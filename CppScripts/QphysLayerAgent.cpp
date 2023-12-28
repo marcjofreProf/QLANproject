@@ -72,7 +72,7 @@ They can also be omitted entirely, yielding int main(), if you do not intend to 
   }
  }
  
- if (argv[1]=="1"){emitQuBit();} // ./QphysLayerAgent 1
+ if ((int)argv[1]==1){emitQuBit();} // ./QphysLayerAgent 1
  else{receiveQuBit();}   
 
  return 0;
