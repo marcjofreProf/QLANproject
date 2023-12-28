@@ -7,4 +7,4 @@
 #include "QtransportLayerAgent.h"
 %}
 
-%include "QtransportLayerAgent.h"
+//%include "QtransportLayerAgent.h" // Instead of including everythin, only include the functions needed

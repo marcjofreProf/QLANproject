@@ -4,7 +4,7 @@
 #####################################################
 
 import os, sys
-pathScriptBelowAgentScript='../CppScripts/'
+pathScriptBelowAgentScript='./../CppScripts/'
 sys.path.append(pathScriptBelowAgentScript)
 
 import QtransportLayerAgent

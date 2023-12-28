@@ -95,24 +95,6 @@ except __builtin__.Exception:
         pass
     _newclass = 0
 
-class QTLA(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, QTLA, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, QTLA, name)
-    __repr__ = _swig_repr
-
-    def __init__(self, numberSessions):
-        this = _QtransportLayerAgent.new_QTLA(numberSessions)
-        try:
-            self.this.append(this)
-        except __builtin__.Exception:
-            self.this = this
-    __swig_destroy__ = _QtransportLayerAgent.delete_QTLA
-    __del__ = lambda self: None
-QTLA_swigregister = _QtransportLayerAgent.QTLA_swigregister
-QTLA_swigregister(QTLA)
-
 # This file is compatible with both classic and new-style classes.
 
 
