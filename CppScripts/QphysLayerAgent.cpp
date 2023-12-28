@@ -58,7 +58,7 @@ argc will be the number of strings pointed to by argv. This will (in practice) b
 The variables are named argc (argument count) and argv (argument vector) by convention, but they can be given any valid identifier: int main(int num_args, char** arg_strings) is equally valid.
 
 They can also be omitted entirely, yielding int main(), if you do not intend to process command line arguments.*/
-
+ /*
  printf( "argc:     %d\n", argc );
  printf( "argv[0]:  %s\n", argv[0] );
  
@@ -71,9 +71,10 @@ They can also be omitted entirely, yielding int main(), if you do not intend to 
    printf( "  %d. %s\n", i, argv[i] );
   }
  }
+ */
  
- if ((int)argv[1]==1){emitQuBit();} // ./QphysLayerAgent 1
- else{receiveQuBit();}   
+ if (argc>=1){emitQuBit();} // ./QphysLayerAgent 1
+ else{receiveQuBit();}   // ./QphysLayerAgent
 
  return 0;
 }
