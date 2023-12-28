@@ -20,9 +20,9 @@ int emitQuBit(){
  outGPIO.setDirection(OUTPUT);
  
  outGPIO.setValue(HIGH);
- usleep(500000); //micro-second sleep 0.5 seconds
+ usleep(500); //micro-second sleep 0.0005 seconds
  outGPIO.setValue(LOW);
- usleep(500000);
+ usleep(500);
   
  /* Not used. Just to know how to do fast writes
  // Fast write to GPIO 1 million times
@@ -53,11 +53,11 @@ int main(int argc, char const * argv[]){
  /* Basically used for testing, since the declarations of the other functions will be used by other Agents as primitives */
  /* argv and argc are how command line arguments are passed to main() in C and C++.
 
-argc will be the number of strings pointed to by argv. This will (in practice) be 1 plus the number of arguments, as virtually all implementations will prepend the name of the program to the array.
+ argc will be the number of strings pointed to by argv. This will (in practice) be 1 plus the number of arguments, as virtually all implementations will prepend the name of the program to the array.
 
-The variables are named argc (argument count) and argv (argument vector) by convention, but they can be given any valid identifier: int main(int num_args, char** arg_strings) is equally valid.
+ The variables are named argc (argument count) and argv (argument vector) by convention, but they can be given any valid identifier: int main(int num_args, char** arg_strings) is equally valid.
 
-They can also be omitted entirely, yielding int main(), if you do not intend to process command line arguments.*/
+ They can also be omitted entirely, yielding int main(), if you do not intend to process command line arguments.*/
  /*
  printf( "argc:     %d\n", argc );
  printf( "argv[0]:  %s\n", argv[0] );
@@ -73,7 +73,7 @@ They can also be omitted entirely, yielding int main(), if you do not intend to 
  }
  */
  
- if (argc>=1){emitQuBit();} // ./QphysLayerAgent 1
+ if (argc>1){emitQuBit();} // ./QphysLayerAgent 1
  else{receiveQuBit();}   // ./QphysLayerAgent
 
  return 0;
