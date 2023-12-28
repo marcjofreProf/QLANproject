@@ -1,7 +1,7 @@
 /* Author: Marc Jofre
 Agent script for Quantum Physical Layer
 */
-
+#include "QphysLayerAgent.h"
 #include<iostream>
 #include<unistd.h> //for usleep
 #include "./BBBhw/GPIO.h"
@@ -13,7 +13,15 @@ using namespace exploringBB; // API to easily use GPIO in c++
 * directory for copyright and GNU GPLv3 license information.*/
 using namespace std;
 
-int emitQuBit(){
+namespace nsQphysLayerAgent {
+
+QPLA::QPLA(int numberLinks, int* EmitLinkNumberArray, int* ReceiveLinkNumberArray) {
+ this->numberLinks = numberLinks; // Number of links directly connected to this physical quantum node
+ this->EmitLinkNumberArray = EmitLinkNumberArray;
+ this->ReceiveLinkNumberArray = ReceiveLinkNumberArray;
+}
+
+int QPLA::emitQuBit(){
  GPIO outGPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
 
  // Basic Output - Generate a pulse of 1 second period
@@ -39,7 +47,7 @@ int emitQuBit(){
  return 0; // return 0 is for no error
 }
 
-int receiveQuBit(){
+int QPLA::receiveQuBit(){
  GPIO inGPIO(48); // Receiving GPIO. Of course gnd have to be connected accordingly.
  
  // Basic Input
@@ -48,6 +56,14 @@ int receiveQuBit(){
   
  return 0; // return 0 is for no error
 }
+
+QPLA::~QPLA() {
+// destructor
+}
+
+} /* namespace nsQphysLayerAgent */
+
+using namespace nsQphysLayerAgent;
 
 int main(int argc, char const * argv[]){
  /* Basically used for testing, since the declarations of the other functions will be used by other Agents as primitives */
@@ -72,10 +88,13 @@ int main(int argc, char const * argv[]){
   }
  }
  */
- 
- if (argc>1){emitQuBit();} // ./QphysLayerAgent 1
- else{receiveQuBit();}   // ./QphysLayerAgent
+ int objectEmitLinkNumberArray[2], objectReceiveLinkNumberArray[2];
+ QPLA objectQPLA(2, objectEmitLinkNumberArray, objectReceiveLinkNumberArray); 
+ if (argc>1){objectQPLA.emitQuBit();} // ./QphysLayerAgent 1
+ else{objectQPLA.receiveQuBit();}   // ./QphysLayerAgent
 
  return 0;
 }
+
+
 
