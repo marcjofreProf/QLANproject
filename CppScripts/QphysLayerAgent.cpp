@@ -33,6 +33,8 @@ int emitQuBit(){
    }
    outGPIO.streamClose();
    */
+   
+ cout << "Qubit emitted" << endl;
  
  return 0; // return 0 is for no error
 }
@@ -57,7 +59,7 @@ The variables are named argc (argument count) and argv (argument vector) by conv
 
 They can also be omitted entirely, yielding int main(), if you do not intend to process command line arguments.*/
  
- if (argv[0]=="1"){emitQuBit();} // ./QphysLayerAgent 1
+ if (argv[1]=="1"){emitQuBit();} // ./QphysLayerAgent 1
  else{receiveQuBit();}
    
 
