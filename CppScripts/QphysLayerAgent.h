@@ -19,7 +19,7 @@ namespace nsQphysLayerAgent {
 // enum GPIO_DIRECTION{ INPUT, OUTPUT };
 
 class QPLA {
-//private:
+private:
 	int numberLinks, *EmitLinkNumberArray, *ReceiveLinkNumberArray;
 
 public:
@@ -29,7 +29,7 @@ public:
 	virtual int emitQuBit();
 	virtual int receiveQuBit();
 
-	virtual ~QPLA();  //destructor will unexport the pin
+	virtual ~QPLA();  //destructor
 
 //private:
 //	int write(string path, string filename, string value);
