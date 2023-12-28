@@ -13,16 +13,6 @@ using namespace exploringBB; // API to easily use GPIO in c++
 * directory for copyright and GNU GPLv3 license information.*/
 using namespace std;
 
-int main(){
-
-   
-   
-
-   
-
- return 0;
-}
-
 int emitQuBit(){
  GPIO outGPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
 
@@ -56,3 +46,21 @@ int receiveQuBit(){
   
  return 0; // return 0 is for no error
 }
+
+int main(int argc, char const * argv[]){
+ /* Basically used for testing, since the declarations of the other functions will be used by other Agents as primitives */
+ /* argv and argc are how command line arguments are passed to main() in C and C++.
+
+argc will be the number of strings pointed to by argv. This will (in practice) be 1 plus the number of arguments, as virtually all implementations will prepend the name of the program to the array.
+
+The variables are named argc (argument count) and argv (argument vector) by convention, but they can be given any valid identifier: int main(int num_args, char** arg_strings) is equally valid.
+
+They can also be omitted entirely, yielding int main(), if you do not intend to process command line arguments.*/
+ 
+ if (argv[0]=="1"){emitQuBit();} // ./QphysLayerAgent 1
+ else{receiveQuBit();}
+   
+
+ return 0;
+}
+
