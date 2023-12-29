@@ -1,29 +1,29 @@
 /* Author: Marc Jofre
-Agent script for Quantum transport Layer
+Agent script for Quantum transport Layer Node
 */
-#include "QtransportLayerAgent.h"
+#include "QtransportLayerAgentN.h"
 #include<iostream>
 #include<unistd.h> //for usleep
 #include "QnetworkLayerAgent.h"
 using namespace std;
 
-namespace nsQtransportLayerAgent {
+namespace nsQtransportLayerAgentN {
 
-QTLA::QTLA(int numberSessions) { // Constructor
+QTLAN::QTLAN(int numberSessions) { // Constructor
  this->numberSessions = numberSessions; // Number of sessions of different services
 }
 
 
-QTLA::~QTLA() {
+QTLAN::~QTLAN() {
 // destructor
 }
 
-} /* namespace nsQnetworkLayerAgent */
+} /* namespace nsQnetworkLayerAgentN */
 
 
 // For testing
 
-using namespace nsQtransportLayerAgent;
+using namespace nsQtransportLayerAgentN;
 
 int main(int argc, char const * argv[]){
  // Basically used for testing, since the declarations of the other functions will be used by other Agents as primitives 

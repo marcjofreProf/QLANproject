@@ -4,7 +4,7 @@
 
 %{
 #define SWIG_FILE_WITH_INIT
-#include "QtransportLayerAgent.h"
+#include "QtransportLayerAgentH.h"
 %}
 
-//%include "QtransportLayerAgent.h" // Instead of including everythin, only include the functions needed
+//%include "QtransportLayerAgentH.h" // Instead of including everythin, only include the functions needed

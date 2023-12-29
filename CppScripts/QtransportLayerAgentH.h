@@ -1,10 +1,10 @@
 /* Author: Marc Jofre
 
-Header declaration file for Quantum transport Layer Agent
+Header declaration file for Quantum transport Layer Agent Host
 
 */
-#ifndef QtransportLayerAgent_H_
-#define QtransportLayerAgent_H_
+#ifndef QtransportLayerAgentH_H_
+#define QtransportLayerAgentH_H_
 
 #include<string>
 #include<fstream>
@@ -13,19 +13,19 @@ using std::ofstream;
 
 // #define GPIO_PATH "/sys/class/gpio/"
 
-namespace nsQtransportLayerAgent {
+namespace nsQtransportLayerAgentH {
 
 // typedef int (*CallbackType)(int);
 // enum GPIO_DIRECTION{ INPUT, OUTPUT };
 
-class QTLA {
+class QTLAH {
 private:
 	int numberSessions;
 
 public:
-	QTLA(int numberSessions); //constructor
+	QTLAH(int numberSessions); //constructor
 	
-	virtual ~QTLA();  //destructor
+	virtual ~QTLAH();  //destructor
 
 //private:
 //	int write(string path, string filename, string value);
@@ -33,6 +33,6 @@ public:
 };
 
 
-} /* namespace nsQtransportLayerAgent */
+} /* namespace nsQtransportLayerAgentH */
 
-#endif /* QtransportLayerAgent_H_ */
+#endif /* QtransportLayerAgentH_H_ */

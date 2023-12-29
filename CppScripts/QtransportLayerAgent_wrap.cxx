@@ -3129,7 +3129,7 @@ namespace swig {
 
 
 #define SWIG_FILE_WITH_INIT
-#include "QtransportLayerAgent.h"
+#include "QtransportLayerAgentH.h"
 
 #ifdef __cplusplus
 extern "C" {
