@@ -71,6 +71,7 @@ int main(int argc, char const * argv[]){
                }
                else{               
 	        QTLANagent.pause(); // Keep paused state
+	        usleep(1000); // Wait 1ms, waiting for other jobs to process
                }
                break;
            }
@@ -83,6 +84,7 @@ int main(int argc, char const * argv[]){
            }
 
         } // switch
+        
     }
    
  return 0; // Everything Ok
