@@ -24,22 +24,25 @@ QTLAN::QTLAN(int numberSessions) { // Constructor
  this->numberSessions = numberSessions; // Number of sessions of different services
 }
 
-int QTLAN::ICPmanagementOpenServerN() {// Node listening for connection from attached host
+int QTLAN::ICPmanagementOpenServer() {// Node listening for connection from attached host
     
     struct sockaddr_in address;
     int opt = 1;
     socklen_t addrlen = sizeof(address);       
  
     // Creating socket file descriptor
+    // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
+    // type: SOCK_STREAM: TCP(reliable, connection oriented)
+    // Protocol value for Internet Protocol(IP), which is 0
     if ((this->serverHN_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("socket failed");
-        //exit(EXIT_FAILURE);
+        exit(0);
     }
  
     // Forcefully attaching socket to the port 8080
     if (setsockopt(this->serverHN_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
         perror("setsockopt");
-        //exit(EXIT_FAILURE);
+        exit(0);
     }
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
@@ -48,21 +51,20 @@ int QTLAN::ICPmanagementOpenServerN() {// Node listening for connection from att
     // Forcefully attaching socket to the port 8080
     if (bind(this->serverHN_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
         perror("bind failed");
-        //exit(EXIT_FAILURE);
+        exit(0);
     }
     if (listen(this->serverHN_fd, 3) < 0) {
         perror("listen");
-        //exit(EXIT_FAILURE);
-    }
+        exit(0);    }
     if ((this->newHN_socket= accept(this->serverHN_fd, (struct sockaddr*)&address,&addrlen))< 0) {
         perror("accept");
-        //exit(EXIT_FAILURE);
+        exit(0);
     }
 
     return 0; // All Ok
 }
 
-int QTLAN::ICPmanagementReadServerN() {
+int QTLAN::ICPmanagementReadServer() {
     ssize_t valread;
     char buffer[1024] = { 0 };
     valread = read(this->newHN_socket, buffer,1024 - 1); // subtract 1 for the null
@@ -72,7 +74,7 @@ int QTLAN::ICPmanagementReadServerN() {
     return 0; // All OK
 }
 
-int QTLAN::ICPmanagementSendServerN() {
+int QTLAN::ICPmanagementSendServer() {
     const char* hello = "Hello from ICP server";
     send(this->newHN_socket, hello, strlen(hello), 0);
     printf("Hello message sent\n");
@@ -80,7 +82,7 @@ int QTLAN::ICPmanagementSendServerN() {
     return 0; // All OK
 }
 
-int QTLAN::ICPmanagementCloseServerN() {
+int QTLAN::ICPmanagementCloseServer() {
     // closing the connected socket
     close(this->newHN_socket);
     // closing the listening socket
@@ -129,7 +131,7 @@ int main(int argc, char const * argv[]){
  // One of the firsts things to do for a node is to initialize ICP socket connection with it host or with its adjacent nodes.
  
  // Then await for next actions
- QTLANagent.pause(); // Initiate in paused state.
+ QTLANagent.m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentN" << endl;
  bool isValidWhileLoop = true;
  
@@ -138,19 +140,16 @@ int main(int argc, char const * argv[]){
            case QTLAN::APPLICATION_RUNNING: {
                
                // Do Some Work
-               QTLANagent.pause(); // After procesing the request, pass to paused state
+               QTLANagent.m_pause(); // After procesing the request, pass to paused state
                break;
            }
            case QTLAN::APPLICATION_PAUSED: {
                // Wait Till You Have Focus Or Continues
                if (true){
-               	QTLANagent.start();
-               }
-               else if (false){
-               	QTLANagent.exit();// Change The Application State to exit
+               	QTLANagent.m_start();
                }
                else{               
-	        QTLANagent.pause(); // Keep paused state
+	        QTLANagent.m_pause(); // Keep paused state
 	        usleep(1000); // Wait 1ms, waiting for other jobs to process
                }
                break;

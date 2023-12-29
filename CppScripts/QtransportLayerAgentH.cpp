@@ -22,7 +22,6 @@ namespace nsQtransportLayerAgentH {
 
 QTLAH::QTLAH(int numberSessions) { // Constructor
  this->numberSessions = numberSessions; // Number of sessions of different services
- 
 }
 
 int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharArray) { // Passing parameters from the upper Agent to initialize the current agent
@@ -41,7 +40,7 @@ int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharAr
 	return 0; //All Ok
 }
 
-int QTLAH::ICPmanagementOpenClientHN() {// Host connecting to the attached node    
+int QTLAH::ICPmanagementOpenClient() {// Host connecting to the attached node    
     int status;
     struct sockaddr_in serv_addr;    
     
@@ -54,7 +53,7 @@ int QTLAH::ICPmanagementOpenClientHN() {// Host connecting to the attached node
     serv_addr.sin_port = htons(PORT);
  
     // Convert IPv4 and IPv6 addresses from text to binary form
-    if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<= 0) {
+    if (inet_pton(AF_INET, this->IPnodeConNet, &serv_addr.sin_addr)<= 0) {
         printf("\nInvalid address/ Address not supported \n");
         return -1;
     }
@@ -67,7 +66,7 @@ int QTLAH::ICPmanagementOpenClientHN() {// Host connecting to the attached node
     return 0; // All Ok
 }
 
-int QTLAH::ICPmanagementReadClientHN() {
+int QTLAH::ICPmanagementReadClient() {
     int valread;
     char buffer[1024] = { 0 };
     valread = read(this->clientHN_fd, buffer, 1024 - 1); // subtract 1 for the null terminator at the end
@@ -76,7 +75,7 @@ int QTLAH::ICPmanagementReadClientHN() {
     return 0; // All OK
 }
 
-int QTLAH::ICPmanagementSendClientHN() {
+int QTLAH::ICPmanagementSendClient() {
     const char* hello = "Hello from ICP client";
     send(this->clientHN_fd, hello, strlen(hello), 0);
     printf("Hello message sent\n");
@@ -84,7 +83,7 @@ int QTLAH::ICPmanagementSendClientHN() {
     return 0; // All OK
 }
 
-int QTLAH::ICPmanagementCloseClientHN() {
+int QTLAH::ICPmanagementCloseClient() {
     // closing the connected socket
     close(this->clientHN_fd);
     
@@ -126,7 +125,6 @@ int main(int argc, char const * argv[]){
  // }
  //}
  
- // One of the first things to do for a Host is to initiate ICP socket connection with its node
  
  
  return 0;
