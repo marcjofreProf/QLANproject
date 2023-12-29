@@ -95,6 +95,27 @@ except __builtin__.Exception:
         pass
     _newclass = 0
 
+class QTLAH(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, QTLAH, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, QTLAH, name)
+    __repr__ = _swig_repr
+
+    def __init__(self, numberSessions):
+        this = _QtransportLayerAgent.new_QTLAH(numberSessions)
+        try:
+            self.this.append(this)
+        except __builtin__.Exception:
+            self.this = this
+
+    def InitAgent(self, ParamsDescendingCharArray, ParamsAscendingCharArray):
+        return _QtransportLayerAgent.QTLAH_InitAgent(self, ParamsDescendingCharArray, ParamsAscendingCharArray)
+    __swig_destroy__ = _QtransportLayerAgent.delete_QTLAH
+    __del__ = lambda self: None
+QTLAH_swigregister = _QtransportLayerAgent.QTLAH_swigregister
+QTLAH_swigregister(QTLAH)
+
 # This file is compatible with both classic and new-style classes.
 
 

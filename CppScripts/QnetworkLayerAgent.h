@@ -25,7 +25,7 @@ private:
 public:
 	QNLA(int numberConnections); //constructor
 	
-	virtual ~QNLA();  //destructor
+	~QNLA();  //destructor
 
 //private:
 //	int write(string path, string filename, string value);

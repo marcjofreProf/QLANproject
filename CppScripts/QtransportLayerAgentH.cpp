@@ -4,6 +4,17 @@ Agent script for Quantum transport Layer Host
 #include "QtransportLayerAgentH.h"
 #include<iostream>
 #include<unistd.h> //for usleep
+// InterCommunication Protocols - Sockets - Common to Server and Client
+#include <stdio.h>
+#include <string.h>
+#include <sys/socket.h>
+#define PORT 8080
+// InterCommunicaton Protocols - Sockets - Server
+#include <netinet/in.h>
+#include <stdlib.h>
+// InterCommunicaton Protocols - Sockets - Client
+#include <arpa/inet.h>
+
 
 using namespace std;
 
@@ -11,6 +22,73 @@ namespace nsQtransportLayerAgentH {
 
 QTLAH::QTLAH(int numberSessions) { // Constructor
  this->numberSessions = numberSessions; // Number of sessions of different services
+ 
+}
+
+int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharArray) { // Passing parameters from the upper Agent to initialize the current agent
+ 	//cout << "The value of the input is: "<< ParamsDescendingCharArray << endl;
+ 	// Parse the ParamsDescendingCharArray
+ 	this->IPhostConNet=strtok(ParamsDescendingCharArray,",");
+	this->IPhostOpNet=strtok(NULL,",");//Null indicates we are using the same pointer as the last strtok
+	this->IPnodeConNet=strtok(NULL,",");
+	this->IPnodeOpNet=strtok(NULL,",");
+	
+	//cout << "IPhostConNet: "<< this->IPhostConNet << endl;
+	//cout << "IPhostOpNet: "<< this->IPhostOpNet << endl;
+	//cout << "IPnodeConNet: "<< this->IPnodeConNet << endl;
+	//cout << "IPnodeOpNet: "<< this->IPnodeOpNet << endl;
+	
+	return 0; //All Ok
+}
+
+int QTLAH::ICPmanagementOpenClientHN() {// Host connecting to the attached node    
+    int status;
+    struct sockaddr_in serv_addr;    
+    
+    if ((this->clientHN_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        printf("\n Socket creation error \n");
+        return -1;
+    }
+ 
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(PORT);
+ 
+    // Convert IPv4 and IPv6 addresses from text to binary form
+    if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<= 0) {
+        printf("\nInvalid address/ Address not supported \n");
+        return -1;
+    }
+ 
+    if ((status= connect(this->clientHN_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr)))< 0) {
+        printf("\nConnection Failed \n");
+        return -1;
+    }
+
+    return 0; // All Ok
+}
+
+int QTLAH::ICPmanagementReadClientHN() {
+    int valread;
+    char buffer[1024] = { 0 };
+    valread = read(this->clientHN_fd, buffer, 1024 - 1); // subtract 1 for the null terminator at the end
+    printf("%s\n", buffer);
+    
+    return 0; // All OK
+}
+
+int QTLAH::ICPmanagementSendClientHN() {
+    const char* hello = "Hello from ICP client";
+    send(this->clientHN_fd, hello, strlen(hello), 0);
+    printf("Hello message sent\n");
+    
+    return 0; // All OK
+}
+
+int QTLAH::ICPmanagementCloseClientHN() {
+    // closing the connected socket
+    close(this->clientHN_fd);
+    
+    return 0; // All OK
 }
 
 
@@ -47,6 +125,9 @@ int main(int argc, char const * argv[]){
  //  printf( "  %d. %s\n", i, argv[i] );
  // }
  //}
+ 
+ // One of the first things to do for a Host is to initiate ICP socket connection with its node
+ 
  
  return 0;
 }

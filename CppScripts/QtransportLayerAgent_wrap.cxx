@@ -3022,8 +3022,9 @@ SWIG_Python_NonDynamicSetAttr(PyObject *obj, PyObject *name, PyObject *value) {
 /* -------- TYPES TABLE (BEGIN) -------- */
 
 #define SWIGTYPE_p_char swig_types[0]
-static swig_type_info *swig_types[2];
-static swig_module_info swig_module = {swig_types, 1, 0, 0, 0, 0};
+#define SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH swig_types[1]
+static swig_type_info *swig_types[3];
+static swig_module_info swig_module = {swig_types, 2, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3131,11 +3132,398 @@ namespace swig {
 #define SWIG_FILE_WITH_INIT
 #include "QtransportLayerAgentH.h"
 
+
+#include <limits.h>
+#if !defined(SWIG_NO_LLONG_MAX)
+# if !defined(LLONG_MAX) && defined(__GNUC__) && defined (__LONG_LONG_MAX__)
+#   define LLONG_MAX __LONG_LONG_MAX__
+#   define LLONG_MIN (-LLONG_MAX - 1LL)
+#   define ULLONG_MAX (LLONG_MAX * 2ULL + 1ULL)
+# endif
+#endif
+
+
+SWIGINTERN int
+SWIG_AsVal_double (PyObject *obj, double *val)
+{
+  int res = SWIG_TypeError;
+  if (PyFloat_Check(obj)) {
+    if (val) *val = PyFloat_AsDouble(obj);
+    return SWIG_OK;
+#if PY_VERSION_HEX < 0x03000000
+  } else if (PyInt_Check(obj)) {
+    if (val) *val = (double) PyInt_AsLong(obj);
+    return SWIG_OK;
+#endif
+  } else if (PyLong_Check(obj)) {
+    double v = PyLong_AsDouble(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      PyErr_Clear();
+    }
+  }
+#ifdef SWIG_PYTHON_CAST_MODE
+  {
+    int dispatch = 0;
+    double d = PyFloat_AsDouble(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = d;
+      return SWIG_AddCast(SWIG_OK);
+    } else {
+      PyErr_Clear();
+    }
+    if (!dispatch) {
+      long v = PyLong_AsLong(obj);
+      if (!PyErr_Occurred()) {
+	if (val) *val = v;
+	return SWIG_AddCast(SWIG_AddCast(SWIG_OK));
+      } else {
+	PyErr_Clear();
+      }
+    }
+  }
+#endif
+  return res;
+}
+
+
+#include <float.h>
+
+
+#include <math.h>
+
+
+SWIGINTERNINLINE int
+SWIG_CanCastAsInteger(double *d, double min, double max) {
+  double x = *d;
+  if ((min <= x && x <= max)) {
+   double fx = floor(x);
+   double cx = ceil(x);
+   double rd =  ((x - fx) < 0.5) ? fx : cx; /* simple rint */
+   if ((errno == EDOM) || (errno == ERANGE)) {
+     errno = 0;
+   } else {
+     double summ, reps, diff;
+     if (rd < x) {
+       diff = x - rd;
+     } else if (rd > x) {
+       diff = rd - x;
+     } else {
+       return 1;
+     }
+     summ = rd + x;
+     reps = diff/summ;
+     if (reps < 8*DBL_EPSILON) {
+       *d = rd;
+       return 1;
+     }
+   }
+  }
+  return 0;
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_long (PyObject *obj, long* val)
+{
+#if PY_VERSION_HEX < 0x03000000
+  if (PyInt_Check(obj)) {
+    if (val) *val = PyInt_AsLong(obj);
+    return SWIG_OK;
+  } else
+#endif
+  if (PyLong_Check(obj)) {
+    long v = PyLong_AsLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      PyErr_Clear();
+      return SWIG_OverflowError;
+    }
+  }
+#ifdef SWIG_PYTHON_CAST_MODE
+  {
+    int dispatch = 0;
+    long v = PyInt_AsLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_AddCast(SWIG_OK);
+    } else {
+      PyErr_Clear();
+    }
+    if (!dispatch) {
+      double d;
+      int res = SWIG_AddCast(SWIG_AsVal_double (obj,&d));
+      if (SWIG_IsOK(res) && SWIG_CanCastAsInteger(&d, LONG_MIN, LONG_MAX)) {
+	if (val) *val = (long)(d);
+	return res;
+      }
+    }
+  }
+#endif
+  return SWIG_TypeError;
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_int (PyObject * obj, int *val)
+{
+  long v;
+  int res = SWIG_AsVal_long (obj, &v);
+  if (SWIG_IsOK(res)) {
+    if ((v < INT_MIN || v > INT_MAX)) {
+      return SWIG_OverflowError;
+    } else {
+      if (val) *val = static_cast< int >(v);
+    }
+  }  
+  return res;
+}
+
+
+SWIGINTERN swig_type_info*
+SWIG_pchar_descriptor(void)
+{
+  static int init = 0;
+  static swig_type_info* info = 0;
+  if (!init) {
+    info = SWIG_TypeQuery("_p_char");
+    init = 1;
+  }
+  return info;
+}
+
+
+SWIGINTERN int
+SWIG_AsCharPtrAndSize(PyObject *obj, char** cptr, size_t* psize, int *alloc)
+{
+#if PY_VERSION_HEX>=0x03000000
+#if defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
+  if (PyBytes_Check(obj))
+#else
+  if (PyUnicode_Check(obj))
+#endif
+#else  
+  if (PyString_Check(obj))
+#endif
+  {
+    char *cstr; Py_ssize_t len;
+#if PY_VERSION_HEX>=0x03000000
+#if !defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
+    if (!alloc && cptr) {
+        /* We can't allow converting without allocation, since the internal
+           representation of string in Python 3 is UCS-2/UCS-4 but we require
+           a UTF-8 representation.
+           TODO(bhy) More detailed explanation */
+        return SWIG_RuntimeError;
+    }
+    obj = PyUnicode_AsUTF8String(obj);
+    if(alloc) *alloc = SWIG_NEWOBJ;
+#endif
+    PyBytes_AsStringAndSize(obj, &cstr, &len);
+#else
+    PyString_AsStringAndSize(obj, &cstr, &len);
+#endif
+    if (cptr) {
+      if (alloc) {
+	/* 
+	   In python the user should not be able to modify the inner
+	   string representation. To warranty that, if you define
+	   SWIG_PYTHON_SAFE_CSTRINGS, a new/copy of the python string
+	   buffer is always returned.
+
+	   The default behavior is just to return the pointer value,
+	   so, be careful.
+	*/ 
+#if defined(SWIG_PYTHON_SAFE_CSTRINGS)
+	if (*alloc != SWIG_OLDOBJ) 
+#else
+	if (*alloc == SWIG_NEWOBJ) 
+#endif
+	{
+	  *cptr = reinterpret_cast< char* >(memcpy(new char[len + 1], cstr, sizeof(char)*(len + 1)));
+	  *alloc = SWIG_NEWOBJ;
+	} else {
+	  *cptr = cstr;
+	  *alloc = SWIG_OLDOBJ;
+	}
+      } else {
+#if PY_VERSION_HEX>=0x03000000
+#if defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
+	*cptr = PyBytes_AsString(obj);
+#else
+	assert(0); /* Should never reach here with Unicode strings in Python 3 */
+#endif
+#else
+	*cptr = SWIG_Python_str_AsChar(obj);
+#endif
+      }
+    }
+    if (psize) *psize = len + 1;
+#if PY_VERSION_HEX>=0x03000000 && !defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
+    Py_XDECREF(obj);
+#endif
+    return SWIG_OK;
+  } else {
+#if defined(SWIG_PYTHON_2_UNICODE)
+#if defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
+#error "Cannot use both SWIG_PYTHON_2_UNICODE and SWIG_PYTHON_STRICT_BYTE_CHAR at once"
+#endif
+#if PY_VERSION_HEX<0x03000000
+    if (PyUnicode_Check(obj)) {
+      char *cstr; Py_ssize_t len;
+      if (!alloc && cptr) {
+        return SWIG_RuntimeError;
+      }
+      obj = PyUnicode_AsUTF8String(obj);
+      if (PyString_AsStringAndSize(obj, &cstr, &len) != -1) {
+        if (cptr) {
+          if (alloc) *alloc = SWIG_NEWOBJ;
+          *cptr = reinterpret_cast< char* >(memcpy(new char[len + 1], cstr, sizeof(char)*(len + 1)));
+        }
+        if (psize) *psize = len + 1;
+
+        Py_XDECREF(obj);
+        return SWIG_OK;
+      } else {
+        Py_XDECREF(obj);
+      }
+    }
+#endif
+#endif
+
+    swig_type_info* pchar_descriptor = SWIG_pchar_descriptor();
+    if (pchar_descriptor) {
+      void* vptr = 0;
+      if (SWIG_ConvertPtr(obj, &vptr, pchar_descriptor, 0) == SWIG_OK) {
+	if (cptr) *cptr = (char *) vptr;
+	if (psize) *psize = vptr ? (strlen((char *)vptr) + 1) : 0;
+	if (alloc) *alloc = SWIG_OLDOBJ;
+	return SWIG_OK;
+      }
+    }
+  }
+  return SWIG_TypeError;
+}
+
+
+
+
+
+SWIGINTERNINLINE PyObject*
+  SWIG_From_int  (int value)
+{
+  return PyInt_FromLong((long) value);
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+SWIGINTERN PyObject *_wrap_new_QTLAH(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int arg1 ;
+  int val1 ;
+  int ecode1 = 0 ;
+  PyObject * obj0 = 0 ;
+  nsQtransportLayerAgentH::QTLAH *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:new_QTLAH",&obj0)) SWIG_fail;
+  ecode1 = SWIG_AsVal_int(obj0, &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_QTLAH" "', argument " "1"" of type '" "int""'");
+  } 
+  arg1 = static_cast< int >(val1);
+  result = (nsQtransportLayerAgentH::QTLAH *)new nsQtransportLayerAgentH::QTLAH(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_QTLAH_InitAgent(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:QTLAH_InitAgent",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_InitAgent" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
+  }
+  arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "QTLAH_InitAgent" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "QTLAH_InitAgent" "', argument " "3"" of type '" "char *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  result = (int)(arg1)->InitAgent(arg2,arg3);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_QTLAH(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:delete_QTLAH",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_QTLAH" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
+  }
+  arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *QTLAH_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_ParseTuple(args,(char *)"O:swigregister", &obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
 static PyMethodDef SwigMethods[] = {
 	 { "SWIG_PyInstanceMethod_New", SWIG_PyInstanceMethod_New, METH_O, NULL},
+	 { "new_QTLAH", _wrap_new_QTLAH, METH_VARARGS, NULL},
+	 { "QTLAH_InitAgent", _wrap_QTLAH_InitAgent, METH_VARARGS, NULL},
+	 { "delete_QTLAH", _wrap_delete_QTLAH, METH_VARARGS, NULL},
+	 { "QTLAH_swigregister", QTLAH_swigregister, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
 };
 
@@ -3143,15 +3531,19 @@ static PyMethodDef SwigMethods[] = {
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_nsQtransportLayerAgentH__QTLAH = {"_p_nsQtransportLayerAgentH__QTLAH", "nsQtransportLayerAgentH::QTLAH *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_char,
+  &_swigt__p_nsQtransportLayerAgentH__QTLAH,
 };
 
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_nsQtransportLayerAgentH__QTLAH[] = {  {&_swigt__p_nsQtransportLayerAgentH__QTLAH, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_char,
+  _swigc__p_nsQtransportLayerAgentH__QTLAH,
 };
 
 

@@ -8,3 +8,7 @@ pathScriptBelowAgentScript='./../CppScripts/'
 sys.path.append(pathScriptBelowAgentScript)
 
 import QtransportLayerAgent
+
+def InitAgent(ParamsDescendingCharArray,ParamsAscendingCharArray):# Initialize this Agent and below Agent
+	QTLAGagent = QtransportLayerAgent.QTLAH(0) # Initialize and instance
+	QTLAGagent.InitAgent(ParamsDescendingCharArray,ParamsAscendingCharArray) # Initialize below Agent

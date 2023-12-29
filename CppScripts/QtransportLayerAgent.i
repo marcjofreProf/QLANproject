@@ -7,4 +7,6 @@
 #include "QtransportLayerAgentH.h"
 %}
 
-//%include "QtransportLayerAgentH.h" // Instead of including everythin, only include the functions needed
+%include "QtransportLayerAgentH.h" // Instead of including everything, only include the functions needed
+using namespace nsQtransportLayerAgentH;
+//int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharArray);

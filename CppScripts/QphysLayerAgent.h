@@ -26,10 +26,9 @@ public:
 	QPLA(int numberLinks, int* EmitLinkNumberArray, int* ReceiveLinkNumberArray); //constructor
 
 	// General Input and Output functions
-	virtual int emitQuBit();
-	virtual int receiveQuBit();
-
-	virtual ~QPLA();  //destructor
+	int emitQuBit();
+	int receiveQuBit();
+	~QPLA();  //destructor
 
 //private:
 //	int write(string path, string filename, string value);

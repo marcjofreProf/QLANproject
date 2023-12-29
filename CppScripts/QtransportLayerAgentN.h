@@ -19,23 +19,24 @@ namespace nsQtransportLayerAgentN {
 // enum GPIO_DIRECTION{ INPUT, OUTPUT };
 
 class QTLAN {
-public:
+public: // Variables/Objects
 	enum ApplicationState {
 		APPLICATION_RUNNING = 0,
 		APPLICATION_PAUSED = 1,  // Out of Focus or Paused If In A Timed Situation
 		APPLICATION_EXIT = -1,
 	    };
 
-private:
+private: // Variables/Objects
 	int numberSessions;
 	// Member Variables Such As Window Handle, Time Etc.,
 	ApplicationState m_state;
+	int serverHN_fd, newHN_socket; // server and socket from node to attached host
 	
-public:
+public: // Functions
 	QTLAN(int numberSessions); //constructor
 	// virtual ~Application(); // Default Okay - Use Virtual If Using Inheritance
-        ApplicationState getState() const { return m_state; }
-
+	// Managing status of this Agent
+        ApplicationState getState() const { return m_state; }	
         bool start() { m_state = APPLICATION_RUNNING; return true; }
         bool pause() { m_state = APPLICATION_PAUSED; return true; } 
         // resume may keep track of time if the application uses a timer.
@@ -45,10 +46,17 @@ public:
         // time for your timer or counter. 
         bool resume() { m_state = APPLICATION_RUNNING; return true; }      
         bool exit() { m_state = APPLICATION_EXIT;  return false; }
-	virtual ~QTLAN();  //destructor
+        
+	~QTLAN();  //destructor
 
-//private:
-//	int write(string path, string filename, string value);
+private: // Functions
+	// Managing ICP connections with sockets
+	// Typically the Node will act as server to the upper host. If the node is in between, then it will act as server of the origin client node. Net 192.168.X.X or Net 10.0.0.X
+	// With nodes in between hosts, the origin node will also act as client to the next node acting as server. Net 10.0.0.X	
+	int ICPmanagementOpenServerN();
+	int ICPmanagementReadServerN();
+	int ICPmanagementSendServerN();
+	int ICPmanagementCloseServerN();
 //	friend void* threadedPoll(void *value);
 };
 

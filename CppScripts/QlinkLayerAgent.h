@@ -25,7 +25,7 @@ private:
 public:
 	QLLA(int numberHops); //constructor
 	
-	virtual ~QLLA();  //destructor
+	~QLLA();  //destructor
 
 //private:
 //	int write(string path, string filename, string value);
