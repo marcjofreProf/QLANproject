@@ -27,24 +27,43 @@ QTLAH::QTLAH(int numberSessions) { // Constructor
 int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharArray) { // Passing parameters from the upper Agent to initialize the current agent
  	//cout << "The value of the input is: "<< ParamsDescendingCharArray << endl;
  	// Parse the ParamsDescendingCharArray
- 	this->IPhostConNet=strtok(ParamsDescendingCharArray,",");
-	this->IPhostOpNet=strtok(NULL,",");//Null indicates we are using the same pointer as the last strtok
-	this->IPnodeConNet=strtok(NULL,",");
-	this->IPnodeOpNet=strtok(NULL,",");
+ 	strcpy(this->IPaddressesSockets[0],strtok(ParamsDescendingCharArray,","));
+	strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
+	this->SCmode=strtok(NULL,","); // to know if this host instance is client or server
 	
-	//cout << "IPhostConNet: "<< this->IPhostConNet << endl;
-	//cout << "IPhostOpNet: "<< this->IPhostOpNet << endl;
-	//cout << "IPnodeConNet: "<< this->IPnodeConNet << endl;
-	//cout << "IPnodeOpNet: "<< this->IPnodeOpNet << endl;
+	//cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
+	//cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
+	//cout << "IPaddressesSockets[2]: "<< this->IPaddressesSockets[2] << endl;
+	//cout << "IPaddressesSockets[3]: "<< this->IPaddressesSockets[3] << endl;
+	
+	// One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
+	 // This agent applies to hosts. So, regarding sockets, different situations apply
+	 // Host is a client initiating the service, so:
+	 //	- host will be client to its own node
+	 //	- host will be client to another host (for classical communication exchange)
+	 //	- initiate the instance by QapplicationServerLayer.ipynb, and use IPattachedNodeConfiguration IPserverHostOperation
+	 // Host is server listening for service provision, so:	
+	 //	- host will be server to attached node
+	 //	- host will be server to client host
+	 //	- initiate the instance by QapplicationClientLayer.ipynb, and will be connected by IPattachedNodeConfiguration and IPclientHostOperation
+	 // since the paradigm is always to establish first node connections and then hosts connections, apparently there are no conflics confusing how is connecting to or from.
+	
+	if (this->SCmode=="client"){
+		this->ICPmanagementOpenClient(this->socket_fdArray[0],IPaddressesSockets[0]); // Connect as client to own node
+		this->ICPmanagementOpenClient(this->socket_fdArray[1],IPaddressesSockets[1]); // Connect as client to destination host
+	}
+	else{// server
+	}
+	
 	
 	return 0; //All Ok
 }
 
-int QTLAH::ICPmanagementOpenClient() {// Host connecting to the attached node    
+int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets) {
     int status;
     struct sockaddr_in serv_addr;    
     
-    if ((this->clientHN_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         printf("\n Socket creation error \n");
         return -1;
     }
@@ -53,39 +72,49 @@ int QTLAH::ICPmanagementOpenClient() {// Host connecting to the attached node
     serv_addr.sin_port = htons(PORT);
  
     // Convert IPv4 and IPv6 addresses from text to binary form
-    if (inet_pton(AF_INET, this->IPnodeConNet, &serv_addr.sin_addr)<= 0) {
+    if (inet_pton(AF_INET, IPaddressesSockets, &serv_addr.sin_addr)<= 0) {
         printf("\nInvalid address/ Address not supported \n");
         return -1;
     }
  
-    if ((status= connect(this->clientHN_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr)))< 0) {
+    if ((status= connect(socket_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr)))< 0) {
         printf("\nConnection Failed \n");
         return -1;
     }
-
     return 0; // All Ok
+
 }
 
-int QTLAH::ICPmanagementRead() {
+int QTLAH::ICPmanagementRead(int socket_fd) {
     int valread;
     char buffer[1024] = { 0 };
-    valread = read(this->clientHN_fd, buffer, 1024 - 1); // subtract 1 for the null terminator at the end
+    valread = read(socket_fd, buffer, 1024 - 1); // subtract 1 for the null terminator at the end
     printf("%s\n", buffer);
-    
+
     return 0; // All OK
 }
 
-int QTLAH::ICPmanagementSend() {
+int QTLAH::ICPmanagementSend(int new_socket) {
     const char* hello = "Hello from ICP client";
-    send(this->clientHN_fd, hello, strlen(hello), 0);
+    send(new_socket, hello, strlen(hello), 0);
     printf("Hello message sent\n");
     
     return 0; // All OK
+
 }
 
-int QTLAH::ICPmanagementCloseClient() {
+int QTLAH::ICPmanagementCloseClient(int socket_fd) {
     // closing the connected socket
-    close(this->clientHN_fd);
+    close(socket_fd);
+ 
+    return 0; // All OK
+}
+
+int QTLAH::ICPmanagementCloseServer(int socket_fd,int new_socket) {
+    // closing the connected socket
+    close(new_socket);
+    // closing the listening socket
+    close(socket_fd);
     
     return 0; // All OK
 }

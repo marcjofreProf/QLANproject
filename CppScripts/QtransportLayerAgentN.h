@@ -30,9 +30,9 @@ private: // Variables/Objects
 	int numberSessions;
 	// Member Variables Such As Window Handle, Time Etc.,
 	ApplicationState m_state;	
-	 
-	int socket_fdArray; // socket descriptor, an integer (like a file-handle)
-	int new_socketArray; // socket between client and server
+	char IPaddressesSockets[2][15]; // IP address of the client/server host/node in the control/operation networks
+	int socket_fdArray[2]; // socket descriptor, an integer (like a file-handle)
+	int new_socketArray[2]; // socket between client and server. Created by the server
 	
 public: // Functions
 	QTLAN(int numberSessions); //constructor
@@ -55,14 +55,14 @@ private: // Functions
 	// Managing ICP connections with sockets
 	// Typically the Node will act as server to the upper host. If the node is in between, then it will act as server of the origin client node. Net 192.168.X.X or Net 10.0.0.X
 	// With nodes in between hosts, the origin node will also act as client to the next node acting as server. Net 10.0.0.X	
-	int ICPmanagementOpenClient(); // Open ICP socket // host will act as client to the attached node. Net 192.168.X.X
-	int ICPmanagementCloseClient(); // Close ICP socket // host will act as client to the attached node. Net 192.168.X.X
+	int ICPmanagementOpenClient(); // Open ICP socket 
+	int ICPmanagementCloseClient(); // Close ICP socket 
 	// As server
 	int ICPmanagementOpenServer();
-	int ICPmanagementCloseServer();
+	int ICPmanagementCloseServer(int socket_fd,int new_socket);
 	// As server or cleint
-	int ICPmanagementRead();
-	int ICPmanagementSend();
+	int ICPmanagementRead(int socket_fd);
+	int ICPmanagementSend(int new_socket);
 //	friend void* threadedPoll(void *value);
 };
 

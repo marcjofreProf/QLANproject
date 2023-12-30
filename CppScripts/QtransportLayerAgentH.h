@@ -21,12 +21,10 @@ namespace nsQtransportLayerAgentH {
 class QTLAH {
 private: // Variables/Objects
 	int numberSessions;
-	char* IPhostConNet; // IP address of the client/server host in the control/configuration network
-	char* IPhostOpNet; // IP address of the client/server host in the operation network
-	char* IPnodeConNet; // IP address of the client/server node (connected to the client host) in the control/configuration network
-	char* IPnodeOpNet; // IP address of the client/server node in the operation network
-	int socket_fdArray; // socket descriptor, an integer (like a file-handle)
-	int new_socketArray; // socket between client and server, an integer. Created by the server.
+	char IPaddressesSockets[2][15]; // IP address of the client/server host/node in the control/operation networks
+	char* SCmode; // Variable to know if the host instance is working as server or client
+	int socket_fdArray[2]; // socket descriptor, an integer (like a file-handle)
+	int new_socketArray[2]; // socket between client and server, an integer. Created by the server.
 
 public: // Functions
 	QTLAH(int numberSessions); //constructor
@@ -35,14 +33,14 @@ public: // Functions
 
 private: //Functions
         // Management functions as client
-	int ICPmanagementOpenClient(); // Open ICP socket 
-	int ICPmanagementCloseClient(); // Close ICP socket
+	int ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets); // Open ICP socket 
+	int ICPmanagementCloseClient(int socket_fd); // Close ICP socket
 	// As server
 	int ICPmanagementOpenServer();
-	int ICPmanagementCloseServer();
+	int ICPmanagementCloseServer(int socket_fd,int new_socket);
 	// As server or client
-	int ICPmanagementRead(); // Read ICP socket
-	int ICPmanagementSend(); // Send ICP socket 
+	int ICPmanagementRead(int socket_fd); // Read ICP socket
+	int ICPmanagementSend(int new_socket); // Send ICP socket 
 //	friend void* threadedPoll(void *value);
 };
 

@@ -64,29 +64,29 @@ int QTLAN::ICPmanagementOpenServer() {// Node listening for connection from atta
     return 0; // All Ok
 }
 
-int QTLAN::ICPmanagementRead() {
+int QTLAN::ICPmanagementRead(int socket_fd) {
     ssize_t valread;
     char buffer[1024] = { 0 };
-    valread = read(this->newHN_socket, buffer,1024 - 1); // subtract 1 for the null
+    valread = read(socket_fd, buffer,1024 - 1); // subtract 1 for the null
     // terminator at the end
     printf("%s\n", buffer);
     
     return 0; // All OK
 }
 
-int QTLAN::ICPmanagementSend() {
+int QTLAN::ICPmanagementSend(int new_socket) {
     const char* hello = "Hello from ICP server";
-    send(this->newHN_socket, hello, strlen(hello), 0);
+    send(new_socket, hello, strlen(hello), 0);
     printf("Hello message sent\n");
     
     return 0; // All OK
 }
 
-int QTLAN::ICPmanagementCloseServer() {
+int QTLAN::ICPmanagementCloseServer(int socket_fd,) {
     // closing the connected socket
     close(this->newHN_socket);
     // closing the listening socket
-    close(this->serverHN_fd);
+    close(socket_fd);
     
     return 0; // All OK
 }
@@ -126,10 +126,24 @@ int main(int argc, char const * argv[]){
  // }
  //}
  
- QTLAN QTLANagent(0); // Initiate the instance with 0 sessions connected.
+ 
+ QTLAN QTLANagent(0); // Initiate the instance with 0 sessions connected. A session is composed of two sockets descriptors active.
  
  // One of the firsts things to do for a node is to initialize ICP socket connection with it host or with its adjacent nodes.
- 
+ // This agent applies to nodes. So, regarding sockets, different situations apply
+ // Node is from a client host initiating the service, so:
+ //	- node will be server to its own host
+ //	- node will be client to another node
+ //	- initiate the instance by ./QtransportLayerAgentN IPnextNodeOperation
+ // Node is from a server host listening for service provision, so:	
+ //	- node will be server to another node
+ //	- node will be client to its own host
+ //	- initiate the instance by ./QtransportLayerAgentN IPupperHostConfiguration
+ // Node is an intermediate node, so:
+ //	- node will be server to the origin node
+ //	- node will be client to the destination node
+ //	- initiate the instance by ./QtransportLayerAgentN IPnextNodeOperation
+ // since the paradigm is always to establish first server connection and then client connection, apparently there are no conflics confusing how is connecting to or from.
  // Then await for next actions
  QTLANagent.m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentN" << endl;
