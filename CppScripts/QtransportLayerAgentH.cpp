@@ -66,7 +66,7 @@ int QTLAH::ICPmanagementOpenClient() {// Host connecting to the attached node
     return 0; // All Ok
 }
 
-int QTLAH::ICPmanagementReadClient() {
+int QTLAH::ICPmanagementRead() {
     int valread;
     char buffer[1024] = { 0 };
     valread = read(this->clientHN_fd, buffer, 1024 - 1); // subtract 1 for the null terminator at the end
@@ -75,7 +75,7 @@ int QTLAH::ICPmanagementReadClient() {
     return 0; // All OK
 }
 
-int QTLAH::ICPmanagementSendClient() {
+int QTLAH::ICPmanagementSend() {
     const char* hello = "Hello from ICP client";
     send(this->clientHN_fd, hello, strlen(hello), 0);
     printf("Hello message sent\n");

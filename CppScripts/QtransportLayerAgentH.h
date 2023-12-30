@@ -25,24 +25,24 @@ private: // Variables/Objects
 	char* IPhostOpNet; // IP address of the client/server host in the operation network
 	char* IPnodeConNet; // IP address of the client/server node (connected to the client host) in the control/configuration network
 	char* IPnodeOpNet; // IP address of the client/server node in the operation network
-	int clientHN_fd; // socket descriptor, an integer (like a file-handle)
+	int socket_fdArray; // socket descriptor, an integer (like a file-handle)
+	int new_socketArray; // socket between client and server, an integer. Created by the server.
 
 public: // Functions
 	QTLAH(int numberSessions); //constructor
-	int InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharArray); // Passign parameters from the upper Agent to initialize the current agent
+	int InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharArray); // Passing parameters from the upper Agent to initialize the current agent
 	~QTLAH();  //destructor
 
 private: //Functions
         // Management functions as client
-	int ICPmanagementOpenClient(); // Open ICP socket // host will act as client to the attached node. Net 192.168.X.X
-	int ICPmanagementReadClient(); // Read ICP socket // host will act as client to the attached node. Net 192.168.X.X
-	int ICPmanagementSendClient(); // Send ICP socket // host will act as client to the attached node. Net 192.168.X.X
-	int ICPmanagementCloseClient(); // Close ICP socket // host will act as client to the attached node. Net 192.168.X.X
+	int ICPmanagementOpenClient(); // Open ICP socket 
+	int ICPmanagementCloseClient(); // Close ICP socket
 	// As server
 	int ICPmanagementOpenServer();
-	int ICPmanagementReadServer();
-	int ICPmanagementSendServer();
 	int ICPmanagementCloseServer();
+	// As server or client
+	int ICPmanagementRead(); // Read ICP socket
+	int ICPmanagementSend(); // Send ICP socket 
 //	friend void* threadedPoll(void *value);
 };
 

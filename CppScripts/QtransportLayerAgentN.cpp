@@ -64,7 +64,7 @@ int QTLAN::ICPmanagementOpenServer() {// Node listening for connection from atta
     return 0; // All Ok
 }
 
-int QTLAN::ICPmanagementReadServer() {
+int QTLAN::ICPmanagementRead() {
     ssize_t valread;
     char buffer[1024] = { 0 };
     valread = read(this->newHN_socket, buffer,1024 - 1); // subtract 1 for the null
@@ -74,7 +74,7 @@ int QTLAN::ICPmanagementReadServer() {
     return 0; // All OK
 }
 
-int QTLAN::ICPmanagementSendServer() {
+int QTLAN::ICPmanagementSend() {
     const char* hello = "Hello from ICP server";
     send(this->newHN_socket, hello, strlen(hello), 0);
     printf("Hello message sent\n");
