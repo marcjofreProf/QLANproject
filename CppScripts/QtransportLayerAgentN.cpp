@@ -92,19 +92,16 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket) {// Node list
 }
 
 int QTLAN::ICPmanagementRead(int socket_fd) {
-    ssize_t valread;
-    char buffer[1024] = { 0 };
-    valread = read(socket_fd, buffer,1024 - 1); // subtract 1 for the null
+    int valread = read(socket_fd, this->ReadBuffer,1024 - 1); // subtract 1 for the null
     // terminator at the end
-    printf("%s\n", buffer);
+    //cout << "Node message received: " << this->ReadBuffer << endl;
     
-    return 0; // All OK
+    return valread; 
 }
 
 int QTLAN::ICPmanagementSend(int new_socket) {
-    const char* hello = "Hello from ICP server";
-    send(new_socket, hello, strlen(hello), 0);
-    printf("Hello message sent\n");
+    const char* SendBufferAux = this->SendBuffer;
+    send(new_socket, SendBufferAux, strlen(SendBufferAux), 0);
     
     return 0; // All OK
 }
@@ -166,6 +163,47 @@ int QTLAN::StopICPconnections(int argc){
 	return 0; // All OK
 }
 
+int QTLAN::ICPConnectionsCheckNewMessages(){
+  int socket_fd=this->socket_fdArray[0]; // To be improved if several sockets
+  // Check for new messages
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(socket_fd, &fds);
+
+  // Set the timeout to 1 second
+  struct timeval timeout;
+  // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
+  timeout.tv_sec = 1;
+  timeout.tv_usec = 0;
+  
+  int nfds = socket_fd + 1;
+  int ret = select(nfds, &fds, NULL, NULL, &timeout);
+
+  if (ret < 0) {
+    cout << "Node error select to check new messages" << endl;
+    this->m_exit();
+    return -1;
+  } else if (ret == 0) {
+    //cout << "Node agent no new messages" << endl;
+    return 0; // All OK;
+  } else {
+    // There is at least one new message
+    if (FD_ISSET(socket_fd, &fds)) {
+      // Read the message from the socket
+      int n = this->ICPmanagementRead(socket_fd);
+      if (n < 0) {
+        cout << "Node error reading new messages" << endl;
+	this->m_exit();
+	return -1;
+      }
+
+      // Process the message
+      cout << "Received message: " << this->ReadBuffer;
+    }
+  }
+  return 0; // All OK
+}
+
 QTLAN::~QTLAN() {
 // destructor
 	this->StopICPconnections(this->ParamArgc);
@@ -214,6 +252,8 @@ int main(int argc, char const * argv[]){
  bool isValidWhileLoop = true;
  
  while(isValidWhileLoop){
+ 	// Check if there are need messages or actions to be done by the node
+ 	QTLANagent.ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
        switch(QTLANagent.getState()) {
            case QTLAN::APPLICATION_RUNNING: {
                
@@ -228,7 +268,6 @@ int main(int argc, char const * argv[]){
                }
                else{               
 	        QTLANagent.m_pause(); // Keep paused state
-	        usleep(1000); // Wait 1ms, waiting for other jobs to process
                }
                break;
            }

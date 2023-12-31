@@ -3133,6 +3133,13 @@ namespace swig {
 #include "QtransportLayerAgentH.h"
 
 
+SWIGINTERNINLINE PyObject*
+  SWIG_From_int  (int value)
+{
+  return PyInt_FromLong((long) value);
+}
+
+
 #include <limits.h>
 #if !defined(SWIG_NO_LLONG_MAX)
 # if !defined(LLONG_MAX) && defined(__GNUC__) && defined (__LONG_LONG_MAX__)
@@ -3285,9 +3292,9 @@ SWIG_AsVal_int (PyObject * obj, int *val)
 
 
 SWIGINTERNINLINE PyObject*
-  SWIG_From_int  (int value)
+  SWIG_From_bool  (bool value)
 {
-  return PyInt_FromLong((long) value);
+  return PyBool_FromLong(value ? 1 : 0);
 }
 
 
@@ -3496,6 +3503,116 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_QTLAH_getState(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  nsQtransportLayerAgentH::QTLAH::ApplicationState result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:QTLAH_getState",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_getState" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH const *""'"); 
+  }
+  arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
+  result = (nsQtransportLayerAgentH::QTLAH::ApplicationState)((nsQtransportLayerAgentH::QTLAH const *)arg1)->getState();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_QTLAH_m_start(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:QTLAH_m_start",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_m_start" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
+  }
+  arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
+  result = (bool)(arg1)->m_start();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_QTLAH_m_pause(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:QTLAH_m_pause",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_m_pause" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
+  }
+  arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
+  result = (bool)(arg1)->m_pause();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_QTLAH_m_resume(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:QTLAH_m_resume",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_m_resume" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
+  }
+  arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
+  result = (bool)(arg1)->m_resume();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_QTLAH_m_exit(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:QTLAH_m_exit",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_m_exit" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
+  }
+  arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
+  result = (bool)(arg1)->m_exit();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_QTLAH_InitAgent(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
@@ -3542,6 +3659,40 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_QTLAH_SendMessageAgent(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:QTLAH_SendMessageAgent",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_SendMessageAgent" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
+  }
+  arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "QTLAH_SendMessageAgent" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (int)(arg1)->SendMessageAgent(arg2);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_QTLAH(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
@@ -3575,7 +3726,13 @@ static PyMethodDef SwigMethods[] = {
 	 { "QTLAH_numberSessions_set", _wrap_QTLAH_numberSessions_set, METH_VARARGS, NULL},
 	 { "QTLAH_numberSessions_get", _wrap_QTLAH_numberSessions_get, METH_VARARGS, NULL},
 	 { "new_QTLAH", _wrap_new_QTLAH, METH_VARARGS, NULL},
+	 { "QTLAH_getState", _wrap_QTLAH_getState, METH_VARARGS, NULL},
+	 { "QTLAH_m_start", _wrap_QTLAH_m_start, METH_VARARGS, NULL},
+	 { "QTLAH_m_pause", _wrap_QTLAH_m_pause, METH_VARARGS, NULL},
+	 { "QTLAH_m_resume", _wrap_QTLAH_m_resume, METH_VARARGS, NULL},
+	 { "QTLAH_m_exit", _wrap_QTLAH_m_exit, METH_VARARGS, NULL},
 	 { "QTLAH_InitAgent", _wrap_QTLAH_InitAgent, METH_VARARGS, NULL},
+	 { "QTLAH_SendMessageAgent", _wrap_QTLAH_SendMessageAgent, METH_VARARGS, NULL},
 	 { "delete_QTLAH", _wrap_delete_QTLAH, METH_VARARGS, NULL},
 	 { "QTLAH_swigregister", QTLAH_swigregister, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
@@ -4288,6 +4445,9 @@ SWIG_init(void) {
   
   SWIG_InstallConstants(d,swig_const_table);
   
+  SWIG_Python_SetConstant(d, "QTLAH_APPLICATION_RUNNING",SWIG_From_int(static_cast< int >(nsQtransportLayerAgentH::QTLAH::APPLICATION_RUNNING)));
+  SWIG_Python_SetConstant(d, "QTLAH_APPLICATION_PAUSED",SWIG_From_int(static_cast< int >(nsQtransportLayerAgentH::QTLAH::APPLICATION_PAUSED)));
+  SWIG_Python_SetConstant(d, "QTLAH_APPLICATION_EXIT",SWIG_From_int(static_cast< int >(nsQtransportLayerAgentH::QTLAH::APPLICATION_EXIT)));
 #if PY_VERSION_HEX >= 0x03000000
   return m;
 #else

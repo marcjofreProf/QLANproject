@@ -14,7 +14,8 @@ Agent script for Quantum transport Layer Host
 #include <stdlib.h>
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
-
+// Threading
+#include <pthread.h>
 
 using namespace std;
 
@@ -40,7 +41,18 @@ int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharAr
 	// One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
 	this->InitiateICPconnections();	 	
 	
+	// Then, regularly check for next job/action without blocking		  
+	  int ret = pthread_create(&threadFunc, NULL, QTLAH::AgentProcessStaticEntryPoint, NULL);
+	  //if (ret) {
+	    // Handle the error
+	  //} 
 	return 0; //All Ok
+}
+
+void* QTLAH::AgentProcessStaticEntryPoint(void* c)
+{
+    ((QTLAH*) c)->AgentProcessRequestsPetitions();
+    return NULL;
 }
 
 int QTLAH::InitiateICPconnections() {
@@ -155,21 +167,18 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket) {// Node list
 }
 
 int QTLAH::ICPmanagementRead(int socket_fd) {
-    int valread;
-    char buffer[1024] = { 0 };
-    valread = read(socket_fd, buffer, 1024 - 1); // subtract 1 for the null terminator at the end
-    printf("%s\n", buffer);
-
-    return 0; // All OK
+    int valread = read(socket_fd, this->ReadBuffer,1024 - 1); // subtract 1 for the null
+    // terminator at the end
+    //cout << "Node message received: " << this->ReadBuffer << endl;
+    
+    return valread; 
 }
 
 int QTLAH::ICPmanagementSend(int new_socket) {
-    const char* hello = "Hello from ICP client";
-    send(new_socket, hello, strlen(hello), 0);
-    printf("Hello message sent\n");
+    const char* SendBufferAux = this->SendBuffer;
+    send(new_socket, SendBufferAux, strlen(SendBufferAux), 0);
     
     return 0; // All OK
-
 }
 
 int QTLAH::ICPmanagementCloseClient(int socket_fd) {
@@ -188,10 +197,111 @@ int QTLAH::ICPmanagementCloseServer(int socket_fd,int new_socket) {
     return 0; // All OK
 }
 
+int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
+    // Parse the message information
+    strcpy(this->SendBuffer,strtok(ParamsDescendingCharArray,","));
+    char* IPaddressesSockets;
+    strcpy(IPaddressesSockets,strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
+    // Understand which socket descriptor has to be used
+    int new_socket;
+    //string(IPaddressesSockets)
+    this->ICPmanagementSend(new_socket);
+    return 0; //All OK
+}
+
+void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
+ this->m_pause(); // Initiate in paused state.
+ cout << "Starting in pause state the QtransportLayerAgentH" << endl;
+ bool isValidWhileLoop = true;
+ 
+ while(isValidWhileLoop){
+ 	// Check if there are need messages or actions to be done by the node
+ 	this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
+ 	// Check for cancellation
+	  if (pthread_cancel(pthread_self())) {
+	    // Handle the cancellation
+	  }
+       switch(this->getState()) {
+           case QTLAH::APPLICATION_RUNNING: {
+               
+               // Do Some Work
+               this->m_pause(); // After procesing the request, pass to paused state
+               break;
+           }
+           case QTLAH::APPLICATION_PAUSED: {
+               // Wait Till You Have Focus Or Continues
+               if (this->numberSessions>0 and true){
+               	this->m_start();
+               }
+               else{               
+	        this->m_pause(); // Keep paused state
+               }
+               break;
+           }
+           case QTLAH::APPLICATION_EXIT: {    
+               cout << "Exiting the QtransportLayerAgentH" << endl;
+               isValidWhileLoop=false;//break;
+           }
+           default: {
+               // ErrorHandling Throw An Exception Etc.
+           }
+
+        } // switch
+        
+    }
+}
+
+int QTLAH::ICPConnectionsCheckNewMessages(){
+  int socket_fd=this->socket_fdArray[0]; // To be improved if several sockets
+  // Check for new messages
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(socket_fd, &fds);
+
+  // Set the timeout to 1 second
+  struct timeval timeout;
+  // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
+  timeout.tv_sec = 1;
+  timeout.tv_usec = 0;
+  
+  int nfds = socket_fd + 1;
+  int ret = select(nfds, &fds, NULL, NULL, &timeout);
+
+  if (ret < 0) {
+    cout << "Node error select to check new messages" << endl;
+    this->m_exit();
+    return -1;
+  } else if (ret == 0) {
+    //cout << "Node agent no new messages" << endl;
+    return 0; // All OK;
+  } else {
+    // There is at least one new message
+    if (FD_ISSET(socket_fd, &fds)) {
+      // Read the message from the socket
+      int n = this->ICPmanagementRead(socket_fd);
+      if (n < 0) {
+        cout << "Node error reading new messages" << endl;
+	this->m_exit();
+	return -1;
+      }
+
+      // Process the message
+      cout << "Received message: " << this->ReadBuffer;
+    }
+  }
+  return 0; // All OK
+}
 
 QTLAH::~QTLAH() {
 	// destructor
 	this->StopICPconnections();
+	// Terminate the process thread
+	pthread_cancel(pthread_self());
+	// Wait for the thread to finish
+	  int ret = pthread_join(this->threadFunc, NULL);
+	  if (ret) {
+	    // Handle the error
+	  }
 }
 
 } /* namespace nsQnetworkLayerAgentH */

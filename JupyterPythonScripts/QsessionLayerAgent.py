@@ -15,4 +15,7 @@ class QSLA:
  
 	def InitAgent(self,ParamsDescendingCharArray,ParamsAscendingCharArray):# Initialize
 		self.QTLAagent.InitAgent(ParamsDescendingCharArray,ParamsAscendingCharArray) # Initialize below Agent
+	
+	def SendMessageAgent(self,ParamsDescendingCharArray): # Send message to the below Agent
+		self.QTLAagent.SendMessageAgent(ParamsDescendingCharArray)
 

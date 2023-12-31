@@ -101,6 +101,9 @@ class QTLAH(_object):
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, QTLAH, name)
     __repr__ = _swig_repr
+    APPLICATION_RUNNING = _QtransportLayerAgent.QTLAH_APPLICATION_RUNNING
+    APPLICATION_PAUSED = _QtransportLayerAgent.QTLAH_APPLICATION_PAUSED
+    APPLICATION_EXIT = _QtransportLayerAgent.QTLAH_APPLICATION_EXIT
     __swig_setmethods__["numberSessions"] = _QtransportLayerAgent.QTLAH_numberSessions_set
     __swig_getmethods__["numberSessions"] = _QtransportLayerAgent.QTLAH_numberSessions_get
     if _newclass:
@@ -113,8 +116,26 @@ class QTLAH(_object):
         except __builtin__.Exception:
             self.this = this
 
+    def getState(self):
+        return _QtransportLayerAgent.QTLAH_getState(self)
+
+    def m_start(self):
+        return _QtransportLayerAgent.QTLAH_m_start(self)
+
+    def m_pause(self):
+        return _QtransportLayerAgent.QTLAH_m_pause(self)
+
+    def m_resume(self):
+        return _QtransportLayerAgent.QTLAH_m_resume(self)
+
+    def m_exit(self):
+        return _QtransportLayerAgent.QTLAH_m_exit(self)
+
     def InitAgent(self, ParamsDescendingCharArray, ParamsAscendingCharArray):
         return _QtransportLayerAgent.QTLAH_InitAgent(self, ParamsDescendingCharArray, ParamsAscendingCharArray)
+
+    def SendMessageAgent(self, ParamsDescendingCharArray):
+        return _QtransportLayerAgent.QTLAH_SendMessageAgent(self, ParamsDescendingCharArray)
     __swig_destroy__ = _QtransportLayerAgent.delete_QTLAH
     __del__ = lambda self: None
 QTLAH_swigregister = _QtransportLayerAgent.QTLAH_swigregister

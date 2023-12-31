@@ -34,6 +34,8 @@ private: // Variables/Objects
 	char IPaddressesSockets[2][15]; // IP address of the client/server host/node in the control/operation networks
 	int socket_fdArray[2]; // socket descriptor, an integer (like a file-handle)
 	int new_socketArray[2]; // socket between client and server. Created by the server
+	char ReadBuffer[1024] = { 0 };// Buffer to read ICP messages
+	char SendBuffer[1024] = { 0 };// Buffer to send ICP messages
 	
 public: // Functions
 	QTLAN(int numberSessions); //constructor
@@ -51,6 +53,7 @@ public: // Functions
         bool m_exit() { m_state = APPLICATION_EXIT;  return false; }
         int InitiateICPconnections(int argc); // Initiating sockets
         int StopICPconnections(int argc); // Closing sockets
+        int ICPConnectionsCheckNewMessages(); // Check for new messages
 	~QTLAN();  //destructor
 
 private: // Functions
