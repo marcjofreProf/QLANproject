@@ -144,7 +144,8 @@ int QTLAN::InitiateICPconnections(int argc){
 
 	//QTLANagent.ICPmanagementOpenClient(QTLANagent.socket_fdArray[1],char* IPaddressesSockets)
 	}
-	if (RetValue==-1){this->m_pause();}; // Exit application
+	if (RetValue==-1){this->m_pause();} // Exit application
+	else{this->numberSessions=1;} // Update indicators
 	
 	return 0; // All OK
 }
@@ -159,6 +160,8 @@ int QTLAN::StopICPconnections(int argc){
 	}
 	// then stop the server socket
 	this->ICPmanagementCloseServer(this->socket_fdArray[0],this->new_socketArray[0]);
+	// Update indicators
+	this->numberSessions=0;
 	return 0; // All OK
 }
 
@@ -219,7 +222,7 @@ int main(int argc, char const * argv[]){
            }
            case QTLAN::APPLICATION_PAUSED: {
                // Wait Till You Have Focus Or Continues
-               if (true){
+               if (QTLANagent.numberSessions>0 and true){
                	QTLANagent.m_start();
                }
                else{               

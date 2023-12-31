@@ -101,6 +101,10 @@ class QTLAH(_object):
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, QTLAH, name)
     __repr__ = _swig_repr
+    __swig_setmethods__["numberSessions"] = _QtransportLayerAgent.QTLAH_numberSessions_set
+    __swig_getmethods__["numberSessions"] = _QtransportLayerAgent.QTLAH_numberSessions_get
+    if _newclass:
+        numberSessions = _swig_property(_QtransportLayerAgent.QTLAH_numberSessions_get, _QtransportLayerAgent.QTLAH_numberSessions_set)
 
     def __init__(self, numberSessions):
         this = _QtransportLayerAgent.new_QTLAH(numberSessions)

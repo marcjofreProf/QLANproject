@@ -19,8 +19,9 @@ namespace nsQtransportLayerAgentH {
 // enum GPIO_DIRECTION{ INPUT, OUTPUT };
 
 class QTLAH {
-private: // Variables/Objects
-	int numberSessions;
+public: // Variables/Objects
+	int numberSessions=0;
+private: // Variables/Objects	
 	char IPaddressesSockets[2][15]; // IP address of the client/server host/node in the control/operation networks
 	char* SCmode; // Variable to know if the host instance is working as server or client
 	int socket_fdArray[2]; // socket descriptor, an integer (like a file-handle)

@@ -55,21 +55,32 @@ int QTLAH::InitiateICPconnections() {
 	 // since the paradigm is always to establish first node connections and then hosts connections, apparently there are no conflics confusing how is connecting to or from.
 	
 	// First connect ot the attached node
-	this->ICPmanagementOpenClient(this->socket_fdArray[0],IPaddressesSockets[0]); // Connect as client to own node
-	if (this->SCmode=="client"){
-		
-		//this->ICPmanagementOpenClient(this->socket_fdArray[1],IPaddressesSockets[1]); // Connect as client to destination host
+	this->ICPmanagementOpenClient(this->socket_fdArray[0],this->IPaddressesSockets[0]); // Connect as client to own node
+	// Then either connect to the server host (acting as client) or open server listening (acting as server)
+	if (this->SCmode=="client"){		
+		this->ICPmanagementOpenClient(this->socket_fdArray[1],this->IPaddressesSockets[1]); // Connect as client to destination host
 	}
 	else{// server
+		this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1]); // Open port as listen as server
 	}
+	this->numberSessions=1;
 	return 0; // All OK
 }
 
 int QTLAH::StopICPconnections() {
 	// First stop client or server host connection
+	if (this->SCmode=="client"){ // client
+		ICPmanagementCloseClient(this->socket_fdArray[1]);
+	}
+	else{// server
+		ICPmanagementCloseServer(this->socket_fdArray[1],this->new_socketArray[1]);
+	}
 	
 	// then stop client connection to attached node
 	ICPmanagementCloseClient(this->socket_fdArray[0]);
+	
+	// Update indicators
+	this->numberSessions=0;
 	return 0; // All OK
 }
 

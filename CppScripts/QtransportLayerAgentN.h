@@ -26,9 +26,9 @@ public: // Variables/Objects
 		APPLICATION_EXIT = -1,
 	    };
 	int ParamArgc=0; // Number of passed parameters
+	int numberSessions=0;
 
-private: // Variables/Objects
-	int numberSessions;
+private: // Variables/Objects	
 	// Member Variables Such As Window Handle, Time Etc.,
 	ApplicationState m_state;	
 	char IPaddressesSockets[2][15]; // IP address of the client/server host/node in the control/operation networks
