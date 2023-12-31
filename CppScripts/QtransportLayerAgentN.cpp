@@ -164,6 +164,7 @@ int QTLAN::StopICPconnections(int argc){
 
 QTLAN::~QTLAN() {
 // destructor
+	this->StopICPconnections(this->ParamArgc);
 }
 
 } /* namespace nsQnetworkLayerAgentN */
@@ -198,9 +199,10 @@ int main(int argc, char const * argv[]){
  
  
  QTLAN QTLANagent(0); // Initiate the instance with 0 sessions connected. A session is composed of one server sockets descriptor active.
- 
+ // Save some given parameters to the instance of the object
+ QTLANagent.ParamArgc=argc;
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
- QTLANagent.InitiateICPconnections(argc);
+ QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
    
  // Then await for next actions
  QTLANagent.m_pause(); // Initiate in paused state.
@@ -228,7 +230,7 @@ int main(int argc, char const * argv[]){
            }
            case QTLAN::APPLICATION_EXIT: {    
                cout << "Exiting the QtransportLayerAgentN" << endl;
-               QTLANagent.StopICPconnections(argc);
+               QTLANagent.StopICPconnections(QTLANagent.ParamArgc);
                isValidWhileLoop=false;//break;
            }
            default: {

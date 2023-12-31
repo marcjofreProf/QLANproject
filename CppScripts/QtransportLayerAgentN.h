@@ -25,6 +25,7 @@ public: // Variables/Objects
 		APPLICATION_PAUSED = 1,  // Out of Focus or Paused If In A Timed Situation
 		APPLICATION_EXIT = -1,
 	    };
+	int ParamArgc=0; // Number of passed parameters
 
 private: // Variables/Objects
 	int numberSessions;
