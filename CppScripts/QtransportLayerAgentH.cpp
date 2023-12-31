@@ -35,7 +35,7 @@ int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharAr
 	//cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
 	//cout << "IPaddressesSockets[2]: "<< this->IPaddressesSockets[2] << endl;
 	//cout << "IPaddressesSockets[3]: "<< this->IPaddressesSockets[3] << endl;
-	cout << "SCmode: "<< this->SCmode << endl;
+	//cout << "SCmode: "<< this->SCmode << endl;
 	
 	// One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
 	this->InitiateICPconnections();	 	
@@ -58,10 +58,12 @@ int QTLAH::InitiateICPconnections() {
 	// First connect ot the attached node
 	this->ICPmanagementOpenClient(this->socket_fdArray[0],this->IPaddressesSockets[0]); // Connect as client to own node
 	// Then either connect to the server host (acting as client) or open server listening (acting as server)
-	if (strcmp(this->SCmode,"client")){		
+	if (string(this->SCmode)=="client"){
+		//cout << "Check - Generating connection as client" << endl;	
 		this->ICPmanagementOpenClient(this->socket_fdArray[1],this->IPaddressesSockets[1]); // Connect as client to destination host
 	}
 	else{// server
+		//cout << "Check - Generating connection as server" << endl;
 		this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1]); // Open port as listen as server
 	}
 	this->numberSessions=1;
@@ -70,7 +72,7 @@ int QTLAH::InitiateICPconnections() {
 
 int QTLAH::StopICPconnections() {
 	// First stop client or server host connection
-	if (strcmp(this->SCmode,"client")){ // client
+	if (string(this->SCmode)=="client"){ // client
 		ICPmanagementCloseClient(this->socket_fdArray[1]);
 	}
 	else{// server
