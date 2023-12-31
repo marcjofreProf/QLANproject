@@ -35,6 +35,7 @@ int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharAr
 	//cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
 	//cout << "IPaddressesSockets[2]: "<< this->IPaddressesSockets[2] << endl;
 	//cout << "IPaddressesSockets[3]: "<< this->IPaddressesSockets[3] << endl;
+	cout << "SCmode: "<< this->SCmode << endl;
 	
 	// One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
 	this->InitiateICPconnections();	 	
@@ -57,7 +58,7 @@ int QTLAH::InitiateICPconnections() {
 	// First connect ot the attached node
 	this->ICPmanagementOpenClient(this->socket_fdArray[0],this->IPaddressesSockets[0]); // Connect as client to own node
 	// Then either connect to the server host (acting as client) or open server listening (acting as server)
-	if (this->SCmode=="client"){		
+	if (strcmp(this->SCmode,"client")){		
 		this->ICPmanagementOpenClient(this->socket_fdArray[1],this->IPaddressesSockets[1]); // Connect as client to destination host
 	}
 	else{// server
@@ -69,7 +70,7 @@ int QTLAH::InitiateICPconnections() {
 
 int QTLAH::StopICPconnections() {
 	// First stop client or server host connection
-	if (this->SCmode=="client"){ // client
+	if (strcmp(this->SCmode,"client")){ // client
 		ICPmanagementCloseClient(this->socket_fdArray[1]);
 	}
 	else{// server
@@ -89,7 +90,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets) {
     struct sockaddr_in serv_addr;    
     
     if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        printf("\n Socket creation error \n");
+        cout << "Client Socket creation error" << endl;
         return -1;
     }
  
@@ -98,15 +99,15 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets) {
  
     // Convert IPv4 and IPv6 addresses from text to binary form
     if (inet_pton(AF_INET, IPaddressesSockets, &serv_addr.sin_addr)<= 0) {
-        printf("\nInvalid address/ Address not supported \n");
+        cout << "Invalid address / Address not supported" << endl;
         return -1;
     }
  
     if ((status= connect(socket_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr)))< 0) {
-        printf("\nConnection Failed \n");
+        cout << "Client Connection Failed" << endl;
         return -1;
     }
-    cout << "Host connected socket to attached server node" << endl;
+    cout << "Client connected to: "<< IPaddressesSockets << endl;
     return 0; // All Ok
 }
 
@@ -121,32 +122,33 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket) {// Node list
     // type: SOCK_STREAM: TCP(reliable, connection oriented)
     // Protocol value for Internet Protocol(IP), which is 0
     if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("socket failed");
-        exit(0);
+        cout << "Server socket failed" << endl;
+        return -1;
     }
  
-    // Forcefully attaching socket to the port 8080
+    // Forcefully attaching socket to the port
     if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
-        perror("setsockopt");
-        exit(0);
+        cout << "Server attaching socket to port failed" << endl;
+        return -1;
     }
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(PORT);
  
-    // Forcefully attaching socket to the port 8080
+    // Forcefully attaching socket to the port
     if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
-        perror("bind failed");
-        exit(0);
+        cout << "Server socket bind failed" << endl;
+        return -1;
     }
     if (listen(socket_fd, 3) < 0) {
-        perror("listen");
-        exit(0);    }
-    if ((new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen))< 0) {
-        perror("accept");
-        exit(0);
+        cout << "Server socket listen failed" << endl;
+        return -1;
     }
-
+    if ((new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen))< 0) {
+        cout << "Server socket accept failed" << endl;
+        return -1;
+    }
+    cout << "Node starting socket server listening to host/node" << endl;
     return 0; // All Ok
 }
 

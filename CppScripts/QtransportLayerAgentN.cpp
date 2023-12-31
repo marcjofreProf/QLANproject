@@ -29,7 +29,7 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets) {
     struct sockaddr_in serv_addr;    
     
     if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        printf("\n Socket creation error \n");
+        cout << "Client Socket creation error" << endl;
         return -1;
     }
  
@@ -38,14 +38,15 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets) {
  
     // Convert IPv4 and IPv6 addresses from text to binary form
     if (inet_pton(AF_INET, IPaddressesSockets, &serv_addr.sin_addr)<= 0) {
-        printf("\nInvalid address/ Address not supported \n");
+        cout << "Invalid address / Address not supported" << endl;
         return -1;
     }
  
     if ((status= connect(socket_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr)))< 0) {
-        printf("\nConnection Failed \n");
+        cout << "Client Connection Failed" << endl;
         return -1;
     }
+    cout << "Client connected to: "<< IPaddressesSockets << endl;
     return 0; // All Ok
 }
 
