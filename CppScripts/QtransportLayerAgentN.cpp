@@ -24,7 +24,32 @@ QTLAN::QTLAN(int numberSessions) { // Constructor
  this->numberSessions = numberSessions; // Number of sessions of different services
 }
 
-int QTLAN::ICPmanagementOpenServer() {// Node listening for connection from attached host
+int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets) {
+    int status;
+    struct sockaddr_in serv_addr;    
+    
+    if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        printf("\n Socket creation error \n");
+        return -1;
+    }
+ 
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(PORT);
+ 
+    // Convert IPv4 and IPv6 addresses from text to binary form
+    if (inet_pton(AF_INET, IPaddressesSockets, &serv_addr.sin_addr)<= 0) {
+        printf("\nInvalid address/ Address not supported \n");
+        return -1;
+    }
+ 
+    if ((status= connect(socket_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr)))< 0) {
+        printf("\nConnection Failed \n");
+        return -1;
+    }
+    return 0; // All Ok
+}
+
+int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket) {// Node listening for connection from attached host
     
     struct sockaddr_in address;
     int opt = 1;
@@ -34,13 +59,13 @@ int QTLAN::ICPmanagementOpenServer() {// Node listening for connection from atta
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
     // type: SOCK_STREAM: TCP(reliable, connection oriented)
     // Protocol value for Internet Protocol(IP), which is 0
-    if ((this->serverHN_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("socket failed");
         exit(0);
     }
  
     // Forcefully attaching socket to the port 8080
-    if (setsockopt(this->serverHN_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
+    if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
         perror("setsockopt");
         exit(0);
     }
@@ -49,18 +74,18 @@ int QTLAN::ICPmanagementOpenServer() {// Node listening for connection from atta
     address.sin_port = htons(PORT);
  
     // Forcefully attaching socket to the port 8080
-    if (bind(this->serverHN_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
+    if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
         perror("bind failed");
         exit(0);
     }
-    if (listen(this->serverHN_fd, 3) < 0) {
+    if (listen(socket_fd, 3) < 0) {
         perror("listen");
         exit(0);    }
-    if ((this->newHN_socket= accept(this->serverHN_fd, (struct sockaddr*)&address,&addrlen))< 0) {
+    if ((new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen))< 0) {
         perror("accept");
         exit(0);
     }
-
+    cout << "Node starting socket server listening host" << endl;
     return 0; // All Ok
 }
 
@@ -82,15 +107,56 @@ int QTLAN::ICPmanagementSend(int new_socket) {
     return 0; // All OK
 }
 
-int QTLAN::ICPmanagementCloseServer(int socket_fd,) {
+int QTLAN::ICPmanagementCloseClient(int socket_fd) {
     // closing the connected socket
-    close(this->newHN_socket);
+    close(socket_fd);
+ 
+    return 0; // All OK
+}
+
+int QTLAN::ICPmanagementCloseServer(int socket_fd,int new_socket) {
+    // closing the connected socket
+    close(new_socket);
     // closing the listening socket
     close(socket_fd);
     
     return 0; // All OK
 }
 
+int QTLAN::InitiateICPconnections(int argc){
+	// This agent applies to nodes. So, regarding sockets, different situations apply
+	// Node is from a host initiating the service, so:
+	//	- node will be server to its own host
+	//	- initiate the instance by ./QtransportLayerAgentN
+	// Node is an intermediate node, so:
+	//	- node will be server to the origin node
+	//	- node will be client to the destination node
+	//	- initiate the instance by ./QtransportLayerAgentN IPnextNodeOperation
+	// since the paradigm is always to establish first server connection and then, evenually, client connection, apparently there are no conflics confusing how is connecting to or from. 
+
+	// First, opening server listening socket 
+	this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0]);
+	// Eventually, if it is an intermediate node
+	if (argc > 1){ // Establish client connection with next node
+	// First parse the parama passed IP address
+
+	//QTLANagent.ICPmanagementOpenClient(QTLANagent.socket_fdArray[1],char* IPaddressesSockets)
+	}
+	return 0; // All OK
+}
+
+int QTLAN::StopICPconnections(int argc){
+	// First, eventually close the client socket	
+	// Eventually, if it is an intermediate node
+	if (argc > 1){ // Establish client connection with next node
+	// First parse the parama passed IP address
+
+	//QTLANagent.ICPmanagementCloseClient(QTLANagent.socket_fdArray[1],char* IPaddressesSockets)
+	}
+	// then stop the server socket
+	this->ICPmanagementCloseServer(this->socket_fdArray[0],this->new_socketArray[0]);
+	return 0; // All OK
+}
 
 QTLAN::~QTLAN() {
 // destructor
@@ -127,23 +193,11 @@ int main(int argc, char const * argv[]){
  //}
  
  
- QTLAN QTLANagent(0); // Initiate the instance with 0 sessions connected. A session is composed of two sockets descriptors active.
+ QTLAN QTLANagent(0); // Initiate the instance with 0 sessions connected. A session is composed of one server sockets descriptor active.
  
- // One of the firsts things to do for a node is to initialize ICP socket connection with it host or with its adjacent nodes.
- // This agent applies to nodes. So, regarding sockets, different situations apply
- // Node is from a client host initiating the service, so:
- //	- node will be server to its own host
- //	- node will be client to another node
- //	- initiate the instance by ./QtransportLayerAgentN IPnextNodeOperation
- // Node is from a server host listening for service provision, so:	
- //	- node will be server to another node
- //	- node will be client to its own host
- //	- initiate the instance by ./QtransportLayerAgentN IPupperHostConfiguration
- // Node is an intermediate node, so:
- //	- node will be server to the origin node
- //	- node will be client to the destination node
- //	- initiate the instance by ./QtransportLayerAgentN IPnextNodeOperation
- // since the paradigm is always to establish first server connection and then client connection, apparently there are no conflics confusing how is connecting to or from.
+ // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
+ QTLANagent.InitiateICPconnections(argc);
+   
  // Then await for next actions
  QTLANagent.m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentN" << endl;
@@ -170,6 +224,7 @@ int main(int argc, char const * argv[]){
            }
            case QTLAN::APPLICATION_EXIT: {    
                cout << "Exiting the QtransportLayerAgentN" << endl;
+               QTLANagent.StopICPconnections(argc);
                isValidWhileLoop=false;//break;
            }
            default: {

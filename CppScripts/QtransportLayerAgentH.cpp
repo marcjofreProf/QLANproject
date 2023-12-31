@@ -43,18 +43,17 @@ int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharAr
 	 //	- host will be client to another host (for classical communication exchange)
 	 //	- initiate the instance by QapplicationServerLayer.ipynb, and use IPattachedNodeConfiguration IPserverHostOperation
 	 // Host is server listening for service provision, so:	
-	 //	- host will be server to attached node
+	 //	- host will be client to attached node
 	 //	- host will be server to client host
-	 //	- initiate the instance by QapplicationClientLayer.ipynb, and will be connected by IPattachedNodeConfiguration and IPclientHostOperation
+	 //	- initiate the instance by QapplicationClientLayer.ipynb, and use IPattachedNodeConfiguration
 	 // since the paradigm is always to establish first node connections and then hosts connections, apparently there are no conflics confusing how is connecting to or from.
 	
 	if (this->SCmode=="client"){
 		this->ICPmanagementOpenClient(this->socket_fdArray[0],IPaddressesSockets[0]); // Connect as client to own node
-		this->ICPmanagementOpenClient(this->socket_fdArray[1],IPaddressesSockets[1]); // Connect as client to destination host
+		//this->ICPmanagementOpenClient(this->socket_fdArray[1],IPaddressesSockets[1]); // Connect as client to destination host
 	}
 	else{// server
-	}
-	
+	}	
 	
 	return 0; //All Ok
 }
@@ -81,8 +80,48 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets) {
         printf("\nConnection Failed \n");
         return -1;
     }
+    cout << "Host connected socket to attached server node" << endl;
     return 0; // All Ok
+}
 
+int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket) {// Node listening for connection from attached host
+    
+    struct sockaddr_in address;
+    int opt = 1;
+    socklen_t addrlen = sizeof(address);       
+ 
+    // Creating socket file descriptor
+    // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
+    // type: SOCK_STREAM: TCP(reliable, connection oriented)
+    // Protocol value for Internet Protocol(IP), which is 0
+    if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror("socket failed");
+        exit(0);
+    }
+ 
+    // Forcefully attaching socket to the port 8080
+    if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
+        perror("setsockopt");
+        exit(0);
+    }
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(PORT);
+ 
+    // Forcefully attaching socket to the port 8080
+    if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
+        perror("bind failed");
+        exit(0);
+    }
+    if (listen(socket_fd, 3) < 0) {
+        perror("listen");
+        exit(0);    }
+    if ((new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen))< 0) {
+        perror("accept");
+        exit(0);
+    }
+
+    return 0; // All Ok
 }
 
 int QTLAH::ICPmanagementRead(int socket_fd) {
