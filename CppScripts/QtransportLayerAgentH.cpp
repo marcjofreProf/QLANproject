@@ -8,7 +8,7 @@ Agent script for Quantum transport Layer Host
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
-#define PORT 8020 // Host servers listen to port 8020
+#define PORT 8010
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
