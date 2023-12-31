@@ -3131,6 +3131,7 @@ namespace swig {
 
 #define SWIG_FILE_WITH_INIT
 #include "QtransportLayerAgentH.h"
+#include <pthread.h>
 
 
 SWIGINTERNINLINE PyObject*

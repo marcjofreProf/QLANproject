@@ -5,8 +5,8 @@
 %{
 #define SWIG_FILE_WITH_INIT
 #include "QtransportLayerAgentH.h"
+#include <pthread.h>
 %}
 
-%include "QtransportLayerAgentH.h" // Instead of including everything, only include the functions needed
+%include "QtransportLayerAgentH.h"
 using namespace nsQtransportLayerAgentH;
-//int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharArray);
