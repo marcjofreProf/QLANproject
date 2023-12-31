@@ -8,7 +8,7 @@ Agent script for Quantum transport Layer Host
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
-#define PORT 8080
+#define PORT 8020 // Host servers listen to port 8020
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -37,7 +37,13 @@ int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharAr
 	//cout << "IPaddressesSockets[3]: "<< this->IPaddressesSockets[3] << endl;
 	
 	// One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
-	 // This agent applies to hosts. So, regarding sockets, different situations apply
+	this->InitiateICPconnections();	 	
+	
+	return 0; //All Ok
+}
+
+int QTLAH::InitiateICPconnections() {
+	// This agent applies to hosts. So, regarding sockets, different situations apply
 	 // Host is a client initiating the service, so:
 	 //	- host will be client to its own node
 	 //	- host will be client to another host (for classical communication exchange)
@@ -48,14 +54,23 @@ int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharAr
 	 //	- initiate the instance by QapplicationClientLayer.ipynb, and use IPattachedNodeConfiguration
 	 // since the paradigm is always to establish first node connections and then hosts connections, apparently there are no conflics confusing how is connecting to or from.
 	
+	// First connect ot the attached node
+	this->ICPmanagementOpenClient(this->socket_fdArray[0],IPaddressesSockets[0]); // Connect as client to own node
 	if (this->SCmode=="client"){
-		this->ICPmanagementOpenClient(this->socket_fdArray[0],IPaddressesSockets[0]); // Connect as client to own node
+		
 		//this->ICPmanagementOpenClient(this->socket_fdArray[1],IPaddressesSockets[1]); // Connect as client to destination host
 	}
 	else{// server
-	}	
+	}
+	return 0; // All OK
+}
+
+int QTLAH::StopICPconnections() {
+	// First stop client or server host connectio
 	
-	return 0; //All Ok
+	// then stop client connection to attached node
+	ICPmanagementCloseClient(this->socket_fdArray[0]);
+	return 0; // All OK
 }
 
 int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets) {
@@ -160,7 +175,8 @@ int QTLAH::ICPmanagementCloseServer(int socket_fd,int new_socket) {
 
 
 QTLAH::~QTLAH() {
-// destructor
+	// destructor
+	this->StopICPconnections();
 }
 
 } /* namespace nsQnetworkLayerAgentH */

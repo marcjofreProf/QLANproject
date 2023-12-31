@@ -9,7 +9,7 @@ Agent script for Quantum transport Layer Node
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
-#define PORT 8080
+#define PORT 8010 // Server nodes listen to port 8010
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
