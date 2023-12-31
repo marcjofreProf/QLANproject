@@ -66,7 +66,7 @@ int QTLAH::InitiateICPconnections() {
 }
 
 int QTLAH::StopICPconnections() {
-	// First stop client or server host connectio
+	// First stop client or server host connection
 	
 	// then stop client connection to attached node
 	ICPmanagementCloseClient(this->socket_fdArray[0]);

@@ -9,6 +9,10 @@ sys.path.append(pathScriptBelowAgentScript)
 
 import QtransportLayerAgent
 
-def InitAgent(ParamsDescendingCharArray,ParamsAscendingCharArray):# Initialize this Agent and below Agent
-	QTLAGagent = QtransportLayerAgent.QTLAH(0) # Initialize and instance
-	QTLAGagent.InitAgent(ParamsDescendingCharArray,ParamsAscendingCharArray) # Initialize below Agent
+class QSLA:
+	def __init__(self,): # Constructor of this class
+        	self.QTLAagent = QtransportLayerAgent.QTLAH(0) # Create instance of the Agent below
+ 
+	def InitAgent(self,ParamsDescendingCharArray,ParamsAscendingCharArray):# Initialize
+		self.QTLAagent.InitAgent(ParamsDescendingCharArray,ParamsAscendingCharArray) # Initialize below Agent
+
