@@ -68,7 +68,7 @@ private: //Functions
 	int InitiateICPconnections(); // Initiating sockets
         int StopICPconnections(); // Closing sockets
 //	friend void* threadedPoll(void *value);
-	static void* AgentProcessStaticEntryPoint(void* c);
+	static void* AgentProcessStaticEntryPoint(void* c); // Not used
 	void AgentProcessRequestsPetitions(); // Process thread that manages requests and petitions
 	int ICPConnectionsCheckNewMessages(); // Check for new messages
 };

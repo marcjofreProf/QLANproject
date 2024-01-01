@@ -41,10 +41,10 @@ int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharAr
 	// One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
 	this->InitiateICPconnections();	 	
 	
-	// Then, regularly check for next job/action without blocking		  
-	//int ret = pthread_create(&threadFunc, NULL, QTLAH::AgentProcessStaticEntryPoint, NULL);	
+	// Then, regularly check for next job/action without blocking		  	
 	void* params;
-	this->threadRef=std::thread(&QTLAH::AgentProcessStaticEntryPoint,params);
+//	this->threadRef=std::thread(&QTLAH::AgentProcessStaticEntryPoint,params);
+	this->threadRef=std::thread(&QTLAH::AgentProcessRequestsPetitions,this);
 	  //if (ret) {
 	    // Handle the error
 	  //} 
@@ -217,7 +217,7 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 }
 
 void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
- /*this->m_pause(); // Initiate in paused state.
+ this->m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentH" << endl;
  bool isValidWhileLoop = true;
  
@@ -249,9 +249,9 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
                // ErrorHandling Throw An Exception Etc.
            }
 
-        } // switch        
+        } // switch    
     }
-   */
+   
 }
 
 int QTLAH::ICPConnectionsCheckNewMessages(){
