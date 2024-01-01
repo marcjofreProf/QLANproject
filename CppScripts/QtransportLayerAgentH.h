@@ -5,6 +5,9 @@ Header declaration file for Quantum transport Layer Agent Host
 */
 #ifndef QtransportLayerAgentH_H_
 #define QtransportLayerAgentH_H_
+// ICP connections
+#define NumSocketsMax 2
+#define NumBytesBufferICPMAX 1024
 // Threading
 #include <thread>
 
@@ -30,12 +33,13 @@ public: // Variables/Objects
 	int numberSessions=0;
 private: // Variables/Objects	
 	ApplicationState m_state;
-	char IPaddressesSockets[2][15]; // IP address of the client/server host/node in the control/operation networks
+	char IPaddressesSockets[NumSocketsMax][15]; // IP address of the client/server host/node in the control/operation networks
 	char* SCmode; // Variable to know if the host instance is working as server or client
-	int socket_fdArray[2]; // socket descriptor, an integer (like a file-handle)
-	int new_socketArray[2]; // socket between client and server, an integer. Created by the server.
-	char ReadBuffer[1024] = { 0 };// Buffer to read ICP messages
-	char SendBuffer[1024] = { 0 };// Buffer to send ICP messages	
+	int socket_fdArray[NumSocketsMax]; // socket descriptor, an integer (like a file-handle)
+	int new_socketArray[NumSocketsMax]; // socket between client and server, an integer. Created by the server.
+	char IPSocketsList[NumSocketsMax][15]; // IP address where the socket descriptors are pointing to
+	char ReadBuffer[NumBytesBufferICPMAX] = { 0 };// Buffer to read ICP messages
+	char SendBuffer[NumBytesBufferICPMAX] = { 0 };// Buffer to send ICP messages	
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 
 public: // Functions
@@ -59,10 +63,10 @@ public: // Functions
 
 private: //Functions
         // Management functions as client
-	int ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets); // Open ICP socket 
+	int ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList); // Open ICP socket 
 	int ICPmanagementCloseClient(int socket_fd); // Close ICP socket
 	// As server
-	int ICPmanagementOpenServer(int& socket_fd,int& new_socket);
+	int ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList);
 	int ICPmanagementCloseServer(int socket_fd,int new_socket);
 	// As server or client
 	int ICPmanagementRead(int socket_fd); // Read ICP socket

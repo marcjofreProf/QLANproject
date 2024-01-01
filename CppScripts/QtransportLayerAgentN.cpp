@@ -10,6 +10,8 @@ Agent script for Quantum transport Layer Node
 #include <string.h>
 #include <sys/socket.h>
 #define PORT 8010
+#define NumSocketsMax 2
+#define NumBytesBufferICPMAX 1024
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -24,7 +26,7 @@ QTLAN::QTLAN(int numberSessions) { // Constructor
  this->numberSessions = numberSessions; // Number of sessions of different services
 }
 
-int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets) {
+int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList) {
     int status;
     struct sockaddr_in serv_addr;    
     
@@ -46,11 +48,22 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets) {
         cout << "Client Connection Failed" << endl;
         return -1;
     }
+    
+    struct sockaddr_in Address;
+    socklen_t len = sizeof (Address);
+    memset(&Address, 42, len);
+    if (getsockname(socket_fd, (struct sockaddr*)&Address, &len) == -1) {
+      cout << "Client failed to get socket name" << endl;
+      return -1;
+    }
+    IPSocketsList=inet_ntoa(Address.sin_addr);
+    //cout << "IPSocketsList: "<< IPSocketsList << endl;
+    
     cout << "Client connected to: "<< IPaddressesSockets << endl;
     return 0; // All Ok
 }
 
-int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket) {// Node listening for connection from attached host
+int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList) {// Node listening for connection from attached host
     
     struct sockaddr_in address;
     int opt = 1;
@@ -87,12 +100,23 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket) {// Node list
         cout << "Server socket accept failed" << endl;
         return -1;
     }
-    cout << "Node starting socket server listening to host/node" << endl;
+    
+    struct sockaddr_in Address;
+    socklen_t len = sizeof (Address);
+    memset(&Address, 42, len);
+    if (getsockname(socket_fd, (struct sockaddr*)&Address, &len) == -1) {
+      cout << "Server failed to get socket name" << endl;
+      return -1;
+    }
+    IPSocketsList=inet_ntoa(Address.sin_addr);
+    //cout << "IPSocketsList: "<< IPSocketsList << endl;
+    
+    cout << "Node starting socket server to host/node: " << IPSocketsList << endl;
     return 0; // All Ok
 }
 
 int QTLAN::ICPmanagementRead(int socket_fd) {
-    int valread = read(socket_fd, this->ReadBuffer,1024 - 1); // subtract 1 for the null
+    int valread = read(socket_fd, this->ReadBuffer,NumBytesBufferICPMAX - 1); // subtract 1 for the null
     // terminator at the end
     //cout << "Node message received: " << this->ReadBuffer << endl;
     
@@ -135,7 +159,7 @@ int QTLAN::InitiateICPconnections(int argc){
 
 	// First, opening server listening socket 
 	int RetValue = 0;
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0]);
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPSocketsList[0]);
 	// Eventually, if it is an intermediate node
 	if (argc > 1){ // Establish client connection with next node
 	// First parse the parama passed IP address
@@ -164,44 +188,75 @@ int QTLAN::StopICPconnections(int argc){
 }
 
 int QTLAN::ICPConnectionsCheckNewMessages(){
-  int socket_fd=this->socket_fdArray[0]; // To be improved if several sockets
-  // Check for new messages
-  fd_set fds;
-  FD_ZERO(&fds);
-  FD_SET(socket_fd, &fds);
+  for (int i=0;i<NumSocketsMax;++i){
+     try{
+	  int socket_fd=this->socket_fdArray[i]; // To be improved if several sockets
+	  // Check for new messages
+	  fd_set fds;
+	  FD_ZERO(&fds);
+	  FD_SET(socket_fd, &fds);
 
-  // Set the timeout to 1 second
-  struct timeval timeout;
-  // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
-  timeout.tv_sec = 1;
-  timeout.tv_usec = 0;
-  
-  int nfds = socket_fd + 1;
-  int ret = select(nfds, &fds, NULL, NULL, &timeout);
+	  // Set the timeout to 1 second
+	  struct timeval timeout;
+	  // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
+	  timeout.tv_sec = 1;
+	  timeout.tv_usec = 0;
+	  
+	  int nfds = socket_fd + 1;
+	  int ret = select(nfds, &fds, NULL, NULL, &timeout);
 
-  if (ret < 0) {
-    cout << "Node error select to check new messages" << endl;
-    this->m_exit();
-    return -1;
-  } else if (ret == 0) {
-    //cout << "Node agent no new messages" << endl;
-    return 0; // All OK;
-  } else {
-    // There is at least one new message
-    if (FD_ISSET(socket_fd, &fds)) {
-      // Read the message from the socket
-      int n = this->ICPmanagementRead(socket_fd);
-      if (n < 0) {
-        cout << "Node error reading new messages" << endl;
-	this->m_exit();
-	return -1;
-      }
+	  if (ret < 0) {
+	    cout << "Node error select to check new messages" << endl;
+	    this->m_exit();
+	    return -1;
+	  } else if (ret == 0) {
+	    //cout << "Node agent no new messages" << endl;
+	    return 0; // All OK;
+	  } else {
+	    // There is at least one new message
+	    if (FD_ISSET(socket_fd, &fds)) {
+	      // Read the message from the socket
+	      int n = this->ICPmanagementRead(socket_fd);
+	      if (n < 0) {
+		cout << "Node error reading new messages" << endl;
+		this->m_exit();
+		return -1;
+	      }
 
-      // Process the message
-      cout << "Received message: " << this->ReadBuffer;
-    }
-  }
+	      // Process the message
+	      cout << "Received message: " << this->ReadBuffer << endl;
+	    }
+	  }
+  } // try
+    catch (const std::exception& e) {
+	// Handle the exception
+    	cout << "Exception: " << e.what() << endl;
+  	}
+  } // for
   return 0; // All OK
+}
+
+int QTLAN::SendMessageAgent(char* ParamsDescendingCharArray){
+	try {
+    	// Code that might throw an exception 
+
+	    // Parse the message information
+	    strcpy(this->SendBuffer,strtok(ParamsDescendingCharArray,","));
+	    char* IPaddressesSockets;
+	    strcpy(IPaddressesSockets,strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
+	    // Understand which socket descriptor has to be used
+	    int new_socket;
+	    for (int i=0; i<NumSocketsMax; ++i){
+	    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){new_socket=this->new_socketArray[i];}
+	    }  
+	    this->ICPmanagementSend(new_socket);
+    
+    } // try
+    catch (const std::exception& e) {
+	// Handle the exception
+    	cout << "Exception: " << e.what() << endl;
+  	}
+    return 0; //All OK
 }
 
 QTLAN::~QTLAN() {
@@ -251,7 +306,10 @@ int main(int argc, char const * argv[]){
  cout << "Starting in pause state the QtransportLayerAgentN" << endl;
  bool isValidWhileLoop = true;
  
- while(isValidWhileLoop){
+ while(isValidWhileLoop){ 
+ 	try {
+    	// Code that might throw an exception 
+ 
  	// Check if there are need messages or actions to be done by the node
  	QTLANagent.ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
        switch(QTLANagent.getState()) {
@@ -281,8 +339,12 @@ int main(int argc, char const * argv[]){
            }
 
         } // switch
-        
     }
+    catch (const std::exception& e) {
+	// Handle the exception
+    	cout << "Exception: " << e.what() << endl;
+  	}
+    } // while
    
  return 0; // Everything Ok
 }

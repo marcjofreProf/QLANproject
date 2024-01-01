@@ -6,6 +6,10 @@ Header declaration file for Quantum transport Layer Agent Node
 #ifndef QtransportLayerAgentN_H_
 #define QtransportLayerAgentN_H_
 
+// ICP connections
+#define NumSocketsMax 2
+#define NumBytesBufferICPMAX 1024
+
 #include<string>
 #include<fstream>
 using std::string;
@@ -31,11 +35,12 @@ public: // Variables/Objects
 private: // Variables/Objects	
 	// Member Variables Such As Window Handle, Time Etc.,
 	ApplicationState m_state;	
-	char IPaddressesSockets[2][15]; // IP address of the client/server host/node in the control/operation networks
-	int socket_fdArray[2]; // socket descriptor, an integer (like a file-handle)
-	int new_socketArray[2]; // socket between client and server. Created by the server
-	char ReadBuffer[1024] = { 0 };// Buffer to read ICP messages
-	char SendBuffer[1024] = { 0 };// Buffer to send ICP messages
+	char IPaddressesSockets[NumSocketsMax][15]; // IP address of the client/server host/node in the control/operation networks
+	char IPSocketsList[NumSocketsMax][15]; // IP address where the socket descriptors are pointing to
+	int socket_fdArray[NumSocketsMax]; // socket descriptor, an integer (like a file-handle)
+	int new_socketArray[NumSocketsMax]; // socket between client and server. Created by the server
+	char ReadBuffer[NumBytesBufferICPMAX] = { 0 };// Buffer to read ICP messages
+	char SendBuffer[NumBytesBufferICPMAX] = { 0 };// Buffer to send ICP messages
 	
 public: // Functions
 	QTLAN(int numberSessions); //constructor
@@ -60,14 +65,15 @@ private: // Functions
 	// Managing ICP connections with sockets
 	// Typically the Node will act as server to the upper host. If the node is in between, then it will act as server of the origin client node. Net 192.168.X.X or Net 10.0.0.X
 	// With nodes in between hosts, the origin node will also act as client to the next node acting as server. Net 10.0.0.X	
-	int ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets); // Open ICP socket 
+	int ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList); // Open ICP socket 
 	int ICPmanagementCloseClient(int socket_fd); // Close ICP socket 
 	// As server
-	int ICPmanagementOpenServer(int& socket_fd,int& new_socket);
+	int ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList);
 	int ICPmanagementCloseServer(int socket_fd,int new_socket);
 	// As server or cleint
 	int ICPmanagementRead(int socket_fd);
 	int ICPmanagementSend(int new_socket);
+	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the Agent to send message to specific host/node
 //	friend void* threadedPoll(void *value);
 };
 
