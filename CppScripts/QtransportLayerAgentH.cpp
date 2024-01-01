@@ -40,20 +40,24 @@ int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharAr
 	
 	// One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
 	this->InitiateICPconnections();	 	
-	/*
+	
 	// Then, regularly check for next job/action without blocking		  
 	  int ret = pthread_create(&threadFunc, NULL, QTLAH::AgentProcessStaticEntryPoint, NULL);
 	  //if (ret) {
 	    // Handle the error
 	  //} 
-	*/
+	
 	return 0; //All Ok
 }
 
 void* QTLAH::AgentProcessStaticEntryPoint(void* c)
-{
-    ((QTLAH*) c)->AgentProcessRequestsPetitions();
-    return NULL;
+{  
+    try {
+      ((QTLAH*) c)->AgentProcessRequestsPetitions();
+  } catch (...) {
+      throw;
+  }
+  return NULL;
 }
 
 int QTLAH::InitiateICPconnections() {

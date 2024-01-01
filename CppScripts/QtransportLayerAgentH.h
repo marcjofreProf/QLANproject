@@ -51,6 +51,7 @@ public: // Functions
         bool m_resume() { m_state = APPLICATION_RUNNING; return true; }      
         bool m_exit() { m_state = APPLICATION_EXIT;  return false; }
 	int InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharArray); // Passing parameters from the upper Agent to initialize the current agent
+	// Communication messages
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the upper Agent to send message to specific host/node
 	~QTLAH();  //destructor
 
