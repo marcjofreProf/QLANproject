@@ -15,7 +15,7 @@ Agent script for Quantum transport Layer Host
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
-#include <pthread.h>
+#include <thread>
 
 using namespace std;
 
@@ -42,7 +42,9 @@ int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharAr
 	this->InitiateICPconnections();	 	
 	
 	// Then, regularly check for next job/action without blocking		  
-	  int ret = pthread_create(&threadFunc, NULL, QTLAH::AgentProcessStaticEntryPoint, NULL);
+	//int ret = pthread_create(&threadFunc, NULL, QTLAH::AgentProcessStaticEntryPoint, NULL);
+	void* params;
+	thread thread_obj(&AgentProcessStaticEntryPoint,params);
 	  //if (ret) {
 	    // Handle the error
 	  //} 

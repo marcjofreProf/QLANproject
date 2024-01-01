@@ -5,7 +5,7 @@
 %{
 #define SWIG_FILE_WITH_INIT
 #include "QtransportLayerAgentH.h"
-#include <pthread.h>
+//#include <thread>
 %}
 
 %include "QtransportLayerAgentH.h"

@@ -6,7 +6,7 @@ Header declaration file for Quantum transport Layer Agent Host
 #ifndef QtransportLayerAgentH_H_
 #define QtransportLayerAgentH_H_
 // Threading
-#include <pthread.h>
+//#include <thread>
 
 //#include<string>
 //#include<fstream>
@@ -36,7 +36,7 @@ private: // Variables/Objects
 	int new_socketArray[2]; // socket between client and server, an integer. Created by the server.
 	char ReadBuffer[1024] = { 0 };// Buffer to read ICP messages
 	char SendBuffer[1024] = { 0 };// Buffer to send ICP messages	
-	pthread_t threadFunc; // Process thread that executes requests/petitons without blocking
+	//pthread_t threadFunc; // Process thread that executes requests/petitons without blocking
 
 public: // Functions
 	QTLAH(int numberSessions); //constructor
