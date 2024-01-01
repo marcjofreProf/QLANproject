@@ -209,6 +209,7 @@ int QTLAH::ICPmanagementCloseServer(int socket_fd,int new_socket) {
 }
 
 int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
+/*
     // Parse the message information
     strcpy(this->SendBuffer,strtok(ParamsDescendingCharArray,","));
     char* IPaddressesSockets;
@@ -217,6 +218,7 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
     int new_socket;
     //string(IPaddressesSockets)
     this->ICPmanagementSend(new_socket);
+    */
     return 0; //All OK
 }
 
@@ -227,7 +229,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  
  while(isValidWhileLoop){
  	// Check if there are need messages or actions to be done by the node
- 	this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
+ 	//this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
        switch(this->getState()) {
            case QTLAH::APPLICATION_RUNNING: {
                
