@@ -134,6 +134,9 @@ class QTLAH(_object):
     def InitAgent(self, ParamsDescendingCharArray, ParamsAscendingCharArray):
         return _QtransportLayerAgent.QTLAH_InitAgent(self, ParamsDescendingCharArray, ParamsAscendingCharArray)
 
+    def InitAgentProcess(self):
+        return _QtransportLayerAgent.QTLAH_InitAgentProcess(self)
+
     def SendMessageAgent(self, ParamsDescendingCharArray):
         return _QtransportLayerAgent.QTLAH_SendMessageAgent(self, ParamsDescendingCharArray)
     __swig_destroy__ = _QtransportLayerAgent.delete_QTLAH

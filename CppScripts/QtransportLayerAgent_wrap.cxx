@@ -3660,6 +3660,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_QTLAH_InitAgentProcess(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:QTLAH_InitAgentProcess",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_InitAgentProcess" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
+  }
+  arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
+  result = (int)(arg1)->InitAgentProcess();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_QTLAH_SendMessageAgent(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
@@ -3733,6 +3755,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "QTLAH_m_resume", _wrap_QTLAH_m_resume, METH_VARARGS, NULL},
 	 { "QTLAH_m_exit", _wrap_QTLAH_m_exit, METH_VARARGS, NULL},
 	 { "QTLAH_InitAgent", _wrap_QTLAH_InitAgent, METH_VARARGS, NULL},
+	 { "QTLAH_InitAgentProcess", _wrap_QTLAH_InitAgentProcess, METH_VARARGS, NULL},
 	 { "QTLAH_SendMessageAgent", _wrap_QTLAH_SendMessageAgent, METH_VARARGS, NULL},
 	 { "delete_QTLAH", _wrap_delete_QTLAH, METH_VARARGS, NULL},
 	 { "QTLAH_swigregister", QTLAH_swigregister, METH_VARARGS, NULL},
