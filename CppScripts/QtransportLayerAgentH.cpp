@@ -42,9 +42,9 @@ int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharAr
 	this->InitiateICPconnections();	 	
 	
 	// Then, regularly check for next job/action without blocking		  
-	//int ret = pthread_create(&threadFunc, NULL, QTLAH::AgentProcessStaticEntryPoint, NULL);
+	//int ret = pthread_create(&threadFunc, NULL, QTLAH::AgentProcessStaticEntryPoint, NULL);	
 	void* params;
-	thread thread_obj(&AgentProcessStaticEntryPoint,params);
+	this->threadRef=std::thread(&QTLAH::AgentProcessStaticEntryPoint,params);
 	  //if (ret) {
 	    // Handle the error
 	  //} 
@@ -53,8 +53,8 @@ int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharAr
 }
 
 void* QTLAH::AgentProcessStaticEntryPoint(void* c)
-{  
-    try {
+{
+  try {
       ((QTLAH*) c)->AgentProcessRequestsPetitions();
   } catch (...) {
       throw;
@@ -97,10 +97,10 @@ int QTLAH::StopICPconnections() {
 	else{// server
 		ICPmanagementCloseServer(this->socket_fdArray[1],this->new_socketArray[1]);
 	}
-	
+
 	// then stop client connection to attached node
 	ICPmanagementCloseClient(this->socket_fdArray[0]);
-	
+
 	// Update indicators
 	this->numberSessions=0;
 	return 0; // All OK
@@ -217,17 +217,13 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 }
 
 void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
- this->m_pause(); // Initiate in paused state.
+ /*this->m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentH" << endl;
  bool isValidWhileLoop = true;
  
  while(isValidWhileLoop){
  	// Check if there are need messages or actions to be done by the node
  	this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
- 	// Check for cancellation
-	  //if (pthread_cancel(pthread_self())) {
-	  //  // Handle the cancellation
-	  //}
        switch(this->getState()) {
            case QTLAH::APPLICATION_RUNNING: {
                
@@ -255,7 +251,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
 
         } // switch        
     }
-    
+   */
 }
 
 int QTLAH::ICPConnectionsCheckNewMessages(){
@@ -304,12 +300,7 @@ QTLAH::~QTLAH() {
 	// destructor
 	this->StopICPconnections();
 	// Terminate the process thread
-	//pthread_cancel(pthread_self());
-	// Wait for the thread to finish
-	  //int ret = pthread_join(this->threadFunc, NULL);
-	  //if (ret) {
-	  //  // Handle the error
-	  //}
+	this->threadRef.join();
 }
 
 } /* namespace nsQnetworkLayerAgentH */
