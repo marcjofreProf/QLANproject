@@ -40,12 +40,13 @@ int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharAr
 	
 	// One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
 	this->InitiateICPconnections();	 	
-	
+	/*
 	// Then, regularly check for next job/action without blocking		  
 	  int ret = pthread_create(&threadFunc, NULL, QTLAH::AgentProcessStaticEntryPoint, NULL);
 	  //if (ret) {
 	    // Handle the error
 	  //} 
+	*/
 	return 0; //All Ok
 }
 
@@ -218,9 +219,9 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  	// Check if there are need messages or actions to be done by the node
  	this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
  	// Check for cancellation
-	  if (pthread_cancel(pthread_self())) {
-	    // Handle the cancellation
-	  }
+	  //if (pthread_cancel(pthread_self())) {
+	  //  // Handle the cancellation
+	  //}
        switch(this->getState()) {
            case QTLAH::APPLICATION_RUNNING: {
                
@@ -246,9 +247,9 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
                // ErrorHandling Throw An Exception Etc.
            }
 
-        } // switch
-        
+        } // switch        
     }
+    
 }
 
 int QTLAH::ICPConnectionsCheckNewMessages(){
@@ -290,18 +291,19 @@ int QTLAH::ICPConnectionsCheckNewMessages(){
     }
   }
   return 0; // All OK
+
 }
 
 QTLAH::~QTLAH() {
 	// destructor
 	this->StopICPconnections();
 	// Terminate the process thread
-	pthread_cancel(pthread_self());
+	//pthread_cancel(pthread_self());
 	// Wait for the thread to finish
-	  int ret = pthread_join(this->threadFunc, NULL);
-	  if (ret) {
-	    // Handle the error
-	  }
+	  //int ret = pthread_join(this->threadFunc, NULL);
+	  //if (ret) {
+	  //  // Handle the error
+	  //}
 }
 
 } /* namespace nsQnetworkLayerAgentH */

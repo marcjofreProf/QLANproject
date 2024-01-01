@@ -26,7 +26,7 @@ public: // Variables/Objects
 		APPLICATION_RUNNING = 0,
 		APPLICATION_PAUSED = 1,  // Out of Focus or Paused If In A Timed Situation
 		APPLICATION_EXIT = -1,
-	    };
+	    };	    
 	int numberSessions=0;
 private: // Variables/Objects	
 	ApplicationState m_state;
