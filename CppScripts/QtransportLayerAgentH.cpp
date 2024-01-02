@@ -40,9 +40,9 @@ strcpy(this->IPaddressesSockets[0],strtok(ParamsDescendingCharArray,","));
 strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
 strcpy(this->SCmode,strtok(NULL,",")); // to know if this host instance is client or server
 
-cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
-cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
-cout << "SCmode: "<< this->SCmode << endl;
+//cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
+//cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
+//cout << "SCmode: "<< this->SCmode << endl;
 
 }
 
@@ -280,10 +280,12 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  try{
    try {
     	// Code that might throw an exception 
-    	// Test to send messages
-    	char* message;
-	strcpy(message, "Hello, world!");
-    	this->SendMessageAgent(message);
+    	// Test to send messages from client
+    	if (string(this->SCmode)==string("client")){
+	    	char* message;
+		strcpy(message, "Hello, world!");
+	    	this->SendMessageAgent(message);
+    	}
  	// Check if there are need messages or actions to be done by the node
  	this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
        switch(this->getState()) {
