@@ -37,7 +37,7 @@ QTLAH::QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAsce
 // Parse the ParamsDescendingCharArray
 strcpy(this->IPaddressesSockets[0],strtok(ParamsDescendingCharArray,","));
 strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
-this->SCmode=strtok(NULL,","); // to know if this host instance is client or server
+strcpy(this->SCmode,strtok(NULL,",")); // to know if this host instance is client or server
 
 //cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
 //cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
@@ -271,7 +271,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
    try {
     	// Code that might throw an exception 
  	// Check if there are need messages or actions to be done by the node
- 	this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
+ 	//this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
        switch(this->getState()) {
            case QTLAH::APPLICATION_RUNNING: {
                
