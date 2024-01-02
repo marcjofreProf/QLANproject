@@ -111,7 +111,7 @@ int QTLAH::InitiateICPconnections() {
 	}
 	else{// server
 		//cout << "Check - Generating connection as server" << endl;
-		this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPSocketsList[1]); // Open port as listen as server
+		this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPSocketsList[1]); // Open port and listen as server
 	}
 	this->numberSessions=1;
 	return 0; // All OK
@@ -172,7 +172,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
 }
 
 int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList) {// Node listening for connection from attached host
-    
+    cout << "Entering here" << endl;
     struct sockaddr_in address;
     int opt = 1;
     socklen_t addrlen = sizeof(address);       
