@@ -2,7 +2,8 @@
 Dept. Network Engineering
 Universitat Politècnica de Catalunya - Technical University of Catalonia
 
-2024
+Modified: 2024
+Created: 2024
 
 Agent script for Quantum transport Layer Host
 */
@@ -16,6 +17,7 @@ Agent script for Quantum transport Layer Host
 #define PORT 8010
 #define NumSocketsMax 2
 #define NumBytesBufferICPMAX 1024
+#define IPcharArrayLengthMAX 15
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -69,11 +71,12 @@ int QTLAH::InitAgentProcess(){
 	    socklen_t len = sizeof (Address);
 	    memset(&Address, 42, len);
 	    if (getsockname(this->socket_fdArray[i], (struct sockaddr*)&Address, &len) == -1) {
-	      cout << "Failed to get socket name" << endl;
-	      return -1;
+	      //cout << "Failed to get socket name" << endl;
+	      //return -1;
 	    }
-	    this->IPSocketsList[i][0]=*inet_ntoa(Address.sin_addr);
-	    cout << "IPSocketsList: "<< IPSocketsList << endl;
+	    strcpy(IPSocketsList[i],inet_ntoa(Address.sin_addr));
+	    //cout << "inet_ntoa(Address.sin_addr): "<< inet_ntoa(Address.sin_addr) << endl;
+	    //cout << "IPSocketsList: "<< this->IPSocketsList[i] << endl;
 	 }
 	// Then, regularly check for next job/action without blocking		  	
 	// Not used void* params;
@@ -243,18 +246,19 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
     try{
 	try {
     	// Code that might throw an exception 
-
 	    // Parse the message information
-	    strcpy(this->SendBuffer,strtok(ParamsDescendingCharArray,","));
-	    char* IPaddressesSockets;
-	    strcpy(IPaddressesSockets,strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
+	    char IPaddressesSockets[IPcharArrayLengthMAX];
+	    strcpy(IPaddressesSockets,strtok(ParamsDescendingCharArray,","));//Null indicates we are using the same pointer as the last strtok
+	    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
+	    
+	    strcpy(this->SendBuffer,strtok(NULL,","));
+	    //cout << "SendBuffer: " << this->SendBuffer << endl;	    
 	    // Understand which socket descriptor has to be used
 	    int new_socket;
 	    for (int i=0; i<NumSocketsMax; ++i){
 	    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){new_socket=this->new_socketArray[i];}
 	    }  
-	    this->ICPmanagementSend(new_socket);
-    
+	    this->ICPmanagementSend(new_socket);    
     } // try
     catch (const std::exception& e) {
 	// Handle the exception

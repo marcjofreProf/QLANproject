@@ -2,7 +2,8 @@
 Dept. Network Engineering
 Universitat Politècnica de Catalunya - Technical University of Catalonia
 
-2024
+Modified: 2024
+Created: 2024
 
 Agent script for Quantum transport Layer Node
 */
@@ -17,6 +18,7 @@ Agent script for Quantum transport Layer Node
 #define PORT 8010
 #define NumSocketsMax 2
 #define NumBytesBufferICPMAX 1024
+#define IPcharArrayLengthMAX 15
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -271,11 +273,12 @@ int QTLAN::UpdateSocketsInformation(){
 	    socklen_t len = sizeof (Address);
 	    memset(&Address, 42, len);
 	    if (getsockname(this->socket_fdArray[i], (struct sockaddr*)&Address, &len) == -1) {
-	      cout << "Failed to get socket name" << endl;
-	      return -1;
+	      //cout << "Failed to get socket name" << endl;
+	      //return -1;
 	    }
-	    this->IPSocketsList[i][0]=*inet_ntoa(Address.sin_addr);
-	    cout << "IPSocketsList: "<< IPSocketsList << endl;
+	    strcpy(IPSocketsList[i],inet_ntoa(Address.sin_addr));
+	    cout << "inet_ntoa(Address.sin_addr): "<< inet_ntoa(Address.sin_addr) << endl;
+	    cout << "IPSocketsList: "<< this->IPSocketsList[i] << endl;
 	 }
 	 return 0; // All ok
 }

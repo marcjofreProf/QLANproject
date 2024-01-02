@@ -2,7 +2,8 @@
 Dept. Network Engineering
 Universitat Politècnica de Catalunya - Technical University of Catalonia
 
-2024
+Modified: 2024
+Created: 2024
 
 Header declaration file for Quantum transport Layer Agent Node
 
@@ -13,6 +14,7 @@ Header declaration file for Quantum transport Layer Agent Node
 // ICP connections
 #define NumSocketsMax 2
 #define NumBytesBufferICPMAX 1024
+#define IPcharArrayLengthMAX 15
 
 #include<string>
 #include<fstream>
@@ -39,8 +41,8 @@ public: // Variables/Objects
 private: // Variables/Objects	
 	// Member Variables Such As Window Handle, Time Etc.,
 	ApplicationState m_state;	
-	char IPaddressesSockets[NumSocketsMax][15]; // IP address of the client/server host/node in the control/operation networks
-	char IPSocketsList[NumSocketsMax][15]; // IP address where the socket descriptors are pointing to
+	char IPaddressesSockets[NumSocketsMax][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks
+	char IPSocketsList[NumSocketsMax][IPcharArrayLengthMAX]; // IP address where the socket descriptors are pointing to
 	int socket_fdArray[NumSocketsMax]; // socket descriptor, an integer (like a file-handle)
 	int new_socketArray[NumSocketsMax]; // socket between client and server. Created by the server
 	char ReadBuffer[NumBytesBufferICPMAX] = { 0 };// Buffer to read ICP messages
