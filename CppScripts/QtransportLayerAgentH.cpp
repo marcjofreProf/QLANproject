@@ -31,6 +31,7 @@ using namespace std;
 namespace nsQtransportLayerAgentH {
 
 QTLAH::QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAscendingCharArray) { // Constructor
+
  this->numberSessions = numberSessions; // Number of sessions of different services
  
  //cout << "The value of the input is: "<< ParamsDescendingCharArray << endl;
@@ -39,11 +40,10 @@ strcpy(this->IPaddressesSockets[0],strtok(ParamsDescendingCharArray,","));
 strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
 strcpy(this->SCmode,strtok(NULL,",")); // to know if this host instance is client or server
 
-//cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
-//cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
-//cout << "IPaddressesSockets[2]: "<< this->IPaddressesSockets[2] << endl;
-//cout << "IPaddressesSockets[3]: "<< this->IPaddressesSockets[3] << endl;
-//cout << "SCmode: "<< this->SCmode << endl;
+cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
+cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
+cout << "SCmode: "<< this->SCmode << endl;
+
 }
 
 /*

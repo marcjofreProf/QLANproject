@@ -18,7 +18,7 @@ import QtransportLayerAgent
 class QSLA:
 	def __init__(self,ParamsDescendingCharArray,ParamsAscendingCharArray): # Constructor of this class
         	self.QTLAagent = QtransportLayerAgent.QTLAH(0,ParamsDescendingCharArray,ParamsAscendingCharArray) # Create instance of the Agent below
- 
+ 	
 	def InitAgentProcess(self,): # Pass to the below agent
 		self.QTLAagent.InitAgentProcess()
 	

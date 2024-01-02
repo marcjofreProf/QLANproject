@@ -16,7 +16,7 @@ import QsessionLayerAgent
 class QPLA:
 	def __init__(self,ParamsDescendingCharArray,ParamsAscendingCharArray): # Constructor of this class
         	self.QSLAagent = QsessionLayerAgent.QSLA(ParamsDescendingCharArray,ParamsAscendingCharArray) # Create instance of the Agent below
- 
+ 	
 	def InitAgentProcess(self,): # Pass to the below agent
 		self.QSLAagent.InitAgentProcess()
 	

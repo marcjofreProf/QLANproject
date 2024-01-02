@@ -40,7 +40,7 @@ public: // Variables/Objects
 private: // Variables/Objects	
 	ApplicationState m_state;
 	char IPaddressesSockets[NumSocketsMax][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks
-	char* SCmode; // Variable to know if the host instance is working as server or client
+	char SCmode[NumBytesBufferICPMAX] = { 0 }; // Variable to know if the host instance is working as server or client
 	int socket_fdArray[NumSocketsMax]; // socket descriptor, an integer (like a file-handle)
 	int new_socketArray[NumSocketsMax]; // socket between client and server, an integer. Created by the server.
 	char IPSocketsList[NumSocketsMax][IPcharArrayLengthMAX]; // IP address where the socket descriptors are pointing to
