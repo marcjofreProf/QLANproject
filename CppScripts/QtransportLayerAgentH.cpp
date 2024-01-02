@@ -218,7 +218,7 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
 }
 
 int QTLAH::ICPmanagementRead(int socket_fd) {
-    int valread = read(socket_fd, this->ReadBuffer,NumBytesBufferICPMAX - 1); // subtract 1 for the null
+    int valread = recv(socket_fd, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
     // terminator at the end
     //cout << "Node message received: " << this->ReadBuffer << endl;
     
@@ -227,7 +227,7 @@ int QTLAH::ICPmanagementRead(int socket_fd) {
 
 int QTLAH::ICPmanagementSend(int new_socket) {
     const char* SendBufferAux = this->SendBuffer;
-    send(new_socket, SendBufferAux, strlen(SendBufferAux), 0);
+    send(new_socket, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);
     
     return 0; // All OK
 }
@@ -327,11 +327,10 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
    
 }
 
-int QTLAH::ICPConnectionsCheckNewMessages(){
- for (int i=0;i<NumSocketsMax;++i){
+int QTLAH::ICPConnectionsCheckNewMessages(){// Read one message at a time and from the different sockets
    try{
      try{
-	  int socket_fd=this->socket_fdArray[i]; // To be improved if several sockets
+	  int socket_fd=this->socket_fdArray[this->socketReadIter];
 	  // Check for new messages
 	  fd_set fds;
 	  FD_ZERO(&fds);
@@ -348,24 +347,19 @@ int QTLAH::ICPConnectionsCheckNewMessages(){
 
 	  if (ret < 0) {
 	    cout << "Node error select to check new messages" << endl;
-	    this->m_exit();
-	    return -1;
 	  } else if (ret == 0) {
-	    //cout << "Node agent no new messages" << endl;
-	    return 0; // All OK;
-	  } else {
-	    // There is at least one new message
+	    //cout << "Host agent no new messages" << endl;
+	  } else {// There is at least one new message
 	    if (FD_ISSET(socket_fd, &fds)) {
 	      // Read the message from the socket
 	      int n = this->ICPmanagementRead(socket_fd);
 	      if (n < 0) {
 		cout << "Node error reading new messages" << endl;
-		this->m_exit();
-		return -1;
 	      }
-
 	      // Process the message
-	      cout << "Received message: " << this->ReadBuffer << endl;
+	      if (n>0){
+	      	cout << "Received message: " << this->ReadBuffer << endl;
+	      }
 	    }
 	  }
   } // try
@@ -377,7 +371,11 @@ int QTLAH::ICPConnectionsCheckNewMessages(){
   catch (...) { // Catches any exception
   cout << "Exception caught" << endl;
     }
-  } // for
+  
+  // Update the socketReadIter
+  this->socketReadIter++; // Variable to read each time a different socket
+  this->socketReadIter=this->socketReadIter % NumSocketsMax;
+   
   return 0; // All OK
 
 }
