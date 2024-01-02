@@ -1,4 +1,9 @@
-/* Author: Marc Jofre
+/* Author: Prof. Marc Jofre
+Dept. Network Engineering
+Universitat Politècnica de Catalunya - Technical University of Catalonia
+
+2024
+
 Agent script for Quantum transport Layer Node
 */
 #include "QtransportLayerAgentN.h"
@@ -63,7 +68,7 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     return 0; // All Ok
 }
 
-int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList) {// Node listening for connection from attached host
+int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket) {// Node listening for connection from attached host
     
     struct sockaddr_in address;
     int opt = 1;
@@ -100,18 +105,8 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
         cout << "Server socket accept failed" << endl;
         return -1;
     }
-    
-    struct sockaddr_in Address;
-    socklen_t len = sizeof (Address);
-    memset(&Address, 42, len);
-    if (getsockname(socket_fd, (struct sockaddr*)&Address, &len) == -1) {
-      cout << "Server failed to get socket name" << endl;
-      return -1;
-    }
-    IPSocketsList=inet_ntoa(Address.sin_addr);
-    //cout << "IPSocketsList: "<< IPSocketsList << endl;
-    
-    cout << "Node starting socket server to host/node: " << IPSocketsList << endl;
+        
+    cout << "Node starting socket server to host/node" << endl;
     return 0; // All Ok
 }
 
@@ -159,7 +154,7 @@ int QTLAN::InitiateICPconnections(int argc){
 
 	// First, opening server listening socket 
 	int RetValue = 0;
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPSocketsList[0]);
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0]);
 	// Eventually, if it is an intermediate node
 	if (argc > 1){ // Establish client connection with next node
 	// First parse the parama passed IP address
@@ -189,6 +184,7 @@ int QTLAN::StopICPconnections(int argc){
 
 int QTLAN::ICPConnectionsCheckNewMessages(){
   for (int i=0;i<NumSocketsMax;++i){
+   try{
      try{
 	  int socket_fd=this->socket_fdArray[i]; // To be improved if several sockets
 	  // Check for new messages
@@ -232,11 +228,16 @@ int QTLAN::ICPConnectionsCheckNewMessages(){
 	// Handle the exception
     	cout << "Exception: " << e.what() << endl;
   	}
+  	} // upper try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+    }
   } // for
   return 0; // All OK
 }
 
 int QTLAN::SendMessageAgent(char* ParamsDescendingCharArray){
+  try{
 	try {
     	// Code that might throw an exception 
 
@@ -256,7 +257,27 @@ int QTLAN::SendMessageAgent(char* ParamsDescendingCharArray){
 	// Handle the exception
     	cout << "Exception: " << e.what() << endl;
   	}
+  	} // upper try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+    }
     return 0; //All OK
+}
+
+int QTLAN::UpdateSocketsInformation(){
+	// First resolve the IPs the sockets are pointing to:
+	for (int i=0;i<NumSocketsMax;++i){
+	    struct sockaddr_in Address;
+	    socklen_t len = sizeof (Address);
+	    memset(&Address, 42, len);
+	    if (getsockname(this->socket_fdArray[i], (struct sockaddr*)&Address, &len) == -1) {
+	      cout << "Failed to get socket name" << endl;
+	      return -1;
+	    }
+	    this->IPSocketsList[i][0]=*inet_ntoa(Address.sin_addr);
+	    cout << "IPSocketsList: "<< IPSocketsList << endl;
+	 }
+	 return 0; // All ok
 }
 
 QTLAN::~QTLAN() {
@@ -307,9 +328,11 @@ int main(int argc, char const * argv[]){
  bool isValidWhileLoop = true;
  
  while(isValidWhileLoop){ 
+   try{
  	try {
     	// Code that might throw an exception 
- 
+    	// Check the IPs the sockets are pointing to:
+ 	QTLANagent.UpdateSocketsInformation();
  	// Check if there are need messages or actions to be done by the node
  	QTLANagent.ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
        switch(QTLANagent.getState()) {
@@ -344,6 +367,10 @@ int main(int argc, char const * argv[]){
 	// Handle the exception
     	cout << "Exception: " << e.what() << endl;
   	}
+  } // upper try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+    }
     } // while
    
  return 0; // Everything Ok

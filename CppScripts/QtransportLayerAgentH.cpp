@@ -1,4 +1,9 @@
-/* Author: Marc Jofre
+/* Author: Prof. Marc Jofre
+Dept. Network Engineering
+Universitat Politècnica de Catalunya - Technical University of Catalonia
+
+2024
+
 Agent script for Quantum transport Layer Host
 */
 #include "QtransportLayerAgentH.h"
@@ -58,7 +63,19 @@ void* QTLAH::AgentProcessStaticEntryPoint(void* c){// Not really used
 */
 
 int QTLAH::InitAgentProcess(){
-// Then, regularly check for next job/action without blocking		  	
+	// First resolve the IPs the sockets are pointing to:
+	for (int i=0;i<NumSocketsMax;++i){
+	    struct sockaddr_in Address;
+	    socklen_t len = sizeof (Address);
+	    memset(&Address, 42, len);
+	    if (getsockname(this->socket_fdArray[i], (struct sockaddr*)&Address, &len) == -1) {
+	      cout << "Failed to get socket name" << endl;
+	      return -1;
+	    }
+	    this->IPSocketsList[i][0]=*inet_ntoa(Address.sin_addr);
+	    cout << "IPSocketsList: "<< IPSocketsList << endl;
+	 }
+	// Then, regularly check for next job/action without blocking		  	
 	// Not used void* params;
 	// Not used this->threadRef=std::thread(&QTLAH::AgentProcessStaticEntryPoint,params);
 	this->threadRef=std::thread(&QTLAH::AgentProcessRequestsPetitions,this);
@@ -89,7 +106,7 @@ int QTLAH::InitiateICPconnections() {
 	}
 	else{// server
 		//cout << "Check - Generating connection as server" << endl;
-		this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPSocketsList[1]); // Open port as listen as server
+		this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1]); // Open port as listen as server
 	}
 	this->numberSessions=1;
 	return 0; // All OK
@@ -149,7 +166,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     return 0; // All Ok
 }
 
-int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList) {// Node listening for connection from attached host
+int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket) {// Node listening for connection from attached host
     
     struct sockaddr_in address;
     int opt = 1;
@@ -186,18 +203,8 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
         cout << "Server socket accept failed" << endl;
         return -1;
     }
-    
-    struct sockaddr_in Address;
-    socklen_t len = sizeof (Address);
-    memset(&Address, 42, len);
-    if (getsockname(socket_fd, (struct sockaddr*)&Address, &len) == -1) {
-      cout << "Server failed to get socket name" << endl;
-      return -1;
-    }
-    IPSocketsList=inet_ntoa(Address.sin_addr);
-    //cout << "IPSocketsList: "<< IPSocketsList << endl;
-    
-    cout << "Node starting socket server to host/node: " << IPSocketsList << endl;
+        
+    cout << "Node starting socket server to host/node" << endl;
     return 0; // All Ok
 }
 
@@ -233,6 +240,7 @@ int QTLAH::ICPmanagementCloseServer(int socket_fd,int new_socket) {
 }
 
 int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
+    try{
 	try {
     	// Code that might throw an exception 
 
@@ -252,6 +260,10 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 	// Handle the exception
     	cout << "Exception: " << e.what() << endl;
   	}
+  } // upper try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+    }
     return 0; //All OK
 }
 
@@ -261,6 +273,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  bool isValidWhileLoop = true;
  
  while(isValidWhileLoop){
+ try{
    try {
     	// Code that might throw an exception 
  	// Check if there are need messages or actions to be done by the node
@@ -296,12 +309,17 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
 	// Handle the exception
     	cout << "Exception: " << e.what() << endl;
     }
+    } // upper try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+    }
     } // while
    
 }
 
 int QTLAH::ICPConnectionsCheckNewMessages(){
  for (int i=0;i<NumSocketsMax;++i){
+   try{
      try{
 	  int socket_fd=this->socket_fdArray[i]; // To be improved if several sockets
 	  // Check for new messages
@@ -345,6 +363,10 @@ int QTLAH::ICPConnectionsCheckNewMessages(){
 	// Handle the exception
     	cout << "Exception: " << e.what() << endl;
   	}
+  	} // upper try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+    }
   } // for
   return 0; // All OK
 

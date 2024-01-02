@@ -1,5 +1,10 @@
 #####################################################
-# Author: Marc Jofre
+# Author: Prof. Marc Jofre
+# Dept. Network Engineering
+# Universitat Politècnica de Catalunya - Technical University of Catalonia
+#
+# 2024
+#
 # Script Quantum LAN session layer
 #####################################################
 

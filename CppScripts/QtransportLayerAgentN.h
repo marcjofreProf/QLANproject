@@ -1,4 +1,8 @@
-/* Author: Marc Jofre
+/* Author: Prof. Marc Jofre
+Dept. Network Engineering
+Universitat Politècnica de Catalunya - Technical University of Catalonia
+
+2024
 
 Header declaration file for Quantum transport Layer Agent Node
 
@@ -59,6 +63,7 @@ public: // Functions
         int InitiateICPconnections(int argc); // Initiating sockets
         int StopICPconnections(int argc); // Closing sockets
         int ICPConnectionsCheckNewMessages(); // Check for new messages
+        int UpdateSocketsInformation(); // Update information to where the sockets are pointing to
 	~QTLAN();  //destructor
 
 private: // Functions
@@ -68,7 +73,7 @@ private: // Functions
 	int ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList); // Open ICP socket 
 	int ICPmanagementCloseClient(int socket_fd); // Close ICP socket 
 	// As server
-	int ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList);
+	int ICPmanagementOpenServer(int& socket_fd,int& new_socket);
 	int ICPmanagementCloseServer(int socket_fd,int new_socket);
 	// As server or cleint
 	int ICPmanagementRead(int socket_fd);
