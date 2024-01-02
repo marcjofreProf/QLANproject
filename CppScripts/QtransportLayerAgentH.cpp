@@ -207,6 +207,7 @@ int QTLAH::ICPmanagementRead(int socket_fd) {
 
 int QTLAH::ICPmanagementSend(int new_socket) {
     const char* SendBufferAux = this->SendBuffer;
+    cout << "SendBufferAux: " << SendBufferAux << endl;
     send(new_socket, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);
     
     return 0; // All OK
@@ -235,10 +236,10 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 	    // Parse the message information
 	    char IPaddressesSockets[IPcharArrayLengthMAX];
 	    strcpy(IPaddressesSockets,strtok(ParamsDescendingCharArray,","));//Null indicates we are using the same pointer as the last strtok
-	    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
+	    cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
 	    
 	    strcpy(this->SendBuffer,strtok(NULL,","));
-	    //cout << "SendBuffer: " << this->SendBuffer << endl;	    
+	    cout << "SendBuffer: " << this->SendBuffer << endl;	    
 	    // Understand which socket descriptor has to be used
 	    int new_socket;
 	    for (int i=0; i<NumSocketsMax; ++i){
@@ -275,19 +276,23 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  this->m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentH" << endl;
  bool isValidWhileLoop = true;
- 
+ int auxVal=0;
  while(isValidWhileLoop){
  try{
    try {
     	// Code that might throw an exception 
     	// Test to send messages from client
-    	if (string(this->SCmode)==string("client")){
-	    	char* message;
-		strcpy(message, "Hello, world!");
+    	
+    	if (string(this->SCmode)==string("client") and auxVal==0){
+    		auxVal=1;
+    		cout << "Send message" << endl;
+	    	char message[NumBytesBufferICPMAX] = { 0 };
+		strcpy(message, "10.0.0.3,Hello world!");
+		cout << "message: " << message << endl;
 	    	this->SendMessageAgent(message);
     	}
  	// Check if there are need messages or actions to be done by the node
- 	this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
+ 	//this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
        switch(this->getState()) {
            case QTLAH::APPLICATION_RUNNING: {
                
@@ -346,7 +351,7 @@ int QTLAH::ICPConnectionsCheckNewMessages(){// Read one message at a time and fr
 	  int ret = select(nfds, &fds, NULL, NULL, &timeout);
 
 	  if (ret < 0) {
-	    cout << "Node error select to check new messages" << endl;
+	    cout << "Host error select to check new messages" << endl;
 	  } else if (ret == 0) {
 	    //cout << "Host agent no new messages" << endl;
 	  } else {// There is at least one new message
@@ -354,7 +359,7 @@ int QTLAH::ICPConnectionsCheckNewMessages(){// Read one message at a time and fr
 	      // Read the message from the socket
 	      int n = this->ICPmanagementRead(socket_fd);
 	      if (n < 0) {
-		cout << "Node error reading new messages" << endl;
+		cout << "Host error reading new messages" << endl;
 	      }
 	      // Process the message
 	      if (n>0){
