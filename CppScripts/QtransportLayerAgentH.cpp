@@ -172,7 +172,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
 }
 
 int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList) {// Node listening for connection from attached host
-    cout << "Entering here" << endl;
+    cout << "Entering here 1" << endl;
     struct sockaddr_in address;
     int opt = 1;
     socklen_t addrlen = sizeof(address);       
@@ -185,7 +185,7 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
         cout << "Server socket failed" << endl;
         return -1;
     }
- 
+ cout << "Entering here 2" << endl;
     // Forcefully attaching socket to the port
     if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
         cout << "Server attaching socket to port failed" << endl;
@@ -194,24 +194,26 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(PORT);
- 
+ cout << "Entering here 3" << endl;
     // Forcefully attaching socket to the port
     if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
         cout << "Server socket bind failed" << endl;
         return -1;
     }
+   cout << "Entering here 4" << endl;
     if (listen(socket_fd, 3) < 0) {
         cout << "Server socket listen failed" << endl;
         return -1;
     }
+ cout << "Entering here 5" << endl;
     if ((new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen))< 0) {
         cout << "Server socket accept failed" << endl;
         return -1;
     }
-    
+ cout << "Entering here 6" << endl;
     // Retrive IP address client
     IPSocketsList=inet_ntoa(address.sin_addr);
-    //cout << "IPSocketsList: "<< IPSocketsList << endl;
+    cout << "IPSocketsList: "<< IPSocketsList << endl;
     
     cout << "Node starting socket server to host/node: " << IPSocketsList << endl;
     return 0; // All Ok
