@@ -83,13 +83,13 @@ int QTLAH::InitiateICPconnections() {
 	// First connect to the attached node
 	this->ICPmanagementOpenClient(this->socket_fdArray[0],this->IPaddressesSockets[0],this->IPSocketsList[0]); // Connect as client to own node
 	// Then either connect to the server host (acting as client) or open server listening (acting as server)
-	cout << "Check - SCmode: " << this->SCmode << endl;
+	//cout << "Check - SCmode: " << this->SCmode << endl;
 	if (string(this->SCmode)==string("client")){
-		cout << "Check - Generating connection as client" << endl;	
+		//cout << "Check - Generating connection as client" << endl;	
 		this->ICPmanagementOpenClient(this->socket_fdArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]); // Connect as client to destination host
 	}
 	else{// server
-		cout << "Check - Generating connection as server" << endl;
+		//cout << "Check - Generating connection as server" << endl;
 		this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPSocketsList[1]); // Open port and listen as server
 	}
 	this->numberSessions=1;
@@ -151,7 +151,6 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
 }
 
 int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList) {// Node listening for connection from attached host
-    cout << "Entering here 1" << endl;
     struct sockaddr_in address;
     int opt = 1;
     socklen_t addrlen = sizeof(address);       
@@ -164,7 +163,7 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
         cout << "Server socket failed" << endl;
         return -1;
     }
- cout << "Entering here 2" << endl;
+    
     // Forcefully attaching socket to the port
     if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
         cout << "Server attaching socket to port failed" << endl;
@@ -173,26 +172,26 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(PORT);
- cout << "Entering here 3" << endl;
+    
     // Forcefully attaching socket to the port
     if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
         cout << "Server socket bind failed" << endl;
         return -1;
     }
-   cout << "Entering here 4" << endl;
+    
     if (listen(socket_fd, 3) < 0) {
         cout << "Server socket listen failed" << endl;
         return -1;
     }
- cout << "Entering here 5" << endl;
+    
     if ((new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen))< 0) {
         cout << "Server socket accept failed" << endl;
         return -1;
     }
- cout << "Entering here 6" << endl;
+    
     // Retrive IP address client
     IPSocketsList=inet_ntoa(address.sin_addr);
-    cout << "IPSocketsList: "<< IPSocketsList << endl;
+    //cout << "IPSocketsList: "<< IPSocketsList << endl;
     
     cout << "Node starting socket server to host/node: " << IPSocketsList << endl;
     return 0; // All Ok
@@ -271,7 +270,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
    try {
     	// Code that might throw an exception 
  	// Check if there are need messages or actions to be done by the node
- 	//this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
+ 	this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
        switch(this->getState()) {
            case QTLAH::APPLICATION_RUNNING: {
                
