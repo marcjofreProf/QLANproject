@@ -112,8 +112,8 @@ class QTLAH(_object):
     if _newclass:
         numberSessions = _swig_property(_QtransportLayerAgent.QTLAH_numberSessions_get, _QtransportLayerAgent.QTLAH_numberSessions_set)
 
-    def __init__(self, numberSessions):
-        this = _QtransportLayerAgent.new_QTLAH(numberSessions)
+    def __init__(self, numberSessions, ParamsDescendingCharArray, ParamsAscendingCharArray):
+        this = _QtransportLayerAgent.new_QTLAH(numberSessions, ParamsDescendingCharArray, ParamsAscendingCharArray)
         try:
             self.this.append(this)
         except __builtin__.Exception:
@@ -133,9 +133,6 @@ class QTLAH(_object):
 
     def m_exit(self):
         return _QtransportLayerAgent.QTLAH_m_exit(self)
-
-    def InitAgent(self, ParamsDescendingCharArray, ParamsAscendingCharArray):
-        return _QtransportLayerAgent.QTLAH_InitAgent(self, ParamsDescendingCharArray, ParamsAscendingCharArray)
 
     def InitAgentProcess(self):
         return _QtransportLayerAgent.QTLAH_InitAgentProcess(self)

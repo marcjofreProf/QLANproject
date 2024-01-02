@@ -51,7 +51,7 @@ private: // Variables/Objects
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 
 public: // Functions
-	QTLAH(int numberSessions); //constructor
+	QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAscendingCharArray); //constructor
 	ApplicationState getState() const { return m_state; }	
         bool m_start() { m_state = APPLICATION_RUNNING; return true; }
         bool m_pause() { m_state = APPLICATION_PAUSED; return true; } 
@@ -62,7 +62,6 @@ public: // Functions
         // time for your timer or counter. 
         bool m_resume() { m_state = APPLICATION_RUNNING; return true; }      
         bool m_exit() { m_state = APPLICATION_EXIT;  return false; }
-	int InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharArray); // Passing parameters from the upper Agent to initialize the current agent
 	// Process Requests and Petitions
 	int InitAgentProcess(); // Initializer of the thread
 	// Communication messages

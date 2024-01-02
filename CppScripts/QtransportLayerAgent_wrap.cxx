@@ -3292,13 +3292,6 @@ SWIG_AsVal_int (PyObject * obj, int *val)
 }
 
 
-SWIGINTERNINLINE PyObject*
-  SWIG_From_bool  (bool value)
-{
-  return PyBool_FromLong(value ? 1 : 0);
-}
-
-
 SWIGINTERN swig_type_info*
 SWIG_pchar_descriptor(void)
 {
@@ -3427,6 +3420,13 @@ SWIG_AsCharPtrAndSize(PyObject *obj, char** cptr, size_t* psize, int *alloc)
 
 
 
+
+SWIGINTERNINLINE PyObject*
+  SWIG_From_bool  (bool value)
+{
+  return PyBool_FromLong(value ? 1 : 0);
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -3485,21 +3485,45 @@ fail:
 SWIGINTERN PyObject *_wrap_new_QTLAH(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
   int val1 ;
   int ecode1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
   PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
   nsQtransportLayerAgentH::QTLAH *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:new_QTLAH",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOO:new_QTLAH",&obj0,&obj1,&obj2)) SWIG_fail;
   ecode1 = SWIG_AsVal_int(obj0, &val1);
   if (!SWIG_IsOK(ecode1)) {
     SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_QTLAH" "', argument " "1"" of type '" "int""'");
   } 
   arg1 = static_cast< int >(val1);
-  result = (nsQtransportLayerAgentH::QTLAH *)new nsQtransportLayerAgentH::QTLAH(arg1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "new_QTLAH" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "new_QTLAH" "', argument " "3"" of type '" "char *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  result = (nsQtransportLayerAgentH::QTLAH *)new nsQtransportLayerAgentH::QTLAH(arg1,arg2,arg3);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, SWIG_POINTER_NEW |  0 );
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return resultobj;
 fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return NULL;
 }
 
@@ -3614,52 +3638,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_QTLAH_InitAgent(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
-  char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  int result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OOO:QTLAH_InitAgent",&obj0,&obj1,&obj2)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_InitAgent" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
-  }
-  arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "QTLAH_InitAgent" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "QTLAH_InitAgent" "', argument " "3"" of type '" "char *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
-  result = (int)(arg1)->InitAgent(arg2,arg3);
-  resultobj = SWIG_From_int(static_cast< int >(result));
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_QTLAH_InitAgentProcess(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
@@ -3754,7 +3732,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "QTLAH_m_pause", _wrap_QTLAH_m_pause, METH_VARARGS, NULL},
 	 { "QTLAH_m_resume", _wrap_QTLAH_m_resume, METH_VARARGS, NULL},
 	 { "QTLAH_m_exit", _wrap_QTLAH_m_exit, METH_VARARGS, NULL},
-	 { "QTLAH_InitAgent", _wrap_QTLAH_InitAgent, METH_VARARGS, NULL},
 	 { "QTLAH_InitAgentProcess", _wrap_QTLAH_InitAgentProcess, METH_VARARGS, NULL},
 	 { "QTLAH_SendMessageAgent", _wrap_QTLAH_SendMessageAgent, METH_VARARGS, NULL},
 	 { "delete_QTLAH", _wrap_delete_QTLAH, METH_VARARGS, NULL},

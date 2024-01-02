@@ -30,24 +30,20 @@ using namespace std;
 
 namespace nsQtransportLayerAgentH {
 
-QTLAH::QTLAH(int numberSessions) { // Constructor
+QTLAH::QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAscendingCharArray) { // Constructor
  this->numberSessions = numberSessions; // Number of sessions of different services
-}
+ 
+ //cout << "The value of the input is: "<< ParamsDescendingCharArray << endl;
+// Parse the ParamsDescendingCharArray
+strcpy(this->IPaddressesSockets[0],strtok(ParamsDescendingCharArray,","));
+strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
+this->SCmode=strtok(NULL,","); // to know if this host instance is client or server
 
-int QTLAH::InitAgent(char* ParamsDescendingCharArray,char* ParamsAscendingCharArray) { // Passing parameters from the upper Agent to initialize the current agent
- 	//cout << "The value of the input is: "<< ParamsDescendingCharArray << endl;
- 	// Parse the ParamsDescendingCharArray
- 	strcpy(this->IPaddressesSockets[0],strtok(ParamsDescendingCharArray,","));
-	strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
-	this->SCmode=strtok(NULL,","); // to know if this host instance is client or server
-	
-	//cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
-	//cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
-	//cout << "IPaddressesSockets[2]: "<< this->IPaddressesSockets[2] << endl;
-	//cout << "IPaddressesSockets[3]: "<< this->IPaddressesSockets[3] << endl;
-	//cout << "SCmode: "<< this->SCmode << endl;
-		
-	return 0; //All Ok
+//cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
+//cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
+//cout << "IPaddressesSockets[2]: "<< this->IPaddressesSockets[2] << endl;
+//cout << "IPaddressesSockets[3]: "<< this->IPaddressesSockets[3] << endl;
+//cout << "SCmode: "<< this->SCmode << endl;
 }
 
 /*
@@ -87,12 +83,13 @@ int QTLAH::InitiateICPconnections() {
 	// First connect to the attached node
 	this->ICPmanagementOpenClient(this->socket_fdArray[0],this->IPaddressesSockets[0],this->IPSocketsList[0]); // Connect as client to own node
 	// Then either connect to the server host (acting as client) or open server listening (acting as server)
-	if (string(this->SCmode)=="client"){
-		//cout << "Check - Generating connection as client" << endl;	
+	cout << "Check - SCmode: " << this->SCmode << endl;
+	if (string(this->SCmode)==string("client")){
+		cout << "Check - Generating connection as client" << endl;	
 		this->ICPmanagementOpenClient(this->socket_fdArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]); // Connect as client to destination host
 	}
 	else{// server
-		//cout << "Check - Generating connection as server" << endl;
+		cout << "Check - Generating connection as server" << endl;
 		this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPSocketsList[1]); // Open port and listen as server
 	}
 	this->numberSessions=1;
@@ -101,7 +98,7 @@ int QTLAH::InitiateICPconnections() {
 
 int QTLAH::StopICPconnections() {
 	// First stop client or server host connection
-	if (string(this->SCmode)=="client"){ // client
+	if (string(this->SCmode)==string("client")){ // client
 		ICPmanagementCloseClient(this->socket_fdArray[1]);
 	}
 	else{// server
