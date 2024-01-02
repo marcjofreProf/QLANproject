@@ -259,7 +259,18 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 
 void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  // One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
- this->InitiateICPconnections();	
+ try{
+  try{
+	 this->InitiateICPconnections();
+	 } // try
+    catch (const std::exception& e) {
+	// Handle the exception
+    	cout << "Exception: " << e.what() << endl;
+  	}
+  } // upper try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+    }	
  //
  this->m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentH" << endl;
@@ -269,6 +280,10 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  try{
    try {
     	// Code that might throw an exception 
+    	// Test to send messages
+    	char* message;
+	strcpy(message, "Hello, world!");
+    	this->SendMessageAgent(message);
  	// Check if there are need messages or actions to be done by the node
  	this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
        switch(this->getState()) {
