@@ -66,7 +66,7 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     IPSocketsList=inet_ntoa(Address.sin_addr);
     //cout << "IPSocketsList: "<< IPSocketsList << endl;
     
-    cout << "Client connected to: "<< IPaddressesSockets << endl;
+    cout << "Client connected to server: "<< IPaddressesSockets << endl;
     return 0; // All Ok
 }
 

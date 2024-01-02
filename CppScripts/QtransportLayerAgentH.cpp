@@ -167,7 +167,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     IPSocketsList=inet_ntoa(Address.sin_addr);
     //cout << "IPSocketsList: "<< IPSocketsList << endl;
     
-    cout << "Client connected to: "<< IPaddressesSockets << endl;
+    cout << "Client connected to server: "<< IPaddressesSockets << endl;
     return 0; // All Ok
 }
 
@@ -213,7 +213,7 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
     IPSocketsList=inet_ntoa(address.sin_addr);
     //cout << "IPSocketsList: "<< IPSocketsList << endl;
     
-    cout << "Node starting socket server to host/node:" << IPSocketsList << endl;
+    cout << "Node starting socket server to host/node: " << IPSocketsList << endl;
     return 0; // All Ok
 }
 
