@@ -207,8 +207,12 @@ int QTLAH::ICPmanagementRead(int socket_fd) {
 
 int QTLAH::ICPmanagementSend(int new_socket) {
     const char* SendBufferAux = this->SendBuffer;
-    cout << "SendBufferAux: " << SendBufferAux << endl;
-    send(new_socket, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);
+    //cout << "SendBufferAux: " << SendBufferAux << endl;
+    int BytesSent=send(new_socket, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);
+        
+    if (BytesSent<0){
+    	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
+    }
     
     return 0; // All OK
 }
@@ -236,10 +240,10 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 	    // Parse the message information
 	    char IPaddressesSockets[IPcharArrayLengthMAX];
 	    strcpy(IPaddressesSockets,strtok(ParamsDescendingCharArray,","));//Null indicates we are using the same pointer as the last strtok
-	    cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
+	    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
 	    
 	    strcpy(this->SendBuffer,strtok(NULL,","));
-	    cout << "SendBuffer: " << this->SendBuffer << endl;	    
+	    //cout << "SendBuffer: " << this->SendBuffer << endl;	    
 	    // Understand which socket descriptor has to be used
 	    int new_socket;
 	    for (int i=0; i<NumSocketsMax; ++i){
