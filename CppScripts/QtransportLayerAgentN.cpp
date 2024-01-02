@@ -70,7 +70,7 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     return 0; // All Ok
 }
 
-int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket) {// Node listening for connection from attached host
+int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList) {// Node listening for connection from attached host
     
     struct sockaddr_in address;
     int opt = 1;
@@ -107,8 +107,12 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket) {// Node list
         cout << "Server socket accept failed" << endl;
         return -1;
     }
-        
-    cout << "Node starting socket server to host/node" << endl;
+    
+    // Retrive IP address client
+    IPSocketsList=inet_ntoa(address.sin_addr);
+    //cout << "IPSocketsList: "<< IPSocketsList << endl;
+    
+    cout << "Node starting socket server to host/node: " << IPSocketsList << endl;
     return 0; // All Ok
 }
 
@@ -156,7 +160,7 @@ int QTLAN::InitiateICPconnections(int argc){
 
 	// First, opening server listening socket 
 	int RetValue = 0;
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0]);
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPSocketsList[0]);
 	// Eventually, if it is an intermediate node
 	if (argc > 1){ // Establish client connection with next node
 	// First parse the parama passed IP address
@@ -239,27 +243,28 @@ int QTLAN::ICPConnectionsCheckNewMessages(){
 }
 
 int QTLAN::SendMessageAgent(char* ParamsDescendingCharArray){
-  try{
+    try{
 	try {
     	// Code that might throw an exception 
-
 	    // Parse the message information
-	    strcpy(this->SendBuffer,strtok(ParamsDescendingCharArray,","));
-	    char* IPaddressesSockets;
-	    strcpy(IPaddressesSockets,strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
+	    char IPaddressesSockets[IPcharArrayLengthMAX];
+	    strcpy(IPaddressesSockets,strtok(ParamsDescendingCharArray,","));//Null indicates we are using the same pointer as the last strtok
+	    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
+	    
+	    strcpy(this->SendBuffer,strtok(NULL,","));
+	    //cout << "SendBuffer: " << this->SendBuffer << endl;	    
 	    // Understand which socket descriptor has to be used
 	    int new_socket;
 	    for (int i=0; i<NumSocketsMax; ++i){
 	    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){new_socket=this->new_socketArray[i];}
 	    }  
-	    this->ICPmanagementSend(new_socket);
-    
+	    this->ICPmanagementSend(new_socket);    
     } // try
     catch (const std::exception& e) {
 	// Handle the exception
     	cout << "Exception: " << e.what() << endl;
   	}
-  	} // upper try
+  } // upper try
   catch (...) { // Catches any exception
   cout << "Exception caught" << endl;
     }
@@ -335,7 +340,7 @@ int main(int argc, char const * argv[]){
  	try {
     	// Code that might throw an exception 
     	// Check the IPs the sockets are pointing to:
- 	QTLANagent.UpdateSocketsInformation();
+ 	/* Not used QTLANagent.UpdateSocketsInformation();*/
  	// Check if there are need messages or actions to be done by the node
  	QTLANagent.ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
        switch(QTLANagent.getState()) {

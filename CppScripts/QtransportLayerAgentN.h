@@ -75,7 +75,7 @@ private: // Functions
 	int ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList); // Open ICP socket 
 	int ICPmanagementCloseClient(int socket_fd); // Close ICP socket 
 	// As server
-	int ICPmanagementOpenServer(int& socket_fd,int& new_socket);
+	int ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList);
 	int ICPmanagementCloseServer(int socket_fd,int new_socket);
 	// As server or cleint
 	int ICPmanagementRead(int socket_fd);

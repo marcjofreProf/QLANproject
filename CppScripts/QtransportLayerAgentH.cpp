@@ -65,6 +65,7 @@ void* QTLAH::AgentProcessStaticEntryPoint(void* c){// Not really used
 */
 
 int QTLAH::InitAgentProcess(){
+/* Not used
 	// First resolve the IPs the sockets are pointing to:
 	for (int i=0;i<NumSocketsMax;++i){
 	    struct sockaddr_in Address;
@@ -78,6 +79,7 @@ int QTLAH::InitAgentProcess(){
 	    //cout << "inet_ntoa(Address.sin_addr): "<< inet_ntoa(Address.sin_addr) << endl;
 	    //cout << "IPSocketsList: "<< this->IPSocketsList[i] << endl;
 	 }
+*/
 	// Then, regularly check for next job/action without blocking		  	
 	// Not used void* params;
 	// Not used this->threadRef=std::thread(&QTLAH::AgentProcessStaticEntryPoint,params);
@@ -109,7 +111,7 @@ int QTLAH::InitiateICPconnections() {
 	}
 	else{// server
 		//cout << "Check - Generating connection as server" << endl;
-		this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1]); // Open port as listen as server
+		this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPSocketsList[1]); // Open port as listen as server
 	}
 	this->numberSessions=1;
 	return 0; // All OK
@@ -169,7 +171,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     return 0; // All Ok
 }
 
-int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket) {// Node listening for connection from attached host
+int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList) {// Node listening for connection from attached host
     
     struct sockaddr_in address;
     int opt = 1;
@@ -206,8 +208,12 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket) {// Node list
         cout << "Server socket accept failed" << endl;
         return -1;
     }
-        
-    cout << "Node starting socket server to host/node" << endl;
+    
+    // Retrive IP address client
+    IPSocketsList=inet_ntoa(address.sin_addr);
+    //cout << "IPSocketsList: "<< IPSocketsList << endl;
+    
+    cout << "Node starting socket server to host/node:" << IPSocketsList << endl;
     return 0; // All Ok
 }
 
