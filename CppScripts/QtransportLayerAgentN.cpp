@@ -56,14 +56,7 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
         return -1;
     }
     
-    struct sockaddr_in Address;
-    socklen_t len = sizeof (Address);
-    memset(&Address, 42, len);
-    if (getsockname(socket_fd, (struct sockaddr*)&Address, &len) == -1) {
-      cout << "Client failed to get socket name" << endl;
-      return -1;
-    }
-    IPSocketsList=inet_ntoa(Address.sin_addr);
+    strcpy(IPSocketsList,IPaddressesSockets);
     //cout << "IPSocketsList: "<< IPSocketsList << endl;
     
     cout << "Client connected to server: "<< IPaddressesSockets << endl;
@@ -109,7 +102,7 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
     }
     
     // Retrive IP address client
-    IPSocketsList=inet_ntoa(address.sin_addr);
+    strcpy(IPSocketsList,inet_ntoa(address.sin_addr));
     //cout << "IPSocketsList: "<< IPSocketsList << endl;
     
     cout << "Node starting socket server to host/node: " << IPSocketsList << endl;
@@ -124,10 +117,13 @@ int QTLAN::ICPmanagementRead(int socket_fd) {
     return valread; 
 }
 
-int QTLAN::ICPmanagementSend(int new_socket) {
+int QTLAN::ICPmanagementSend(int socket_fd) {
     const char* SendBufferAux = this->SendBuffer;
-    send(new_socket, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);
-    
+    send(socket_fd, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);
+    if (BytesSent<0){
+    	perror("send");
+    	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
+    }
     return 0; // All OK
 }
 
@@ -252,11 +248,11 @@ int QTLAN::SendMessageAgent(char* ParamsDescendingCharArray){
 	    strcpy(this->SendBuffer,strtok(NULL,","));
 	    //cout << "SendBuffer: " << this->SendBuffer << endl;	    
 	    // Understand which socket descriptor has to be used
-	    int new_socket;
+	    int socket_fd;
 	    for (int i=0; i<NumSocketsMax; ++i){
-	    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){new_socket=this->new_socketArray[i];}
+	    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){socket_fd=this->socket_fdArray[i];}
 	    }  
-	    this->ICPmanagementSend(new_socket);    
+	    this->ICPmanagementSend(socket_fd);     
     } // try
     catch (const std::exception& e) {
 	// Handle the exception

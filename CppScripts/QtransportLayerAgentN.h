@@ -80,7 +80,7 @@ private: // Functions
 	int ICPmanagementCloseServer(int socket_fd,int new_socket);
 	// As server or cleint
 	int ICPmanagementRead(int socket_fd);
-	int ICPmanagementSend(int new_socket);
+	int ICPmanagementSend(int socket_fd);
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the Agent to send message to specific host/node
 //	friend void* threadedPoll(void *value);
 };

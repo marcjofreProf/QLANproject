@@ -14,6 +14,7 @@ Agent script for Quantum transport Layer Host
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <fcntl.h>
 #define PORT 8010
 #define NumSocketsMax 2
 #define NumBytesBufferICPMAX 1024
@@ -121,6 +122,8 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
         cout << "Client Socket creation error" << endl;
         return -1;
     }
+    
+    //cout << "Client Socket file descriptor: " << socket_fd << endl;
  
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
@@ -136,14 +139,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
         return -1;
     }
     
-    struct sockaddr_in Address;
-    socklen_t len = sizeof (Address);
-    memset(&Address, 42, len);
-    if (getsockname(socket_fd, (struct sockaddr*)&Address, &len) == -1) {
-      cout << "Client failed to get socket name" << endl;
-      return -1;
-    }
-    IPSocketsList=inet_ntoa(Address.sin_addr);
+    strcpy(IPSocketsList,IPaddressesSockets);
     //cout << "IPSocketsList: "<< IPSocketsList << endl;
     
     cout << "Client connected to server: "<< IPaddressesSockets << endl;
@@ -190,7 +186,7 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
     }
     
     // Retrive IP address client
-    IPSocketsList=inet_ntoa(address.sin_addr);
+    strcpy(IPSocketsList,inet_ntoa(address.sin_addr));
     //cout << "IPSocketsList: "<< IPSocketsList << endl;
     
     cout << "Node starting socket server to host/node: " << IPSocketsList << endl;
@@ -205,14 +201,25 @@ int QTLAH::ICPmanagementRead(int socket_fd) {
     return valread; 
 }
 
-int QTLAH::ICPmanagementSend(int new_socket) {
+int QTLAH::ICPmanagementSend(int socket_fd) {
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
-    int BytesSent=send(new_socket, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);
+    int BytesSent=send(socket_fd, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);//MSG_DONTWAIT
         
     if (BytesSent<0){
+    	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
     }
+    /*
+    // Check if file descriptor is only readable
+    	int flags = fcntl(socket_fd, F_GETFL);
+
+	if (flags & O_RDONLY) {
+	  printf("File descriptor is read-only\n");
+	} else {
+	  printf("File descriptor is not read-only\n");
+	}
+	*/
     
     return 0; // All OK
 }
@@ -245,11 +252,14 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 	    strcpy(this->SendBuffer,strtok(NULL,","));
 	    //cout << "SendBuffer: " << this->SendBuffer << endl;	    
 	    // Understand which socket descriptor has to be used
-	    int new_socket;
+	    int socket_fd;
 	    for (int i=0; i<NumSocketsMax; ++i){
-	    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){new_socket=this->new_socketArray[i];}
+	    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
+	    	//cout << "Found socket file descriptor to send" << endl;
+	    	socket_fd=this->socket_fdArray[i];
+	    	}
 	    }  
-	    this->ICPmanagementSend(new_socket);    
+	    this->ICPmanagementSend(socket_fd);    
     } // try
     catch (const std::exception& e) {
 	// Handle the exception
@@ -284,17 +294,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  while(isValidWhileLoop){
  try{
    try {
-    	// Code that might throw an exception 
-    	// Test to send messages from client
-    	
-    	if (string(this->SCmode)==string("client") and auxVal==0){
-    		auxVal=1;
-    		cout << "Send message" << endl;
-	    	char message[NumBytesBufferICPMAX] = { 0 };
-		strcpy(message, "10.0.0.3,Hello world!");
-		cout << "message: " << message << endl;
-	    	this->SendMessageAgent(message);
-    	}
+    	// Code that might throw an exception
  	// Check if there are need messages or actions to be done by the node
  	//this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
        switch(this->getState()) {

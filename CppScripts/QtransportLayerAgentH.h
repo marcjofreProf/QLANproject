@@ -77,7 +77,7 @@ private: //Functions
 	int ICPmanagementCloseServer(int socket_fd,int new_socket);
 	// As server or client
 	int ICPmanagementRead(int socket_fd); // Read ICP socket
-	int ICPmanagementSend(int new_socket); // Send ICP socket
+	int ICPmanagementSend(int socket_fd); // Send ICP socket
 	int InitiateICPconnections(); // Initiating sockets
         int StopICPconnections(); // Closing sockets
 //	friend void* threadedPoll(void *value);
