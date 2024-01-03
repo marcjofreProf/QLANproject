@@ -40,6 +40,7 @@ QTLAH::QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAsce
 // Parse the ParamsDescendingCharArray
 strcpy(this->IPaddressesSockets[0],strtok(ParamsDescendingCharArray,","));
 strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
+strcpy(this->IPaddressesSockets[2],strtok(NULL,","));// Host own IP
 strcpy(this->SCmode[0],"client"); // to know if this host instance is client or server
 strcpy(this->SCmode[1],strtok(NULL,",")); // to know if this host instance is client or server
 
@@ -267,39 +268,28 @@ int QTLAH::ICPmanagementCloseServer(int socket_fd,int new_socket) {
 }
 
 int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
-    try{
-	try {
-    	// Code that might throw an exception
-    	    strcpy(this->SendBuffer,ParamsDescendingCharArray);//strtok(NULL,","));
-	    //cout << "SendBuffer: " << this->SendBuffer << endl;	
-	    // Parse the message information
-	    char IPaddressesSockets[IPcharArrayLengthMAX];
-	    strcpy(IPaddressesSockets,strtok(ParamsDescendingCharArray,","));//Null indicates we are using the same pointer as the last strtok
-	    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
-	    // Understand which socket descriptor has to be used
-	    int socket_fd_conn;
-	    for (int i=0; i<NumSocketsMax; ++i){
-	    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
-	    	//cout << "Found socket file descriptor//connection to send" << endl;
-	    	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
-	    		socket_fd_conn=this->socket_fdArray[i];
-	    	}
-	    	else{// server sends on the socket connection
-	    		//cout << "socket_fd_conn" << socket_fd_conn << endl;
-	    		socket_fd_conn=this->new_socketArray[i];
-	    	}
-	    	}
-	    }  
-	    this->ICPmanagementSend(socket_fd_conn);    
-    } // try
-    catch (const std::exception& e) {
-	// Handle the exception
-    	cout << "Exception: " << e.what() << endl;
-  	}
-  } // upper try
-  catch (...) { // Catches any exception
-  cout << "Exception caught" << endl;
-    }
+// Code that might throw an exception
+    strcpy(this->SendBuffer,ParamsDescendingCharArray);//strtok(NULL,","));
+    //cout << "SendBuffer: " << this->SendBuffer << endl;	
+    // Parse the message information
+    char IPaddressesSockets[IPcharArrayLengthMAX];
+    strcpy(IPaddressesSockets,strtok(ParamsDescendingCharArray,","));//Null indicates we are using the same pointer as the last strtok
+    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
+    // Understand which socket descriptor has to be used
+    int socket_fd_conn;
+    for (int i=0; i<NumSocketsMax; ++i){
+    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
+    	//cout << "Found socket file descriptor//connection to send" << endl;
+    	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
+    		socket_fd_conn=this->socket_fdArray[i];
+    	}
+    	else{// server sends on the socket connection
+    		//cout << "socket_fd_conn" << socket_fd_conn << endl;
+    		socket_fd_conn=this->new_socketArray[i];
+    	}
+    	}
+    }  
+    this->ICPmanagementSend(socket_fd_conn);    
     return 0; //All OK
 }
 
@@ -352,56 +342,45 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
 }
 
 int QTLAH::ICPConnectionsCheckNewMessages(){// Read one message at a time and from the different sockets
-   try{
-     try{
-        int socket_fd_conn=0;
-	if (string(this->SCmode[this->socketReadIter])==string("client")){// Client sends on the file descriptor
-    		socket_fd_conn=this->socket_fdArray[this->socketReadIter];
-    	}
-    	else{// server checks on the socket connection
-    		socket_fd_conn=this->new_socketArray[this->socketReadIter];
-    	}
-	  // Check for new messages
-	  fd_set fds;
-	  FD_ZERO(&fds);
-	  FD_SET(socket_fd_conn, &fds);
+int socket_fd_conn=0;
+if (string(this->SCmode[this->socketReadIter])==string("client")){// Client sends on the file descriptor
+	socket_fd_conn=this->socket_fdArray[this->socketReadIter];
+}
+else{// server checks on the socket connection
+	socket_fd_conn=this->new_socketArray[this->socketReadIter];
+}
+  // Check for new messages
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(socket_fd_conn, &fds);
 
-	  // Set the timeout
-	  struct timeval timeout;
-	  // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
-	  timeout.tv_sec = 0;
-	  timeout.tv_usec = SockListenTimeMAXusec;
-	  
-	  int nfds = socket_fd_conn + 1;
-	  int ret = select(nfds, &fds, NULL, NULL, &timeout);
+  // Set the timeout
+  struct timeval timeout;
+  // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
+  timeout.tv_sec = 0;
+  timeout.tv_usec = SockListenTimeMAXusec;
+  
+  int nfds = socket_fd_conn + 1;
+  int ret = select(nfds, &fds, NULL, NULL, &timeout);
 
-	  if (ret < 0) {
-	    cout << "Host error select to check new messages" << endl;
-	  } else if (ret == 0) {
-	    //cout << "Host agent no new messages" << endl;
-	  } else {// There is at least one new message
-	    if (FD_ISSET(socket_fd_conn, &fds)) {
-	      // Read the message from the socket
-	      int n = this->ICPmanagementRead(socket_fd_conn);
-	      if (n < 0) {
-		cout << "Host error reading new messages" << endl;
-	      }
-	      // Process the message
-	      if (n>0){
-	      	//cout << "Received message: " << this->ReadBuffer << endl;
-	      	this->m_start();
-	      }
-	    }
-	  }
-  } // try
-    catch (const std::exception& e) {
-	// Handle the exception
-    	cout << "Exception: " << e.what() << endl;
-  	}
-  	} // upper try
-  catch (...) { // Catches any exception
-  cout << "Exception caught" << endl;
+  if (ret < 0) {
+    cout << "Host error select to check new messages" << endl;
+  } else if (ret == 0) {
+    //cout << "Host agent no new messages" << endl;
+  } else {// There is at least one new message
+    if (FD_ISSET(socket_fd_conn, &fds)) {
+      // Read the message from the socket
+      int n = this->ICPmanagementRead(socket_fd_conn);
+      if (n < 0) {
+	cout << "Host error reading new messages" << endl;
+      }
+      // Process the message
+      if (n>0){
+      	//cout << "Received message: " << this->ReadBuffer << endl;
+      	this->m_start();
+      }
     }
+  }
   
   // Update the socketReadIter
   this->socketReadIter++; // Variable to read each time a different socket
@@ -431,9 +410,35 @@ strcpy(Payload,strtok(NULL,","));
 //cout << "Payload: " << Payload << endl;
 
 // Identify what to do and execute it
-if (string(Type)==string("Operation")){// Operation message
+if (string(Type)==string("Operation")){// Operation message. 
+
+	if (string(Command)==string("print")){
+		cout << "New Message: "<< Payload << endl;
+	}
+	else{//Default
+	// Do not do anything
+	}
 }
-else if(string(Type)==string("Control")){//Control message
+else if(string(Type)==string("Control")){//Control message. If it is not meant for this process, forward to the node
+        strcpy(this->SendBuffer,this->ReadBuffer);
+	if (string(IPorg)==string(this->IPSocketsList[0]) and string(IPdest)!=string(this->IPaddressesSockets[2])){ // If it comes from its attached node and destination at this host (if destination is another host, then means that has to go to else), it means it has to forward it to the other host (so it can forward it to its attached node)
+	// The node of a host is always identified in the Array in position 0	
+	    //cout << "SendBuffer: " << this->SendBuffer << endl;
+	    if (string(this->SCmode[1])==string("client")){//host acts as client
+	    int socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor  
+	    this->ICPmanagementSend(socket_fd_conn);
+	    }
+	    else{ //host acts as server
+	    int socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
+	    this->ICPmanagementSend(socket_fd_conn);
+	    }
+	}
+	else{// It has to forward to its node
+	   // The node of a host is always identified in the Array in position 0	
+	    //cout << "SendBuffer: " << this->SendBuffer << endl;
+	    int socket_fd_conn=this->socket_fdArray[0];  // the host always acts as client to the node, so it needs the socket descriptor   
+	    this->ICPmanagementSend(socket_fd_conn);
+        }  
 }
 else{// Info message; Default
 	if (string(Command)==string("print")){

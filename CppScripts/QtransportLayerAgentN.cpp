@@ -208,8 +208,6 @@ int QTLAN::StopICPconnections(int argc){
 }
 
 int QTLAN::ICPConnectionsCheckNewMessages(){
-   try{
-     try{
      int socket_fd_conn=0;
 	if (string(this->SCmode[this->socketReadIter])==string("client")){// Client sends on the file descriptor
     		socket_fd_conn=this->socket_fdArray[this->socketReadIter];
@@ -249,15 +247,6 @@ int QTLAN::ICPConnectionsCheckNewMessages(){
 	      }
 	    }
 	  }
-  } // try
-    catch (const std::exception& e) {
-	// Handle the exception
-    	cout << "Exception: " << e.what() << endl;
-  	}
-  	} // upper try
-  catch (...) { // Catches any exception
-  cout << "Exception caught" << endl;
-    }
   
   // Update the socketReadIter
   this->socketReadIter++; // Variable to read each time a different socket
@@ -267,39 +256,29 @@ int QTLAN::ICPConnectionsCheckNewMessages(){
 }
 
 int QTLAN::SendMessageAgent(char* ParamsDescendingCharArray){
-    try{
-	try {
-    	     // Code that might throw an exception 
-    	     strcpy(this->SendBuffer,ParamsDescendingCharArray);//strtok(NULL,","));
-	    //cout << "SendBuffer: " << this->SendBuffer << endl;
-	    // Parse the message information
-	    char IPaddressesSockets[IPcharArrayLengthMAX];
-	    strcpy(IPaddressesSockets,strtok(ParamsDescendingCharArray,","));//Null indicates we are using the same pointer as the last strtok
-	    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;    
-	    	    
-	    // Understand which socket descriptor has to be used
-	    int socket_fd_conn;
-	    for (int i=0; i<NumSocketsMax; ++i){
-	    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
-	    	//cout << "Found socket file descriptor//connection to send" << endl;
-	    	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
-	    		socket_fd_conn=this->socket_fdArray[i];
-	    	}
-	    	else{// server sends on the socket connection
-	    		socket_fd_conn=this->new_socketArray[i];
-	    	}
-	    	}
-	    }  
-	    this->ICPmanagementSend(socket_fd_conn);     
-    } // try
-    catch (const std::exception& e) {
-	// Handle the exception
-    	cout << "Exception: " << e.what() << endl;
-  	}
-  } // upper try
-  catch (...) { // Catches any exception
-  cout << "Exception caught" << endl;
-    }
+     // Code that might throw an exception 
+     strcpy(this->SendBuffer,ParamsDescendingCharArray);//strtok(NULL,","));
+    //cout << "SendBuffer: " << this->SendBuffer << endl;
+    // Parse the message information
+    char IPaddressesSockets[IPcharArrayLengthMAX];
+    strcpy(IPaddressesSockets,strtok(ParamsDescendingCharArray,","));//Null indicates we are using the same pointer as the last strtok
+    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;    
+    	    
+    // Understand which socket descriptor has to be used
+    int socket_fd_conn;
+    for (int i=0; i<NumSocketsMax; ++i){
+    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
+    	//cout << "Found socket file descriptor//connection to send" << endl;
+    	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
+    		socket_fd_conn=this->socket_fdArray[i];
+    	}
+    	else{// server sends on the socket connection
+    		socket_fd_conn=this->new_socketArray[i];
+    	}
+    	}
+    }  
+    this->ICPmanagementSend(socket_fd_conn);     
+
     return 0; //All OK
 }
 
@@ -341,9 +320,16 @@ strcpy(Payload,strtok(NULL,","));
 //cout << "Payload: " << Payload << endl;
 
 // Identify what to do and execute it
-if (string(Type)==string("Operation")){// Operation message
+if (string(Type)==string("Operation")){// Operation message. Forward to the host (there should not be messages of this type in the QtransportLayerAgent. So not develop
+	// Do not do anything
 }
 else if(string(Type)==string("Control")){//Control message
+	if (string(Command)==string("print")){
+		cout << "New Message: "<< Payload << endl;
+	}
+	else{//Default
+	// Do not do anything
+	}
 }
 else{// Info message; Default
 	if (string(Command)==string("print")){
