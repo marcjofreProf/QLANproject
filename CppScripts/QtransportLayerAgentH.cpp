@@ -122,12 +122,12 @@ int QTLAH::SocketCheckForceShutDown(int socket_fd){
 
 //The shutdown() function, on the other hand, allows you to terminate a connection in a more controlled way. You can specify whether to shut down the read, write, or both ends of the connection. This can be useful if you want to gracefully terminate the connection, such as when the server is shutting down or when a client needs to send a final message.
 
-if (shutdown(socket_fd, SHUT_RDWR) < 0) {
+//if (shutdown(socket_fd, SHUT_RDWR) < 0) {
 //perror("shutdown");
 //close(socket_fd);
 //cout << "Not capable to shutdown Socket!!! Restart the application!" << endl;
 //return -1;
-}
+//}
 return 0; // All Ok
 }
 
