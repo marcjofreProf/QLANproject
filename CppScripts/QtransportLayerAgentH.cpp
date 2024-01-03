@@ -19,7 +19,7 @@ Agent script for Quantum transport Layer Host
 #define NumSocketsMax 2
 #define NumBytesBufferICPMAX 1024
 #define IPcharArrayLengthMAX 15
-#define SockListenTimeMAXusec 10
+#define SockListenTimeMAXusec 100
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
