@@ -451,6 +451,9 @@ else{// Info message; Default
 	}
 }  
 
+// Clear the ReadBuffer after using it!!! Important
+memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
+
 return 0; // All OK
 }
 
