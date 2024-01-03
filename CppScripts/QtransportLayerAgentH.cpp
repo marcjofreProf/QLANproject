@@ -43,9 +43,10 @@ strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are usi
 strcpy(this->SCmode[0],"client"); // to know if this host instance is client or server
 strcpy(this->SCmode[1],strtok(NULL,",")); // to know if this host instance is client or server
 
-//cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
-//cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
-//cout << "SCmode: "<< this->SCmode << endl;
+cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
+cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
+cout << "SCmode[0]: "<< this->SCmode[0] << endl;
+cout << "SCmode[1]: "<< this->SCmode[1] << endl;
 
 }
 
@@ -187,6 +188,9 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
         return -1;
     }
     
+    cout << " Server socket_fd: " << socket_fd << endl;
+    cout << " Server new_socket: " << new_socket << endl;
+    
     // Retrive IP address client
     strcpy(IPSocketsList,inet_ntoa(address.sin_addr));
     //cout << "IPSocketsList: "<< IPSocketsList << endl;
@@ -251,16 +255,17 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 	    // Parse the message information
 	    char IPaddressesSockets[IPcharArrayLengthMAX];
 	    strcpy(IPaddressesSockets,strtok(ParamsDescendingCharArray,","));//Null indicates we are using the same pointer as the last strtok
-	    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
+	    cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
 	    // Understand which socket descriptor has to be used
 	    int socket_fd_conn;
 	    for (int i=0; i<NumSocketsMax; ++i){
 	    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
-	    	//cout << "Found socket file descriptor//connection to send" << endl;
+	    	cout << "Found socket file descriptor//connection to send" << endl;
 	    	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
 	    		socket_fd_conn=this->socket_fdArray[i];
 	    	}
 	    	else{// server sends on the socket connection
+	    		cout << "socket_fd_conn" << socket_fd_conn << endl;
 	    		socket_fd_conn=this->new_socketArray[i];
 	    	}
 	    	}
@@ -340,11 +345,11 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
 int QTLAH::ICPConnectionsCheckNewMessages(){// Read one message at a time and from the different sockets
    try{
      try{
-     int socket_fd_conn=0;
+        int socket_fd_conn=0;
 	if (string(this->SCmode[this->socketReadIter])==string("client")){// Client sends on the file descriptor
     		socket_fd_conn=this->socket_fdArray[this->socketReadIter];
     	}
-    	else{// server sends on the socket connection
+    	else{// server checks on the socket connection
     		socket_fd_conn=this->new_socketArray[this->socketReadIter];
     	}
 	  // Check for new messages
@@ -352,7 +357,7 @@ int QTLAH::ICPConnectionsCheckNewMessages(){// Read one message at a time and fr
 	  FD_ZERO(&fds);
 	  FD_SET(socket_fd_conn, &fds);
 
-	  // Set the timeout to 1 second
+	  // Set the timeout
 	  struct timeval timeout;
 	  // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
 	  timeout.tv_sec = 0;

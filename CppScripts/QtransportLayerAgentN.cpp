@@ -202,7 +202,7 @@ int QTLAN::ICPConnectionsCheckNewMessages(){
 	  FD_ZERO(&fds);
 	  FD_SET(socket_fd_conn, &fds);
 
-	  // Set the timeout to 1 second
+	  // Set the timeout to
 	  struct timeval timeout;
 	  // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
 	  timeout.tv_sec = 0;
