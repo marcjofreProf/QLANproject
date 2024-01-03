@@ -249,14 +249,14 @@ int QTLAN::ICPConnectionsCheckNewMessages(){
 int QTLAN::SendMessageAgent(char* ParamsDescendingCharArray){
     try{
 	try {
-    	// Code that might throw an exception 
+    	     // Code that might throw an exception 
+    	     strcpy(this->SendBuffer,ParamsDescendingCharArray);//strtok(NULL,","));
+	    //cout << "SendBuffer: " << this->SendBuffer << endl;
 	    // Parse the message information
 	    char IPaddressesSockets[IPcharArrayLengthMAX];
 	    strcpy(IPaddressesSockets,strtok(ParamsDescendingCharArray,","));//Null indicates we are using the same pointer as the last strtok
-	    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
-	    
-	    strcpy(this->SendBuffer,ParamsDescendingCharArray);//strtok(NULL,","));
-	    //cout << "SendBuffer: " << this->SendBuffer << endl;	    
+	    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;    
+	    	    
 	    // Understand which socket descriptor has to be used
 	    int socket_fd_conn;
 	    for (int i=0; i<NumSocketsMax; ++i){
@@ -301,7 +301,7 @@ int QTLAN::UpdateSocketsInformation(){
 }
 
 int QTLAN::ProcessNewMessage(){
-cout << "ReadBuffer: " << this->ReadBuffer << endl;
+//cout << "ReadBuffer: " << this->ReadBuffer << endl;
 // Parse the message information
 char IPdest[NumBytesBufferICPMAX] = { 0 };
 char IPorg[NumBytesBufferICPMAX] = { 0 };
@@ -314,11 +314,11 @@ strcpy(Type,strtok(NULL,","));
 strcpy(Command,strtok(NULL,","));
 strcpy(Payload,strtok(NULL,","));
 
-cout << "IPdest: " << IPdest << endl;
-cout << "IPorg: " << IPorg << endl;
-cout << "Type: " << Type << endl;
-cout << "Command: " << Command << endl;
-cout << "Payload: " << Payload << endl;
+//cout << "IPdest: " << IPdest << endl;
+//cout << "IPorg: " << IPorg << endl;
+//cout << "Type: " << Type << endl;
+//cout << "Command: " << Command << endl;
+//cout << "Payload: " << Payload << endl;
 
 // Identify what to do and execute it
 if (string(Type)==string("Operation")){// Operation message
