@@ -84,6 +84,8 @@ private: //Functions
 	//static void* AgentProcessStaticEntryPoint(void* c); // Not used
 	void AgentProcessRequestsPetitions(); // Process thread that manages requests and petitions
 	int ICPConnectionsCheckNewMessages(); // Check for new messages
+	// Process and execute requests
+	int ProcessNewMessage();
 };
 
 

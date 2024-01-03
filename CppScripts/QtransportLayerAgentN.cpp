@@ -19,6 +19,7 @@ Agent script for Quantum transport Layer Node
 #define NumSocketsMax 2
 #define NumBytesBufferICPMAX 1024
 #define IPcharArrayLengthMAX 15
+#define SockListenTimeMAXusec 10
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -204,8 +205,8 @@ int QTLAN::ICPConnectionsCheckNewMessages(){
 	  // Set the timeout to 1 second
 	  struct timeval timeout;
 	  // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
-	  timeout.tv_sec = 1;
-	  timeout.tv_usec = 0;
+	  timeout.tv_sec = 0;
+	  timeout.tv_usec = SockListenTimeMAXusec;
 	  
 	  int nfds = socket_fd_conn + 1;
 	  int ret = select(nfds, &fds, NULL, NULL, &timeout);
@@ -223,7 +224,8 @@ int QTLAN::ICPConnectionsCheckNewMessages(){
 	      }
 	      // Process the message
 	      if (n>0){
-	      	cout << "Received message: " << this->ReadBuffer << endl;
+	      	//cout << "Received message: " << this->ReadBuffer << endl;
+	      	this->m_start();
 	      }
 	    }
 	  }
@@ -253,7 +255,7 @@ int QTLAN::SendMessageAgent(char* ParamsDescendingCharArray){
 	    strcpy(IPaddressesSockets,strtok(ParamsDescendingCharArray,","));//Null indicates we are using the same pointer as the last strtok
 	    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
 	    
-	    strcpy(this->SendBuffer,strtok(NULL,","));
+	    strcpy(this->SendBuffer,ParamsDescendingCharArray);//strtok(NULL,","));
 	    //cout << "SendBuffer: " << this->SendBuffer << endl;	    
 	    // Understand which socket descriptor has to be used
 	    int socket_fd_conn;
@@ -296,6 +298,36 @@ int QTLAN::UpdateSocketsInformation(){
 	    cout << "IPSocketsList: "<< this->IPSocketsList[i] << endl;
 	 }
 	 return 0; // All ok
+}
+
+int QTLAN::ProcessNewMessage(){
+// Parse the message information
+char IPdest[NumBytesBufferICPMAX] = { 0 };
+char IPorg[NumBytesBufferICPMAX] = { 0 };
+char Type[NumBytesBufferICPMAX] = { 0 };
+char Command[NumBytesBufferICPMAX] = { 0 };
+char Payload[NumBytesBufferICPMAX] = { 0 };
+strcpy(IPdest,strtok(ReadBuffer,","));
+strcpy(IPorg,strtok(NULL,","));
+strcpy(Type,strtok(NULL,","));
+strcpy(Command,strtok(NULL,","));
+strcpy(Payload,strtok(NULL,","));
+
+// Identify what to do and execute it
+if (string(Type)==string("Operation")){// Operation message
+}
+else if(string(Type)==string("Control")){//Control message
+}
+else{// Info message; Default
+	if (string(Command)==string("print")){
+		cout << "New Message: "<< Payload << endl;
+	}
+	else{//Default
+	// Do not do anything
+	}
+}  
+
+return 0; // All OK
 }
 
 QTLAN::~QTLAN() {
@@ -354,20 +386,14 @@ int main(int argc, char const * argv[]){
  	// Check if there are need messages or actions to be done by the node
  	QTLANagent.ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
        switch(QTLANagent.getState()) {
-           case QTLAN::APPLICATION_RUNNING: {
-               
+           case QTLAN::APPLICATION_RUNNING: {               
                // Do Some Work
+               QTLANagent.ProcessNewMessage();
                QTLANagent.m_pause(); // After procesing the request, pass to paused state
                break;
            }
            case QTLAN::APPLICATION_PAUSED: {
-               // Wait Till You Have Focus Or Continues
-               if (QTLANagent.numberSessions>0 and true){
-               	QTLANagent.m_start();
-               }
-               else{               
-	        QTLANagent.m_pause(); // Keep paused state
-               }
+               // Maybe do some checks if necessary 
                break;
            }
            case QTLAN::APPLICATION_EXIT: {    

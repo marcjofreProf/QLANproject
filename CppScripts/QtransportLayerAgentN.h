@@ -68,6 +68,8 @@ public: // Functions
         int StopICPconnections(int argc); // Closing sockets
         int ICPConnectionsCheckNewMessages(); // Check for new messages
         int UpdateSocketsInformation(); // Update information to where the sockets are pointing to
+        // Process and execute requests
+	int ProcessNewMessage();
 	~QTLAN();  //destructor
 
 private: // Functions
@@ -84,6 +86,7 @@ private: // Functions
 	int ICPmanagementSend(int socket_fd_conn);
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the Agent to send message to specific host/node
 //	friend void* threadedPoll(void *value);
+	
 };
 
 
