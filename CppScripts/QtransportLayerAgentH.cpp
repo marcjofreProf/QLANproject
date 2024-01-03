@@ -43,10 +43,10 @@ strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are usi
 strcpy(this->SCmode[0],"client"); // to know if this host instance is client or server
 strcpy(this->SCmode[1],strtok(NULL,",")); // to know if this host instance is client or server
 
-cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
-cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
-cout << "SCmode[0]: "<< this->SCmode[0] << endl;
-cout << "SCmode[1]: "<< this->SCmode[1] << endl;
+//cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
+//cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
+//cout << "SCmode[0]: "<< this->SCmode[0] << endl;
+//cout << "SCmode[1]: "<< this->SCmode[1] << endl;
 
 }
 
@@ -188,8 +188,8 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
         return -1;
     }
     
-    cout << " Server socket_fd: " << socket_fd << endl;
-    cout << " Server new_socket: " << new_socket << endl;
+    //cout << " Server socket_fd: " << socket_fd << endl;
+    //cout << " Server new_socket: " << new_socket << endl;
     
     // Retrive IP address client
     strcpy(IPSocketsList,inet_ntoa(address.sin_addr));
@@ -255,17 +255,17 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 	    // Parse the message information
 	    char IPaddressesSockets[IPcharArrayLengthMAX];
 	    strcpy(IPaddressesSockets,strtok(ParamsDescendingCharArray,","));//Null indicates we are using the same pointer as the last strtok
-	    cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
+	    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
 	    // Understand which socket descriptor has to be used
 	    int socket_fd_conn;
 	    for (int i=0; i<NumSocketsMax; ++i){
 	    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
-	    	cout << "Found socket file descriptor//connection to send" << endl;
+	    	//cout << "Found socket file descriptor//connection to send" << endl;
 	    	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
 	    		socket_fd_conn=this->socket_fdArray[i];
 	    	}
 	    	else{// server sends on the socket connection
-	    		cout << "socket_fd_conn" << socket_fd_conn << endl;
+	    		//cout << "socket_fd_conn" << socket_fd_conn << endl;
 	    		socket_fd_conn=this->new_socketArray[i];
 	    	}
 	    	}
@@ -285,18 +285,7 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 
 void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  // One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
- try{
-  try{
-	 this->InitiateICPconnections();
-	 } // try
-    catch (const std::exception& e) {
-	// Handle the exception
-    	cout << "Exception: " << e.what() << endl;
-  	}
-  } // upper try
-  catch (...) { // Catches any exception
-  cout << "Exception caught" << endl;
-    }	
+ this->InitiateICPconnections(); // Very important that they work. Otherwise the rest go wrong
  //
  this->m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentH" << endl;
