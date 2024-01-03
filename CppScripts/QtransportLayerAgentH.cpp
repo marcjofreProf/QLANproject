@@ -124,9 +124,9 @@ int QTLAH::SocketCheckForceShutDown(int socket_fd){
 
 if (shutdown(socket_fd, SHUT_RDWR) < 0) {
 //perror("shutdown");
-close(socket_fd);
-cout << "Not capable to shutdown Socket!!! Restart the application!" << endl;
-return -1;
+//close(socket_fd);
+//cout << "Not capable to shutdown Socket!!! Restart the application!" << endl;
+//return -1;
 }
 return 0; // All Ok
 }
