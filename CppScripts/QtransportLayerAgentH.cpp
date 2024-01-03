@@ -371,11 +371,13 @@ else{// server checks on the socket connection
     if (FD_ISSET(socket_fd_conn, &fds)) {
       // Read the message from the socket
       int n = this->ICPmanagementRead(socket_fd_conn);
-      if (n < 0) {
-	cout << "Host error reading new messages" << endl;
+      if (n <= 0) {
+        if (n<0){cout << "Host error reading new messages" << endl;}
+	// Clear the ReadBuffer after using it!!! Important
+	memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
       }
       // Process the message
-      if (n>0){
+      else{// (n>0){
       	//cout << "Received message: " << this->ReadBuffer << endl;
       	this->m_start();
       }
