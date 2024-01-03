@@ -43,6 +43,7 @@ private: // Variables/Objects
 	ApplicationState m_state;	
 	char IPaddressesSockets[NumSocketsMax][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks
 	char IPSocketsList[NumSocketsMax][IPcharArrayLengthMAX]; // IP address where the socket descriptors are pointing to
+	char SCmode[NumSocketsMax][NumBytesBufferICPMAX] = { 0 }; // Variable to know if the host instance is working as server or client
 	int socket_fdArray[NumSocketsMax]; // socket descriptor, an integer (like a file-handle)
 	int new_socketArray[NumSocketsMax]; // socket between client and server. Created by the server
 	char ReadBuffer[NumBytesBufferICPMAX] = { 0 };// Buffer to read ICP messages
@@ -79,8 +80,8 @@ private: // Functions
 	int ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList);
 	int ICPmanagementCloseServer(int socket_fd,int new_socket);
 	// As server or cleint
-	int ICPmanagementRead(int socket_fd);
-	int ICPmanagementSend(int socket_fd);
+	int ICPmanagementRead(int socket_fd_conn);
+	int ICPmanagementSend(int socket_fd_conn);
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the Agent to send message to specific host/node
 //	friend void* threadedPoll(void *value);
 };

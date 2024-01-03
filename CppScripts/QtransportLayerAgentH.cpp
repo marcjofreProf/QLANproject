@@ -39,7 +39,8 @@ QTLAH::QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAsce
 // Parse the ParamsDescendingCharArray
 strcpy(this->IPaddressesSockets[0],strtok(ParamsDescendingCharArray,","));
 strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
-strcpy(this->SCmode,strtok(NULL,",")); // to know if this host instance is client or server
+strcpy(this->SCmode[0],"client"); // to know if this host instance is client or server
+strcpy(this->SCmode[1],strtok(NULL,",")); // to know if this host instance is client or server
 
 //cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
 //cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
@@ -84,8 +85,8 @@ int QTLAH::InitiateICPconnections() {
 	// First connect to the attached node
 	this->ICPmanagementOpenClient(this->socket_fdArray[0],this->IPaddressesSockets[0],this->IPSocketsList[0]); // Connect as client to own node
 	// Then either connect to the server host (acting as client) or open server listening (acting as server)
-	//cout << "Check - SCmode: " << this->SCmode << endl;
-	if (string(this->SCmode)==string("client")){
+	//cout << "Check - SCmode[1]: " << this->SCmode[1] << endl;
+	if (string(this->SCmode[1])==string("client")){
 		//cout << "Check - Generating connection as client" << endl;	
 		this->ICPmanagementOpenClient(this->socket_fdArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]); // Connect as client to destination host
 	}
@@ -99,7 +100,7 @@ int QTLAH::InitiateICPconnections() {
 
 int QTLAH::StopICPconnections() {
 	// First stop client or server host connection
-	if (string(this->SCmode)==string("client")){ // client
+	if (string(this->SCmode[1])==string("client")){ // client
 		ICPmanagementCloseClient(this->socket_fdArray[1]);
 	}
 	else{// server
@@ -142,7 +143,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     strcpy(IPSocketsList,IPaddressesSockets);
     //cout << "IPSocketsList: "<< IPSocketsList << endl;
     
-    cout << "Client connected to server: "<< IPaddressesSockets << endl;
+    cout << "Host client connected to server: "<< IPaddressesSockets << endl;
     return 0; // All Ok
 }
 
@@ -189,22 +190,22 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
     strcpy(IPSocketsList,inet_ntoa(address.sin_addr));
     //cout << "IPSocketsList: "<< IPSocketsList << endl;
     
-    cout << "Node starting socket server to host/node: " << IPSocketsList << endl;
+    cout << "Host starting socket server to host/node: " << IPSocketsList << endl;
     return 0; // All Ok
 }
 
-int QTLAH::ICPmanagementRead(int socket_fd) {
-    int valread = recv(socket_fd, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
+int QTLAH::ICPmanagementRead(int socket_fd_conn) {
+    int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
     // terminator at the end
     //cout << "Node message received: " << this->ReadBuffer << endl;
     
     return valread; 
 }
 
-int QTLAH::ICPmanagementSend(int socket_fd) {
+int QTLAH::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
-    int BytesSent=send(socket_fd, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);//MSG_DONTWAIT
+    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);//MSG_DONTWAIT
         
     if (BytesSent<0){
     	perror("send");
@@ -252,14 +253,19 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 	    strcpy(this->SendBuffer,strtok(NULL,","));
 	    //cout << "SendBuffer: " << this->SendBuffer << endl;	    
 	    // Understand which socket descriptor has to be used
-	    int socket_fd;
+	    int socket_fd_conn;
 	    for (int i=0; i<NumSocketsMax; ++i){
 	    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
-	    	//cout << "Found socket file descriptor to send" << endl;
-	    	socket_fd=this->socket_fdArray[i];
+	    	//cout << "Found socket file descriptor//connection to send" << endl;
+	    	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
+	    		socket_fd_conn=this->socket_fdArray[i];
+	    	}
+	    	else{// server sends on the socket connection
+	    		socket_fd_conn=this->new_socketArray[i];
+	    	}
 	    	}
 	    }  
-	    this->ICPmanagementSend(socket_fd);    
+	    this->ICPmanagementSend(socket_fd_conn);    
     } // try
     catch (const std::exception& e) {
 	// Handle the exception
@@ -339,11 +345,17 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
 int QTLAH::ICPConnectionsCheckNewMessages(){// Read one message at a time and from the different sockets
    try{
      try{
-	  int socket_fd=this->socket_fdArray[this->socketReadIter];
+     int socket_fd_conn=0;
+	if (string(this->SCmode[this->socketReadIter])==string("client")){// Client sends on the file descriptor
+    		socket_fd_conn=this->socket_fdArray[this->socketReadIter];
+    	}
+    	else{// server sends on the socket connection
+    		socket_fd_conn=this->new_socketArray[this->socketReadIter];
+    	}
 	  // Check for new messages
 	  fd_set fds;
 	  FD_ZERO(&fds);
-	  FD_SET(socket_fd, &fds);
+	  FD_SET(socket_fd_conn, &fds);
 
 	  // Set the timeout to 1 second
 	  struct timeval timeout;
@@ -351,7 +363,7 @@ int QTLAH::ICPConnectionsCheckNewMessages(){// Read one message at a time and fr
 	  timeout.tv_sec = 1;
 	  timeout.tv_usec = 0;
 	  
-	  int nfds = socket_fd + 1;
+	  int nfds = socket_fd_conn + 1;
 	  int ret = select(nfds, &fds, NULL, NULL, &timeout);
 
 	  if (ret < 0) {
@@ -359,9 +371,9 @@ int QTLAH::ICPConnectionsCheckNewMessages(){// Read one message at a time and fr
 	  } else if (ret == 0) {
 	    //cout << "Host agent no new messages" << endl;
 	  } else {// There is at least one new message
-	    if (FD_ISSET(socket_fd, &fds)) {
+	    if (FD_ISSET(socket_fd_conn, &fds)) {
 	      // Read the message from the socket
-	      int n = this->ICPmanagementRead(socket_fd);
+	      int n = this->ICPmanagementRead(socket_fd_conn);
 	      if (n < 0) {
 		cout << "Host error reading new messages" << endl;
 	      }

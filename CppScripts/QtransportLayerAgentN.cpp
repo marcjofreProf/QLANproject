@@ -31,6 +31,8 @@ namespace nsQtransportLayerAgentN {
 
 QTLAN::QTLAN(int numberSessions) { // Constructor
  this->numberSessions = numberSessions; // Number of sessions of different services
+ strcpy(this->SCmode[0],"server"); // to know if this host instance is client or server
+ strcpy(this->SCmode[1],"client"); // to know if this host instance is client or server
 }
 
 int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList) {
@@ -109,17 +111,17 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
     return 0; // All Ok
 }
 
-int QTLAN::ICPmanagementRead(int socket_fd) {
-    int valread = recv(socket_fd, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
+int QTLAN::ICPmanagementRead(int socket_fd_conn) {
+    int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
     // terminator at the end
     //cout << "Node message received: " << this->ReadBuffer << endl;
     
     return valread; 
 }
 
-int QTLAN::ICPmanagementSend(int socket_fd) {
+int QTLAN::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
-    send(socket_fd, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);
+    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
@@ -187,11 +189,17 @@ int QTLAN::StopICPconnections(int argc){
 int QTLAN::ICPConnectionsCheckNewMessages(){
    try{
      try{
-	  int socket_fd=this->socket_fdArray[this->socketReadIter];
+     int socket_fd_conn=0;
+	if (string(this->SCmode[this->socketReadIter])==string("client")){// Client sends on the file descriptor
+    		socket_fd_conn=this->socket_fdArray[this->socketReadIter];
+    	}
+    	else{// server sends on the socket connection
+    		socket_fd_conn=this->new_socketArray[this->socketReadIter];
+    	}
 	  // Check for new messages
 	  fd_set fds;
 	  FD_ZERO(&fds);
-	  FD_SET(socket_fd, &fds);
+	  FD_SET(socket_fd_conn, &fds);
 
 	  // Set the timeout to 1 second
 	  struct timeval timeout;
@@ -199,19 +207,19 @@ int QTLAN::ICPConnectionsCheckNewMessages(){
 	  timeout.tv_sec = 1;
 	  timeout.tv_usec = 0;
 	  
-	  int nfds = socket_fd + 1;
+	  int nfds = socket_fd_conn + 1;
 	  int ret = select(nfds, &fds, NULL, NULL, &timeout);
 
 	  if (ret < 0) {
-	    cout << "Node error select to check new messages" << endl;
+	    cout << "Host error select to check new messages" << endl;
 	  } else if (ret == 0) {
 	    //cout << "Host agent no new messages" << endl;
 	  } else {// There is at least one new message
-	    if (FD_ISSET(socket_fd, &fds)) {
+	    if (FD_ISSET(socket_fd_conn, &fds)) {
 	      // Read the message from the socket
-	      int n = this->ICPmanagementRead(socket_fd);
+	      int n = this->ICPmanagementRead(socket_fd_conn);
 	      if (n < 0) {
-		cout << "Node error reading new messages" << endl;
+		cout << "Host error reading new messages" << endl;
 	      }
 	      // Process the message
 	      if (n>0){
@@ -232,7 +240,7 @@ int QTLAN::ICPConnectionsCheckNewMessages(){
   // Update the socketReadIter
   this->socketReadIter++; // Variable to read each time a different socket
   this->socketReadIter=this->socketReadIter % NumSocketsMax;
-  
+   
   return 0; // All OK
 }
 
@@ -248,11 +256,19 @@ int QTLAN::SendMessageAgent(char* ParamsDescendingCharArray){
 	    strcpy(this->SendBuffer,strtok(NULL,","));
 	    //cout << "SendBuffer: " << this->SendBuffer << endl;	    
 	    // Understand which socket descriptor has to be used
-	    int socket_fd;
+	    int socket_fd_conn;
 	    for (int i=0; i<NumSocketsMax; ++i){
-	    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){socket_fd=this->socket_fdArray[i];}
+	    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
+	    	//cout << "Found socket file descriptor//connection to send" << endl;
+	    	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
+	    		socket_fd_conn=this->socket_fdArray[i];
+	    	}
+	    	else{// server sends on the socket connection
+	    		socket_fd_conn=this->new_socketArray[i];
+	    	}
+	    	}
 	    }  
-	    this->ICPmanagementSend(socket_fd);     
+	    this->ICPmanagementSend(socket_fd_conn);     
     } // try
     catch (const std::exception& e) {
 	// Handle the exception
