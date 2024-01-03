@@ -76,6 +76,7 @@ private: // Functions
 	// Managing ICP connections with sockets
 	// Typically the Node will act as server to the upper host. If the node is in between, then it will act as server of the origin client node. Net 192.168.X.X or Net 10.0.0.X
 	// With nodes in between hosts, the origin node will also act as client to the next node acting as server. Net 10.0.0.X	
+	int SocketCheckForceShutDown(int socket_fd);// Force the socket to shutdown (whatever status but closed)
 	int ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList); // Open ICP socket 
 	int ICPmanagementCloseClient(int socket_fd); // Close ICP socket 
 	// As server

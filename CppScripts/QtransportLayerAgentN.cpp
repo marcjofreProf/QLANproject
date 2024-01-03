@@ -36,6 +36,20 @@ QTLAN::QTLAN(int numberSessions) { // Constructor
  strcpy(this->SCmode[1],"client"); // to know if this host instance is client or server
 }
 
+int QTLAN::SocketCheckForceShutDown(int socket_fd){
+//The close() function terminates the entire connection and releases all resources associated with the socket, including the file descriptor. This means that the socket can no longer be used for any purpose, and it will be closed immediately.
+
+//The shutdown() function, on the other hand, allows you to terminate a connection in a more controlled way. You can specify whether to shut down the read, write, or both ends of the connection. This can be useful if you want to gracefully terminate the connection, such as when the server is shutting down or when a client needs to send a final message.
+
+if (shutdown(socket_fd, SHUT_RDWR) < 0) {
+//perror("shutdown");
+close(socket_fd);
+cout << "Not capable to shutdown Socket!!! Restart the application!" << endl;
+return -1;
+}
+return 0; // All Ok
+}
+
 int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList) {
     int status;
     struct sockaddr_in serv_addr;    
@@ -44,7 +58,10 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
         cout << "Client Socket creation error" << endl;
         return -1;
     }
- 
+    
+    // Check status of a previously initiated socket to reduce misconnections
+    this->SocketCheckForceShutDown(socket_fd);
+    
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
  
@@ -80,6 +97,9 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
         cout << "Server socket failed" << endl;
         return -1;
     }
+    
+    // Check status of a previously initiated socket to reduce misconnections
+    this->SocketCheckForceShutDown(socket_fd);
  
     // Forcefully attaching socket to the port
     if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {

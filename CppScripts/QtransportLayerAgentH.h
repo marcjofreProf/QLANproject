@@ -69,6 +69,8 @@ public: // Functions
 	~QTLAH();  //destructor
 
 private: //Functions
+	// Management of ICP communications
+	int SocketCheckForceShutDown(int socket_fd);// Force the socket to shutdown (whatever status but closed)
         // Management functions as client
 	int ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList); // Open ICP socket 
 	int ICPmanagementCloseClient(int socket_fd); // Close ICP socket
