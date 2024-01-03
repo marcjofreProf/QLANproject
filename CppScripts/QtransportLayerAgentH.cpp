@@ -19,7 +19,7 @@ Agent script for Quantum transport Layer Host
 #define NumSocketsMax 2
 #define NumBytesBufferICPMAX 1024
 #define IPcharArrayLengthMAX 15
-#define SockListenTimeMAXusec 100
+#define SockListenTimeMAXusec 10
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -398,17 +398,24 @@ int QTLAH::ICPConnectionsCheckNewMessages(){// Read one message at a time and fr
 }
 
 int QTLAH::ProcessNewMessage(){
+cout << "ReadBuffer: " << this->ReadBuffer << endl;
 // Parse the message information
 char IPdest[NumBytesBufferICPMAX] = { 0 };
 char IPorg[NumBytesBufferICPMAX] = { 0 };
 char Type[NumBytesBufferICPMAX] = { 0 };
 char Command[NumBytesBufferICPMAX] = { 0 };
 char Payload[NumBytesBufferICPMAX] = { 0 };
-strcpy(IPdest,strtok(ReadBuffer,","));
+strcpy(IPdest,strtok(this->ReadBuffer,","));
 strcpy(IPorg,strtok(NULL,","));
 strcpy(Type,strtok(NULL,","));
 strcpy(Command,strtok(NULL,","));
 strcpy(Payload,strtok(NULL,","));
+
+cout << "IPdest: " << IPdest << endl;
+cout << "IPorg: " << IPorg << endl;
+cout << "Type: " << Type << endl;
+cout << "Command: " << Command << endl;
+cout << "Payload: " << Payload << endl;
 
 // Identify what to do and execute it
 if (string(Type)==string("Operation")){// Operation message
