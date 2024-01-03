@@ -302,7 +302,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
    try {
     	// Code that might throw an exception
  	// Check if there are need messages or actions to be done by the node
- 	//this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
+ 	this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
        switch(this->getState()) {
            case QTLAH::APPLICATION_RUNNING: {
                
