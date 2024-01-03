@@ -302,12 +302,14 @@ int QTLAN::UpdateSocketsInformation(){
 int QTLAN::ProcessNewMessage(){
 //cout << "ReadBuffer: " << this->ReadBuffer << endl;
 // Parse the message information
+char ReadBufferAux[NumBytesBufferICPMAX] = { 0 };
+strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 char IPdest[NumBytesBufferICPMAX] = { 0 };
 char IPorg[NumBytesBufferICPMAX] = { 0 };
 char Type[NumBytesBufferICPMAX] = { 0 };
 char Command[NumBytesBufferICPMAX] = { 0 };
 char Payload[NumBytesBufferICPMAX] = { 0 };
-strcpy(IPdest,strtok(this->ReadBuffer,","));
+strcpy(IPdest,strtok(ReadBufferAux,","));
 strcpy(IPorg,strtok(NULL,","));
 strcpy(Type,strtok(NULL,","));
 strcpy(Command,strtok(NULL,","));
