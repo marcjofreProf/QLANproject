@@ -270,7 +270,7 @@ strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
     int socket_fd_conn;
     for (int i=0; i<NumSocketsMax; ++i){
     	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
-    	//cout << "Found socket file descriptor//connection to send" << endl;
+    	cout << "Found socket file descriptor//connection to send" << endl;
     	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
     		socket_fd_conn=this->socket_fdArray[i];
     	}
@@ -350,7 +350,7 @@ else if(string(Type)==string("Control")){//Control message
 		char charNum[NumBytesBufferICPMAX] = { 0 };
 		sprintf(charNum, "%d", NumStoredQubitsNode);
 		strcat(ParamsCharArray,charNum);
-		cout << "ParamsCharArray: " << ParamsCharArray << endl;
+		//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 		  // reply imediately with a message to requester		  
 		  this->ICPdiscoverSend(ParamsCharArray); 
 		}
