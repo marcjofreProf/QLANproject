@@ -68,7 +68,7 @@ public: // Functions
         bool m_exit() { m_state = APPLICATION_EXIT;  return false; }
         int InitiateICPconnections(int argc); // Initiating sockets
         int StopICPconnections(int argc); // Closing sockets
-        int ICPConnectionsCheckNewMessages(); // Check for new messages
+        int ICPConnectionsCheckNewMessages(int SockListenTimeusec); // Check for new messages
         int UpdateSocketsInformation(); // Update information to where the sockets are pointing to
         // Process and execute requests
 	int ProcessNewMessage();
@@ -85,8 +85,10 @@ private: // Functions
 	int ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList);
 	int ICPmanagementCloseServer(int socket_fd,int new_socket);
 	// As server or cleint
-	int ICPmanagementRead(int socket_fd_conn);
+	int ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec);
 	int ICPmanagementSend(int socket_fd_conn);
+	int ICPdiscoverSend(char* ParamsCharArray); // Discover the socket and send the message
+	// REquests
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the Agent to send message to specific host/node
 //	friend void* threadedPoll(void *value);
 	

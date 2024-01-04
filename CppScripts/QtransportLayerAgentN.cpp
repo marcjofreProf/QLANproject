@@ -19,7 +19,7 @@ Agent script for Quantum transport Layer Node
 #define NumSocketsMax 2
 #define NumBytesBufferICPMAX 1024
 #define IPcharArrayLengthMAX 15
-#define SockListenTimeMAXusec 10
+#define SockListenTimeusecStandard 10
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -132,12 +132,46 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
     return 0; // All Ok
 }
 
-int QTLAN::ICPmanagementRead(int socket_fd_conn) {
-    int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
-    // terminator at the end
-    //cout << "Node message received: " << this->ReadBuffer << endl;
-    
-    return valread; 
+int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
+  // Check for new messages
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(socket_fd_conn, &fds);
+
+  // Set the timeout
+  struct timeval timeout;
+  // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
+  timeout.tv_sec = 0;
+  timeout.tv_usec = SockListenTimeusec;
+  
+  int nfds = socket_fd_conn + 1;
+  int ret = select(nfds, &fds, NULL, NULL, &timeout);
+
+  if (ret < 0) {
+    cout << "Host error select to check new messages" << endl;
+    return -1;
+  } else if (ret == 0) {
+    //cout << "Host agent no new messages" << endl;
+    return -1;
+  } else {// There is at least one new message
+    if (FD_ISSET(socket_fd_conn, &fds)) {
+      // Read the message from the socket
+      int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
+      //cout << "Node message received: " << this->ReadBuffer << endl;
+      if (valread <= 0) {
+        if (valread<0){cout << "Host error reading new messages" << endl;}
+	// Clear the ReadBuffer after using it!!! Important
+	memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
+	return -1;
+      }
+      // Process the message
+      else{// (n>0){
+      	//cout << "Received message: " << this->ReadBuffer << endl;
+      	return valread; //
+      }
+    }
+    else{return -1;}
+  }
 }
 
 int QTLAN::ICPmanagementSend(int socket_fd_conn) {
@@ -207,65 +241,31 @@ int QTLAN::StopICPconnections(int argc){
 	return 0; // All OK
 }
 
-int QTLAN::ICPConnectionsCheckNewMessages(){
-     int socket_fd_conn=0;
-	if (string(this->SCmode[this->socketReadIter])==string("client")){// Client sends on the file descriptor
-    		socket_fd_conn=this->socket_fdArray[this->socketReadIter];
-    	}
-    	else{// server sends on the socket connection
-    		socket_fd_conn=this->new_socketArray[this->socketReadIter];
-    	}
-	  // Check for new messages
-	  fd_set fds;
-	  FD_ZERO(&fds);
-	  FD_SET(socket_fd_conn, &fds);
-
-	  // Set the timeout to
-	  struct timeval timeout;
-	  // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
-	  timeout.tv_sec = 0;
-	  timeout.tv_usec = SockListenTimeMAXusec;
-	  
-	  int nfds = socket_fd_conn + 1;
-	  int ret = select(nfds, &fds, NULL, NULL, &timeout);
-
-	  if (ret < 0) {
-	    cout << "Host error select to check new messages" << endl;
-	  } else if (ret == 0) {
-	    //cout << "Host agent no new messages" << endl;
-	  } else {// There is at least one new message
-	    if (FD_ISSET(socket_fd_conn, &fds)) {
-	      // Read the message from the socket
-	      int n = this->ICPmanagementRead(socket_fd_conn);
-	      if (n <= 0) {
-	        if (n<0){cout << "Host error reading new messages" << endl;}
-		// Clear the ReadBuffer after using it!!! Important
-		memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
-	      }
-	      // Process the message
-	      else{// (n>0){
-	      	//cout << "Received message: " << this->ReadBuffer << endl;
-	      	this->m_start();
-	      }
-	    }
-	  }
-  
-  // Update the socketReadIter
-  this->socketReadIter++; // Variable to read each time a different socket
-  this->socketReadIter=this->socketReadIter % NumSocketsMax;
-   
-  return 0; // All OK
+int QTLAN::ICPConnectionsCheckNewMessages(int SockListenTimeusec){ 
+int socket_fd_conn=0;
+if (string(this->SCmode[this->socketReadIter])==string("client")){// Client sends on the file descriptor
+	socket_fd_conn=this->socket_fdArray[this->socketReadIter];
+}
+else{// server checks on the socket connection
+	socket_fd_conn=this->new_socketArray[this->socketReadIter];
 }
 
-int QTLAN::SendMessageAgent(char* ParamsDescendingCharArray){
-     // Code that might throw an exception 
-     strcpy(this->SendBuffer,ParamsDescendingCharArray);//strtok(NULL,","));
-    //cout << "SendBuffer: " << this->SendBuffer << endl;
+if(this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec)>0){this->m_start();} // Process the message
+
+// Update the socketReadIter
+this->socketReadIter++; // Variable to read each time a different socket
+this->socketReadIter=this->socketReadIter % NumSocketsMax;
+
+return 0; // All OK	  
+}
+
+int QTLAN::ICPdiscoverSend(char* ParamsCharArray){
+strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
+    //cout << "SendBuffer: " << this->SendBuffer << endl;	
     // Parse the message information
     char IPaddressesSockets[IPcharArrayLengthMAX];
-    strcpy(IPaddressesSockets,strtok(ParamsDescendingCharArray,","));//Null indicates we are using the same pointer as the last strtok
-    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;    
-    	    
+    strcpy(IPaddressesSockets,strtok(ParamsCharArray,","));//Null indicates we are using the same pointer as the last strtok
+    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
     // Understand which socket descriptor has to be used
     int socket_fd_conn;
     for (int i=0; i<NumSocketsMax; ++i){
@@ -275,11 +275,17 @@ int QTLAN::SendMessageAgent(char* ParamsDescendingCharArray){
     		socket_fd_conn=this->socket_fdArray[i];
     	}
     	else{// server sends on the socket connection
+    		//cout << "socket_fd_conn" << socket_fd_conn << endl;
     		socket_fd_conn=this->new_socketArray[i];
     	}
     	}
     }  
-    this->ICPmanagementSend(socket_fd_conn);     
+    this->ICPmanagementSend(socket_fd_conn);  
+return 0; // All Ok
+}
+///////////////////////////////////////////////////////////////////////
+int QTLAN::SendMessageAgent(char* ParamsDescendingCharArray){// Probably not use for this class
+    this->ICPdiscoverSend(ParamsDescendingCharArray);   
 
     return 0; //All OK
 }
@@ -328,7 +334,31 @@ if (string(Type)==string("Operation")){// Operation message. Forward to the host
 	// Do not do anything
 }
 else if(string(Type)==string("Control")){//Control message
-	if (string(Command)==string("print")){
+	if (string(Command)==string("InfoRequest")){ // Request to provide information
+		if (string(Payload)==string("NumStoredQubitsNode")){
+		  int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.NumStoredQubitsNode[0];// to be developed for more than one link
+		  // Generate the message
+		  char ParamsCharArray[NumBytesBufferICPMAX] = { 0 };
+		  strcpy(ParamsCharArray, IPorg);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,IPdest);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"Operation");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"InfoRequest");
+		strcat(ParamsCharArray,",");
+		char charNum[NumBytesBufferICPMAX] = { 0 };
+		sprintf(charNum, "%d", NumStoredQubitsNode);
+		strcat(ParamsCharArray,charNum);
+		  // reply imediately with a message to requester		  
+		  this->ICPdiscoverSend(ParamsCharArray); 
+		}
+		else{
+		//discard
+		cout << "Node does not have this information"<< Payload << endl;
+		}
+	}
+	else if (string(Command)==string("print")){
 		cout << "New Message: "<< Payload << endl;
 	}
 	else{//Default
@@ -353,7 +383,7 @@ return 0; // All OK
 QTLAN::~QTLAN() {
 // destructor
 	this->StopICPconnections(this->ParamArgc);
-	QNLAagent.~QNLA(); // Destructor of the agent below
+	this->QNLAagent.~QNLA(); // Destructor of the agent below
 }
 
 } /* namespace nsQnetworkLayerAgentN */
@@ -405,7 +435,7 @@ int main(int argc, char const * argv[]){
     	// Check the IPs the sockets are pointing to:
  	/* Not used QTLANagent.UpdateSocketsInformation();*/
  	// Check if there are need messages or actions to be done by the node
- 	QTLANagent.ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
+ 	QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
        switch(QTLANagent.getState()) {
            case QTLAN::APPLICATION_RUNNING: {               
                // Do Some Work

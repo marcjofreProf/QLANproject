@@ -22,7 +22,7 @@ QNLA::QNLA() { // Constructor
 
 QNLA::~QNLA() {
 // destructor
- QLLAagent.~QLLA(); // Destruct the instance of the below agent
+ this->QLLAagent.~QLLA(); // Destruct the instance of the below agent
 }
 
 } /* namespace nsQnetworkLayerAgent */

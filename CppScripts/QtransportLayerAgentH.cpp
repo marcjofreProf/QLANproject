@@ -19,7 +19,7 @@ Agent script for Quantum transport Layer Host
 #define NumSocketsMax 2
 #define NumBytesBufferICPMAX 1024
 #define IPcharArrayLengthMAX 15
-#define SockListenTimeMAXusec 10
+#define SockListenTimeusecStandard 10
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -220,12 +220,46 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
     return 0; // All Ok
 }
 
-int QTLAH::ICPmanagementRead(int socket_fd_conn) {
-    int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
-    // terminator at the end
-    //cout << "Node message received: " << this->ReadBuffer << endl;
-    
-    return valread; 
+int QTLAH::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
+    // Check for new messages
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(socket_fd_conn, &fds);
+
+  // Set the timeout
+  struct timeval timeout;
+  // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
+  timeout.tv_sec = 0;
+  timeout.tv_usec = SockListenTimeusec;
+  
+  int nfds = socket_fd_conn + 1;
+  int ret = select(nfds, &fds, NULL, NULL, &timeout);
+
+  if (ret < 0) {
+    cout << "Host error select to check new messages" << endl;
+    return -1;
+  } else if (ret == 0) {
+    //cout << "Host agent no new messages" << endl;
+    return -1;
+  } else {// There is at least one new message
+    if (FD_ISSET(socket_fd_conn, &fds)) {
+      // Read the message from the socket
+      int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
+      //cout << "Node message received: " << this->ReadBuffer << endl;
+      if (valread <= 0) {
+        if (valread<0){cout << "Host error reading new messages" << endl;}
+	// Clear the ReadBuffer after using it!!! Important
+	memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
+	return -1;
+      }
+      // Process the message
+      else{// (n>0){
+      	//cout << "Received message: " << this->ReadBuffer << endl;
+      	return valread; //
+      }
+    }
+    else{return -1;}
+  }
 }
 
 int QTLAH::ICPmanagementSend(int socket_fd_conn) {
@@ -267,32 +301,6 @@ int QTLAH::ICPmanagementCloseServer(int socket_fd,int new_socket) {
     return 0; // All OK
 }
 
-int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
-// Code that might throw an exception
-    strcpy(this->SendBuffer,ParamsDescendingCharArray);//strtok(NULL,","));
-    //cout << "SendBuffer: " << this->SendBuffer << endl;	
-    // Parse the message information
-    char IPaddressesSockets[IPcharArrayLengthMAX];
-    strcpy(IPaddressesSockets,strtok(ParamsDescendingCharArray,","));//Null indicates we are using the same pointer as the last strtok
-    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
-    // Understand which socket descriptor has to be used
-    int socket_fd_conn;
-    for (int i=0; i<NumSocketsMax; ++i){
-    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
-    	//cout << "Found socket file descriptor//connection to send" << endl;
-    	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
-    		socket_fd_conn=this->socket_fdArray[i];
-    	}
-    	else{// server sends on the socket connection
-    		//cout << "socket_fd_conn" << socket_fd_conn << endl;
-    		socket_fd_conn=this->new_socketArray[i];
-    	}
-    	}
-    }  
-    this->ICPmanagementSend(socket_fd_conn);    
-    return 0; //All OK
-}
-
 void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  // One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
  this->InitiateICPconnections(); // Very important that they work. Otherwise the rest go wrong
@@ -304,9 +312,10 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  while(isValidWhileLoop){
  try{
    try {
+   	sem_wait(&semResource);// Wait semaphore until it can proceed
     	// Code that might throw an exception
- 	// Check if there are need messages or actions to be done by the node
- 	this->ICPConnectionsCheckNewMessages(); // This function has some time out (so will not consume resources of the node)
+ 	// Check if there are need messages or actions to be done by the node 	
+ 	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
        switch(this->getState()) {
            case QTLAH::APPLICATION_RUNNING: {               
                // Do Some Work
@@ -327,7 +336,8 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
                // ErrorHandling Throw An Exception Etc.
            }
 
-        } // switch    
+        } // switch
+        sem_post(&semResource); // Release the semaphore 
     }
     catch (const std::exception& e) {
 	// Handle the exception
@@ -341,7 +351,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
    
 }
 
-int QTLAH::ICPConnectionsCheckNewMessages(){// Read one message at a time and from the different sockets
+int QTLAH::ICPConnectionsCheckNewMessages(int SockListenTimeusec){// Read one message at a time and from the different sockets
 int socket_fd_conn=0;
 if (string(this->SCmode[this->socketReadIter])==string("client")){// Client sends on the file descriptor
 	socket_fd_conn=this->socket_fdArray[this->socketReadIter];
@@ -349,46 +359,14 @@ if (string(this->SCmode[this->socketReadIter])==string("client")){// Client send
 else{// server checks on the socket connection
 	socket_fd_conn=this->new_socketArray[this->socketReadIter];
 }
-  // Check for new messages
-  fd_set fds;
-  FD_ZERO(&fds);
-  FD_SET(socket_fd_conn, &fds);
 
-  // Set the timeout
-  struct timeval timeout;
-  // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
-  timeout.tv_sec = 0;
-  timeout.tv_usec = SockListenTimeMAXusec;
-  
-  int nfds = socket_fd_conn + 1;
-  int ret = select(nfds, &fds, NULL, NULL, &timeout);
+if(this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec)>0){this->m_start();} // Process the message
 
-  if (ret < 0) {
-    cout << "Host error select to check new messages" << endl;
-  } else if (ret == 0) {
-    //cout << "Host agent no new messages" << endl;
-  } else {// There is at least one new message
-    if (FD_ISSET(socket_fd_conn, &fds)) {
-      // Read the message from the socket
-      int n = this->ICPmanagementRead(socket_fd_conn);
-      if (n <= 0) {
-        if (n<0){cout << "Host error reading new messages" << endl;}
-	// Clear the ReadBuffer after using it!!! Important
-	memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
-      }
-      // Process the message
-      else{// (n>0){
-      	//cout << "Received message: " << this->ReadBuffer << endl;
-      	this->m_start();
-      }
-    }
-  }
-  
-  // Update the socketReadIter
-  this->socketReadIter++; // Variable to read each time a different socket
-  this->socketReadIter=this->socketReadIter % NumSocketsMax;
-   
-  return 0; // All OK
+// Update the socketReadIter
+this->socketReadIter++; // Variable to read each time a different socket
+this->socketReadIter=this->socketReadIter % NumSocketsMax;
+
+return 0; // All OK
 }
 
 int QTLAH::ProcessNewMessage(){
@@ -461,21 +439,89 @@ memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
 
 return 0; // All OK
 }
+
+int QTLAH::ICPdiscoverSend(char* ParamsCharArray){
+    strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
+    //cout << "SendBuffer: " << this->SendBuffer << endl;	
+    // Parse the message information
+    char IPaddressesSockets[IPcharArrayLengthMAX];
+    strcpy(IPaddressesSockets,strtok(ParamsCharArray,","));//Null indicates we are using the same pointer as the last strtok
+    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
+    // Understand which socket descriptor has to be used
+    int socket_fd_conn;
+    for (int i=0; i<NumSocketsMax; ++i){
+    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
+    	//cout << "Found socket file descriptor//connection to send" << endl;
+    	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
+    		socket_fd_conn=this->socket_fdArray[i];
+    	}
+    	else{// server sends on the socket connection
+    		//cout << "socket_fd_conn" << socket_fd_conn << endl;
+    		socket_fd_conn=this->new_socketArray[i];
+    	}
+    	}
+    }  
+    this->ICPmanagementSend(socket_fd_conn);   
+return 0; //All OK
+}
 ///////////////////////////////////////////////////////////////////
 // Request methods
+int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
+// Code that might throw an exception
+    sem_wait(&semResource);// Wait semaphore until it can proceed
+    this->ICPdiscoverSend(ParamsDescendingCharArray);
+    sem_post(&semResource); // Release the semaphore 
+    return 0; //All OK
+}
 
 int QTLAH::RetrieveNumStoredQubitsNode(){ // Send to the upper layer agent how many qubits are stored
+sem_wait(&semResource);// Wait semaphore until it can proceed
+
 int NumStoredQubitsNode=0;
-// It is a blocking communication between host and node
-//cout << "New Message: "<< Payload << endl;
+// It is a "blocking" communication between host and node, because the listen time is very large
+
+int socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor
+
+strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,this->IPaddressesSockets[2]);
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"Control");
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"InfoRequest");
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"NumStoredQubitsNode");
+
+this->ICPmanagementSend(socket_fd_conn); // send mesage to node
+int SockListenTimeusec=1000; // Long time so the node has time to response
+
+if (this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec)>0){// Read block
+char ReadBufferAux[NumBytesBufferICPMAX] = { 0 };
+strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
+// After reading the information, erase the ReadBuffer
+memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
+char IPdest[NumBytesBufferICPMAX] = { 0 };
+char IPorg[NumBytesBufferICPMAX] = { 0 };
+char Type[NumBytesBufferICPMAX] = { 0 };
+char Command[NumBytesBufferICPMAX] = { 0 };
+char Payload[NumBytesBufferICPMAX] = { 0 };
+strcpy(IPdest,strtok(ReadBufferAux,","));
+strcpy(IPorg,strtok(NULL,","));
+strcpy(Type,strtok(NULL,","));
+strcpy(Command,strtok(NULL,","));
+strcpy(Payload,strtok(NULL,","));
+int NumStoredQubitsNode=atoi(Payload);
+}
+else{int NumStoredQubitsNode=0;}
+sem_post(&semResource); // Release the semaphore
 return NumStoredQubitsNode;
 }
 ///////////////////////////////////////////////////////////////////
 QTLAH::~QTLAH() {
 	// destructor
 	this->StopICPconnections();
-	// Terminate the process thread
-	this->threadRef.join();
+	sem_destroy(&semResource); // Destroy semaphore	
+	this->threadRef.join();// Terminate the process thread
 }
 
 } /* namespace nsQnetworkLayerAgentH */

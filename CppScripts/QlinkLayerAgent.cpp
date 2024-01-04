@@ -22,7 +22,7 @@ QLLA::QLLA() { // Constructor
 
 QLLA::~QLLA() {
 // destructor
- QPLAagent.~QPLA(); // Destruct the instance of the below layer
+ this->QPLAagent.~QPLA(); // Destruct the instance of the below layer
 }
 
 } /* namespace nsQlinkLayerAgent */

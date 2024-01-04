@@ -26,9 +26,11 @@ namespace nsQlinkLayerAgent {
 
 class QLLA {
 private: // Variables
-	int numberHops;
-	nsQphysLayerAgent::QPLA QPLAagent;
+	int numberHops;	
 
+public: // Variables/Instances
+	nsQphysLayerAgent::QPLA QPLAagent;
+	
 public: // Functions
 	QLLA(); //constructor
 	

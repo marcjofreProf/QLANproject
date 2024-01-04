@@ -16,6 +16,7 @@ Header declaration file for Quantum transport Layer Agent Host
 #define IPcharArrayLengthMAX 15
 // Threading
 #include <thread>
+#include <semaphore.h>
 
 //#include<string>
 //#include<fstream>
@@ -49,6 +50,7 @@ private: // Variables/Objects
 	int socketReadIter = 0; // Variable to read each time a different socket
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
+	sem_t semResource; // Semaphore to acquire the resource to be used or not (block until available)
 
 public: // Functions
 	// Management
@@ -65,9 +67,8 @@ public: // Functions
         bool m_exit() { m_state = APPLICATION_EXIT;  return false; }
 	// Process Requests and Petitions
 	int InitAgentProcess(); // Initializer of the thread
-	// Communication messages
-	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the upper Agent to send message to specific host/node
-	// Requests
+	// Requests. They have to be in semaphore structure to avoid collisions between main and thread
+	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the upper Agent to send message to specific host/node	
 	int RetrieveNumStoredQubitsNode(); // Send to the upper layer agent how many qubits are stored
 	~QTLAH();  //destructor
 
@@ -81,14 +82,15 @@ private: //Functions
 	int ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList);
 	int ICPmanagementCloseServer(int socket_fd,int new_socket);
 	// As server or client
-	int ICPmanagementRead(int socket_fd_conn); // Read ICP socket
+	int ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec); // Read ICP socket
 	int ICPmanagementSend(int socket_fd_conn); // Send ICP socket
+	int ICPdiscoverSend(char* ParamsCharArray); // Discover the socket and send the message
 	int InitiateICPconnections(); // Initiating sockets
         int StopICPconnections(); // Closing sockets
 //	friend void* threadedPoll(void *value);
 	//static void* AgentProcessStaticEntryPoint(void* c); // Not used
 	void AgentProcessRequestsPetitions(); // Process thread that manages requests and petitions
-	int ICPConnectionsCheckNewMessages(); // Check for new messages
+	int ICPConnectionsCheckNewMessages(int SockListenTimeusec); // Check for new messages
 	// Process and execute requests
 	int ProcessNewMessage(); // main function perferming the required operatons to process the task
 };

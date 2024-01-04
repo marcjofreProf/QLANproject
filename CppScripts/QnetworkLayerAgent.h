@@ -26,10 +26,12 @@ namespace nsQnetworkLayerAgent {
 
 class QNLA {
 private:// Variables/Instances
-	int numberHops=0;
+	int numberHops=0;	
+
+public: // Variables/Instances
 	nsQlinkLayerAgent::QLLA QLLAagent;// Instance of the below agent
 
-public:
+public: // Methods
 	QNLA(); //constructor
 	
 	~QNLA();  //destructor
