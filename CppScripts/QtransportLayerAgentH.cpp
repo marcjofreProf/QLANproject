@@ -42,7 +42,8 @@ QTLAH::QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAsce
 // Parse the ParamsDescendingCharArray
 strcpy(this->IPaddressesSockets[0],strtok(ParamsDescendingCharArray,","));
 strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
-strcpy(this->IPaddressesSockets[2],strtok(NULL,","));// Host own IP
+strcpy(this->IPaddressesSockets[2],strtok(NULL,","));// Host own IP in operaton network
+strcpy(this->IPaddressesSockets[3],strtok(NULL,","));// Host own IP in control network
 strcpy(this->SCmode[0],"client"); // to know if this host instance is client or server
 strcpy(this->SCmode[1],strtok(NULL,",")); // to know if this host instance is client or server
 
@@ -502,7 +503,7 @@ int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node
 
 strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
 strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,this->IPaddressesSockets[2]);
+strcat(this->SendBuffer,this->IPaddressesSockets[3]);
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"Control");
 strcat(this->SendBuffer,",");

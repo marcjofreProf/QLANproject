@@ -32,7 +32,7 @@ private: //Variables/Instances
         int ReceiveLinkNumberArray[LinkNumberMAX]={0}; // Array indicating the GPIO numbers identifying the receive pins
         
 public: // Variables/Instances
-	int NumStoredQubitsNode[LinkNumberMAX]={0}; // Array indicating the number of stored qubits
+	int NumStoredQubitsNode[LinkNumberMAX]={10}; // Array indicating the number of stored qubits
 
 public: // Methods
 	QPLA(); //constructor
