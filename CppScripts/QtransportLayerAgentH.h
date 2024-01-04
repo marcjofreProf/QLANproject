@@ -72,7 +72,7 @@ public: // Functions
 	int InitAgentProcess(); // Initializer of the thread
 	// Requests. They have to be in semaphore structure to avoid collisions between main and thread
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the upper Agent to send message to specific host/node	
-	int RetrieveNumStoredQubitsNode(); // Send to the upper layer agent how many qubits are stored
+	int RetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray); // Send to the upper layer agent how many qubits are stored
 	~QTLAH();  //destructor
 
 private: //Functions

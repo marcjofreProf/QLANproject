@@ -493,10 +493,9 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
     return 0; //All OK
 }
 
-int QTLAH::RetrieveNumStoredQubitsNode(){ // Send to the upper layer agent how many qubits are stored
+int QTLAH::RetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray){ // Send to the upper layer agent how many qubits are stored
 this->acquire();// Wait semaphore until it can proceed
 
-int NumStoredQubitsNode=0;
 // It is a "blocking" communication between host and node, because the listen time is very large
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor
@@ -512,28 +511,29 @@ strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"NumStoredQubitsNode");
 
 this->ICPmanagementSend(socket_fd_conn); // send mesage to node
-int SockListenTimeusec=1000; // Long time so the node has time to response
+int SockListenTimeusec=999999; // Long time so the node has time to response
 
 if (this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec)>0){// Read block
-char ReadBufferAux[NumBytesBufferICPMAX] = { 0 };
-strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
-// After reading the information, erase the ReadBuffer
-memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
-char IPdest[NumBytesBufferICPMAX] = { 0 };
-char IPorg[NumBytesBufferICPMAX] = { 0 };
-char Type[NumBytesBufferICPMAX] = { 0 };
-char Command[NumBytesBufferICPMAX] = { 0 };
-char Payload[NumBytesBufferICPMAX] = { 0 };
-strcpy(IPdest,strtok(ReadBufferAux,","));
-strcpy(IPorg,strtok(NULL,","));
-strcpy(Type,strtok(NULL,","));
-strcpy(Command,strtok(NULL,","));
-strcpy(Payload,strtok(NULL,","));
-int NumStoredQubitsNode=atoi(Payload);
+	char ReadBufferAux[NumBytesBufferICPMAX] = { 0 };
+	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
+	// After reading the information, erase the ReadBuffer
+	memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
+	char IPdest[NumBytesBufferICPMAX] = { 0 };
+	char IPorg[NumBytesBufferICPMAX] = { 0 };
+	char Type[NumBytesBufferICPMAX] = { 0 };
+	char Command[NumBytesBufferICPMAX] = { 0 };
+	char Payload[NumBytesBufferICPMAX] = { 0 };
+	strcpy(IPdest,strtok(ReadBufferAux,","));
+	strcpy(IPorg,strtok(NULL,","));
+	strcpy(Type,strtok(NULL,","));
+	strcpy(Command,strtok(NULL,","));
+	strcpy(Payload,strtok(NULL,","));
+	cout << "Payload: " << Payload << endl;
+	ParamsIntArray[0]=atoi(Payload);
 }
-else{int NumStoredQubitsNode=0;}
+else{ParamsIntArray[0]=0;}
 this->release(); // Release the semaphore
-return NumStoredQubitsNode;
+return 0; // All OK
 }
 ///////////////////////////////////////////////////////////////////
 QTLAH::~QTLAH() {

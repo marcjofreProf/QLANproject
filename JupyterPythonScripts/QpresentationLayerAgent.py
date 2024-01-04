@@ -41,6 +41,5 @@ class QPLA:
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
 		time.sleep(1)# Wait some time (seconds) so qubits are received
 	
-	def RetrieveNumStoredQubitsNode(self,): # Supposing that node has received quBits, make use of them
-		NumStoredQubitsNode=self.QSLAagent.RetrieveNumStoredQubitsNode()
-		return NumStoredQubitsNode
+	def RetrieveNumStoredQubitsNode(self,ParamsIntArray): # Supposing that node has received quBits, make use of them
+		self.QSLAagent.RetrieveNumStoredQubitsNode(ParamsIntArray)

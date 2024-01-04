@@ -32,7 +32,6 @@ class QSLA:
 	def SendMessageAgent(self,ParamsDescendingCharArray): # Send message to the below Agent
 		self.QTLAagent.SendMessageAgent(ParamsDescendingCharArray)
 	
-	def RetrieveNumStoredQubitsNode(self,): # Supposing that node has received quBits, make use of them
-		NumStoredQubitsNode=self.QTLAagent.RetrieveNumStoredQubitsNode()
-		return NumStoredQubitsNode
+	def RetrieveNumStoredQubitsNode(self,ParamsIntArray): # Supposing that node has received quBits, make use of them
+		self.QTLAagent.RetrieveNumStoredQubitsNode(ParamsIntArray)
 

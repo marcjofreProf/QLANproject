@@ -140,8 +140,8 @@ class QTLAH(_object):
     def SendMessageAgent(self, ParamsDescendingCharArray):
         return _QtransportLayerAgent.QTLAH_SendMessageAgent(self, ParamsDescendingCharArray)
 
-    def RetrieveNumStoredQubitsNode(self):
-        return _QtransportLayerAgent.QTLAH_RetrieveNumStoredQubitsNode(self)
+    def RetrieveNumStoredQubitsNode(self, ParamsIntArray):
+        return _QtransportLayerAgent.QTLAH_RetrieveNumStoredQubitsNode(self, ParamsIntArray)
     __swig_destroy__ = _QtransportLayerAgent.delete_QTLAH
     __del__ = lambda self: None
 QTLAH_swigregister = _QtransportLayerAgent.QTLAH_swigregister
