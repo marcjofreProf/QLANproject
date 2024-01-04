@@ -10,6 +10,7 @@ Agent script for Quantum Physical Layer
 #include "QphysLayerAgent.h"
 #include<iostream>
 #include<unistd.h> //for usleep
+#define LinkNumberMAX 2
 #include "./BBBhw/GPIO.h"
 using namespace exploringBB; // API to easily use GPIO in c++
 /* A Simple GPIO application
@@ -20,11 +21,8 @@ using namespace exploringBB; // API to easily use GPIO in c++
 using namespace std;
 
 namespace nsQphysLayerAgent {
-
-QPLA::QPLA(int numberLinks, int* EmitLinkNumberArray, int* ReceiveLinkNumberArray) {
- this->numberLinks = numberLinks; // Number of links directly connected to this physical quantum node
- this->EmitLinkNumberArray = EmitLinkNumberArray;
- this->ReceiveLinkNumberArray = ReceiveLinkNumberArray;
+QPLA::QPLA() {
+ 
 }
 
 int QPLA::emitQuBit(){

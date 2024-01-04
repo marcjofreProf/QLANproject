@@ -15,13 +15,14 @@ using namespace std;
 
 namespace nsQlinkLayerAgent {
 
-QLLA::QLLA(int numberHops) { // Constructor
- this->numberHops = numberHops; // Number of hops to reach destination
+QLLA::QLLA() { // Constructor
+ 
 }
 
 
 QLLA::~QLLA() {
 // destructor
+ QPLAagent.~QPLA(); // Destruct the instance of the below layer
 }
 
 } /* namespace nsQlinkLayerAgent */

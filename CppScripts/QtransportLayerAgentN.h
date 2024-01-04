@@ -18,6 +18,7 @@ Header declaration file for Quantum transport Layer Agent Node
 
 #include<string>
 #include<fstream>
+#include "QnetworkLayerAgent.h"
 using std::string;
 using std::ofstream;
 
@@ -39,6 +40,7 @@ public: // Variables/Objects
 	int numberSessions=0;
 
 private: // Variables/Objects	
+	nsQnetworkLayerAgent::QNLA QNLAagent; // Instance of the below agent
 	// Member Variables Such As Window Handle, Time Etc.,
 	ApplicationState m_state;	
 	char IPaddressesSockets[NumSocketsMax][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks

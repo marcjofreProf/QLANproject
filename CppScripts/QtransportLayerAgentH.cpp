@@ -416,7 +416,10 @@ strcpy(Payload,strtok(NULL,","));
 // Identify what to do and execute it
 if (string(Type)==string("Operation")){// Operation message. 
 
-	if (string(Command)==string("print")){
+	if (string(Command)==string("ServeQubits")){// Send qubits to the requesting host
+		
+	}
+	else if (string(Command)==string("print")){
 		cout << "New Message: "<< Payload << endl;
 	}
 	else{//Default
@@ -458,7 +461,16 @@ memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
 
 return 0; // All OK
 }
+///////////////////////////////////////////////////////////////////
+// Request methods
 
+int QTLAH::RetrieveNumStoredQubitsNode(){ // Send to the upper layer agent how many qubits are stored
+int NumStoredQubitsNode=0;
+// It is a blocking communication between host and node
+//cout << "New Message: "<< Payload << endl;
+return NumStoredQubitsNode;
+}
+///////////////////////////////////////////////////////////////////
 QTLAH::~QTLAH() {
 	// destructor
 	this->StopICPconnections();

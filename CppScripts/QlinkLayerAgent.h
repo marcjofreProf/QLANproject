@@ -13,6 +13,7 @@ Header declaration file for Quantum link Layer Agent
 
 #include<string>
 #include<fstream>
+#include "QphysLayerAgent.h"
 using std::string;
 using std::ofstream;
 
@@ -24,17 +25,17 @@ namespace nsQlinkLayerAgent {
 // enum GPIO_DIRECTION{ INPUT, OUTPUT };
 
 class QLLA {
-private:
+private: // Variables
 	int numberHops;
+	nsQphysLayerAgent::QPLA QPLAagent;
 
-public:
-	QLLA(int numberHops); //constructor
+public: // Functions
+	QLLA(); //constructor
 	
 	~QLLA();  //destructor
 
-//private:
+private: // Functions
 //	int write(string path, string filename, string value);
-//	friend void* threadedPoll(void *value);
 };
 
 

@@ -30,7 +30,7 @@ using namespace std;
 
 namespace nsQtransportLayerAgentN {
 
-QTLAN::QTLAN(int numberSessions) { // Constructor
+QTLAN::QTLAN(int numberSessions) { // Constructor 
  this->numberSessions = numberSessions; // Number of sessions of different services
  strcpy(this->SCmode[0],"server"); // to know if this host instance is client or server
  strcpy(this->SCmode[1],"client"); // to know if this host instance is client or server
@@ -353,6 +353,7 @@ return 0; // All OK
 QTLAN::~QTLAN() {
 // destructor
 	this->StopICPconnections(this->ParamArgc);
+	QNLAagent.~QNLA(); // Destructor of the agent below
 }
 
 } /* namespace nsQnetworkLayerAgentN */

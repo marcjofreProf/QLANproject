@@ -11,6 +11,8 @@ Header declaration file for Quantum physical Layer Agent
 #ifndef QphysLayerAgent_H_
 #define QphysLayerAgent_H_
 
+#define LinkNumberMAX 2
+
 #include<string>
 #include<fstream>
 using std::string;
@@ -25,10 +27,12 @@ namespace nsQphysLayerAgent {
 
 class QPLA {
 private:
-	int numberLinks, *EmitLinkNumberArray, *ReceiveLinkNumberArray;
+	int numberLinks=0;// Number of full duplex links directly connected to this physical quantum node
+        int EmitLinkNumberArray[LinkNumberMAX]={0}; // Array indicating the GPIO numbers identifying the emit pins
+        int ReceiveLinkNumberArray[LinkNumberMAX]={0}; // Array indicating the GPIO numbers identifying the receive pins
 
 public:
-	QPLA(int numberLinks, int* EmitLinkNumberArray, int* ReceiveLinkNumberArray); //constructor
+	QPLA(); //constructor
 
 	// General Input and Output functions
 	int emitQuBit();

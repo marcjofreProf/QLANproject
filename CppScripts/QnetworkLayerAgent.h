@@ -13,6 +13,7 @@ Header declaration file for Quantum network Layer Agent
 
 #include<string>
 #include<fstream>
+#include "QlinkLayerAgent.h"
 using std::string;
 using std::ofstream;
 
@@ -24,11 +25,12 @@ namespace nsQnetworkLayerAgent {
 // enum GPIO_DIRECTION{ INPUT, OUTPUT };
 
 class QNLA {
-private:
-	int numberConnections;
+private:// Variables/Instances
+	int numberHops=0;
+	nsQlinkLayerAgent::QLLA QLLAagent;// Instance of the below agent
 
 public:
-	QNLA(int numberConnections); //constructor
+	QNLA(); //constructor
 	
 	~QNLA();  //destructor
 

@@ -51,6 +51,7 @@ private: // Variables/Objects
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 
 public: // Functions
+	// Management
 	QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAscendingCharArray); //constructor
 	ApplicationState getState() const { return m_state; }	
         bool m_start() { m_state = APPLICATION_RUNNING; return true; }
@@ -66,6 +67,8 @@ public: // Functions
 	int InitAgentProcess(); // Initializer of the thread
 	// Communication messages
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the upper Agent to send message to specific host/node
+	// Requests
+	int RetrieveNumStoredQubitsNode(); // Send to the upper layer agent how many qubits are stored
 	~QTLAH();  //destructor
 
 private: //Functions
@@ -87,7 +90,7 @@ private: //Functions
 	void AgentProcessRequestsPetitions(); // Process thread that manages requests and petitions
 	int ICPConnectionsCheckNewMessages(); // Check for new messages
 	// Process and execute requests
-	int ProcessNewMessage();
+	int ProcessNewMessage(); // main function perferming the required operatons to process the task
 };
 
 

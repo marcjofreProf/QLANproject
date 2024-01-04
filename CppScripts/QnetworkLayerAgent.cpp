@@ -15,13 +15,14 @@ using namespace std;
 
 namespace nsQnetworkLayerAgent {
 
-QNLA::QNLA(int numberConnections) { // Constructor
- this->numberConnections = numberConnections; // Number of hops to reach destination
+QNLA::QNLA() { // Constructor
+ 
 }
 
 
 QNLA::~QNLA() {
 // destructor
+ QLLAagent.~QLLA(); // Destruct the instance of the below agent
 }
 
 } /* namespace nsQnetworkLayerAgent */
