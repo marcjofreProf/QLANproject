@@ -61,7 +61,10 @@ void* QTLAH::AgentProcessStaticEntryPoint(void* c){// Not really used
   return NULL;
 }
 */
+//////////////// Sempahore ////////////////////////////
 
+
+////////////////////////////////////////////////////////
 int QTLAH::InitAgentProcess(){
 	// Then, regularly check for next job/action without blocking		  	
 	// Not used void* params;
@@ -312,7 +315,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  while(isValidWhileLoop){
  try{
    try {
-   	sem_wait(&semResource);// Wait semaphore until it can proceed
+   	//sem_wait(&semResource);// Wait semaphore until it can proceed
     	// Code that might throw an exception
  	// Check if there are need messages or actions to be done by the node 	
  	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
@@ -337,7 +340,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
            }
 
         } // switch
-        sem_post(&semResource); // Release the semaphore 
+        //sem_post(&semResource); // Release the semaphore 
     }
     catch (const std::exception& e) {
 	// Handle the exception
@@ -468,14 +471,14 @@ return 0; //All OK
 // Request methods
 int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 // Code that might throw an exception
-    sem_wait(&semResource);// Wait semaphore until it can proceed
+    //sem_wait(&semResource);// Wait semaphore until it can proceed
     this->ICPdiscoverSend(ParamsDescendingCharArray);
-    sem_post(&semResource); // Release the semaphore 
+    //sem_post(&semResource); // Release the semaphore 
     return 0; //All OK
 }
 
 int QTLAH::RetrieveNumStoredQubitsNode(){ // Send to the upper layer agent how many qubits are stored
-sem_wait(&semResource);// Wait semaphore until it can proceed
+//sem_wait(&semResource);// Wait semaphore until it can proceed
 
 int NumStoredQubitsNode=0;
 // It is a "blocking" communication between host and node, because the listen time is very large
@@ -513,14 +516,13 @@ strcpy(Payload,strtok(NULL,","));
 int NumStoredQubitsNode=atoi(Payload);
 }
 else{int NumStoredQubitsNode=0;}
-sem_post(&semResource); // Release the semaphore
+//sem_post(&semResource); // Release the semaphore
 return NumStoredQubitsNode;
 }
 ///////////////////////////////////////////////////////////////////
 QTLAH::~QTLAH() {
 	// destructor
 	this->StopICPconnections();
-	sem_destroy(&semResource); // Destroy semaphore	
 	this->threadRef.join();// Terminate the process thread
 }
 

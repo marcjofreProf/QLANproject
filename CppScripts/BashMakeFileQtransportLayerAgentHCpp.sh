@@ -1,1 +1,1 @@
-g++ QtransportLayerAgentH.cpp -o QtransportLayerAgentH
+g++ -pthread QtransportLayerAgentH.cpp -o QtransportLayerAgentH
