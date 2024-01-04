@@ -16,6 +16,8 @@ Header declaration file for Quantum transport Layer Agent Host
 #define IPcharArrayLengthMAX 15
 // Threading
 #include <thread>
+// Semaphore
+#include <atomic>
 
 //#include<string>
 //#include<fstream>
@@ -49,6 +51,9 @@ private: // Variables/Objects
 	int socketReadIter = 0; // Variable to read each time a different socket
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
+	// Semaphore
+	std::atomic<int> valueSemaphore=1;// Start as 1 (open or acquireable)	
+	int valueSemaphoreExpected = 0;
 
 public: // Functions
 	// Management
@@ -71,7 +76,9 @@ public: // Functions
 	~QTLAH();  //destructor
 
 private: //Functions
-	//explicit Semaphore(int initialValue) : valueSemaphore(initialValue) {};
+	// Sempahore
+	void acquire();
+	void release();
 	// Management of ICP communications
 	int SocketCheckForceShutDown(int socket_fd);// Force the socket to shutdown (whatever status but closed)
         // Management functions as client

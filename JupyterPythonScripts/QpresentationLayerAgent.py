@@ -10,6 +10,7 @@
 #####################################################
 
 import sys, os
+import time
 
 import QsessionLayerAgent
 
@@ -37,7 +38,7 @@ class QPLA:
 		messageIPorg=IPhostOrgOpNet
 		messageIPdest=IPhostDestOpNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-		self.QSLAagent.SendMessageAgent(ParamsDescendingCharArray)
+		self.QSLAagent.SendMessageAgent(messageAuxChar)
 		time.sleep(1)# Wait some time (seconds) so qubits are received
 	
 	def RetrieveNumStoredQubitsNode(self,): # Supposing that node has received quBits, make use of them

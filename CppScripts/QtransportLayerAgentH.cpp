@@ -27,6 +27,8 @@ Agent script for Quantum transport Layer Host
 #include <arpa/inet.h>
 // Threading
 #include <thread>
+// Semaphore
+#include <atomic>
 
 using namespace std;
 
@@ -61,9 +63,22 @@ void* QTLAH::AgentProcessStaticEntryPoint(void* c){// Not really used
   return NULL;
 }
 */
-//////////////// Sempahore ////////////////////////////
+//////////////// Sempahore /////////////////////////////*
 
 
+void QTLAH::acquire() {
+     // !expected: if expected is set to true by another thread, done!
+    // Otherwise, it fails spuriously and we should try again.
+	while (!valueSemaphore.compare_exchange_weak(this->valueSemaphoreExpected, 1) && !this->valueSemaphoreExpected);
+  }
+
+void QTLAH::release() {
+    if (valueSemaphore.fetch_add(1, std::memory_order_release) == 0) {
+      // Notify any waiting threads
+      std::atomic_thread_fence(std::memory_order_release);
+      std::this_thread::yield();
+    }
+  }
 ////////////////////////////////////////////////////////
 int QTLAH::InitAgentProcess(){
 	// Then, regularly check for next job/action without blocking		  	
@@ -315,7 +330,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  while(isValidWhileLoop){
  try{
    try {
-   	//sem_wait(&semResource);// Wait semaphore until it can proceed
+   	this->acquire();// Wait semaphore until it can proceed
     	// Code that might throw an exception
  	// Check if there are need messages or actions to be done by the node 	
  	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
@@ -340,7 +355,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
            }
 
         } // switch
-        //sem_post(&semResource); // Release the semaphore 
+        this->release(); // Release the semaphore 
     }
     catch (const std::exception& e) {
 	// Handle the exception
@@ -471,19 +486,19 @@ return 0; //All OK
 // Request methods
 int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 // Code that might throw an exception
-    //sem_wait(&semResource);// Wait semaphore until it can proceed
+    this->acquire();// Wait semaphore until it can proceed
     this->ICPdiscoverSend(ParamsDescendingCharArray);
-    //sem_post(&semResource); // Release the semaphore 
+    this->release(); // Release the semaphore 
     return 0; //All OK
 }
 
 int QTLAH::RetrieveNumStoredQubitsNode(){ // Send to the upper layer agent how many qubits are stored
-//sem_wait(&semResource);// Wait semaphore until it can proceed
+this->acquire();// Wait semaphore until it can proceed
 
 int NumStoredQubitsNode=0;
 // It is a "blocking" communication between host and node, because the listen time is very large
 
-int socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor
+int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor
 
 strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
 strcat(this->SendBuffer,",");
@@ -516,7 +531,7 @@ strcpy(Payload,strtok(NULL,","));
 int NumStoredQubitsNode=atoi(Payload);
 }
 else{int NumStoredQubitsNode=0;}
-//sem_post(&semResource); // Release the semaphore
+this->release(); // Release the semaphore
 return NumStoredQubitsNode;
 }
 ///////////////////////////////////////////////////////////////////
