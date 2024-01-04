@@ -268,7 +268,9 @@ strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
     //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
     // Understand which socket descriptor has to be used
     int socket_fd_conn;
+    cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
     for (int i=0; i<NumSocketsMax; ++i){
+    	cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
     	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
     	cout << "Found socket file descriptor//connection to send" << endl;
     	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
