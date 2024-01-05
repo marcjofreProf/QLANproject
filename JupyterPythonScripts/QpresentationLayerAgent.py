@@ -39,7 +39,6 @@ class QPLA:
 		messageIPdest=IPhostDestOpNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
-		time.sleep(1)# Wait some time (seconds) so qubits are received
 	
 	def RetrieveNumStoredQubitsNode(self,ParamsIntArray): # Supposing that node has received quBits, make use of them
 		self.QSLAagent.RetrieveNumStoredQubitsNode(ParamsIntArray)

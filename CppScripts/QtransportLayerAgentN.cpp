@@ -174,7 +174,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 		cout << "Host agent message of 0 Bytes" << endl;
 	}
 	// Clear the ReadBuffer after using it!!! Important
-	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+	//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
 	return -1;
       }
       // Process the message
@@ -394,7 +394,7 @@ else{// Info message; Default
 }  
 
 // Clear the ReadBuffer after using it!!! Important
-memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
 
 return 0; // All OK
 }

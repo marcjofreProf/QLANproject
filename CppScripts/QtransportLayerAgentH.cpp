@@ -285,7 +285,7 @@ else {// There might be at least one new message
 				cout << "Host agent message of 0 Bytes" << endl;
 			}
 			// Clear the ReadBuffer after using it!!! Important
-			memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+			//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
 			return -1;
 		}
 		// Process the message
@@ -474,7 +474,7 @@ else{// Info message; Default
 }  
 
 // Clear the ReadBuffer after using it!!! Important
-memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
 
 return 0; // All OK
 }
@@ -542,6 +542,7 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"NumStoredQubitsNode");
 strcat(this->SendBuffer,",");// Very important to end the message
+
 this->ICPmanagementSend(socket_fd_conn); // send mesage to node
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 //cout << "ReadBytes: " << ReadBytes << endl;
@@ -549,7 +550,7 @@ if (ReadBytes>0){// Read block
 	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 	// After reading the information, erase the ReadBuffer
-	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+	//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
 	char IPdest[NumBytesBufferICPMAX] = {0};
 	char IPorg[NumBytesBufferICPMAX] = {0};
 	char Type[NumBytesBufferICPMAX] = {0};
@@ -568,7 +569,8 @@ if (ReadBytes>0){// Read block
 	else// Not the message that was expected. Probably a node to the other node message, so let it pass
 	{
 		// First remount the message in the ReadBuffer
-		strcpy(this->ReadBuffer, IPdest);
+		//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+		strcpy(this->ReadBuffer,IPdest);
 		strcat(this->ReadBuffer,",");
 		strcat(this->ReadBuffer,IPorg);
 		strcat(this->ReadBuffer,",");
@@ -577,11 +579,12 @@ if (ReadBytes>0){// Read block
 		strcat(this->ReadBuffer,Command);
 		strcat(this->ReadBuffer,",");
 		strcat(this->ReadBuffer,Payload);
+		strcat(this->ReadBuffer,",");// Very important to end the message
 		this->ProcessNewMessage(); // Send to the method for processing
 	}
 }
 else{
-memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
 ParamsIntArray[0]=-1;
 isValidWhileLoopCount--;
 usleep(1000);
