@@ -496,7 +496,7 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 int QTLAH::RetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray){ // Send to the upper layer agent how many qubits are stored
 this->acquire();// Wait semaphore until it can proceed
 
-// It is a "blocking" communication between host and node, because the listen time is very large
+// It is a "blocking" communication between host and node, because it is many read trials for reading
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor
 
@@ -511,9 +511,12 @@ strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"NumStoredQubitsNode");
 
 this->ICPmanagementSend(socket_fd_conn); // send mesage to node
-int SockListenTimeusec=999999; // Long time so the node has time to response
+int SockListenTimeusec=500; // Long time so the node has time to response
 
+int isValidWhileLoopCount = 1000;
+while(isValidWhileLoopCount>0){
 if (this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec)>0){// Read block
+	isValidWhileLoopCount=0;
 	char ReadBufferAux[NumBytesBufferICPMAX] = { 0 };
 	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 	// After reading the information, erase the ReadBuffer
@@ -528,10 +531,11 @@ if (this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec)>0){// Read block
 	strcpy(Type,strtok(NULL,","));
 	strcpy(Command,strtok(NULL,","));
 	strcpy(Payload,strtok(NULL,","));
-	cout << "Payload: " << Payload << endl;
+	//cout << "Payload: " << Payload << endl;
 	ParamsIntArray[0]=atoi(Payload);
 }
-else{ParamsIntArray[0]=0;}
+else{ParamsIntArray[0]=-1;isValidWhileLoopCount--;}// Long time so the node has time to response} // No reading, so it is notified. It could be forced to make a loop until obtaining reading but then it mightblock the code completely
+}//while
 this->release(); // Release the semaphore
 return 0; // All OK
 }
