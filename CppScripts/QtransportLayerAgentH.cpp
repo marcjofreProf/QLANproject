@@ -534,7 +534,7 @@ if (this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec)>0){// Read block
 	//cout << "Payload: " << Payload << endl;
 	ParamsIntArray[0]=atoi(Payload);
 }
-else{ParamsIntArray[0]=-1;isValidWhileLoopCount--;}// Long time so the node has time to response} // No reading, so it is notified. It could be forced to make a loop until obtaining reading but then it mightblock the code completely
+else{ParamsIntArray[0]=-1;isValidWhileLoopCount--;usleep(5000);}// Long time so the node has time to response} // No reading, so it is notified. It could be forced to make a loop until obtaining reading but then it mightblock the code completely
 }//while
 this->release(); // Release the semaphore
 return 0; // All OK
