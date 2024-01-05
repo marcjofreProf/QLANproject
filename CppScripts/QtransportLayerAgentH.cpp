@@ -19,7 +19,7 @@ Agent script for Quantum transport Layer Host
 #define NumSocketsMax 2
 #define NumBytesBufferICPMAX 1024
 #define IPcharArrayLengthMAX 15
-#define SockListenTimeusecStandard 100
+#define SockListenTimeusecStandard 50
 #define WaitTimeAfterReadWriteUsec 100
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
@@ -27,6 +27,7 @@ Agent script for Quantum transport Layer Host
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
+#define WaitTimeAfterMainWhileLoop 500
 #include <thread>
 // Semaphore
 #include <atomic>
@@ -117,7 +118,8 @@ int QTLAH::InitiateICPconnections() {
 	}
 	else{// server
 		//cout << "Check - Generating connection as server" << endl;
-		this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPSocketsList[1]); // Open port and listen as server
+		int RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPSocketsList[1]); // Open port and listen as server
+		if (RetValue==-1){this->m_exit();} // Exit application
 	}
 	this->numberSessions=1;
 	return 0; // All OK
@@ -367,7 +369,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
 
         } // switch
         this->release(); // Release the semaphore 
-        usleep(5000);// Wait a few microseconds for other processes to enter
+        usleep(WaitTimeAfterMainWhileLoop);// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception

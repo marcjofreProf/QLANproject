@@ -19,13 +19,14 @@ Agent script for Quantum transport Layer Node
 #define NumSocketsMax 2
 #define NumBytesBufferICPMAX 1024
 #define IPcharArrayLengthMAX 15
-#define SockListenTimeusecStandard 100
+#define SockListenTimeusecStandard 50
 #define WaitTimeAfterReadWriteUsec 100
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
+#define WaitTimeAfterMainWhileLoop 500
 
 using namespace std;
 
@@ -223,7 +224,7 @@ int QTLAN::InitiateICPconnections(int argc){
 
 	//QTLANagent.ICPmanagementOpenClient(QTLANagent.socket_fdArray[1],char* IPaddressesSockets)
 	}
-	if (RetValue==-1){this->m_pause();} // Exit application
+	if (RetValue==-1){this->m_exit();} // Exit application
 	else{this->numberSessions=1;} // Update indicators
 	
 	return 0; // All OK
@@ -465,7 +466,7 @@ int main(int argc, char const * argv[]){
            }
 
         } // switch
-        usleep(5000);// Wait a few microseconds for other processes to enter
+        usleep(WaitTimeAfterMainWhileLoop);// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception
