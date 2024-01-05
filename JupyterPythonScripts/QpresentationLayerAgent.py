@@ -22,7 +22,7 @@ class QPLA:
 	# Methods
 	def ListCharArrayParser(self,ListCharArrayAux):
 	    # Actually concatenating a python list of strings to a single string
-	    ParsedCharArrayAux=",".join(ListCharArrayAux)
+	    ParsedCharArrayAux=",".join(ListCharArrayAux)+","
 	    return ParsedCharArrayAux
  	
 	def InitAgentProcess(self,): # Pass to the below agent
