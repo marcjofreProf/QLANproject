@@ -148,11 +148,11 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   int ret = select(nfds, &fds, NULL, NULL, &timeout);
 
   if (ret < 0) {
-    cout << "Host error select to check new messages" << endl;
+    cout << "Host select no new messages" << endl;
     return -1;
-  } else if (ret == 0) {
-    //cout << "Host agent no new messages" << endl;
-    return -1;
+   else if (ret==0){
+   //cout << "No new messages" << endl;
+   return -1;}
   } else {// There is at least one new message
     if (FD_ISSET(socket_fd_conn, &fds)) {
       // Read the message from the socket

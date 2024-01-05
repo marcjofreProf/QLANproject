@@ -70,7 +70,8 @@ void* QTLAH::AgentProcessStaticEntryPoint(void* c){// Not really used
 void QTLAH::acquire() {
      // !expected: if expected is set to true by another thread, done!
     // Otherwise, it fails spuriously and we should try again.
-	while (!valueSemaphore.compare_exchange_weak(this->valueSemaphoreExpected, 1) && !this->valueSemaphoreExpected);
+	while (!valueSemaphore.compare_exchange_weak(this->valueSemaphoreExpected, 1,std::memory_order_acquire) && !this->valueSemaphoreExpected);
+
   }
 
 void QTLAH::release() {
@@ -79,6 +80,7 @@ void QTLAH::release() {
       std::atomic_thread_fence(std::memory_order_release);
       std::this_thread::yield();
     }
+
   }
 ////////////////////////////////////////////////////////
 int QTLAH::InitAgentProcess(){
@@ -251,34 +253,40 @@ int QTLAH::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   timeout.tv_sec = 0;
   timeout.tv_usec = SockListenTimeusec;
   
-  int nfds = socket_fd_conn + 1;
+  int nfds = socket_fd_conn + 1; //The nfds argument specifies the range of file descriptors to be tested. The select() function tests file descriptors in the range of 0 to nfds-1.
   int ret = select(nfds, &fds, NULL, NULL, &timeout);
 
-  if (ret < 0) {
-    cout << "Host error select to check new messages" << endl;
-    return -1;
-  } else if (ret == 0) {
-    //cout << "Host agent no new messages" << endl;
-    return -1;
-  } else {// There is at least one new message
-    if (FD_ISSET(socket_fd_conn, &fds)) {
-      // Read the message from the socket
-      int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
-      //cout << "Node message received: " << this->ReadBuffer << endl;
-      if (valread <= 0) {
-        if (valread<0){cout << "Host error reading new messages" << endl;}
-	// Clear the ReadBuffer after using it!!! Important
-	memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
-	return -1;
-      }
-      // Process the message
-      else{// (n>0){
-      	//cout << "Received message: " << this->ReadBuffer << endl;
-      	return valread; //
-      }
-    }
-    else{return -1;}
-  }
+if (ret < 0){cout << "Host select no new messages" << endl;return -1;}
+else if (ret==0){//cout << "No new messages" << endl;
+return -1;
+}
+else {// There might be at least one new message
+	if (FD_ISSET(socket_fd_conn, &fds)){
+		// Read the message from the socket
+		int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
+		//cout << "valread: " << valread << endl;
+		//cout << "Node message received: " << this->ReadBuffer << endl;
+		if (valread <= 0){
+			if (valread<0){
+				cout << "Host error reading new messages" << endl;
+			}
+			else{
+				cout << "Host agent message of 0 Bytes" << endl;
+			}
+			// Clear the ReadBuffer after using it!!! Important
+			memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
+			return -1;
+		}
+		// Process the message
+		else{// (valread>0){
+			//cout << "Received message: " << this->ReadBuffer << endl;
+			//cout << "valread: " << valread << endl;
+			return valread;
+		}
+	}
+	else{cout << "Host FD_ISSET no new messages" << endl;return -1;}
+}
+
 }
 
 int QTLAH::ICPmanagementSend(int socket_fd_conn) {
@@ -485,6 +493,7 @@ return 0; //All OK
 }
 ///////////////////////////////////////////////////////////////////
 // Request methods
+// The blocking requests from host to the node are ok because the node is not to sent request to the host (following the OSI pile methodology). At most, there will be request of retransmission to the other host's node, which have to be let pass
 int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 // Code that might throw an exception
     this->acquire();// Wait semaphore until it can proceed
@@ -510,12 +519,13 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"NumStoredQubitsNode");
 
-int SockListenTimeusec=250; // Long time so the node has time to response
+int SockListenTimeusec=100; // Infinite time (if value less than 0)Long time so the node has time to response
 this->ICPmanagementSend(socket_fd_conn); // send mesage to node
 int isValidWhileLoopCount = 100;
 while(isValidWhileLoopCount>0){
-if (this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec)>0){// Read block
-	isValidWhileLoopCount=0;
+int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
+//cout << "ReadBytes: " << ReadBytes << endl;
+if (ReadBytes>0){// Read block	
 	char ReadBufferAux[NumBytesBufferICPMAX] = {'\0'};
 	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 	// After reading the information, erase the ReadBuffer
@@ -531,9 +541,30 @@ if (this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec)>0){// Read block
 	strcpy(Command,strtok(NULL,","));
 	strcpy(Payload,strtok(NULL,","));
 	//cout << "Payload: " << Payload << endl;
+	if (string(Command)==string("InfoRequest") and string(Type)==string("Operation")){// Expected/awaiting message
 	ParamsIntArray[0]=atoi(Payload);
+	isValidWhileLoopCount=0;
+	}
+	else// Not the message that was expected. Probably a node to the other node message, so let it pass
+	{
+		// First remount the message in the ReadBuffer
+		strcpy(this->ReadBuffer, IPdest);
+		strcat(this->ReadBuffer,",");
+		strcat(this->ReadBuffer,IPorg);
+		strcat(this->ReadBuffer,",");
+		strcat(this->ReadBuffer,Type);
+		strcat(this->ReadBuffer,",");
+		strcat(this->ReadBuffer,Command);
+		strcat(this->ReadBuffer,",");
+		strcat(this->ReadBuffer,Payload);
+		this->ProcessNewMessage(); // Send to the method for processing
+	}
 }
-else{ParamsIntArray[0]=-1;isValidWhileLoopCount--;usleep(5000);}// Long time so the node has time to response} // No reading, so it is notified. It could be forced to make a loop until obtaining reading but then it mightblock the code completely
+else{
+memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
+ParamsIntArray[0]=-1;
+isValidWhileLoopCount--;
+}
 }//while
 this->release(); // Release the semaphore
 return 0; // All OK
