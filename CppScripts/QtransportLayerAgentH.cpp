@@ -367,7 +367,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
 
         } // switch
         this->release(); // Release the semaphore 
-        usleep(50);// Wait a few microseconds for other processes to enter
+        usleep(500);// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception
@@ -501,21 +501,26 @@ return 0; //All OK
 int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 // Code that might throw an exception
     this->acquire();// Wait semaphore until it can proceed
+    try{
     this->ICPdiscoverSend(ParamsDescendingCharArray);
+    } // try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+    }
     this->release(); // Release the semaphore 
     return 0; //All OK
 }
 
 int QTLAH::RetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray){ // Send to the upper layer agent how many qubits are stored
 this->acquire();// Wait semaphore until it can proceed
-
+try{
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor
 
 int SockListenTimeusec=100; // Infinite time (if value less than 0)Long time so the node has time to response
 
-int isValidWhileLoopCount = 100;
+int isValidWhileLoopCount = 100; // Number of tries
 while(isValidWhileLoopCount>0){
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
 strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
@@ -570,9 +575,14 @@ else{
 memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
 ParamsIntArray[0]=-1;
 isValidWhileLoopCount--;
-usleep(100);
+usleep(1000);
 }
 }//while
+
+} // try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+    }
 this->release(); // Release the semaphore
 return 0; // All OK
 }
