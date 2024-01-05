@@ -149,11 +149,11 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 
   if (ret < 0) {
     cout << "Host select no new messages" << endl;
-    return -1;
+    return -1;}
    else if (ret==0){
    //cout << "No new messages" << endl;
    return -1;}
-  } else {// There is at least one new message
+  else {// There is at least one new message
     if (FD_ISSET(socket_fd_conn, &fds)) {
       // Read the message from the socket
       int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
@@ -460,6 +460,7 @@ int main(int argc, char const * argv[]){
            }
 
         } // switch
+        usleep(50);// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception
