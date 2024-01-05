@@ -158,7 +158,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   else {// There is at least one new message
     if (FD_ISSET(socket_fd_conn, &fds)) {
       // Read the message from the socket
-      int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
+      int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);//MSG_DONTWAIT);
       usleep(WaitTimeAfterReadWriteUsec); // very important to wait a little after recv
       //cout << "Node message received: " << this->ReadBuffer << endl;
       if (valread <= 0) {
@@ -179,7 +179,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 
 int QTLAN::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
-    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);
+    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),0);// MSG_DONTWAIT);
     usleep(WaitTimeAfterReadWriteUsec); // very important to wait a little after send
     if (BytesSent<0){
     	perror("send");
