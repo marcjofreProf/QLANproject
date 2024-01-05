@@ -20,6 +20,7 @@ Agent script for Quantum transport Layer Host
 #define NumBytesBufferICPMAX 1024
 #define IPcharArrayLengthMAX 15
 #define SockListenTimeusecStandard 10
+#define WaitTimeAfterReadWriteUsec 100
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -264,6 +265,7 @@ else {// There might be at least one new message
 	if (FD_ISSET(socket_fd_conn, &fds)){
 		// Read the message from the socket
 		int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
+		usleep(WaitTimeAfterReadWriteUsec); // very important to wait a little after recv
 		//cout << "valread: " << valread << endl;
 		//cout << "Node message received: " << this->ReadBuffer << endl;
 		if (valread <= 0){
@@ -293,7 +295,7 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);//MSG_DONTWAIT
-        
+    usleep(WaitTimeAfterReadWriteUsec); // very important to wait a little after send
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
