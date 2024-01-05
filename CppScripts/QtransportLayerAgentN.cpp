@@ -171,7 +171,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
       }
     }
     else{return -1;}
-  }
+  }    
 }
 
 int QTLAN::ICPmanagementSend(int socket_fd_conn) {
@@ -352,8 +352,8 @@ else if(string(Type)==string("Control")){//Control message
 		char charNum[NumBytesBufferICPMAX] = { 0 };
 		sprintf(charNum, "%d", NumStoredQubitsNode);
 		strcat(ParamsCharArray,charNum);
-		cout << "ParamsCharArray: " << ParamsCharArray << endl;
-		  // reply imediately with a message to requester		  
+		//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+		  // reply immediately with a message to requester		  
 		  this->ICPdiscoverSend(ParamsCharArray); 
 		}
 		else{
