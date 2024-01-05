@@ -274,7 +274,7 @@ else {// There might be at least one new message
 				cout << "Host agent message of 0 Bytes" << endl;
 			}
 			// Clear the ReadBuffer after using it!!! Important
-			memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
+			memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
 			return -1;
 		}
 		// Process the message
@@ -400,13 +400,13 @@ return 0; // All OK
 int QTLAH::ProcessNewMessage(){
 //cout << "ReadBuffer: " << this->ReadBuffer << endl;
 // Parse the message information
-char ReadBufferAux[NumBytesBufferICPMAX] = {'\0'};
+char ReadBufferAux[NumBytesBufferICPMAX] = {0};
 strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
-char IPdest[NumBytesBufferICPMAX] = {'\0'};
-char IPorg[NumBytesBufferICPMAX] = {'\0'};
-char Type[NumBytesBufferICPMAX] = {'\0'};
-char Command[NumBytesBufferICPMAX] = {'\0'};
-char Payload[NumBytesBufferICPMAX] = {'\0'};
+char IPdest[NumBytesBufferICPMAX] = {0};
+char IPorg[NumBytesBufferICPMAX] = {0};
+char Type[NumBytesBufferICPMAX] = {0};
+char Command[NumBytesBufferICPMAX] = {0};
+char Payload[NumBytesBufferICPMAX] = {0};
 strcpy(IPdest,strtok(ReadBufferAux,","));
 strcpy(IPorg,strtok(NULL,","));
 strcpy(Type,strtok(NULL,","));
@@ -463,12 +463,13 @@ else{// Info message; Default
 }  
 
 // Clear the ReadBuffer after using it!!! Important
-memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
+memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
 
 return 0; // All OK
 }
 
 int QTLAH::ICPdiscoverSend(char* ParamsCharArray){
+    memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
     strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
     //cout << "SendBuffer: " << this->SendBuffer << endl;	
     // Parse the message information
@@ -514,6 +515,7 @@ int SockListenTimeusec=100; // Infinite time (if value less than 0)Long time so 
 
 int isValidWhileLoopCount = 100;
 while(isValidWhileLoopCount>0){
+memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
 strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,this->IPaddressesSockets[3]);
@@ -527,15 +529,15 @@ this->ICPmanagementSend(socket_fd_conn); // send mesage to node
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 //cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
-	char ReadBufferAux[NumBytesBufferICPMAX] = {'\0'};
+	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 	// After reading the information, erase the ReadBuffer
-	memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
-	char IPdest[NumBytesBufferICPMAX] = {'\0'};
-	char IPorg[NumBytesBufferICPMAX] = {'\0'};
-	char Type[NumBytesBufferICPMAX] = {'\0'};
-	char Command[NumBytesBufferICPMAX] = {'\0'};
-	char Payload[NumBytesBufferICPMAX] = {'\0'};
+	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+	char IPdest[NumBytesBufferICPMAX] = {0};
+	char IPorg[NumBytesBufferICPMAX] = {0};
+	char Type[NumBytesBufferICPMAX] = {0};
+	char Command[NumBytesBufferICPMAX] = {0};
+	char Payload[NumBytesBufferICPMAX] = {0};
 	strcpy(IPdest,strtok(ReadBufferAux,","));
 	strcpy(IPorg,strtok(NULL,","));
 	strcpy(Type,strtok(NULL,","));
@@ -562,7 +564,7 @@ if (ReadBytes>0){// Read block
 	}
 }
 else{
-memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
+memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
 ParamsIntArray[0]=-1;
 isValidWhileLoopCount--;
 usleep(100);
