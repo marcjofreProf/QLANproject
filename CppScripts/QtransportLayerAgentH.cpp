@@ -510,11 +510,11 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"NumStoredQubitsNode");
 
-this->ICPmanagementSend(socket_fd_conn); // send mesage to node
 int SockListenTimeusec=500; // Long time so the node has time to response
 
-int isValidWhileLoopCount = 1000;
+int isValidWhileLoopCount = 100;
 while(isValidWhileLoopCount>0){
+this->ICPmanagementSend(socket_fd_conn); // send mesage to node
 if (this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec)>0){// Read block
 	isValidWhileLoopCount=0;
 	char ReadBufferAux[NumBytesBufferICPMAX] = { 0 };
