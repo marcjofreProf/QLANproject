@@ -465,7 +465,7 @@ int main(int argc, char const * argv[]){
            }
 
         } // switch
-        usleep(500);// Wait a few microseconds for other processes to enter
+        usleep(5000);// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception

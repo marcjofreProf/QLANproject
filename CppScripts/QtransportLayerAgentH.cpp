@@ -367,7 +367,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
 
         } // switch
         this->release(); // Release the semaphore 
-        usleep(500);// Wait a few microseconds for other processes to enter
+        usleep(5000);// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception
