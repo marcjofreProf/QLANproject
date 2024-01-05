@@ -351,7 +351,7 @@ else if(string(Type)==string("Control")){//Control message
 		strcat(ParamsCharArray,",");
 		char charNum[NumBytesBufferICPMAX] = {'\0'};
 		sprintf(charNum, "%d", NumStoredQubitsNode);
-		strcat(ParamsCharArray,"10");
+		strcat(ParamsCharArray,charNum);
 		//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 		  // reply immediately with a message to requester		  
 		  this->ICPdiscoverSend(ParamsCharArray); 
