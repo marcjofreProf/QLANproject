@@ -53,7 +53,7 @@ private: // Variables/Objects
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 	// Semaphore
 	std::atomic<int> valueSemaphore=1;// Start as 1 (open or acquireable)	
-	int valueSemaphoreExpected = 0;
+	int valueSemaphoreExpected = 1;
 
 public: // Functions
 	// Management

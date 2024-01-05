@@ -68,19 +68,19 @@ void* QTLAH::AgentProcessStaticEntryPoint(void* c){// Not really used
 
 
 void QTLAH::acquire() {
-     // !expected: if expected is set to true by another thread, done!
-    // Otherwise, it fails spuriously and we should try again.
-	while (!valueSemaphore.compare_exchange_weak(this->valueSemaphoreExpected, 1,std::memory_order_acquire) && !this->valueSemaphoreExpected);
+while (!valueSemaphore.compare_exchange_strong(this->valueSemaphoreExpected, 0,std::memory_order_acquire));
 
-  }
-
+// Notify any waiting threads
+std::atomic_thread_fence(std::memory_order_release);
+std::this_thread::yield();
+}
+ 
 void QTLAH::release() {
-    if (valueSemaphore.fetch_add(1, std::memory_order_release) == 0) {
+    if (valueSemaphore.fetch_add(1, std::memory_order_acquire)) {
       // Notify any waiting threads
       std::atomic_thread_fence(std::memory_order_release);
       std::this_thread::yield();
     }
-
   }
 ////////////////////////////////////////////////////////
 int QTLAH::InitAgentProcess(){
@@ -510,6 +510,10 @@ this->acquire();// Wait semaphore until it can proceed
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor
 
+int SockListenTimeusec=100; // Infinite time (if value less than 0)Long time so the node has time to response
+
+int isValidWhileLoopCount = 100;
+while(isValidWhileLoopCount>0){
 strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,this->IPaddressesSockets[3]);
@@ -519,11 +523,7 @@ strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"NumStoredQubitsNode");
-
-int SockListenTimeusec=100; // Infinite time (if value less than 0)Long time so the node has time to response
 this->ICPmanagementSend(socket_fd_conn); // send mesage to node
-int isValidWhileLoopCount = 100;
-while(isValidWhileLoopCount>0){
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 //cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
@@ -565,6 +565,7 @@ else{
 memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
 ParamsIntArray[0]=-1;
 isValidWhileLoopCount--;
+usleep(100);
 }
 }//while
 this->release(); // Release the semaphore

@@ -148,7 +148,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   int ret = select(nfds, &fds, NULL, NULL, &timeout);
 
   if (ret < 0) {
-    cout << "Host select no new messages" << endl;
+    cout << "Node select no new messages" << endl;
     return -1;}
    else if (ret==0){
    //cout << "No new messages" << endl;
@@ -159,7 +159,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
       int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
       //cout << "Node message received: " << this->ReadBuffer << endl;
       if (valread <= 0) {
-        if (valread<0){cout << "Host error reading new messages" << endl;}
+        if (valread<0){cout << "Node error reading new messages" << endl;}
 	// Clear the ReadBuffer after using it!!! Important
 	memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
 	return -1;
@@ -358,7 +358,7 @@ else if(string(Type)==string("Control")){//Control message
 		}
 		else{
 		//discard
-		cout << "Node does not have this information"<< Payload << endl;
+		cout << "Node does not have this information "<< Payload << endl;
 		}
 	}
 	else if (string(Command)==string("print")){
