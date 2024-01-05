@@ -20,7 +20,6 @@ Agent script for Quantum transport Layer Node
 #define NumBytesBufferICPMAX 1024
 #define IPcharArrayLengthMAX 15
 #define SockListenTimeusecStandard 50
-#define WaitTimeAfterReadWriteUsec 100
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -161,8 +160,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   else {// There is at least one new message
     if (FD_ISSET(socket_fd_conn, &fds)) {
       // Read the message from the socket
-      int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);      
-      usleep(WaitTimeAfterReadWriteUsec); // very important to wait a little after recv
+      int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
       //cout << "Node message received: " << this->ReadBuffer << endl;
       if (valread <= 0) {
 	if (valread<0){
@@ -173,8 +171,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 		cout << strerror(errno) << endl;
 		cout << "Host agent message of 0 Bytes" << endl;
 	}
-	// Clear the ReadBuffer after using it!!! Important
-	//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 	return -1;
       }
       // Process the message
@@ -190,7 +187,6 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 int QTLAN::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
     int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);
-    usleep(WaitTimeAfterReadWriteUsec); // very important to wait a little after send
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
@@ -393,8 +389,7 @@ else{// Info message; Default
 	}
 }  
 
-// Clear the ReadBuffer after using it!!! Important
-//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 
 return 0; // All OK
 }

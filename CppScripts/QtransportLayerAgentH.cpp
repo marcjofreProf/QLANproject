@@ -20,7 +20,6 @@ Agent script for Quantum transport Layer Host
 #define NumBytesBufferICPMAX 1024
 #define IPcharArrayLengthMAX 15
 #define SockListenTimeusecStandard 50
-#define WaitTimeAfterReadWriteUsec 100
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -272,7 +271,6 @@ else {// There might be at least one new message
 	if (FD_ISSET(socket_fd_conn, &fds)){
 		// Read the message from the socket
 		int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
-		usleep(WaitTimeAfterReadWriteUsec); // very important to wait a little after recv
 		//cout << "valread: " << valread << endl;
 		//cout << "Node message received: " << this->ReadBuffer << endl;
 		if (valread <= 0){
@@ -284,8 +282,7 @@ else {// There might be at least one new message
 				cout << strerror(errno) << endl;
 				cout << "Host agent message of 0 Bytes" << endl;
 			}
-			// Clear the ReadBuffer after using it!!! Important
-			//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+			// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 			return -1;
 		}
 		// Process the message
@@ -304,7 +301,6 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);
-    usleep(WaitTimeAfterReadWriteUsec); // very important to wait a little after send
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
@@ -473,8 +469,7 @@ else{// Info message; Default
 	}
 }  
 
-// Clear the ReadBuffer after using it!!! Important
-//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 
 return 0; // All OK
 }
@@ -549,8 +544,7 @@ int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 if (ReadBytes>0){// Read block	
 	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
-	// After reading the information, erase the ReadBuffer
-	//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 	char IPdest[NumBytesBufferICPMAX] = {0};
 	char IPorg[NumBytesBufferICPMAX] = {0};
 	char Type[NumBytesBufferICPMAX] = {0};
@@ -569,7 +563,7 @@ if (ReadBytes>0){// Read block
 	else// Not the message that was expected. Probably a node to the other node message, so let it pass
 	{
 		// First remount the message in the ReadBuffer
-		//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+		// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 		strcpy(this->ReadBuffer,IPdest);
 		strcat(this->ReadBuffer,",");
 		strcat(this->ReadBuffer,IPorg);
@@ -584,7 +578,7 @@ if (ReadBytes>0){// Read block
 	}
 }
 else{
-//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
+// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 ParamsIntArray[0]=-1;
 isValidWhileLoopCount--;
 usleep(1000);
