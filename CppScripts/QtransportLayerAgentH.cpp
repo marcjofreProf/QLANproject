@@ -391,13 +391,13 @@ return 0; // All OK
 int QTLAH::ProcessNewMessage(){
 //cout << "ReadBuffer: " << this->ReadBuffer << endl;
 // Parse the message information
-char ReadBufferAux[NumBytesBufferICPMAX] = { 0 };
+char ReadBufferAux[NumBytesBufferICPMAX] = {'\0'};
 strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
-char IPdest[NumBytesBufferICPMAX] = { 0 };
-char IPorg[NumBytesBufferICPMAX] = { 0 };
-char Type[NumBytesBufferICPMAX] = { 0 };
-char Command[NumBytesBufferICPMAX] = { 0 };
-char Payload[NumBytesBufferICPMAX] = { 0 };
+char IPdest[NumBytesBufferICPMAX] = {'\0'};
+char IPorg[NumBytesBufferICPMAX] = {'\0'};
+char Type[NumBytesBufferICPMAX] = {'\0'};
+char Command[NumBytesBufferICPMAX] = {'\0'};
+char Payload[NumBytesBufferICPMAX] = {'\0'};
 strcpy(IPdest,strtok(ReadBufferAux,","));
 strcpy(IPorg,strtok(NULL,","));
 strcpy(Type,strtok(NULL,","));
@@ -516,15 +516,15 @@ int isValidWhileLoopCount = 100;
 while(isValidWhileLoopCount>0){
 if (this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec)>0){// Read block
 	isValidWhileLoopCount=0;
-	char ReadBufferAux[NumBytesBufferICPMAX] = { 0 };
+	char ReadBufferAux[NumBytesBufferICPMAX] = {'\0'};
 	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 	// After reading the information, erase the ReadBuffer
 	memset(this->ReadBuffer, '\0', sizeof(this->ReadBuffer));
-	char IPdest[NumBytesBufferICPMAX] = { 0 };
-	char IPorg[NumBytesBufferICPMAX] = { 0 };
-	char Type[NumBytesBufferICPMAX] = { 0 };
-	char Command[NumBytesBufferICPMAX] = { 0 };
-	char Payload[NumBytesBufferICPMAX] = { 0 };
+	char IPdest[NumBytesBufferICPMAX] = {'\0'};
+	char IPorg[NumBytesBufferICPMAX] = {'\0'};
+	char Type[NumBytesBufferICPMAX] = {'\0'};
+	char Command[NumBytesBufferICPMAX] = {'\0'};
+	char Payload[NumBytesBufferICPMAX] = {'\0'};
 	strcpy(IPdest,strtok(ReadBufferAux,","));
 	strcpy(IPorg,strtok(NULL,","));
 	strcpy(Type,strtok(NULL,","));

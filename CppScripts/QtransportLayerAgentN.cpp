@@ -312,13 +312,13 @@ int QTLAN::UpdateSocketsInformation(){
 int QTLAN::ProcessNewMessage(){
 //cout << "ReadBuffer: " << this->ReadBuffer << endl;
 // Parse the message information
-char ReadBufferAux[NumBytesBufferICPMAX] = { 0 };
+char ReadBufferAux[NumBytesBufferICPMAX] = {'\0'};
 strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
-char IPdest[NumBytesBufferICPMAX] = { 0 };
-char IPorg[NumBytesBufferICPMAX] = { 0 };
-char Type[NumBytesBufferICPMAX] = { 0 };
-char Command[NumBytesBufferICPMAX] = { 0 };
-char Payload[NumBytesBufferICPMAX] = { 0 };
+char IPdest[NumBytesBufferICPMAX] = {'\0'};
+char IPorg[NumBytesBufferICPMAX] = {'\0'};
+char Type[NumBytesBufferICPMAX] = {'\0'};
+char Command[NumBytesBufferICPMAX] = {'\0'};
+char Payload[NumBytesBufferICPMAX] = {'\0'};
 strcpy(IPdest,strtok(ReadBufferAux,","));
 strcpy(IPorg,strtok(NULL,","));
 strcpy(Type,strtok(NULL,","));
@@ -340,7 +340,7 @@ else if(string(Type)==string("Control")){//Control message
 		if (string(Payload)==string("NumStoredQubitsNode")){
 		  int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.NumStoredQubitsNode[0];// to be developed for more than one link
 		  // Generate the message
-		  char ParamsCharArray[NumBytesBufferICPMAX] = { 0 };
+		  char ParamsCharArray[NumBytesBufferICPMAX] = {'\0'};
 		  strcpy(ParamsCharArray, IPorg);
 		strcat(ParamsCharArray,",");
 		strcat(ParamsCharArray,IPdest);
@@ -349,7 +349,7 @@ else if(string(Type)==string("Control")){//Control message
 		strcat(ParamsCharArray,",");
 		strcat(ParamsCharArray,"InfoRequest");
 		strcat(ParamsCharArray,",");
-		char charNum[NumBytesBufferICPMAX] = { 0 };
+		char charNum[NumBytesBufferICPMAX] = {'\0'};
 		sprintf(charNum, "%d", NumStoredQubitsNode);
 		strcat(ParamsCharArray,charNum);
 		//cout << "ParamsCharArray: " << ParamsCharArray << endl;
