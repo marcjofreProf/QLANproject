@@ -53,10 +53,10 @@ return 0; // All Ok
 }
 
 int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList) {
-    int status;
-    struct sockaddr_in serv_addr;    
     
-    if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    struct sockaddr_in serv_addr;    
+    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (socket_fd < 0) {
         cout << "Client Socket creation error" << endl;
         return -1;
     }
@@ -72,8 +72,9 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
         cout << "Invalid address / Address not supported" << endl;
         return -1;
     }
- 
-    if ((status= connect(socket_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr)))< 0) {
+    
+    int status= connect(socket_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr));
+    if (status< 0) {
         cout << "Client Connection Failed" << endl;
         return -1;
     }
@@ -95,7 +96,8 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
     // type: SOCK_STREAM: TCP(reliable, connection oriented)
     // Protocol value for Internet Protocol(IP), which is 0
-    if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (socket_fd < 0) {
         cout << "Server socket failed" << endl;
         return -1;
     }
@@ -121,7 +123,8 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
         cout << "Server socket listen failed" << endl;
         return -1;
     }
-    if ((new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen))< 0) {
+    new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen);
+    if (new_socket< 0) {
         cout << "Server socket accept failed" << endl;
         return -1;
     }
@@ -158,11 +161,18 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   else {// There is at least one new message
     if (FD_ISSET(socket_fd_conn, &fds)) {
       // Read the message from the socket
-      int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
+      int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);      
       usleep(WaitTimeAfterReadWriteUsec); // very important to wait a little after recv
       //cout << "Node message received: " << this->ReadBuffer << endl;
       if (valread <= 0) {
-        if (valread<0){cout << "Node error reading new messages" << endl;}
+	if (valread<0){
+		cout << strerror(errno) << endl;
+		cout << "Host error reading new messages" << endl;
+	}
+	else{
+		cout << strerror(errno) << endl;
+		cout << "Host agent message of 0 Bytes" << endl;
+	}
 	// Clear the ReadBuffer after using it!!! Important
 	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));
 	return -1;

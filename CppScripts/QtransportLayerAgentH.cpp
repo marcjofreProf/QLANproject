@@ -70,7 +70,8 @@ void* QTLAH::AgentProcessStaticEntryPoint(void* c){// Not really used
 
 
 void QTLAH::acquire() {
-while (!valueSemaphore.compare_exchange_strong(this->valueSemaphoreExpected, 0,std::memory_order_acquire));
+bool CheckAquire = !valueSemaphore.compare_exchange_strong(this->valueSemaphoreExpected, 0,std::memory_order_acquire);
+while (CheckAquire);
 
 // Notify any waiting threads
 std::atomic_thread_fence(std::memory_order_release);
@@ -78,7 +79,8 @@ std::this_thread::yield();
 }
  
 void QTLAH::release() {
-    if (valueSemaphore.fetch_add(1, std::memory_order_acquire)) {
+bool CheckRelease = valueSemaphore.fetch_add(1, std::memory_order_acquire);
+    if (CheckRelease) {
       // Notify any waiting threads
       std::atomic_thread_fence(std::memory_order_release);
       std::this_thread::yield();
@@ -157,10 +159,10 @@ return 0; // All Ok
 }
 
 int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList) {
-    int status;
-    struct sockaddr_in serv_addr;    
     
-    if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    struct sockaddr_in serv_addr;    
+    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (socket_fd < 0) {
         cout << "Client Socket creation error" << endl;
         return -1;
     }
@@ -178,8 +180,9 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
         cout << "Invalid address / Address not supported" << endl;
         return -1;
     }
- 
-    if ((status= connect(socket_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr)))< 0) {
+    
+    int status= connect(socket_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr));
+    if (status< 0) {
         cout << "Client Connection Failed" << endl;
         return -1;
     }
@@ -200,7 +203,8 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
     // type: SOCK_STREAM: TCP(reliable, connection oriented)
     // Protocol value for Internet Protocol(IP), which is 0
-    if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (socket_fd < 0) {
         cout << "Server socket failed" << endl;
         return -1;
     }
@@ -228,7 +232,8 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
         return -1;
     }
     
-    if ((new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen))< 0) {
+    new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen);
+    if (new_socket< 0) {
         cout << "Server socket accept failed" << endl;
         return -1;
     }
@@ -272,9 +277,11 @@ else {// There might be at least one new message
 		//cout << "Node message received: " << this->ReadBuffer << endl;
 		if (valread <= 0){
 			if (valread<0){
+				cout << strerror(errno) << endl;
 				cout << "Host error reading new messages" << endl;
 			}
 			else{
+				cout << strerror(errno) << endl;
 				cout << "Host agent message of 0 Bytes" << endl;
 			}
 			// Clear the ReadBuffer after using it!!! Important
