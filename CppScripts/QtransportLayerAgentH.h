@@ -93,7 +93,6 @@ private: //Functions
 	int ICPdiscoverSend(char* ParamsCharArray); // Discover the socket and send the message
 	int InitiateICPconnections(); // Initiating sockets
         int StopICPconnections(); // Closing sockets
-        bool FlagReadBlock=false;
 //	friend void* threadedPoll(void *value);
 	//static void* AgentProcessStaticEntryPoint(void* c); // Not used
 	void AgentProcessRequestsPetitions(); // Process thread that manages requests and petitions
