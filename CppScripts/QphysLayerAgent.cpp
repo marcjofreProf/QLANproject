@@ -46,7 +46,7 @@ int QPLA::emitQuBit(){
    outGPIO.streamClose();
    */
    
- cout << "Qubit emitted" << endl;
+ //cout << "Qubit emitted" << endl;
  
  return 0; // return 0 is for no error
 }
@@ -56,7 +56,7 @@ int QPLA::receiveQuBit(){
  
  // Basic Input
  inGPIO.setDirection(INPUT);
- cout << "The value of the input is: "<< inGPIO.getValue() << endl;
+ //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
   
  return 0; // return 0 is for no error
 }
