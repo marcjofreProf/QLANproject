@@ -270,7 +270,7 @@ return -1;
 else {// There might be at least one new message
 	if (FD_ISSET(socket_fd_conn, &fds)){
 		// Read the message from the socket
-		int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
+		int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);//MSG_DONTWAIT);
 		//cout << "valread: " << valread << endl;
 		//cout << "Node message received: " << this->ReadBuffer << endl;
 		if (valread <= 0){
@@ -300,7 +300,7 @@ else {// There might be at least one new message
 int QTLAH::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
-    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);
+    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux), 0);//MSG_DONTWAIT);
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
