@@ -69,25 +69,31 @@ void* QTLAH::AgentProcessStaticEntryPoint(void* c){// Not really used
 
 
 void QTLAH::acquire() {
+/*
 bool CheckAquire = !valueSemaphore.compare_exchange_strong(this->valueSemaphoreExpected, 0,std::memory_order_acquire);
 while (CheckAquire);
 this->valueSemaphoreExpected=1; // Make sure it stays at 1
 this->valueSemaphore=0; // Make sure it stays at 0
 
 // Notify any waiting threads
-//std::atomic_thread_fence(std::memory_order_release);
-//std::this_thread::yield();
+std::atomic_thread_fence(std::memory_order_release);
+std::this_thread::yield();
+*/
+while(valueSemaphore==0);
+this->valueSemaphore=0; // Make sure it stays at 0
 }
  
 void QTLAH::release() {
+/*
 bool CheckRelease = valueSemaphore.fetch_add(1, std::memory_order_acquire);
     if (CheckRelease) {
       // Notify any waiting threads
-      //std::atomic_thread_fence(std::memory_order_release);
-      //std::this_thread::yield();
+      std::atomic_thread_fence(std::memory_order_release);
+      std::this_thread::yield();
       this->valueSemaphoreExpected=1; // Make sure it stays at 1
       this->valueSemaphore=1; // Make sure it stays at 1
-    }
+    }*/
+   this->valueSemaphore=1; // Make sure it stays at 0
   }
 ////////////////////////////////////////////////////////
 int QTLAH::InitAgentProcess(){
