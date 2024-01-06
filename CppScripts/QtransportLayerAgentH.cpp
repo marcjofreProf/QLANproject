@@ -71,18 +71,22 @@ void* QTLAH::AgentProcessStaticEntryPoint(void* c){// Not really used
 void QTLAH::acquire() {
 bool CheckAquire = !valueSemaphore.compare_exchange_strong(this->valueSemaphoreExpected, 0,std::memory_order_acquire);
 while (CheckAquire);
+this->valueSemaphoreExpected=1; // Make sure it stays at 1
+this->valueSemaphore=0; // Make sure it stays at 0
 
 // Notify any waiting threads
-std::atomic_thread_fence(std::memory_order_release);
-std::this_thread::yield();
+//std::atomic_thread_fence(std::memory_order_release);
+//std::this_thread::yield();
 }
  
 void QTLAH::release() {
 bool CheckRelease = valueSemaphore.fetch_add(1, std::memory_order_acquire);
     if (CheckRelease) {
       // Notify any waiting threads
-      std::atomic_thread_fence(std::memory_order_release);
-      std::this_thread::yield();
+      //std::atomic_thread_fence(std::memory_order_release);
+      //std::this_thread::yield();
+      this->valueSemaphoreExpected=1; // Make sure it stays at 1
+      this->valueSemaphore=1; // Make sure it stays at 1
     }
   }
 ////////////////////////////////////////////////////////
@@ -504,7 +508,11 @@ return 0; //All OK
 // The blocking requests from host to the node are ok because the node is not to sent request to the host (following the OSI pile methodology). At most, there will be request of retransmission to the other host's node, which have to be let pass
 int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 // Code that might throw an exception
+    //cout << "Before acquire valueSemaphore: " << valueSemaphore << endl;
+    //cout << "Before acquire valueSemaphoreExpected: " << valueSemaphoreExpected << endl;
     this->acquire();// Wait semaphore until it can proceed
+    //cout << "After acquire valueSemaphore: " << valueSemaphore << endl;
+    //cout << "After acquire valueSemaphoreExpected: " << valueSemaphoreExpected << endl;
     try{
     this->ICPdiscoverSend(ParamsDescendingCharArray);
     } // try
@@ -589,7 +597,11 @@ usleep(100);
   catch (...) { // Catches any exception
   cout << "Exception caught" << endl;
     }
+//cout << "Before release valueSemaphore: " << valueSemaphore << endl;
+//cout << "Before release valueSemaphoreExpected: " << valueSemaphoreExpected << endl;
 this->release(); // Release the semaphore
+//cout << "After release valueSemaphore: " << valueSemaphore << endl;
+//cout << "After release valueSemaphoreExpected: " << valueSemaphoreExpected << endl;
 return 0; // All OK
 }
 ///////////////////////////////////////////////////////////////////
