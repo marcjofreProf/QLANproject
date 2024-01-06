@@ -11,6 +11,12 @@ Agent script for Quantum Link Layer
 #include<iostream>
 #include<unistd.h> //for usleep
 #include "QphysLayerAgent.h"
+// Threading
+#define WaitTimeAfterMainWhileLoop 1
+#include <thread>
+// Semaphore
+#include <atomic>
+
 using namespace std;
 
 namespace nsQlinkLayerAgent {
@@ -19,12 +25,53 @@ QLLA::QLLA() { // Constructor
  
 }
 
+void QLLA::acquire() {
+while(valueSemaphore==0);
+this->valueSemaphore=0; // Make sure it stays at 0
+}
+ 
+void QLLA::release() {
+this->valueSemaphore=1; // Make sure it stays at 1
+}
+
+////////////////////////////////////////////////////////
+int QLLA::InitAgentProcess(){
+	// Then, regularly check for next job/action without blocking		  	
+	// Not used void* params;
+	// Not used this->threadRef=std::thread(&QTLAH::AgentProcessStaticEntryPoint,params);
+	this->threadRef=std::thread(&QLLA::AgentProcessRequestsPetitions,this);
+	  //if (ret) {
+	    // Handle the error
+	  //} 
+	return 0; //All OK
+}
 
 QLLA::~QLLA() {
 // destructor
+ this->threadRef.join();// Terminate the process thread
  this->QPLAagent.~QPLA(); // Destruct the instance of the below layer
 }
 
+void QLLA::AgentProcessRequestsPetitions(){// Check next thing to do
+ bool isValidWhileLoop = true;
+ while(isValidWhileLoop){
+ try{
+   try {
+   	this->acquire();// Wait semaphore until it can proceed
+    	
+        this->release(); // Release the semaphore 
+        usleep(WaitTimeAfterMainWhileLoop);// Wait a few microseconds for other processes to enter
+    }
+    catch (const std::exception& e) {
+	// Handle the exception
+    	cout << "Exception: " << e.what() << endl;
+    }
+    } // upper try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+    }
+    } // while
+}
 } /* namespace nsQlinkLayerAgent */
 
 /*

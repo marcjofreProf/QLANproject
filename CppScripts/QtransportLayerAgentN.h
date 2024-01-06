@@ -18,6 +18,10 @@ Header declaration file for Quantum transport Layer Agent Node
 
 #include<string>
 #include<fstream>
+// Threading
+#include <thread>
+// Semaphore
+#include <atomic>
 #include "QnetworkLayerAgent.h"
 using std::string;
 using std::ofstream;
@@ -51,8 +55,11 @@ private: // Variables/Objects
 	char ReadBuffer[NumBytesBufferICPMAX] = {0};// Buffer to read ICP messages
 	char SendBuffer[NumBytesBufferICPMAX] = {0};// Buffer to send ICP messages
 	int socketReadIter = 0; // Variable to read each time a different socket
+	// Semaphore
+	std::atomic<int> valueSemaphore=1;// Start as 1 (open or acquireable)
 	
 public: // Functions
+	int InitAgentProcess(); // Initializer of the thread
 	QTLAN(int numberSessions); //constructor
 	// virtual ~Application(); // Default Okay - Use Virtual If Using Inheritance
 	// Managing status of this Agent
@@ -74,7 +81,13 @@ public: // Functions
 	int ProcessNewMessage();
 	~QTLAN();  //destructor
 
-private: // Functions
+private: // Functions/Methods
+	// Thread management
+	std::thread threadRef; // Process thread that executes requests/petitions without blocking
+	void AgentProcessRequestsPetitions(); // Process thread that manages requests and petitions
+	// Sempahore
+	void acquire();
+	void release();
 	// Managing ICP connections with sockets
 	// Typically the Node will act as server to the upper host. If the node is in between, then it will act as server of the origin client node. Net 192.168.X.X or Net 10.0.0.X
 	// With nodes in between hosts, the origin node will also act as client to the next node acting as server. Net 10.0.0.X	

@@ -94,7 +94,7 @@ bool CheckRelease = valueSemaphore.fetch_add(1, std::memory_order_acquire);
       this->valueSemaphore=1; // Make sure it stays at 1
     }*/
    this->valueSemaphore=1; // Make sure it stays at 1
-  }
+}
 ////////////////////////////////////////////////////////
 int QTLAH::InitAgentProcess(){
 	// Then, regularly check for next job/action without blocking		  	
@@ -352,7 +352,6 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  this->m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentH" << endl;
  bool isValidWhileLoop = true;
- int auxVal=0;
  while(isValidWhileLoop){
  try{
    try {

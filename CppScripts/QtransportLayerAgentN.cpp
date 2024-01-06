@@ -26,6 +26,11 @@ Agent script for Quantum transport Layer Node
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 #define WaitTimeAfterMainWhileLoop 1
+// Threading
+#define WaitTimeAfterMainWhileLoop 1
+#include <thread>
+// Semaphore
+#include <atomic>
 
 using namespace std;
 
@@ -35,6 +40,27 @@ QTLAN::QTLAN(int numberSessions) { // Constructor
  this->numberSessions = numberSessions; // Number of sessions of different services
  strcpy(this->SCmode[0],"server"); // to know if this host instance is client or server
  strcpy(this->SCmode[1],"client"); // to know if this host instance is client or server
+}
+
+void QTLAN::acquire() {
+while(valueSemaphore==0);
+this->valueSemaphore=0; // Make sure it stays at 0
+}
+ 
+void QTLAN::release() {
+this->valueSemaphore=1; // Make sure it stays at 1
+}
+
+////////////////////////////////////////////////////////
+int QTLAN::InitAgentProcess(){
+	// Then, regularly check for next job/action without blocking		  	
+	// Not used void* params;
+	// Not used this->threadRef=std::thread(&QTLAH::AgentProcessStaticEntryPoint,params);
+	this->threadRef=std::thread(&QTLAN::AgentProcessRequestsPetitions,this);
+	  //if (ret) {
+	    // Handle the error
+	  //} 
+	return 0; //All OK
 }
 
 int QTLAN::SocketCheckForceShutDown(int socket_fd){
@@ -397,9 +423,30 @@ return 0; // All OK
 QTLAN::~QTLAN() {
 // destructor
 	this->StopICPconnections(this->ParamArgc);
+	this->threadRef.join();// Terminate the process thread
 	this->QNLAagent.~QNLA(); // Destructor of the agent below
 }
 
+void QTLAN::AgentProcessRequestsPetitions(){// Check next thing to do
+ bool isValidWhileLoop = true;
+ while(isValidWhileLoop){
+ try{
+   try {
+   	this->acquire();// Wait semaphore until it can proceed
+    	
+        this->release(); // Release the semaphore 
+        usleep(WaitTimeAfterMainWhileLoop);// Wait a few microseconds for other processes to enter
+    }
+    catch (const std::exception& e) {
+	// Handle the exception
+    	cout << "Exception: " << e.what() << endl;
+    }
+    } // upper try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+    }
+    } // while
+}
 } /* namespace nsQnetworkLayerAgentN */
 
 

@@ -13,6 +13,10 @@ Header declaration file for Quantum network Layer Agent
 
 #include<string>
 #include<fstream>
+// Threading
+#include <thread>
+// Semaphore
+#include <atomic>
 #include "QlinkLayerAgent.h"
 using std::string;
 using std::ofstream;
@@ -26,17 +30,25 @@ namespace nsQnetworkLayerAgent {
 
 class QNLA {
 private:// Variables/Instances
-	int numberHops=0;	
+	int numberHops=0;
+	// Semaphore
+	std::atomic<int> valueSemaphore=1;// Start as 1 (open or acquireable)	
 
 public: // Variables/Instances
 	nsQlinkLayerAgent::QLLA QLLAagent;// Instance of the below agent
 
-public: // Methods
+public: // Functions/Methods
 	QNLA(); //constructor
-	
+	int InitAgentProcess(); // Initializer of the thread
 	~QNLA();  //destructor
 
-//private:
+private://Functions/Methods
+	// Thread management
+	std::thread threadRef; // Process thread that executes requests/petitions without blocking
+	// Sempahore
+	void acquire();
+	void release();
+	void AgentProcessRequestsPetitions(); // Process thread that manages requests and petitions
 //	int write(string path, string filename, string value);
 //	friend void* threadedPoll(void *value);
 };

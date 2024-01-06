@@ -12,6 +12,12 @@ Agent script for Quantum Physical Layer
 #include<unistd.h> //for usleep
 #define LinkNumberMAX 2
 #include "./BBBhw/GPIO.h"
+// Threading
+#define WaitTimeAfterMainWhileLoop 1
+#include <thread>
+// Semaphore
+#include <atomic>
+
 using namespace exploringBB; // API to easily use GPIO in c++
 /* A Simple GPIO application
 * Written by Derek Molloy for the book "Exploring BeagleBone: Tools and
@@ -21,9 +27,31 @@ using namespace exploringBB; // API to easily use GPIO in c++
 using namespace std;
 
 namespace nsQphysLayerAgent {
-QPLA::QPLA() {
+QPLA::QPLA() {// Constructor
  
 }
+
+void QPLA::acquire() {
+while(valueSemaphore==0);
+this->valueSemaphore=0; // Make sure it stays at 0
+}
+ 
+void QPLA::release() {
+this->valueSemaphore=1; // Make sure it stays at 1
+}
+
+////////////////////////////////////////////////////////
+int QPLA::InitAgentProcess(){
+	// Then, regularly check for next job/action without blocking		  	
+	// Not used void* params;
+	// Not used this->threadRef=std::thread(&QTLAH::AgentProcessStaticEntryPoint,params);
+	this->threadRef=std::thread(&QPLA::AgentProcessRequestsPetitions,this);
+	  //if (ret) {
+	    // Handle the error
+	  //} 
+	return 0; //All OK
+}
+
 
 int QPLA::emitQuBit(){
  GPIO outGPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
@@ -63,6 +91,28 @@ int QPLA::receiveQuBit(){
 
 QPLA::~QPLA() {
 // destructor
+this->threadRef.join();// Terminate the process thread
+}
+
+void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
+ bool isValidWhileLoop = true;
+ while(isValidWhileLoop){
+ try{
+   try {
+   	this->acquire();// Wait semaphore until it can proceed
+    	
+        this->release(); // Release the semaphore 
+        usleep(WaitTimeAfterMainWhileLoop);// Wait a few microseconds for other processes to enter
+    }
+    catch (const std::exception& e) {
+	// Handle the exception
+    	cout << "Exception: " << e.what() << endl;
+    }
+    } // upper try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+    }
+    } // while
 }
 
 } /* namespace nsQphysLayerAgent */

@@ -75,7 +75,7 @@ public: // Functions
 	int RetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray); // Send to the upper layer agent how many qubits are stored
 	~QTLAH();  //destructor
 
-private: //Functions
+private: //Functions//Methods
 	// Sempahore
 	void acquire();
 	void release();
