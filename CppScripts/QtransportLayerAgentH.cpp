@@ -93,7 +93,7 @@ bool CheckRelease = valueSemaphore.fetch_add(1, std::memory_order_acquire);
       this->valueSemaphoreExpected=1; // Make sure it stays at 1
       this->valueSemaphore=1; // Make sure it stays at 1
     }*/
-   this->valueSemaphore=1; // Make sure it stays at 0
+   this->valueSemaphore=1; // Make sure it stays at 1
   }
 ////////////////////////////////////////////////////////
 int QTLAH::InitAgentProcess(){
