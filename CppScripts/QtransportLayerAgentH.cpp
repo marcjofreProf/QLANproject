@@ -270,7 +270,7 @@ return -1;
 else {// There might be at least one new message
 	if (FD_ISSET(socket_fd_conn, &fds)){
 		// Read the message from the socket
-		int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
+		int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);//MSG_DONTWAIT);
 		//cout << "valread: " << valread << endl;
 		//cout << "Node message received: " << this->ReadBuffer << endl;
 		if (valread <= 0){
@@ -522,7 +522,7 @@ try{
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor
 
-int SockListenTimeusec=100; // Infinite time (if value less than 0)Long time so the node has time to response
+int SockListenTimeusec=100; // time so the node has time to response
 
 int isValidWhileLoopCount = 100; // Number of tries
 while(isValidWhileLoopCount>0){
@@ -581,7 +581,9 @@ else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 ParamsIntArray[0]=-1;
 isValidWhileLoopCount--;
+this->release(); // Release the semaphore
 usleep(1000);
+this->acquire(); // Acquire the semaphore
 }
 }//while
 

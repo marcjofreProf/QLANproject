@@ -160,7 +160,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   else {// There is at least one new message
     if (FD_ISSET(socket_fd_conn, &fds)) {
       // Read the message from the socket
-      int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
+      int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);//MSG_DONTWAIT);
       //cout << "Node message received: " << this->ReadBuffer << endl;
       if (valread <= 0) {
 	if (valread<0){
