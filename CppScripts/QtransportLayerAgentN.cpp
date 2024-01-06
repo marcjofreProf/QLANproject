@@ -186,7 +186,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 
 int QTLAN::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
-    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),0);//MSG_DONTWAIT);
+    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
