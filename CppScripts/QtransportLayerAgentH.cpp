@@ -270,7 +270,7 @@ return -1;
 else {// There might be at least one new message
 	if (FD_ISSET(socket_fd_conn, &fds)){
 		// Read the message from the socket
-		int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);//MSG_DONTWAIT);
+		int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
 		//cout << "valread: " << valread << endl;
 		//cout << "Node message received: " << this->ReadBuffer << endl;
 		if (valread <= 0){
