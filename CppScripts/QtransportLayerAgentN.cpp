@@ -483,7 +483,12 @@ int main(int argc, char const * argv[]){
  QTLANagent.ParamArgc=argc;
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
-   
+ 
+ // Then negotiate some parameters
+ 
+ // Then the sub agents threads can be started
+ QTLANagent.QNLAagent.InitAgentProcess();
+ 
  // Then await for next actions
  QTLANagent.m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentN" << endl;

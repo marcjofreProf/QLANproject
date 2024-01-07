@@ -348,6 +348,8 @@ int QTLAH::ICPmanagementCloseServer(int socket_fd,int new_socket) {
 void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  // One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
  this->InitiateICPconnections(); // Very important that they work. Otherwise the rest go wrong
+ // Then negotiate some parameters
+ 
  //
  this->m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentH" << endl;

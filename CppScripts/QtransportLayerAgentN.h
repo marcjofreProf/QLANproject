@@ -40,11 +40,11 @@ public: // Variables/Objects
 		APPLICATION_PAUSED = 1,  // Out of Focus or Paused If In A Timed Situation
 		APPLICATION_EXIT = -1,
 	    };
+	nsQnetworkLayerAgent::QNLA QNLAagent; // Instance of the below agent
 	int ParamArgc=0; // Number of passed parameters
 	int numberSessions=0;
 
-private: // Variables/Objects	
-	nsQnetworkLayerAgent::QNLA QNLAagent; // Instance of the below agent
+private: // Variables/Objects		
 	// Member Variables Such As Window Handle, Time Etc.,
 	ApplicationState m_state;	
 	char IPaddressesSockets[NumSocketsMax][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks

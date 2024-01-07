@@ -43,6 +43,7 @@ int QNLA::InitAgentProcess(){
 	  //if (ret) {
 	    // Handle the error
 	  //} 
+	QLLAagent.InitAgentProcess();// Initialize thread of the agent below
 	return 0; //All OK
 }
 
