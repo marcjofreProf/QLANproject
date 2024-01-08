@@ -528,7 +528,7 @@ try{
 
 int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
 
-int SockListenTimeusec=100; // Negative means infinite
+int SockListenTimeusec=1000; // Negative means infinite
 
 int isValidWhileLoopCount = 1000; // Number of tries
 while(isValidWhileLoopCount>0){
@@ -646,7 +646,7 @@ int main(int argc, char const * argv[]){
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest 
- //QTLANagent.RetrieveIPSocketsHosts();
+ QTLANagent.RetrieveIPSocketsHosts();
  
  // Then negotiate some parameters
  //QTLANagent.NegotiateInitialParamsNode(); 
