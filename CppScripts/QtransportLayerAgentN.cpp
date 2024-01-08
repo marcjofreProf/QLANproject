@@ -664,7 +664,7 @@ int main(int argc, char const * argv[]){
     	// Code that might throw an exception 
  	// Check if there are need messages or actions to be done by the node
  	QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
- 	QTLANagent.SendParametersAgent(); // Send Parameters information stored
+ 	//QTLANagent.SendParametersAgent(); // Send Parameters information stored
        switch(QTLANagent.getState()) {
            case QTLAN::APPLICATION_RUNNING: {               
                // Do Some Work
