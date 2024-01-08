@@ -565,7 +565,7 @@ if (ReadBytes>0){// Read block
 	strcpy(Type,strtok(NULL,","));
 	strcpy(Command,strtok(NULL,","));
 	strcpy(Payload,strtok(NULL,","));
-	//cout << "Payload: " << Payload << endl;
+	cout << "Payload: " << Payload << endl;
 	if (string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
 		strcpy(IPaddressesSockets[0],Payload);
 		isValidWhileLoopCount=0;
@@ -646,7 +646,7 @@ int main(int argc, char const * argv[]){
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest 
- //QTLANagent.RetrieveIPSocketsHosts();
+ QTLANagent.RetrieveIPSocketsHosts();
  
  // Then negotiate some parameters
  //QTLANagent.NegotiateInitialParamsNode(); 
