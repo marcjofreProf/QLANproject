@@ -56,7 +56,7 @@ return 0; // All OK
 
 int QPLA::SetSendParametersAgent(){// Node accumulates parameters for the other node
 
-strcpy(this->PayloadSendBuffer,"none_none");
+strcpy(this->PayloadSendBuffer,"none_none_");
 
 return 0; //All OK
 }

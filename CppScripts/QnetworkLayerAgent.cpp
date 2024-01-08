@@ -41,7 +41,7 @@ this->valueSemaphore=1; // Make sure it stays at 1
 ///////////////////////////////////////////////////
 int QNLA::InitParametersAgent(){// Client node have some parameters to adjust to the server node
 
-strcpy(this->PayloadSendBuffer,"none_none");
+strcpy(this->PayloadSendBuffer,"none_none_");
 
 return 0; //All OK
 }
@@ -56,7 +56,7 @@ return 0; // All OK
 
 int QNLA::SetSendParametersAgent(){// Node accumulates parameters for the other node
 
-strcpy(this->PayloadSendBuffer,"none_none");
+strcpy(this->PayloadSendBuffer,"none_none_");
 
 return 0; //All OK
 }
