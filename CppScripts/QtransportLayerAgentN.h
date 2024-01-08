@@ -87,7 +87,7 @@ public: // Functions
 	int ProcessNewMessage();
 	// Payload information parameters
 	int SendParametersAgent();// The upper layer gets the information to be send
-        int SetReadParametersAgent();// The upper layer sets information from the other node
+        int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node
 	~QTLAN();  //destructor
 
 private: // Functions/Methods
@@ -115,7 +115,7 @@ private: // Functions/Methods
 //	friend void* threadedPoll(void *value);
 	// Payload information parameters
 	int InitParametersAgent();// Client node have some parameters to adjust to the server node
-	int SetSendParametersAgent();// Node accumulates parameters for the other node
+	int SetSendParametersAgent(char* ParamsCharArray);// Node accumulates parameters for the other node
 	int ReadParametersAgent();// Node checks parameters from the other node
 	
 };

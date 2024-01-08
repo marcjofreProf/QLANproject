@@ -69,7 +69,7 @@ return 0; // All OK
 
 }
 
-int QTLAN::SetSendParametersAgent(){// Node accumulates parameters for the other node
+int QTLAN::SetSendParametersAgent(char* ParamsCharArray){// Node accumulates parameters for the other node
 
 strcpy(this->PayloadSendBuffer,"none_none_");
 
@@ -81,7 +81,7 @@ int QTLAN::ReadParametersAgent(){// Node checks parameters from the other node
 return 0; // All OK
 }
 
-int QTLAN::SetReadParametersAgent(){// The upper layer sets information to be read
+int QTLAN::SetReadParametersAgent(char* ParamsCharArray){// The upper layer sets information to be read
 this->acquire();
 //strcpy(this->PayloadReadBuffer,);
 this->release();

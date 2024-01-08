@@ -54,7 +54,7 @@ return 0; // All OK
 
 }
 
-int QNLA::SetSendParametersAgent(){// Node accumulates parameters for the other node
+int QNLA::SetSendParametersAgent(char* ParamsCharArray){// Node accumulates parameters for the other node
 
 strcpy(this->PayloadSendBuffer,"none_none_");
 
@@ -66,7 +66,7 @@ int QNLA::ReadParametersAgent(){// Node checks parameters from the other node
 return 0; // All OK
 }
 
-int QNLA::SetReadParametersAgent(){// The upper layer sets information to be read
+int QNLA::SetReadParametersAgent(char* ParamsCharArray){// The upper layer sets information to be read
 this->acquire();
 //strcpy(this->PayloadReadBuffer,);
 this->release();

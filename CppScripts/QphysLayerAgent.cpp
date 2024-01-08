@@ -37,6 +37,17 @@ QPLA::QPLA() {// Constructor
 
  
 }
+
+////////////////////////////////////////////////////////
+void QPLA::acquire() {
+while(valueSemaphore==0);
+this->valueSemaphore=0; // Make sure it stays at 0
+}
+ 
+void QPLA::release() {
+this->valueSemaphore=1; // Make sure it stays at 1
+}
+
 //////////////////////////////////////////////
 int QPLA::InitParametersAgent(){// Client node have some parameters to adjust to the server node
 
@@ -48,41 +59,34 @@ return 0; //All OK
 int QPLA::SendParametersAgent(){// The upper layer gets the information to be send
 this->acquire();
 
+strcpy(this->PayloadSendBuffer,""); // Reset the buffer
 this->release();
 
 return 0; // All OK
 
 }
 
-int QPLA::SetSendParametersAgent(){// Node accumulates parameters for the other node
+int QPLA::SetSendParametersAgent(char* ParamsCharArray){// Node accumulates parameters for the other node
 
-strcpy(this->PayloadSendBuffer,"none_none_");
+strcat(this->PayloadSendBuffer,ParamsCharArray);
 
 return 0; //All OK
 }
 
 int QPLA::ReadParametersAgent(){// Node checks parameters from the other node
 
+strcpy(this->PayloadReadBuffer,""); // Reset the buffer
 return 0; // All OK
 }
 
-int QPLA::SetReadParametersAgent(){// The upper layer sets information to be read
+int QPLA::SetReadParametersAgent(char* ParamsCharArray){// The upper layer sets information to be read
 this->acquire();
-//strcpy(this->PayloadReadBuffer,);
+strcat(this->PayloadReadBuffer,ParamsCharArray);
 this->release();
 return 0; // All OK
 }
 ////////////////////////////////////////////////////
-void QPLA::acquire() {
-while(valueSemaphore==0);
-this->valueSemaphore=0; // Make sure it stays at 0
-}
- 
-void QPLA::release() {
-this->valueSemaphore=1; // Make sure it stays at 1
-}
 
-////////////////////////////////////////////////////////
 int QPLA::InitAgentProcess(){
 	// Then, regularly check for next job/action without blocking		  	
 	// Not used void* params;
@@ -131,6 +135,12 @@ int QPLA::receiveQuBit(){
 	 usleep(QuBitsUSecHalfPeriodInt[0]);
 	 QuBitValueArray[iIterRead]=inGPIO.getValue();
 	 usleep(QuBitsUSecHalfPeriodInt[0]);	 
+ }
+  this->NumStoredQubitsNode[0]=0;
+ for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;++iIterRead){// Count how many qubits 
+ 	if (QuBitValueArray[iIterRead]==1){
+ 		this->NumStoredQubitsNode[0]++;
+ 	} 	
  }
  //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
   
