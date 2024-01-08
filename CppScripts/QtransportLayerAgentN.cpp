@@ -518,7 +518,7 @@ int QTLAN::RetrieveIPSocketsHosts(){ // Ask the host about the other host IP
 
 try{
 // It is a "blocking" communication between host and node, because it is many read trials for reading
-
+usleep(10000); // wait some time so that connections are stablished
 int socket_fd_conn=this->socket_fdArray[0];   // The first point probably to the host
 
 int SockListenTimeusec=100; // Negative means infinite
