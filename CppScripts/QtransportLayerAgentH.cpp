@@ -439,12 +439,11 @@ strcpy(Payload,strtok(NULL,","));
 
 // Identify what to do and execute it
 if (string(Type)==string("Operation")){// Operation message. 
-
-	if(string(IPorg)==string(this->IPSocketsList[0]) and string(IPdest)==string(this->IPaddressesSockets[2])){// Information requested by the attached node
+	//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
+	if(string(IPorg)==string(this->IPSocketsList[0]) and string(IPdest)==string(this->IPaddressesSockets[3])){// Information requested by the attached node
 		if (string(Command)==string("InfoRequest") and string(Payload)==string("IPaddressesSockets")){
 		// Mount message and send it to attached node
 		 // Generate the message
-		 cout << "Entering here" << endl;
 		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 		strcpy(ParamsCharArray,IPdest);
 		strcat(ParamsCharArray,",");

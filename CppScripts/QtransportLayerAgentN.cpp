@@ -530,7 +530,7 @@ int socket_fd_conn=this->new_socketArray[0];   // The first point probably to th
 
 int SockListenTimeusec=1000; // Negative means infinite
 
-int isValidWhileLoopCount = 1; // Number of tries
+int isValidWhileLoopCount = 1000; // Number of tries
 while(isValidWhileLoopCount>0){
 
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
