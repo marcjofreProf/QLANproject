@@ -534,10 +534,10 @@ while(isValidWhileLoopCount>0){
 
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
 strcpy(this->SendBuffer,this->IPaddressesSockets[0]); //IP attached host
-cout << "this->IPaddressesSockets[0]: " << this->IPaddressesSockets[0] << endl;
+//cout << "this->IPaddressesSockets[0]: " << this->IPaddressesSockets[0] << endl;
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,this->IPaddressesSockets[2]);
-cout << "this->IPaddressesSockets[2]: " << this->IPaddressesSockets[2] << endl;
+//cout << "this->IPaddressesSockets[2]: " << this->IPaddressesSockets[2] << endl;
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"Control");
 strcat(this->SendBuffer,",");
@@ -577,7 +577,7 @@ if (ReadBytes>0){// Read block
 else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 isValidWhileLoopCount--;
-usleep(10000);
+usleep(100000);
 }
 }//while
 
