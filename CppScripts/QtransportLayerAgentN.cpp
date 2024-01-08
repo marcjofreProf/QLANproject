@@ -540,7 +540,7 @@ strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,this->IPaddressesSockets[2]);
 //cout << "this->IPaddressesSockets[2]: " << this->IPaddressesSockets[2] << endl;
 strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"Operational");
+strcat(this->SendBuffer,"Operation");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
