@@ -529,7 +529,7 @@ int socket_fd_conn=this->new_socketArray[0];   // The first point probably to th
 
 int SockListenTimeusec=100; // Negative means infinite
 
-int isValidWhileLoopCount = 100; // Number of tries
+int isValidWhileLoopCount = 1000; // Number of tries
 while(isValidWhileLoopCount>0){
 
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
@@ -547,7 +547,7 @@ strcat(this->SendBuffer,",");// Very important to end the message
 this->ICPmanagementSend(socket_fd_conn); // send mesage to node
 
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
-cout << "ReadBytes: " << ReadBytes << endl;
+//cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
 	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
@@ -562,7 +562,7 @@ if (ReadBytes>0){// Read block
 	strcpy(Type,strtok(NULL,","));
 	strcpy(Command,strtok(NULL,","));
 	strcpy(Payload,strtok(NULL,","));
-	cout << "Payload: " << Payload << endl;
+	//cout << "Payload: " << Payload << endl;
 	if (string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
 		strcpy(IPaddressesSockets[0],Payload);
 		isValidWhileLoopCount=0;
