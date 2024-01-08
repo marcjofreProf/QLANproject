@@ -56,10 +56,19 @@ strcpy(this->PayloadSendBuffer,"EmitLinkNumberArray_48_ReceiveLinkNumberArray_60
 return 0; //All OK
 }
 
-int QPLA::SendParametersAgent(){// The upper layer gets the information to be send
+int QPLA::SendParametersAgent(char* ParamsCharArray){// The upper layer gets the information to be send
 this->acquire();
 
-strcpy(this->PayloadSendBuffer,""); // Reset the buffer
+strcat(ParamsCharArray,"Phys;");
+if (string(this->PayloadSendBuffer)!=string("")){
+	strcat(ParamsCharArray,this->PayloadSendBuffer);
+}
+else{
+	strcat(ParamsCharArray,"none_none_");
+}
+strcat(ParamsCharArray,";");
+strcpy(this->PayloadSendBuffer,"");// Reset buffer
+
 this->release();
 
 return 0; // All OK
@@ -158,7 +167,7 @@ void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
  try{
    try {
    	this->acquire();// Wait semaphore until it can proceed
-    	
+    	this->ReadParametersAgent(); // Reads messages from above layer
         this->release(); // Release the semaphore 
         usleep(WaitTimeAfterMainWhileLoop);// Wait a few microseconds for other processes to enter
     }

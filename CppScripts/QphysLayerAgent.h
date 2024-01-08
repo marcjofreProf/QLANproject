@@ -68,7 +68,7 @@ public: // Functions/Methods
 	QPLA(); //constructor
 	int InitAgentProcess(); // Initializer of the thread
 	// Payload information parameters
-	int SendParametersAgent();// The upper layer gets the information to be send
+	int SendParametersAgent(char* ParamsCharArray);// The upper layer gets the information to be send
         int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node
 	~QPLA();  //destructor
 

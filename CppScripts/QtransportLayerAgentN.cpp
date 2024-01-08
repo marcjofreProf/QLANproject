@@ -55,15 +55,41 @@ this->valueSemaphore=1; // Make sure it stays at 1
 ///////////////////////////////////////////////////////
 int QTLAN::InitParametersAgent(){// Client node have some parameters to adjust to the server node
 
-strcpy(this->PayloadSendBuffer,"none_none_");
+strcpy(this->PayloadSendBuffer,"");
 
 return 0; //All OK
 }
 
 int QTLAN::SendParametersAgent(){// The upper layer gets the information to be send
-this->acquire();
+//this->acquire(); Does not need it since it is within the while loop
 
-this->release();
+char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+strcpy(ParamsCharArray,"Trans;"); // Initiates the ParamsCharArray, so use strcpy
+if (string(this->PayloadSendBuffer)!=string("")){
+	strcat(ParamsCharArray,this->PayloadSendBuffer);
+}
+else{
+	strcat(ParamsCharArray,"none_none_");
+}
+strcat(ParamsCharArray,";");
+QNLAagent.SendParametersAgent(ParamsCharArray);// Below Agent Method
+strcpy(this->PayloadSendBuffer,"");// Reset buffer
+// Mount the information to send the message
+
+ // Generate the message
+char ParamsCharArrayAux[NumBytesBufferICPMAX] = {0};
+strcpy(ParamsCharArrayAux,"0.0.0.0");
+strcat(ParamsCharArrayAux,",");
+strcat(ParamsCharArrayAux,"0.0.0.0");
+strcat(ParamsCharArrayAux,",");
+strcat(ParamsCharArrayAux,"Control");
+strcat(ParamsCharArrayAux,",");
+strcat(ParamsCharArrayAux,"InfoRequest");
+strcat(ParamsCharArrayAux,",");
+strcat(ParamsCharArrayAux,ParamsCharArray);
+strcat(ParamsCharArrayAux,",");// Very important to end the message
+this->ICPdiscoverSend(ParamsCharArrayAux);
+//this->release();Does not need it since it is within the while loop
 
 return 0; // All OK
 
@@ -78,12 +104,13 @@ return 0; //All OK
 
 int QTLAN::ReadParametersAgent(){// Node checks parameters from the other node
 
+strcpy(this->PayloadReadBuffer,"");// Reset buffer
 return 0; // All OK
 }
 
 int QTLAN::SetReadParametersAgent(char* ParamsCharArray){// The upper layer sets information to be read
 this->acquire();
-//strcpy(this->PayloadReadBuffer,);
+strcat(this->PayloadReadBuffer,ParamsCharArray);
 this->release();
 return 0; // All OK
 }
@@ -538,6 +565,7 @@ int main(int argc, char const * argv[]){
  	/* Not used QTLANagent.UpdateSocketsInformation();*/
  	// Check if there are need messages or actions to be done by the node
  	QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+ 	QTLANagent.SendParametersAgent(); // Send Parameters information stored
        switch(QTLANagent.getState()) {
            case QTLAN::APPLICATION_RUNNING: {               
                // Do Some Work

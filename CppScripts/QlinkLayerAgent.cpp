@@ -41,13 +41,24 @@ this->valueSemaphore=1; // Make sure it stays at 1
 ////////////////////////////////////////////////////
 int QLLA::InitParametersAgent(){// Client node have some parameters to adjust to the server node
 
-strcpy(this->PayloadSendBuffer,"none_none_");
+strcpy(this->PayloadSendBuffer,"");
 
 return 0; //All OK
 }
 
-int QLLA::SendParametersAgent(){// The upper layer gets the information to be send
+int QLLA::SendParametersAgent(char* ParamsCharArray){// The upper layer gets the information to be send
 this->acquire();
+
+strcat(ParamsCharArray,"Link;");
+if (string(this->PayloadSendBuffer)!=string("")){
+	strcat(ParamsCharArray,this->PayloadSendBuffer);
+}
+else{
+	strcat(ParamsCharArray,"none_none_");
+}
+strcat(ParamsCharArray,";");
+QPLAagent.SendParametersAgent(ParamsCharArray);// Below Agent Method
+strcpy(this->PayloadSendBuffer,"");// Reset buffer
 
 this->release();
 
@@ -57,7 +68,7 @@ return 0; // All OK
 
 int QLLA::SetSendParametersAgent(char* ParamsCharArray){// Node accumulates parameters for the other node
 
-strcpy(this->PayloadSendBuffer,"none_none_");
+strcat(this->PayloadSendBuffer,ParamsCharArray);
 
 return 0; //All OK
 }
@@ -98,7 +109,7 @@ void QLLA::AgentProcessRequestsPetitions(){// Check next thing to do
  try{
    try {
    	this->acquire();// Wait semaphore until it can proceed
-    	
+    	this->ReadParametersAgent();// Reads messages from above layer
         this->release(); // Release the semaphore 
         usleep(WaitTimeAfterMainWhileLoop);// Wait a few microseconds for other processes to enter
     }
