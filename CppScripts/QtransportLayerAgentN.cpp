@@ -528,9 +528,9 @@ try{
 
 int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
 
-int SockListenTimeusec=1000; // Negative means infinite
+int SockListenTimeusec=100; // Negative means infinite
 
-int isValidWhileLoopCount = 1000; // Number of tries
+int isValidWhileLoopCount = 1; // Number of tries
 while(isValidWhileLoopCount>0){
 
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
@@ -578,7 +578,7 @@ if (ReadBytes>0){// Read block
 else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 isValidWhileLoopCount--;
-usleep(100000);
+usleep(10000);
 }
 }//while
 
