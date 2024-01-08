@@ -80,10 +80,9 @@ strcat(ParamsCharArray,";");
 QNLAagent.SendParametersAgent(ParamsCharArray);// Below Agent Method
 strcpy(this->PayloadSendBuffer,"");// Reset buffer
 // Mount the information to send the message
-cout << "ParamsCharArray: " << ParamsCharArray << endl;
+//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none_;Link;none_none_;Phys;none_none_;")){
-	 // Generate the message
-	 cout << "Should not be here" << endl;
+	 // Generate the message	 
 	char ParamsCharArrayAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ParamsCharArrayAux,this->IPaddressesSockets[0]);
 	strcat(ParamsCharArrayAux,",");
@@ -640,13 +639,13 @@ int main(int argc, char const * argv[]){
  cout << "QTLANagent.SCmode[1]: " << QTLANagent.SCmode[1] << endl;
  strcpy(QTLANagent.IPaddressesSockets[2],argv[2]); // To know its own IP in the control network
  cout << "QTLANagent.IPaddressesSockets[2]: " << QTLANagent.IPaddressesSockets[3] << endl;
- strcpy(QTLANagent.IPaddressesSockets[1],argv[3]); // To know the other host IP in the operation network
- cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[0] << endl;
+ //strcpy(QTLANagent.IPaddressesSockets[1],argv[3]); // To know the other host IP in the operation network
+ //cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[0] << endl;
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest
  cout << "Here 0" << endl;
- //QTLANagent.RetrieveIPSocketsHosts();
+ QTLANagent.RetrieveIPSocketsHosts();
  cout << "Here 1" << endl;
  // Then negotiate some parameters
  //QTLANagent.NegotiateInitialParamsNode(); 
