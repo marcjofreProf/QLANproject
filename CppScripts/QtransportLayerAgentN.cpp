@@ -83,6 +83,7 @@ strcpy(this->PayloadSendBuffer,"");// Reset buffer
 cout << "ParamsCharArray: " << ParamsCharArray << endl;
 if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none;Link;none_none_;Phys;none_none_;")){
 	 // Generate the message
+	 cout << "Should not be here" << endl;
 	char ParamsCharArrayAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ParamsCharArrayAux,this->IPaddressesSockets[0]);
 	strcat(ParamsCharArrayAux,",");
@@ -94,7 +95,7 @@ if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none;Link;none_no
 	strcat(ParamsCharArrayAux,",");
 	strcat(ParamsCharArrayAux,ParamsCharArray);
 	strcat(ParamsCharArrayAux,",");// Very important to end the message
-	cout << "ParamsCharArrayAux: " << ParamsCharArrayAux << endl;
+	//cout << "ParamsCharArrayAux: " << ParamsCharArrayAux << endl;
 	this->ICPdiscoverSend(ParamsCharArrayAux);
 }
 //this->release();Does not need it since it is within the while loop
@@ -376,7 +377,7 @@ strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
     // Understand which socket descriptor has to be used
     int socket_fd_conn;
     //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
-    for (int i=0; i<NumSocketsMax; ++i){
+    for (int i=0; i<(NumSocketsMax-1); ++i){
     	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
     	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
     	//cout << "Found socket file descriptor//connection to send" << endl;
