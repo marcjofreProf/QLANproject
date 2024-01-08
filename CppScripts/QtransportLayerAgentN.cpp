@@ -81,7 +81,7 @@ QNLAagent.SendParametersAgent(ParamsCharArray);// Below Agent Method
 strcpy(this->PayloadSendBuffer,"");// Reset buffer
 // Mount the information to send the message
 cout << "ParamsCharArray: " << ParamsCharArray << endl;
-if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none;Link;none_none_;Phys;none_none_;")){
+if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none_;Link;none_none_;Phys;none_none_;")){
 	 // Generate the message
 	 cout << "Should not be here" << endl;
 	char ParamsCharArrayAux[NumBytesBufferICPMAX] = {0};
@@ -322,6 +322,7 @@ int QTLAN::InitiateICPconnections(int argc){
 	// First, opening server listening socket 
 	int RetValue = 0;
 	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPSocketsList[0]);
+	strcpy(this->IPaddressesSockets[0],this->IPSocketsList[0]);
 	// Eventually, if it is an intermediate node
 	if (argc > 1){ // Establish client connection with next node
 	// First parse the parama passed IP address
@@ -377,7 +378,7 @@ strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
     // Understand which socket descriptor has to be used
     int socket_fd_conn;
     //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
-    for (int i=0; i<(NumSocketsMax-1); ++i){
+    for (int i=0; i<(NumSocketsMax); ++i){
     	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
     	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
     	//cout << "Found socket file descriptor//connection to send" << endl;
@@ -525,7 +526,7 @@ int QTLAN::RetrieveIPSocketsHosts(){ // Ask the host about the other host IP
 try{
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 
-int socket_fd_conn=this->socket_fdArray[0];   // The first point probably to the host
+int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
 
 int SockListenTimeusec=100; // Negative means infinite
 
@@ -535,7 +536,7 @@ cout << "Here sub 1" << endl;
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
 strcpy(this->SendBuffer,this->IPSocketsList[0]); //IP attached host
 strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,this->IPaddressesSockets[3]);
+strcat(this->SendBuffer,this->IPaddressesSockets[2]);
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"Control");
 strcat(this->SendBuffer,",");
@@ -637,10 +638,10 @@ int main(int argc, char const * argv[]){
  QTLANagent.ParamArgc=argc;
  strcpy(QTLANagent.SCmode[1],argv[1]); // to know if this host instance is client or server
  cout << "QTLANagent.SCmode[1]: " << QTLANagent.SCmode[1] << endl;
- strcpy(QTLANagent.IPaddressesSockets[3],argv[2]); // To know its own IP in the control network
- cout << "QTLANagent.IPaddressesSockets[3]: " << QTLANagent.IPaddressesSockets[3] << endl;
- strcpy(QTLANagent.IPaddressesSockets[0],argv[3]); // To know the other host IP in the operation network
- cout << "QTLANagent.IPaddressesSockets[0]: " << QTLANagent.IPaddressesSockets[0] << endl;
+ strcpy(QTLANagent.IPaddressesSockets[2],argv[2]); // To know its own IP in the control network
+ cout << "QTLANagent.IPaddressesSockets[2]: " << QTLANagent.IPaddressesSockets[3] << endl;
+ strcpy(QTLANagent.IPaddressesSockets[1],argv[3]); // To know the other host IP in the operation network
+ cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[0] << endl;
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest
