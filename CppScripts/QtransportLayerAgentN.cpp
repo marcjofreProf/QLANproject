@@ -527,11 +527,11 @@ try{
 
 int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
 
-int SockListenTimeusec=100; // Negative means infinite
+int SockListenTimeusec=-1; // Negative means infinite
 
 int isValidWhileLoopCount = 100; // Number of tries
 while(isValidWhileLoopCount>0){
-cout << "Here sub 1" << endl;
+
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
 strcpy(this->SendBuffer,this->IPSocketsList[0]); //IP attached host
 strcat(this->SendBuffer,",");
@@ -543,10 +543,9 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"IPaddressesSockets");
 strcat(this->SendBuffer,",");// Very important to end the message
-cout << "Here sub 2" << endl;
-cout << "socket_fd_conn: " << socket_fd_conn << endl;
+
 this->ICPmanagementSend(socket_fd_conn); // send mesage to node
-cout << "Here sub 3" << endl;
+
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
@@ -640,7 +639,7 @@ int main(int argc, char const * argv[]){
  strcpy(QTLANagent.IPaddressesSockets[2],argv[2]); // To know its own IP in the control network
  cout << "QTLANagent.IPaddressesSockets[2]: " << QTLANagent.IPaddressesSockets[3] << endl;
  //strcpy(QTLANagent.IPaddressesSockets[1],argv[3]); // To know the other host IP in the operation network
- //cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[0] << endl;
+ cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[0] << endl;
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest
