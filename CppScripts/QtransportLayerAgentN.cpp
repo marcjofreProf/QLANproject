@@ -533,9 +533,11 @@ int isValidWhileLoopCount = 1000; // Number of tries
 while(isValidWhileLoopCount>0){
 
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
-strcpy(this->SendBuffer,this->IPSocketsList[0]); //IP attached host
+strcpy(this->SendBuffer,this->IPaddressesSockets[0]); //IP attached host
+cout << "this->IPaddressesSockets[0]: " << this->IPaddressesSockets[0] << endl;
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,this->IPaddressesSockets[2]);
+cout << "this->IPaddressesSockets[0]: " << this->IPaddressesSockets[0] << endl;
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"Control");
 strcat(this->SendBuffer,",");
