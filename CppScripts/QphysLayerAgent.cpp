@@ -10,10 +10,16 @@ Agent script for Quantum Physical Layer
 #include "QphysLayerAgent.h"
 #include<iostream>
 #include<unistd.h> //for usleep
+#include <stdio.h>
+#include <string.h>
+
 #define LinkNumberMAX 2
 #include "./BBBhw/GPIO.h"
+#include <stdlib.h>
 // Threading
 #define WaitTimeAfterMainWhileLoop 1
+// Payload messages
+#define NumBytesPayloadBuffer 1000
 #include <thread>
 // Semaphore
 #include <atomic>
@@ -28,9 +34,45 @@ using namespace std;
 
 namespace nsQphysLayerAgent {
 QPLA::QPLA() {// Constructor
+
  
 }
+//////////////////////////////////////////////
+int QPLA::InitParametersAgent(){// Client node have some parameters to adjust to the server node
 
+strcpy(this->PayloadSendBuffer,"EmitLinkNumberArray_48_ReceiveLinkNumberArray_60_QuBitsPerSecondVelocity[0]_1000_");
+
+return 0; //All OK
+}
+
+int QPLA::SendParametersAgent(){// The upper layer gets the information to be send
+this->acquire();
+
+this->release();
+
+return 0; // All OK
+
+}
+
+int QPLA::SetSendParametersAgent(){// Node accumulates parameters for the other node
+
+strcpy(this->PayloadSendBuffer,"none_none");
+
+return 0; //All OK
+}
+
+int QPLA::ReadParametersAgent(){// Node checks parameters from the other node
+
+return 0; // All OK
+}
+
+int QPLA::SetReadParametersAgent(){// The upper layer sets information to be read
+this->acquire();
+//strcpy(this->PayloadReadBuffer,);
+this->release();
+return 0; // All OK
+}
+////////////////////////////////////////////////////
 void QPLA::acquire() {
 while(valueSemaphore==0);
 this->valueSemaphore=0; // Make sure it stays at 0
@@ -54,15 +96,16 @@ int QPLA::InitAgentProcess(){
 
 
 int QPLA::emitQuBit(){
- GPIO outGPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
-
+// this->outGPIO=exploringBB::GPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
+ GPIO outGPIO(this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
  outGPIO.setDirection(OUTPUT);
- 
- outGPIO.setValue(HIGH);
- usleep(500); //micro-second sleep 0.0005 seconds
- outGPIO.setValue(LOW);
- usleep(500);
+ for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;++iIterRead){
+	 outGPIO.setValue(HIGH);
+	 usleep(QuBitsUSecPeriodInt[0]);
+	 outGPIO.setValue(LOW);
+ }
+ //usleep(QuBitsUSecHalfPeriodInt[0]);
   
  /* Not used. Just to know how to do fast writes
  // Fast write to GPIO 1 million times
@@ -80,10 +123,15 @@ int QPLA::emitQuBit(){
 }
 
 int QPLA::receiveQuBit(){
- GPIO inGPIO(48); // Receiving GPIO. Of course gnd have to be connected accordingly.
- 
- // Basic Input
+// this->inGPIO=exploringBB::GPIO(48); // Receiving GPIO. Of course gnd have to be connected accordingly.
+ GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
  inGPIO.setDirection(INPUT);
+ // Basic Input
+ for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;++iIterRead){
+	 usleep(QuBitsUSecHalfPeriodInt[0]);
+	 QuBitValueArray[iIterRead]=inGPIO.getValue();
+	 usleep(QuBitsUSecHalfPeriodInt[0]);	 
+ }
  //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
   
  return 0; // return 0 is for no error

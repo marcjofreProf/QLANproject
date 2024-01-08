@@ -11,7 +11,13 @@ Header declaration file for Quantum physical Layer Agent
 #ifndef QphysLayerAgent_H_
 #define QphysLayerAgent_H_
 
+#include "./BBBhw/GPIO.h"
+
 #define LinkNumberMAX 2
+// Payload messages
+#define NumBytesPayloadBuffer 1000
+//Qubits
+#define NumQubitsMemoryBuffer 2048
 
 #include<string>
 #include<fstream>
@@ -24,6 +30,8 @@ using std::ofstream;
 
 // #define GPIO_PATH "/sys/class/gpio/"
 
+using namespace exploringBB; // API to easily use GPIO in c++
+
 namespace nsQphysLayerAgent {
 
 // typedef int (*CallbackType)(int);
@@ -32,10 +40,19 @@ namespace nsQphysLayerAgent {
 class QPLA {
 private: //Variables/Instances		
 	int numberLinks=0;// Number of full duplex links directly connected to this physical quantum node
-        int EmitLinkNumberArray[LinkNumberMAX]={0}; // Array indicating the GPIO numbers identifying the emit pins
-        int ReceiveLinkNumberArray[LinkNumberMAX]={0}; // Array indicating the GPIO numbers identifying the receive pins
+        int EmitLinkNumberArray[LinkNumberMAX]={60}; // Array indicating the GPIO numbers identifying the emit pins
+        int ReceiveLinkNumberArray[LinkNumberMAX]={48}; // Array indicating the GPIO numbers identifying the receive pins
+        float QuBitsPerSecondVelocity[LinkNumberMAX]={1000.0}; // Array indicating the qubits per second velocity of each emit/receive pair 
+        int QuBitsUSecPeriodInt[LinkNumberMAX]={1000};
+        int QuBitsUSecHalfPeriodInt[LinkNumberMAX]={500};
         // Semaphore
 	std::atomic<int> valueSemaphore=1;// Start as 1 (open or acquireable)
+	// Payload messages
+	char PayloadReadBuffer[NumBytesPayloadBuffer]={0}; //Buffer to read payload messages
+	char PayloadSendBuffer[NumBytesPayloadBuffer]={0}; //Buffer to send payload messages
+	// GPIO
+	//exploringBB::GPIO inGPIO; // Object for reading Qubits
+	//exploringBB::GPIO outGPIO; // Object for sending Qubits
         
 public: // Variables/Instances
 	enum ApplicationState { // State of the agent sequences
@@ -45,13 +62,14 @@ public: // Variables/Instances
 	    };
 	ApplicationState m_state;
 	int NumStoredQubitsNode[LinkNumberMAX]={0}; // Array indicating the number of stored qubits
+	int QuBitValueArray[NumQubitsMemoryBuffer]={0};
 
 public: // Functions/Methods
 	QPLA(); //constructor
 	int InitAgentProcess(); // Initializer of the thread
-	// General Input and Output functions
-	int emitQuBit();
-	int receiveQuBit();
+	// Payload information parameters
+	int SendParametersAgent();// The upper layer gets the information to be send
+        int SetReadParametersAgent();// The upper layer sets information from the other node
 	~QPLA();  //destructor
 
 private: // Functions/Methods
@@ -73,7 +91,15 @@ private: // Functions/Methods
         // paused was trigger would be saved, and then reset as new starting
         // time for your timer or counter. 
         bool m_resume() { m_state = APPLICATION_RUNNING; return true; }      
-        bool m_exit() { m_state = APPLICATION_EXIT;  return false; }
+        bool m_exit() { m_state = APPLICATION_EXIT;  return false; }        
+	// General Input and Output functions
+	int emitQuBit();
+	int receiveQuBit();
+        // Payload information parameters
+        int InitParametersAgent();// Client node have some parameters to adjust to the server node        
+	int SetSendParametersAgent();// Node accumulates parameters for the other node
+	int ReadParametersAgent();// Node checks parameters from the other node
+	
 };
 
 

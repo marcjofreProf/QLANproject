@@ -11,6 +11,9 @@ Header declaration file for Quantum network Layer Agent
 #ifndef QnetworkLayerAgent_H_
 #define QnetworkLayerAgent_H_
 
+// Payload messages
+#define NumBytesPayloadBuffer 1000
+
 #include<string>
 #include<fstream>
 // Threading
@@ -32,7 +35,10 @@ class QNLA {
 private:// Variables/Instances		
 	int numberHops=0;
 	// Semaphore
-	std::atomic<int> valueSemaphore=1;// Start as 1 (open or acquireable)	
+	std::atomic<int> valueSemaphore=1;// Start as 1 (open or acquireable)
+	// Payload messages
+	char PayloadReadBuffer[NumBytesPayloadBuffer]={0}; //Buffer to read payload messages
+	char PayloadSendBuffer[NumBytesPayloadBuffer]={0}; //Buffer to send payload messages
 
 public: // Variables/Instances
 	enum ApplicationState { // State of the agent sequences
@@ -46,6 +52,9 @@ public: // Variables/Instances
 public: // Functions/Methods
 	QNLA(); //constructor
 	int InitAgentProcess(); // Initializer of the thread
+	// Payload information parameters
+	int SendParametersAgent();// The upper layer gets the information to be send
+        int SetReadParametersAgent();// The upper layer sets information from the other node
 	~QNLA();  //destructor
 
 private://Functions/Methods
@@ -68,6 +77,10 @@ private://Functions/Methods
         // time for your timer or counter. 
         bool m_resume() { m_state = APPLICATION_RUNNING; return true; }      
         bool m_exit() { m_state = APPLICATION_EXIT;  return false; }
+        // Payload information parameters
+        int InitParametersAgent();// Client node have some parameters to adjust to the server node
+        int SetSendParametersAgent();// Node accumulates parameters for the other node
+	int ReadParametersAgent();// Node checks parameters from the other node
 };
 
 

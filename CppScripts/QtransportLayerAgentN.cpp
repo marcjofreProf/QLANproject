@@ -31,6 +31,8 @@ Agent script for Quantum transport Layer Node
 #include <thread>
 // Semaphore
 #include <atomic>
+// Payload messages
+#define NumBytesPayloadBuffer 1000
 
 using namespace std;
 
@@ -41,7 +43,7 @@ QTLAN::QTLAN(int numberSessions) { // Constructor
  strcpy(this->SCmode[0],"server"); // to know if this host instance is client or server
  strcpy(this->SCmode[1],"client"); // to know if this host instance is client or server
 }
-
+///////////////////////////////////////////////////
 void QTLAN::acquire() {
 while(valueSemaphore==0);
 this->valueSemaphore=0; // Make sure it stays at 0
@@ -50,7 +52,41 @@ this->valueSemaphore=0; // Make sure it stays at 0
 void QTLAN::release() {
 this->valueSemaphore=1; // Make sure it stays at 1
 }
+///////////////////////////////////////////////////////
+int QTLAN::InitParametersAgent(){// Client node have some parameters to adjust to the server node
 
+strcpy(this->PayloadSendBuffer,"none_none");
+
+return 0; //All OK
+}
+
+int QTLAN::SendParametersAgent(){// The upper layer gets the information to be send
+this->acquire();
+
+this->release();
+
+return 0; // All OK
+
+}
+
+int QTLAN::SetSendParametersAgent(){// Node accumulates parameters for the other node
+
+strcpy(this->PayloadSendBuffer,"none_none");
+
+return 0; //All OK
+}
+
+int QTLAN::ReadParametersAgent(){// Node checks parameters from the other node
+
+return 0; // All OK
+}
+
+int QTLAN::SetReadParametersAgent(){// The upper layer sets information to be read
+this->acquire();
+//strcpy(this->PayloadReadBuffer,);
+this->release();
+return 0; // All OK
+}
 ////////////////////////////////////////////////////////
 int QTLAN::InitAgentProcess(){
 	// Then, regularly check for next job/action without blocking		  	
@@ -377,8 +413,8 @@ else if(string(Type)==string("Control")){//Control message
 		if (string(Payload)==string("NumStoredQubitsNode")){
 		  int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.NumStoredQubitsNode[0];// to be developed for more than one link
 		  // Generate the message
-		  char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-		  strcpy(ParamsCharArray, IPorg);
+		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+		strcpy(ParamsCharArray, IPorg);
 		strcat(ParamsCharArray,",");
 		strcat(ParamsCharArray,IPdest);
 		strcat(ParamsCharArray,",");

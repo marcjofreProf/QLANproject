@@ -10,9 +10,14 @@ Agent script for Quantum Link Layer
 #include "QlinkLayerAgent.h"
 #include<iostream>
 #include<unistd.h> //for usleep
+#include <stdio.h>
+#include <string.h>
+
 #include "QphysLayerAgent.h"
 // Threading
 #define WaitTimeAfterMainWhileLoop 1
+// Payload messages
+#define NumBytesPayloadBuffer 1000
 #include <thread>
 // Semaphore
 #include <atomic>
@@ -24,7 +29,7 @@ namespace nsQlinkLayerAgent {
 QLLA::QLLA() { // Constructor
  
 }
-
+/////////////////////////////////////////////
 void QLLA::acquire() {
 while(valueSemaphore==0);
 this->valueSemaphore=0; // Make sure it stays at 0
@@ -33,7 +38,41 @@ this->valueSemaphore=0; // Make sure it stays at 0
 void QLLA::release() {
 this->valueSemaphore=1; // Make sure it stays at 1
 }
+////////////////////////////////////////////////////
+int QLLA::InitParametersAgent(){// Client node have some parameters to adjust to the server node
 
+strcpy(this->PayloadSendBuffer,"none_none");
+
+return 0; //All OK
+}
+
+int QLLA::SendParametersAgent(){// The upper layer gets the information to be send
+this->acquire();
+
+this->release();
+
+return 0; // All OK
+
+}
+
+int QLLA::SetSendParametersAgent(){// Node accumulates parameters for the other node
+
+strcpy(this->PayloadSendBuffer,"none_none");
+
+return 0; //All OK
+}
+
+int QLLA::ReadParametersAgent(){// Node checks parameters from the other node
+
+return 0; // All OK
+}
+
+int QLLA::SetReadParametersAgent(){// The upper layer sets information to be read
+this->acquire();
+//strcpy(this->PayloadReadBuffer,);
+this->release();
+return 0; // All OK
+}
 ////////////////////////////////////////////////////////
 int QLLA::InitAgentProcess(){
 	// Then, regularly check for next job/action without blocking		  	

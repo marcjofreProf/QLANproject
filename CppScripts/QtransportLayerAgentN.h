@@ -16,6 +16,9 @@ Header declaration file for Quantum transport Layer Agent Node
 #define NumBytesBufferICPMAX 1024
 #define IPcharArrayLengthMAX 15
 
+// Payload messages
+#define NumBytesPayloadBuffer 1000
+
 #include<string>
 #include<fstream>
 // Threading
@@ -57,6 +60,9 @@ private: // Variables/Objects
 	int socketReadIter = 0; // Variable to read each time a different socket
 	// Semaphore
 	std::atomic<int> valueSemaphore=1;// Start as 1 (open or acquireable)
+	// Payload messages
+	char PayloadReadBuffer[NumBytesPayloadBuffer]={0}; //Buffer to read payload messages
+	char PayloadSendBuffer[NumBytesPayloadBuffer]={0}; //Buffer to send payload messages
 	
 public: // Functions
 	int InitAgentProcess(); // Initializer of the thread
@@ -79,6 +85,9 @@ public: // Functions
         int UpdateSocketsInformation(); // Update information to where the sockets are pointing to
         // Process and execute requests
 	int ProcessNewMessage();
+	// Payload information parameters
+	int SendParametersAgent();// The upper layer gets the information to be send
+        int SetReadParametersAgent();// The upper layer sets information from the other node
 	~QTLAN();  //destructor
 
 private: // Functions/Methods
@@ -104,6 +113,10 @@ private: // Functions/Methods
 	// REquests
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the Agent to send message to specific host/node
 //	friend void* threadedPoll(void *value);
+	// Payload information parameters
+	int InitParametersAgent();// Client node have some parameters to adjust to the server node
+	int SetSendParametersAgent();// Node accumulates parameters for the other node
+	int ReadParametersAgent();// Node checks parameters from the other node
 	
 };
 
