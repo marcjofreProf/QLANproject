@@ -537,7 +537,7 @@ strcpy(this->SendBuffer,this->IPaddressesSockets[0]); //IP attached host
 cout << "this->IPaddressesSockets[0]: " << this->IPaddressesSockets[0] << endl;
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,this->IPaddressesSockets[2]);
-cout << "this->IPaddressesSockets[0]: " << this->IPaddressesSockets[0] << endl;
+cout << "this->IPaddressesSockets[2]: " << this->IPaddressesSockets[2] << endl;
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"Control");
 strcat(this->SendBuffer,",");
@@ -639,9 +639,9 @@ int main(int argc, char const * argv[]){
  strcpy(QTLANagent.SCmode[1],argv[1]); // to know if this host instance is client or server
  cout << "QTLANagent.SCmode[1]: " << QTLANagent.SCmode[1] << endl;
  strcpy(QTLANagent.IPaddressesSockets[2],argv[2]); // To know its own IP in the control network
- cout << "QTLANagent.IPaddressesSockets[2]: " << QTLANagent.IPaddressesSockets[3] << endl;
+ cout << "QTLANagent.IPaddressesSockets[2]: " << QTLANagent.IPaddressesSockets[2] << endl;
  //strcpy(QTLANagent.IPaddressesSockets[1],argv[3]); // To know the other host IP in the operation network
- cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[0] << endl;
+ //cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[0] << endl;
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest 
