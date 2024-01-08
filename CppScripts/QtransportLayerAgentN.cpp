@@ -523,7 +523,7 @@ int SockListenTimeusec=100; // time so the node has time to response
 int isValidWhileLoopCount = 100; // Number of tries
 while(isValidWhileLoopCount>0){
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
-strcpy(this->SendBuffer, this->IPSocketsList[0]); //IP attached host
+strcpy(this->SendBuffer,this->IPSocketsList[0]); //IP attached host
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,this->IPaddressesSockets[3]);
 strcat(this->SendBuffer,",");
@@ -630,11 +630,13 @@ int main(int argc, char const * argv[]){
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest
  QTLANagent.RetrieveIPSocketsHosts();
+ cout << "Here 1" << endl;
  // Then negotiate some parameters
  QTLANagent.NegotiateInitialParamsNode(); 
+ cout << "Here 2" << endl;
  // Then the sub agents threads can be started
  QTLANagent.QNLAagent.InitAgentProcess();
- 
+ cout << "Here 3" << endl;
  // Then await for next actions
  QTLANagent.m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentN" << endl;
