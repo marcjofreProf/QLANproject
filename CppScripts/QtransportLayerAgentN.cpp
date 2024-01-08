@@ -527,7 +527,7 @@ try{
 
 int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
 
-int SockListenTimeusec=-1; // Negative means infinite
+int SockListenTimeusec=100; // Negative means infinite
 
 int isValidWhileLoopCount = 100; // Number of tries
 while(isValidWhileLoopCount>0){
@@ -642,16 +642,15 @@ int main(int argc, char const * argv[]){
  cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[0] << endl;
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
- // Discover some IP addresses of interest
- cout << "Here 0" << endl;
+ // Discover some IP addresses of interest 
  QTLANagent.RetrieveIPSocketsHosts();
- cout << "Here 1" << endl;
+ 
  // Then negotiate some parameters
- //QTLANagent.NegotiateInitialParamsNode(); 
- cout << "Here 2" << endl;
+ QTLANagent.NegotiateInitialParamsNode(); 
+ 
  // Then the sub agents threads can be started
  QTLANagent.QNLAagent.InitAgentProcess();
- cout << "Here 3" << endl;
+ 
  // Then await for next actions
  QTLANagent.m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentN" << endl;
