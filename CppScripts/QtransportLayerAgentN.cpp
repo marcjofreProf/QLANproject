@@ -642,10 +642,10 @@ int main(int argc, char const * argv[]){
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest
  cout << "Here 0" << endl;
- QTLANagent.RetrieveIPSocketsHosts();
+ //QTLANagent.RetrieveIPSocketsHosts();
  cout << "Here 1" << endl;
  // Then negotiate some parameters
- QTLANagent.NegotiateInitialParamsNode(); 
+ //QTLANagent.NegotiateInitialParamsNode(); 
  cout << "Here 2" << endl;
  // Then the sub agents threads can be started
  QTLANagent.QNLAagent.InitAgentProcess();
