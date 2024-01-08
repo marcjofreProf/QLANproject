@@ -560,7 +560,7 @@ try{
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor
 
-int SockListenTimeusec=100; // time so the node has time to response
+int SockListenTimeusec=-1; // negative means infinite time
 
 int isValidWhileLoopCount = 100; // Number of tries
 while(isValidWhileLoopCount>0){
