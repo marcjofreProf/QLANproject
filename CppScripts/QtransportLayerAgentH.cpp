@@ -440,6 +440,31 @@ strcpy(Payload,strtok(NULL,","));
 // Identify what to do and execute it
 if (string(Type)==string("Operation")){// Operation message. 
 
+	if(string(IPorg)==string(this->IPSocketsList[0]) and string(IPdest)==string(this->IPaddressesSockets[2])){// Information requested by the attached node
+		if (string(Command)==string("InfoRequest") and string(Payload)==string("IPaddressesSockets")){
+		// Mount message and send it to attached node
+		 // Generate the message
+		 cout << "Entering here" << endl;
+		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+		strcpy(ParamsCharArray,IPdest);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,IPorg);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"Control");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"InfoRequest");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,IPaddressesSockets[1]);
+		strcat(ParamsCharArray,",");// Very important to end the message
+		strcpy(this->SendBuffer,ParamsCharArray);
+		}
+		else{
+		// Send something since node is waiting
+		}
+		int socket_fd_conn=this->socket_fdArray[0];// Socket descriptor to the attached node
+		this->ICPmanagementSend(socket_fd_conn);
+	}
+
 	if (string(Command)==string("ServeQubits")){// Send qubits to the requesting host
 		
 	}
@@ -463,31 +488,7 @@ else if(string(Type)==string("Control")){//Control message. If it is not meant f
 	    int socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
 	    this->ICPmanagementSend(socket_fd_conn);
 	    }
-	}
-	else if(string(IPorg)==string(this->IPSocketsList[0]) and string(IPdest)==string(this->IPaddressesSockets[3])){// Information requested by the attached node
-		if (string(Command)==string("InfoRequest") and string(Payload)==string("IPaddressesSockets")){
-		// Mount message and send it to attached node
-		 // Generate the message
-		 cout << "Entering here" << endl;
-		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-		strcpy(ParamsCharArray,IPdest);
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,IPorg);
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"Control");
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"InfoRequest");
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,IPaddressesSockets[1]);
-		strcat(ParamsCharArray,",");// Very important to end the message
-		this->ICPdiscoverSend(ParamsCharArray);
-		}
-		else{
-		// Send something since node is waiting
-		}
-		int socket_fd_conn=this->new_socketArray[0];// Socket descriptor to the attached node
-		this->ICPmanagementSend(socket_fd_conn);
-	}
+	}	
 	else{// It has to forward to its node
 	   // The node of a host is always identified in the Array in position 0	
 	    //cout << "SendBuffer: " << this->SendBuffer << endl;
