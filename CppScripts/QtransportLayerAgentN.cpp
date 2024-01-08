@@ -577,7 +577,7 @@ if (ReadBytes>0){// Read block
 else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 isValidWhileLoopCount--;
-usleep(100);
+usleep(10000);
 }
 }//while
 
