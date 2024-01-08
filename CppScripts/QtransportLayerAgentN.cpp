@@ -351,6 +351,7 @@ int QTLAN::StopICPconnections(int argc){
 
 int QTLAN::ICPConnectionsCheckNewMessages(int SockListenTimeusec){ 
 int socket_fd_conn=0;
+
 if (string(this->SCmode[this->socketReadIter])==string("client")){// Client sends on the file descriptor
 	socket_fd_conn=this->socket_fdArray[this->socketReadIter];
 }
@@ -363,7 +364,7 @@ if(this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec)>0){this->m_start()
 // Update the socketReadIter
 this->socketReadIter++; // Variable to read each time a different socket
 this->socketReadIter=this->socketReadIter % NumSocketsMax;
-
+this->socketReadIter=0; // Not checking other connection yet
 return 0; // All OK	  
 }
 
