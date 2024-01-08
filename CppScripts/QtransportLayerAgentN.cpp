@@ -81,20 +81,22 @@ QNLAagent.SendParametersAgent(ParamsCharArray);// Below Agent Method
 strcpy(this->PayloadSendBuffer,"");// Reset buffer
 // Mount the information to send the message
 
- // Generate the message
-char ParamsCharArrayAux[NumBytesBufferICPMAX] = {0};
-strcpy(ParamsCharArrayAux,this->IPaddressesSockets[0]);
-strcat(ParamsCharArrayAux,",");
-strcat(ParamsCharArrayAux,this->IPaddressesSockets[3]);
-strcat(ParamsCharArrayAux,",");
-strcat(ParamsCharArrayAux,"Control");
-strcat(ParamsCharArrayAux,",");
-strcat(ParamsCharArrayAux,"InfoProcess");
-strcat(ParamsCharArrayAux,",");
-strcat(ParamsCharArrayAux,ParamsCharArray);
-strcat(ParamsCharArrayAux,",");// Very important to end the message
-cout << "ParamsCharArrayAux: " << ParamsCharArrayAux << endl;
-this->ICPdiscoverSend(ParamsCharArrayAux);
+if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none;Link;none_none_;Phys;none_none_")){
+	 // Generate the message
+	char ParamsCharArrayAux[NumBytesBufferICPMAX] = {0};
+	strcpy(ParamsCharArrayAux,this->IPaddressesSockets[0]);
+	strcat(ParamsCharArrayAux,",");
+	strcat(ParamsCharArrayAux,this->IPaddressesSockets[3]);
+	strcat(ParamsCharArrayAux,",");
+	strcat(ParamsCharArrayAux,"Control");
+	strcat(ParamsCharArrayAux,",");
+	strcat(ParamsCharArrayAux,"InfoProcess");
+	strcat(ParamsCharArrayAux,",");
+	strcat(ParamsCharArrayAux,ParamsCharArray);
+	strcat(ParamsCharArrayAux,",");// Very important to end the message
+	cout << "ParamsCharArrayAux: " << ParamsCharArrayAux << endl;
+	this->ICPdiscoverSend(ParamsCharArrayAux);
+}
 //this->release();Does not need it since it is within the while loop
 
 return 0; // All OK
