@@ -81,7 +81,7 @@ QNLAagent.SendParametersAgent(ParamsCharArray);// Below Agent Method
 strcpy(this->PayloadSendBuffer,"");// Reset buffer
 // Mount the information to send the message
 
-if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none;Link;none_none_;Phys;none_none_")){
+if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none;Link;none_none_;Phys;none_none_;")){
 	 // Generate the message
 	char ParamsCharArrayAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ParamsCharArrayAux,this->IPaddressesSockets[0]);
