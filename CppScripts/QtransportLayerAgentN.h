@@ -46,13 +46,13 @@ public: // Variables/Objects
 	nsQnetworkLayerAgent::QNLA QNLAagent; // Instance of the below agent
 	int ParamArgc=0; // Number of passed parameters
 	int numberSessions=0;
+	char IPaddressesSockets[NumSocketsMax+2][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks
+	char SCmode[NumSocketsMax][NumBytesBufferICPMAX] = {0}; // Variable to know if the node instance is working as server or client to the other node
 
 private: // Variables/Objects		
 	// Member Variables Such As Window Handle, Time Etc.,
 	ApplicationState m_state;	
-	char IPaddressesSockets[NumSocketsMax][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks
-	char IPSocketsList[NumSocketsMax][IPcharArrayLengthMAX]; // IP address where the socket descriptors are pointing to
-	char SCmode[NumSocketsMax][NumBytesBufferICPMAX] = {0}; // Variable to know if the host instance is working as server or client
+	char IPSocketsList[NumSocketsMax][IPcharArrayLengthMAX]; // IP address where the socket descriptors are pointing to	
 	int socket_fdArray[NumSocketsMax]; // socket descriptor, an integer (like a file-handle)
 	int new_socketArray[NumSocketsMax]; // socket between client and server. Created by the server
 	char ReadBuffer[NumBytesBufferICPMAX] = {0};// Buffer to read ICP messages
@@ -64,7 +64,7 @@ private: // Variables/Objects
 	char PayloadReadBuffer[NumBytesPayloadBuffer]={0}; //Buffer to read payload messages
 	char PayloadSendBuffer[NumBytesPayloadBuffer]={0}; //Buffer to send payload messages
 	
-public: // Functions
+public: // Functions/Methods
 	int InitAgentProcess(); // Initializer of the thread
 	QTLAN(int numberSessions); //constructor
 	// virtual ~Application(); // Default Okay - Use Virtual If Using Inheritance
@@ -88,6 +88,8 @@ public: // Functions
 	// Payload information parameters
 	int SendParametersAgent();// The upper layer gets the information to be send
         int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node
+        int RetrieveIPSocketsHosts();
+	int NegotiateInitialParamsNode();
 	~QTLAN();  //destructor
 
 private: // Functions/Methods
@@ -110,7 +112,7 @@ private: // Functions/Methods
 	int ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec);
 	int ICPmanagementSend(int socket_fd_conn);
 	int ICPdiscoverSend(char* ParamsCharArray); // Discover the socket and send the message
-	// REquests
+	// REquests	
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the Agent to send message to specific host/node
 //	friend void* threadedPoll(void *value);
 	// Payload information parameters

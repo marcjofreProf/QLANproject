@@ -41,7 +41,7 @@ namespace nsQtransportLayerAgentN {
 QTLAN::QTLAN(int numberSessions) { // Constructor 
  this->numberSessions = numberSessions; // Number of sessions of different services
  strcpy(this->SCmode[0],"server"); // to know if this host instance is client or server
- strcpy(this->SCmode[1],"client"); // to know if this host instance is client or server
+ 
 }
 ///////////////////////////////////////////////////
 void QTLAN::acquire() {
@@ -78,13 +78,13 @@ strcpy(this->PayloadSendBuffer,"");// Reset buffer
 
  // Generate the message
 char ParamsCharArrayAux[NumBytesBufferICPMAX] = {0};
-strcpy(ParamsCharArrayAux,"0.0.0.0");
+strcpy(ParamsCharArrayAux,this->IPaddressesSockets[0]);
 strcat(ParamsCharArrayAux,",");
-strcat(ParamsCharArrayAux,"0.0.0.0");
+strcat(ParamsCharArrayAux,this->IPaddressesSockets[3]);
 strcat(ParamsCharArrayAux,",");
 strcat(ParamsCharArrayAux,"Control");
 strcat(ParamsCharArrayAux,",");
-strcat(ParamsCharArrayAux,"InfoRequest");
+strcat(ParamsCharArrayAux,"InfoProcess");
 strcat(ParamsCharArrayAux,",");
 strcat(ParamsCharArrayAux,ParamsCharArray);
 strcat(ParamsCharArrayAux,",");// Very important to end the message
@@ -510,6 +510,85 @@ void QTLAN::AgentProcessRequestsPetitions(){// Check next thing to do
     }
     } // while
 }
+
+int QTLAN::RetrieveIPSocketsHosts(){ // Ask the host about the other host IP
+
+try{
+// It is a "blocking" communication between host and node, because it is many read trials for reading
+
+int socket_fd_conn=this->socket_fdArray[0];   // The first point probably to the host
+
+int SockListenTimeusec=100; // time so the node has time to response
+
+int isValidWhileLoopCount = 100; // Number of tries
+while(isValidWhileLoopCount>0){
+memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
+strcpy(this->SendBuffer, this->IPSocketsList[0]); //IP attached host
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,this->IPaddressesSockets[3]);
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"Control");
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"InfoRequest");
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"IPaddressesSockets");
+strcat(this->SendBuffer,",");// Very important to end the message
+
+this->ICPmanagementSend(socket_fd_conn); // send mesage to node
+int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
+//cout << "ReadBytes: " << ReadBytes << endl;
+if (ReadBytes>0){// Read block	
+	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
+	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
+	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+	char IPdest[NumBytesBufferICPMAX] = {0};
+	char IPorg[NumBytesBufferICPMAX] = {0};
+	char Type[NumBytesBufferICPMAX] = {0};
+	char Command[NumBytesBufferICPMAX] = {0};
+	char Payload[NumBytesBufferICPMAX] = {0};
+	strcpy(IPdest,strtok(ReadBufferAux,","));
+	strcpy(IPorg,strtok(NULL,","));
+	strcpy(Type,strtok(NULL,","));
+	strcpy(Command,strtok(NULL,","));
+	strcpy(Payload,strtok(NULL,","));
+	//cout << "Payload: " << Payload << endl;
+	if (string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
+	strcpy(IPaddressesSockets[0],Payload);
+	isValidWhileLoopCount=0;
+	}
+	else// Not the message that was expected. Probably a node to the other node message, so let it pass
+	{
+		// Not messages expected as this point
+	}
+}
+else{
+// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+isValidWhileLoopCount--;
+usleep(100);
+}
+}//while
+
+} // try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+    }
+
+
+return 0; // All OK
+}
+
+int QTLAN::NegotiateInitialParamsNode(){
+
+if (string(this->SCmode[1])==string("client")){
+ this->SendParametersAgent();
+}
+else{//server
+// Expect to receive some information
+}
+
+return 0;// All OK
+}
+
 } /* namespace nsQnetworkLayerAgentN */
 
 
@@ -540,15 +619,19 @@ int main(int argc, char const * argv[]){
  // }
  //}
  
- 
  QTLAN QTLANagent(0); // Initiate the instance with 0 sessions connected. A session is composed of one server sockets descriptor active.
  // Save some given parameters to the instance of the object
  QTLANagent.ParamArgc=argc;
+ strcpy(QTLANagent.SCmode[1],argv[1]); // to know if this host instance is client or server
+ cout << "QTLANagent.SCmode[1]: " << QTLANagent.SCmode[1] << endl;
+ strcpy(QTLANagent.IPaddressesSockets[3],argv[2]); // To know its own IP in the control network
+ cout << "QTLANagent.IPaddressesSockets[3]: " << QTLANagent.IPaddressesSockets[3] << endl;
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
- 
+ // Discover some IP addresses of interest
+ QTLANagent.RetrieveIPSocketsHosts();
  // Then negotiate some parameters
- 
+ QTLANagent.NegotiateInitialParamsNode(); 
  // Then the sub agents threads can be started
  QTLANagent.QNLAagent.InitAgentProcess();
  

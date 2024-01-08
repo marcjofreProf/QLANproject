@@ -113,7 +113,7 @@ int QPLA::emitQuBit(){
  GPIO outGPIO(this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
  outGPIO.setDirection(OUTPUT);
- for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;++iIterRead){
+ for (int iIterWrite=0;iIterWrite<NumQubitsMemoryBuffer;++iIterWrite){
 	 outGPIO.setValue(HIGH);
 	 usleep(QuBitsUSecPeriodInt[0]);
 	 outGPIO.setValue(LOW);
