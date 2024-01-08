@@ -645,7 +645,7 @@ int main(int argc, char const * argv[]){
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest 
- QTLANagent.RetrieveIPSocketsHosts();
+ //QTLANagent.RetrieveIPSocketsHosts();
  
  // Then negotiate some parameters
  //QTLANagent.NegotiateInitialParamsNode(); 
