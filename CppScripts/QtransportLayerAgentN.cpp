@@ -93,6 +93,7 @@ strcat(ParamsCharArrayAux,"InfoProcess");
 strcat(ParamsCharArrayAux,",");
 strcat(ParamsCharArrayAux,ParamsCharArray);
 strcat(ParamsCharArrayAux,",");// Very important to end the message
+cout << "ParamsCharArrayAux: " << ParamsCharArrayAux << endl;
 this->ICPdiscoverSend(ParamsCharArrayAux);
 //this->release();Does not need it since it is within the while loop
 
@@ -638,6 +639,8 @@ int main(int argc, char const * argv[]){
  cout << "QTLANagent.SCmode[1]: " << QTLANagent.SCmode[1] << endl;
  strcpy(QTLANagent.IPaddressesSockets[3],argv[2]); // To know its own IP in the control network
  cout << "QTLANagent.IPaddressesSockets[3]: " << QTLANagent.IPaddressesSockets[3] << endl;
+ strcpy(QTLANagent.IPaddressesSockets[0],argv[3]); // To know the other host IP in the operation network
+ cout << "QTLANagent.IPaddressesSockets[0]: " << QTLANagent.IPaddressesSockets[0] << endl;
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest
