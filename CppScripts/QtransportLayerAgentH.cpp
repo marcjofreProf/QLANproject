@@ -468,6 +468,7 @@ else if(string(Type)==string("Control")){//Control message. If it is not meant f
 		if (string(Command)==string("InfoRequest") and string(Payload)==string("IPaddressesSockets")){
 		// Mount message and send it to attached node
 		 // Generate the message
+		 cout << "Entering here" << endl;
 		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 		strcpy(ParamsCharArray,IPdest);
 		strcat(ParamsCharArray,",");

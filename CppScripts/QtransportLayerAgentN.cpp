@@ -547,7 +547,7 @@ strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"IPaddressesSockets");
 strcat(this->SendBuffer,",");// Very important to end the message
 
-this->ICPmanagementSend(socket_fd_conn); // send mesage to node
+this->ICPmanagementSend(socket_fd_conn); // send message to node
 
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 //cout << "ReadBytes: " << ReadBytes << endl;
@@ -567,7 +567,7 @@ if (ReadBytes>0){// Read block
 	strcpy(Payload,strtok(NULL,","));
 	cout << "Payload: " << Payload << endl;
 	if (string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
-		strcpy(IPaddressesSockets[1],Payload);
+		strcpy(this->IPaddressesSockets[1],Payload);
 		isValidWhileLoopCount=0;
 	}
 	else// Not the message that was expected. Probably a node to the other node message, so let it pass
@@ -646,7 +646,7 @@ int main(int argc, char const * argv[]){
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest 
- QTLANagent.RetrieveIPSocketsHosts();
+ //QTLANagent.RetrieveIPSocketsHosts();
  
  // Then negotiate some parameters
  //QTLANagent.NegotiateInitialParamsNode(); 
