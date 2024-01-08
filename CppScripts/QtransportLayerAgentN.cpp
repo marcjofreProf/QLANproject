@@ -84,9 +84,9 @@ strcpy(this->PayloadSendBuffer,"");// Reset buffer
 if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none_;Link;none_none_;Phys;none_none_;")){
 	 // Generate the message	 
 	char ParamsCharArrayAux[NumBytesBufferICPMAX] = {0};
-	strcpy(ParamsCharArrayAux,this->IPaddressesSockets[0]);
+	strcpy(ParamsCharArrayAux,this->IPaddressesSockets[1]);
 	strcat(ParamsCharArrayAux,",");
-	strcat(ParamsCharArrayAux,this->IPaddressesSockets[3]);
+	strcat(ParamsCharArrayAux,this->IPaddressesSockets[2]);
 	strcat(ParamsCharArrayAux,",");
 	strcat(ParamsCharArrayAux,"Control");
 	strcat(ParamsCharArrayAux,",");
@@ -567,7 +567,7 @@ if (ReadBytes>0){// Read block
 	strcpy(Payload,strtok(NULL,","));
 	cout << "Payload: " << Payload << endl;
 	if (string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
-		strcpy(IPaddressesSockets[0],Payload);
+		strcpy(IPaddressesSockets[1],Payload);
 		isValidWhileLoopCount=0;
 	}
 	else// Not the message that was expected. Probably a node to the other node message, so let it pass
