@@ -14,6 +14,7 @@ Agent script for Quantum transport Layer Node
 // InterCommunication Protocols - Sockets - Common to Server and Client
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
 #include <sys/socket.h>
 #define PORT 8010
 #define NumSocketsMax 2
@@ -51,6 +52,10 @@ this->valueSemaphore=0; // Make sure it stays at 0
  
 void QTLAN::release() {
 this->valueSemaphore=1; // Make sure it stays at 1
+}
+
+void SignalPIPEHandler(int s) {
+cout << "Caught SIGPIPE" << endl;
 }
 ///////////////////////////////////////////////////////
 int QTLAN::InitParametersAgent(){// Client node have some parameters to adjust to the server node
@@ -518,7 +523,7 @@ int QTLAN::RetrieveIPSocketsHosts(){ // Ask the host about the other host IP
 
 try{
 // It is a "blocking" communication between host and node, because it is many read trials for reading
-usleep(10000); // wait some time so that connections are stablished
+
 int socket_fd_conn=this->socket_fdArray[0];   // The first point probably to the host
 
 int SockListenTimeusec=100; // Negative means infinite
@@ -625,6 +630,7 @@ int main(int argc, char const * argv[]){
  // }
  //}
  
+ signal(SIGPIPE, SignalPIPEHandler);
  QTLAN QTLANagent(0); // Initiate the instance with 0 sessions connected. A session is composed of one server sockets descriptor active.
  // Save some given parameters to the instance of the object
  QTLANagent.ParamArgc=argc;
