@@ -522,6 +522,7 @@ int SockListenTimeusec=-1; // Negative means infinite
 
 int isValidWhileLoopCount = 100; // Number of tries
 while(isValidWhileLoopCount>0){
+cout << "Here sub 1" << endl;
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
 strcpy(this->SendBuffer,this->IPSocketsList[0]); //IP attached host
 strcat(this->SendBuffer,",");
@@ -533,10 +534,10 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"IPaddressesSockets");
 strcat(this->SendBuffer,",");// Very important to end the message
-
+cout << "Here sub 2" << endl;
 this->ICPmanagementSend(socket_fd_conn); // send mesage to node
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
-//cout << "ReadBytes: " << ReadBytes << endl;
+cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
 	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
@@ -629,6 +630,7 @@ int main(int argc, char const * argv[]){
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest
+ cout << "Here 0" << endl;
  QTLANagent.RetrieveIPSocketsHosts();
  cout << "Here 1" << endl;
  // Then negotiate some parameters
@@ -646,8 +648,6 @@ int main(int argc, char const * argv[]){
    try{
  	try {
     	// Code that might throw an exception 
-    	// Check the IPs the sockets are pointing to:
- 	/* Not used QTLANagent.UpdateSocketsInformation();*/
  	// Check if there are need messages or actions to be done by the node
  	QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
  	QTLANagent.SendParametersAgent(); // Send Parameters information stored
