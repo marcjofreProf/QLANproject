@@ -80,7 +80,7 @@ strcat(ParamsCharArray,";");
 QNLAagent.SendParametersAgent(ParamsCharArray);// Below Agent Method
 strcpy(this->PayloadSendBuffer,"");// Reset buffer
 // Mount the information to send the message
-
+cout << "ParamsCharArray: " << ParamsCharArray << endl;
 if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none;Link;none_none_;Phys;none_none_;")){
 	 // Generate the message
 	char ParamsCharArrayAux[NumBytesBufferICPMAX] = {0};
@@ -283,10 +283,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 
 int QTLAN::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
-    cout << "Here sub sub 1" << endl;
-    cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);
-    cout << "Here sub sub 2" << endl;
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
