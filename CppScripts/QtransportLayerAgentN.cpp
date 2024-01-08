@@ -648,7 +648,7 @@ int main(int argc, char const * argv[]){
  QTLANagent.RetrieveIPSocketsHosts();
  
  // Then negotiate some parameters
- QTLANagent.NegotiateInitialParamsNode(); 
+ //QTLANagent.NegotiateInitialParamsNode(); 
  
  // Then the sub agents threads can be started
  QTLANagent.QNLAagent.InitAgentProcess();
