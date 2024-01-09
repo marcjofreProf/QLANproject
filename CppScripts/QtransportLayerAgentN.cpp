@@ -472,13 +472,13 @@ else if(string(Type)==string("Control")){//Control message
 		  // reply immediately with a message to requester		  
 		  this->ICPdiscoverSend(ParamsCharArray); 
 		}
-		else if (string(Command)==string("InfoRequest") and string(Payload)==string("NodeAreYouThere?")){
+		else if (string(Payload)==string("NodeAreYouThere?")){
 		// Mount message and send it to attached node
 		 // Generate the message
 		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-		strcpy(ParamsCharArray,IPdest);
+		strcpy(ParamsCharArray,IPaddressesSockets[1]);
 		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,IPorg);
+		strcat(ParamsCharArray,IPaddressesSockets[2]);
 		strcat(ParamsCharArray,",");
 		strcat(ParamsCharArray,"Control");
 		strcat(ParamsCharArray,",");
@@ -487,8 +487,7 @@ else if(string(Type)==string("Control")){//Control message
 		strcat(ParamsCharArray,"YesIamHere");
 		strcat(ParamsCharArray,",");// Very important to end the message
 		//cout << "socket_fd_conn: " << socket_fd_conn << endl;
-		cout << "IPdest: " << IPdest << endl;
-		cout << "IPorg: " << IPorg << endl;
+		cout << "ParamsCharArray: " << ParamsCharArray << endl;
 		this->ICPdiscoverSend(ParamsCharArray); 
 		cout << "Node responding that I am here" << endl;
 		}
@@ -597,9 +596,9 @@ if (ReadBytes>0){// Read block
 	//cout << "Payload: " << Payload << endl;
 	if (string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
 		strcpy(this->IPaddressesSockets[1],strtok(Payload,":"));
-		strcpy(this->IPaddressesSockets[2],strtok(NULL,":"));
-		cout << "this->IPaddressesSockets[1]" << this->IPaddressesSockets[1] << endl;
-		cout << "this->IPaddressesSockets[2]" << this->IPaddressesSockets[2] << endl;
+		strcpy(this->IPaddressesSockets[3],strtok(NULL,":")); // Really not used
+		//cout << "this->IPaddressesSockets[1]: " << this->IPaddressesSockets[1] << endl;
+		//cout << "this->IPaddressesSockets[2]: " << this->IPaddressesSockets[2] << endl;
 		isValidWhileLoopCount=0;
 	}
 	else// Not the message that was expected. Probably a node to the other node message, so let it pass
@@ -673,7 +672,7 @@ if (ReadBytes>0){// Read block
 	strcpy(Command,strtok(NULL,","));
 	strcpy(Payload,strtok(NULL,","));
 	//cout << "Payload: " << Payload << endl;
-	if (string(Command)==string("YesIamHere") and string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
+	if (string(Payload)==string("YesIamHere") and string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
 		cout << "Other node responding that it is here" << endl;
 		isValidWhileLoopCount=0;
 	}

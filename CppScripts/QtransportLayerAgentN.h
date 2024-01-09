@@ -47,6 +47,10 @@ public: // Variables/Objects
 	int ParamArgc=0; // Number of passed parameters
 	int numberSessions=0;
 	char IPaddressesSockets[NumSocketsMax+2][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks
+	// IPaddressesSockets[0]: IP host attached ConNet
+	// IPaddressesSockets[1]: IP host other OpNet
+	// IPaddressesSockets[2]: IP node attached ConNet
+	// IPaddressesSockets[3]: Not used
 	char SCmode[NumSocketsMax][NumBytesBufferICPMAX] = {0}; // Variable to know if the node instance is working as server or client to the other node
 
 private: // Variables/Objects		

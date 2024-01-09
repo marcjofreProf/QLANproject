@@ -487,6 +487,7 @@ if (string(Type)==string("Operation")){// Operation message.
 }
 else if(string(Type)==string("Control")){//Control message. If it is not meant for this process, forward to the node
         strcpy(this->SendBuffer,this->ReadBuffer);
+        cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
 	if (string(IPorg)==string(this->IPSocketsList[0]) and string(IPdest)!=string(this->IPaddressesSockets[2])){ // If it comes from its attached node and destination at this host (if destination is another host, then means that has to go to else), it means it has to forward it to the other host (so it can forward it to its attached node)
 	// The node of a host is always identified in the Array in position 0	
 	    //cout << "SendBuffer: " << this->SendBuffer << endl;
