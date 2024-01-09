@@ -525,7 +525,7 @@ strcpy(Payload,strtok(NULL,","));
 //cout << "Type: " << Type << endl;
 //cout << "Command: " << Command << endl;
 //cout << "Payload: " << Payload << endl;
-
+cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
 // Identify what to do and execute it
 if (string(Type)==string("Operation")){// Operation message. Forward to the host (there should not be messages of this type in the QtransportLayerAgent. So not develop
 	// Do not do anything
@@ -790,7 +790,7 @@ usleep(999999);
 }
 }//while
 
-cout << "SendParametersAgent()" << endl;
+//cout << "SendParametersAgent()" << endl;
  this->SendParametersAgent();
 }
 else{//server
