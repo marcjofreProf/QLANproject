@@ -90,7 +90,10 @@ return 0; // All OK
 
 int QPLA::SetReadParametersAgent(char* ParamsCharArray){// The upper layer sets information to be read
 this->acquire();
-strcat(this->PayloadReadBuffer,ParamsCharArray);
+cout << "QPLA::ReadParametersAgent: " << ParamsCharArray << endl;
+char DiscardBuffer[NumBytesPayloadBuffer]={0};
+strcpy(DiscardBuffer,ParamsCharArray);
+strcat(this->PayloadReadBuffer,strtok(NULL,";"));
 this->release();
 return 0; // All OK
 }

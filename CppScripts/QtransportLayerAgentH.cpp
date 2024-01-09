@@ -586,6 +586,7 @@ strcat(this->SendBuffer,"NumStoredQubitsNode");
 strcat(this->SendBuffer,",");// Very important to end the message
 
 this->ICPmanagementSend(socket_fd_conn); // send mesage to node
+usleep(500);
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 //cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	

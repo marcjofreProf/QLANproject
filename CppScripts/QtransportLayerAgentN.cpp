@@ -110,7 +110,12 @@ strcpy(this->PayloadSendBuffer,"none_none_");
 return 0; //All OK
 }
 
-int QTLAN::ReadParametersAgent(){// Node checks parameters from the other node
+int QTLAN::ReadParametersAgent(char* ParamsCharArray){// Node checks parameters from the other node
+cout << "QTLAN::ReadParametersAgent: " << ParamsCharArray << endl;
+char DiscardBuffer[NumBytesPayloadBuffer]={0};
+strcpy(DiscardBuffer,ParamsCharArray);
+strcpy(this->PayloadReadBuffer,strtok(NULL,";"));
+QNLAagent.SetReadParametersAgent(ParamsCharArray); // Send respective information to the below layer agent
 
 strcpy(this->PayloadReadBuffer,"");// Reset buffer
 return 0; // All OK
@@ -472,6 +477,10 @@ else if(string(Type)==string("Control")){//Control message
 		cout << "Node does not have this information "<< Payload << endl;
 		}
 	}
+	else if (string(Command)==string("InfoProcess")){// Params messages
+		//cout << "New Message: "<< Payload << endl;
+		this->ReadParametersAgent(Payload);
+	}
 	else if (string(Command)==string("print")){
 		cout << "New Message: "<< Payload << endl;
 	}
@@ -546,9 +555,9 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"IPaddressesSockets");
 strcat(this->SendBuffer,",");// Very important to end the message
-usleep(900000);
+usleep(999999);
 this->ICPmanagementSend(socket_fd_conn); // send message to node
-usleep(900000);
+usleep(999999);
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 //cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
@@ -579,7 +588,7 @@ if (ReadBytes>0){// Read block
 else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 isValidWhileLoopCount--;
-usleep(900000);
+usleep(999999);
 }
 }//while
 

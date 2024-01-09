@@ -80,7 +80,11 @@ return 0; // All OK
 
 int QNLA::SetReadParametersAgent(char* ParamsCharArray){// The upper layer sets information to be read
 this->acquire();
-//strcpy(this->PayloadReadBuffer,);
+cout << "QNLA::ReadParametersAgent: " << ParamsCharArray << endl;
+char DiscardBuffer[NumBytesPayloadBuffer]={0};
+strcpy(DiscardBuffer,ParamsCharArray);
+strcat(this->PayloadReadBuffer,strtok(NULL,";"));
+QLLAagent.SetReadParametersAgent(ParamsCharArray); // Send respective information to the below layer agent
 this->release();
 return 0; // All OK
 }

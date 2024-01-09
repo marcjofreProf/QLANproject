@@ -119,7 +119,7 @@ private: // Functions/Methods
 	// Payload information parameters
 	int InitParametersAgent();// Client node have some parameters to adjust to the server node
 	int SetSendParametersAgent(char* ParamsCharArray);// Node accumulates parameters for the other node
-	int ReadParametersAgent();// Node checks parameters from the other node
+	int ReadParametersAgent(char* ParamsCharArray);// Node checks parameters from the other node
 	
 };
 
