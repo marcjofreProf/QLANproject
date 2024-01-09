@@ -88,7 +88,7 @@ strcat(ParamsCharArray,";");
 QNLAagent.SendParametersAgent(ParamsCharArray);// Below Agent Method
 strcpy(this->PayloadSendBuffer,"");// Reset buffer
 // Mount the information to send the message
-cout << "ParamsCharArray: " << ParamsCharArray << endl;
+//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none_;Link;none_none_;Phys;none_none_;")){
 	 // Generate the message	 
 	memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
@@ -124,7 +124,8 @@ cout << "QTLAN::ReadParametersAgent: " << ParamsCharArray << endl;
 char DiscardBuffer[NumBytesPayloadBuffer]={0};
 strcpy(DiscardBuffer,ParamsCharArray);
 strcpy(this->PayloadReadBuffer,strtok(NULL,";"));
-QNLAagent.SetReadParametersAgent(ParamsCharArray); // Send respective information to the below layer agent
+
+//QNLAagent.SetReadParametersAgent(ParamsCharArray); // Send respective information to the below layer agent
 
 strcpy(this->PayloadReadBuffer,"");// Reset buffer
 return 0; // All OK
