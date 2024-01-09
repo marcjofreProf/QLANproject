@@ -528,9 +528,9 @@ try{
 
 int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
 
-int SockListenTimeusec=100000; // Negative means infinite
+int SockListenTimeusec=500000; // Negative means infinite
 
-int isValidWhileLoopCount = 5; // Number of tries
+int isValidWhileLoopCount = 1; // Number of tries
 
 while(isValidWhileLoopCount>0){
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
@@ -546,9 +546,9 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"IPaddressesSockets");
 strcat(this->SendBuffer,",");// Very important to end the message
-
+usleep(500000);
 this->ICPmanagementSend(socket_fd_conn); // send message to node
-
+usleep(500000);
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
@@ -579,7 +579,7 @@ if (ReadBytes>0){// Read block
 else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 isValidWhileLoopCount--;
-usleep(100000);
+usleep(500000);
 }
 }//while
 
