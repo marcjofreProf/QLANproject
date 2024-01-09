@@ -48,6 +48,7 @@ public: // Variables/Instances
 	    };
 	ApplicationState m_state;
 	nsQlinkLayerAgent::QLLA QLLAagent;// Instance of the below agent
+	char SCmode[1][NumBytesPayloadBuffer] = {0}; // Variable to know if the node instance is working as server or client to the other node
 
 public: // Functions/Methods
 	QNLA(); //constructor
@@ -81,6 +82,7 @@ private://Functions/Methods
         int InitParametersAgent();// Client node have some parameters to adjust to the server node
         int SetSendParametersAgent(char* ParamsCharArray);// Node accumulates parameters for the other node
 	int ReadParametersAgent();// Node checks parameters from the other node
+	int NegotiateInitialParamsNode();
 };
 
 

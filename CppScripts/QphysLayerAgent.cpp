@@ -51,8 +51,6 @@ this->valueSemaphore=1; // Make sure it stays at 1
 //////////////////////////////////////////////
 int QPLA::InitParametersAgent(){// Client node have some parameters to adjust to the server node
 
-strcpy(this->PayloadSendBuffer,"EmitLinkNumberArray_48_ReceiveLinkNumberArray_60_QuBitsPerSecondVelocity[0]_1000_");
-
 return 0; //All OK
 }
 
@@ -164,7 +162,29 @@ QPLA::~QPLA() {
 this->threadRef.join();// Terminate the process thread
 }
 
+int QPLA::NegotiateInitialParamsNode(){
+try{
+ 
+if (string(this->SCmode[0])==string("client")){
+ char ParamsCharArray[NumBytesPayloadBuffer]="EmitLinkNumberArray_48_ReceiveLinkNumberArray_60_QuBitsPerSecondVelocity[0]_1000_";
+ this->SetSendParametersAgent(ParamsCharArray);// Set initialization values for the other node
+}
+else{//server
+// Expect to receive some information
+}
+
+} // try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+   }
+
+return 0;// All OK
+}
+
 void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
+
+ this->NegotiateInitialParamsNode();
+
  bool isValidWhileLoop = true;
  while(isValidWhileLoop){
  try{

@@ -107,7 +107,26 @@ QLLA::~QLLA() {
  this->QPLAagent.~QPLA(); // Destruct the instance of the below layer
 }
 
+int QLLA::NegotiateInitialParamsNode(){
+try{
+ 
+if (string(this->SCmode[0])==string("client")){
+
+}
+else{//server
+// Expect to receive some information
+}
+
+} // try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+   }
+
+return 0;// All OK
+}
+
 void QLLA::AgentProcessRequestsPetitions(){// Check next thing to do
+ this->NegotiateInitialParamsNode();
  bool isValidWhileLoop = true;
  while(isValidWhileLoop){
  try{

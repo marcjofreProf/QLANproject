@@ -70,6 +70,7 @@ private: // Variables/Objects
 	
 public: // Functions/Methods
 	int InitAgentProcess(); // Initializer of the thread
+	int InitiateBelowAgentsObjects();
 	QTLAN(int numberSessions); //constructor
 	// virtual ~Application(); // Default Okay - Use Virtual If Using Inheritance
 	// Managing status of this Agent

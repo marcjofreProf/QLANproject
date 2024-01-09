@@ -42,7 +42,7 @@ namespace nsQtransportLayerAgentN {
 QTLAN::QTLAN(int numberSessions) { // Constructor 
  this->numberSessions = numberSessions; // Number of sessions of different services
  strcpy(this->SCmode[0],"server"); // to know if this host instance is client or server
- 
+
 }
 ///////////////////////////////////////////////////
 void QTLAN::acquire() {
@@ -58,6 +58,14 @@ static void SignalPIPEHandler(int s) {
 cout << "Caught SIGPIPE" << endl;
 }
 ///////////////////////////////////////////////////////
+int QTLAN::InitiateBelowAgentsObjects(){// Some objects of the below layers that have to be initialized
+strcpy(this->QNLAagent.SCmode[0],this->SCmode[1]);
+strcpy(this->QNLAagent.QLLAagent.SCmode[0],this->SCmode[1]);
+strcpy(this->QNLAagent.QLLAagent.QPLAagent.SCmode[0],this->SCmode[1]);
+
+return 0; // All OK
+}
+
 int QTLAN::InitParametersAgent(){// Client node have some parameters to adjust to the server node
 
 strcpy(this->PayloadSendBuffer,"");
@@ -80,7 +88,7 @@ strcat(ParamsCharArray,";");
 QNLAagent.SendParametersAgent(ParamsCharArray);// Below Agent Method
 strcpy(this->PayloadSendBuffer,"");// Reset buffer
 // Mount the information to send the message
-//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+cout << "ParamsCharArray: " << ParamsCharArray << endl;
 if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none_;Link;none_none_;Phys;none_none_;")){
 	 // Generate the message	 
 	memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
@@ -674,9 +682,9 @@ if (ReadBytes>0){// Read block
 	strcpy(Type,strtok(NULL,","));
 	strcpy(Command,strtok(NULL,","));
 	strcpy(Payload,strtok(NULL,","));
-	cout << "Payload: " << Payload << endl;
+	//cout << "Payload: " << Payload << endl;
 	if (string(Payload)==string("YesIamHere") and string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
-		cout << "Other node responding that it is here" << endl;
+		//cout << "Other node responding that it is here" << endl;
 		isValidWhileLoopCount=0;
 	}
 	else// Not the message that was expected. Probably a node to the other node message, so let it pass
@@ -692,7 +700,7 @@ usleep(999999);
 }
 }//while
 
-
+cout << "SendParametersAgent()" << endl;
  this->SendParametersAgent();
 }
 else{//server
@@ -747,6 +755,10 @@ int main(int argc, char const * argv[]){
  cout << "QTLANagent.IPaddressesSockets[2]: " << QTLANagent.IPaddressesSockets[2] << endl;
  //strcpy(QTLANagent.IPaddressesSockets[1],argv[3]); // To know the other host IP in the operation network
  //cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[1] << endl;
+ // Then the sub agents threads can be started
+ QTLANagent.QNLAagent.InitAgentProcess();
+ QTLANagent.InitiateBelowAgentsObjects();
+ 
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest 
@@ -754,9 +766,6 @@ int main(int argc, char const * argv[]){
  
  // Then negotiate some parameters
  QTLANagent.NegotiateInitialParamsNode(); 
- 
- // Then the sub agents threads can be started
- QTLANagent.QNLAagent.InitAgentProcess();
  
  // Then await for next actions
  QTLANagent.m_pause(); // Initiate in paused state.
