@@ -91,7 +91,8 @@ this->acquire();
 cout << "QPLA::ReadParametersAgent: " << ParamsCharArray << endl;
 char DiscardBuffer[NumBytesPayloadBuffer]={0};
 strcpy(DiscardBuffer,strtok(ParamsCharArray,";"));
-strcat(this->PayloadReadBuffer,strtok(NULL,";"));
+strcpy(this->PayloadReadBuffer,strtok(NULL,";"));
+
 this->release();
 return 0; // All OK
 }

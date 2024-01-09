@@ -102,7 +102,7 @@ if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none_;Link;none_n
 	strcat(this->SendBuffer,",");
 	strcat(this->SendBuffer,ParamsCharArray);
 	strcat(this->SendBuffer,",");// Very important to end the message
-	cout << "this->SendBuffer: " << this->SendBuffer << endl;
+	//cout << "this->SendBuffer: " << this->SendBuffer << endl;
 	int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
 	this->ICPmanagementSend(socket_fd_conn); // send message to node
 }
@@ -120,11 +120,11 @@ return 0; //All OK
 }
 
 int QTLAN::ReadParametersAgent(char* ParamsCharArray){// Node checks parameters from the other node
-cout << "QTLAN::ReadParametersAgent: " << ParamsCharArray << endl;
+//cout << "QTLAN::ReadParametersAgent: " << ParamsCharArray << endl;
 char DiscardBuffer[NumBytesPayloadBuffer]={0};
 strcpy(DiscardBuffer,strtok(ParamsCharArray,";"));
 strcpy(this->PayloadReadBuffer,strtok(NULL,";"));
-cout << "this->PayloadReadBuffer" << this->PayloadReadBuffer << endl;
+//cout << "this->PayloadReadBuffer: " << this->PayloadReadBuffer << endl;
 char ParamsCharArrayAux[NumBytesPayloadBuffer]={0};
 strcpy(ParamsCharArrayAux,strtok(NULL,";"));
 strcat(ParamsCharArrayAux,";");
@@ -138,7 +138,7 @@ strcat(ParamsCharArrayAux,strtok(NULL,";"));
 strcat(ParamsCharArrayAux,";");
 strcat(ParamsCharArrayAux,strtok(NULL,";"));
 strcat(ParamsCharArrayAux,";");
-cout << "ParamsCharArrayAux: " << ParamsCharArrayAux << endl;
+//cout << "ParamsCharArrayAux: " << ParamsCharArrayAux << endl;
 QNLAagent.SetReadParametersAgent(ParamsCharArrayAux); // Send respective information to the below layer agent
 
 strcpy(this->PayloadReadBuffer,"");// Reset buffer
