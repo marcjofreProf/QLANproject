@@ -546,7 +546,7 @@ strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"IPaddressesSockets");
 strcat(this->SendBuffer,",");// Very important to end the message
 usleep(100000);
-this->ICPmanagementSend(socket_fd_conn); // send message to node
+//this->ICPmanagementSend(socket_fd_conn); // send message to node
 usleep(100000);
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 cout << "ReadBytes: " << ReadBytes << endl;

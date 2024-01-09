@@ -451,7 +451,7 @@ if (string(Type)==string("Operation")){// Operation message.
 		if (string(Command)==string("InfoRequest") and string(Payload)==string("IPaddressesSockets")){
 		// Mount message and send it to attached node
 		 // Generate the message
-		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+		/*char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 		strcpy(ParamsCharArray,IPdest);
 		strcat(ParamsCharArray,",");
 		strcat(ParamsCharArray,IPorg);
@@ -467,7 +467,7 @@ if (string(Type)==string("Operation")){// Operation message.
 		cout << "socket_fd_conn: " << socket_fd_conn << endl;
 		cout << "IPdest: " << IPdest << endl;
 		cout << "IPorg: " << IPorg << endl;
-		//this->ICPmanagementSend(socket_fd_conn);
+		this->ICPmanagementSend(socket_fd_conn);*/
 		}
 		else{
 		// Send something since node is waiting
