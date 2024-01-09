@@ -122,10 +122,10 @@ return 0; //All OK
 int QTLAN::ReadParametersAgent(char* ParamsCharArray){// Node checks parameters from the other node
 cout << "QTLAN::ReadParametersAgent: " << ParamsCharArray << endl;
 char DiscardBuffer[NumBytesPayloadBuffer]={0};
-strcpy(DiscardBuffer,ParamsCharArray);
+strcpy(DiscardBuffer,strtok(ParamsCharArray,";"));
 strcpy(this->PayloadReadBuffer,strtok(NULL,";"));
 
-//QNLAagent.SetReadParametersAgent(ParamsCharArray); // Send respective information to the below layer agent
+QNLAagent.SetReadParametersAgent(ParamsCharArray); // Send respective information to the below layer agent
 
 strcpy(this->PayloadReadBuffer,"");// Reset buffer
 return 0; // All OK
