@@ -283,7 +283,7 @@ return -1;
 else {// There might be at least one new message
 	if (FD_ISSET(socket_fd_conn, &fds)){// is a macro that checks whether a specified file descriptor is set in a specified file descriptor set.
 		// Read the message from the socket
-		int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
+		int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);//MSG_DONTWAIT);
 		//cout << "valread: " << valread << endl;
 		//cout << "Node message received: " << this->ReadBuffer << endl;
 		if (valread <= 0){
@@ -314,7 +314,7 @@ else {// There might be at least one new message
 int QTLAH::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
-    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux), MSG_DONTWAIT);
+    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),0);//MSG_DONTWAIT);
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
@@ -448,7 +448,7 @@ if (string(Type)==string("Operation")){// Operation message.
 		if (string(Command)==string("InfoRequest") and string(Payload)==string("IPaddressesSockets")){
 		// Mount message and send it to attached node
 		 // Generate the message
-		/*char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 		strcpy(ParamsCharArray,IPdest);
 		strcat(ParamsCharArray,",");
 		strcat(ParamsCharArray,IPorg);
@@ -464,7 +464,7 @@ if (string(Type)==string("Operation")){// Operation message.
 		cout << "socket_fd_conn: " << socket_fd_conn << endl;
 		cout << "IPdest: " << IPdest << endl;
 		cout << "IPorg: " << IPorg << endl;
-		this->ICPmanagementSend(socket_fd_conn);*/
+		this->ICPmanagementSend(socket_fd_conn);
 		}
 		else{
 		// Send something since node is waiting
