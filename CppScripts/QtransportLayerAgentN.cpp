@@ -641,12 +641,12 @@ int main(int argc, char const * argv[]){
  cout << "QTLANagent.SCmode[1]: " << QTLANagent.SCmode[1] << endl;
  strcpy(QTLANagent.IPaddressesSockets[2],argv[2]); // To know its own IP in the control network
  cout << "QTLANagent.IPaddressesSockets[2]: " << QTLANagent.IPaddressesSockets[2] << endl;
- //strcpy(QTLANagent.IPaddressesSockets[1],argv[3]); // To know the other host IP in the operation network
- //cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[0] << endl;
+ strcpy(QTLANagent.IPaddressesSockets[1],argv[3]); // To know the other host IP in the operation network
+ cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[1] << endl;
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest 
- QTLANagent.RetrieveIPSocketsHosts();
+ //QTLANagent.RetrieveIPSocketsHosts();
  
  // Then negotiate some parameters
  //QTLANagent.NegotiateInitialParamsNode(); 
@@ -665,7 +665,7 @@ int main(int argc, char const * argv[]){
     	// Code that might throw an exception 
  	// Check if there are need messages or actions to be done by the node
  	QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
- 	//QTLANagent.SendParametersAgent(); // Send Parameters information stored
+ 	QTLANagent.SendParametersAgent(); // Send Parameters information stored
        switch(QTLANagent.getState()) {
            case QTLAN::APPLICATION_RUNNING: {               
                // Do Some Work

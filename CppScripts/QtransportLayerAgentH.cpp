@@ -13,6 +13,7 @@ Agent script for Quantum transport Layer Host
 // InterCommunication Protocols - Sockets - Common to Server and Client
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
 #include <sys/socket.h>
 #include <fcntl.h>
 #define PORT 8010
@@ -94,6 +95,10 @@ bool CheckRelease = valueSemaphore.fetch_add(1, std::memory_order_acquire);
       this->valueSemaphore=1; // Make sure it stays at 1
     }*/
    this->valueSemaphore=1; // Make sure it stays at 1
+}
+
+void SignalPIPEHandler(int s) {
+cout << "Caught SIGPIPE" << endl;
 }
 ////////////////////////////////////////////////////////
 int QTLAH::InitAgentProcess(){
