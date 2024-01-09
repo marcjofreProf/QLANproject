@@ -125,6 +125,9 @@ private: // Functions/Methods
 	int InitParametersAgent();// Client node have some parameters to adjust to the server node
 	int SetSendParametersAgent(char* ParamsCharArray);// Node accumulates parameters for the other node
 	int ReadParametersAgent(char* ParamsCharArray);// Node checks parameters from the other node
+	int ProcessNewParameters();// Process the parameters received
+	int countDoubleColons(char* ParamsCharArray);
+	int countDoubleUnderscores(char* ParamsCharArray);
 	
 };
 

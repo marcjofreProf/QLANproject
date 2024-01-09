@@ -15,10 +15,12 @@ Agent script for Quantum Link Layer
 
 #include "QphysLayerAgent.h"
 // Threading
+#include <thread>
 #define WaitTimeAfterMainWhileLoop 1
 // Payload messages
 #define NumBytesPayloadBuffer 1000
-#include <thread>
+#define NumParamMessagesMax 20
+
 // Semaphore
 #include <atomic>
 
@@ -74,13 +76,16 @@ return 0; //All OK
 }
 
 int QLLA::ReadParametersAgent(){// Node checks parameters from the other node
-
+if (string(this->PayloadReadBuffer)!=string("") and string(this->PayloadReadBuffer)==string("none_none_")){
+	this->ProcessNewParameters();
+}
+strcpy(this->PayloadReadBuffer,""); // Reset the buffer
 return 0; // All OK
 }
 
 int QLLA::SetReadParametersAgent(char* ParamsCharArray){// The upper layer sets information to be read
 this->acquire();
-cout << "QLLA::ReadParametersAgent: " << ParamsCharArray << endl;
+//cout << "QLLA::ReadParametersAgent: " << ParamsCharArray << endl;
 char DiscardBuffer[NumBytesPayloadBuffer]={0};
 strcpy(DiscardBuffer,strtok(ParamsCharArray,";"));
 strcpy(this->PayloadReadBuffer,strtok(NULL,";"));
@@ -93,6 +98,58 @@ strcat(ParamsCharArrayAux,";");
 
 QPLAagent.SetReadParametersAgent(ParamsCharArrayAux); // Send respective information to the below layer agent
 this->release();
+return 0; // All OK
+}
+////////////////////////////////////////////////////
+int QLLA::countDoubleColons(char* ParamsCharArray) {
+  int colonCount = 0;
+
+  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+    if (ParamsCharArray[i] == ':') {
+      colonCount++;
+    }
+  }
+
+  return colonCount;
+}
+
+int QLLA::countDoubleUnderscores(char* ParamsCharArray) {
+  int underscoreCount = 0;
+
+  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+    if (ParamsCharArray[i] == '_') {
+      underscoreCount++;
+    }
+  }
+
+  return underscoreCount;
+}
+
+int QLLA::ProcessNewParameters(){
+char ParamsCharArray[NumBytesPayloadBuffer]={0};
+char HeaderCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
+char ValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
+char TokenValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
+
+int NumDoubleUnderscores = this->countDoubleUnderscores(ParamsCharArray);
+
+strcpy(ParamsCharArray,this->PayloadReadBuffer);
+
+for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
+	if (iHeaders==0){
+		strcpy(HeaderCharArray[iHeaders],strtok(ParamsCharArray,"_"));		
+	}
+	else{
+		strcpy(HeaderCharArray[iHeaders],strtok(NULL,"_"));
+	}
+	strcpy(ValuesCharArray[iHeaders],strtok(NULL,"_"));
+}
+
+for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
+// Missing to develop if there are different values
+
+}
+
 return 0; // All OK
 }
 ////////////////////////////////////////////////////////

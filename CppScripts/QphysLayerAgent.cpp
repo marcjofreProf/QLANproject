@@ -20,6 +20,7 @@ Agent script for Quantum Physical Layer
 #define WaitTimeAfterMainWhileLoop 1
 // Payload messages
 #define NumBytesPayloadBuffer 1000
+#define NumParamMessagesMax 20
 #include <thread>
 // Semaphore
 #include <atomic>
@@ -81,19 +82,77 @@ return 0; //All OK
 }
 
 int QPLA::ReadParametersAgent(){// Node checks parameters from the other node
-
+if (string(this->PayloadReadBuffer)!=string("") and string(this->PayloadReadBuffer)==string("none_none_")){
+	this->ProcessNewParameters();
+}
 strcpy(this->PayloadReadBuffer,""); // Reset the buffer
 return 0; // All OK
 }
 
 int QPLA::SetReadParametersAgent(char* ParamsCharArray){// The upper layer sets information to be read
 this->acquire();
-cout << "QPLA::ReadParametersAgent: " << ParamsCharArray << endl;
+//cout << "QPLA::ReadParametersAgent: " << ParamsCharArray << endl;
 char DiscardBuffer[NumBytesPayloadBuffer]={0};
 strcpy(DiscardBuffer,strtok(ParamsCharArray,";"));
 strcpy(this->PayloadReadBuffer,strtok(NULL,";"));
 
 this->release();
+return 0; // All OK
+}
+////////////////////////////////////////////////////
+int QPLA::countDoubleColons(char* ParamsCharArray) {
+  int colonCount = 0;
+
+  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+    if (ParamsCharArray[i] == ':') {
+      colonCount++;
+    }
+  }
+
+  return colonCount;
+}
+
+int QPLA::countDoubleUnderscores(char* ParamsCharArray) {
+  int underscoreCount = 0;
+
+  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+    if (ParamsCharArray[i] == '_') {
+      underscoreCount++;
+    }
+  }
+
+  return underscoreCount;
+}
+
+int QPLA::ProcessNewParameters(){
+char ParamsCharArray[NumBytesPayloadBuffer]={0};
+char HeaderCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
+char ValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
+char TokenValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
+
+int NumDoubleUnderscores = this->countDoubleUnderscores(ParamsCharArray);
+
+strcpy(ParamsCharArray,this->PayloadReadBuffer);
+
+for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
+	if (iHeaders==0){
+		strcpy(HeaderCharArray[iHeaders],strtok(ParamsCharArray,"_"));		
+	}
+	else{
+		strcpy(HeaderCharArray[iHeaders],strtok(NULL,"_"));
+	}
+	strcpy(ValuesCharArray[iHeaders],strtok(NULL,"_"));
+}
+
+for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
+// Missing to develop if there are different values
+if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){this->EmitLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
+else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){this->ReceiveLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
+else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=atoi(ValuesCharArray[iHeaders]);}
+else{// discard
+}
+}
+
 return 0; // All OK
 }
 ////////////////////////////////////////////////////
@@ -167,7 +226,7 @@ int QPLA::NegotiateInitialParamsNode(){
 try{
  
 if (string(this->SCmode[0])==string("client")){
- char ParamsCharArray[NumBytesPayloadBuffer]="EmitLinkNumberArray_48_ReceiveLinkNumberArray_60_QuBitsPerSecondVelocity[0]_1000_";
+ char ParamsCharArray[NumBytesPayloadBuffer]="EmitLinkNumberArray[0]_48_ReceiveLinkNumberArray[0]_60_QuBitsPerSecondVelocity[0]_1000_";
  this->SetSendParametersAgent(ParamsCharArray);// Set initialization values for the other node
 }
 else{//server

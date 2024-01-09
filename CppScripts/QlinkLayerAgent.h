@@ -82,6 +82,9 @@ private: // Functions//Methods
         int SetSendParametersAgent(char* ParamsCharArray);// Node accumulates parameters for the other node
 	int ReadParametersAgent();// Node checks parameters from the other node
 	int NegotiateInitialParamsNode();
+	int ProcessNewParameters();// Process the parameters 
+	int countDoubleColons(char* ParamsCharArray);
+	int countDoubleUnderscores(char* ParamsCharArray);
 };
 
 
