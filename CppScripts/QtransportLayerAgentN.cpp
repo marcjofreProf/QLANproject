@@ -546,9 +546,9 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"IPaddressesSockets");
 strcat(this->SendBuffer,",");// Very important to end the message
-usleep(500000);
+usleep(900000);
 this->ICPmanagementSend(socket_fd_conn); // send message to node
-usleep(500000);
+usleep(900000);
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
@@ -579,7 +579,7 @@ if (ReadBytes>0){// Read block
 else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 isValidWhileLoopCount--;
-usleep(500000);
+usleep(900000);
 }
 }//while
 
