@@ -464,7 +464,10 @@ if (string(Type)==string("Operation")){// Operation message.
 		strcat(ParamsCharArray,",");// Very important to end the message
 		strcpy(this->SendBuffer,ParamsCharArray);
 		int socket_fd_conn=this->socket_fdArray[0];// Socket descriptor to the attached node
-		this->ICPmanagementSend(socket_fd_conn);
+		cout << "socket_fd_conn: " << socket_fd_conn << endl;
+		cout << "IPdest: " << IPdest << endl;
+		cout << "IPorg: " << IPorg << endl;
+		//this->ICPmanagementSend(socket_fd_conn);
 		}
 		else{
 		// Send something since node is waiting
