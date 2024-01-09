@@ -314,7 +314,7 @@ else {// There might be at least one new message
 int QTLAH::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
-    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);
+    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),0);//MSG_DONTWAIT);
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
@@ -529,7 +529,9 @@ int QTLAH::ICPdiscoverSend(char* ParamsCharArray){
     int socket_fd_conn;
     for (int i=0; i<NumSocketsMax; ++i){
     	if (string(this->IPSocketsList[i])==string(IPaddressesSocketsAux)){
-    	//cout << "Found socket file descriptor//connection to send" << endl;
+    	cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
+    	cout << "this->IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
+    	cout << "Found socket file descriptor//connection to send" << endl;
     	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
     		socket_fd_conn=this->socket_fdArray[i];
     	}
