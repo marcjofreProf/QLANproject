@@ -124,8 +124,22 @@ cout << "QTLAN::ReadParametersAgent: " << ParamsCharArray << endl;
 char DiscardBuffer[NumBytesPayloadBuffer]={0};
 strcpy(DiscardBuffer,strtok(ParamsCharArray,";"));
 strcpy(this->PayloadReadBuffer,strtok(NULL,";"));
-
-QNLAagent.SetReadParametersAgent(ParamsCharArray); // Send respective information to the below layer agent
+cout << "this->PayloadReadBuffer" << this->PayloadReadBuffer << endl;
+char ParamsCharArrayAux[NumBytesPayloadBuffer]={0};
+strcpy(ParamsCharArrayAux,strtok(NULL,";"));
+strcat(ParamsCharArrayAux,";");
+strcat(ParamsCharArrayAux,strtok(NULL,";"));
+strcat(ParamsCharArrayAux,";");
+strcat(ParamsCharArrayAux,strtok(NULL,";"));
+strcat(ParamsCharArrayAux,";");
+strcat(ParamsCharArrayAux,strtok(NULL,";"));
+strcat(ParamsCharArrayAux,";");
+strcat(ParamsCharArrayAux,strtok(NULL,";"));
+strcat(ParamsCharArrayAux,";");
+strcat(ParamsCharArrayAux,strtok(NULL,";"));
+strcat(ParamsCharArrayAux,";");
+cout << "ParamsCharArrayAux: " << ParamsCharArrayAux << endl;
+QNLAagent.SetReadParametersAgent(ParamsCharArrayAux); // Send respective information to the below layer agent
 
 strcpy(this->PayloadReadBuffer,"");// Reset buffer
 return 0; // All OK
@@ -622,7 +636,13 @@ if (ReadBytes>0){// Read block
 else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 isValidWhileLoopCount--;
+if (isValidWhileLoopCount==0){
+cout << "Exiting QtransportLayerAgentN since no initial IP addresses retrieved" << endl;
+this->m_exit(); // Exit the application
+}
+else{
 usleep(999999);
+}
 }
 }//while
 
@@ -697,7 +717,13 @@ if (ReadBytes>0){// Read block
 else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 isValidWhileLoopCount--;
+if (isValidWhileLoopCount==0){
+cout << "Exiting QtransportLayerAgentN since no initial parameters negotiation achieved" << endl;
+this->m_exit(); // Exit the application
+}
+else{
 usleep(999999);
+}
 }
 }//while
 
@@ -748,6 +774,8 @@ int main(int argc, char const * argv[]){
  
  signal(SIGPIPE, SignalPIPEHandler);
  QTLAN QTLANagent(0); // Initiate the instance with 0 sessions connected. A session is composed of one server sockets descriptor active.
+ QTLANagent.m_pause(); // Initiate in paused state.
+ //cout << "Starting in pause state the QtransportLayerAgentN" << endl;
  // Save some given parameters to the instance of the object
  QTLANagent.ParamArgc=argc;
  strcpy(QTLANagent.SCmode[1],argv[1]); // to know if this host instance is client or server
@@ -769,8 +797,7 @@ int main(int argc, char const * argv[]){
  QTLANagent.NegotiateInitialParamsNode(); 
  
  // Then await for next actions
- QTLANagent.m_pause(); // Initiate in paused state.
- cout << "Starting in pause state the QtransportLayerAgentN" << endl;
+ 
  bool isValidWhileLoop = true;
  
  while(isValidWhileLoop){ 
