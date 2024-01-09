@@ -528,7 +528,7 @@ try{
 
 int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
 
-int SockListenTimeusec=100; // Negative means infinite
+int SockListenTimeusec=100000; // Negative means infinite
 
 int isValidWhileLoopCount = 5; // Number of tries
 
@@ -567,7 +567,7 @@ if (ReadBytes>0){// Read block
 	strcpy(Payload,strtok(NULL,","));
 	cout << "Payload: " << Payload << endl;
 	if (string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
-		//strcpy(this->IPaddressesSockets[1],Payload);
+		strcpy(this->IPaddressesSockets[1],Payload);
 		isValidWhileLoopCount=0;
 	}
 	else// Not the message that was expected. Probably a node to the other node message, so let it pass
