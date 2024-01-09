@@ -544,9 +544,9 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"IPaddressesSockets");
 strcat(this->SendBuffer,",");// Very important to end the message
-
+usleep(100000);
 this->ICPmanagementSend(socket_fd_conn); // send message to node
-
+usleep(100000);
 while(isValidWhileLoopCount>0){
 
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
@@ -580,7 +580,7 @@ else{
 */
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 isValidWhileLoopCount--;
-usleep(10000);
+usleep(100000);
 //}
 }//while
 
