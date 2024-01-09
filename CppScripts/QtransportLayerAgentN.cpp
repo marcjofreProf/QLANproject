@@ -674,9 +674,9 @@ if (ReadBytes>0){// Read block
 	strcpy(Type,strtok(NULL,","));
 	strcpy(Command,strtok(NULL,","));
 	strcpy(Payload,strtok(NULL,","));
-	//cout << "Payload: " << Payload << endl;
+	cout << "Payload: " << Payload << endl;
 	if (string(Payload)==string("YesIamHere") and string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
-		//cout << "Other node responding that it is here" << endl;
+		cout << "Other node responding that it is here" << endl;
 		isValidWhileLoopCount=0;
 	}
 	else// Not the message that was expected. Probably a node to the other node message, so let it pass
