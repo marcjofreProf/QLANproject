@@ -485,10 +485,10 @@ else if(string(Type)==string("Control")){//Control message
 		strcat(this->SendBuffer,",");
 		strcat(this->SendBuffer,"InfoRequest");
 		strcat(this->SendBuffer,",");
-		strcat(this->SendBuffer,"YesIamHere?");
+		strcat(this->SendBuffer,"YesIamHere");
 		strcat(this->SendBuffer,",");// Very important to end the message
-		cout << "this->SendBuffer: " << this->SendBuffer << endl;
-		cout << "Node responding that I am here" << endl;		
+		//cout << "this->SendBuffer: " << this->SendBuffer << endl;
+		//cout << "Node responding that I am here" << endl;		
 		
 		int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
 		this->ICPmanagementSend(socket_fd_conn); // send message to node
@@ -673,9 +673,9 @@ if (ReadBytes>0){// Read block
 	strcpy(Type,strtok(NULL,","));
 	strcpy(Command,strtok(NULL,","));
 	strcpy(Payload,strtok(NULL,","));
-	cout << "Payload: " << Payload << endl;
+	//cout << "Payload: " << Payload << endl;
 	if (string(Payload)==string("YesIamHere") and string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
-		cout << "Other node responding that it is here" << endl;
+		//cout << "Other node responding that it is here" << endl;
 		isValidWhileLoopCount=0;
 	}
 	else// Not the message that was expected. Probably a node to the other node message, so let it pass
@@ -692,8 +692,6 @@ usleep(999999);
 }//while
 
 
-
- 
  this->SendParametersAgent();
 }
 else{//server
