@@ -93,7 +93,7 @@ public: // Functions/Methods
 	~QTLAN();  //destructor
 
 private: // Functions/Methods
-	void SignalPIPEHandler(int s);
+	void SignalPIPEHandler(int s); // Handler for socket SIGPIPE signal error
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 	void AgentProcessRequestsPetitions(); // Process thread that manages requests and petitions

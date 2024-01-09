@@ -548,7 +548,7 @@ strcat(this->SendBuffer,"IPaddressesSockets");
 strcat(this->SendBuffer,",");// Very important to end the message
 
 this->ICPmanagementSend(socket_fd_conn); // send message to node
-
+/*
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 //cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
@@ -567,26 +567,27 @@ if (ReadBytes>0){// Read block
 	strcpy(Payload,strtok(NULL,","));
 	cout << "Payload: " << Payload << endl;
 	if (string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
-		strcpy(this->IPaddressesSockets[1],Payload);
+		//strcpy(this->IPaddressesSockets[1],Payload);
 		isValidWhileLoopCount=0;
 	}
 	else// Not the message that was expected. Probably a node to the other node message, so let it pass
 	{
 		// Not messages expected as this point
 	}
+
 }
 else{
+*/
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 isValidWhileLoopCount--;
 usleep(10000);
-}
+//}
 }//while
 
 } // try
   catch (...) { // Catches any exception
   cout << "Exception caught" << endl;
     }
-
 
 return 0; // All OK
 }
