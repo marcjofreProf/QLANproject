@@ -97,9 +97,10 @@ bool CheckRelease = valueSemaphore.fetch_add(1, std::memory_order_acquire);
    this->valueSemaphore=1; // Make sure it stays at 1
 }
 
-void SignalPIPEHandler(int s) {
+static void SignalPIPEHandler(int s) {
 cout << "Caught SIGPIPE" << endl;
 }
+
 ////////////////////////////////////////////////////////
 int QTLAH::InitAgentProcess(){
 	// Then, regularly check for next job/action without blocking		  	
@@ -351,6 +352,7 @@ int QTLAH::ICPmanagementCloseServer(int socket_fd,int new_socket) {
 }
 
 void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
+ signal(SIGPIPE, SignalPIPEHandler);
  // One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
  this->InitiateICPconnections(); // Very important that they work. Otherwise the rest go wrong
  // Then negotiate some parameters

@@ -54,7 +54,7 @@ void QTLAN::release() {
 this->valueSemaphore=1; // Make sure it stays at 1
 }
 
-void SignalPIPEHandler(int s) {
+static void SignalPIPEHandler(int s) {
 cout << "Caught SIGPIPE" << endl;
 }
 ///////////////////////////////////////////////////////
@@ -364,7 +364,6 @@ if(this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec)>0){this->m_start()
 // Update the socketReadIter
 this->socketReadIter++; // Variable to read each time a different socket
 this->socketReadIter=this->socketReadIter % NumSocketsMax;
-this->socketReadIter=0; // Not checking other connection yet
 return 0; // All OK	  
 }
 
