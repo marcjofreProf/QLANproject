@@ -551,7 +551,7 @@ this->ICPmanagementSend(socket_fd_conn); // send message to node
 usleep(100000);
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 cout << "ReadBytes: " << ReadBytes << endl;
-/*if (ReadBytes>0){// Read block	
+if (ReadBytes>0){// Read block	
 	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
@@ -577,11 +577,10 @@ cout << "ReadBytes: " << ReadBytes << endl;
 
 }
 else{
-*/
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 isValidWhileLoopCount--;
 usleep(100000);
-//}
+}
 }//while
 
 } // try
