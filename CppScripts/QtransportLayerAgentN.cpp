@@ -249,13 +249,13 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   int ret = select(nfds, &fds, NULL, NULL, &timeout);
 
   if (ret < 0) {
-    cout << "Node select no new messages" << endl;
+    //cout << "Node select no new messages" << endl;this->m_exit();
     return -1;}
    else if (ret==0){
    //cout << "No new messages" << endl;
    return -1;}
   else {// There is at least one new message
-    if (FD_ISSET(socket_fd_conn, &fds)) {
+    if (FD_ISSET(socket_fd_conn, &fds)) {// s a macro that checks whether a specified file descriptor is set in a specified file descriptor set.
       // Read the message from the socket
       int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
       //cout << "Node message received: " << this->ReadBuffer << endl;
@@ -269,6 +269,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 		cout << "Host agent message of 0 Bytes" << endl;
 	}
 	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+	this->m_exit();
 	return -1;
       }
       // Process the message
@@ -277,7 +278,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
       	return valread; //
       }
     }
-    else{return -1;}
+    else{this->m_exit();return -1;}
   }    
 }
 
@@ -529,7 +530,7 @@ int socket_fd_conn=this->new_socketArray[0];   // The first point probably to th
 
 int SockListenTimeusec=100; // Negative means infinite
 
-int isValidWhileLoopCount = 1; // Number of tries
+int isValidWhileLoopCount = 5; // Number of tries
 
 while(isValidWhileLoopCount>0){
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
@@ -545,9 +546,9 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"IPaddressesSockets");
 strcat(this->SendBuffer,",");// Very important to end the message
-usleep(100000);
-//this->ICPmanagementSend(socket_fd_conn); // send message to node
-usleep(100000);
+
+this->ICPmanagementSend(socket_fd_conn); // send message to node
+
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	

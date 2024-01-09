@@ -13,7 +13,6 @@ Agent script for Quantum transport Layer Host
 // InterCommunication Protocols - Sockets - Common to Server and Client
 #include <stdio.h>
 #include <string.h>
-#include <signal.h>
 #include <sys/socket.h>
 #include <fcntl.h>
 #define PORT 8010
@@ -96,11 +95,7 @@ bool CheckRelease = valueSemaphore.fetch_add(1, std::memory_order_acquire);
     }*/
    this->valueSemaphore=1; // Make sure it stays at 1
 }
-/*
-static void SignalPIPEHandler(int s) {
-cout << "Caught SIGPIPE" << endl;
-}
-*/
+
 ////////////////////////////////////////////////////////
 int QTLAH::InitAgentProcess(){
 	// Then, regularly check for next job/action without blocking		  	
@@ -279,12 +274,14 @@ int QTLAH::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   int nfds = socket_fd_conn + 1; //The nfds argument specifies the range of file descriptors to be tested. The select() function tests file descriptors in the range of 0 to nfds-1.
   int ret = select(nfds, &fds, NULL, NULL, &timeout);
 
-if (ret < 0){cout << "Host select no new messages" << endl;return -1;}
+if (ret < 0){
+//cout << "Host select no new messages" << endl;this->m_exit();
+return -1;}
 else if (ret==0){//cout << "No new messages" << endl;
 return -1;
 }
 else {// There might be at least one new message
-	if (FD_ISSET(socket_fd_conn, &fds)){
+	if (FD_ISSET(socket_fd_conn, &fds)){// is a macro that checks whether a specified file descriptor is set in a specified file descriptor set.
 		// Read the message from the socket
 		int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);
 		//cout << "valread: " << valread << endl;
@@ -299,6 +296,7 @@ else {// There might be at least one new message
 				cout << "Host agent message of 0 Bytes" << endl;
 			}
 			// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+			this->m_exit();
 			return -1;
 		}
 		// Process the message
@@ -308,7 +306,7 @@ else {// There might be at least one new message
 			return valread;
 		}
 	}
-	else{cout << "Host FD_ISSET no new messages" << endl;return -1;}
+	else{cout << "Host FD_ISSET no new messages" << endl;this->m_exit();return -1;}
 }
 
 }
@@ -352,7 +350,6 @@ int QTLAH::ICPmanagementCloseServer(int socket_fd,int new_socket) {
 }
 
 void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
- //signal(SIGPIPE, SignalPIPEHandler);
  // One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
  this->InitiateICPconnections(); // Very important that they work. Otherwise the rest go wrong
  // Then negotiate some parameters
@@ -446,7 +443,7 @@ strcpy(Payload,strtok(NULL,","));
 
 // Identify what to do and execute it
 if (string(Type)==string("Operation")){// Operation message. 
-	//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
+	cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
 	if(string(IPorg)==string(this->IPSocketsList[0]) and string(IPdest)==string(this->IPaddressesSockets[3])){// Information requested by the attached node
 		if (string(Command)==string("InfoRequest") and string(Payload)==string("IPaddressesSockets")){
 		// Mount message and send it to attached node

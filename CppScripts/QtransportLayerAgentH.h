@@ -76,7 +76,6 @@ public: // Functions
 	~QTLAH();  //destructor
 
 private: //Functions//Methods
-	//static void SignalPIPEHandler(int s); // Handler for socket SIGPIPE signal error
 	// Sempahore
 	void acquire();
 	void release();
