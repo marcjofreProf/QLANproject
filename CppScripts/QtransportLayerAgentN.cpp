@@ -531,6 +531,8 @@ int socket_fd_conn=this->new_socketArray[0];   // The first point probably to th
 int SockListenTimeusec=100; // Negative means infinite
 
 int isValidWhileLoopCount = 1000; // Number of tries
+
+while(isValidWhileLoopCount>0){
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
 strcpy(this->SendBuffer,this->IPaddressesSockets[0]); //IP attached host
 //cout << "this->IPaddressesSockets[0]: " << this->IPaddressesSockets[0] << endl;
@@ -547,8 +549,6 @@ strcat(this->SendBuffer,",");// Very important to end the message
 usleep(100000);
 this->ICPmanagementSend(socket_fd_conn); // send message to node
 usleep(100000);
-while(isValidWhileLoopCount>0){
-
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 cout << "ReadBytes: " << ReadBytes << endl;
 /*if (ReadBytes>0){// Read block	
