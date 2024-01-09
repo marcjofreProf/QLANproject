@@ -83,19 +83,20 @@ strcpy(this->PayloadSendBuffer,"");// Reset buffer
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
 if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none_;Link;none_none_;Phys;none_none_;")){
 	 // Generate the message	 
-	char ParamsCharArrayAux[NumBytesBufferICPMAX] = {0};
-	strcpy(ParamsCharArrayAux,this->IPaddressesSockets[1]);
-	strcat(ParamsCharArrayAux,",");
-	strcat(ParamsCharArrayAux,this->IPaddressesSockets[2]);
-	strcat(ParamsCharArrayAux,",");
-	strcat(ParamsCharArrayAux,"Control");
-	strcat(ParamsCharArrayAux,",");
-	strcat(ParamsCharArrayAux,"InfoProcess");
-	strcat(ParamsCharArrayAux,",");
-	strcat(ParamsCharArrayAux,ParamsCharArray);
-	strcat(ParamsCharArrayAux,",");// Very important to end the message
-	//cout << "ParamsCharArrayAux: " << ParamsCharArrayAux << endl;
-	this->ICPdiscoverSend(ParamsCharArrayAux);
+	memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
+	strcpy(this->SendBuffer,this->IPaddressesSockets[1]);
+	strcat(this->SendBuffer,",");
+	strcat(this->SendBuffer,this->IPaddressesSockets[2]);
+	strcat(this->SendBuffer,",");
+	strcat(this->SendBuffer,"Control");
+	strcat(this->SendBuffer,",");
+	strcat(this->SendBuffer,"InfoProcess");
+	strcat(this->SendBuffer,",");
+	strcat(this->SendBuffer,ParamsCharArray);
+	strcat(this->SendBuffer,",");// Very important to end the message
+	cout << "this->SendBuffer: " << this->SendBuffer << endl;
+	int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
+	this->ICPmanagementSend(socket_fd_conn); // send message to node
 }
 //this->release();Does not need it since it is within the while loop
 
