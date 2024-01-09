@@ -583,6 +583,12 @@ else if(string(Type)==string("Control")){//Control message
 		//cout << "New Message: "<< Payload << endl;
 		this->ReadParametersAgent(Payload);
 	}
+	else if (string(Command)==string("SendQubits")){// Send qubits to the requesting host
+		this->QNLAagent.QLLAagent.QPLAagent.emitQuBit();
+	}
+	else if (string(Command)==string("ReceiveQubits")){// Read qubits to the attached node
+		 this->QNLAagent.QLLAagent.QPLAagent.receiveQuBit();
+	}
 	else if (string(Command)==string("print")){
 		cout << "New Message: "<< Payload << endl;
 	}

@@ -31,10 +31,17 @@ class QPLA:
 	def SendMessageAgent(self,ParamsDescendingCharArray): # Send message to the below Agent
 		self.QSLAagent.SendMessageAgent(ParamsDescendingCharArray)
 	
-	def RequestQubitsHost(self,IPhostDestOpNet,IPhostOrgOpNet,NumRequestedQubits): # Request that host's node sends qubits to this host's node
+	def RequestQubitsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRequestedQubits): # Request that host's node sends qubits to this host's node
 		messagePayloadAux=str(NumRequestedQubits)
-		messageCommandAux="ServeQubits"
-		messageTypeAux="Operation"
+		messageCommandAux="SendQubits"
+		messageTypeAux="Control"
+		messageIPorg=IPhostOrgOpNet
+		messageIPdest=IPhostDestOpNet
+		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
+		self.QSLAagent.SendMessageAgent(messageAuxChar)
+		messagePayloadAux=str(NumRequestedQubits)
+		messageCommandAux="ReceiveQubits"
+		messageTypeAux="Control"
 		messageIPorg=IPhostOrgOpNet
 		messageIPdest=IPhostDestOpNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])

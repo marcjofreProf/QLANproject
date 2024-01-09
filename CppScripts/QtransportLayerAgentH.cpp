@@ -474,10 +474,6 @@ if (string(Type)==string("Operation")){// Operation message.
 		}
 		
 	}
-
-	if (string(Command)==string("ServeQubits")){// Send qubits to the requesting host
-		
-	}
 	else if (string(Command)==string("print")){
 		cout << "New Message: "<< Payload << endl;
 	}

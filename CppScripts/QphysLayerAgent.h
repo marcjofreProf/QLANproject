@@ -71,6 +71,9 @@ public: // Functions/Methods
 	// Payload information parameters
 	int SendParametersAgent(char* ParamsCharArray);// The upper layer gets the information to be send
         int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node
+        // General Input and Output functions
+	int emitQuBit();
+	int receiveQuBit();
 	~QPLA();  //destructor
 
 private: // Functions/Methods
@@ -92,10 +95,7 @@ private: // Functions/Methods
         // paused was trigger would be saved, and then reset as new starting
         // time for your timer or counter. 
         bool m_resume() { m_state = APPLICATION_RUNNING; return true; }      
-        bool m_exit() { m_state = APPLICATION_EXIT;  return false; }        
-	// General Input and Output functions
-	int emitQuBit();
-	int receiveQuBit();
+        bool m_exit() { m_state = APPLICATION_EXIT;  return false; } 
         // Payload information parameters
         int InitParametersAgent();// Client node have some parameters to adjust to the server node        
 	int SetSendParametersAgent(char* ParamsCharArray);// Node accumulates parameters for the other node

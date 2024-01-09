@@ -143,7 +143,7 @@ for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 	}
 	strcpy(ValuesCharArray[iHeaders],strtok(NULL,"_"));
 }
-
+cout << "Phys: Processing Parameters" << endl;
 for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 // Missing to develop if there are different values
 if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){this->EmitLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
@@ -170,6 +170,8 @@ int QPLA::InitAgentProcess(){
 
 
 int QPLA::emitQuBit(){
+this->acquire();
+cout << "Emiting Qubits" << endl;
 // this->outGPIO=exploringBB::GPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  GPIO outGPIO(this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
@@ -192,11 +194,13 @@ int QPLA::emitQuBit(){
    */
    
  //cout << "Qubit emitted" << endl;
- 
+ this->release();
  return 0; // return 0 is for no error
 }
 
 int QPLA::receiveQuBit(){
+this->acquire();
+cout << "Receiving Qubits" << endl;
 // this->inGPIO=exploringBB::GPIO(48); // Receiving GPIO. Of course gnd have to be connected accordingly.
  GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
  inGPIO.setDirection(INPUT);
@@ -213,7 +217,7 @@ int QPLA::receiveQuBit(){
  	} 	
  }
  //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
-  
+this->release();
  return 0; // return 0 is for no error
 }
 
