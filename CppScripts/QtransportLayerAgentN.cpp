@@ -377,15 +377,14 @@ int QTLAN::ICPdiscoverSend(char* ParamsCharArray){
 strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
     //cout << "SendBuffer: " << this->SendBuffer << endl;	
     // Parse the message information
-    char IPaddressesSockets[IPcharArrayLengthMAX];
-    strcpy(IPaddressesSockets,strtok(ParamsCharArray,","));//Null indicates we are using the same pointer as the last strtok
-    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
+    char IPaddressesSocketsAux[IPcharArrayLengthMAX];
+    strcpy(IPaddressesSocketsAux,strtok(ParamsCharArray,","));//Null indicates we are using the same pointer as the last strtok
+    //cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
     // Understand which socket descriptor has to be used
     int socket_fd_conn;
-    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
     for (int i=0; i<(NumSocketsMax); ++i){
     	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
-    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
+    	if (string(this->IPSocketsList[i])==string(IPaddressesSocketsAux)){
     	//cout << "Found socket file descriptor//connection to send" << endl;
     	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
     		socket_fd_conn=this->socket_fdArray[i];
@@ -456,7 +455,7 @@ else if(string(Type)==string("Control")){//Control message
 		  int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.NumStoredQubitsNode[0];// to be developed for more than one link
 		  // Generate the message
 		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-		strcpy(ParamsCharArray, IPorg);
+		strcpy(ParamsCharArray,IPorg);
 		strcat(ParamsCharArray,",");
 		strcat(ParamsCharArray,IPdest);
 		strcat(ParamsCharArray,",");
@@ -474,22 +473,25 @@ else if(string(Type)==string("Control")){//Control message
 		}
 		else if (string(Payload)==string("NodeAreYouThere?")){
 		// Mount message and send it to attached node
-		 // Generate the message
-		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-		strcpy(ParamsCharArray,IPaddressesSockets[1]);
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,IPaddressesSockets[2]);
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"Control");
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"InfoRequest");
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"YesIamHere");
-		strcat(ParamsCharArray,",");// Very important to end the message
-		//cout << "socket_fd_conn: " << socket_fd_conn << endl;
-		cout << "ParamsCharArray: " << ParamsCharArray << endl;
-		this->ICPdiscoverSend(ParamsCharArray); 
-		cout << "Node responding that I am here" << endl;
+		 // Generate the message		
+		memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
+		strcpy(this->SendBuffer,this->IPaddressesSockets[1]); //IP attached host to the other node
+		//cout << "this->IPaddressesSockets[1]: " << this->IPaddressesSockets[1] << endl;
+		strcat(this->SendBuffer,",");
+		strcat(this->SendBuffer,this->IPaddressesSockets[2]); // This attached host so that the other node can reply
+		//cout << "this->IPaddressesSockets[2]: " << this->IPaddressesSockets[2] << endl;
+		strcat(this->SendBuffer,",");
+		strcat(this->SendBuffer,"Control");
+		strcat(this->SendBuffer,",");
+		strcat(this->SendBuffer,"InfoRequest");
+		strcat(this->SendBuffer,",");
+		strcat(this->SendBuffer,"YesIamHere?");
+		strcat(this->SendBuffer,",");// Very important to end the message
+		cout << "this->SendBuffer: " << this->SendBuffer << endl;
+		cout << "Node responding that I am here" << endl;		
+		
+		int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
+		this->ICPmanagementSend(socket_fd_conn); // send message to node
 		}
 		else{
 		//discard
@@ -671,7 +673,7 @@ if (ReadBytes>0){// Read block
 	strcpy(Type,strtok(NULL,","));
 	strcpy(Command,strtok(NULL,","));
 	strcpy(Payload,strtok(NULL,","));
-	//cout << "Payload: " << Payload << endl;
+	cout << "Payload: " << Payload << endl;
 	if (string(Payload)==string("YesIamHere") and string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
 		cout << "Other node responding that it is here" << endl;
 		isValidWhileLoopCount=0;

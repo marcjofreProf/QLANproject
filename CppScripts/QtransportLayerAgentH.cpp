@@ -487,8 +487,8 @@ if (string(Type)==string("Operation")){// Operation message.
 }
 else if(string(Type)==string("Control")){//Control message. If it is not meant for this process, forward to the node
         strcpy(this->SendBuffer,this->ReadBuffer);
-        cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
-	if (string(IPorg)==string(this->IPSocketsList[0]) and string(IPdest)!=string(this->IPaddressesSockets[2])){ // If it comes from its attached node and destination at this host (if destination is another host, then means that has to go to else), it means it has to forward it to the other host (so it can forward it to its attached node)
+        //cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
+	if (string(IPorg)==string(this->IPSocketsList[0])){ // If it comes from its attached node and destination at this host (if destination is another host, then means that has to go to else), it means it has to forward it to the other host (so it can forward it to its attached node)
 	// The node of a host is always identified in the Array in position 0	
 	    //cout << "SendBuffer: " << this->SendBuffer << endl;
 	    if (string(this->SCmode[1])==string("client")){//host acts as client
@@ -526,13 +526,13 @@ int QTLAH::ICPdiscoverSend(char* ParamsCharArray){
     strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
     //cout << "SendBuffer: " << this->SendBuffer << endl;	
     // Parse the message information
-    char IPaddressesSockets[IPcharArrayLengthMAX];
-    strcpy(IPaddressesSockets,strtok(ParamsCharArray,","));//Null indicates we are using the same pointer as the last strtok
-    //cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
+    char IPaddressesSocketsAux[IPcharArrayLengthMAX];
+    strcpy(IPaddressesSocketsAux,strtok(ParamsCharArray,","));//Null indicates we are using the same pointer as the last strtok
+    //cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
     // Understand which socket descriptor has to be used
     int socket_fd_conn;
     for (int i=0; i<NumSocketsMax; ++i){
-    	if (string(this->IPSocketsList[i])==string(IPaddressesSockets)){
+    	if (string(this->IPSocketsList[i])==string(IPaddressesSocketsAux)){
     	//cout << "Found socket file descriptor//connection to send" << endl;
     	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
     		socket_fd_conn=this->socket_fdArray[i];
