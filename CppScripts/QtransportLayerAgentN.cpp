@@ -472,6 +472,25 @@ else if(string(Type)==string("Control")){//Control message
 		  // reply immediately with a message to requester		  
 		  this->ICPdiscoverSend(ParamsCharArray); 
 		}
+		else if (string(Command)==string("InfoRequest") and string(Payload)==string("NodeAreYouThere?")){
+		// Mount message and send it to attached node
+		 // Generate the message
+		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+		strcpy(ParamsCharArray,IPdest);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,IPorg);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"Control");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"InfoRequest");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"YesIamHere");
+		strcat(ParamsCharArray,",");// Very important to end the message
+		//cout << "socket_fd_conn: " << socket_fd_conn << endl;
+		//cout << "IPdest: " << IPdest << endl;
+		//cout << "IPorg: " << IPorg << endl;
+		this->ICPdiscoverSend(ParamsCharArray); 
+		}
 		else{
 		//discard
 		cout << "Node does not have this information "<< Payload << endl;
@@ -576,7 +595,8 @@ if (ReadBytes>0){// Read block
 	strcpy(Payload,strtok(NULL,","));
 	//cout << "Payload: " << Payload << endl;
 	if (string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
-		strcpy(this->IPaddressesSockets[1],Payload);
+		strcpy(this->IPaddressesSockets[1],strtok(Payload,":"));
+		strcpy(this->IPaddressesSockets[2],strtok(NULL,":"));
 		isValidWhileLoopCount=0;
 	}
 	else// Not the message that was expected. Probably a node to the other node message, so let it pass
@@ -602,12 +622,83 @@ return 0; // All OK
 
 int QTLAN::NegotiateInitialParamsNode(){
 
+ try{
+ 
 if (string(this->SCmode[1])==string("client")){
+ // First check that the other node is with established connection
+ 
+
+// It is a "blocking" communication between host and node, because it is many read trials for reading
+
+int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
+
+int SockListenTimeusec=500000; // Negative means infinite
+
+int isValidWhileLoopCount = 15; // Number of tries
+
+while(isValidWhileLoopCount>0){
+memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
+strcpy(this->SendBuffer,this->IPaddressesSockets[1]); //IP attached host to the other node
+//cout << "this->IPaddressesSockets[1]: " << this->IPaddressesSockets[1] << endl;
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,this->IPaddressesSockets[2]); // This attached host so that the other node can reply
+//cout << "this->IPaddressesSockets[2]: " << this->IPaddressesSockets[2] << endl;
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"Control");
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"InfoRequest");
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"NodeAreYouThere?");
+strcat(this->SendBuffer,",");// Very important to end the message
+usleep(999999);
+this->ICPmanagementSend(socket_fd_conn); // send message to node
+usleep(999999);
+int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
+//cout << "ReadBytes: " << ReadBytes << endl;
+if (ReadBytes>0){// Read block	
+	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
+	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
+	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+	char IPdest[NumBytesBufferICPMAX] = {0};
+	char IPorg[NumBytesBufferICPMAX] = {0};
+	char Type[NumBytesBufferICPMAX] = {0};
+	char Command[NumBytesBufferICPMAX] = {0};
+	char Payload[NumBytesBufferICPMAX] = {0};
+	strcpy(IPdest,strtok(ReadBufferAux,","));
+	strcpy(IPorg,strtok(NULL,","));
+	strcpy(Type,strtok(NULL,","));
+	strcpy(Command,strtok(NULL,","));
+	strcpy(Payload,strtok(NULL,","));
+	//cout << "Payload: " << Payload << endl;
+	if (string(Command)==string("YesIamHere") and string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
+		isValidWhileLoopCount=0;
+	}
+	else// Not the message that was expected. Probably a node to the other node message, so let it pass
+	{
+		// Not messages expected as this point
+	}
+
+}
+else{
+// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+isValidWhileLoopCount--;
+usleep(999999);
+}
+}//while
+
+
+
+ 
  this->SendParametersAgent();
 }
 else{//server
 // Expect to receive some information
 }
+
+} // try
+  catch (...) { // Catches any exception
+  cout << "Exception caught" << endl;
+    }
 
 return 0;// All OK
 }
