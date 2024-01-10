@@ -83,7 +83,7 @@ return 0; //All OK
 
 int QPLA::ReadParametersAgent(){// Node checks parameters from the other node
 if (string(this->PayloadReadBuffer)!=string("") and string(this->PayloadReadBuffer)!=string("none_none_")){
-	cout << "There are new Parameters" << endl;
+	//cout << "There are new Parameters" << endl;
 	this->ProcessNewParameters();
 }
 memset(this->PayloadReadBuffer, 0, sizeof(this->PayloadReadBuffer));// Reset buffer
@@ -144,7 +144,7 @@ for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 	}
 	strcpy(ValuesCharArray[iHeaders],strtok(NULL,"_"));
 }
-cout << "Phys: Processing Parameters" << endl;
+//cout << "Phys: Processing Parameters" << endl;
 for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 // Missing to develop if there are different values
 if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){this->EmitLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
