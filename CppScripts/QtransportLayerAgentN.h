@@ -131,7 +131,7 @@ private: // Functions/Methods
 	int ProcessNewParameters();// Process the parameters received
 	int countDoubleColons(char* ParamsCharArray);
 	int countDoubleUnderscores(char* ParamsCharArray);
-	int countQuadrupleComas(char* ParamsCharArray);
+	int countQintupleComas(char* ParamsCharArray);
 	
 };
 

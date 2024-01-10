@@ -157,7 +157,7 @@ this->release();
 return 0; // All OK
 }
 ////////////////////////////////////////////////////
-int QTLAN::countQuadrupleComas(char* ParamsCharArray) {
+int QTLAN::countQintupleComas(char* ParamsCharArray) {
   int comasCount = 0;
 
   for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
@@ -526,9 +526,9 @@ int QTLAN::ProcessNewMessage(){
 char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
 strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 
-int NumQuadrupleComas=this->countQuadrupleComas(ReadBufferAuxOriginal);
-NumQuadrupleComas=1;
-for (int iIterMessages=0;iIterMessages<NumQuadrupleComas;iIterMessages++){
+int NumQintupleComas=this->countQintupleComas(ReadBufferAuxOriginal);
+//NumQintupleComas=1;
+for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	char IPdest[NumBytesBufferICPMAX] = {0};
 	char IPorg[NumBytesBufferICPMAX] = {0};
 	char Type[NumBytesBufferICPMAX] = {0};
@@ -536,9 +536,9 @@ for (int iIterMessages=0;iIterMessages<NumQuadrupleComas;iIterMessages++){
 	char Payload[NumBytesBufferICPMAX] = {0};
 	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ReadBufferAux,ReadBufferAuxOriginal); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
-	for (int iIterDump=0;iIterDump<(4*iIterMessages);iIterDump++){
+	for (int iIterDump=0;iIterDump<(5*iIterMessages);iIterDump++){
 	if (iIterDump==0){strtok(ReadBufferAux,",");}
-	strtok(NULL,",");
+	else{strtok(NULL,",");}
 	}
 	if (iIterMessages==0){strcpy(IPdest,strtok(ReadBufferAux,","));}
 	else{strcpy(IPdest,strtok(NULL,","));}
