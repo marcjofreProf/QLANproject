@@ -95,7 +95,18 @@ bool CheckRelease = valueSemaphore.fetch_add(1, std::memory_order_acquire);
     }*/
    this->valueSemaphore=1; // Make sure it stays at 1
 }
+/////////////////////////////////////////////////////////
+int QTLAH::countQuadrupleComas(char* ParamsCharArray) {
+  int comasCount = 0;
 
+  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+    if (ParamsCharArray[i] == ',') {
+      comasCount++;
+    }
+  }
+
+  return comasCount/4;
+}
 ////////////////////////////////////////////////////////
 int QTLAH::InitAgentProcess(){
 	// Then, regularly check for next job/action without blocking		  	
@@ -318,7 +329,6 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);
-    //usleep(99);// Important to sleep for some time after sending
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
@@ -436,96 +446,106 @@ return 0; // All OK
 int QTLAH::ProcessNewMessage(){
 //cout << "ReadBuffer: " << this->ReadBuffer << endl;
 // Parse the message information
-char ReadBufferAux[NumBytesBufferICPMAX] = {0};
-strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
-char IPdest[NumBytesBufferICPMAX] = {0};
-char IPorg[NumBytesBufferICPMAX] = {0};
-char Type[NumBytesBufferICPMAX] = {0};
-char Command[NumBytesBufferICPMAX] = {0};
-char Payload[NumBytesBufferICPMAX] = {0};
-strcpy(IPdest,strtok(ReadBufferAux,","));
-strcpy(IPorg,strtok(NULL,","));
-strcpy(Type,strtok(NULL,","));
-strcpy(Command,strtok(NULL,","));
-strcpy(Payload,strtok(NULL,","));
+char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
+strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 
-//cout << "IPdest: " << IPdest << endl;
-//cout << "IPorg: " << IPorg << endl;
-//cout << "Type: " << Type << endl;
-//cout << "Command: " << Command << endl;
-//cout << "Payload: " << Payload << endl;
+int NumQuadrupleComas=this->countQuadrupleComas(ReadBufferAuxOriginal);
+for (int iIterMessages=0;iIterMessages<NumQuadrupleComas;iIterMessages++){
+	char IPdest[NumBytesBufferICPMAX] = {0};
+	char IPorg[NumBytesBufferICPMAX] = {0};
+	char Type[NumBytesBufferICPMAX] = {0};
+	char Command[NumBytesBufferICPMAX] = {0};
+	char Payload[NumBytesBufferICPMAX] = {0};
+	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
+	strcpy(ReadBufferAux,ReadBufferAuxOriginal); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
+	for (int iIterDump=0;iIterDump<(4*iIterMessages);iIterDump++){
+	if (iIterDump==0){strtok(ReadBufferAux,",");}
+	strtok(NULL,",");
+	}
+	if (iIterMessages==0){strcpy(IPdest,strtok(ReadBufferAux,","));}
+	else{strcpy(IPdest,strtok(NULL,","));}
+	strcpy(IPorg,strtok(NULL,","));
+	strcpy(Type,strtok(NULL,","));
+	strcpy(Command,strtok(NULL,","));
+	strcpy(Payload,strtok(NULL,","));
 
-// Identify what to do and execute it
-if (string(Type)==string("Operation")){// Operation message. 
-	//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
-	if(string(IPorg)==string(this->IPSocketsList[0]) and string(IPdest)==string(this->IPaddressesSockets[3])){// Information requested by the attached node
-		if (string(Command)==string("InfoRequest") and string(Payload)==string("IPaddressesSockets")){
-		// Mount message and send it to attached node
-		 // Generate the message
-		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-		strcpy(ParamsCharArray,IPdest);
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,IPorg);
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"Control");
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"InfoRequest");
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,IPaddressesSockets[1]);
-		strcat(ParamsCharArray,":");
-		strcat(ParamsCharArray,IPaddressesSockets[2]);
-		strcat(ParamsCharArray,":");
-		strcat(ParamsCharArray,",");// Very important to end the message
-		strcpy(this->SendBuffer,ParamsCharArray);
-		int socket_fd_conn=this->socket_fdArray[0];// Socket descriptor to the attached node
-		//cout << "socket_fd_conn: " << socket_fd_conn << endl;
-		//cout << "IPdest: " << IPdest << endl;
-		//cout << "IPorg: " << IPorg << endl;
-		this->ICPmanagementSend(socket_fd_conn);
-		}		
-		else{
-		// Send something since node is waiting
+	//cout << "IPdest: " << IPdest << endl;
+	//cout << "IPorg: " << IPorg << endl;
+	//cout << "Type: " << Type << endl;
+	//cout << "Command: " << Command << endl;
+	//cout << "Payload: " << Payload << endl;
+
+	// Identify what to do and execute it
+	if (string(Type)==string("Operation")){// Operation message. 
+		//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
+		if(string(IPorg)==string(this->IPSocketsList[0]) and string(IPdest)==string(this->IPaddressesSockets[3])){// Information requested by the attached node
+			if (string(Command)==string("InfoRequest") and string(Payload)==string("IPaddressesSockets")){
+			// Mount message and send it to attached node
+			 // Generate the message
+			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+			strcpy(ParamsCharArray,IPdest);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,IPorg);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"Control");
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"InfoRequest");
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,IPaddressesSockets[1]);
+			strcat(ParamsCharArray,":");
+			strcat(ParamsCharArray,IPaddressesSockets[2]);
+			strcat(ParamsCharArray,":");
+			strcat(ParamsCharArray,",");// Very important to end the message
+			strcpy(this->SendBuffer,ParamsCharArray);
+			int socket_fd_conn=this->socket_fdArray[0];// Socket descriptor to the attached node
+			//cout << "socket_fd_conn: " << socket_fd_conn << endl;
+			//cout << "IPdest: " << IPdest << endl;
+			//cout << "IPorg: " << IPorg << endl;
+			this->ICPmanagementSend(socket_fd_conn);
+			}		
+			else{
+			// Send something since node is waiting
+			}
+			
 		}
-		
+		else if (string(Command)==string("print")){
+			cout << "New Message: "<< Payload << endl;
+		}
+		else{//Default
+		// Do not do anything
+		}
 	}
-	else if (string(Command)==string("print")){
-		cout << "New Message: "<< Payload << endl;
+	else if(string(Type)==string("Control")){//Control message. If it is not meant for this process, forward to the node
+		strcpy(this->SendBuffer,this->ReadBuffer);
+		//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
+		if (string(IPorg)==string(this->IPSocketsList[0])){ // If it comes from its attached node and destination at this host (if destination is another host, then means that has to go to else), it means it has to forward it to the other host (so it can forward it to its attached node)
+		// The node of a host is always identified in the Array in position 0	
+		    //cout << "SendBuffer: " << this->SendBuffer << endl;
+		    if (string(this->SCmode[1])==string("client")){//host acts as client
+		    int socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor  
+		    this->ICPmanagementSend(socket_fd_conn);
+		    }
+		    else{ //host acts as server
+		    int socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
+		    this->ICPmanagementSend(socket_fd_conn);
+		    }
+		}	
+		else{// It has to forward to its node
+		   // The node of a host is always identified in the Array in position 0	
+		    //cout << "SendBuffer: " << this->SendBuffer << endl;
+		    int socket_fd_conn=this->socket_fdArray[0];  // the host always acts as client to the node, so it needs the socket descriptor   
+		    this->ICPmanagementSend(socket_fd_conn);
+		}  
 	}
-	else{//Default
-	// Do not do anything
-	}
-}
-else if(string(Type)==string("Control")){//Control message. If it is not meant for this process, forward to the node
-        strcpy(this->SendBuffer,this->ReadBuffer);
-        //cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
-	if (string(IPorg)==string(this->IPSocketsList[0])){ // If it comes from its attached node and destination at this host (if destination is another host, then means that has to go to else), it means it has to forward it to the other host (so it can forward it to its attached node)
-	// The node of a host is always identified in the Array in position 0	
-	    //cout << "SendBuffer: " << this->SendBuffer << endl;
-	    if (string(this->SCmode[1])==string("client")){//host acts as client
-	    int socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor  
-	    this->ICPmanagementSend(socket_fd_conn);
-	    }
-	    else{ //host acts as server
-	    int socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
-	    this->ICPmanagementSend(socket_fd_conn);
-	    }
-	}	
-	else{// It has to forward to its node
-	   // The node of a host is always identified in the Array in position 0	
-	    //cout << "SendBuffer: " << this->SendBuffer << endl;
-	    int socket_fd_conn=this->socket_fdArray[0];  // the host always acts as client to the node, so it needs the socket descriptor   
-	    this->ICPmanagementSend(socket_fd_conn);
-        }  
-}
-else{// Info message; Default
-	if (string(Command)==string("print")){
-		cout << "New Message: "<< Payload << endl;
-	}
-	else{//Default
-	// Do not do anything
-	}
-}  
-
+	else{// Info message; Default
+		if (string(Command)==string("print")){
+			cout << "New Message: "<< Payload << endl;
+		}
+		else{//Default
+		// Do not do anything
+		}
+	}  
+}// for
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 return 0; // All OK

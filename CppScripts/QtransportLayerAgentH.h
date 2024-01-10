@@ -106,6 +106,7 @@ private: //Functions//Methods
 	int ICPConnectionsCheckNewMessages(int SockListenTimeusec); // Check for new messages
 	// Process and execute requests
 	int ProcessNewMessage(); // main function perferming the required operatons to process the task
+	int countQuadrupleComas(char* ParamsCharArray);
 };
 
 

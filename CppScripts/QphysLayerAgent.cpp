@@ -110,7 +110,7 @@ int QPLA::countDoubleColons(char* ParamsCharArray) {
     }
   }
 
-  return colonCount;
+  return colonCount/2;
 }
 
 int QPLA::countDoubleUnderscores(char* ParamsCharArray) {
@@ -122,7 +122,7 @@ int QPLA::countDoubleUnderscores(char* ParamsCharArray) {
     }
   }
 
-  return underscoreCount;
+  return underscoreCount/2;
 }
 
 int QPLA::ProcessNewParameters(){

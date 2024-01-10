@@ -157,6 +157,18 @@ this->release();
 return 0; // All OK
 }
 ////////////////////////////////////////////////////
+int QTLAN::countQuadrupleComas(char* ParamsCharArray) {
+  int comasCount = 0;
+
+  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+    if (ParamsCharArray[i] == ',') {
+      comasCount++;
+    }
+  }
+
+  return comasCount/4;
+}
+
 int QTLAN::countDoubleColons(char* ParamsCharArray) {
   int colonCount = 0;
 
@@ -166,7 +178,7 @@ int QTLAN::countDoubleColons(char* ParamsCharArray) {
     }
   }
 
-  return colonCount;
+  return colonCount/2;
 }
 
 int QTLAN::countDoubleUnderscores(char* ParamsCharArray) {
@@ -178,7 +190,7 @@ int QTLAN::countDoubleUnderscores(char* ParamsCharArray) {
     }
   }
 
-  return underscoreCount;
+  return underscoreCount/2;
 }
 
 int QTLAN::ProcessNewParameters(){
@@ -374,7 +386,6 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 int QTLAN::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
     int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);
-    //usleep(99);// Important to sleep for some time after sending
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
@@ -510,105 +521,116 @@ int QTLAN::UpdateSocketsInformation(){
 
 int QTLAN::ProcessNewMessage(){
 //cout << "ReadBuffer: " << this->ReadBuffer << endl;
+
 // Parse the message information
-char ReadBufferAux[NumBytesBufferICPMAX] = {0};
-strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
-char IPdest[NumBytesBufferICPMAX] = {0};
-char IPorg[NumBytesBufferICPMAX] = {0};
-char Type[NumBytesBufferICPMAX] = {0};
-char Command[NumBytesBufferICPMAX] = {0};
-char Payload[NumBytesBufferICPMAX] = {0};
-strcpy(IPdest,strtok(ReadBufferAux,","));
-strcpy(IPorg,strtok(NULL,","));
-strcpy(Type,strtok(NULL,","));
-strcpy(Command,strtok(NULL,","));
-strcpy(Payload,strtok(NULL,","));
+char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
+strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 
-//cout << "IPdest: " << IPdest << endl;
-//cout << "IPorg: " << IPorg << endl;
-//cout << "Type: " << Type << endl;
-//cout << "Command: " << Command << endl;
-//cout << "Payload: " << Payload << endl;
-//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
-// Identify what to do and execute it
-if (string(Type)==string("Operation")){// Operation message. Forward to the host (there should not be messages of this type in the QtransportLayerAgent. So not develop
-	// Do not do anything
-}
-else if(string(Type)==string("Control")){//Control message
-	if (string(Command)==string("InfoRequest")){ // Request to provide information
-		if (string(Payload)==string("NumStoredQubitsNode")){
-		  int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
-		  // Generate the message
-		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-		strcpy(ParamsCharArray,IPorg);
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,IPdest);
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"Operation");
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"InfoRequest");
-		strcat(ParamsCharArray,",");
-		char charNum[NumBytesBufferICPMAX] = {0};
-		sprintf(charNum, "%d", NumStoredQubitsNode);
-		strcat(ParamsCharArray,charNum);
-		strcat(ParamsCharArray,",");// Very important to end the message
-		//cout << "ParamsCharArray: " << ParamsCharArray << endl;
-		  // reply immediately with a message to requester		  
-		  this->ICPdiscoverSend(ParamsCharArray); 
-		}
-		else if (string(Payload)==string("NodeAreYouThere?")){
-		// Mount message and send it to attached node
-		 // Generate the message		
-		memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
-		strcpy(this->SendBuffer,this->IPaddressesSockets[1]); //IP attached host to the other node
-		//cout << "this->IPaddressesSockets[1]: " << this->IPaddressesSockets[1] << endl;
-		strcat(this->SendBuffer,",");
-		strcat(this->SendBuffer,this->IPaddressesSockets[2]); // This attached host so that the other node can reply
-		//cout << "this->IPaddressesSockets[2]: " << this->IPaddressesSockets[2] << endl;
-		strcat(this->SendBuffer,",");
-		strcat(this->SendBuffer,"Control");
-		strcat(this->SendBuffer,",");
-		strcat(this->SendBuffer,"InfoRequest");
-		strcat(this->SendBuffer,",");
-		strcat(this->SendBuffer,"YesIamHere");
-		strcat(this->SendBuffer,",");// Very important to end the message
-		//cout << "this->SendBuffer: " << this->SendBuffer << endl;
-		//cout << "Node responding that I am here" << endl;		
-		
-		int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
-		this->ICPmanagementSend(socket_fd_conn); // send message to node
-		}
-		else{
-		//discard
-		cout << "Node does not have this information "<< Payload << endl;
-		}
+int NumQuadrupleComas=this->countQuadrupleComas(ReadBufferAuxOriginal);
+for (int iIterMessages=0;iIterMessages<NumQuadrupleComas;iIterMessages++){
+	char IPdest[NumBytesBufferICPMAX] = {0};
+	char IPorg[NumBytesBufferICPMAX] = {0};
+	char Type[NumBytesBufferICPMAX] = {0};
+	char Command[NumBytesBufferICPMAX] = {0};
+	char Payload[NumBytesBufferICPMAX] = {0};
+	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
+	strcpy(ReadBufferAux,ReadBufferAuxOriginal); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
+	for (int iIterDump=0;iIterDump<(4*iIterMessages);iIterDump++){
+	if (iIterDump==0){strtok(ReadBufferAux,",");}
+	strtok(NULL,",");
 	}
-	else if (string(Command)==string("InfoProcess")){// Params messages
-		//cout << "New Message: "<< Payload << endl;
-		this->ReadParametersAgent(Payload);
-	}
-	else if (string(Command)==string("SendQubits")){// Send qubits to the requesting host
-		this->QNLAagent.QLLAagent.QPLAagent.emitQuBit();
-	}
-	else if (string(Command)==string("ReceiveQubits")){// Read qubits to the attached node
-		 this->QNLAagent.QLLAagent.QPLAagent.receiveQuBit();
-	}
-	else if (string(Command)==string("print")){
-		cout << "New Message: "<< Payload << endl;
-	}
-	else{//Default
-	// Do not do anything
-	}
-}
-else{// Info message; Default
-	if (string(Command)==string("print")){
-		cout << "New Message: "<< Payload << endl;
-	}
-	else{//Default
-	// Do not do anything
-	}
-}  
+	if (iIterMessages==0){strcpy(IPdest,strtok(ReadBufferAux,","));}
+	else{strcpy(IPdest,strtok(NULL,","));}
+	strcpy(IPorg,strtok(NULL,","));
+	strcpy(Type,strtok(NULL,","));
+	strcpy(Command,strtok(NULL,","));
+	strcpy(Payload,strtok(NULL,","));
 
+	//cout << "IPdest: " << IPdest << endl;
+	//cout << "IPorg: " << IPorg << endl;
+	//cout << "Type: " << Type << endl;
+	//cout << "Command: " << Command << endl;
+	//cout << "Payload: " << Payload << endl;
+	//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
+	// Identify what to do and execute it
+	if (string(Type)==string("Operation")){// Operation message. Forward to the host (there should not be messages of this type in the QtransportLayerAgent. So not develop
+		// Do not do anything
+	}
+	else if(string(Type)==string("Control")){//Control message
+		if (string(Command)==string("InfoRequest")){ // Request to provide information
+			if (string(Payload)==string("NumStoredQubitsNode")){
+			  int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
+			  // Generate the message
+			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+			strcpy(ParamsCharArray,IPorg);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,IPdest);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"Operation");
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"InfoRequest");
+			strcat(ParamsCharArray,",");
+			char charNum[NumBytesBufferICPMAX] = {0};
+			sprintf(charNum, "%d", NumStoredQubitsNode);
+			strcat(ParamsCharArray,charNum);
+			strcat(ParamsCharArray,",");// Very important to end the message
+			//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+			  // reply immediately with a message to requester		  
+			  this->ICPdiscoverSend(ParamsCharArray); 
+			}
+			else if (string(Payload)==string("NodeAreYouThere?")){
+			// Mount message and send it to attached node
+			 // Generate the message		
+			memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
+			strcpy(this->SendBuffer,this->IPaddressesSockets[1]); //IP attached host to the other node
+			//cout << "this->IPaddressesSockets[1]: " << this->IPaddressesSockets[1] << endl;
+			strcat(this->SendBuffer,",");
+			strcat(this->SendBuffer,this->IPaddressesSockets[2]); // This attached host so that the other node can reply
+			//cout << "this->IPaddressesSockets[2]: " << this->IPaddressesSockets[2] << endl;
+			strcat(this->SendBuffer,",");
+			strcat(this->SendBuffer,"Control");
+			strcat(this->SendBuffer,",");
+			strcat(this->SendBuffer,"InfoRequest");
+			strcat(this->SendBuffer,",");
+			strcat(this->SendBuffer,"YesIamHere");
+			strcat(this->SendBuffer,",");// Very important to end the message
+			//cout << "this->SendBuffer: " << this->SendBuffer << endl;
+			//cout << "Node responding that I am here" << endl;		
+			
+			int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
+			this->ICPmanagementSend(socket_fd_conn); // send message to node
+			}
+			else{
+			//discard
+			cout << "Node does not have this information "<< Payload << endl;
+			}
+		}
+		else if (string(Command)==string("InfoProcess")){// Params messages
+			//cout << "New Message: "<< Payload << endl;
+			this->ReadParametersAgent(Payload);
+		}
+		else if (string(Command)==string("SendQubits")){// Send qubits to the requesting host
+			this->QNLAagent.QLLAagent.QPLAagent.emitQuBit();
+		}
+		else if (string(Command)==string("ReceiveQubits")){// Read qubits to the attached node
+			 this->QNLAagent.QLLAagent.QPLAagent.receiveQuBit();
+		}
+		else if (string(Command)==string("print")){
+			cout << "New Message: "<< Payload << endl;
+		}
+		else{//Default
+		// Do not do anything
+		}
+	}
+	else{// Info message; Default
+		if (string(Command)==string("print")){
+			cout << "New Message: "<< Payload << endl;
+		}
+		else{//Default
+		// Do not do anything
+		}
+	}  
+}// for
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 

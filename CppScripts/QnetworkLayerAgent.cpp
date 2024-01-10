@@ -113,7 +113,7 @@ int QNLA::countDoubleColons(char* ParamsCharArray) {
     }
   }
 
-  return colonCount;
+  return colonCount/2;
 }
 
 int QNLA::countDoubleUnderscores(char* ParamsCharArray) {
@@ -125,7 +125,7 @@ int QNLA::countDoubleUnderscores(char* ParamsCharArray) {
     }
   }
 
-  return underscoreCount;
+  return underscoreCount/2;
 }
 
 int QNLA::ProcessNewParameters(){
