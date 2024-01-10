@@ -338,7 +338,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
     //cout << "Node select no new messages" << endl;this->m_exit();
     return -1;}
    else if (ret==0){
-   //cout << "No new messages" << endl;
+   //cout << "Node no new messages" << endl;
    return -1;}
   else {// There is at least one new message
     if (FD_ISSET(socket_fd_conn, &fds)) {// is a macro that checks whether a specified file descriptor is set in a specified file descriptor set.
@@ -346,15 +346,15 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
         int valread=0;
 	if (this->ReadFlagWait){valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 	else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
-      //cout << "Node message received: " << this->ReadBuffer << endl;
+        cout << "Node message received: " << this->ReadBuffer << endl;
       if (valread <= 0) {
 	if (valread<0){
 		cout << strerror(errno) << endl;
-		cout << "Host error reading new messages" << endl;
+		cout << "Node error reading new messages" << endl;
 	}
 	else{
 		cout << strerror(errno) << endl;
-		cout << "Host agent message of 0 Bytes" << endl;
+		cout << "Node agent message of 0 Bytes" << endl;
 	}
 	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
@@ -367,13 +367,13 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
       	return valread; //
       }
     }
-    else{this->m_exit();return -1;}
+    else{this->m_exit();cout << "Node error FD_ISSET new messages" << endl;return -1;}
   }    
 }
 
 int QTLAN::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
-    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);
+    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),0);//MSG_DONTWAIT);
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;

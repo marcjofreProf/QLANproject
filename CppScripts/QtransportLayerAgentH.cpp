@@ -287,7 +287,7 @@ else {// There might be at least one new message
 		if (this->ReadFlagWait){valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 		//cout << "valread: " << valread << endl;
-		//cout << "Node message received: " << this->ReadBuffer << endl;
+		cout << "Host message received: " << this->ReadBuffer << endl;
 		if (valread <= 0){
 			if (valread<0){
 				cout << strerror(errno) << endl;
@@ -309,7 +309,7 @@ else {// There might be at least one new message
 			return valread;
 		}
 	}
-	else{cout << "Host FD_ISSET no new messages" << endl;this->m_exit();return -1;}
+	else{cout << "Host FD_ISSET error new messages" << endl;this->m_exit();return -1;}
 }
 
 }
@@ -317,7 +317,7 @@ else {// There might be at least one new message
 int QTLAH::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
-    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);
+    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),0);//MSG_DONTWAIT);
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
