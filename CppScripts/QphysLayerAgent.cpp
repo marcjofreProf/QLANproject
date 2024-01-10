@@ -82,7 +82,6 @@ return 0; //All OK
 }
 
 int QPLA::ReadParametersAgent(){// Node checks parameters from the other node
-cout << "this->PayloadReadBuffer: " << this->PayloadReadBuffer << endl;
 if (string(this->PayloadReadBuffer)!=string("") and string(this->PayloadReadBuffer)!=string("none_none_")){
 	cout << "There are new Parameters" << endl;
 	this->ProcessNewParameters();
