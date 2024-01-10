@@ -166,7 +166,7 @@ int QTLAN::countQintupleComas(char* ParamsCharArray) {
     }
   }
 
-  return comasCount/4;
+  return comasCount/5;
 }
 
 int QTLAN::countDoubleColons(char* ParamsCharArray) {

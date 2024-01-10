@@ -105,7 +105,7 @@ int QTLAH::countQintupleComas(char* ParamsCharArray) {
     }
   }
 
-  return comasCount/4;
+  return comasCount/5;
 }
 ////////////////////////////////////////////////////////
 int QTLAH::InitAgentProcess(){
