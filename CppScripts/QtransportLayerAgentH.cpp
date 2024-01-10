@@ -20,6 +20,7 @@ Agent script for Quantum transport Layer Host
 #define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 #define IPcharArrayLengthMAX 15
 #define SockListenTimeusecStandard 50
+#define NumProcessMessagesConcurrentMax 20
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -298,7 +299,7 @@ else {// There might be at least one new message
 		if (this->ReadFlagWait){valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 		//cout << "valread: " << valread << endl;
-		cout << "Host message received: " << this->ReadBuffer << endl;
+		//cout << "Host message received: " << this->ReadBuffer << endl;
 		if (valread <= 0){
 			if (valread<0){
 				cout << strerror(errno) << endl;
@@ -450,7 +451,7 @@ char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
 strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 
 int NumQintupleComas=this->countQintupleComas(ReadBufferAuxOriginal);
-if (NumQintupleComas>20){NumQintupleComas=20;}// Limit the total number that can be proceessed
+if (NumQintupleComas>20){NumQintupleComas=NumProcessMessagesConcurrentMax;}// Limit the total number that can be proceessed, avoiding cascades
 cout << "NumQintupleComas: " << NumQintupleComas << endl;
 //NumQintupleComas=1;
 for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){

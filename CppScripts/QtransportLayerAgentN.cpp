@@ -21,6 +21,7 @@ Agent script for Quantum transport Layer Node
 #define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 #define IPcharArrayLengthMAX 15
 #define SockListenTimeusecStandard 50
+#define NumProcessMessagesConcurrentMax 20
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -358,7 +359,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
         int valread=0;
 	if (this->ReadFlagWait){valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 	else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
-        cout << "Node message received: " << this->ReadBuffer << endl;
+        //cout << "Node message received: " << this->ReadBuffer << endl;
       if (valread <= 0) {
 	if (valread<0){
 		cout << strerror(errno) << endl;
@@ -528,7 +529,7 @@ strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the
 
 int NumQintupleComas=this->countQintupleComas(ReadBufferAuxOriginal);
 //NumQintupleComas=1;
-if (NumQintupleComas>20){NumQintupleComas=20;}// Limit the total number that can be proceessed
+if (NumQintupleComas>20){NumQintupleComas=NumProcessMessagesConcurrentMax;}// Limit the total number that can be proceessed, avoiding cascades
 cout << "NumQintupleComas: " << NumQintupleComas << endl;
 if (NumQintupleComas>20){NumQintupleComas=20;}// Limit the total number that can be proceessed
 for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
