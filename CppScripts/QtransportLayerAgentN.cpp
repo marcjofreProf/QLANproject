@@ -341,7 +341,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
    //cout << "No new messages" << endl;
    return -1;}
   else {// There is at least one new message
-    if (FD_ISSET(socket_fd_conn, &fds)) {// s a macro that checks whether a specified file descriptor is set in a specified file descriptor set.
+    if (FD_ISSET(socket_fd_conn, &fds)) {// is a macro that checks whether a specified file descriptor is set in a specified file descriptor set.
       // Read the message from the socket
         int valread=0;
 	if (this->ReadFlagWait){valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
