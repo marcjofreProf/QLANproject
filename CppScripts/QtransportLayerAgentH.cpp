@@ -532,7 +532,7 @@ return 0; // All OK
 int QTLAH::ICPdiscoverSend(char* ParamsCharArray){
     memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
     strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
-    cout << "SendBuffer: " << this->SendBuffer << endl;	
+    //cout << "SendBuffer: " << this->SendBuffer << endl;	
     // Parse the message information
     char IPaddressesSocketsAux[IPcharArrayLengthMAX];
     strcpy(IPaddressesSocketsAux,strtok(ParamsCharArray,","));//Null indicates we are using the same pointer as the last strtok
@@ -541,9 +541,9 @@ int QTLAH::ICPdiscoverSend(char* ParamsCharArray){
     int socket_fd_conn;
     for (int i=0; i<NumSocketsMax; ++i){
     	if (string(this->IPSocketsList[i])==string(IPaddressesSocketsAux)){
-    	cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
-    	cout << "this->IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
-    	cout << "Found socket file descriptor//connection to send" << endl;
+    	//cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
+    	//cout << "this->IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
+    	//cout << "Found socket file descriptor//connection to send" << endl;
     	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
     		socket_fd_conn=this->socket_fdArray[i];
     	}
@@ -583,7 +583,7 @@ try{
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor
 
-int SockListenTimeusec=10000; // negative means infinite time
+int SockListenTimeusec=500000; // negative means infinite time
 
 int isValidWhileLoopCount = 100; // Number of tries
 while(isValidWhileLoopCount>0){
@@ -600,7 +600,7 @@ strcat(this->SendBuffer,"NumStoredQubitsNode");
 strcat(this->SendBuffer,",");// Very important to end the message
 
 this->ICPmanagementSend(socket_fd_conn); // send mesage to node
-usleep(10000);
+usleep(999999);
 this->ReadFlagWait=true;
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 this->ReadFlagWait=false;
@@ -648,7 +648,7 @@ else{
 memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 ParamsIntArray[0]=-1;
 isValidWhileLoopCount--;
-usleep(10000);
+usleep(999999);
 }
 }//while
 
