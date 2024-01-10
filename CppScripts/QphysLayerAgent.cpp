@@ -176,10 +176,12 @@ cout << "Emiting Qubits" << endl;
  GPIO outGPIO(this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
  outGPIO.setDirection(OUTPUT);
+ usleep(QuBitsUSecQuarterPeriodInt[0]);
  for (int iIterWrite=0;iIterWrite<NumQubitsMemoryBuffer;++iIterWrite){
 	 outGPIO.setValue(HIGH);
-	 usleep(QuBitsUSecPeriodInt[0]);
+	 usleep(QuBitsUSecHalfPeriodInt[0]);
 	 outGPIO.setValue(LOW);
+	 usleep(QuBitsUSecHalfPeriodInt[0]);
  }
  //usleep(QuBitsUSecHalfPeriodInt[0]);
   
@@ -205,10 +207,10 @@ cout << "Receiving Qubits" << endl;
  GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
  inGPIO.setDirection(INPUT);
  // Basic Input
- for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;++iIterRead){
-	 usleep(QuBitsUSecHalfPeriodInt[0]);
+ usleep(QuBitsUSecHalfPeriodInt[0]);
+ for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;++iIterRead){	 
 	 QuBitValueArray[iIterRead]=inGPIO.getValue();
-	 usleep(QuBitsUSecHalfPeriodInt[0]);	 
+	 usleep(QuBitsUSecPeriodInt[0]);	 
  }
   this->NumStoredQubitsNode[0]=0;
  for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;++iIterRead){// Count how many qubits 

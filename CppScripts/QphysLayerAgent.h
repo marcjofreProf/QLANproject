@@ -45,6 +45,7 @@ private: //Variables/Instances
         float QuBitsPerSecondVelocity[LinkNumberMAX]={1000.0}; // Array indicating the qubits per second velocity of each emit/receive pair 
         int QuBitsUSecPeriodInt[LinkNumberMAX]={1000};
         int QuBitsUSecHalfPeriodInt[LinkNumberMAX]={500};
+        int QuBitsUSecQuarterPeriodInt[LinkNumberMAX]={250};
         // Semaphore
 	std::atomic<int> valueSemaphore=1;// Start as 1 (open or acquireable)
 	// Payload messages
