@@ -12,7 +12,7 @@ Header declaration file for Quantum transport Layer Agent Host
 #define QtransportLayerAgentH_H_
 // ICP connections
 #define NumSocketsMax 2
-#define NumBytesBufferICPMAX 2048
+#define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 #define IPcharArrayLengthMAX 15
 // Threading
 #include <thread>

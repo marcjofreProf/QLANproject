@@ -17,7 +17,7 @@ Agent script for Quantum transport Layer Host
 #include <fcntl.h>
 #define PORT 8010
 #define NumSocketsMax 2
-#define NumBytesBufferICPMAX 2048
+#define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 #define IPcharArrayLengthMAX 15
 #define SockListenTimeusecStandard 50
 // InterCommunicaton Protocols - Sockets - Server
@@ -318,7 +318,7 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);
-    usleep(99);// Important to sleep for some time after sending
+    //usleep(99);// Important to sleep for some time after sending
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
