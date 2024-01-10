@@ -649,7 +649,7 @@ try{
 
 int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
 
-int SockListenTimeusec=500000; // Negative means infinite
+int SockListenTimeusec=9999999; // Negative means infinite
 
 int isValidWhileLoopCount = 5; // Number of tries
 
@@ -737,7 +737,7 @@ if (string(this->SCmode[1])==string("client")){
 
 int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
 
-int SockListenTimeusec=500000; // Negative means infinite
+int SockListenTimeusec=9999999; // Negative means infinite
 
 int isValidWhileLoopCount = 15; // Number of tries
 
