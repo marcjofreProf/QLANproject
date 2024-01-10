@@ -51,7 +51,7 @@ this->valueSemaphore=1; // Make sure it stays at 1
 
 //////////////////////////////////////////////
 int QPLA::InitParametersAgent(){// Client node have some parameters to adjust to the server node
-
+memset(this->PayloadSendBuffer, 0, sizeof(this->PayloadSendBuffer));// Reset buffer
 return 0; //All OK
 }
 
@@ -66,7 +66,7 @@ else{
 	strcat(ParamsCharArray,"none_none_");
 }
 strcat(ParamsCharArray,";");
-strcpy(this->PayloadSendBuffer,"");// Reset buffer
+memset(this->PayloadSendBuffer, 0, sizeof(this->PayloadSendBuffer));// Reset buffer
 
 this->release();
 
@@ -85,7 +85,7 @@ int QPLA::ReadParametersAgent(){// Node checks parameters from the other node
 if (string(this->PayloadReadBuffer)!=string("") and string(this->PayloadReadBuffer)==string("none_none_")){
 	this->ProcessNewParameters();
 }
-strcpy(this->PayloadReadBuffer,""); // Reset the buffer
+memset(this->PayloadReadBuffer, 0, sizeof(this->PayloadReadBuffer));// Reset buffer
 return 0; // All OK
 }
 

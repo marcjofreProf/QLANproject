@@ -296,6 +296,7 @@ else {// There might be at least one new message
 				cout << "Host agent message of 0 Bytes" << endl;
 			}
 			// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+			memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 			this->m_exit();
 			return -1;
 		}
@@ -353,6 +354,8 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  // One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
  this->InitiateICPconnections(); // Very important that they work. Otherwise the rest go wrong
  // Then negotiate some parameters
+ 
+ /*
  cout << "this->SCmode[1]: " << this->SCmode[1] << endl;
  cout << "this->IPaddressesSockets[0]: " << this->IPaddressesSockets[0] << endl;
  cout << "this->IPaddressesSockets[1]: " << this->IPaddressesSockets[1] << endl;
@@ -360,7 +363,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  cout << "this->IPaddressesSockets[3]: " << this->IPaddressesSockets[3] << endl;
  cout << "this->IPSocketsList[0]: " << this->IPSocketsList[0] << endl;
  cout << "this->IPSocketsList[1]: " << this->IPSocketsList[1] << endl;
- 
+ */
  //
  this->m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentH" << endl;
@@ -520,14 +523,14 @@ else{// Info message; Default
 }  
 
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-
+memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 return 0; // All OK
 }
 
 int QTLAH::ICPdiscoverSend(char* ParamsCharArray){
     memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
     strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
-    //cout << "SendBuffer: " << this->SendBuffer << endl;	
+    cout << "SendBuffer: " << this->SendBuffer << endl;	
     // Parse the message information
     char IPaddressesSocketsAux[IPcharArrayLengthMAX];
     strcpy(IPaddressesSocketsAux,strtok(ParamsCharArray,","));//Null indicates we are using the same pointer as the last strtok
@@ -602,6 +605,7 @@ if (ReadBytes>0){// Read block
 	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 	char IPdest[NumBytesBufferICPMAX] = {0};
 	char IPorg[NumBytesBufferICPMAX] = {0};
 	char Type[NumBytesBufferICPMAX] = {0};
@@ -621,6 +625,7 @@ if (ReadBytes>0){// Read block
 	{
 		// First remount the message in the ReadBuffer
 		// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+		memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 		strcpy(this->ReadBuffer,IPdest);
 		strcat(this->ReadBuffer,",");
 		strcat(this->ReadBuffer,IPorg);
@@ -636,6 +641,7 @@ if (ReadBytes>0){// Read block
 }
 else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 ParamsIntArray[0]=-1;
 isValidWhileLoopCount--;
 usleep(100);

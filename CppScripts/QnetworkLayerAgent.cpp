@@ -43,7 +43,7 @@ this->valueSemaphore=1; // Make sure it stays at 1
 ///////////////////////////////////////////////////
 int QNLA::InitParametersAgent(){// Client node have some parameters to adjust to the server node
 
-strcpy(this->PayloadSendBuffer,"");
+memset(this->PayloadSendBuffer, 0, sizeof(this->PayloadSendBuffer));// Reset buffer
 
 return 0; //All OK
 }
@@ -60,8 +60,7 @@ else{
 }
 strcat(ParamsCharArray,";");
 QLLAagent.SendParametersAgent(ParamsCharArray);// Below Agent Method
-strcpy(this->PayloadSendBuffer,"");// Reset buffer
-
+memset(this->PayloadSendBuffer, 0, sizeof(this->PayloadSendBuffer));// Reset buffer
 this->release();
 
 return 0; // All OK
@@ -79,7 +78,7 @@ int QNLA::ReadParametersAgent(){// Node checks parameters from the other node
 if (string(this->PayloadReadBuffer)!=string("") and string(this->PayloadReadBuffer)==string("none_none_")){
 	this->ProcessNewParameters();
 }
-strcpy(this->PayloadReadBuffer,""); // Reset the buffer
+memset(this->PayloadReadBuffer, 0, sizeof(this->PayloadReadBuffer));// Reset buffer
 return 0; // All OK
 }
 

@@ -50,7 +50,7 @@ public: // Variables/Objects
 	// IPaddressesSockets[0]: IP host attached ConNet
 	// IPaddressesSockets[1]: IP host other OpNet
 	// IPaddressesSockets[2]: IP node attached ConNet
-	// IPaddressesSockets[3]: Not used
+	// IPaddressesSockets[3]: IP host attached OpNet
 	char IPSocketsList[NumSocketsMax][IPcharArrayLengthMAX]; // IP address where the socket descriptors are pointing to	
 	// IPSocketsList[0]: IP host attached ConNet
 	// IPSocketsList[1]: Not used/IP node intermediate OpNet

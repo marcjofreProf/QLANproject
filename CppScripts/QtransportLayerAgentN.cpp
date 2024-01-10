@@ -69,7 +69,7 @@ return 0; // All OK
 
 int QTLAN::InitParametersAgent(){// Client node have some parameters to adjust to the server node
 
-strcpy(this->PayloadSendBuffer,"");
+memset(this->PayloadSendBuffer, 0, sizeof(this->PayloadSendBuffer));// Reset buffer
 
 return 0; //All OK
 }
@@ -87,7 +87,7 @@ else{
 }
 strcat(ParamsCharArray,";");
 QNLAagent.SendParametersAgent(ParamsCharArray);// Below Agent Method
-strcpy(this->PayloadSendBuffer,"");// Reset buffer
+memset(this->PayloadSendBuffer, 0, sizeof(this->PayloadSendBuffer));// Reset buffer
 // Mount the information to send the message
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
 if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none_;Link;none_none_;Phys;none_none_;")){
@@ -146,7 +146,7 @@ if (string(this->PayloadReadBuffer)!=string("") and string(this->PayloadReadBuff
 	this->ProcessNewParameters();
 }
 
-strcpy(this->PayloadReadBuffer,"");// Reset buffer
+memset(this->PayloadReadBuffer, 0, sizeof(this->PayloadReadBuffer));// Reset buffer
 return 0; // All OK
 }
 
@@ -355,6 +355,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 		cout << "Host agent message of 0 Bytes" << endl;
 	}
 	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 	this->m_exit();
 	return -1;
       }
@@ -455,7 +456,7 @@ return 0; // All OK
 }
 
 int QTLAN::ICPdiscoverSend(char* ParamsCharArray){
-strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
+     strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
     //cout << "SendBuffer: " << this->SendBuffer << endl;	
     // Parse the message information
     char IPaddressesSocketsAux[IPcharArrayLengthMAX];
@@ -606,6 +607,7 @@ else{// Info message; Default
 }  
 
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 
 return 0; // All OK
 }
@@ -672,6 +674,7 @@ if (ReadBytes>0){// Read block
 	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 	char IPdest[NumBytesBufferICPMAX] = {0};
 	char IPorg[NumBytesBufferICPMAX] = {0};
 	char Type[NumBytesBufferICPMAX] = {0};
@@ -698,6 +701,7 @@ if (ReadBytes>0){// Read block
 }
 else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 isValidWhileLoopCount--;
 if (isValidWhileLoopCount==0){
 cout << "Exiting QtransportLayerAgentN since no initial IP addresses retrieved" << endl;
@@ -756,6 +760,7 @@ if (ReadBytes>0){// Read block
 	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 	char IPdest[NumBytesBufferICPMAX] = {0};
 	char IPorg[NumBytesBufferICPMAX] = {0};
 	char Type[NumBytesBufferICPMAX] = {0};
@@ -779,6 +784,7 @@ if (ReadBytes>0){// Read block
 }
 else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 isValidWhileLoopCount--;
 if (isValidWhileLoopCount==0){
 cout << "Exiting QtransportLayerAgentN since no initial parameters negotiation achieved" << endl;
@@ -855,14 +861,14 @@ int main(int argc, char const * argv[]){
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest 
  QTLANagent.RetrieveIPSocketsHosts();
- 
+ /*
  cout << "QTLANagent.IPaddressesSockets[0]: " << QTLANagent.IPaddressesSockets[0] << endl;
  cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[1] << endl;
  cout << "QTLANagent.IPaddressesSockets[2]: " << QTLANagent.IPaddressesSockets[2] << endl;
  cout << "QTLANagent.IPaddressesSockets[3]: " << QTLANagent.IPaddressesSockets[3] << endl;
  cout << "QTLANagent.IPSocketsList[0]: " << QTLANagent.IPSocketsList[0] << endl;
  cout << "QTLANagent.IPSocketsList[1]: " << QTLANagent.IPSocketsList[1] << endl;
- 
+ */
  // Then negotiate some parameters
  QTLANagent.NegotiateInitialParamsNode(); 
  

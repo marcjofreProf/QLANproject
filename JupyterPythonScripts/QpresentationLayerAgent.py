@@ -42,8 +42,8 @@ class QPLA:
 		messagePayloadAux=str(NumRequestedQubits)
 		messageCommandAux="ReceiveQubits"
 		messageTypeAux="Control"
-		messageIPorg=IPhostDestConNet
-		messageIPdest=IPhostOrgConNet
+		messageIPorg=IPhostOrgConNet
+		messageIPdest=IPhostDestConNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
 	
