@@ -528,6 +528,7 @@ strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the
 
 int NumQintupleComas=this->countQintupleComas(ReadBufferAuxOriginal);
 //NumQintupleComas=1;
+cout << "NumQintupleComas: " << NumQintupleComas << endl;
 for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	char IPdest[NumBytesBufferICPMAX] = {0};
 	char IPorg[NumBytesBufferICPMAX] = {0};

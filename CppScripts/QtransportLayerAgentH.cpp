@@ -450,6 +450,7 @@ char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
 strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 
 int NumQintupleComas=this->countQintupleComas(ReadBufferAuxOriginal);
+cout << "NumQintupleComas: " << NumQintupleComas << endl;
 //NumQintupleComas=1;
 for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	char IPdest[NumBytesBufferICPMAX] = {0};
