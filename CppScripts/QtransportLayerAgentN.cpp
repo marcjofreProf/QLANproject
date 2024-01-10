@@ -530,7 +530,7 @@ strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the
 int NumQintupleComas=this->countQintupleComas(ReadBufferAuxOriginal);
 //NumQintupleComas=1;
 if (NumQintupleComas>20){NumQintupleComas=NumProcessMessagesConcurrentMax;}// Limit the total number that can be proceessed, avoiding cascades
-cout << "NumQintupleComas: " << NumQintupleComas << endl;
+//cout << "NumQintupleComas: " << NumQintupleComas << endl;
 if (NumQintupleComas>20){NumQintupleComas=20;}// Limit the total number that can be proceessed
 for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	char IPdest[NumBytesBufferICPMAX] = {0};
