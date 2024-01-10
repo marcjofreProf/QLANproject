@@ -221,6 +221,14 @@ this->release();
  return 0; // return 0 is for no error
 }
 
+int QPLA::GetNumStoredQubitsNode(){
+int NumStoredQubitsNodeAux=0;
+this->acquire();
+NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
+this->release();
+return NumStoredQubitsNodeAux;
+}
+
 QPLA::~QPLA() {
 // destructor
 this->threadRef.join();// Terminate the process thread

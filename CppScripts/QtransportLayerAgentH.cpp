@@ -600,7 +600,7 @@ strcat(this->SendBuffer,"NumStoredQubitsNode");
 strcat(this->SendBuffer,",");// Very important to end the message
 
 this->ICPmanagementSend(socket_fd_conn); // send mesage to node
-usleep(999999);
+//usleep(999999);
 this->ReadFlagWait=true;
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 this->ReadFlagWait=false;
@@ -648,7 +648,7 @@ else{
 memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 ParamsIntArray[0]=-1;
 isValidWhileLoopCount--;
-usleep(999999);
+usleep(9999);
 }
 }//while
 

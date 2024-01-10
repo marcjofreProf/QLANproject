@@ -74,6 +74,7 @@ public: // Functions/Methods
         // General Input and Output functions
 	int emitQuBit();
 	int receiveQuBit();
+	int GetNumStoredQubitsNode();
 	~QPLA();  //destructor
 
 private: // Functions/Methods

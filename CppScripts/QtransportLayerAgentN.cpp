@@ -536,7 +536,7 @@ if (string(Type)==string("Operation")){// Operation message. Forward to the host
 else if(string(Type)==string("Control")){//Control message
 	if (string(Command)==string("InfoRequest")){ // Request to provide information
 		if (string(Payload)==string("NumStoredQubitsNode")){
-		  int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.NumStoredQubitsNode[0];// to be developed for more than one link
+		  int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
 		  // Generate the message
 		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 		strcpy(ParamsCharArray,IPorg);
@@ -667,9 +667,9 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"IPaddressesSockets");
 strcat(this->SendBuffer,",");// Very important to end the message
-usleep(999999);
+usleep(99999);
 this->ICPmanagementSend(socket_fd_conn); // send message to node
-usleep(999999);
+//usleep(999999);
 this->ReadFlagWait=true;
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 this->ReadFlagWait=false;
@@ -712,7 +712,7 @@ cout << "Exiting QtransportLayerAgentN since no initial IP addresses retrieved" 
 this->m_exit(); // Exit the application
 }
 else{
-usleep(999999);
+usleep(9999);
 }
 }
 }//while
@@ -755,9 +755,9 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"NodeAreYouThere?");
 strcat(this->SendBuffer,",");// Very important to end the message
-usleep(999999);
+//usleep(999999);
 this->ICPmanagementSend(socket_fd_conn); // send message to node
-usleep(999999);
+//usleep(999999);
 this->ReadFlagWait=true;
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 this->ReadFlagWait=false;
@@ -797,7 +797,7 @@ cout << "Exiting QtransportLayerAgentN since no initial parameters negotiation a
 this->m_exit(); // Exit the application
 }
 else{
-usleep(999999);
+usleep(9999);
 }
 }
 }//while
