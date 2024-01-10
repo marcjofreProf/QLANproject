@@ -4985,7 +4985,7 @@ SWIG_init(void) {
   import_array();
   
   SWIG_Python_SetConstant(d, "NumSocketsMax",SWIG_From_int(static_cast< int >(2)));
-  SWIG_Python_SetConstant(d, "NumBytesBufferICPMAX",SWIG_From_int(static_cast< int >(1024)));
+  SWIG_Python_SetConstant(d, "NumBytesBufferICPMAX",SWIG_From_int(static_cast< int >(2048)));
   SWIG_Python_SetConstant(d, "IPcharArrayLengthMAX",SWIG_From_int(static_cast< int >(15)));
   SWIG_Python_SetConstant(d, "QTLAH_APPLICATION_RUNNING",SWIG_From_int(static_cast< int >(nsQtransportLayerAgentH::QTLAH::APPLICATION_RUNNING)));
   SWIG_Python_SetConstant(d, "QTLAH_APPLICATION_PAUSED",SWIG_From_int(static_cast< int >(nsQtransportLayerAgentH::QTLAH::APPLICATION_PAUSED)));

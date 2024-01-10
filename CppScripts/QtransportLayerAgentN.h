@@ -13,7 +13,7 @@ Header declaration file for Quantum transport Layer Agent Node
 
 // ICP connections
 #define NumSocketsMax 2
-#define NumBytesBufferICPMAX 1024
+#define NumBytesBufferICPMAX 2048
 #define IPcharArrayLengthMAX 15
 
 // Payload messages
