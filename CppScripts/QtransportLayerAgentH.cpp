@@ -283,7 +283,9 @@ return -1;
 else {// There might be at least one new message
 	if (FD_ISSET(socket_fd_conn, &fds)){// is a macro that checks whether a specified file descriptor is set in a specified file descriptor set.
 		// Read the message from the socket
-		int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);//0);//MSG_DONTWAIT);
+		int valread=0;
+		if (this->ReadFlagWait){valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
+		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 		//cout << "valread: " << valread << endl;
 		//cout << "Node message received: " << this->ReadBuffer << endl;
 		if (valread <= 0){
@@ -581,7 +583,7 @@ try{
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor
 
-int SockListenTimeusec=100; // negative means infinite time
+int SockListenTimeusec=10000; // negative means infinite time
 
 int isValidWhileLoopCount = 100; // Number of tries
 while(isValidWhileLoopCount>0){
@@ -598,8 +600,10 @@ strcat(this->SendBuffer,"NumStoredQubitsNode");
 strcat(this->SendBuffer,",");// Very important to end the message
 
 this->ICPmanagementSend(socket_fd_conn); // send mesage to node
-usleep(500);
+usleep(10000);
+this->ReadFlagWait=true;
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
+this->ReadFlagWait=false;
 //cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
 	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
@@ -644,7 +648,7 @@ else{
 memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 ParamsIntArray[0]=-1;
 isValidWhileLoopCount--;
-usleep(100);
+usleep(10000);
 }
 }//while
 

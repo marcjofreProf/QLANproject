@@ -343,7 +343,9 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   else {// There is at least one new message
     if (FD_ISSET(socket_fd_conn, &fds)) {// s a macro that checks whether a specified file descriptor is set in a specified file descriptor set.
       // Read the message from the socket
-      int valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);//0);//MSG_DONTWAIT);
+        int valread=0;
+	if (this->ReadFlagWait){valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
+	else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
       //cout << "Node message received: " << this->ReadBuffer << endl;
       if (valread <= 0) {
 	if (valread<0){
@@ -668,7 +670,9 @@ strcat(this->SendBuffer,",");// Very important to end the message
 usleep(999999);
 this->ICPmanagementSend(socket_fd_conn); // send message to node
 usleep(999999);
+this->ReadFlagWait=true;
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
+this->ReadFlagWait=false;
 //cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
 	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
@@ -754,7 +758,9 @@ strcat(this->SendBuffer,",");// Very important to end the message
 usleep(999999);
 this->ICPmanagementSend(socket_fd_conn); // send message to node
 usleep(999999);
+this->ReadFlagWait=true;
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
+this->ReadFlagWait=false;
 //cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
 	char ReadBufferAux[NumBytesBufferICPMAX] = {0};

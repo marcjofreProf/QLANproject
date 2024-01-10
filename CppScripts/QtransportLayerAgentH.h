@@ -53,7 +53,8 @@ private: // Variables/Objects
 	// IPSocketsList[0]: IP node attached ConNet
 	// IPSocketsList[1]: IP host other OpNet
 	char ReadBuffer[NumBytesBufferICPMAX] = {0};// Buffer to read ICP messages
-	char SendBuffer[NumBytesBufferICPMAX] = {0};// Buffer to send ICP messages	
+	char SendBuffer[NumBytesBufferICPMAX] = {0};// Buffer to send ICP messages
+	bool ReadFlagWait=false;	
 	int socketReadIter = 0; // Variable to read each time a different socket
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking

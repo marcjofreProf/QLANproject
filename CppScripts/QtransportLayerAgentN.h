@@ -63,6 +63,7 @@ private: // Variables/Objects
 	int new_socketArray[NumSocketsMax]; // socket between client and server. Created by the server
 	char ReadBuffer[NumBytesBufferICPMAX] = {0};// Buffer to read ICP messages
 	char SendBuffer[NumBytesBufferICPMAX] = {0};// Buffer to send ICP messages
+	bool ReadFlagWait=false;
 	int socketReadIter = 0; // Variable to read each time a different socket
 	// Semaphore
 	std::atomic<int> valueSemaphore=1;// Start as 1 (open or acquireable)
