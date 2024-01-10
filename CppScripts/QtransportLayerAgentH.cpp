@@ -318,6 +318,7 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),0);//MSG_DONTWAIT);
+    usleep(999);// Important to sleep for some time after sending
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
@@ -381,6 +382,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
            case QTLAH::APPLICATION_RUNNING: {               
                // Do Some Work
                this->ProcessNewMessage();
+               while(this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard)>0);// Make sure to remove all pending mesages in the socket
                this->m_pause(); // After procesing the request, pass to paused state
                break;
            }
