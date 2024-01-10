@@ -353,6 +353,13 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  // One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
  this->InitiateICPconnections(); // Very important that they work. Otherwise the rest go wrong
  // Then negotiate some parameters
+ cout << "this->SCmode[1]: " << this->SCmode[1] << endl;
+ cout << "this->IPaddressesSockets[0]: " << this->IPaddressesSockets[0] << endl;
+ cout << "this->IPaddressesSockets[1]: " << this->IPaddressesSockets[1] << endl;
+ cout << "this->IPaddressesSockets[2]: " << this->IPaddressesSockets[2] << endl;
+ cout << "this->IPaddressesSockets[3]: " << this->IPaddressesSockets[3] << endl;
+ cout << "this->IPSocketsList[0]: " << this->IPSocketsList[0] << endl;
+ cout << "this->IPSocketsList[1]: " << this->IPSocketsList[1] << endl;
  
  //
  this->m_pause(); // Initiate in paused state.

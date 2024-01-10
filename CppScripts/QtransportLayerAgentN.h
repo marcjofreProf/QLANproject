@@ -51,12 +51,14 @@ public: // Variables/Objects
 	// IPaddressesSockets[1]: IP host other OpNet
 	// IPaddressesSockets[2]: IP node attached ConNet
 	// IPaddressesSockets[3]: Not used
+	char IPSocketsList[NumSocketsMax][IPcharArrayLengthMAX]; // IP address where the socket descriptors are pointing to	
+	// IPSocketsList[0]: IP host attached ConNet
+	// IPSocketsList[1]: Not used/IP node intermediate OpNet
 	char SCmode[NumSocketsMax][NumBytesBufferICPMAX] = {0}; // Variable to know if the node instance is working as server or client to the other node
 
 private: // Variables/Objects		
 	// Member Variables Such As Window Handle, Time Etc.,
-	ApplicationState m_state;	
-	char IPSocketsList[NumSocketsMax][IPcharArrayLengthMAX]; // IP address where the socket descriptors are pointing to	
+	ApplicationState m_state;		
 	int socket_fdArray[NumSocketsMax]; // socket descriptor, an integer (like a file-handle)
 	int new_socketArray[NumSocketsMax]; // socket between client and server. Created by the server
 	char ReadBuffer[NumBytesBufferICPMAX] = {0};// Buffer to read ICP messages

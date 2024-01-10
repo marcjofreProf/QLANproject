@@ -42,10 +42,16 @@ public: // Variables/Objects
 private: // Variables/Objects	
 	ApplicationState m_state;
 	char IPaddressesSockets[NumSocketsMax+2][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks
+	// IPaddressesSockets[0]: IP node attached ConNet
+	// IPaddressesSockets[1]: IP host other OpNet
+	// IPaddressesSockets[2]: IP host attached OpNet
+	// IPaddressesSockets[3]: IP host attached ConNet
 	char SCmode[NumSocketsMax][NumBytesBufferICPMAX] = {0}; // Variable to know if the host instance is working as server or client
 	int socket_fdArray[NumSocketsMax]; // socket descriptor, an integer (like a file-handle)
 	int new_socketArray[NumSocketsMax]; // socket between client and server, an integer. Created by the server.
 	char IPSocketsList[NumSocketsMax][IPcharArrayLengthMAX]; // IP address where the socket descriptors are pointing to
+	// IPSocketsList[0]: IP node attached ConNet
+	// IPSocketsList[1]: IP host other OpNet
 	char ReadBuffer[NumBytesBufferICPMAX] = {0};// Buffer to read ICP messages
 	char SendBuffer[NumBytesBufferICPMAX] = {0};// Buffer to send ICP messages	
 	int socketReadIter = 0; // Variable to read each time a different socket

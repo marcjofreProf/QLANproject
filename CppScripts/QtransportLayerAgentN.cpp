@@ -856,6 +856,13 @@ int main(int argc, char const * argv[]){
  // Discover some IP addresses of interest 
  QTLANagent.RetrieveIPSocketsHosts();
  
+ cout << "QTLANagent.IPaddressesSockets[0]: " << QTLANagent.IPaddressesSockets[0] << endl;
+ cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[1] << endl;
+ cout << "QTLANagent.IPaddressesSockets[2]: " << QTLANagent.IPaddressesSockets[2] << endl;
+ cout << "QTLANagent.IPaddressesSockets[3]: " << QTLANagent.IPaddressesSockets[3] << endl;
+ cout << "QTLANagent.IPSocketsList[0]: " << QTLANagent.IPSocketsList[0] << endl;
+ cout << "QTLANagent.IPSocketsList[1]: " << QTLANagent.IPSocketsList[1] << endl;
+ 
  // Then negotiate some parameters
  QTLANagent.NegotiateInitialParamsNode(); 
  
