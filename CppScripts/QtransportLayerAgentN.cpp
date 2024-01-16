@@ -709,22 +709,22 @@ int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 this->ReadFlagWait=false;
 //cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
-	this->ProcessNewMessage();	
-	if (this->InfoIPaddressesSocketsFlag==true){isValidWhileLoopCount=0;}
+	this->ProcessNewMessage();		
 }
+if (this->InfoIPaddressesSocketsFlag==true){isValidWhileLoopCount=0;}
 else{
-// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
-isValidWhileLoopCount--;
-if (isValidWhileLoopCount==0){
-cout << "Exiting QtransportLayerAgentN since no initial IP addresses retrieved" << endl;
-this->m_exit(); // Exit the application
-}
-else{
-this->release();// Non-block during sleeping
-usleep(9999);
-this->acquire(); // Re-acquire semaphore
-}
+	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
+	isValidWhileLoopCount--;
+	if (isValidWhileLoopCount==0){
+	cout << "Exiting QtransportLayerAgentN since no initial IP addresses retrieved" << endl;
+	this->m_exit(); // Exit the application
+	}
+	else{
+	this->release();// Non-block during sleeping
+	usleep(9999);
+	this->acquire(); // Re-acquire semaphore
+	}
 }
 }//while
 
@@ -775,21 +775,21 @@ this->ReadFlagWait=false;
 //cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
 	this->ProcessNewMessage();	
-	if (this->OtherNodeThereFlag==true){isValidWhileLoopCount=0;}
 }
+if (this->OtherNodeThereFlag==true){isValidWhileLoopCount=0;}
 else{
-// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
-isValidWhileLoopCount--;
-if (isValidWhileLoopCount==0){
-cout << "Exiting QtransportLayerAgentN since no initial parameters negotiation achieved" << endl;
-this->m_exit(); // Exit the application
-}
-else{
-this->release();// Non-block during sleeping
-usleep(9999);
-this->acquire(); // Re-acquire semaphore
-}
+	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
+	isValidWhileLoopCount--;
+	if (isValidWhileLoopCount==0){
+	cout << "Exiting QtransportLayerAgentN since no initial parameters negotiation achieved" << endl;
+	this->m_exit(); // Exit the application
+	}
+	else{
+	this->release();// Non-block during sleeping
+	usleep(9999);
+	this->acquire(); // Re-acquire semaphore
+	}
 }
 }//while
 

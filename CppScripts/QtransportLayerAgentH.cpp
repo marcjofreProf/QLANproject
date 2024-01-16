@@ -635,11 +635,11 @@ int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 this->ReadFlagWait=false;
 //cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
-	this->ProcessNewMessage();	
-	if (this->InfoNumStoredQubitsNodeFlag==true){
-	ParamsIntArray[0]=this->NumStoredQubitsNodeParamsIntArray[0];	
-	isValidWhileLoopCount=0;
-	}
+	this->ProcessNewMessage();		
+}
+if (this->InfoNumStoredQubitsNodeFlag==true){
+ParamsIntArray[0]=this->NumStoredQubitsNodeParamsIntArray[0];	
+isValidWhileLoopCount=0;
 }
 else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
