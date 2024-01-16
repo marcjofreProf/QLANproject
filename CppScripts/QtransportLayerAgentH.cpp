@@ -299,7 +299,7 @@ else {// There might be at least one new message
 		if (this->ReadFlagWait){valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 		//cout << "valread: " << valread << endl;
-		cout << "Host message received: " << this->ReadBuffer << endl;
+		//cout << "Host message received: " << this->ReadBuffer << endl;
 		if (valread <= 0){
 			if (valread<0){
 				cout << strerror(errno) << endl;
