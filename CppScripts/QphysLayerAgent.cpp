@@ -171,6 +171,12 @@ int QPLA::InitAgentProcess(){
 
 
 int QPLA::emitQuBit(){
+std::thread threadRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
+threadRefAux.join();// Wait for the thread to finish
+return 0; // return 0 is for no error
+}
+
+int QPLA::ThreadEmitQuBit(){
 this->acquire();
 cout << "Emiting Qubits" << endl;
 // this->outGPIO=exploringBB::GPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
@@ -202,6 +208,12 @@ cout << "Emiting Qubits" << endl;
 }
 
 int QPLA::receiveQuBit(){
+std::thread threadRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
+threadRefAux.join();// Wait for the thread to finish
+return 0; // return 0 is for no error
+}
+
+int QPLA::ThreadReceiveQubit(){
 this->acquire();
 cout << "Receiving Qubits" << endl;
 // this->inGPIO=exploringBB::GPIO(48); // Receiving GPIO. Of course gnd have to be connected accordingly.

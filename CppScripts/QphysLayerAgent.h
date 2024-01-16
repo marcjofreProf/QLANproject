@@ -78,9 +78,7 @@ public: // Functions/Methods
 	int GetNumStoredQubitsNode();
 	~QPLA();  //destructor
 
-private: // Functions/Methods
-	// Thread management
-	std::thread threadRef; // Process thread that executes requests/petitions without blocking
+private: // Functions/Methods	
 	// Sempahore
 	void acquire();
 	void release();
@@ -106,6 +104,11 @@ private: // Functions/Methods
 	int ProcessNewParameters();// Process the parameters
 	int countDoubleColons(char* ParamsCharArray);
 	int countDoubleUnderscores(char* ParamsCharArray);
+	// Thread management
+	std::thread threadRef; // Process thread that executes requests/petitions without blocking
+	// Particular process threads
+	int ThreadEmitQuBit();
+	int ThreadReceiveQubit();
 	
 };
 
