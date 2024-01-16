@@ -493,7 +493,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,"Control");
 			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,"InfoRequest");
+			strcat(ParamsCharArray,"IPaddressesSockets");
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,IPaddressesSockets[1]);
 			strcat(ParamsCharArray,":");
@@ -506,15 +506,18 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			//cout << "IPdest: " << IPdest << endl;
 			//cout << "IPorg: " << IPorg << endl;
 			this->ICPmanagementSend(socket_fd_conn);
-			}		
-			else{
-			// Send something since node is waiting
 			}
-			
+			else if (string(Command)==string("NumStoredQubitsNode")){// Expected/awaiting message
+				this->InfoNumStoredQubitsNodeFlag=true;
+				this->NumStoredQubitsNodeParamsIntArray[0]=atoi(Payload);
+			}					
+			else{
+			// Do not do anything
+			}			
 		}
 		else if (string(Command)==string("print")){
 			cout << "New Message: "<< Payload << endl;
-		}
+		}		
 		else{//Default
 		// Do not do anything
 		}
@@ -608,7 +611,7 @@ try{
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor
-
+this->InfoNumStoredQubitsNodeFlag=false; // Reset the flag
 int SockListenTimeusec=9999999; // negative means infinite time
 
 int isValidWhileLoopCount = 100; // Number of tries
@@ -632,41 +635,10 @@ int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 this->ReadFlagWait=false;
 //cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
-	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
-	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
-	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
-	char IPdest[NumBytesBufferICPMAX] = {0};
-	char IPorg[NumBytesBufferICPMAX] = {0};
-	char Type[NumBytesBufferICPMAX] = {0};
-	char Command[NumBytesBufferICPMAX] = {0};
-	char Payload[NumBytesBufferICPMAX] = {0};
-	strcpy(IPdest,strtok(ReadBufferAux,","));
-	strcpy(IPorg,strtok(NULL,","));
-	strcpy(Type,strtok(NULL,","));
-	strcpy(Command,strtok(NULL,","));
-	strcpy(Payload,strtok(NULL,","));
-	//cout << "Payload: " << Payload << endl;
-	if (string(Command)==string("InfoRequest") and string(Type)==string("Operation")){// Expected/awaiting message
-	ParamsIntArray[0]=atoi(Payload);
+	this->ProcessNewMessage();	
+	if (this->InfoNumStoredQubitsNodeFlag==true){
+	ParamsIntArray[0]=this->NumStoredQubitsNodeParamsIntArray[0];	
 	isValidWhileLoopCount=0;
-	}
-	else// Not the message that was expected. Probably a node to the other node message, so let it pass
-	{
-		// First remount the message in the ReadBuffer
-		// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-		memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
-		strcpy(this->ReadBuffer,IPdest);
-		strcat(this->ReadBuffer,",");
-		strcat(this->ReadBuffer,IPorg);
-		strcat(this->ReadBuffer,",");
-		strcat(this->ReadBuffer,Type);
-		strcat(this->ReadBuffer,",");
-		strcat(this->ReadBuffer,Command);
-		strcat(this->ReadBuffer,",");
-		strcat(this->ReadBuffer,Payload);
-		strcat(this->ReadBuffer,",");// Very important to end the message
-		this->ProcessNewMessage(); // Send to the method for processing
 	}
 }
 else{

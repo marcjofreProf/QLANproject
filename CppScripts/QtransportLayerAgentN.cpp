@@ -561,7 +561,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	if (string(Type)==string("Operation")){// Operation message. Forward to the host (there should not be messages of this type in the QtransportLayerAgent. So not develop
 		// Do not do anything
 	}
-	else if(string(Type)==string("Control")){//Control message
+	else if(string(Type)==string("Control")){//Control message	
 		if (string(Command)==string("InfoRequest")){ // Request to provide information
 			if (string(Payload)==string("NumStoredQubitsNode")){
 			  int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
@@ -573,7 +573,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,"Operation");
 			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,"InfoRequest");
+			strcat(ParamsCharArray,"NumStoredQubitsNode");
 			strcat(ParamsCharArray,",");
 			char charNum[NumBytesBufferICPMAX] = {0};
 			sprintf(charNum, "%d", NumStoredQubitsNode);
@@ -605,11 +605,17 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
 			this->ICPmanagementSend(socket_fd_conn); // send message to node
 			}
+			else if (string(Payload)==string("YesIamHere")){this->OtherNodeThereFlag=true;}
 			else{
 			//discard
 			cout << "Node does not have this information "<< Payload << endl;
 			}
 		}
+		else if (string(Command)==string("IPaddressesSockets")){
+			strcpy(this->IPaddressesSockets[1],strtok(Payload,":"));
+			strcpy(this->IPaddressesSockets[3],strtok(NULL,":"));
+			InfoIPaddressesSocketsFlag=true;
+		}		
 		else if (string(Command)==string("InfoProcess")){// Params messages
 			//cout << "New Message: "<< Payload << endl;
 			this->ReadParametersAgent(Payload);
@@ -678,7 +684,7 @@ try{
 int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
 
 int SockListenTimeusec=9999999; // Negative means infinite
-
+this->InfoIPaddressesSocketsFlag=false;// Reset flag indicating information
 int isValidWhileLoopCount = 5; // Number of tries
 
 while(isValidWhileLoopCount>0){
@@ -703,33 +709,8 @@ int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 this->ReadFlagWait=false;
 //cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
-	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
-	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
-	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
-	char IPdest[NumBytesBufferICPMAX] = {0};
-	char IPorg[NumBytesBufferICPMAX] = {0};
-	char Type[NumBytesBufferICPMAX] = {0};
-	char Command[NumBytesBufferICPMAX] = {0};
-	char Payload[NumBytesBufferICPMAX] = {0};
-	strcpy(IPdest,strtok(ReadBufferAux,","));
-	strcpy(IPorg,strtok(NULL,","));
-	strcpy(Type,strtok(NULL,","));
-	strcpy(Command,strtok(NULL,","));
-	strcpy(Payload,strtok(NULL,","));
-	//cout << "Payload: " << Payload << endl;
-	if (string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
-		strcpy(this->IPaddressesSockets[1],strtok(Payload,":"));
-		strcpy(this->IPaddressesSockets[3],strtok(NULL,":")); // Really not used
-		//cout << "this->IPaddressesSockets[1]: " << this->IPaddressesSockets[1] << endl;
-		//cout << "this->IPaddressesSockets[2]: " << this->IPaddressesSockets[2] << endl;
-		isValidWhileLoopCount=0;
-	}
-	else// Not the message that was expected. Probably a node to the other node message, so let it pass
-	{
-		// Not messages expected as this point
-	}
-
+	this->ProcessNewMessage();	
+	if (this->InfoIPaddressesSocketsFlag==true){isValidWhileLoopCount=0;}
 }
 else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
@@ -760,7 +741,7 @@ int QTLAN::NegotiateInitialParamsNode(){
 if (string(this->SCmode[1])==string("client")){
  // First check that the other node is with established connection
  
-
+this->OtherNodeThereFlag=false;// Reset the value
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 
 int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
@@ -791,30 +772,8 @@ int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 this->ReadFlagWait=false;
 //cout << "ReadBytes: " << ReadBytes << endl;
 if (ReadBytes>0){// Read block	
-	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
-	strcpy(ReadBufferAux,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
-	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
-	char IPdest[NumBytesBufferICPMAX] = {0};
-	char IPorg[NumBytesBufferICPMAX] = {0};
-	char Type[NumBytesBufferICPMAX] = {0};
-	char Command[NumBytesBufferICPMAX] = {0};
-	char Payload[NumBytesBufferICPMAX] = {0};
-	strcpy(IPdest,strtok(ReadBufferAux,","));
-	strcpy(IPorg,strtok(NULL,","));
-	strcpy(Type,strtok(NULL,","));
-	strcpy(Command,strtok(NULL,","));
-	strcpy(Payload,strtok(NULL,","));
-	//cout << "Payload: " << Payload << endl;
-	if (string(Payload)==string("YesIamHere") and string(Command)==string("InfoRequest") and string(Type)==string("Control")){// Expected/awaiting message
-		//cout << "Other node responding that it is here" << endl;
-		isValidWhileLoopCount=0;
-	}
-	else// Not the message that was expected. Probably a node to the other node message, so let it pass
-	{
-		// Not messages expected as this point
-	}
-
+	this->ProcessNewMessage();	
+	if (this->OtherNodeThereFlag==true){isValidWhileLoopCount=0;}
 }
 else{
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
