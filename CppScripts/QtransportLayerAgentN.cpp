@@ -359,7 +359,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
         int valread=0;
 	if (this->ReadFlagWait){valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 	else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
-        cout << "Node message received: " << this->ReadBuffer << endl;
+        //cout << "Node message received: " << this->ReadBuffer << endl;
       if (valread <= 0) {
 	if (valread<0){
 		cout << strerror(errno) << endl;
