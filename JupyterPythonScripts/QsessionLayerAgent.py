@@ -10,6 +10,7 @@
 #####################################################
 
 import os, sys
+import numpy as np
 pathScriptBelowAgentScript='./../CppScripts/'
 sys.path.append(pathScriptBelowAgentScript)
 

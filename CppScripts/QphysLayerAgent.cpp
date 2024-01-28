@@ -180,7 +180,9 @@ int QPLA::InitAgentProcess(){
 
 
 int QPLA::emitQuBit(){
+if (!this->threadEmitQuBitRefAux.joinable()){// Protection, do not run if there is a previous thread running
 this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
+}
 
 return 0; // return 0 is for no error
 }
@@ -189,7 +191,7 @@ int QPLA::ThreadEmitQuBit(){
 this->acquire();
 cout << "Emiting Qubits" << endl;
 
-int MaxWhileRound=10000;
+int MaxWhileRound=1000;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
 	this->release();
@@ -197,7 +199,7 @@ while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && 
 	MaxWhileRound--;
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
-MaxWhileRound=10000;
+MaxWhileRound=1000;
 this->acquire();
 
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
@@ -254,7 +256,9 @@ this->release();
 }
 
 int QPLA::receiveQuBit(){
+if (!this->threadReceiveQuBitRefAux.joinable()){// Protection, do not run if there is a previous thread running
 this->threadReceiveQuBitRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
+}
 
 return 0; // return 0 is for no error
 }
@@ -286,7 +290,7 @@ strcat(ParamsCharArray,"_"); // Final _
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 
-int MaxWhileRound=10000;
+int MaxWhileRound=1000;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 	this->release();	
 	TimePoint TimePointClockNow=Clock::now();

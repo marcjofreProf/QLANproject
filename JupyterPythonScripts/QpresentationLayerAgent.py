@@ -11,6 +11,7 @@
 
 import sys, os
 import time
+import numpy as np
 
 import QsessionLayerAgent
 
@@ -46,6 +47,7 @@ class QPLA:
 		messageIPdest=IPhostDestConNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
+		ParamsIntArray = np.zeros(1, dtype=np.intc)
 		self.QSLAagent.RetrieveNumStoredQubitsNode(ParamsIntArray)# (although redundant maybe) run it because it also executes the thread join in the receiving Node
 	
 	def RetrieveNumStoredQubitsNode(self,ParamsIntArray): # Supposing that node has received quBits, make use of them
