@@ -189,7 +189,7 @@ int QPLA::ThreadEmitQuBit(){
 this->acquire();
 cout << "Emiting Qubits" << endl;
 
-int MaxWhileRound=100000;
+int MaxWhileRound=10000;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
 	this->release();
@@ -197,9 +197,23 @@ while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && 
 	MaxWhileRound--;
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
-MaxWhileRound=100000;
+MaxWhileRound=10000;
 this->acquire();
+
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
+	TimePoint TimePointClockNow=std::chrono::time_point<Clock>();
+	auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
+	// Convert duration to desired time
+	auto millisTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+	unsigned int TimeNow_time_as_count = static_cast<int>(millisTimeNow);// Convert to int 
+	cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
+	
+	auto duration_since_epochFutureTimePoint=this->OtherClientNodeFutureTimePoint.time_since_epoch();
+	// Convert duration to desired time
+	auto millisTimePointFuture = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+	unsigned int TimePointFuture_time_as_count = static_cast<int>(millisTimePointFuture);// Convert to int 
+	cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
+        
 	this->release();
 	usleep(500);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
@@ -257,7 +271,7 @@ auto duration_since_epoch=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
 auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 unsigned int time_as_count = static_cast<int>(millis);// Convert to int 
-//cout << "time_as_count: " << time_as_count << endl;
+cout << "time_as_count: " << time_as_count << endl;
 // Mount the Parameters message for the other node
 char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 strcpy(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Initiates the ParamsCharArray, so use strcpy
@@ -270,14 +284,14 @@ strcat(ParamsCharArray,"_"); // Final _
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 
-int MaxWhileRound=100000;
+int MaxWhileRound=10000;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 this->release();
 usleep(500);//Maybe some sleep to reduce CPU consumption
 MaxWhileRound--;
 };
 this->acquire();
-cout << "MaxWhileRound: " << MaxWhileRound << endl;
+//cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // Start measuring
 // this->inGPIO=exploringBB::GPIO(48); // Receiving GPIO. Of course gnd have to be connected accordingly.
  GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
