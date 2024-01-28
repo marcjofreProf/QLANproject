@@ -212,7 +212,7 @@ int QPLA::ThreadEmitQuBit(){
 this->acquire();
 cout << "Emiting Qubits" << endl;
 
-int MaxWhileRound=50000;
+int MaxWhileRound=10000;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
 	this->release();
