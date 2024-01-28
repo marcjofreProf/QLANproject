@@ -146,15 +146,16 @@ for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 	}
 	strcpy(ValuesCharArray[iHeaders],strtok(NULL,"_"));
 }
-//cout << "Phys: Processing Parameters" << endl;
+cout << "Phys: Processing Parameters" << endl;
+cout << "this->PayloadReadBuffer: " << this->PayloadReadBuffer << endl;
 for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 // Missing to develop if there are different values
 if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){this->EmitLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){this->ReceiveLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){
-	cout << "OtherClientNodeFutureTimePoint: " << (unsigned long int)atoi(ValuesCharArray[iHeaders]) << endl;
-	std::chrono::milliseconds duration_back(atoi(ValuesCharArray[iHeaders]));
+	cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
+	std::chrono::milliseconds duration_back((unsigned int)atoi(ValuesCharArray[iHeaders]));
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
 	}
 else{// discard
@@ -249,17 +250,18 @@ TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFut
 auto duration_since_epoch=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
 auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
-int time_as_count = static_cast<int>(millis);// Convert to int 
+unsigned int time_as_count = static_cast<int>(millis);// Convert to int 
 cout << "time_as_count: " << time_as_count << endl;
 // Mount the Parameters message for the other node
 char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 strcpy(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Initiates the ParamsCharArray, so use strcpy
 
 char charNum[NumBytesPayloadBuffer] = {0}; 
-sprintf(charNum, "%d", time_as_count); 
+sprintf(charNum, "%u", time_as_count); 
 strcat(ParamsCharArray,charNum);
 
 strcat(ParamsCharArray,"_"); // Final _
+cout << "ParamsCharArray: " << ParamsCharArray << endl;
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 
 int MaxWhileRound=1000000;
