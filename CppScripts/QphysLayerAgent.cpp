@@ -153,10 +153,11 @@ for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){this->EmitLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){this->ReceiveLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=atoi(ValuesCharArray[iHeaders]);}
-else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){
+else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread
 	cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
 	std::chrono::milliseconds duration_back((unsigned int)atoi(ValuesCharArray[iHeaders]));
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
+	this->threadEmitQuBitRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
 	}
 else{// discard
 }
@@ -179,8 +180,6 @@ int QPLA::InitAgentProcess(){
 
 
 int QPLA::emitQuBit(){
-this->threadReceiveQuBitRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
-this->threadEmitQuBitRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
 this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
 
 return 0; // return 0 is for no error
@@ -236,8 +235,6 @@ this->OtherClientNodeFutureTimePoint=TimePoint();
 }
 
 int QPLA::receiveQuBit(){
-this->threadReceiveQuBitRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
-this->threadEmitQuBitRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
 this->threadReceiveQuBitRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
 
 return 0; // return 0 is for no error
@@ -300,6 +297,7 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::GetNumStoredQubitsNode(){
+this->threadReceiveQuBitRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
 this->acquire();
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
 this->release();
@@ -309,8 +307,6 @@ return NumStoredQubitsNodeAux;
 QPLA::~QPLA() {
 // destructor
 this->threadRef.join();// Terminate the process thread
-this->threadReceiveQuBitRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
-this->threadEmitQuBitRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
 }
 
 int QPLA::NegotiateInitialParamsNode(){
