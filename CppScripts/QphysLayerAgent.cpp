@@ -320,7 +320,7 @@ cout << "Receiving Qubits" << endl;
 
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
 // Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
-int WaitTimeToFutureTimePoint=1000;
+int WaitTimeToFutureTimePoint=10000;
 TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
 
 auto duration_since_epoch=FutureTimePoint.time_since_epoch();
