@@ -191,13 +191,13 @@ cout << "Emiting Qubits" << endl;
 int MaxWhileRound=100000;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
-	usleep(100);//Maybe some sleep to reduce CPU consumption
+	usleep(500);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 MaxWhileRound=100000;
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
-	usleep(100);//Maybe some sleep to reduce CPU consumption
+	usleep(500);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
@@ -244,7 +244,7 @@ cout << "Receiving Qubits" << endl;
 
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
 // Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
-int WaitTimeToFutureTimePoint=5;
+int WaitTimeToFutureTimePoint=10;
 TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
 
 auto duration_since_epoch=FutureTimePoint.time_since_epoch();
@@ -266,7 +266,7 @@ this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nod
 
 int MaxWhileRound=100000;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
-usleep(100);//Maybe some sleep to reduce CPU consumption
+usleep(500);//Maybe some sleep to reduce CPU consumption
 MaxWhileRound--;
 };
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
