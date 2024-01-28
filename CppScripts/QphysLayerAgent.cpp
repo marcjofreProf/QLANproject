@@ -119,6 +119,7 @@ int QPLA::countDoubleUnderscores(char* ParamsCharArray) {
   int underscoreCount = 0;
 
   for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+    cout << "ParamsCharArray[i]: " << ParamsCharArray[i] << endl;
     if (ParamsCharArray[i] == '_') {
       underscoreCount++;
     }
