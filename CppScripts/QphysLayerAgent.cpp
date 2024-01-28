@@ -134,9 +134,10 @@ char HeaderCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
 char ValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
 char TokenValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
 
+strcpy(ParamsCharArray,this->PayloadReadBuffer);
+
 int NumDoubleUnderscores = this->countDoubleUnderscores(ParamsCharArray);
 cout << "NumDoubleUnderscores: " << NumDoubleUnderscores << endl;
-strcpy(ParamsCharArray,this->PayloadReadBuffer);
 
 for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 	if (iHeaders==0){

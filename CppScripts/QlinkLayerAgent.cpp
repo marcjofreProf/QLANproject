@@ -130,9 +130,9 @@ char HeaderCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
 char ValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
 char TokenValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
 
-int NumDoubleUnderscores = this->countDoubleUnderscores(ParamsCharArray);
-
 strcpy(ParamsCharArray,this->PayloadReadBuffer);
+
+int NumDoubleUnderscores = this->countDoubleUnderscores(ParamsCharArray);
 
 for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 	if (iHeaders==0){
