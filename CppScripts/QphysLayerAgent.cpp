@@ -149,6 +149,7 @@ for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 cout << "Phys: Processing Parameters" << endl;
 cout << "this->PayloadReadBuffer: " << this->PayloadReadBuffer << endl;
 for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
+cout << "HeaderCharArray[iHeaders]: " << HeaderCharArray[iHeaders] << endl;
 // Missing to develop if there are different values
 if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){this->EmitLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){this->ReceiveLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
@@ -191,13 +192,13 @@ cout << "Emiting Qubits" << endl;
 int MaxWhileRound=1000000;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==TimePoint() && MaxWhileRound>0){
-	usleep(10);//Maybe some sleep to reduce CPU consumption
+	usleep(100);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	};
 
 MaxWhileRound=1000000;
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
-	usleep(10);//Maybe some sleep to reduce CPU consumption
+	usleep(100);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	};
 
@@ -266,7 +267,7 @@ this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nod
 
 int MaxWhileRound=1000000;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
-usleep(10);//Maybe some sleep to reduce CPU consumption
+usleep(100);//Maybe some sleep to reduce CPU consumption
 MaxWhileRound--;
 };
 
