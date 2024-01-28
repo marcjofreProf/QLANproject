@@ -202,13 +202,13 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadEmitQuBit(){
-
+//this->acquire();
 cout << "Emiting Qubits" << endl;
 
-int MaxWhileRound=100;
+int MaxWhileRound=5000;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
-	this->release();
+	//this->release();
 	usleep(500);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	};
@@ -216,7 +216,7 @@ if (MaxWhileRound<=0){this->OtherClientNodeFutureTimePoint=Clock::now();}// Prov
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 MaxWhileRound=100;
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
-	this->release();	
+	//this->release();	
 	TimePoint TimePointClockNow=Clock::now();
 	auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
@@ -288,7 +288,7 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadReceiveQubit(){
-this->acquire();
+//this->acquire();
 int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
 
@@ -316,7 +316,7 @@ this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nod
 
 int MaxWhileRound=100;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
-	this->release();	
+	//this->release();	
 	TimePoint TimePointClockNow=Clock::now();
 	auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
@@ -335,7 +335,7 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 };
-this->acquire();
+//this->acquire();
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // Start measuring
 // this->inGPIO=exploringBB::GPIO(48); // Receiving GPIO. Of course gnd have to be connected accordingly.
@@ -356,7 +356,7 @@ cout << "MaxWhileRound: " << MaxWhileRound << endl;
 
 this->NumStoredQubitsNode[0]=NumStoredQubitsNodeAux;
 //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
-this->release();
+//this->release();
 return 0; // return 0 is for no error
 }
 
