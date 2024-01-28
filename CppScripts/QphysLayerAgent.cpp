@@ -182,7 +182,7 @@ int QPLA::InitAgentProcess(){
 int QPLA::emitQuBit(){
 bool RunThreadFlag=true;
 try{
-bool RunThreadFlag=!this->threadEmitQuBitRefAux.joinable();
+ RunThreadFlag=!this->threadEmitQuBitRefAux.joinable();
     } // upper try
   catch (...) { // Catches any exception
   	RunThreadFlag=true;  
@@ -230,6 +230,7 @@ while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
         unsigned int TimePointsDiff_time_as_count=0;
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=TimeNow_time_as_count-TimePointFuture_time_as_count;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
+        cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
 	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	};
@@ -269,7 +270,7 @@ this->release();
 int QPLA::receiveQuBit(){
 bool RunThreadFlag=true;
 try{
-bool RunThreadFlag=!this->threadReceiveQuBitRefAux.joinable();
+RunThreadFlag=!this->threadReceiveQuBitRefAux.joinable();
     } // upper try
   catch (...) { // Catches any exception
   	RunThreadFlag=true;  
