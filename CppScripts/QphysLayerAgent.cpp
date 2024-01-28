@@ -276,7 +276,7 @@ bool RunThreadFlag=!this->threadReceiveQuBitRefAux.joinable();
     }
     
 if (RunThreadFlag){// Protection, do not run if there is a previous thread running
-this->threadReceiveQuBitRefAux=std::thread(&QPLA::threadReceiveQuBitRefAux,this);
+this->threadReceiveQuBitRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
 }
 else{
 cout << "Not possible to launch ThreadReceiveQubit" << endl;
