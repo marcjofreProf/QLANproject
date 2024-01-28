@@ -362,10 +362,10 @@ cout << "MaxWhileRound: " << MaxWhileRound << endl;
  	} 	
  }
 
-this->acquire();
+//this->acquire();
 this->NumStoredQubitsNode[0]=NumStoredQubitsNodeAux;
 //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
-this->release();
+//this->release();
 return 0; // return 0 is for no error
 }
 
