@@ -180,7 +180,8 @@ int QPLA::InitAgentProcess(){
 
 int QPLA::emitQuBit(){
 std::thread threadRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
-threadRefAux.join();// Wait for the thread to finish
+//threadRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
+threadRefAux.detach();// Do not wait for the thread to finish
 return 0; // return 0 is for no error
 }
 
@@ -235,7 +236,8 @@ this->OtherClientNodeFutureTimePoint=TimePoint();
 
 int QPLA::receiveQuBit(){
 std::thread threadRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
-threadRefAux.join();// Wait for the thread to finish
+//threadRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
+threadRefAux.detach();// Do not wait for the thread to finish
 return 0; // return 0 is for no error
 }
 
@@ -245,7 +247,7 @@ cout << "Receiving Qubits" << endl;
 
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
 // Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
-int WaitTimeToFutureTimePoint=10;
+int WaitTimeToFutureTimePoint=100;
 TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
 
 auto duration_since_epoch=FutureTimePoint.time_since_epoch();
