@@ -620,7 +620,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			//cout << "New Message: "<< Payload << endl;
 			this->ReadParametersAgent(Payload);
 		}
-		else if (string(Command)==string("SendQubits")){// Send qubits to the requesting host
+		else if (string(Command)==string("SendQubits")){// Send qubits to the requesting host			
 			this->QNLAagent.QLLAagent.QPLAagent.emitQuBit();
 		}
 		else if (string(Command)==string("ReceiveQubits")){// Read qubits to the attached node

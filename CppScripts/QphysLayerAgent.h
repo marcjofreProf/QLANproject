@@ -60,6 +60,9 @@ private: //Variables/Instances
 	using Clock = std::chrono::steady_clock;//system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;//could be nanoseconds, microseconds, milliseconds...
 	TimePoint OtherClientNodeFutureTimePoint=TimePoint();
+	// Private threads
+	std::thread threadEmitQuBitRefAux;
+	std::thread threadReceiveQuBitRefAux;
         
 public: // Variables/Instances
 	enum ApplicationState { // State of the agent sequences
