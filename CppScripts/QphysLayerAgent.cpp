@@ -180,8 +180,19 @@ int QPLA::InitAgentProcess(){
 
 
 int QPLA::emitQuBit(){
-if (!this->threadEmitQuBitRefAux.joinable()){// Protection, do not run if there is a previous thread running
+bool RunThreadFlag=false;
+try{
+bool RunThreadFlag=!this->threadEmitQuBitRefAux.joinable();
+    } // upper try
+  catch (...) { // Catches any exception
+  	RunThreadFlag=true;  
+    }
+    
+if (RunThreadFlag){// Protection, do not run if there is a previous thread running
 this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
+}
+else{
+cout << "Not possible to launch ThreadEmitQuBit" << endl;
 }
 
 return 0; // return 0 is for no error
@@ -256,8 +267,19 @@ this->release();
 }
 
 int QPLA::receiveQuBit(){
-if (!this->threadReceiveQuBitRefAux.joinable()){// Protection, do not run if there is a previous thread running
-this->threadReceiveQuBitRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
+bool RunThreadFlag=false;
+try{
+bool RunThreadFlag=!this->threadReceiveQuBitRefAux.joinable();
+    } // upper try
+  catch (...) { // Catches any exception
+  	RunThreadFlag=true;  
+    }
+    
+if (RunThreadFlag){// Protection, do not run if there is a previous thread running
+this->threadReceiveQuBitRefAux=std::thread(&QPLA::threadReceiveQuBitRefAux,this);
+}
+else{
+cout << "Not possible to launch ThreadReceiveQubit" << endl;
 }
 
 return 0; // return 0 is for no error
