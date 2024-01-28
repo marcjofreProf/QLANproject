@@ -25,6 +25,8 @@ Header declaration file for Quantum physical Layer Agent
 #include <thread>
 // Semaphore
 #include <atomic>
+// Time/synchronization management
+#include <chrono>
 using std::string;
 using std::ofstream;
 
@@ -54,6 +56,10 @@ private: //Variables/Instances
 	// GPIO
 	//exploringBB::GPIO inGPIO; // Object for reading Qubits
 	//exploringBB::GPIO outGPIO; // Object for sending Qubits
+	// Time/synchronization management
+	using Clock = std::chrono::steady_clock;//system_clock;steady_clock;high_resolution_clock
+	using TimePoint = std::chrono::time_point<Clock>;//could be nanoseconds, microseconds, milliseconds...
+	TimePoint OtherClientNodeFutureTimePoint=TimePoint();
         
 public: // Variables/Instances
 	enum ApplicationState { // State of the agent sequences

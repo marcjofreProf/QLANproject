@@ -12,6 +12,8 @@ Agent script for Quantum Physical Layer
 #include<unistd.h> //for usleep
 #include <stdio.h>
 #include <string.h>
+// Time/synchronization management
+#include <chrono>
 
 #define LinkNumberMAX 2
 #include "./BBBhw/GPIO.h"
@@ -150,6 +152,11 @@ for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){this->EmitLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){this->ReceiveLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=atoi(ValuesCharArray[iHeaders]);}
+else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){
+	cout << "OtherClientNodeFutureTimePoint: " << (unsigned long int)atoi(ValuesCharArray[iHeaders]) << endl;
+	std::chrono::milliseconds duration_back(atoi(ValuesCharArray[iHeaders]));
+	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
+	}
 else{// discard
 }
 }
@@ -177,8 +184,22 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadEmitQuBit(){
-this->acquire();
+//this->acquire();
 cout << "Emiting Qubits" << endl;
+
+int MaxWhileRound=1000000;
+// Wait to receive the FutureTimePoint from client node
+while(this->OtherClientNodeFutureTimePoint==TimePoint() && MaxWhileRound>0){
+	usleep(10);//Maybe some sleep to reduce CPU consumption
+	MaxWhileRound--;
+	};
+
+MaxWhileRound=1000000;
+while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
+	usleep(10);//Maybe some sleep to reduce CPU consumption
+	MaxWhileRound--;
+	};
+
 // this->outGPIO=exploringBB::GPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  GPIO outGPIO(this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
@@ -203,7 +224,10 @@ cout << "Emiting Qubits" << endl;
    */
    
  //cout << "Qubit emitted" << endl;
- this->release();
+// this->release();
+
+// Reset the ClientNodeFutureTimePoint for duture interactions
+this->OtherClientNodeFutureTimePoint=TimePoint();
  return 0; // return 0 is for no error
 }
 
@@ -214,8 +238,37 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadReceiveQubit(){
-this->acquire();
+int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
+
+// Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
+// Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
+int WaitTimeToFutureTimePoint=5;
+TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
+
+auto duration_since_epoch=FutureTimePoint.time_since_epoch();
+// Convert duration to desired time
+auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+int time_as_count = static_cast<int>(millis);// Convert to int 
+cout << "time_as_count: " << time_as_count << endl;
+// Mount the Parameters message for the other node
+char ParamsCharArray[NumBytesPayloadBuffer] = {0};
+strcpy(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Initiates the ParamsCharArray, so use strcpy
+
+char charNum[NumBytesPayloadBuffer] = {0}; 
+sprintf(charNum, "%d", time_as_count); 
+strcat(ParamsCharArray,charNum);
+
+strcat(ParamsCharArray,"_"); // Final _
+this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
+
+int MaxWhileRound=1000000;
+while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
+usleep(10);//Maybe some sleep to reduce CPU consumption
+MaxWhileRound--;
+};
+
+// Start measuring
 // this->inGPIO=exploringBB::GPIO(48); // Receiving GPIO. Of course gnd have to be connected accordingly.
  GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
  inGPIO.setDirection(INPUT);
@@ -225,21 +278,23 @@ cout << "Receiving Qubits" << endl;
 	 QuBitValueArray[iIterRead]=inGPIO.getValue();
 	 usleep(QuBitsUSecPeriodInt[0]);	 
  }
-  this->NumStoredQubitsNode[0]=0;
+ // Count received QuBits
  for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;++iIterRead){// Count how many qubits 
  	if (QuBitValueArray[iIterRead]==1){
- 		this->NumStoredQubitsNode[0]++;
+ 		NumStoredQubitsNodeAux++;
  	} 	
  }
- //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
+ 
+this->acquire();
+this->NumStoredQubitsNode[0]=NumStoredQubitsNodeAux;
+//cout << "The value of the input is: "<< inGPIO.getValue() << endl;
 this->release();
- return 0; // return 0 is for no error
+return 0; // return 0 is for no error
 }
 
 int QPLA::GetNumStoredQubitsNode(){
-int NumStoredQubitsNodeAux=0;
 this->acquire();
-NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
+int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
 this->release();
 return NumStoredQubitsNodeAux;
 }
