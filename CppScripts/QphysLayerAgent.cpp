@@ -298,9 +298,7 @@ return 0; // return 0 is for no error
 
 int QPLA::GetNumStoredQubitsNode(){
 this->threadReceiveQuBitRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
-this->acquire();
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
-this->release();
 return NumStoredQubitsNodeAux;
 }
 
