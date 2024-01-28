@@ -187,7 +187,10 @@ try{
   catch (...) { // Catches any exception
   	RunThreadFlag=true;  
     }
-    
+
+// Reset the ClientNodeFutureTimePoint for duture interactions
+this->OtherClientNodeFutureTimePoint=TimePoint();
+
 if (RunThreadFlag){// Protection, do not run if there is a previous thread running
 this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
 }
@@ -261,8 +264,6 @@ cout << "MaxWhileRound: " << MaxWhileRound << endl;
    
  //cout << "Qubit emitted" << endl;
 
-// Reset the ClientNodeFutureTimePoint for duture interactions
-this->OtherClientNodeFutureTimePoint=TimePoint();
 //this->release();
  return 0; // return 0 is for no error
 }
