@@ -205,7 +205,7 @@ int QPLA::ThreadEmitQuBit(){
 
 cout << "Emiting Qubits" << endl;
 
-int MaxWhileRound=1000;
+int MaxWhileRound=100;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
 	this->release();
@@ -361,7 +361,7 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::GetNumStoredQubitsNode(){
-this->acquire();
+//this->acquire();
 
 try{
 if (this->threadReceiveQuBitRefAux.joinable()){this->threadReceiveQuBitRefAux.join();}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
@@ -370,7 +370,7 @@ if (this->threadReceiveQuBitRefAux.joinable()){this->threadReceiveQuBitRefAux.jo
     }
 
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
-this->release();
+//this->release();
 return NumStoredQubitsNodeAux;
 }
 
