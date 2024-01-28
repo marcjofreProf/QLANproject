@@ -179,6 +179,8 @@ int QPLA::InitAgentProcess(){
 
 
 int QPLA::emitQuBit(){
+this->threadReceiveQuBitRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
+this->threadEmitQuBitRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
 this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
 
 return 0; // return 0 is for no error
@@ -234,6 +236,8 @@ this->OtherClientNodeFutureTimePoint=TimePoint();
 }
 
 int QPLA::receiveQuBit(){
+this->threadReceiveQuBitRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
+this->threadEmitQuBitRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
 this->threadReceiveQuBitRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
 
 return 0; // return 0 is for no error
