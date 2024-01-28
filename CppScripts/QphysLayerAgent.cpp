@@ -201,7 +201,7 @@ MaxWhileRound=10000;
 this->acquire();
 
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
-	TimePoint TimePointClockNow=std::chrono::time_point<Clock>();
+	TimePoint TimePointClockNow=Clock::now();
 	auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
 	auto millisTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
