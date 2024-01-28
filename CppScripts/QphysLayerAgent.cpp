@@ -182,10 +182,13 @@ int QPLA::InitAgentProcess(){
 int QPLA::emitQuBit(){
 bool RunThreadFlag=true;
 try{
+this->acquire();
  RunThreadFlag=!this->threadEmitQuBitRefAux.joinable();
+ this->release();
     } // upper try
   catch (...) { // Catches any exception
   	RunThreadFlag=true;  
+  	this->release();
     }
 
 // Reset the ClientNodeFutureTimePoint for duture interactions
@@ -202,21 +205,22 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadEmitQuBit(){
-//this->acquire();
+this->acquire();
 cout << "Emiting Qubits" << endl;
 
-int MaxWhileRound=5000;
+int MaxWhileRound=50000;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
-	//this->release();
+	this->release();
 	usleep(500);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	};
 if (MaxWhileRound<=0){this->OtherClientNodeFutureTimePoint=Clock::now();}// Provide a TimePoint to avoid blocking issues
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 MaxWhileRound=100;
+this->acquire();
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
-	//this->release();	
+	this->release();	
 	TimePoint TimePointClockNow=Clock::now();
 	auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
@@ -237,7 +241,7 @@ while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
 	MaxWhileRound--;
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
-
+this->release();
 //this->acquire();
 // this->outGPIO=exploringBB::GPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  GPIO outGPIO(this->EmitLinkNumberArray[0]);
@@ -271,10 +275,13 @@ cout << "MaxWhileRound: " << MaxWhileRound << endl;
 int QPLA::receiveQuBit(){
 bool RunThreadFlag=true;
 try{
+this->acquire();
 RunThreadFlag=!this->threadReceiveQuBitRefAux.joinable();
+this->release();
     } // upper try
   catch (...) { // Catches any exception
   	RunThreadFlag=true;  
+  	this->release();
     }
     
 if (RunThreadFlag){// Protection, do not run if there is a previous thread running
@@ -312,8 +319,9 @@ strcat(ParamsCharArray,charNum);
 
 strcat(ParamsCharArray,"_"); // Final _
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
+this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
-
+this->release();
 int MaxWhileRound=100;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 	//this->release();	
@@ -354,9 +362,10 @@ cout << "MaxWhileRound: " << MaxWhileRound << endl;
  	} 	
  }
 
+this->acquire();
 this->NumStoredQubitsNode[0]=NumStoredQubitsNodeAux;
 //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
-//this->release();
+this->release();
 return 0; // return 0 is for no error
 }
 
