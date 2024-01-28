@@ -244,6 +244,7 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadReceiveQubit(){
+this->acquire();
 int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
 
@@ -271,9 +272,11 @@ this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nod
 
 int MaxWhileRound=100000;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
+this->release();
 usleep(500);//Maybe some sleep to reduce CPU consumption
 MaxWhileRound--;
 };
+this->acquire();
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // Start measuring
 // this->inGPIO=exploringBB::GPIO(48); // Receiving GPIO. Of course gnd have to be connected accordingly.
@@ -291,8 +294,7 @@ cout << "MaxWhileRound: " << MaxWhileRound << endl;
  		NumStoredQubitsNodeAux++;
  	} 	
  }
- 
-this->acquire();
+
 this->NumStoredQubitsNode[0]=NumStoredQubitsNodeAux;
 //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
 this->release();
