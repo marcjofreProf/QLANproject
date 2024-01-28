@@ -209,7 +209,7 @@ while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && 
 	usleep(500);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	};
-//cout << "MaxWhileRound: " << MaxWhileRound << endl;
+cout << "MaxWhileRound: " << MaxWhileRound << endl;
 MaxWhileRound=100;
 this->acquire();
 
@@ -234,7 +234,7 @@ while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
 	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	};
-//cout << "MaxWhileRound: " << MaxWhileRound << endl;
+cout << "MaxWhileRound: " << MaxWhileRound << endl;
 
 // this->outGPIO=exploringBB::GPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  GPIO outGPIO(this->EmitLinkNumberArray[0]);
@@ -335,7 +335,7 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 	MaxWhileRound--;
 };
 this->acquire();
-//cout << "MaxWhileRound: " << MaxWhileRound << endl;
+cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // Start measuring
 // this->inGPIO=exploringBB::GPIO(48); // Receiving GPIO. Of course gnd have to be connected accordingly.
  GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
