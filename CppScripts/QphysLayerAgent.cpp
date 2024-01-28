@@ -237,7 +237,8 @@ this->acquire();
 	unsigned int TimePointFuture_time_as_count = static_cast<int>(millisTimePointFuture);// Convert to int 
 	cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
 	
-	
+	bool CheckTimePoints = Clock::now()<this->OtherClientNodeFutureTimePoint;
+	cout << "Clock::now()<this->OtherClientNodeFutureTimePoint: " << CheckTimePoints << endl;
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
 	this->release();	
 	TimePoint TimePointClockNow=Clock::now();
