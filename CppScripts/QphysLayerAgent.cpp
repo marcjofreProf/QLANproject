@@ -157,7 +157,11 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoi
 	//cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
 	std::chrono::milliseconds duration_back((unsigned int)atoi(ValuesCharArray[iHeaders]));
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
-	if (this->threadEmitQuBitRefAux.joinable()){this->threadEmitQuBitRefAux.join();}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
+	if (this->threadEmitQuBitRefAux.joinable()){
+	this->release();
+	this->threadEmitQuBitRefAux.join();
+	this->acquire();
+	}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
 	}
 else{// discard
 }
@@ -373,7 +377,11 @@ int QPLA::GetNumStoredQubitsNode(){
 this->acquire();
 
 try{
-if (this->threadReceiveQuBitRefAux.joinable()){this->threadReceiveQuBitRefAux.join();}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
+if (this->threadReceiveQuBitRefAux.joinable()){
+this->release();
+this->threadReceiveQuBitRefAux.join();
+this->acquire();
+}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
     } // upper try
   catch (...) { // Catches any exception
     }
