@@ -181,14 +181,14 @@ int QPLA::InitAgentProcess(){
 int QPLA::emitQuBit(){
 std::thread threadRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
 //threadRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
-threadRefAux.detach();// Do not wait for the thread to finish
+
 return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadEmitQuBit(){
 //this->acquire();
 cout << "Emiting Qubits" << endl;
-/*
+
 int MaxWhileRound=100000;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
@@ -202,7 +202,7 @@ while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
 	MaxWhileRound--;
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
-*/
+
 // this->outGPIO=exploringBB::GPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  GPIO outGPIO(this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
@@ -237,7 +237,7 @@ this->OtherClientNodeFutureTimePoint=TimePoint();
 int QPLA::receiveQuBit(){
 std::thread threadRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
 //threadRefAux.join();// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also blocked
-threadRefAux.detach();// Do not wait for the thread to finish
+
 return 0; // return 0 is for no error
 }
 
