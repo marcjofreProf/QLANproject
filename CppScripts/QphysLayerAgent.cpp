@@ -202,7 +202,7 @@ int QPLA::ThreadEmitQuBit(){
 this->acquire();
 cout << "Emiting Qubits" << endl;
 
-int MaxWhileRound=1000;
+int MaxWhileRound=100;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
 	this->release();
@@ -210,7 +210,7 @@ while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && 
 	MaxWhileRound--;
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
-MaxWhileRound=1000;
+MaxWhileRound=100;
 this->acquire();
 
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
@@ -313,7 +313,7 @@ strcat(ParamsCharArray,"_"); // Final _
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 
-int MaxWhileRound=1000;
+int MaxWhileRound=100;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 	this->release();	
 	TimePoint TimePointClockNow=Clock::now();
