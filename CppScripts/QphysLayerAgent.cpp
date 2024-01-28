@@ -186,18 +186,21 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadEmitQuBit(){
-//this->acquire();
+this->acquire();
 cout << "Emiting Qubits" << endl;
 
 int MaxWhileRound=100000;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
+	this->release();
 	usleep(500);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 MaxWhileRound=100000;
+this->acquire();
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
+	this->release();
 	usleep(500);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	};
@@ -227,10 +230,10 @@ cout << "MaxWhileRound: " << MaxWhileRound << endl;
    */
    
  //cout << "Qubit emitted" << endl;
-// this->release();
 
 // Reset the ClientNodeFutureTimePoint for duture interactions
 this->OtherClientNodeFutureTimePoint=TimePoint();
+this->release();
  return 0; // return 0 is for no error
 }
 
@@ -297,8 +300,8 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::GetNumStoredQubitsNode(){
-if (this->threadReceiveQuBitRefAux.joinable()){this->threadReceiveQuBitRefAux.join();}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
 this->acquire();
+if (this->threadReceiveQuBitRefAux.joinable()){this->threadReceiveQuBitRefAux.join();}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
 this->release();
 return NumStoredQubitsNodeAux;
