@@ -195,9 +195,6 @@ this->acquire();
   	this->release();
     }
 
-// Reset the ClientNodeFutureTimePoint for duture interactions
-this->OtherClientNodeFutureTimePoint=TimePoint();
-
 if (RunThreadFlag){// Protection, do not run if there is a previous thread running
 this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
 }
@@ -261,6 +258,9 @@ while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
 	MaxWhileRound--;
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
+// Reset the ClientNodeFutureTimePoint
+this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
+
 this->release();
 //this->acquire();
 // this->outGPIO=exploringBB::GPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
