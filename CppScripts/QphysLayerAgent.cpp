@@ -199,7 +199,7 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadEmitQuBit(){
-this->acquire();
+
 cout << "Emiting Qubits" << endl;
 
 int MaxWhileRound=100;
@@ -211,7 +211,6 @@ while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && 
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 MaxWhileRound=100;
-this->acquire();
 
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
 	this->release();	
@@ -236,6 +235,7 @@ while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 
+this->acquire();
 // this->outGPIO=exploringBB::GPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  GPIO outGPIO(this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
