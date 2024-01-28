@@ -235,7 +235,7 @@ while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 
-this->acquire();
+//this->acquire();
 // this->outGPIO=exploringBB::GPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  GPIO outGPIO(this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
@@ -263,7 +263,7 @@ this->acquire();
 
 // Reset the ClientNodeFutureTimePoint for duture interactions
 this->OtherClientNodeFutureTimePoint=TimePoint();
-this->release();
+//this->release();
  return 0; // return 0 is for no error
 }
 
