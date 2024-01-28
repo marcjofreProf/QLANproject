@@ -117,14 +117,11 @@ int QPLA::countDoubleColons(char* ParamsCharArray) {
 
 int QPLA::countDoubleUnderscores(char* ParamsCharArray) {
   int underscoreCount = 0;
-  cout << "ParamsCharArray: " << ParamsCharArray << endl;
   for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
-    cout << "ParamsCharArray[i]: " << ParamsCharArray[i] << endl;
     if (ParamsCharArray[i] == '_') {
       underscoreCount++;
     }
   }
-  cout << "underscoreCount: " << underscoreCount << endl;
   return underscoreCount/2;
 }
 
@@ -137,7 +134,7 @@ char TokenValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
 strcpy(ParamsCharArray,this->PayloadReadBuffer);
 
 int NumDoubleUnderscores = this->countDoubleUnderscores(ParamsCharArray);
-cout << "NumDoubleUnderscores: " << NumDoubleUnderscores << endl;
+//cout << "NumDoubleUnderscores: " << NumDoubleUnderscores << endl;
 
 for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 	if (iHeaders==0){
@@ -148,16 +145,16 @@ for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 	}
 	strcpy(ValuesCharArray[iHeaders],strtok(NULL,"_"));
 }
-cout << "Phys: Processing Parameters" << endl;
-cout << "this->PayloadReadBuffer: " << this->PayloadReadBuffer << endl;
+//cout << "Phys: Processing Parameters" << endl;
+//cout << "this->PayloadReadBuffer: " << this->PayloadReadBuffer << endl;
 for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
-cout << "HeaderCharArray[iHeaders]: " << HeaderCharArray[iHeaders] << endl;
+//cout << "HeaderCharArray[iHeaders]: " << HeaderCharArray[iHeaders] << endl;
 // Missing to develop if there are different values
 if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){this->EmitLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){this->ReceiveLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){
-	cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
+	//cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
 	std::chrono::milliseconds duration_back((unsigned int)atoi(ValuesCharArray[iHeaders]));
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
 	}
@@ -191,19 +188,19 @@ int QPLA::ThreadEmitQuBit(){
 //this->acquire();
 cout << "Emiting Qubits" << endl;
 
-int MaxWhileRound=1000000;
+int MaxWhileRound=100000;
 // Wait to receive the FutureTimePoint from client node
-while(this->OtherClientNodeFutureTimePoint==TimePoint() && MaxWhileRound>0){
+while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
 	usleep(100);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	};
-
-MaxWhileRound=1000000;
+cout << "MaxWhileRound: " << MaxWhileRound << endl;
+MaxWhileRound=100000;
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
 	usleep(100);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	};
-
+cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // this->outGPIO=exploringBB::GPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  GPIO outGPIO(this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
@@ -254,7 +251,7 @@ auto duration_since_epoch=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
 auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 unsigned int time_as_count = static_cast<int>(millis);// Convert to int 
-cout << "time_as_count: " << time_as_count << endl;
+//cout << "time_as_count: " << time_as_count << endl;
 // Mount the Parameters message for the other node
 char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 strcpy(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Initiates the ParamsCharArray, so use strcpy
@@ -264,15 +261,15 @@ sprintf(charNum, "%u", time_as_count);
 strcat(ParamsCharArray,charNum);
 
 strcat(ParamsCharArray,"_"); // Final _
-cout << "ParamsCharArray: " << ParamsCharArray << endl;
+//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 
-int MaxWhileRound=1000000;
+int MaxWhileRound=100000;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 usleep(100);//Maybe some sleep to reduce CPU consumption
 MaxWhileRound--;
 };
-
+cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // Start measuring
 // this->inGPIO=exploringBB::GPIO(48); // Receiving GPIO. Of course gnd have to be connected accordingly.
  GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
