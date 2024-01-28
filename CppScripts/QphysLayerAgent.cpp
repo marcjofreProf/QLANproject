@@ -123,7 +123,7 @@ int QPLA::countDoubleUnderscores(char* ParamsCharArray) {
       underscoreCount++;
     }
   }
-
+  cout << "underscoreCount: " << underscoreCount << endl;
   return underscoreCount/2;
 }
 
