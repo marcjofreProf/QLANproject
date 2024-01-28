@@ -180,7 +180,7 @@ int QPLA::InitAgentProcess(){
 
 
 int QPLA::emitQuBit(){
-bool RunThreadFlag=false;
+bool RunThreadFlag=true;
 try{
 bool RunThreadFlag=!this->threadEmitQuBitRefAux.joinable();
     } // upper try
@@ -267,7 +267,7 @@ this->release();
 }
 
 int QPLA::receiveQuBit(){
-bool RunThreadFlag=false;
+bool RunThreadFlag=true;
 try{
 bool RunThreadFlag=!this->threadReceiveQuBitRefAux.joinable();
     } // upper try
@@ -360,7 +360,13 @@ return 0; // return 0 is for no error
 
 int QPLA::GetNumStoredQubitsNode(){
 this->acquire();
+
+try{
 if (this->threadReceiveQuBitRefAux.joinable()){this->threadReceiveQuBitRefAux.join();}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
+    } // upper try
+  catch (...) { // Catches any exception
+    }
+
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
 this->release();
 return NumStoredQubitsNodeAux;
