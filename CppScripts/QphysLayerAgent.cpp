@@ -226,6 +226,26 @@ if (MaxWhileRound<=0){this->OtherClientNodeFutureTimePoint=Clock::now();}// Prov
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 MaxWhileRound=100;
 
+/////////////////////////////////////////////
+// Checks
+	TimePoint TimePointClockNow=Clock::now();
+	auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
+	// Convert duration to desired time
+	auto millisTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+	unsigned int TimeNow_time_as_count = static_cast<int>(millisTimeNow);// Convert to int 
+	cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
+	
+	auto duration_since_epochFutureTimePoint=this->OtherClientNodeFutureTimePoint.time_since_epoch();
+	// Convert duration to desired time
+	auto millisTimePointFuture = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+	unsigned int TimePointFuture_time_as_count = static_cast<int>(millisTimePointFuture);// Convert to int 
+	cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
+        unsigned int TimePointsDiff_time_as_count=0;
+        if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=TimeNow_time_as_count-TimePointFuture_time_as_count;}
+        else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
+        cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
+///////////////////////////////////
+
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
 	this->release();	
 	TimePoint TimePointClockNow=Clock::now();
