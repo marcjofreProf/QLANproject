@@ -198,16 +198,16 @@ this->acquire();
   	this->release();
     }
 
-if (RunThreadFlag){// Protection, do not run if there is a previous thread running
 this->acquire();
+if (RunThreadFlag){// Protection, do not run if there is a previous thread running
 this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
-this->release();
 }
 else{
 // Reset the ClientNodeFutureTimePoint
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 cout << "Not possible to launch ThreadEmitQuBit" << endl;
 }
+this->release();
 
 return 0; // return 0 is for no error
 }
@@ -243,8 +243,7 @@ MaxWhileRound=100;
 	unsigned int TimePointFuture_time_as_count = static_cast<int>(millisTimePointFuture);// Convert to int 
 	cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
         unsigned int TimePointsDiff_time_as_count=0;
-        if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=TimeNow_time_as_count-TimePointFuture_time_as_count;}
-        else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
+        TimePointsDiff_time_as_count=TimeNow_time_as_count-TimePointFuture_time_as_count;
         cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
 ///////////////////////////////////
 
