@@ -200,6 +200,8 @@ this->acquire();
 
 if (RunThreadFlag){// Protection, do not run if there is a previous thread running
 this->acquire();
+// Reset the ClientNodeFutureTimePoint
+this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
 this->release();
 }
