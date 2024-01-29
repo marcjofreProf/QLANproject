@@ -159,8 +159,11 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoi
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
 	if (this->threadEmitQuBitRefAux.joinable()){
 	this->release();
+	cout << "Check block release Process New Parameters" << endl;
 	this->threadEmitQuBitRefAux.join();
+	cout << "Check block before acquire Process New Parameters" << endl;
 	this->acquire();
+	cout << "Check block after acquire Process New Parameters" << endl;
 	}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
 	}
 else{// discard
@@ -217,11 +220,11 @@ while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && 
 	this->release();
 	usleep(500);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
+	this->acquire();
 	};
 if (MaxWhileRound<=0){this->OtherClientNodeFutureTimePoint=Clock::now();}// Provide a TimePoint to avoid blocking issues
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 MaxWhileRound=100;
-this->acquire();
 
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
 	this->release();	
@@ -243,6 +246,7 @@ while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
         cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
 	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
+	this->acquire();
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // Reset the ClientNodeFutureTimePoint
@@ -330,10 +334,10 @@ strcat(ParamsCharArray,"_"); // Final _
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
-this->release();
+
 int MaxWhileRound=100;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
-	//this->release();	
+	this->release();	
 	TimePoint TimePointClockNow=Clock::now();
 	auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
@@ -351,7 +355,9 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
 	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
+	this->acquire();
 };
+this->release();
 //this->acquire();
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // Start measuring
