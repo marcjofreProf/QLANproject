@@ -620,11 +620,15 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			//cout << "New Message: "<< Payload << endl;
 			this->ReadParametersAgent(Payload);
 		}
-		else if (string(Command)==string("SendQubits")){// Send qubits to the requesting host			
+		else if (string(Command)==string("SendQubits")){// Send qubits to the requesting host
+			this->release();			
 			this->QNLAagent.QLLAagent.QPLAagent.emitQuBit();
+			this->acquire();
 		}
 		else if (string(Command)==string("ReceiveQubits")){// Read qubits to the attached node
+	  		 this->release();
 			 this->QNLAagent.QLLAagent.QPLAagent.receiveQuBit();
+			 this->acquire();
 		}
 		else if (string(Command)==string("print")){
 			cout << "New Message: "<< Payload << endl;
