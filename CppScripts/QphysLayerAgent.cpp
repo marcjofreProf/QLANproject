@@ -332,7 +332,7 @@ int QPLA::ThreadReceiveQubit(){
 //this->acquire();
 int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
-
+this->acquire();
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
 // Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
 int WaitTimeToFutureTimePoint=5000;
@@ -353,10 +353,9 @@ strcat(ParamsCharArray,charNum);
 
 strcat(ParamsCharArray,"_"); // Final _
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
-this->acquire();
+
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
-this->release();
-this->acquire();
+
 int MaxWhileRound=100;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 	this->release();	
