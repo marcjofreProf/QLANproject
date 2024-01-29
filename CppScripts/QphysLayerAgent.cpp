@@ -190,7 +190,7 @@ int QPLA::emitQuBit(){
 bool RunThreadFlag=true;
 try{
 this->acquire();
- RunThreadFlag=(!this->threadEmitQuBitRefAux.joinable() && !this->threadReceiveQuBitRefAux.joinable());
+ RunThreadFlag=!this->threadEmitQuBitRefAux.joinable();//(!this->threadEmitQuBitRefAux.joinable() && !this->threadReceiveQuBitRefAux.joinable());
  this->release();
     } // upper try
   catch (...) { // Catches any exception
@@ -308,7 +308,7 @@ int QPLA::receiveQuBit(){
 bool RunThreadFlag=true;
 try{
 this->acquire();
-RunThreadFlag=(!this->threadReceiveQuBitRefAux.joinable() && !this->threadEmitQuBitRefAux.joinable() ) ;
+RunThreadFlag=!this->threadReceiveQuBitRefAux.joinable();//(!this->threadReceiveQuBitRefAux.joinable() && !this->threadEmitQuBitRefAux.joinable() ) ;
 this->release();
     } // upper try
   catch (...) { // Catches any exception
@@ -335,7 +335,7 @@ cout << "Receiving Qubits" << endl;
 
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
 // Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
-int WaitTimeToFutureTimePoint=1000;
+int WaitTimeToFutureTimePoint=100;
 TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
 
 auto duration_since_epoch=FutureTimePoint.time_since_epoch();
