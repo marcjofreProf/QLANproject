@@ -242,8 +242,8 @@ MaxWhileRound=100;
 	auto millisTimePointFuture = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 	unsigned int TimePointFuture_time_as_count = static_cast<int>(millisTimePointFuture);// Convert to int 
 	cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
-        unsigned int TimePointsDiff_time_as_count=0;
-        TimePointsDiff_time_as_count=TimeNow_time_as_count-TimePointFuture_time_as_count;
+        int TimePointsDiff_time_as_count=0;
+        TimePointsDiff_time_as_count=(int)(TimeNow_time_as_count-TimePointFuture_time_as_count);
         cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
 ///////////////////////////////////
 
