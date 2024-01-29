@@ -190,7 +190,7 @@ int QPLA::emitQuBit(){
 bool RunThreadFlag=true;
 try{
 this->acquire();
- RunThreadFlag=!this->threadEmitQuBitRefAux.joinable();
+ RunThreadFlag=(!this->threadEmitQuBitRefAux.joinable() && !this->threadReceiveQuBitRefAux.joinable());
  this->release();
     } // upper try
   catch (...) { // Catches any exception
@@ -308,7 +308,7 @@ int QPLA::receiveQuBit(){
 bool RunThreadFlag=true;
 try{
 this->acquire();
-RunThreadFlag=!this->threadReceiveQuBitRefAux.joinable();
+RunThreadFlag=(!this->threadReceiveQuBitRefAux.joinable() && !this->threadEmitQuBitRefAux.joinable() ) ;
 this->release();
     } // upper try
   catch (...) { // Catches any exception
@@ -335,7 +335,7 @@ cout << "Receiving Qubits" << endl;
 
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
 // Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
-int WaitTimeToFutureTimePoint=100;
+int WaitTimeToFutureTimePoint=1000;
 TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
 
 auto duration_since_epoch=FutureTimePoint.time_since_epoch();
@@ -398,10 +398,10 @@ cout << "MaxWhileRound: " << MaxWhileRound << endl;
  	} 	
  }
 
-//this->acquire();
+this->acquire();
 this->NumStoredQubitsNode[0]=NumStoredQubitsNodeAux;
 //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
-//this->release();
+this->release();
 return 0; // return 0 is for no error
 }
 
