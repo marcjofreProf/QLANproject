@@ -279,12 +279,12 @@ this->release();
  GPIO outGPIO(60);//this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
  outGPIO.setDirection(OUTPUT);
- usleep(1000);//QuBitsUSecQuarterPeriodInt[0]);
- for (int iIterWrite=0;iIterWrite<NumQubitsMemoryBuffer;iIterWrite++){
+ usleep(10000);//QuBitsUSecQuarterPeriodInt[0]);
+ for (int iIterWrite=0;iIterWrite<1000;iIterWrite++){//NumQubitsMemoryBuffer;iIterWrite++){
 	 outGPIO.setValue(HIGH);
-	 usleep(1000);//QuBitsUSecHalfPeriodInt[0]);
+	 usleep(10000);//QuBitsUSecHalfPeriodInt[0]);
 	 outGPIO.setValue(LOW);
-	 usleep(1000);//QuBitsUSecHalfPeriodInt[0]);
+	 usleep(10000);//QuBitsUSecHalfPeriodInt[0]);
  }
  //usleep(QuBitsUSecHalfPeriodInt[0]);
   
