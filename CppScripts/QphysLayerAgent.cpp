@@ -26,6 +26,8 @@ Agent script for Quantum Physical Layer
 #include <thread>
 // Semaphore
 #include <atomic>
+// time points
+#define WaitTimeToFutureTimePoint 10 // considered millisecons (it can be changed on the transformatoin used)
 
 using namespace exploringBB; // API to easily use GPIO in c++
 /* A Simple GPIO application
@@ -159,11 +161,11 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoi
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
 	if (this->threadEmitQuBitRefAux.joinable()){
 	this->release();
-	cout << "Check block release Process New Parameters" << endl;
+	//cout << "Check block release Process New Parameters" << endl;
 	this->threadEmitQuBitRefAux.join();
-	cout << "Check block before acquire Process New Parameters" << endl;
+	//cout << "Check block before acquire Process New Parameters" << endl;
 	this->acquire();
-	cout << "Check block after acquire Process New Parameters" << endl;
+	//cout << "Check block after acquire Process New Parameters" << endl;
 	}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
 	}
 else{// discard
@@ -264,6 +266,7 @@ while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
         unsigned int TimePointsDiff_time_as_count=0;
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=TimeNow_time_as_count-TimePointFuture_time_as_count;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
+        if (TimeNow_time_as_count>WaitTimeToFutureTimePoint){TimeNow_time_as_count=WaitTimeToFutureTimePoint;}//conditions to get extremely large sleeps
         cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
 	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
@@ -335,7 +338,7 @@ cout << "Receiving Qubits" << endl;
 this->acquire();
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
 // Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
-int WaitTimeToFutureTimePoint=500;
+
 TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
 
 auto duration_since_epoch=FutureTimePoint.time_since_epoch();
@@ -377,6 +380,7 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
         unsigned int TimePointsDiff_time_as_count=0;
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=TimeNow_time_as_count-TimePointFuture_time_as_count;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
+        if (TimeNow_time_as_count>WaitTimeToFutureTimePoint){TimeNow_time_as_count=WaitTimeToFutureTimePoint;}//conditions to get extremely large sleeps
 	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	this->acquire();

@@ -57,7 +57,7 @@ private: //Variables/Instances
 	//exploringBB::GPIO inGPIO; // Object for reading Qubits
 	//exploringBB::GPIO outGPIO; // Object for sending Qubits
 	// Time/synchronization management
-	using Clock = std::chrono::steady_clock;//system_clock;steady_clock;high_resolution_clock
+	using Clock = std::chrono::system_clock;//system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
 	TimePoint OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 	// Private threads
