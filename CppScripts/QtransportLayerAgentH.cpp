@@ -24,7 +24,7 @@ Agent script for Quantum transport Layer Host
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
-#define SOCKtype "SOCK_STREAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
+#define SOCKtype "SOCK_DGRAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
@@ -143,7 +143,7 @@ int QTLAH::InitiateICPconnections() {
 	}
 	else{// server
 		//cout << "Check - Generating connection as server" << endl;
-		int RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPSocketsList[1]); // Open port and listen as server
+		int RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]); // Open port and listen as server
 		if (RetValue==-1){this->m_exit();} // Exit application
 	}
 	this->numberSessions=1;
@@ -224,7 +224,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     return 0; // All Ok
 }
 
-int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList) {// Node listening for connection from attached host
+int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddressesSockets,char* IPSocketsList) {// Node listening for connection from attached host
     struct sockaddr_in address;
     int opt = 1;
     socklen_t addrlen = sizeof(address);       
@@ -270,13 +270,18 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
 		cout << "Server socket accept failed" << endl;
 		return -1;
 	    }
+	// Retrive IP address client
+    strcpy(IPSocketsList,inet_ntoa(address.sin_addr));
+    }
+    else{
+    // Retrive IP address client
+    strcpy(IPSocketsList,IPaddressesSockets);
     }
     
     //cout << " Server socket_fd: " << socket_fd << endl;
     //cout << " Server new_socket: " << new_socket << endl;
     
-    // Retrive IP address client
-    strcpy(IPSocketsList,inet_ntoa(address.sin_addr));
+    
     //cout << "IPSocketsList: "<< IPSocketsList << endl;
     
     cout << "Host starting socket server to host/node: " << IPSocketsList << endl;
@@ -309,11 +314,29 @@ else {// There might be at least one new message
 		// Read the message from the socket
 		int valread=0;
 		if (this->ReadFlagWait){			
-			if (string(SOCKtype)=="SOCK_DGRAM"){valread=0;/*recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,,sizeof());*/}
+			if (string(SOCKtype)=="SOCK_DGRAM"){
+				struct sockaddr_in orgaddr; 
+			    memset(&orgaddr, 0, sizeof(orgaddr));		       
+			    // Filling information 
+			    orgaddr.sin_family    = AF_INET; // IPv4 
+			    orgaddr.sin_addr.s_addr = INADDR_ANY; 
+			    orgaddr.sin_port = htons(PORT);
+			    socklen_t len;
+			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&len);
+			}
     			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 			}
 		else{			
-			if (string(SOCKtype)=="SOCK_DGRAM"){valread=0;/*recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,,sizeof());*/}
+			if (string(SOCKtype)=="SOCK_DGRAM"){
+				struct sockaddr_in orgaddr; 
+			    memset(&orgaddr, 0, sizeof(orgaddr));		       
+			    // Filling information 
+			    orgaddr.sin_family    = AF_INET; // IPv4 
+			    orgaddr.sin_addr.s_addr = INADDR_ANY; 
+			    orgaddr.sin_port = htons(PORT);
+			    socklen_t len;
+			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&len);
+			}
     			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 			}
 		//cout << "valread: " << valread << endl;
@@ -344,11 +367,19 @@ else {// There might be at least one new message
 
 }
 
-int QTLAH::ICPmanagementSend(int socket_fd_conn) {
+int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=0;
-    if (string(SOCKtype)=="SOCK_DGRAM"){BytesSent=0;/*sento(socket_fd_conn,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,,sizeof());*/}
+    if (string(SOCKtype)=="SOCK_DGRAM"){
+	struct sockaddr_in destaddr; 
+	    memset(&destaddr, 0, sizeof(destaddr)); 	       
+	    // Filling information 
+	    destaddr.sin_family    = AF_INET; // IPv4 
+	    destaddr.sin_addr.s_addr =  inet_addr(IPaddressesSockets); 
+	    destaddr.sin_port = htons(PORT);     
+	    BytesSent=sendto(socket_fd_conn,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
+    }
     else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
     
     if (BytesSent<0){
@@ -377,8 +408,10 @@ int QTLAH::ICPmanagementCloseClient(int socket_fd) {
 }
 
 int QTLAH::ICPmanagementCloseServer(int socket_fd,int new_socket) {
+if (string(SOCKtype)=="SOCK_STREAM"){
     // closing the connected socket
     close(new_socket);
+}
     // closing the listening socket
     close(socket_fd);
     
@@ -522,11 +555,11 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArray,":");
 			strcat(ParamsCharArray,",");// Very important to end the message
 			strcpy(this->SendBuffer,ParamsCharArray);
-			int socket_fd_conn=this->socket_fdArray[0];// Socket descriptor to the attached node
+			int socket_fd_conn=this->socket_fdArray[0];// Socket descriptor to the attached node (it applies both to TCP and UDP
 			//cout << "socket_fd_conn: " << socket_fd_conn << endl;
 			//cout << "IPdest: " << IPdest << endl;
 			//cout << "IPorg: " << IPorg << endl;
-			this->ICPmanagementSend(socket_fd_conn);
+			this->ICPmanagementSend(socket_fd_conn,IPdest);
 			}
 			else if (string(Command)==string("NumStoredQubitsNode")){// Expected/awaiting message
 				this->InfoNumStoredQubitsNodeFlag=true;
@@ -549,20 +582,21 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		if (string(IPorg)==string(this->IPSocketsList[0])){ // If it comes from its attached node and destination at this host (if destination is another host, then means that has to go to else), it means it has to forward it to the other host (so it can forward it to its attached node)
 		// The node of a host is always identified in the Array in position 0	
 		    //cout << "SendBuffer: " << this->SendBuffer << endl;
-		    if (string(this->SCmode[1])==string("client")){//host acts as client
-		    int socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor  
-		    this->ICPmanagementSend(socket_fd_conn);
+		    int socket_fd_conn;
+		    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
+		    socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
+		    this->ICPmanagementSend(socket_fd_conn,this->IPSocketsList[0]);
 		    }
-		    else{ //host acts as server
-		    int socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
-		    this->ICPmanagementSend(socket_fd_conn);
+		    else{ //host acts as server		    
+		    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
+		    this->ICPmanagementSend(socket_fd_conn,this->IPSocketsList[0]);
 		    }
 		}	
 		else{// It has to forward to its node
 		   // The node of a host is always identified in the Array in position 0	
 		    //cout << "SendBuffer: " << this->SendBuffer << endl;
-		    int socket_fd_conn=this->socket_fdArray[0];  // the host always acts as client to the node, so it needs the socket descriptor   
-		    this->ICPmanagementSend(socket_fd_conn);
+		    int socket_fd_conn=this->socket_fdArray[0];  // the host always acts as client to the node, so it needs the socket descriptor   (it applies both to TCP and UDP)
+		    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
 		}  
 	}
 	else{// Info message; Default
@@ -594,16 +628,16 @@ int QTLAH::ICPdiscoverSend(char* ParamsCharArray){
     	//cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
     	//cout << "this->IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
     	//cout << "Found socket file descriptor//connection to send" << endl;
-    	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
-    		socket_fd_conn=this->socket_fdArray[i];
+    	if (string(this->SCmode[i])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){// Client sends on the file descriptor
+    		socket_fd_conn=this->socket_fdArray[i];// it applies both to TCP and UDP
     	}
-    	else{// server sends on the socket connection
+    	else{// server sends on the socket connection    		
     		//cout << "socket_fd_conn" << socket_fd_conn << endl;
     		socket_fd_conn=this->new_socketArray[i];
     	}
     	}
     }  
-    this->ICPmanagementSend(socket_fd_conn);   
+    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);   
 return 0; //All OK
 }
 ///////////////////////////////////////////////////////////////////
@@ -631,7 +665,7 @@ this->acquire();// Wait semaphore until it can proceed
 try{
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 
-int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor
+int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor (it applies both to TCP and UDP)
 this->InfoNumStoredQubitsNodeFlag=false; // Reset the flag
 int SockListenTimeusec=99999; // negative means infinite time
 
@@ -649,7 +683,7 @@ strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"NumStoredQubitsNode");
 strcat(this->SendBuffer,",");// Very important to end the message
 
-this->ICPmanagementSend(socket_fd_conn); // send mesage to node
+this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send mesage to node
 //usleep(999999);
 this->ReadFlagWait=true;
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);

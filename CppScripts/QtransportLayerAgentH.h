@@ -95,11 +95,11 @@ private: //Functions//Methods
 	int ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList); // Open ICP socket 
 	int ICPmanagementCloseClient(int socket_fd); // Close ICP socket
 	// As server
-	int ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList);
+	int ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddressesSockets,char* IPSocketsList);
 	int ICPmanagementCloseServer(int socket_fd,int new_socket);
 	// As server or client
 	int ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec); // Read ICP socket
-	int ICPmanagementSend(int socket_fd_conn); // Send ICP socket
+	int ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets); // Send ICP socket
 	int ICPdiscoverSend(char* ParamsCharArray); // Discover the socket and send the message
 	int InitiateICPconnections(); // Initiating sockets
         int StopICPconnections(); // Closing sockets

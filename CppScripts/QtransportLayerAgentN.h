@@ -118,11 +118,11 @@ private: // Functions/Methods
 	int ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList); // Open ICP socket 
 	int ICPmanagementCloseClient(int socket_fd); // Close ICP socket 
 	// As server
-	int ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList);
+	int ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddressesSockets,char* IPSocketsList);
 	int ICPmanagementCloseServer(int socket_fd,int new_socket);
 	// As server or cleint
 	int ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec);
-	int ICPmanagementSend(int socket_fd_conn);
+	int ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets);
 	int ICPdiscoverSend(char* ParamsCharArray); // Discover the socket and send the message
 	// REquests	
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the Agent to send message to specific host/node

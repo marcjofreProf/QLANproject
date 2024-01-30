@@ -25,7 +25,7 @@ Agent script for Quantum transport Layer Node
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
-#define SOCKtype "SOCK_STREAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
+#define SOCKtype "SOCK_DGRAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
@@ -105,8 +105,14 @@ if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none_;Link;none_n
 	strcat(this->SendBuffer,ParamsCharArray);
 	strcat(this->SendBuffer,",");// Very important to end the message
 	//cout << "this->SendBuffer: " << this->SendBuffer << endl;
-	int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
-	this->ICPmanagementSend(socket_fd_conn); // send message to node
+	int socket_fd_conn;
+	if (string(SOCKtype)=="SOCK_DGRAM"){
+		socket_fd_conn=this->socket_fdArray[0];// UDP works with socket descriptor (not connection)
+	}
+	else{
+		socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
+	}
+	this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[1]); // send message to node
 }
 //this->release();Does not need it since it is within the while loop
 
@@ -288,7 +294,7 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     return 0; // All Ok
 }
 
-int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocketsList) {// Node listening for connection from attached host    
+int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddressesSockets,char* IPSocketsList) {// Node listening for connection from attached host    
     struct sockaddr_in address;
     int opt = 1;
     socklen_t addrlen = sizeof(address);       
@@ -333,9 +339,14 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
 		cout << "Server socket accept failed" << endl;
 		return -1;
 	    }
-    }
-    // Retrive IP address client
+	// Retrive IP address client
     strcpy(IPSocketsList,inet_ntoa(address.sin_addr));
+    }
+    else{
+    // Retrive IP address client
+    strcpy(IPSocketsList,IPaddressesSockets);
+    }
+    
     //cout << "IPSocketsList: "<< IPSocketsList << endl;
     
     cout << "Node starting socket server to host/node: " << IPSocketsList << endl;
@@ -368,11 +379,29 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
       // Read the message from the socket
         int valread=0;
 	if (this->ReadFlagWait){
-		if (string(SOCKtype)=="SOCK_DGRAM"){valread=0;/*recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,,sizeof());*/}
+		if (string(SOCKtype)=="SOCK_DGRAM"){
+		struct sockaddr_in orgaddr; 
+		    memset(&orgaddr, 0, sizeof(orgaddr));		       
+		    // Filling information 
+		    orgaddr.sin_family    = AF_INET; // IPv4 
+		    orgaddr.sin_addr.s_addr = INADDR_ANY; 
+		    orgaddr.sin_port = htons(PORT);
+		    socklen_t len;
+		valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&len);
+		}
     		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 		}
 	else{
-		if (string(SOCKtype)=="SOCK_DGRAM"){valread=0;/*recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,,sizeof());*/}
+		if (string(SOCKtype)=="SOCK_DGRAM"){
+		struct sockaddr_in orgaddr; 
+		    memset(&orgaddr, 0, sizeof(orgaddr));		       
+		    // Filling information 
+		    orgaddr.sin_family    = AF_INET; // IPv4 
+		    orgaddr.sin_addr.s_addr = INADDR_ANY; 
+		    orgaddr.sin_port = htons(PORT);
+		    socklen_t len;
+		valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&len);
+		}
     		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 	}
         //cout << "Node message received: " << this->ReadBuffer << endl;
@@ -400,10 +429,18 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   }    
 }
 
-int QTLAN::ICPmanagementSend(int socket_fd_conn) {
+int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
     const char* SendBufferAux = this->SendBuffer;
     int BytesSent=0;
-    if (string(SOCKtype)=="SOCK_DGRAM"){BytesSent=0;/*sento(socket_fd_conn,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,,sizeof());*/}
+    if (string(SOCKtype)=="SOCK_DGRAM"){    
+	    struct sockaddr_in destaddr; 
+	    memset(&destaddr, 0, sizeof(destaddr));	       
+	    // Filling information 
+	    destaddr.sin_family    = AF_INET; // IPv4 
+	    destaddr.sin_addr.s_addr =  inet_addr(IPaddressesSockets); 
+	    destaddr.sin_port = htons(PORT);     
+	    BytesSent=sendto(socket_fd_conn,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
+    }
     else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
     
     if (BytesSent<0){
@@ -421,8 +458,10 @@ int QTLAN::ICPmanagementCloseClient(int socket_fd) {
 }
 
 int QTLAN::ICPmanagementCloseServer(int socket_fd,int new_socket) {
+if (string(SOCKtype)=="SOCK_STREAM"){
     // closing the connected socket
     close(new_socket);
+}
     // closing the listening socket
     close(socket_fd);
     
@@ -442,10 +481,10 @@ int QTLAN::InitiateICPconnections(int argc){
 
 	// First, opening server listening socket 
 	int RetValue = 0;
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPSocketsList[0]);
-	strcpy(this->IPaddressesSockets[0],this->IPSocketsList[0]);
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPSocketsList[0]);
+	// Not needed because provided in the initialization strcpy(this->IPaddressesSockets[0],this->IPSocketsList[0]);
 	// Eventually, if it is an intermediate node
-	if (argc > 1){ // Establish client connection with next node
+	if (argc > 3){ // Establish client connection with next node
 	// First parse the parama passed IP address
 
 	//QTLANagent.ICPmanagementOpenClient(QTLANagent.socket_fdArray[1],char* IPaddressesSockets)
@@ -502,7 +541,7 @@ int QTLAN::ICPdiscoverSend(char* ParamsCharArray){
     	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
     	if (string(this->IPSocketsList[i])==string(IPaddressesSocketsAux)){
     	//cout << "Found socket file descriptor//connection to send" << endl;
-    	if (string(this->SCmode[i])==string("client")){// Client sends on the file descriptor
+    	if (string(this->SCmode[i])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){// Client sends on the file descriptor
     		socket_fd_conn=this->socket_fdArray[i];
     	}
     	else{// server sends on the socket connection
@@ -511,7 +550,7 @@ int QTLAN::ICPdiscoverSend(char* ParamsCharArray){
     	}
     	}
     }  
-    this->ICPmanagementSend(socket_fd_conn);  
+    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);  
 return 0; // All Ok
 }
 ///////////////////////////////////////////////////////////////////////
@@ -619,10 +658,15 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(this->SendBuffer,"YesIamHere");
 			strcat(this->SendBuffer,",");// Very important to end the message
 			//cout << "this->SendBuffer: " << this->SendBuffer << endl;
-			//cout << "Node responding that I am here" << endl;		
-			
-			int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
-			this->ICPmanagementSend(socket_fd_conn); // send message to node
+			//cout << "Node responding that I am here" << endl;	
+			int socket_fd_conn;	
+			if (string(SOCKtype)=="SOCK_DGRAM"){
+				socket_fd_conn=this->socket_fdArray[0]; // UDP works with socket descriptor
+			}
+			else{
+				socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
+			}
+			this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[1]); // send message to node
 			}
 			else if (string(Payload)==string("YesIamHere")){this->OtherNodeThereFlag=true;}
 			else{
@@ -699,8 +743,13 @@ int QTLAN::RetrieveIPSocketsHosts(){ // Ask the host about the other host IP
 
 try{
 // It is a "blocking" communication between host and node, because it is many read trials for reading
-
-int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
+int socket_fd_conn;
+if (string(SOCKtype)=="SOCK_DGRAM"){
+	socket_fd_conn=this->socket_fdArray[0]; // UDP works with socket descriptor
+}
+else{
+	socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
+}
 
 int SockListenTimeusec=9999999; // Negative means infinite
 this->InfoIPaddressesSocketsFlag=false;// Reset flag indicating information
@@ -721,7 +770,7 @@ strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"IPaddressesSockets");
 strcat(this->SendBuffer,",");// Very important to end the message
 usleep(99999);
-this->ICPmanagementSend(socket_fd_conn); // send message to node
+this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send message to node
 //usleep(999999);
 this->ReadFlagWait=true;
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
@@ -765,7 +814,13 @@ if (string(this->SCmode[1])==string("client")){
 this->OtherNodeThereFlag=false;// Reset the value
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 
-int socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
+int socket_fd_conn;
+if (string(SOCKtype)=="SOCK_DGRAM"){
+	socket_fd_conn=this->socket_fdArray[0]; // UDP works with socket descriptor
+}
+else{
+	socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
+}
 
 int SockListenTimeusec=9999999; // Negative means infinite
 
@@ -786,7 +841,7 @@ strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"NodeAreYouThere?");
 strcat(this->SendBuffer,",");// Very important to end the message
 //usleep(999999);
-this->ICPmanagementSend(socket_fd_conn); // send message to node
+this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[1]); // send message to node
 //usleep(999999);
 this->ReadFlagWait=true;
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
@@ -867,8 +922,8 @@ int main(int argc, char const * argv[]){
  cout << "QTLANagent.SCmode[1]: " << QTLANagent.SCmode[1] << endl;
  strcpy(QTLANagent.IPaddressesSockets[2],argv[2]); // To know its own IP in the control network
  cout << "QTLANagent.IPaddressesSockets[2]: " << QTLANagent.IPaddressesSockets[2] << endl;
- //strcpy(QTLANagent.IPaddressesSockets[1],argv[3]); // To know the other host IP in the operation network
- //cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[1] << endl;
+ strcpy(QTLANagent.IPaddressesSockets[0],argv[3]); // To know the other host IP in the control network
+ cout << "QTLANagent.IPaddressesSockets[0]: " << QTLANagent.IPaddressesSockets[0] << endl;
  // Then the sub agents threads can be started
  QTLANagent.QNLAagent.InitAgentProcess();
  QTLANagent.InitiateBelowAgentsObjects();
