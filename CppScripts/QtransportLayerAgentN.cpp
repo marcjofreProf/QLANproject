@@ -25,7 +25,7 @@ Agent script for Quantum transport Layer Node
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
-#define SOCKtype "SOCK_DGRAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
+#define SOCKtype "SOCK_STREAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
@@ -274,11 +274,11 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     
     // Connect is for TCP
     if (string(SOCKtype)=="SOCK_STREAM"){
-    int status= connect(socket_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr));
-    if (status< 0) {
-        cout << "Client Connection Failed" << endl;
-        return -1;
-    }
+	    int status= connect(socket_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr));
+	    if (status< 0) {
+		cout << "Client Connection Failed" << endl;
+		return -1;
+	    }
     }
     
     strcpy(IPSocketsList,IPaddressesSockets);
@@ -324,15 +324,15 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
     
     // listen and accept are particular of TCP
     if (string(SOCKtype)=="SOCK_STREAM"){
-    if (listen(socket_fd, 3) < 0) {
-        cout << "Server socket listen failed" << endl;
-        return -1;
-    }
-    new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen);
-    if (new_socket< 0) {
-        cout << "Server socket accept failed" << endl;
-        return -1;
-    }
+	    if (listen(socket_fd, 3) < 0) {
+		cout << "Server socket listen failed" << endl;
+		return -1;
+	    }
+	    new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen);
+	    if (new_socket< 0) {
+		cout << "Server socket accept failed" << endl;
+		return -1;
+	    }
     }
     // Retrive IP address client
     strcpy(IPSocketsList,inet_ntoa(address.sin_addr));
@@ -367,8 +367,14 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
     if (FD_ISSET(socket_fd_conn, &fds)) {// is a macro that checks whether a specified file descriptor is set in a specified file descriptor set.
       // Read the message from the socket
         int valread=0;
-	if (this->ReadFlagWait){valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
-	else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
+	if (this->ReadFlagWait){
+		if (string(SOCKtype)=="SOCK_DGRAM"){valread=0;/*recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,,sizeof());*/}
+    		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
+		}
+	else{
+		if (string(SOCKtype)=="SOCK_DGRAM"){valread=0;/*recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,,sizeof());*/}
+    		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
+	}
         //cout << "Node message received: " << this->ReadBuffer << endl;
       if (valread <= 0) {
 	if (valread<0){
@@ -396,7 +402,10 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 
 int QTLAN::ICPmanagementSend(int socket_fd_conn) {
     const char* SendBufferAux = this->SendBuffer;
-    int BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);
+    int BytesSent=0;
+    if (string(SOCKtype)=="SOCK_DGRAM"){BytesSent=0;/*sento(socket_fd_conn,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,,sizeof());*/}
+    else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
+    
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
