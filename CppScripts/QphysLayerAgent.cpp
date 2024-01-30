@@ -276,15 +276,15 @@ this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 this->release();
 //this->acquire();
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
- GPIO outGPIO(60);//this->EmitLinkNumberArray[0]);
+ GPIO outGPIO(this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
  outGPIO.setDirection(OUTPUT);
- usleep(10000);//QuBitsUSecQuarterPeriodInt[0]);
+ usleep(QuBitsUSecQuarterPeriodInt[0]);
  for (int iIterWrite=0;iIterWrite<1000;iIterWrite++){//NumQubitsMemoryBuffer;iIterWrite++){
 	 outGPIO.setValue(HIGH);
-	 usleep(10000);//QuBitsUSecHalfPeriodInt[0]);
+	 usleep(QuBitsUSecHalfPeriodInt[0]);
 	 outGPIO.setValue(LOW);
-	 usleep(10000);//QuBitsUSecHalfPeriodInt[0]);
+	 usleep(QuBitsUSecHalfPeriodInt[0]);
  }
  //usleep(QuBitsUSecHalfPeriodInt[0]);
   
