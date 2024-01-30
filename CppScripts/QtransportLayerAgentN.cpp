@@ -943,7 +943,7 @@ int main(int argc, char const * argv[]){
  cout << "QTLANagent.IPSocketsList[1]: " << QTLANagent.IPSocketsList[1] << endl;
  */
  // Then negotiate some parameters
- QTLANagent.NegotiateInitialParamsNode(); 
+ //QTLANagent.NegotiateInitialParamsNode(); 
  
  // Then await for next actions
  
