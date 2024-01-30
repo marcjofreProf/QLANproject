@@ -27,9 +27,8 @@ Agent script for Quantum transport Layer Node
 #include <stdlib.h>
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
-#define WaitTimeAfterMainWhileLoop 1
 // Threading
-#define WaitTimeAfterMainWhileLoop 1
+#define WaitTimeAfterMainWhileLoop 100
 #include <thread>
 // Semaphore
 #include <atomic>
