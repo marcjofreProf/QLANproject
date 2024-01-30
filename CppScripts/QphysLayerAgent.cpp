@@ -275,8 +275,8 @@ this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 
 this->release();
 //this->acquire();
-// this->outGPIO=exploringBB::GPIO(60); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
- GPIO outGPIO(this->EmitLinkNumberArray[0]);
+ exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
+ //GPIO outGPIO(this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
  outGPIO.setDirection(OUTPUT);
  usleep(QuBitsUSecQuarterPeriodInt[0]);
@@ -357,7 +357,7 @@ strcat(ParamsCharArray,"_"); // Final _
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 this->release();
 usleep(500);// Give sometime for the node to send the message and the other node to receive it
-this->acwquire();
+this->acquire();
 
 int MaxWhileRound=100;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
@@ -385,8 +385,8 @@ this->release();
 //this->acquire();
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // Start measuring
-// this->inGPIO=exploringBB::GPIO(48); // Receiving GPIO. Of course gnd have to be connected accordingly.
- GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
+ exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
+ //GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
  inGPIO.setDirection(INPUT);
  // Basic Input
  usleep(QuBitsUSecHalfPeriodInt[0]);
@@ -435,7 +435,7 @@ int QPLA::NegotiateInitialParamsNode(){
 try{
  
 if (string(this->SCmode[0])==string("client")){
- char ParamsCharArray[NumBytesPayloadBuffer]="EmitLinkNumberArray[0]_48_ReceiveLinkNumberArray[0]_60_QuBitsPerSecondVelocity[0]_1000_";
+ char ParamsCharArray[NumBytesPayloadBuffer]="EmitLinkNumberArray[0]_48_ReceiveLinkNumberArray[0]_60_QuBitsPerSecondVelocity[0]_1000_";// Set initialization value for the other node
  this->SetSendParametersAgent(ParamsCharArray);// Set initialization values for the other node
 }
 else{//server
