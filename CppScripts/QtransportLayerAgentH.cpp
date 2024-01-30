@@ -24,6 +24,7 @@ Agent script for Quantum transport Layer Host
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
+#define SOCKtype "SOCK_DGRAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
@@ -186,7 +187,8 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
     // type: SOCK_STREAM: TCP(reliable, connection oriented) // ( SOCK_STREAM for TCP / SOCK_DGRAM for UDP ) 
     // Protocol value for Internet Protocol(IP), which is 0 
-    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (string(SOCKtype)=="SOCK_DGRAM"){socket_fd = socket(AF_INET, SOCK_DGRAM, 0);}
+    else {socket_fd = socket(AF_INET, SOCK_STREAM, 0);}
     if (socket_fd < 0) {
         cout << "Client Socket creation error" << endl;
         return -1;
@@ -206,10 +208,13 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
         return -1;
     }
     
+    // Connect is for TCP
+    if (string(SOCKtype)=="SOCK_STREAM"){
     int status= connect(socket_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr));
     if (status< 0) {
         cout << "Client Connection Failed" << endl;
         return -1;
+    }
     }
     
     strcpy(IPSocketsList,IPaddressesSockets);
@@ -228,7 +233,8 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
     // type: SOCK_STREAM: TCP(reliable, connection oriented) // ( SOCK_STREAM for TCP / SOCK_DGRAM for UDP ) 
     // Protocol value for Internet Protocol(IP), which is 0 
-    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (string(SOCKtype)=="SOCK_DGRAM"){socket_fd = socket(AF_INET, SOCK_DGRAM, 0);}
+    else {socket_fd = socket(AF_INET, SOCK_STREAM, 0);}
     if (socket_fd < 0) {
         cout << "Server socket failed" << endl;
         return -1;
@@ -252,6 +258,8 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
         return -1;
     }
     
+    // listen and accept are particular of TCP
+    if (string(SOCKtype)=="SOCK_STREAM"){
     if (listen(socket_fd, 3) < 0) {
         cout << "Server socket listen failed" << endl;
         return -1;
@@ -261,6 +269,7 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
     if (new_socket< 0) {
         cout << "Server socket accept failed" << endl;
         return -1;
+    }
     }
     
     //cout << " Server socket_fd: " << socket_fd << endl;
