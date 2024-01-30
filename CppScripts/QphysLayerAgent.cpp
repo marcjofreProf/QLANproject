@@ -275,8 +275,8 @@ this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 
 this->release();
 //this->acquire();
- exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
- //GPIO outGPIO(this->EmitLinkNumberArray[0]);
+ //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
+ GPIO outGPIO(48);//this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
  outGPIO.setDirection(OUTPUT);
  usleep(QuBitsUSecQuarterPeriodInt[0]);
@@ -385,8 +385,8 @@ this->release();
 //this->acquire();
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // Start measuring
- exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
- //GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
+ //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
+ GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
  inGPIO.setDirection(INPUT);
  // Basic Input
  usleep(QuBitsUSecHalfPeriodInt[0]);
