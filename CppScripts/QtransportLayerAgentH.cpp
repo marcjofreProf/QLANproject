@@ -137,7 +137,7 @@ int QTLAH::InitiateICPconnections() {
 	this->ICPmanagementOpenClient(this->socket_fdArray[0],this->IPaddressesSockets[0],this->IPSocketsList[0]); // Connect as client to own node
 	// Then either connect to the server host (acting as client) or open server listening (acting as server)
 	//cout << "Check - SCmode[1]: " << this->SCmode[1] << endl;
-	if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){
+	if (string(this->SCmode[1])==string("client")){
 		//cout << "Check - Generating connection as client" << endl;	
 		this->ICPmanagementOpenClient(this->socket_fdArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]); // Connect as client to destination host
 	}
