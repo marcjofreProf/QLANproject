@@ -773,6 +773,7 @@ usleep(99999);
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send message to node
 //usleep(999999);
 this->ReadFlagWait=true;
+if (string(SOCKtype)=="SOCK_DGRAM"){usleep(SockListenTimeusec);}
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 this->ReadFlagWait=false;
 //cout << "ReadBytes: " << ReadBytes << endl;
@@ -844,6 +845,7 @@ strcat(this->SendBuffer,",");// Very important to end the message
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[1]); // send message to node
 //usleep(999999);
 this->ReadFlagWait=true;
+if (string(SOCKtype)=="SOCK_DGRAM"){usleep(SockListenTimeusec);}
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 this->ReadFlagWait=false;
 //cout << "ReadBytes: " << ReadBytes << endl;
@@ -931,7 +933,7 @@ int main(int argc, char const * argv[]){
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
  // Discover some IP addresses of interest 
- QTLANagent.RetrieveIPSocketsHosts();
+ //QTLANagent.RetrieveIPSocketsHosts();// Not used because info provided by command line
  /*
  cout << "QTLANagent.IPaddressesSockets[0]: " << QTLANagent.IPaddressesSockets[0] << endl;
  cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[1] << endl;
