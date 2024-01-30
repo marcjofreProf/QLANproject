@@ -150,9 +150,9 @@ for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 //cout << "HeaderCharArray[iHeaders]: " << HeaderCharArray[iHeaders] << endl;
 // Missing to develop if there are different values
-if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){this->EmitLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
-else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){this->ReceiveLinkNumberArray[0]=atoi(ValuesCharArray[iHeaders]);}
-else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=atoi(ValuesCharArray[iHeaders]);}
+if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){this->EmitLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);}
+else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){this->ReceiveLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);}
+else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread
 	//cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
 	std::chrono::milliseconds duration_back((unsigned int)atoi(ValuesCharArray[iHeaders]));
@@ -279,12 +279,12 @@ this->release();
  GPIO outGPIO(this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
  outGPIO.setDirection(OUTPUT);
- usleep(QuBitsUSecQuarterPeriodInt[0]);
+ usleep(1000);//QuBitsUSecQuarterPeriodInt[0]);
  for (int iIterWrite=0;iIterWrite<1000;iIterWrite++){//NumQubitsMemoryBuffer;iIterWrite++){
 	 outGPIO.setValue(HIGH);
-	 usleep(QuBitsUSecHalfPeriodInt[0]);
+	 usleep(1000);//QuBitsUSecHalfPeriodInt[0]);
 	 outGPIO.setValue(LOW);
-	 usleep(QuBitsUSecHalfPeriodInt[0]);
+	 usleep(1000);//QuBitsUSecHalfPeriodInt[0]);
  }
  //usleep(QuBitsUSecHalfPeriodInt[0]);
   
