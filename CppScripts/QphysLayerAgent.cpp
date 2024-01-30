@@ -285,9 +285,9 @@ this->release();
  usleep(QuBitsUSecQuarterPeriodInt[0]);
  for (int iIterWrite=0;iIterWrite<NumQubitsMemoryBuffer;iIterWrite++){
 	 outGPIO.setValue(HIGH);
-	 usleep(1000);//QuBitsUSecHalfPeriodInt[0]);
+	 usleep(QuBitsUSecHalfPeriodInt[0]);
 	 outGPIO.setValue(LOW);
-	 usleep(1000);//QuBitsUSecHalfPeriodInt[0]);
+	 usleep(QuBitsUSecHalfPeriodInt[0]);
  }
  //usleep(QuBitsUSecHalfPeriodInt[0]);
   
