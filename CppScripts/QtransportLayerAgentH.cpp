@@ -376,14 +376,9 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	    memset(&destaddr, 0, sizeof(destaddr)); 	       
 	    // Filling information 
 	    destaddr.sin_family    = AF_INET; // IPv4 
-	    //destaddr.sin_addr.s_addr =  inet_addr(IPaddressesSockets); 
+	    destaddr.sin_addr.s_addr =  inet_addr(IPaddressesSockets); 
 	    destaddr.sin_port = htons(PORT);
 	    
-	    // Convert IPv4 and IPv6 addresses from text to binary form
-	    if (inet_pton(AF_INET, IPaddressesSockets, &destaddr.sin_addr)<= 0) {
-		cout << "Invalid address / Address not supported" << endl;
-		return -1;
-	    } 
 	    BytesSent=sendto(socket_fd_conn,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
     }
     else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
@@ -590,12 +585,12 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		    //cout << "SendBuffer: " << this->SendBuffer << endl;
 		    int socket_fd_conn;
 		    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
-		    socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
-		    this->ICPmanagementSend(socket_fd_conn,this->IPSocketsList[0]);
+			    socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
+			    this->ICPmanagementSend(socket_fd_conn,this->IPSocketsList[0]);
 		    }
 		    else{ //host acts as server		    
-		    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
-		    this->ICPmanagementSend(socket_fd_conn,this->IPSocketsList[0]);
+			    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
+			    this->ICPmanagementSend(socket_fd_conn,this->IPSocketsList[0]);
 		    }
 		}	
 		else{// It has to forward to its node
