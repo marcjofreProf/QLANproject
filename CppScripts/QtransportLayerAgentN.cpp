@@ -246,10 +246,13 @@ int QTLAN::SocketCheckForceShutDown(int socket_fd){
 return 0; // All Ok
 }
 
-int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList) {
-    
-    struct sockaddr_in serv_addr;    
-    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList) {    
+    struct sockaddr_in serv_addr;   
+    // Creating socket file descriptor
+    // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
+    // type: SOCK_STREAM: TCP(reliable, connection oriented) // ( SOCK_STREAM for TCP / SOCK_DGRAM for UDP ) 
+    // Protocol value for Internet Protocol(IP), which is 0 
+    socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (socket_fd < 0) {
         cout << "Client Socket creation error" << endl;
         return -1;
@@ -288,9 +291,9 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPSocket
  
     // Creating socket file descriptor
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
-    // type: SOCK_STREAM: TCP(reliable, connection oriented)
+    // type: SOCK_STREAM: TCP(reliable, connection oriented) // ( SOCK_STREAM for TCP / SOCK_DGRAM for UDP ) 
     // Protocol value for Internet Protocol(IP), which is 0
-    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (socket_fd < 0) {
         cout << "Server socket failed" << endl;
         return -1;
@@ -520,7 +523,7 @@ int QTLAN::UpdateSocketsInformation(){
 }
 
 int QTLAN::ProcessNewMessage(){
-//cout << "ReadBuffer: " << this->ReadBuffer << endl;
+cout << "ReadBuffer: " << this->ReadBuffer << endl;
 
 // Parse the message information
 char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
