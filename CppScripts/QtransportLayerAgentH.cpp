@@ -197,7 +197,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     //cout << "Client Socket file descriptor: " << socket_fd << endl;
     
     // Check status of a previously initiated socket to reduce misconnections
-    this->SocketCheckForceShutDown(socket_fd);
+    //this->SocketCheckForceShutDown(socket_fd); Not used
  
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
@@ -241,7 +241,7 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddres
     }
     
     // Check status of a previously initiated socket to reduce misconnections
-    this->SocketCheckForceShutDown(socket_fd);
+    //this->SocketCheckForceShutDown(socket_fd); Not used
     
     // Forcefully attaching socket to the port
     if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
@@ -376,8 +376,14 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	    memset(&destaddr, 0, sizeof(destaddr)); 	       
 	    // Filling information 
 	    destaddr.sin_family    = AF_INET; // IPv4 
-	    destaddr.sin_addr.s_addr =  inet_addr(IPaddressesSockets); 
-	    destaddr.sin_port = htons(PORT);     
+	    //destaddr.sin_addr.s_addr =  inet_addr(IPaddressesSockets); 
+	    destaddr.sin_port = htons(PORT);
+	    
+	    // Convert IPv4 and IPv6 addresses from text to binary form
+	    if (inet_pton(AF_INET, IPaddressesSockets, &destaddr.sin_addr)<= 0) {
+		cout << "Invalid address / Address not supported" << endl;
+		return -1;
+	    } 
 	    BytesSent=sendto(socket_fd_conn,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
     }
     else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
