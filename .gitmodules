@@ -1,0 +1,3 @@
+[submodule "linuxptp"]
+	path = linuxptp
+	url = http://git.code.sf.net/p/linuxptp/code
