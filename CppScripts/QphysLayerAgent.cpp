@@ -27,7 +27,7 @@ Agent script for Quantum Physical Layer
 // Semaphore
 #include <atomic>
 // time points
-#define WaitTimeToFutureTimePoint 100 // considered millisecons (it can be changed on the transformatoin used)
+#define WaitTimeToFutureTimePoint 10 // considered millisecons (it can be changed on the transformatoin used)
 
 using namespace exploringBB; // API to easily use GPIO in c++
 /* A Simple GPIO application
@@ -438,7 +438,7 @@ int QPLA::NegotiateInitialParamsNode(){
 try{
  
 if (string(this->SCmode[0])==string("client")){
- char ParamsCharArray[NumBytesPayloadBuffer]="EmitLinkNumberArray[0]_48_ReceiveLinkNumberArray[0]_60_QuBitsPerSecondVelocity[0]_1000_";// Set initialization value for the other node
+ char ParamsCharArray[NumBytesPayloadBuffer]="EmitLinkNumberArray[0]_48_ReceiveLinkNumberArray[0]_60_QuBitsPerSecondVelocity[0]_10000_";// Set initialization value for the other node
  this->SetSendParametersAgent(ParamsCharArray);// Set initialization values for the other node
 }
 else{//server
