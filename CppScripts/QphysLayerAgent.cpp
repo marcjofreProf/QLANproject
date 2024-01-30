@@ -279,8 +279,8 @@ this->release();
  GPIO outGPIO(this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
  outGPIO.setDirection(OUTPUT);
- usleep(1000);//QuBitsUSecQuarterPeriodInt[0]);
- for (int iIterWrite=0;iIterWrite<1000;iIterWrite++){//NumQubitsMemoryBuffer;iIterWrite++){
+ usleep(QuBitsUSecQuarterPeriodInt[0]);
+ for (int iIterWrite=0;iIterWrite<NumQubitsMemoryBuffer;iIterWrite++){
 	 outGPIO.setValue(HIGH);
 	 usleep(1000);//QuBitsUSecHalfPeriodInt[0]);
 	 outGPIO.setValue(LOW);
@@ -390,12 +390,12 @@ cout << "MaxWhileRound: " << MaxWhileRound << endl;
  inGPIO.setDirection(INPUT);
  // Basic Input
  usleep(QuBitsUSecHalfPeriodInt[0]);
- for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;++iIterRead){	 
+ for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){	 
 	 QuBitValueArray[iIterRead]=inGPIO.getValue();
 	 usleep(QuBitsUSecPeriodInt[0]);	 
  }
  // Count received QuBits
- for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;++iIterRead){// Count how many qubits 
+ for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){// Count how many qubits 
  	if (QuBitValueArray[iIterRead]==1){
  		NumStoredQubitsNodeAux++;
  	} 	
