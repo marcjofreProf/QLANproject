@@ -25,7 +25,7 @@ Agent script for Quantum transport Layer Node
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
-#define SOCKtype "SOCK_DGRAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
+#define SOCKtype "SOCK_STREAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
@@ -290,6 +290,7 @@ else{// TCP
 
 int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPaddressesSocketsLocal,char* IPSocketsList) {    
     struct sockaddr_in address;   
+    int opt = 1;
     // Creating socket file descriptor
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
     // type: SOCK_STREAM: TCP(reliable, connection oriented) // ( SOCK_STREAM for TCP / SOCK_DGRAM for UDP ) 
@@ -303,6 +304,12 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     
     // Check status of a previously initiated socket to reduce misconnections
     //this->SocketCheckForceShutDown(socket_fd); Not used
+    
+    // Specifying some options to the port
+    if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
+	cout << "Server attaching socket options failed" << endl;
+	return -1;
+    }
     
     address.sin_family = AF_INET;
     if (string(SOCKtype)=="SOCK_DGRAM"){
@@ -445,8 +452,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 		    orgaddr.sin_port = htons(PORT);
 		    unsigned int addrLen;
 			addrLen = sizeof(orgaddr);
-		//valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
-		valread=recvfrom(socket_fd_conn,this->ReadBuffer,128,0,(struct sockaddr *) &orgaddr,&addrLen);
+		valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
 		}
     		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 		}
@@ -465,8 +471,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 		    orgaddr.sin_port = htons(PORT);
 		    unsigned int addrLen;
 			addrLen = sizeof(orgaddr);
-		//valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&addrLen);
-		valread=recvfrom(socket_fd_conn,this->ReadBuffer,128,0,(struct sockaddr *) &orgaddr,&addrLen);
+		valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&addrLen);
 		}
     		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 	}
