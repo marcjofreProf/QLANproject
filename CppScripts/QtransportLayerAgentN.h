@@ -60,6 +60,7 @@ private: // Variables/Objects
 	// Member Variables Such As Window Handle, Time Etc.,
 	ApplicationState m_state;		
 	int socket_fdArray[NumSocketsMax]; // socket descriptor, an integer (like a file-handle)
+	int socket_SendUDPfdArray[NumSocketsMax]; // socket descriptor, an integer (like a file-handle), for sending in UDP
 	int new_socketArray[NumSocketsMax]; // socket between client and server. Created by the server
 	char ReadBuffer[NumBytesBufferICPMAX] = {0};// Buffer to read ICP messages
 	char SendBuffer[NumBytesBufferICPMAX] = {0};// Buffer to send ICP messages

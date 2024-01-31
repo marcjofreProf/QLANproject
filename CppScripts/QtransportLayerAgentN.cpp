@@ -257,6 +257,8 @@ int QTLAN::InitiateICPconnections(int argc){
 int RetValue = 0;
 if (string(SOCKtype)=="SOCK_DGRAM"){
 	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[2],this->IPSocketsList[0]);// Listen to the port
+	
+	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[2],this->IPSocketsList[0]);}// In order to send datagrams
 }
 else{// TCP
 	// This agent applies to nodes. So, regarding sockets, different situations apply
@@ -490,15 +492,23 @@ int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
     const char* SendBufferAux = this->SendBuffer;
     int BytesSent=0;
     if (string(SOCKtype)=="SOCK_DGRAM"){    
-    	    int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
-	    struct sockaddr_in destaddr; 
-	    memset(&destaddr, 0, sizeof(destaddr));	       
-	    // Filling information 
-	    destaddr.sin_family    = AF_INET; // IPv4 
-	    destaddr.sin_addr.s_addr =  inet_addr(IPaddressesSockets); 
-	    destaddr.sin_port = htons(PORT);
-	      
-	    BytesSent=0;//sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
+    	    int socket_fd=0;
+	    
+	    struct sockaddr_in destaddr;   
+	    memset(&destaddr, 0, sizeof(destaddr)); 
+	       
+	    // Filling server information 
+	    destaddr.sin_family = AF_INET; 
+	    destaddr.sin_port = htons(PORT); 
+	    destaddr.sin_addr.s_addr = inet_addr(IPaddressesSockets); 
+	    
+	    for (int i=0; i<(NumSocketsMax); i++){
+	    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
+	    	if (socket_fd_conn==socket_fdArray[i]){
+	    		socket_fd=socket_SendUDPfdArray[i];
+	    		BytesSent=sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
+	    	}
+	    }
     }
     else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
     

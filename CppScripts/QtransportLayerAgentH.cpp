@@ -129,7 +129,10 @@ if (string(SOCKtype)=="SOCK_DGRAM"){
 	
 	if (RetValue>-1){
 	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPaddressesSockets[2],this->IPSocketsList[1]);} // Open port and listen as server
-	// The socket for sending it is treated in the send function
+	// The socket for sending
+	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[3],this->IPSocketsList[0]);}// In order to send datagrams
+	
+	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[1],this->IPaddressesSockets[1],this->IPaddressesSockets[2],this->IPSocketsList[1]);}// In order to send datagrams
 }
 else{// TCP
 	// This agent applies to hosts. So, regarding sockets, different situations apply
@@ -411,15 +414,23 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=0;
     if (string(SOCKtype)=="SOCK_DGRAM"){
-	int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
-	struct sockaddr_in destaddr; 
-	    memset(&destaddr, 0, sizeof(destaddr)); 	       
-	    // Filling information 
-	    destaddr.sin_family    = AF_INET; // IPv4 
-	    destaddr.sin_addr.s_addr =  inet_addr(IPaddressesSockets); 
-	    destaddr.sin_port = htons(PORT);
+	int socket_fd = 0;
 	    
-	    BytesSent=0;//sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
+	    struct sockaddr_in destaddr;   
+	    memset(&destaddr, 0, sizeof(destaddr)); 
+	       
+	    // Filling server information 
+	    destaddr.sin_family = AF_INET; 
+	    destaddr.sin_port = htons(PORT); 
+	    destaddr.sin_addr.s_addr = inet_addr(IPaddressesSockets); 
+	    
+	    for (int i=0; i<(NumSocketsMax); i++){
+	    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
+	    	if (socket_fd_conn==socket_fdArray[i]){
+	    		socket_fd=socket_SendUDPfdArray[i];
+	    		BytesSent=sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
+	    	}
+	    }	    
     }
     else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
     
