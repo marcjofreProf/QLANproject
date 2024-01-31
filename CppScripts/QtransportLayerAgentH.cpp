@@ -125,12 +125,10 @@ int QTLAH::InitiateICPconnections() {
 int RetValue=0;
 if (string(SOCKtype)=="SOCK_DGRAM"){
 	// UDP philosophy is different since it is not connection oriented. Actually, we are tellgin to listen to a port, and if we want also specifically to an IP (which we might want to do to keep better track of things)
-	cout << "Before first H connection" << endl;
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[3],this->IPaddressesSockets[0],this->IPSocketsList[0]); // Listen to the port
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[3],this->IPSocketsList[0]); // Listen to the port
 	
 	if (RetValue>-1){
-	cout << "Before second H connection" << endl;
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[2],this->IPaddressesSockets[1],this->IPSocketsList[1]);} // Open port and listen as server
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPaddressesSockets[2],this->IPSocketsList[1]);} // Open port and listen as server
 	// The socket for sending it is treated in the send function
 }
 else{// TCP
@@ -283,6 +281,8 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddres
     
     // Forcefully attaching socket to the port
     if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
+    	//cout << "Server bind IPaddressesSocketsLocal: " << IPaddressesSocketsLocal << endl;
+    	cout << strerror(errno) << endl;
         cout << "Server socket bind failed" << endl;
         return -1;
     }
@@ -351,7 +351,7 @@ else {// There might be at least one new message
 			    orgaddr.sin_addr.s_addr = INADDR_ANY; 
 			    orgaddr.sin_port = htons(PORT);
 			    socklen_t len;
-			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&len);
+			valread=0;//recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&len);
 			}
     			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 			}
@@ -364,7 +364,7 @@ else {// There might be at least one new message
 			    orgaddr.sin_addr.s_addr = INADDR_ANY; 
 			    orgaddr.sin_port = htons(PORT);
 			    socklen_t len;
-			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&len);
+			valread=0;//recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&len);
 			}
     			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 			}
@@ -409,7 +409,7 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	    destaddr.sin_addr.s_addr =  inet_addr(IPaddressesSockets); 
 	    destaddr.sin_port = htons(PORT);
 	    
-	    BytesSent=sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
+	    BytesSent=0;//sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
     }
     else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
     

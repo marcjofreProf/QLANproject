@@ -434,7 +434,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 		    orgaddr.sin_addr.s_addr = INADDR_ANY; 
 		    orgaddr.sin_port = htons(PORT);
 		    socklen_t len;
-		valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&len);
+		valread=0;//recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&len);
 		}
     		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 		}
@@ -447,7 +447,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 		    orgaddr.sin_addr.s_addr = INADDR_ANY; 
 		    orgaddr.sin_port = htons(PORT);
 		    socklen_t len;
-		valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&len);
+		valread=0;//recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&len);
 		}
     		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 	}
@@ -488,7 +488,7 @@ int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	    destaddr.sin_addr.s_addr =  inet_addr(IPaddressesSockets); 
 	    destaddr.sin_port = htons(PORT);
 	      
-	    BytesSent=sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
+	    BytesSent=0;//sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
     }
     else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
     
