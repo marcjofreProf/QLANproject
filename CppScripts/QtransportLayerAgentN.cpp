@@ -322,7 +322,10 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddres
 	    }
     }
     address.sin_family = AF_INET;
-    address.sin_addr.s_addr = inet_addr(IPaddressesSockets);// Since we have the info, it is better to specify, instead of INADDR_ANY;
+    if (string(SOCKtype)=="SOCK_DGRAM"){
+    	address.sin_addr.s_addr = inet_addr(IPaddressesSockets);// Since we have the info, it is better to specify, instead of INADDR_ANY;
+    }
+    else{address.sin_addr.s_addr = INADDR_ANY;}
     address.sin_port = htons(PORT);
  
     // Forcefully attaching socket to the port
