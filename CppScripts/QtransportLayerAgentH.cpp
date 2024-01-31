@@ -364,8 +364,9 @@ else {// There might be at least one new message
 			    	}
 			    }
 			    orgaddr.sin_port = htons(PORT);
-			    socklen_t len;
-			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&len);
+			    unsigned int addrLen;
+				addrLen = sizeof(orgaddr);
+			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
 			}
     			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 			}
@@ -384,8 +385,9 @@ else {// There might be at least one new message
 			    	}
 			    }
 			    orgaddr.sin_port = htons(PORT);
-			    socklen_t len;
-			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&len);
+			    unsigned int addrLen;
+				addrLen = sizeof(orgaddr);
+			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&addrLen);//MSG_WAITALL
 			}
     			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 			}
@@ -394,7 +396,13 @@ else {// There might be at least one new message
 		if (valread <= 0){
 			if (valread<0){
 				cout << strerror(errno) << endl;
-				cout << "Host error reading new messages" << endl;
+				for (int i=0; i<(NumSocketsMax); i++){
+				//cout << "socket_fd_conn: " << socket_fd_conn << endl;
+			    	//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
+			    	if (socket_fd_conn==socket_fdArray[i]){
+				cout << "Host " << string(this->SCmode[i]) << " error reading new messages" << endl;
+				}
+				}
 			}
 			else{
 				cout << strerror(errno) << endl;
