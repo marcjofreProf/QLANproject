@@ -24,7 +24,7 @@ Agent script for Quantum transport Layer Host
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
-#define SOCKtype "SOCK_STREAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
+#define SOCKtype "SOCK_DGRAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
@@ -514,7 +514,10 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  this->m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentH" << endl;
  bool isValidWhileLoop = true;
+ unsigned int CheckCounter=0;
  while(isValidWhileLoop){
+ cout << "CheckCounter: " << CheckCounter << endl;
+ CheckCounter++;
  try{
    try {
    	this->acquire();// Wait semaphore until it can proceed
