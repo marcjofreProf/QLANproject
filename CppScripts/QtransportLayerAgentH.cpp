@@ -375,14 +375,14 @@ else {// There might be at least one new message
 			    	}
 			    }
 			    
-			cout << "valread: " << valread << endl;
-			for (int i=0; i<(NumSocketsMax); i++){
-				cout << "socket_fd_conn: " << socket_fd_conn << endl;
-			    	cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
-			    	if (socket_fd_conn==socket_fdArray[i]){
-			cout << "Host " << string(this->SCmode[i]) << " this->ReadBuffer: " << this->ReadBuffer << endl;
-			}
-			}
+			//cout << "valread: " << valread << endl;
+			//for (int i=0; i<(NumSocketsMax); i++){
+			//	cout << "socket_fd_conn: " << socket_fd_conn << endl;
+			//    	cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
+			//    	if (socket_fd_conn==socket_fdArray[i]){
+			//cout << "Host " << string(this->SCmode[i]) << " this->ReadBuffer: " << this->ReadBuffer << endl;
+			//}
+			//}
 			}
     			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 			}
@@ -406,14 +406,14 @@ else {// There might be at least one new message
 			    	}
 			    }
 			    
-			cout << "valread: " << valread << endl;
-			for (int i=0; i<(NumSocketsMax); i++){
-				cout << "socket_fd_conn: " << socket_fd_conn << endl;
-			    	cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
-			    	if (socket_fd_conn==socket_fdArray[i]){
-			cout << "Host " << string(this->SCmode[i]) << " this->ReadBuffer: " << this->ReadBuffer << endl;
-			}
-			}
+			//cout << "valread: " << valread << endl;
+			//for (int i=0; i<(NumSocketsMax); i++){
+			//	cout << "socket_fd_conn: " << socket_fd_conn << endl;
+			//    	cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
+			//    	if (socket_fd_conn==socket_fdArray[i]){
+			//cout << "Host " << string(this->SCmode[i]) << " this->ReadBuffer: " << this->ReadBuffer << endl;
+			//}
+			//}
 			}
     			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 			}
@@ -474,6 +474,9 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	    for (int i=0; i<(NumSocketsMax); i++){
 	    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
 	    	if (socket_fd_conn==socket_fdArray[i]){
+	    		cout << "socket_fd_conn: " << socket_fd_conn << endl;
+	    		cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
+	    		cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
 	    		socket_fd=socket_SendUDPfdArray[i];
 	    		BytesSent=sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
 	    	}
