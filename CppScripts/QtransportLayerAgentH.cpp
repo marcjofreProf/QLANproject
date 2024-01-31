@@ -123,12 +123,7 @@ int QTLAH::InitAgentProcess(){
 
 int QTLAH::InitiateICPconnections() {
 int RetValue=0;
-if (string(SOCKtype)=="SOCK_DGRAM"){
-RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPSocketsList[0]); // Connect as client to own node
-if (RetValue>-1){
-RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]);} // Open port and listen as server
-}
-else{// TCP
+
 	// This agent applies to hosts. So, regarding sockets, different situations apply
 	 // Host is a client initiating the service, so:
 	 //	- host will be client to its own node
@@ -153,7 +148,7 @@ else{// TCP
 		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]); // Open port and listen as server
 		
 	}
-}
+
 	if (RetValue==-1){this->m_exit();} // Exit application
 	this->numberSessions=1;
 	return 0; // All OK
@@ -207,18 +202,19 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     
     // Check status of a previously initiated socket to reduce misconnections
     //this->SocketCheckForceShutDown(socket_fd); Not used
- 
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
- 
-    // Convert IPv4 and IPv6 addresses from text to binary form
-    if (inet_pton(AF_INET, IPaddressesSockets, &serv_addr.sin_addr)<= 0) {
-        cout << "Invalid address / Address not supported" << endl;
-        return -1;
-    }
     
     // Connect is for TCP
     if (string(SOCKtype)=="SOCK_STREAM"){
+	    serv_addr.sin_family = AF_INET;
+	    serv_addr.sin_port = htons(PORT);
+	 
+	    // Convert IPv4 and IPv6 addresses from text to binary form
+	    if (inet_pton(AF_INET, IPaddressesSockets, &serv_addr.sin_addr)<= 0) {
+		cout << "Invalid address / Address not supported" << endl;
+		return -1;
+	    }
+	    
+    
 	    int status= connect(socket_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr));
 	    if (status< 0) {
 		cout << "Client Connection Failed" << endl;

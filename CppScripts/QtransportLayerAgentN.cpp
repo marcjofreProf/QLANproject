@@ -269,17 +269,17 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     // Check status of a previously initiated socket to reduce misconnections
     //this->SocketCheckForceShutDown(socket_fd); Not used
     
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
- 
-    // Convert IPv4 and IPv6 addresses from text to binary form
-    if (inet_pton(AF_INET, IPaddressesSockets, &serv_addr.sin_addr)<= 0) {
-        cout << "Invalid address / Address not supported" << endl;
-        return -1;
-    }
-    
     // Connect is for TCP
     if (string(SOCKtype)=="SOCK_STREAM"){
+	    serv_addr.sin_family = AF_INET;
+	    serv_addr.sin_port = htons(PORT);
+	 
+	    // Convert IPv4 and IPv6 addresses from text to binary form
+	    if (inet_pton(AF_INET, IPaddressesSockets, &serv_addr.sin_addr)<= 0) {
+		cout << "Invalid address / Address not supported" << endl;
+		return -1;
+	    }    
+    
 	    int status= connect(socket_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr));
 	    if (status< 0) {
 		cout << "Client Connection Failed" << endl;
@@ -474,10 +474,7 @@ if (string(SOCKtype)=="SOCK_STREAM"){
 
 int QTLAN::InitiateICPconnections(int argc){
 int RetValue = 0;
-if (string(SOCKtype)=="SOCK_DGRAM"){
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPSocketsList[0]);
-}
-else{// TCP
+
 	// This agent applies to nodes. So, regarding sockets, different situations apply
 	// Node is from a host initiating the service, so:
 	//	- node will be server to its own host
@@ -498,7 +495,7 @@ else{// TCP
 
 	//QTLANagent.ICPmanagementOpenClient(QTLANagent.socket_fdArray[1],char* IPaddressesSockets)
 	}
-}
+
 	if (RetValue==-1){this->m_exit();} // Exit application
 	else{this->numberSessions=1;} // Update indicators
 	
