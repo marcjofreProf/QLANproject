@@ -478,9 +478,9 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	    for (int i=0; i<(NumSocketsMax); i++){
 	    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
 	    	if (socket_fd_conn==socket_fdArray[i]){
-	    		cout << "socket_fd_conn: " << socket_fd_conn << endl;
-	    		cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
-	    		cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
+	    		//cout << "socket_fd_conn: " << socket_fd_conn << endl;
+	    		//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
+	    		//cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
 	    		socket_fd=socket_SendUDPfdArray[i];
 	    		BytesSent=sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
 	    	}

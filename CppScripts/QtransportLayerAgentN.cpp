@@ -906,7 +906,7 @@ strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"NodeAreYouThere?");
 strcat(this->SendBuffer,",");// Very important to end the message
 //usleep(999999);
-this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[1]); // send message to node
+this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send message to node
 //usleep(999999);
 this->ReadFlagWait=true;
 if (string(SOCKtype)=="SOCK_DGRAM"){usleep(SockListenTimeusec);}
