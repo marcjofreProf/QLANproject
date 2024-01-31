@@ -92,10 +92,10 @@ private: //Functions//Methods
 	// Management of ICP communications
 	int SocketCheckForceShutDown(int socket_fd);// Force the socket to shutdown (whatever status but closed)
         // Management functions as client
-	int ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList); // Open ICP socket 
+	int ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPaddressesSocketsLocal,char* IPSocketsList); // Open ICP socket 
 	int ICPmanagementCloseClient(int socket_fd); // Close ICP socket
 	// As server
-	int ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddressesSockets,char* IPSocketsList);
+	int ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddressesSockets,char* IPaddressesSocketsLocal,char* IPSocketsList);
 	int ICPmanagementCloseServer(int socket_fd,int new_socket);
 	// As server or client
 	int ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec); // Read ICP socket

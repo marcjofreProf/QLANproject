@@ -126,11 +126,11 @@ int RetValue=0;
 if (string(SOCKtype)=="SOCK_DGRAM"){
 	// UDP philosophy is different since it is not connection oriented. Actually, we are tellgin to listen to a port, and if we want also specifically to an IP (which we might want to do to keep better track of things)
 	cout << "Before first H connection" << endl;
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPSocketsList[0]); // Listen to the port
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[3],this->IPaddressesSockets[0],this->IPSocketsList[0]); // Listen to the port
 	
 	if (RetValue>-1){
 	cout << "Before second H connection" << endl;
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]);} // Open port and listen as server
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[2],this->IPaddressesSockets[1],this->IPSocketsList[1]);} // Open port and listen as server
 	// The socket for sending it is treated in the send function
 }
 else{// TCP
@@ -146,16 +146,16 @@ else{// TCP
 	 // since the paradigm is always to establish first node connections and then hosts connections, apparently there are no conflics confusing how is connecting to or from.
 	
 	// First connect to the attached node
-	this->ICPmanagementOpenClient(this->socket_fdArray[0],this->IPaddressesSockets[0],this->IPSocketsList[0]); // Connect as client to own node
+	this->ICPmanagementOpenClient(this->socket_fdArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[3],this->IPSocketsList[0]); // Connect as client to own node
 	// Then either connect to the server host (acting as client) or open server listening (acting as server)
 	//cout << "Check - SCmode[1]: " << this->SCmode[1] << endl;
 	if (string(this->SCmode[1])==string("client")){
 		//cout << "Check - Generating connection as client" << endl;	
-		this->ICPmanagementOpenClient(this->socket_fdArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]); // Connect as client to destination host
+		this->ICPmanagementOpenClient(this->socket_fdArray[1],this->IPaddressesSockets[1],this->IPaddressesSockets[2],this->IPSocketsList[1]); // Connect as client to destination host
 	}
 	else{// server
 		//cout << "Check - Generating connection as server" << endl;
-		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]); // Open port and listen as server
+		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPaddressesSockets[2],this->IPSocketsList[1]); // Open port and listen as server
 		
 	}
 }
@@ -195,7 +195,7 @@ int QTLAH::SocketCheckForceShutDown(int socket_fd){
 return 0; // All Ok
 }
 
-int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPSocketsList) {    
+int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPaddressesSocketsLocal,char* IPSocketsList) {    
     struct sockaddr_in serv_addr;
     // Creating socket file descriptor
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
@@ -239,7 +239,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     return 0; // All Ok
 }
 
-int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddressesSockets,char* IPSocketsList) {// Node listening for connection from attached host
+int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddressesSockets,char* IPaddressesSocketsLocal,char* IPSocketsList) {// Node listening for connection from attached host
     struct sockaddr_in address;
     int opt = 1;
     socklen_t addrlen = sizeof(address);       
@@ -268,9 +268,9 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddres
     }
     address.sin_family = AF_INET;
     if (string(SOCKtype)=="SOCK_DGRAM"){
-    	address.sin_addr.s_addr = inet_addr(IPaddressesSockets);// Since we have the info, it is better to specify, instead of INADDR_ANY;
+    	address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);// Since we have the info, it is better to specify, instead of INADDR_ANY;
     }
-    else{address.sin_addr.s_addr = INADDR_ANY;}
+    else{address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);}
     address.sin_port = htons(PORT);
     
     // Forcefully attaching socket to the port
