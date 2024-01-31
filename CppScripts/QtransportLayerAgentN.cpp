@@ -287,7 +287,7 @@ else{// TCP
 }
 
 int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPaddressesSocketsLocal,char* IPSocketsList) {    
-    struct sockaddr_in serv_addr;   
+    struct sockaddr_in address;   
     // Creating socket file descriptor
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
     // type: SOCK_STREAM: TCP(reliable, connection oriented) // ( SOCK_STREAM for TCP / SOCK_DGRAM for UDP ) 
@@ -302,18 +302,28 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     // Check status of a previously initiated socket to reduce misconnections
     //this->SocketCheckForceShutDown(socket_fd); Not used
     
+    address.sin_family = AF_INET;
+    if (string(SOCKtype)=="SOCK_DGRAM"){
+    	address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);// Since we have the info, it is better to specify, instead of INADDR_ANY;
+    }
+    else{address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);}
+    address.sin_port = htons(PORT);
+    
+    // Forcefully attaching socket to the port
+    if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
+        cout << "Client socket bind failed" << endl;
+        return -1;
+    }
+    
     // Connect is for TCP
-    if (string(SOCKtype)=="SOCK_STREAM"){
-	    serv_addr.sin_family = AF_INET;
-	    serv_addr.sin_port = htons(PORT);
-	 
+    if (string(SOCKtype)=="SOCK_STREAM"){	 
 	    // Convert IPv4 and IPv6 addresses from text to binary form
-	    if (inet_pton(AF_INET, IPaddressesSockets, &serv_addr.sin_addr)<= 0) {
+	    if (inet_pton(AF_INET, IPaddressesSockets, &address.sin_addr)<= 0) {
 		cout << "Invalid address / Address not supported" << endl;
 		return -1;
 	    }    
     
-	    int status= connect(socket_fd, (struct sockaddr*)&serv_addr,sizeof(serv_addr));
+	    int status= connect(socket_fd, (struct sockaddr*)&address,sizeof(address));
 	    if (status< 0) {
 		cout << "Client Connection Failed" << endl;
 		return -1;
