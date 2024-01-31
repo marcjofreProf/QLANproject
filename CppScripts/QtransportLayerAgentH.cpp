@@ -348,10 +348,15 @@ else {// There might be at least one new message
 			    memset(&orgaddr, 0, sizeof(orgaddr));		       
 			    // Filling information 
 			    orgaddr.sin_family    = AF_INET; // IPv4 
-			    orgaddr.sin_addr.s_addr = INADDR_ANY; 
+			    for (int i=0; i<(NumSocketsMax); i++){
+			    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
+			    	if (socket_fd_conn==socket_fdArray[i]){
+			    		orgaddr.sin_addr.s_addr = inet_addr(this->IPaddressesSockets[i]);//INADDR_ANY; 
+			    	}
+			    }
 			    orgaddr.sin_port = htons(PORT);
 			    socklen_t len;
-			valread=0;//recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&len);
+			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&len);
 			}
     			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 			}
@@ -361,10 +366,15 @@ else {// There might be at least one new message
 			    memset(&orgaddr, 0, sizeof(orgaddr));		       
 			    // Filling information 
 			    orgaddr.sin_family    = AF_INET; // IPv4 
-			    orgaddr.sin_addr.s_addr = INADDR_ANY; 
+			    for (int i=0; i<(NumSocketsMax); i++){
+			    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
+			    	if (socket_fd_conn==socket_fdArray[i]){
+			    		orgaddr.sin_addr.s_addr = inet_addr(this->IPaddressesSockets[i]);//INADDR_ANY; 
+			    	}
+			    }
 			    orgaddr.sin_port = htons(PORT);
 			    socklen_t len;
-			valread=0;//recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&len);
+			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&len);
 			}
     			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 			}
