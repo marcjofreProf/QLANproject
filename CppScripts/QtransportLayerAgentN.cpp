@@ -322,7 +322,7 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddres
 	    }
     }
     address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_addr.s_addr = inet_addr(IPaddressesSockets);// Since we have the info, it is better to specify, instead of INADDR_ANY;
     address.sin_port = htons(PORT);
  
     // Forcefully attaching socket to the port
@@ -436,6 +436,7 @@ int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
     const char* SendBufferAux = this->SendBuffer;
     int BytesSent=0;
     if (string(SOCKtype)=="SOCK_DGRAM"){    
+    	    int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
 	    struct sockaddr_in destaddr; 
 	    memset(&destaddr, 0, sizeof(destaddr));	       
 	    // Filling information 
@@ -443,7 +444,7 @@ int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	    destaddr.sin_addr.s_addr =  inet_addr(IPaddressesSockets); 
 	    destaddr.sin_port = htons(PORT);
 	      
-	    BytesSent=sendto(socket_fd_conn,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
+	    BytesSent=sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
     }
     else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
     
@@ -474,7 +475,10 @@ if (string(SOCKtype)=="SOCK_STREAM"){
 
 int QTLAN::InitiateICPconnections(int argc){
 int RetValue = 0;
-
+if (string(SOCKtype)=="SOCK_DGRAM"){
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPSocketsList[0]);// Listen to the port
+}
+else{// TCP
 	// This agent applies to nodes. So, regarding sockets, different situations apply
 	// Node is from a host initiating the service, so:
 	//	- node will be server to its own host
@@ -495,7 +499,7 @@ int RetValue = 0;
 
 	//QTLANagent.ICPmanagementOpenClient(QTLANagent.socket_fdArray[1],char* IPaddressesSockets)
 	}
-
+}
 	if (RetValue==-1){this->m_exit();} // Exit application
 	else{this->numberSessions=1;} // Update indicators
 	

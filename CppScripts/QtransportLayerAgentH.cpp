@@ -123,7 +123,17 @@ int QTLAH::InitAgentProcess(){
 
 int QTLAH::InitiateICPconnections() {
 int RetValue=0;
-
+if (string(SOCKtype)=="SOCK_DGRAM"){
+	// UDP philosophy is different since it is not connection oriented. Actually, we are tellgin to listen to a port, and if we want also specifically to an IP (which we might want to do to keep better track of things)
+	cout << "Before first H connection" << endl;
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPSocketsList[0]); // Listen to the port
+	
+	if (RetValue>-1){
+	cout << "Before second H connection" << endl;
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]);} // Open port and listen as server
+	// The socket for sending it is treated in the send function
+}
+else{// TCP
 	// This agent applies to hosts. So, regarding sockets, different situations apply
 	 // Host is a client initiating the service, so:
 	 //	- host will be client to its own node
@@ -148,7 +158,7 @@ int RetValue=0;
 		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]); // Open port and listen as server
 		
 	}
-
+}
 	if (RetValue==-1){this->m_exit();} // Exit application
 	this->numberSessions=1;
 	return 0; // All OK
@@ -257,7 +267,7 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddres
 	    }
     }
     address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_addr.s_addr = inet_addr(IPaddressesSockets);// Since we have the info, it is better to specify, instead of INADDR_ANY;
     address.sin_port = htons(PORT);
     
     // Forcefully attaching socket to the port
@@ -380,6 +390,7 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=0;
     if (string(SOCKtype)=="SOCK_DGRAM"){
+	int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
 	struct sockaddr_in destaddr; 
 	    memset(&destaddr, 0, sizeof(destaddr)); 	       
 	    // Filling information 
@@ -387,7 +398,7 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	    destaddr.sin_addr.s_addr =  inet_addr(IPaddressesSockets); 
 	    destaddr.sin_port = htons(PORT);
 	    
-	    BytesSent=sendto(socket_fd_conn,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
+	    BytesSent=sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
     }
     else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
     
