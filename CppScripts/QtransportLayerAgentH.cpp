@@ -122,6 +122,13 @@ int QTLAH::InitAgentProcess(){
 }
 
 int QTLAH::InitiateICPconnections() {
+int RetValue=0;
+if (string(SOCKtype)=="SOCK_DGRAM"){
+RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPSocketsList[0]); // Connect as client to own node
+if (RetValue>-1){
+RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]);} // Open port and listen as server
+}
+else{// TCP
 	// This agent applies to hosts. So, regarding sockets, different situations apply
 	 // Host is a client initiating the service, so:
 	 //	- host will be client to its own node
@@ -143,9 +150,11 @@ int QTLAH::InitiateICPconnections() {
 	}
 	else{// server
 		//cout << "Check - Generating connection as server" << endl;
-		int RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]); // Open port and listen as server
-		if (RetValue==-1){this->m_exit();} // Exit application
+		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPSocketsList[1]); // Open port and listen as server
+		
 	}
+}
+	if (RetValue==-1){this->m_exit();} // Exit application
 	this->numberSessions=1;
 	return 0; // All OK
 }

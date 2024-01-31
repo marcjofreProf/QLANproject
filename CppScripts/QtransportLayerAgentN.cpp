@@ -473,6 +473,11 @@ if (string(SOCKtype)=="SOCK_STREAM"){
 }
 
 int QTLAN::InitiateICPconnections(int argc){
+int RetValue = 0;
+if (string(SOCKtype)=="SOCK_DGRAM"){
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPSocketsList[0]);
+}
+else{// TCP
 	// This agent applies to nodes. So, regarding sockets, different situations apply
 	// Node is from a host initiating the service, so:
 	//	- node will be server to its own host
@@ -484,7 +489,7 @@ int QTLAN::InitiateICPconnections(int argc){
 	// since the paradigm is always to establish first server connection and then, evenually, client connection, apparently there are no conflics confusing how is connecting to or from. 
 
 	// First, opening server listening socket 
-	int RetValue = 0;
+	
 	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPSocketsList[0]);
 	// Not needed because provided in the initialization strcpy(this->IPaddressesSockets[0],this->IPSocketsList[0]);
 	// Eventually, if it is an intermediate node
@@ -493,6 +498,7 @@ int QTLAN::InitiateICPconnections(int argc){
 
 	//QTLANagent.ICPmanagementOpenClient(QTLANagent.socket_fdArray[1],char* IPaddressesSockets)
 	}
+}
 	if (RetValue==-1){this->m_exit();} // Exit application
 	else{this->numberSessions=1;} // Update indicators
 	
