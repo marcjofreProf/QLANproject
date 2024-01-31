@@ -364,12 +364,7 @@ else {// There might be at least one new message
 			    memset(&orgaddr, 0, sizeof(orgaddr));		       
 			    // Filling information 
 			    orgaddr.sin_family    = AF_INET; // IPv4 
-			    orgaddr.sin_addr.s_addr = INADDR_ANY;
-			    orgaddr.sin_port = htons(PORT);
-			    unsigned int addrLen;
-			addrLen = sizeof(orgaddr);
-				valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
-					/*
+			    
 			    for (int i=0; i<(NumSocketsMax); i++){
 				//cout << "socket_fd_conn: " << socket_fd_conn << endl;
 			    	//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
@@ -381,7 +376,7 @@ else {// There might be at least one new message
 						addrLen = sizeof(orgaddr);
 					valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
 			    	}
-			    }*/
+			    }
 			    
 			//cout << "valread: " << valread << endl;
 			//for (int i=0; i<(NumSocketsMax); i++){
@@ -401,12 +396,6 @@ else {// There might be at least one new message
 			    memset(&orgaddr, 0, sizeof(orgaddr));		       
 			    // Filling information 
 			    orgaddr.sin_family    = AF_INET; // IPv4
-			    orgaddr.sin_addr.s_addr = INADDR_ANY;
-			    orgaddr.sin_port = htons(PORT);
-			    unsigned int addrLen;
-			addrLen = sizeof(orgaddr);
-				valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
-				/*
 			    for (int i=0; i<(NumSocketsMax); i++){
 				//cout << "socket_fd_conn: " << socket_fd_conn << endl;
 			    	//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
@@ -418,7 +407,7 @@ else {// There might be at least one new message
 				addrLen = sizeof(orgaddr);
 			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);//MSG_WAITALL
 			    	}
-			    }*/
+			    }
 			    
 			//cout << "valread: " << valread << endl;
 			//for (int i=0; i<(NumSocketsMax); i++){
