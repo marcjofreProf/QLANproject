@@ -508,8 +508,8 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 }
 
 int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
-	cout << "Node SendBuffer: " << this->SendBuffer << endl;
-	cout << "Node SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
+	//cout << "Node SendBuffer: " << this->SendBuffer << endl;
+	//cout << "Node SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
     const char* SendBufferAux = this->SendBuffer;
     int BytesSent=0;
     if (string(SOCKtype)=="SOCK_DGRAM"){    
@@ -643,7 +643,7 @@ int QTLAN::UpdateSocketsInformation(){
 }
 
 int QTLAN::ProcessNewMessage(){
-cout << "Node ReadBuffer: " << this->ReadBuffer << endl;
+//cout << "Node ReadBuffer: " << this->ReadBuffer << endl;
 
 // Parse the message information
 char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};

@@ -460,8 +460,8 @@ else {// There might be at least one new message
 }
 
 int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
-	cout << "Host SendBuffer: " << this->SendBuffer << endl;
-	cout << "Host SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
+	//cout << "Host SendBuffer: " << this->SendBuffer << endl;
+	//cout << "Host SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=0;
@@ -609,7 +609,7 @@ return 0; // All OK
 }
 
 int QTLAH::ProcessNewMessage(){
-cout << "Host ReadBuffer: " << this->ReadBuffer << endl;
+//cout << "Host ReadBuffer: " << this->ReadBuffer << endl;
 // Parse the message information
 char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
 strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
@@ -690,8 +690,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	else if(string(Type)==string("Control")){//Control message. If it is not meant for this process, forward to the node
 		strcpy(this->SendBuffer,this->ReadBuffer);
 		//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
-		cout << "IPorg: " << IPorg << endl;
-		cout << "IPaddressesSockets: " << IPaddressesSockets[0] << endl;
+		//cout << "IPorg: " << IPorg << endl;
+		//cout << "IPaddressesSockets: " << IPaddressesSockets[0] << endl;
 		if (string(IPorg)==string(this->IPaddressesSockets[0])){ // If it comes from its attached node and destination at this host (if destination is another host, then means that has to go to else), it means it has to forward it to the other host (so it can forward it to its attached node)
 		// The node of a host is always identified in the Array in position 0	
 		    //cout << "SendBuffer: " << this->SendBuffer << endl;
