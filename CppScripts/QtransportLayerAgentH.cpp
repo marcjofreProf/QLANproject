@@ -214,6 +214,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     // Check status of a previously initiated socket to reduce misconnections
     //this->SocketCheckForceShutDown(socket_fd); Not used
     
+    if (string(SOCKtype)=="SOCK_STREAM"){
     address.sin_family = AF_INET;
     if (string(SOCKtype)=="SOCK_DGRAM"){
     	address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);// Since we have the info, it is better to specify, instead of INADDR_ANY;
@@ -226,7 +227,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
         cout << "Client socket bind failed" << endl;
         return -1;
     }
-    
+    }
     // Connect is for TCP
     if (string(SOCKtype)=="SOCK_STREAM"){	 
 	    // Convert IPv4 and IPv6 addresses from text to binary form

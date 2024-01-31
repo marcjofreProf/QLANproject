@@ -303,7 +303,7 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     
     // Check status of a previously initiated socket to reduce misconnections
     //this->SocketCheckForceShutDown(socket_fd); Not used
-    
+    if (string(SOCKtype)=="SOCK_STREAM"){
     address.sin_family = AF_INET;
     if (string(SOCKtype)=="SOCK_DGRAM"){
     	address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);// Since we have the info, it is better to specify, instead of INADDR_ANY;
@@ -315,6 +315,7 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
         cout << "Client socket bind failed" << endl;
         return -1;
+    }
     }
     
     // Connect is for TCP
