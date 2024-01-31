@@ -364,6 +364,12 @@ else {// There might be at least one new message
 			    memset(&orgaddr, 0, sizeof(orgaddr));		       
 			    // Filling information 
 			    orgaddr.sin_family    = AF_INET; // IPv4 
+			    orgaddr.sin_addr.s_addr = INADDR_ANY;
+			    orgaddr.sin_port = htons(PORT);
+			    unsigned int addrLen;
+			addrLen = sizeof(orgaddr);
+				valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
+					/*
 			    for (int i=0; i<(NumSocketsMax); i++){
 				//cout << "socket_fd_conn: " << socket_fd_conn << endl;
 			    	//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
@@ -375,7 +381,7 @@ else {// There might be at least one new message
 						addrLen = sizeof(orgaddr);
 					valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
 			    	}
-			    }
+			    }*/
 			    
 			//cout << "valread: " << valread << endl;
 			//for (int i=0; i<(NumSocketsMax); i++){
@@ -394,7 +400,13 @@ else {// There might be at least one new message
 				struct sockaddr_in orgaddr; 
 			    memset(&orgaddr, 0, sizeof(orgaddr));		       
 			    // Filling information 
-			    orgaddr.sin_family    = AF_INET; // IPv4 
+			    orgaddr.sin_family    = AF_INET; // IPv4
+			    orgaddr.sin_addr.s_addr = INADDR_ANY;
+			    orgaddr.sin_port = htons(PORT);
+			    unsigned int addrLen;
+			addrLen = sizeof(orgaddr);
+				valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
+				/*
 			    for (int i=0; i<(NumSocketsMax); i++){
 				//cout << "socket_fd_conn: " << socket_fd_conn << endl;
 			    	//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
@@ -406,7 +418,7 @@ else {// There might be at least one new message
 				addrLen = sizeof(orgaddr);
 			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);//MSG_WAITALL
 			    	}
-			    }
+			    }*/
 			    
 			//cout << "valread: " << valread << endl;
 			//for (int i=0; i<(NumSocketsMax); i++){
@@ -689,17 +701,19 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	else if(string(Type)==string("Control")){//Control message. If it is not meant for this process, forward to the node
 		strcpy(this->SendBuffer,this->ReadBuffer);
 		//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
-		if (string(IPorg)==string(this->IPSocketsList[0])){ // If it comes from its attached node and destination at this host (if destination is another host, then means that has to go to else), it means it has to forward it to the other host (so it can forward it to its attached node)
+		cout << "IPorg: " << IPorg << endl;
+		cout << "IPaddressesSockets: " << IPaddressesSockets[0] << endl;
+		if (string(IPorg)==string(this->IPaddressesSockets[0])){ // If it comes from its attached node and destination at this host (if destination is another host, then means that has to go to else), it means it has to forward it to the other host (so it can forward it to its attached node)
 		// The node of a host is always identified in the Array in position 0	
 		    //cout << "SendBuffer: " << this->SendBuffer << endl;
 		    int socket_fd_conn;
 		    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
 			    socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
-			    this->ICPmanagementSend(socket_fd_conn,this->IPSocketsList[0]);
+			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[1]);
 		    }
 		    else{ //host acts as server		    
 			    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
-			    this->ICPmanagementSend(socket_fd_conn,this->IPSocketsList[0]);
+			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[1]);
 		    }
 		}	
 		else{// It has to forward to its node

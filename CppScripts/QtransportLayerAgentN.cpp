@@ -442,7 +442,13 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 		struct sockaddr_in orgaddr; 
 		    memset(&orgaddr, 0, sizeof(orgaddr));		       
 		    // Filling information 
-		    orgaddr.sin_family    = AF_INET; // IPv4 
+		    orgaddr.sin_family    = AF_INET; // IPv4
+			    orgaddr.sin_addr.s_addr = INADDR_ANY;
+			    orgaddr.sin_port = htons(PORT);
+			    unsigned int addrLen;
+			addrLen = sizeof(orgaddr);
+				valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
+				/*
 		    for (int i=0; i<(NumSocketsMax); i++){
 		    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
 		    	if (socket_fd_conn==socket_fdArray[i]){
@@ -452,7 +458,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 			addrLen = sizeof(orgaddr);
 		valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
 		    	}
-		    }
+		    }*/
 		    
 		}
     		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
@@ -463,6 +469,12 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 		    memset(&orgaddr, 0, sizeof(orgaddr));		       
 		    // Filling information 
 		    orgaddr.sin_family    = AF_INET; // IPv4 
+			    orgaddr.sin_addr.s_addr = INADDR_ANY;
+			    orgaddr.sin_port = htons(PORT);
+			    unsigned int addrLen;
+			addrLen = sizeof(orgaddr);
+				valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
+				/*
 		    for (int i=0; i<(NumSocketsMax); i++){
 		    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
 		    	if (socket_fd_conn==socket_fdArray[i]){
@@ -472,7 +484,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 			addrLen = sizeof(orgaddr);
 		valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);//MSG_WAITALL (needs a NULL in the timer in select
 		    	}
-		    }
+		    }*/
 		    
 		}
     		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
