@@ -25,7 +25,7 @@ Agent script for Quantum transport Layer Node
 // InterCommunicaton Protocols - Sockets - Server
 #include <netinet/in.h>
 #include <stdlib.h>
-#define SOCKtype "SOCK_STREAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
+#define SOCKtype "SOCK_DGRAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
@@ -306,7 +306,7 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     if (string(SOCKtype)=="SOCK_DGRAM"){
     	address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);// Since we have the info, it is better to specify, instead of INADDR_ANY;
     }
-    else{address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);}
+    else{address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);}// Since we have the info, it is better to specify, instead of INADDR_ANY;
     address.sin_port = htons(PORT);
     
     // Forcefully attaching socket to the port
@@ -356,19 +356,17 @@ int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddres
     // Check status of a previously initiated socket to reduce misconnections
     //this->SocketCheckForceShutDown(socket_fd); Not used
     
-    // setsockop is for TCP
-    if (string(SOCKtype)=="SOCK_STREAM"){
-	    // Forcefully attaching socket to the port
-	    if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
-		cout << "Server attaching socket to port failed" << endl;
-		return -1;
-	    }
+    // Specifying some options to the port
+    if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
+	cout << "Server attaching socket options failed" << endl;
+	return -1;
     }
+    
     address.sin_family = AF_INET;
     if (string(SOCKtype)=="SOCK_DGRAM"){
     	address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);// Since we have the info, it is better to specify, instead of INADDR_ANY;
     }
-    else{address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);}
+    else{address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);}// Since we have the info, it is better to specify, instead of INADDR_ANY;
     address.sin_port = htons(PORT);
  
     // Forcefully attaching socket to the port
