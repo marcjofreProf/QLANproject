@@ -130,6 +130,7 @@ if (string(SOCKtype)=="SOCK_DGRAM"){
 	if (RetValue>-1){
 	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPaddressesSockets[2],this->IPSocketsList[1]);} // Open port and listen as server
 	// The socket for sending
+	
 	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[3],this->IPSocketsList[0]);}// In order to send datagrams
 	
 	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[1],this->IPaddressesSockets[1],this->IPaddressesSockets[2],this->IPSocketsList[1]);}// In order to send datagrams
@@ -334,7 +335,9 @@ int QTLAH::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   timeout.tv_usec = SockListenTimeusec;
   
   int nfds = socket_fd_conn + 1; //The nfds argument specifies the range of file descriptors to be tested. The select() function tests file descriptors in the range of 0 to nfds-1.
-  int ret = select(nfds, &fds, NULL, NULL, &timeout);
+  int ret = 0;
+  if (string(SOCKtype)=="SOCK_DGRAM"){ret = select(nfds, &fds, NULL, NULL, NULL);}
+  else{ret = select(nfds, &fds, NULL, NULL, &timeout);}
 
 if (ret < 0){
 //cout << "Host select no new messages" << endl;this->m_exit();
@@ -347,14 +350,16 @@ else {// There might be at least one new message
 		// Read the message from the socket
 		int valread=0;
 		if (this->ReadFlagWait){			
-			if (string(SOCKtype)=="SOCK_DGRAM"){
+			if (string(SOCKtype)=="SOCK_DGRAM"){			
 				struct sockaddr_in orgaddr; 
 			    memset(&orgaddr, 0, sizeof(orgaddr));		       
 			    // Filling information 
 			    orgaddr.sin_family    = AF_INET; // IPv4 
 			    for (int i=0; i<(NumSocketsMax); i++){
-			    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
+				//cout << "socket_fd_conn: " << socket_fd_conn << endl;
+			    	//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
 			    	if (socket_fd_conn==socket_fdArray[i]){
+			    		//cout << "this->IPaddressesSockets[i]: " << this->IPaddressesSockets[i] << endl;
 			    		orgaddr.sin_addr.s_addr = inet_addr(this->IPaddressesSockets[i]);//INADDR_ANY; 
 			    	}
 			    }
@@ -371,8 +376,10 @@ else {// There might be at least one new message
 			    // Filling information 
 			    orgaddr.sin_family    = AF_INET; // IPv4 
 			    for (int i=0; i<(NumSocketsMax); i++){
-			    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
+				//cout << "socket_fd_conn: " << socket_fd_conn << endl;
+			    	//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
 			    	if (socket_fd_conn==socket_fdArray[i]){
+			    		//cout << "this->IPaddressesSockets[i]: " << this->IPaddressesSockets[i] << endl;
 			    		orgaddr.sin_addr.s_addr = inet_addr(this->IPaddressesSockets[i]);//INADDR_ANY; 
 			    	}
 			    }
@@ -406,7 +413,7 @@ else {// There might be at least one new message
 		}
 	}
 	else{cout << "Host FD_ISSET error new messages" << endl;this->m_exit();return -1;}
-}
+   }
 
 }
 

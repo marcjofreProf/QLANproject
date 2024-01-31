@@ -416,7 +416,9 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   timeout.tv_usec = SockListenTimeusec;
   
   int nfds = socket_fd_conn + 1;
-  int ret = select(nfds, &fds, NULL, NULL, &timeout);
+  int ret = 0;
+  if (string(SOCKtype)=="SOCK_DGRAM"){ret = select(nfds, &fds, NULL, NULL, NULL);}
+  else{ret = select(nfds, &fds, NULL, NULL, &timeout);}
 
   if (ret < 0) {
     //cout << "Node select no new messages" << endl;this->m_exit();
