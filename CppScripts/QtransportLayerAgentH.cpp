@@ -219,7 +219,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     address.sin_family = AF_INET;
     if (string(SOCKtype)=="SOCK_DGRAM"){
     	address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);// Since we have the info, it is better to specify, instead of INADDR_ANY;
-    	address.sin_port = htons(PORT);// 0 any avaliable
+    	address.sin_port = htons(0);// 0 any avaliable
     }
     else{address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);address.sin_port = htons(PORT);}// Since we have the info, it is better to specify, instead of INADDR_ANY;
         
@@ -366,7 +366,8 @@ else {// There might be at least one new message
 			    orgaddr.sin_port = htons(PORT);
 			    unsigned int addrLen;
 				addrLen = sizeof(orgaddr);
-			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
+			//valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
+			valread=recvfrom(socket_fd_conn,this->ReadBuffer,128,0,(struct sockaddr *) &orgaddr,&addrLen);
 			}
     			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 			}
@@ -387,7 +388,8 @@ else {// There might be at least one new message
 			    orgaddr.sin_port = htons(PORT);
 			    unsigned int addrLen;
 				addrLen = sizeof(orgaddr);
-			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&addrLen);//MSG_WAITALL
+			//valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&addrLen);//MSG_WAITALL
+			valread=recvfrom(socket_fd_conn,this->ReadBuffer,128,0,(struct sockaddr *) &orgaddr,&addrLen);
 			}
     			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 			}
