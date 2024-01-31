@@ -265,7 +265,7 @@ while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
         unsigned int TimePointsDiff_time_as_count=0;
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=TimeNow_time_as_count-TimePointFuture_time_as_count;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
-        if (TimeNow_time_as_count>WaitTimeToFutureTimePoint){TimeNow_time_as_count=WaitTimeToFutureTimePoint;}//conditions to get extremely large sleeps
+        if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
         cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
 	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
@@ -379,7 +379,7 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
         unsigned int TimePointsDiff_time_as_count=0;
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=TimeNow_time_as_count-TimePointFuture_time_as_count;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
-        if (TimeNow_time_as_count>WaitTimeToFutureTimePoint){TimeNow_time_as_count=WaitTimeToFutureTimePoint;}//conditions to get extremely large sleeps
+        if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
 	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	this->acquire();
