@@ -356,7 +356,8 @@ else {// There might be at least one new message
 		// Read the message from the socket
 		int valread=0;
 		if (this->ReadFlagWait){			
-			if (string(SOCKtype)=="SOCK_DGRAM"){			
+			if (string(SOCKtype)=="SOCK_DGRAM"){	
+			//usleep(SockListenTimeusec);		
 				struct sockaddr_in orgaddr; 
 			    memset(&orgaddr, 0, sizeof(orgaddr));		       
 			    // Filling information 
@@ -366,20 +367,28 @@ else {// There might be at least one new message
 			    	//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
 			    	if (socket_fd_conn==socket_fdArray[i]){
 			    		//cout << "this->IPaddressesSockets[i]: " << this->IPaddressesSockets[i] << endl;
-			    		orgaddr.sin_addr.s_addr = inet_addr(this->IPaddressesSockets[i]);//INADDR_ANY; 
+			    		orgaddr.sin_addr.s_addr = inet_addr(this->IPaddressesSockets[i]);//INADDR_ANY;
+			    		orgaddr.sin_port = htons(PORT);
+					    unsigned int addrLen;
+						addrLen = sizeof(orgaddr);
+					valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
 			    	}
 			    }
-			    orgaddr.sin_port = htons(PORT);
-			    unsigned int addrLen;
-				addrLen = sizeof(orgaddr);
-			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
+			    
 			cout << "valread: " << valread << endl;
-			cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
+			for (int i=0; i<(NumSocketsMax); i++){
+				cout << "socket_fd_conn: " << socket_fd_conn << endl;
+			    	cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
+			    	if (socket_fd_conn==socket_fdArray[i]){
+			cout << "Host " << string(this->SCmode[i]) << " this->ReadBuffer: " << this->ReadBuffer << endl;
+			}
+			}
 			}
     			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 			}
 		else{			
 			if (string(SOCKtype)=="SOCK_DGRAM"){
+			//usleep(SockListenTimeusec);
 				struct sockaddr_in orgaddr; 
 			    memset(&orgaddr, 0, sizeof(orgaddr));		       
 			    // Filling information 
@@ -390,14 +399,21 @@ else {// There might be at least one new message
 			    	if (socket_fd_conn==socket_fdArray[i]){
 			    		//cout << "this->IPaddressesSockets[i]: " << this->IPaddressesSockets[i] << endl;
 			    		orgaddr.sin_addr.s_addr = inet_addr(this->IPaddressesSockets[i]);//INADDR_ANY; 
-			    	}
-			    }
-			    orgaddr.sin_port = htons(PORT);
+			    		orgaddr.sin_port = htons(PORT);
 			    unsigned int addrLen;
 				addrLen = sizeof(orgaddr);
-			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);//MSG_WAITALL
+			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&addrLen);//MSG_WAITALL
+			    	}
+			    }
+			    
 			cout << "valread: " << valread << endl;
-			cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
+			for (int i=0; i<(NumSocketsMax); i++){
+				cout << "socket_fd_conn: " << socket_fd_conn << endl;
+			    	cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
+			    	if (socket_fd_conn==socket_fdArray[i]){
+			cout << "Host " << string(this->SCmode[i]) << " this->ReadBuffer: " << this->ReadBuffer << endl;
+			}
+			}
 			}
     			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 			}
@@ -413,15 +429,20 @@ else {// There might be at least one new message
 				cout << "Host " << string(this->SCmode[i]) << " error reading new messages" << endl;
 				}
 				}
+				// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+				memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
+				this->m_exit();
+				return -1;
 			}
 			else{
-				cout << strerror(errno) << endl;
-				cout << "Host agent message of 0 Bytes" << endl;
+				//cout << strerror(errno) << endl;
+				//cout << "Host agent message of 0 Bytes" << endl;
+				// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+				memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
+				//this->m_exit();
+				return 0;
 			}
-			// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-			memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
-			this->m_exit();
-			return -1;
+			
 		}
 		// Process the message
 		else{// (valread>0){
@@ -514,10 +535,10 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  this->m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentH" << endl;
  bool isValidWhileLoop = true;
- unsigned int CheckCounter=0;
+ //unsigned int CheckCounter=0;
  while(isValidWhileLoop){
- cout << "CheckCounter: " << CheckCounter << endl;
- CheckCounter++;
+ //cout << "CheckCounter: " << CheckCounter << endl;
+ //CheckCounter++;
  try{
    try {
    	this->acquire();// Wait semaphore until it can proceed
