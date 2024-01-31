@@ -577,7 +577,7 @@ int QTLAN::StopICPconnections(int argc){
 int QTLAN::ICPConnectionsCheckNewMessages(int SockListenTimeusec){ 
 int socket_fd_conn=0;
 
-if (string(this->SCmode[this->socketReadIter])==string("client")){// Client sends on the file descriptor
+if (string(this->SCmode[this->socketReadIter])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){// Client sends on the file descriptor (applies also to UDP)
 	socket_fd_conn=this->socket_fdArray[this->socketReadIter];
 }
 else{// server checks on the socket connection
