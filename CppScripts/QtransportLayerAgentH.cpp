@@ -459,6 +459,8 @@ else {// There might be at least one new message
 }
 
 int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
+	cout << "Host SendBuffer: " << this->SendBuffer << endl;
+	cout << "Host SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=0;
@@ -606,7 +608,7 @@ return 0; // All OK
 }
 
 int QTLAH::ProcessNewMessage(){
-//cout << "ReadBuffer: " << this->ReadBuffer << endl;
+cout << "Host ReadBuffer: " << this->ReadBuffer << endl;
 // Parse the message information
 char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
 strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
@@ -648,9 +650,9 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			// Mount message and send it to attached node
 			 // Generate the message
 			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-			strcpy(ParamsCharArray,IPdest);
+			strcpy(ParamsCharArray,IPorg);
 			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,IPorg);
+			strcat(ParamsCharArray,IPdest);
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,"Control");
 			strcat(ParamsCharArray,",");
@@ -663,10 +665,11 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArray,",");// Very important to end the message
 			strcpy(this->SendBuffer,ParamsCharArray);
 			int socket_fd_conn=this->socket_fdArray[0];// Socket descriptor to the attached node (it applies both to TCP and UDP
+			//cout << "this->SendBuffer: " << this->SendBuffer << endl;
 			//cout << "socket_fd_conn: " << socket_fd_conn << endl;
 			//cout << "IPdest: " << IPdest << endl;
 			//cout << "IPorg: " << IPorg << endl;
-			this->ICPmanagementSend(socket_fd_conn,IPdest);
+			this->ICPmanagementSend(socket_fd_conn,IPorg);
 			}
 			else if (string(Command)==string("NumStoredQubitsNode")){// Expected/awaiting message
 				this->InfoNumStoredQubitsNodeFlag=true;
