@@ -424,7 +424,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   
   int nfds = socket_fd_conn + 1;
   int ret = 0;
-  if (string(SOCKtype)=="SOCK_DGRAM"){ret = select(nfds, &fds, NULL, NULL, NULL);}
+  if (string(SOCKtype)=="SOCK_DGRAM"){ret = select(nfds, &fds, NULL, NULL, &timeout);}
   else{ret = select(nfds, &fds, NULL, NULL, &timeout);}
 
   if (ret < 0) {
@@ -470,7 +470,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 		    		orgaddr.sin_port = htons(PORT);
 		    unsigned int addrLen;
 			addrLen = sizeof(orgaddr);
-		valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&addrLen);
+		valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);//MSG_WAITALL (needs a NULL in the timer in select
 		    	}
 		    }
 		    
@@ -557,6 +557,7 @@ if (string(SOCKtype)=="SOCK_STREAM"){
 }
 
 int QTLAN::StopICPconnections(int argc){
+	if (string(SOCKtype)=="SOCK_DGRAM"){ICPmanagementCloseClient(this->socket_SendUDPfdArray[0]);}
 	// First, eventually close the client socket	
 	// Eventually, if it is an intermediate node
 	if (argc > 1){ // Establish client connection with next node

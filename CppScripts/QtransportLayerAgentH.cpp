@@ -168,6 +168,8 @@ else{// TCP
 
 int QTLAH::StopICPconnections() {
 	// First stop client or server host connection
+	if (string(SOCKtype)=="SOCK_DGRAM"){ICPmanagementCloseClient(this->socket_SendUDPfdArray[0]);ICPmanagementCloseClient(this->socket_SendUDPfdArray[1]);ICPmanagementCloseServer(this->socket_fdArray[0],this->new_socketArray[0]);ICPmanagementCloseServer(this->socket_fdArray[1],this->new_socketArray[1]);}
+	else{
 	if (string(this->SCmode[1])==string("client")){ // client
 		ICPmanagementCloseClient(this->socket_fdArray[1]);
 	}
@@ -177,7 +179,7 @@ int QTLAH::StopICPconnections() {
 
 	// then stop client connection to attached node
 	ICPmanagementCloseClient(this->socket_fdArray[0]);
-
+	}
 	// Update indicators
 	this->numberSessions=0;
 	return 0; // All OK
@@ -342,7 +344,7 @@ int QTLAH::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   
   int nfds = socket_fd_conn + 1; //The nfds argument specifies the range of file descriptors to be tested. The select() function tests file descriptors in the range of 0 to nfds-1.
   int ret = 0;
-  if (string(SOCKtype)=="SOCK_DGRAM"){ret = select(nfds, &fds, NULL, NULL, NULL);}
+  if (string(SOCKtype)=="SOCK_DGRAM"){ret = select(nfds, &fds, NULL, NULL, &timeout);}
   else{ret = select(nfds, &fds, NULL, NULL, &timeout);}
 
 if (ret < 0){
@@ -402,7 +404,7 @@ else {// There might be at least one new message
 			    		orgaddr.sin_port = htons(PORT);
 			    unsigned int addrLen;
 				addrLen = sizeof(orgaddr);
-			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,MSG_WAITALL,(struct sockaddr *) &orgaddr,&addrLen);//MSG_WAITALL
+			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);//MSG_WAITALL
 			    	}
 			    }
 			    
