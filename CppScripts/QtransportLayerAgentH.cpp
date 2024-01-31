@@ -243,10 +243,13 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddres
     // Check status of a previously initiated socket to reduce misconnections
     //this->SocketCheckForceShutDown(socket_fd); Not used
     
-    // Forcefully attaching socket to the port
-    if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
-        cout << "Server attaching socket to port failed" << endl;
-        return -1;
+    // setsockop is for TCP
+    if (string(SOCKtype)=="SOCK_STREAM"){
+	    // Forcefully attaching socket to the port
+	    if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
+		cout << "Server attaching socket to port failed" << endl;
+		return -1;
+	    }
     }
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
