@@ -219,7 +219,7 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     address.sin_family = AF_INET;
     if (string(SOCKtype)=="SOCK_DGRAM"){
     	address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);// Since we have the info, it is better to specify, instead of INADDR_ANY;
-    	address.sin_port = htons(0);
+    	address.sin_port = htons(PORT);// 0 any avaliable
     }
     else{address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);address.sin_port = htons(PORT);}// Since we have the info, it is better to specify, instead of INADDR_ANY;
         
