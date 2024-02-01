@@ -159,6 +159,19 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoi
 	//cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
 	std::chrono::milliseconds duration_back((unsigned int)atoi(ValuesCharArray[iHeaders]));
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
+	
+	// Debugging
+	TimePoint TimePointClockNow=Clock::now();
+	auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
+	// Convert duration to desired time
+	unsigned int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+	cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
+	auto duration_since_epoch=this->OtherClientNodeFutureTimePoint.time_since_epoch();
+	// Convert duration to desired time
+	unsigned int time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count(); // Convert 
+	cout << "time_as_count: " << time_as_count << endl;
+	//
+
 	if (this->threadEmitQuBitRefAux.joinable()){
 	this->release();
 	//cout << "Check block release Process New Parameters" << endl;
@@ -334,12 +347,18 @@ cout << "Receiving Qubits" << endl;
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
 // Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
 
+// Debugging
+TimePoint TimePointClockNow=Clock::now();
+auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
+// Convert duration to desired time
+unsigned int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
+//
 TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
-
 auto duration_since_epoch=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
 unsigned int time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count(); // Convert 
-//cout << "time_as_count: " << time_as_count << endl;
+cout << "time_as_count: " << time_as_count << endl;
 // Mount the Parameters message for the other node
 char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 strcpy(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Initiates the ParamsCharArray, so use strcpy
