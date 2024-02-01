@@ -343,7 +343,7 @@ TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFut
 auto duration_since_epoch=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
 auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
-unsigned int time_as_count = static_cast<int>(millis);// Convert to int 
+unsigned int time_as_count = static_cast<unsigned int>(millis);// Convert to int 
 //cout << "time_as_count: " << time_as_count << endl;
 // Mount the Parameters message for the other node
 char ParamsCharArray[NumBytesPayloadBuffer] = {0};
