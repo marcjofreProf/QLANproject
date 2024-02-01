@@ -171,19 +171,18 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoi
 	unsigned int time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count(); // Convert 
 	cout << "time_as_count: " << time_as_count << endl;
 	//
-	}
+}
 else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTimePoint")){//CLear this node OtherClientNodeFutureTimePoints to avoid having anon-zero value eventhough the other node has finished transmitting and this one for some reason could no execute it
 if (this->threadEmitQuBitRefAux.joinable()){
-	this->release();
+	//this->release();
 	//cout << "Check block release Process New Parameters" << endl;
 	this->threadEmitQuBitRefAux.join();
 	//cout << "Check block before acquire Process New Parameters" << endl;
-	this->acquire();
+	//this->acquire();
 	//cout << "Check block after acquire Process New Parameters" << endl;
 }// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
 // Reset the ClientNodeFutureTimePoint
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
-
 }
 else{// discard
 }
@@ -399,7 +398,6 @@ cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // Tell the other node to clear the TimePoint (this avoids having a time point in the other node after having finished this one (because it was not ocnsumed)
 ParamsCharArray[NumBytesPayloadBuffer] = {0};
 strcpy(ParamsCharArray,"ClearOtherClientNodeFutureTimePoint_0_"); // Initiates the ParamsCharArray, so use strcpy
-
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 this->release();
