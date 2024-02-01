@@ -138,6 +138,7 @@ private: // Functions/Methods
 	int countQintupleComas(char* ParamsCharArray);
 	//
 	int QPLAemitQuBit();
+	int QPLAreceiveQuBit();
 	
 };
 
