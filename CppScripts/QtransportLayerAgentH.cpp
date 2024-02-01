@@ -432,20 +432,16 @@ else {// There might be at least one new message
 				cout << "Host " << string(this->SCmode[i]) << " error reading new messages" << endl;
 				}
 				}
-				// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-				memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
-				this->m_exit();
-				return -1;
+				
 			}
 			else{
-				//cout << strerror(errno) << endl;
-				//cout << "Host agent message of 0 Bytes" << endl;
-				// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-				memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
-				//this->m_exit();
-				return 0;
+				cout << strerror(errno) << endl;
+				cout << "Host agent message of 0 Bytes" << endl;				
 			}
-			
+			// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+			memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
+			this->m_exit();
+			return -1;			
 		}
 		// Process the message
 		else{// (valread>0){
