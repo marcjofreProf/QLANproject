@@ -372,6 +372,7 @@ strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,"_"); // Final _
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
 //this->acquire();
+this->release();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 //this->release();
 
