@@ -228,18 +228,19 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadEmitQuBit(){
-this->acquire();
 cout << "Emiting Qubits" << endl;
 
 int MaxWhileRound=10000000;
 // Wait to receive the FutureTimePoint from client node
+this->acquire();
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
-	this->release();
-	usleep(100);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
+	this->release();
+	usleep(100);//Maybe some sleep to reduce CPU consumption	
 	this->acquire();
 	};
 if (MaxWhileRound<=0){this->OtherClientNodeFutureTimePoint=Clock::now();}// Provide a TimePoint to avoid blocking issues
+this->release();
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 MaxWhileRound=100;
 /////////////////////////////////////////////
@@ -258,32 +259,24 @@ MaxWhileRound=100;
         TimePointsDiff_time_as_count=(int)(TimeNow_time_as_count-TimePointFuture_time_as_count);
         cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
 ///////////////////////////////////
-
-while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
-	this->release();	
+while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
+	MaxWhileRound--;
+	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption
 	TimePoint TimePointClockNow=Clock::now();
 	auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
 	unsigned int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 	//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
-	
-	auto duration_since_epochFutureTimePoint=this->OtherClientNodeFutureTimePoint.time_since_epoch();
-	// Convert duration to desired time
-	unsigned int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
-	//cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
         unsigned int TimePointsDiff_time_as_count=0;
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=TimeNow_time_as_count-TimePointFuture_time_as_count;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
         if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
-        cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
-	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption
-	MaxWhileRound--;
-	this->acquire();
+        cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;	
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // Reset the ClientNodeFutureTimePoint
+this->acquire();
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
-
 this->release();
 //this->acquire();
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
