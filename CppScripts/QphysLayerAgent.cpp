@@ -364,7 +364,7 @@ char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 strcpy(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Initiates the ParamsCharArray, so use strcpy
 
 char charNum[NumBytesPayloadBuffer] = {0}; 
-sprintf(charNum, "%u", time_as_count); 
+sprintf(charNum, "%u", time_as_count*1000); // Factor 1000 because it is inmilliseconds
 strcat(ParamsCharArray,charNum);
 
 strcat(ParamsCharArray,"_"); // Final _
