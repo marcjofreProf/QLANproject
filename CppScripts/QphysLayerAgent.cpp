@@ -342,7 +342,7 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadReceiveQubit(){
-//this->acquire();
+this->acquire();
 int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
 
@@ -371,7 +371,7 @@ strcat(ParamsCharArray,charNum);
 
 strcat(ParamsCharArray,"_"); // Final _
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
-this->acquire();
+
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 this->release();
 
