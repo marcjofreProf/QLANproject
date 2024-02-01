@@ -27,7 +27,7 @@ Agent script for Quantum Physical Layer
 // Semaphore
 #include <atomic>
 // time points
-#define WaitTimeToFutureTimePoint 10000 // It is the time barrier to try to achieve synchronization. considered millisecons (it can be changed on the transformatoin used)
+#define WaitTimeToFutureTimePoint 100 // It is the time barrier to try to achieve synchronization. considered millisecons (it can be changed on the transformatoin used)
 
 using namespace exploringBB; // API to easily use GPIO in c++
 /* A Simple GPIO application
@@ -230,7 +230,7 @@ return 0; // return 0 is for no error
 int QPLA::ThreadEmitQuBit(){
 cout << "Emiting Qubits" << endl;
 
-int MaxWhileRound=10000000;
+int MaxWhileRound=10000;
 // Wait to receive the FutureTimePoint from client node
 this->acquire();
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
