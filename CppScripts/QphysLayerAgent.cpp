@@ -181,6 +181,10 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoi
 	//cout << "Check block after acquire Process New Parameters" << endl;
 	}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
 	}
+else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTimePoint")){//CLear this node OtherClientNodeFutureTimePoints to avoid having anon-zero value eventhough the other node has finished transmitting and this one for some reason could no execute it
+// Reset the ClientNodeFutureTimePoint
+this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
+}
 else{// discard
 }
 }
@@ -213,16 +217,14 @@ this->acquire();
   	this->release();
     }
 
-this->acquire();
+//this->acquire();
 if (RunThreadFlag){// Protection, do not run if there is a previous thread running
 this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
 }
 else{
-// Reset the ClientNodeFutureTimePoint
-this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 cout << "Not possible to launch ThreadEmitQuBit" << endl;
 }
-this->release();
+//this->release();
 
 return 0; // return 0 is for no error
 }
@@ -328,9 +330,9 @@ this->release();
     }
     
 if (RunThreadFlag){// Protection, do not run if there is a previous thread running
-this->acquire();
+//this->acquire();
 this->threadReceiveQuBitRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
-this->release();
+//this->release();
 }
 else{
 cout << "Not possible to launch ThreadReceiveQubit" << endl;
@@ -392,6 +394,13 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
         if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
 	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption	
 };
+// Tell the other node to clear the TimePoint (this avoids having a time point in the other node after having finished this one (because it was not ocnsumed)
+char ParamsCharArray[NumBytesPayloadBuffer] = {0};
+strcpy(ParamsCharArray,"ClearOtherClientNodeFutureTimePoint_0_"); // Initiates the ParamsCharArray, so use strcpy
+
+this->acquire();
+this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
+this->release();
 
 //this->acquire();
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
