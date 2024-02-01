@@ -27,7 +27,7 @@ Agent script for Quantum Physical Layer
 // Semaphore
 #include <atomic>
 // time points
-#define WaitTimeToFutureTimePoint 1000 // It is the time barrier to try to achieve synchronization. considered millisecons (it can be changed on the transformatoin used)
+#define WaitTimeToFutureTimePoint 10000 // It is the time barrier to try to achieve synchronization. considered millisecons (it can be changed on the transformatoin used)
 
 using namespace exploringBB; // API to easily use GPIO in c++
 /* A Simple GPIO application
@@ -170,7 +170,6 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoi
 	// Convert duration to desired time
 	unsigned int time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count(); // Convert 
 	cout << "time_as_count: " << time_as_count << endl;
-	//
 }
 else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTimePoint")){//CLear this node OtherClientNodeFutureTimePoints to avoid having anon-zero value eventhough the other node has finished transmitting and this one for some reason could no execute it
 if (this->threadEmitQuBitRefAux.joinable()){
@@ -313,6 +312,7 @@ this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
  //cout << "Qubit emitted" << endl;
 
 //this->release();
+cout << "End Emiting Qubits" << endl;
  return 0; // return 0 is for no error
 }
 
@@ -424,6 +424,7 @@ this->acquire();
 this->NumStoredQubitsNode[0]=NumStoredQubitsNodeAux;
 //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
 this->release();
+cout << "End Receiving Qubits" << endl;
 return 0; // return 0 is for no error
 }
 
