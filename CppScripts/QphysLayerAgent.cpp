@@ -233,11 +233,11 @@ int QPLA::ThreadEmitQuBit(){
 this->acquire();
 cout << "Emiting Qubits" << endl;
 
-int MaxWhileRound=10000;
+int MaxWhileRound=1000000000;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
 	this->release();
-	usleep(500);//Maybe some sleep to reduce CPU consumption
+	usleep(1000);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	this->acquire();
 	};
@@ -395,7 +395,7 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption	
 };
 // Tell the other node to clear the TimePoint (this avoids having a time point in the other node after having finished this one (because it was not ocnsumed)
-char ParamsCharArray[NumBytesPayloadBuffer] = {0};
+ParamsCharArray[NumBytesPayloadBuffer] = {0};
 strcpy(ParamsCharArray,"ClearOtherClientNodeFutureTimePoint_0_"); // Initiates the ParamsCharArray, so use strcpy
 
 this->acquire();
