@@ -27,7 +27,7 @@ Agent script for Quantum Physical Layer
 // Semaphore
 #include <atomic>
 // time points
-#define WaitTimeToFutureTimePoint 100 // considered millisecons (it can be changed on the transformatoin used)
+#define WaitTimeToFutureTimePoint 1000 // It is the time barrier to try to achieve synchronization. considered millisecons (it can be changed on the transformatoin used)
 
 using namespace exploringBB; // API to easily use GPIO in c++
 /* A Simple GPIO application
@@ -430,18 +430,18 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::GetNumStoredQubitsNode(){
-this->acquire();
+//this->acquire();
 
 try{
 if (this->threadReceiveQuBitRefAux.joinable()){
-this->release();
+//this->release();
 this->threadReceiveQuBitRefAux.join();
-this->acquire();
+//this->acquire();
 }// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
     } // upper try
   catch (...) { // Catches any exception
     }
-
+this->acquire();
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
 this->release();
 return NumStoredQubitsNodeAux;
