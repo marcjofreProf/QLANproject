@@ -260,7 +260,7 @@ int TimePointsDiff_time_as_count=0;
 TimePointsDiff_time_as_count=(int)(TimeNow_time_as_count-TimePointFuture_time_as_count);
 cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
 ///////////////////////////////////
-while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
+while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
 	MaxWhileRound--;	
 	TimePointClockNow=Clock::now();
 	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
@@ -271,7 +271,11 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
         if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
         usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption
-        //cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;	
+        //cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
+        TimePointClockNow=Clock::now();
+	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
+	// Convert duration to desired time
+	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 	
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // Reset the ClientNodeFutureTimePoint
