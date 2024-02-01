@@ -171,19 +171,19 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoi
 	unsigned int time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count(); // Convert 
 	cout << "time_as_count: " << time_as_count << endl;
 	//
-
-	if (this->threadEmitQuBitRefAux.joinable()){
+	}
+else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTimePoint")){//CLear this node OtherClientNodeFutureTimePoints to avoid having anon-zero value eventhough the other node has finished transmitting and this one for some reason could no execute it
+if (this->threadEmitQuBitRefAux.joinable()){
 	this->release();
 	//cout << "Check block release Process New Parameters" << endl;
 	this->threadEmitQuBitRefAux.join();
 	//cout << "Check block before acquire Process New Parameters" << endl;
 	this->acquire();
 	//cout << "Check block after acquire Process New Parameters" << endl;
-	}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
-	}
-else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTimePoint")){//CLear this node OtherClientNodeFutureTimePoints to avoid having anon-zero value eventhough the other node has finished transmitting and this one for some reason could no execute it
+}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
 // Reset the ClientNodeFutureTimePoint
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
+
 }
 else{// discard
 }
