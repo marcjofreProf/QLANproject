@@ -371,9 +371,9 @@ strcat(ParamsCharArray,charNum);
 
 strcat(ParamsCharArray,"_"); // Final _
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
-this->acquire();
+//this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
-this->release();
+//this->release();
 
 int MaxWhileRound=100;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
