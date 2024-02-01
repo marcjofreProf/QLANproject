@@ -27,7 +27,7 @@ Agent script for Quantum Physical Layer
 // Semaphore
 #include <atomic>
 // time points
-#define WaitTimeToFutureTimePoint 10000 // considered millisecons (it can be changed on the transformatoin used)
+#define WaitTimeToFutureTimePoint 100 // considered millisecons (it can be changed on the transformatoin used)
 
 using namespace exploringBB; // API to easily use GPIO in c++
 /* A Simple GPIO application
@@ -237,7 +237,7 @@ int MaxWhileRound=1000000000;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
 	this->release();
-	usleep(1000);//Maybe some sleep to reduce CPU consumption
+	usleep(100);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
 	this->acquire();
 	};
@@ -342,7 +342,7 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadReceiveQubit(){
-this->acquire();
+
 int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
 
@@ -371,7 +371,7 @@ strcat(ParamsCharArray,charNum);
 
 strcat(ParamsCharArray,"_"); // Final _
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
-
+this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 this->release();
 
@@ -394,6 +394,8 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
         if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
 	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption	
 };
+//this->acquire();
+cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // Tell the other node to clear the TimePoint (this avoids having a time point in the other node after having finished this one (because it was not ocnsumed)
 ParamsCharArray[NumBytesPayloadBuffer] = {0};
 strcpy(ParamsCharArray,"ClearOtherClientNodeFutureTimePoint_0_"); // Initiates the ParamsCharArray, so use strcpy
@@ -402,8 +404,7 @@ this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 this->release();
 
-//this->acquire();
-cout << "MaxWhileRound: " << MaxWhileRound << endl;
+
 // Start measuring
  //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
  GPIO inGPIO(this->ReceiveLinkNumberArray[0]);

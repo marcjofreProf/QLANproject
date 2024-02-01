@@ -523,7 +523,7 @@ int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
 	    	if (socket_fd_conn==socket_fdArray[i]){
 	    		socket_fd=socket_SendUDPfdArray[i];
-	    		BytesSent=sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
+	    		BytesSent=sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_DONTWAIT,(const struct sockaddr *) &destaddr,sizeof(destaddr));//MSG_CONFIRM
 	    	}
 	    }
     }
