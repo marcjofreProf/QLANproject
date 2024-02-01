@@ -230,16 +230,16 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadEmitQuBit(){
-this->acquire();
+//this->acquire();
 cout << "Emiting Qubits" << endl;
 
 int MaxWhileRound=1000000000;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
-	this->release();
+	//this->release();
 	usleep(100);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
-	this->acquire();
+	//this->acquire();
 	};
 if (MaxWhileRound<=0){this->OtherClientNodeFutureTimePoint=Clock::now();}// Provide a TimePoint to avoid blocking issues
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
@@ -262,7 +262,7 @@ MaxWhileRound=100;
 ///////////////////////////////////
 
 while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
-	this->release();	
+	//this->release();	
 	TimePoint TimePointClockNow=Clock::now();
 	auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
@@ -280,13 +280,13 @@ while(Clock::now()<this->OtherClientNodeFutureTimePoint && MaxWhileRound>0){
         cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
 	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption
 	MaxWhileRound--;
-	this->acquire();
+	//this->acquire();
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
 // Reset the ClientNodeFutureTimePoint
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 
-this->release();
+//this->release();
 //this->acquire();
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  GPIO outGPIO(this->EmitLinkNumberArray[0]);
