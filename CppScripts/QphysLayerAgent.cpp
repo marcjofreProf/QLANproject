@@ -208,13 +208,13 @@ int QPLA::InitAgentProcess(){
 int QPLA::emitQuBit(){
 bool RunThreadFlag=true;
 try{
-this->acquire();
+//this->acquire();
  RunThreadFlag=!this->threadEmitQuBitRefAux.joinable();//(!this->threadEmitQuBitRefAux.joinable() && !this->threadReceiveQuBitRefAux.joinable());
- this->release();
+ //this->release();
     } // upper try
   catch (...) { // Catches any exception
   	RunThreadFlag=true;  
-  	this->release();
+  	//this->release();
     }
 
 //this->acquire();
@@ -320,13 +320,13 @@ this->release();
 int QPLA::receiveQuBit(){
 bool RunThreadFlag=true;
 try{
-this->acquire();
+//this->acquire();
 RunThreadFlag=!this->threadReceiveQuBitRefAux.joinable();//(!this->threadReceiveQuBitRefAux.joinable() && !this->threadEmitQuBitRefAux.joinable() ) ;
-this->release();
+//this->release();
     } // upper try
   catch (...) { // Catches any exception
   	RunThreadFlag=true;  
-  	this->release();
+  	//this->release();
     }
     
 if (RunThreadFlag){// Protection, do not run if there is a previous thread running
@@ -371,10 +371,9 @@ strcat(ParamsCharArray,charNum);
 
 strcat(ParamsCharArray,"_"); // Final _
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
-//this->acquire();
-this->release();
+this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
-//this->release();
+this->release();
 
 int MaxWhileRound=100;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
