@@ -479,7 +479,7 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	    		//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
 	    		//cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
 	    		socket_fd=socket_SendUDPfdArray[i];
-	    		BytesSent=sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_CONFIRM,(const struct sockaddr *) &destaddr,sizeof(destaddr));
+	    		BytesSent=sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_DONTWAIT,(const struct sockaddr *) &destaddr,sizeof(destaddr));//MSG_CONFIRM
 	    	}
 	    }	    
     }

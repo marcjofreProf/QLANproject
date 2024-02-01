@@ -744,10 +744,16 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			this->ReadParametersAgent(Payload);
 		}
 		else if (string(Command)==string("SendQubits")){// Send qubits to the requesting host
-			this->QNLAagent.QLLAagent.QPLAagent.emitQuBit();
+			this->release();
+			//this->QNLAagent.QLLAagent.QPLAagent.emitQuBit();
+			std::thread threadEmitQuBitRefAux=std::thread(&QTLAN::QPLAemitQuBit,this);
+			threadEmitQuBitRefAux.detach();
+			this->acquire();
 		}
 		else if (string(Command)==string("ReceiveQubits")){// Read qubits to the attached node
+			this->release();
 			 this->QNLAagent.QLLAagent.QPLAagent.receiveQuBit();
+			 this->acquire();
 		}
 		else if (string(Command)==string("print")){
 			cout << "New Message: "<< Payload << endl;
@@ -769,6 +775,11 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 
 return 0; // All OK
+}
+
+int QTLAN::QPLAemitQuBit() {
+this->QNLAagent.QLLAagent.QPLAagent.emitQuBit();
+return 0;
 }
 
 QTLAN::~QTLAN() {

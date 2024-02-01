@@ -136,6 +136,8 @@ private: // Functions/Methods
 	int countDoubleColons(char* ParamsCharArray);
 	int countDoubleUnderscores(char* ParamsCharArray);
 	int countQintupleComas(char* ParamsCharArray);
+	//
+	int QPLAemitQuBit();
 	
 };
 
