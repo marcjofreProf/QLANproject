@@ -173,11 +173,11 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoi
 }
 else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTimePoint")){//CLear this node OtherClientNodeFutureTimePoints to avoid having anon-zero value eventhough the other node has finished transmitting and this one for some reason could no execute it
 if (this->threadEmitQuBitRefAux.joinable()){
-	//this->release();
+	this->release();
 	//cout << "Check block release Process New Parameters" << endl;
 	this->threadEmitQuBitRefAux.join();
 	//cout << "Check block before acquire Process New Parameters" << endl;
-	//this->acquire();
+	this->acquire();
 	//cout << "Check block after acquire Process New Parameters" << endl;
 }// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
 // Reset the ClientNodeFutureTimePoint
@@ -231,7 +231,7 @@ int QPLA::ThreadEmitQuBit(){
 this->acquire();
 cout << "Emiting Qubits" << endl;
 
-int MaxWhileRound=1000000000;
+int MaxWhileRound=10000000;
 // Wait to receive the FutureTimePoint from client node
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
 	this->release();
