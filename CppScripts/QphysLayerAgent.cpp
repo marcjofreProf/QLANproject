@@ -278,12 +278,11 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
 	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 	
 	};
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
-// Reset the ClientNodeFutureTimePoint
-this->acquire();
-this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
-this->release();
+
 //this->acquire();
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
+ 
+ cout << "Start Emiting Qubits" << endl;
  GPIO outGPIO(this->EmitLinkNumberArray[0]);
  // Basic Output - Generate a pulse of 1 second period
  outGPIO.setDirection(OUTPUT);
@@ -307,9 +306,11 @@ this->release();
    */
    
  //cout << "Qubit emitted" << endl;
-
-//this->release();
 cout << "End Emiting Qubits" << endl;
+// Reset the ClientNodeFutureTimePoint
+this->acquire();
+this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
+this->release();
  return 0; // return 0 is for no error
 }
 
@@ -392,14 +393,8 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 };
 //this->acquire();
 cout << "MaxWhileRound: " << MaxWhileRound << endl;
-// Tell the other node to clear the TimePoint (this avoids having a time point in the other node after having finished this one (because it was not ocnsumed)
-ParamsCharArray[NumBytesPayloadBuffer] = {0};
-strcpy(ParamsCharArray,"ClearOtherClientNodeFutureTimePoint_0_"); // Initiates the ParamsCharArray, so use strcpy
-this->acquire();
-this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
-this->release();
 
-
+cout << "Start Receiving Qubits" << endl;
 // Start measuring
  //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
  GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
@@ -410,6 +405,7 @@ this->release();
 	 QuBitValueArray[iIterRead]=inGPIO.getValue();
 	 usleep(QuBitsUSecPeriodInt[0]);	 
  }
+ cout << "End Receiving Qubits" << endl;
  // Count received QuBits
  for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){// Count how many qubits 
  	if (QuBitValueArray[iIterRead]==1){
@@ -420,8 +416,12 @@ this->release();
 this->acquire();
 this->NumStoredQubitsNode[0]=NumStoredQubitsNodeAux;
 //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
+// Tell the other node to clear the TimePoint (this avoids having a time point in the other node after having finished this one (because it was not ocnsumed)
+ParamsCharArray[NumBytesPayloadBuffer] = {0};
+strcpy(ParamsCharArray,"ClearOtherClientNodeFutureTimePoint_0_"); // Initiates the ParamsCharArray, so use strcpy
+this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 this->release();
-cout << "End Receiving Qubits" << endl;
+
 return 0; // return 0 is for no error
 }
 
