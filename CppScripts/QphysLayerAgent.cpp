@@ -188,12 +188,12 @@ strcpy(NewMessageParamsCharArray,"JoinOtherClientNodeThread_0_"); // Initiates t
 this->SetSendParametersAgent(NewMessageParamsCharArray);// Send parameter to the other node
 }
 else if (string(HeaderCharArray[iHeaders])==string("JoinOtherClientNodeThread")){
-cout << "JoinOtherClientNodeThread" << endl;
-this->RunThreadReceiveQuBitFlag=true;
-if (this->threadReceiveQuBitRefAux.joinable()){
-this->release();
-this->threadReceiveQuBitRefAux.join();
-this->acquire();
+	cout << "JoinOtherClientNodeThread" << endl;
+	this->RunThreadReceiveQuBitFlag=true;
+	if (this->threadReceiveQuBitRefAux.joinable()){
+	this->release();
+	this->threadReceiveQuBitRefAux.join();
+	this->acquire();
 }
 }
 else{// discard
@@ -459,12 +459,13 @@ int QPLA::GetNumStoredQubitsNode(){
 //if (this->threadReceiveQuBitRefAux.joinable()){
 //this->threadReceiveQuBitRefAux.join();
 //}
-
+cout << "Here 1" << endl;
 while(this->RunThreadReceiveQuBitFlag==false){usleep(1000);}// Wait for Receiving thread to finish
-
+cout << "Here 2" << endl;
 this->acquire();
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
 this->release();
+cout << "Here 3" << endl;
 return NumStoredQubitsNodeAux;
 }
 
