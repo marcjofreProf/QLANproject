@@ -76,7 +76,10 @@ private: // Variables/Objects
 	bool InfoIPaddressesSocketsFlag=false;// To check if there is information for IPAddressesSockets
 	
 public: // Functions/Methods
-	int InitAgentProcess(); // Initializer of the thread
+	// Sempahore
+	void acquire();
+	void release();
+	int InitAgentProcess(); // Initializer of the thread. Not used
 	int InitiateBelowAgentsObjects();
 	QTLAN(int numberSessions); //constructor
 	// virtual ~Application(); // Default Okay - Use Virtual If Using Inheritance
@@ -108,10 +111,7 @@ private: // Functions/Methods
 	static void SignalPIPEHandler(int s); // Handler for socket SIGPIPE signal error
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
-	void AgentProcessRequestsPetitions(); // Process thread that manages requests and petitions
-	// Sempahore
-	void acquire();
-	void release();
+	void AgentProcessRequestsPetitions(); // Process thread that manages requests and petitions	
 	// Managing ICP connections with sockets
 	// Typically the Node will act as server to the upper host. If the node is in between, then it will act as server of the origin client node. Net 192.168.X.X or Net 10.0.0.X
 	// With nodes in between hosts, the origin node will also act as client to the next node acting as server. Net 10.0.0.X	

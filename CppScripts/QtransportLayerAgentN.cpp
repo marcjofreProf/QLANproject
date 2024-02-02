@@ -682,10 +682,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	else if(string(Type)==string("Control")){//Control message	
 		if (string(Command)==string("InfoRequest")){ // Request to provide information
 			if (string(Payload)==string("NumStoredQubitsNode")){
-			  this->release();
 			  std::thread threadGetNumStoredQubitsNodeRefAux=std::thread(&QTLAN::GetNumStoredQubitsNode,this,IPorg,IPdest);
 			  threadGetNumStoredQubitsNodeRefAux.detach();
-			  this->acquire();
 			}
 			else if (string(Payload)==string("NodeAreYouThere?")){
 			// Mount message and send it to attached node
@@ -790,7 +788,7 @@ strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,",");// Very important to end the message
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
   // reply immediately with a message to requester
-this->release();	
+
 this->acquire();	  
 this->ICPdiscoverSend(ParamsCharArray); 
 this->release();
@@ -876,9 +874,7 @@ else{
 	this->m_exit(); // Exit the application
 	}
 	else{
-	this->release();// Non-block during sleeping
 	usleep(9999);
-	this->acquire(); // Re-acquire semaphore
 	}
 }
 }//while
@@ -947,9 +943,7 @@ else{
 	this->m_exit(); // Exit the application
 	}
 	else{
-	this->release();// Non-block during sleeping
 	usleep(9999);
-	this->acquire(); // Re-acquire semaphore
 	}
 }
 }//while
@@ -1039,6 +1033,7 @@ int main(int argc, char const * argv[]){
  	try {
     	// Code that might throw an exception 
  	// Check if there are need messages or actions to be done by the node
+ 	QTLANagent.acquire();
  	QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
  	QTLANagent.SendParametersAgent(); // Send Parameters information stored
        switch(QTLANagent.getState()) {
@@ -1063,6 +1058,7 @@ int main(int argc, char const * argv[]){
            }
 
         } // switch
+        QTLANagent.release();
         usleep(WaitTimeAfterMainWhileLoop);// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {

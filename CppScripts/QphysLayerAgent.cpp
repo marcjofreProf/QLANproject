@@ -194,7 +194,7 @@ else if (string(HeaderCharArray[iHeaders])==string("JoinOtherClientNodeThread"))
 	this->release();
 	this->threadReceiveQuBitRefAux.join();
 	this->acquire();
-}
+	}
 }
 else{// discard
 }
