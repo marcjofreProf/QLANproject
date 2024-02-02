@@ -669,7 +669,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			this->ICPmanagementSend(socket_fd_conn,IPorg);
 			}
 			else if (string(Command)==string("NumStoredQubitsNode")){// Expected/awaiting message
-				cout << "We are here NumStoredQubitsNode" << endl;
+				//cout << "We are here NumStoredQubitsNode" << endl;
 				this->NumStoredQubitsNodeParamsIntArray[0]=atoi(Payload);
 				this->InfoNumStoredQubitsNodeFlag=true;				
 			}					
@@ -805,9 +805,10 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"NumStoredQubitsNode");
 strcat(this->SendBuffer,",");// Very important to end the message
-//this->acquire();// Wait semaphore until it can proceed
+
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send mesage to node
 this->release();
+usleep(500000);// Give some time to have the chance to receive the response
 }
 	if (this->InfoNumStoredQubitsNodeFlag==true){
 		ParamsIntArray[0]=this->NumStoredQubitsNodeParamsIntArray[0];	
@@ -818,9 +819,6 @@ this->release();
 		//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 		ParamsIntArray[0]=-1;
 		isValidWhileLoopCount--;
-		//this->release();// Non-block during sleeping
-		usleep(100000);
-		//this->acquire(); // Re-acquire semaphore
 }
 }//while
 
