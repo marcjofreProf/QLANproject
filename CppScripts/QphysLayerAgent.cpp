@@ -178,7 +178,7 @@ else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTi
 	if (this->threadEmitQuBitRefAux.joinable()){
 		this->threadEmitQuBitRefAux.join();
 	}
-	//while(this->RunThreadEmitQuBitFlag==false){usleep(10);}// Wait for Receiving thread to finish
+	//while(this->RunThreadEmitQuBitFlag==false){usleep(1000);}// Wait for Receiving thread to finish
 	//cout << "Check block before acquire Process New Parameters" << endl;
 	this->acquire();
 	//cout << "Check block after acquire Process New Parameters" << endl;
@@ -446,7 +446,7 @@ if (this->threadReceiveQuBitRefAux.joinable()){
 this->threadReceiveQuBitRefAux.join();
 }
 
-while(this->RunThreadReceiveQuBitFlag==false){usleep(10);}// Wait for Receiving thread to finish
+while(this->RunThreadReceiveQuBitFlag==false){usleep(1000);}// Wait for Receiving thread to finish
 
 this->acquire();
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
