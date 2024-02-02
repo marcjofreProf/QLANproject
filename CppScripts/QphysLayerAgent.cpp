@@ -445,9 +445,13 @@ int QPLA::GetNumStoredQubitsNode(){
 //    } // upper try
 //  catch (...) { // Catches any exception
 //    }
+this->acquire();
 if (this->threadReceiveQuBitRefAux.joinable()){
+this->release();
 this->threadReceiveQuBitRefAux.join();
+this->acquire();
 }
+this->release();
 
 while(this->RunThreadReceiveQuBitFlag==false){usleep(1000);}// Wait for Receiving thread to finish
 
