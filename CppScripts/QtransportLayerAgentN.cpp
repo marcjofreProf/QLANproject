@@ -794,7 +794,7 @@ this->release();
 this->acquire();	  
 this->ICPdiscoverSend(ParamsCharArray); 
 this->release();
-cout << "We get here GetNumStoredQubitsNode" << endl;
+//cout << "We get here GetNumStoredQubitsNode" << endl;
 return 0;
 }
 
