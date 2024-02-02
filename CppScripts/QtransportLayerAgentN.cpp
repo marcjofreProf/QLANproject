@@ -683,6 +683,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		if (string(Command)==string("InfoRequest")){ // Request to provide information
 			if (string(Payload)==string("NumStoredQubitsNode")){
 			  this->release();
+			  cout << "IPorg: " << IPorg << endl;
+				cout << "IPdest: " << IPdest << endl;
 			  std::thread threadGetNumStoredQubitsNodeRefAux=std::thread(&QTLAN::GetNumStoredQubitsNode,this,IPorg,IPdest);
 			  threadGetNumStoredQubitsNodeRefAux.detach();
 			  this->acquire();
@@ -772,6 +774,8 @@ return 0;
 }
 
 int QTLAN::GetNumStoredQubitsNode(char* IPorg,char* IPdest) {
+cout << "Thread IPorg: " << IPorg << endl;
+cout << "Thread IPdest: " << IPdest << endl;
 int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
 cout << "NumStoredQubitsNode: " << NumStoredQubitsNode << endl;
   // Generate the message
