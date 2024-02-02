@@ -781,20 +781,6 @@ int SockListenTimeusec=9999; // negative means infinite time
 
 int isValidWhileLoopCount = 1000; // Number of tries
 
-memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
-strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,this->IPaddressesSockets[3]);
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"Control");
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"InfoRequest");
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"NumStoredQubitsNode");
-strcat(this->SendBuffer,",");// Very important to end the message
-this->acquire();// Wait semaphore until it can proceed
-this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send mesage to node
-this->release();
 //usleep(999999);
 /*
 this->ReadFlagWait=true;
@@ -806,17 +792,34 @@ if (ReadBytes>0){// Read block
 }
 */
 while(isValidWhileLoopCount>0){
+if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
+this->acquire();
+memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
+strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,this->IPaddressesSockets[3]);
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"Control");
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"InfoRequest");
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"NumStoredQubitsNode");
+strcat(this->SendBuffer,",");// Very important to end the message
+//this->acquire();// Wait semaphore until it can proceed
+this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send mesage to node
+this->release();
+}
 	if (this->InfoNumStoredQubitsNodeFlag==true){
 		ParamsIntArray[0]=this->NumStoredQubitsNodeParamsIntArray[0];	
 		isValidWhileLoopCount=0;
 	}
 	else{
 		// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-		memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
+		//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 		ParamsIntArray[0]=-1;
 		isValidWhileLoopCount--;
 		//this->release();// Non-block during sleeping
-		usleep(99999);
+		usleep(100000);
 		//this->acquire(); // Re-acquire semaphore
 }
 }//while
