@@ -821,7 +821,7 @@ usleep(500000);// Give some time to have the chance to receive the response
 		isValidWhileLoopCount--;
 }
 }//while
-
+usleep(1000000);// Give some time to have the chance to clear all pending responses
 } // try
   catch (...) { // Catches any exception
   cout << "Exception caught" << endl;
