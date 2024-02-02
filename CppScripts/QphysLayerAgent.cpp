@@ -180,13 +180,20 @@ else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTi
 		this->threadEmitQuBitRefAux.join();
 	this->acquire();
 	}
-	//while(this->RunThreadEmitQuBitFlag==false){usleep(1000);}// Wait for Receiving thread to finish
-	//cout << "Check block before acquire Process New Parameters" << endl;
 	
-	//cout << "Check block after acquire Process New Parameters" << endl;
-//}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
 // Reset the ClientNodeFutureTimePoint
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
+char NewMessageParamsCharArray[NumBytesPayloadBuffer] = {0};
+strcpy(NewMessageParamsCharArray,"JoinOtherClientNodeThread_0_"); // Initiates the ParamsCharArray, so use strcpy
+this->SetSendParametersAgent(NewMessageParamsCharArray);// Send parameter to the other node
+}
+else if (string(HeaderCharArray[iHeaders])==string("JoinOtherClientNodeThread")){
+cout << "JoinOtherClientNodeThread" << endl;
+if (this->threadReceiveQuBitRefAux.joinable()){
+this->release();
+this->threadReceiveQuBitRefAux.join();
+this->acquire();
+}
 }
 else{// discard
 }
@@ -448,11 +455,11 @@ int QPLA::GetNumStoredQubitsNode(){
 //  catch (...) { // Catches any exception
 //    }
 
-if (this->threadReceiveQuBitRefAux.joinable()){
-this->threadReceiveQuBitRefAux.join();
-}
-usleep(1000000);
-//while(this->RunThreadReceiveQuBitFlag==false){usleep(1000);}// Wait for Receiving thread to finish
+//if (this->threadReceiveQuBitRefAux.joinable()){
+//this->threadReceiveQuBitRefAux.join();
+//}
+
+while(this->RunThreadReceiveQuBitFlag==false){usleep(1000);}// Wait for Receiving thread to finish
 
 this->acquire();
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
