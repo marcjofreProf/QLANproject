@@ -669,8 +669,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			this->ICPmanagementSend(socket_fd_conn,IPorg);
 			}
 			else if (string(Command)==string("NumStoredQubitsNode")){// Expected/awaiting message
-				this->InfoNumStoredQubitsNodeFlag=true;
 				this->NumStoredQubitsNodeParamsIntArray[0]=atoi(Payload);
+				this->InfoNumStoredQubitsNodeFlag=true;				
 			}					
 			else{
 			// Do not do anything
@@ -776,10 +776,10 @@ try{
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor (it applies both to TCP and UDP)
 this->InfoNumStoredQubitsNodeFlag=false; // Reset the flag
-int SockListenTimeusec=999999; // negative means infinite time
+int SockListenTimeusec=9999; // negative means infinite time
 
-int isValidWhileLoopCount = 100; // Number of tries
-while(isValidWhileLoopCount>0){
+int isValidWhileLoopCount = 1000; // Number of tries
+
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
 strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
 strcat(this->SendBuffer,",");
@@ -794,6 +794,7 @@ strcat(this->SendBuffer,",");// Very important to end the message
 
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send mesage to node
 //usleep(999999);
+/*
 this->ReadFlagWait=true;
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 this->ReadFlagWait=false;
@@ -801,18 +802,20 @@ this->ReadFlagWait=false;
 if (ReadBytes>0){// Read block	
 	this->ProcessNewMessage();		
 }
-if (this->InfoNumStoredQubitsNodeFlag==true){
-ParamsIntArray[0]=this->NumStoredQubitsNodeParamsIntArray[0];	
-isValidWhileLoopCount=0;
-}
-else{
-// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
-ParamsIntArray[0]=-1;
-isValidWhileLoopCount--;
-this->release();// Non-block during sleeping
-usleep(999999);
-this->acquire(); // Re-acquire semaphore
+*/
+while(isValidWhileLoopCount>0){
+	if (this->InfoNumStoredQubitsNodeFlag==true){
+		ParamsIntArray[0]=this->NumStoredQubitsNodeParamsIntArray[0];	
+		isValidWhileLoopCount=0;
+	}
+	else{
+		// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+		memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
+		ParamsIntArray[0]=-1;
+		isValidWhileLoopCount--;
+		this->release();// Non-block during sleeping
+		usleep(999999);
+		this->acquire(); // Re-acquire semaphore
 }
 }//while
 
@@ -827,6 +830,7 @@ this->release(); // Release the semaphore
 //cout << "After release valueSemaphoreExpected: " << valueSemaphoreExpected << endl;
 return 0; // All OK
 }
+
 ///////////////////////////////////////////////////////////////////
 QTLAH::~QTLAH() {
 	// destructor

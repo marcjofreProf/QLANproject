@@ -156,7 +156,7 @@ if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){this->E
 else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){this->ReceiveLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread
-	cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
+	//cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
 	std::chrono::milliseconds duration_back((unsigned int)atoi(ValuesCharArray[iHeaders]));
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
 	
@@ -188,7 +188,7 @@ strcpy(NewMessageParamsCharArray,"JoinOtherClientNodeThread_0_"); // Initiates t
 this->SetSendParametersAgent(NewMessageParamsCharArray);// Send parameter to the other node
 }
 else if (string(HeaderCharArray[iHeaders])==string("JoinOtherClientNodeThread")){
-	cout << "JoinOtherClientNodeThread" << endl;
+	//cout << "JoinOtherClientNodeThread" << endl;
 	this->RunThreadReceiveQuBitFlag=true;
 	if (this->threadReceiveQuBitRefAux.joinable()){
 	this->release();
@@ -259,7 +259,7 @@ cout << "QPLA:ThreadEmitQuBit could not obtain in time the TimePoint from the ot
 }// Provide a TimePoint to avoid blocking issues
 TimePoint FutureTimePoint=this->OtherClientNodeFutureTimePoint;
 this->release();
-cout << "MaxWhileRound: " << MaxWhileRound << endl;
+//cout << "MaxWhileRound: " << MaxWhileRound << endl;
 MaxWhileRound=100;
 /////////////////////////////////////////////
 // Checks
@@ -459,13 +459,13 @@ int QPLA::GetNumStoredQubitsNode(){
 //if (this->threadReceiveQuBitRefAux.joinable()){
 //this->threadReceiveQuBitRefAux.join();
 //}
-cout << "Here 1" << endl;
+
 while(this->RunThreadReceiveQuBitFlag==false){usleep(1000);}// Wait for Receiving thread to finish
-cout << "Here 2" << endl;
+
 this->acquire();
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
 this->release();
-cout << "Here 3" << endl;
+
 return NumStoredQubitsNodeAux;
 }
 
