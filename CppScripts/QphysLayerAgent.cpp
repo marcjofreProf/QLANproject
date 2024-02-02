@@ -439,6 +439,7 @@ this->threadReceiveQuBitRefAux.join();
     } // upper try
   catch (...) { // Catches any exception
     }
+while(this->RunThreadReceiveQuBitFlag==false){usleep(10);}// Wait for Receiving thread to finish
 this->acquire();
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
 this->release();
