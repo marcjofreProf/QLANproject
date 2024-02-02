@@ -189,6 +189,7 @@ this->SetSendParametersAgent(NewMessageParamsCharArray);// Send parameter to the
 }
 else if (string(HeaderCharArray[iHeaders])==string("JoinOtherClientNodeThread")){
 cout << "JoinOtherClientNodeThread" << endl;
+this->RunThreadReceiveQuBitFlag=true;
 if (this->threadReceiveQuBitRefAux.joinable()){
 this->release();
 this->threadReceiveQuBitRefAux.join();
