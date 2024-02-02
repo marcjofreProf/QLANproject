@@ -33,12 +33,21 @@ QLLA::QLLA() { // Constructor
 }
 /////////////////////////////////////////////
 void QLLA::acquire() {
-while(valueSemaphore==0);
+/*while(valueSemaphore==0);
 this->valueSemaphore=0; // Make sure it stays at 0
+*/
+int oldCount;
+while(true){
+	oldCount = this->valueSemaphore.load(std::memory_order_relaxed);
+	if (oldCount > 0 && this->valueSemaphore.compare_exchange_strong(oldCount,oldCount-1,std::memory_order_acquire)){
+	break;
+	}
+}
 }
  
 void QLLA::release() {
-this->valueSemaphore=1; // Make sure it stays at 1
+//this->valueSemaphore=1; // Make sure it stays at 1
+this->valueSemaphore.fetch_add(1,std::memory_order_release);
 }
 ////////////////////////////////////////////////////
 int QLLA::InitParametersAgent(){// Client node have some parameters to adjust to the server node

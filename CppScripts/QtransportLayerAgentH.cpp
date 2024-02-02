@@ -81,8 +81,17 @@ this->valueSemaphore=0; // Make sure it stays at 0
 std::atomic_thread_fence(std::memory_order_release);
 std::this_thread::yield();
 */
+/*
 while(valueSemaphore==0);
 this->valueSemaphore=0; // Make sure it stays at 0
+*/
+int oldCount;
+while(true){
+	oldCount = this->valueSemaphore.load(std::memory_order_relaxed);
+	if (oldCount > 0 && this->valueSemaphore.compare_exchange_strong(oldCount,oldCount-1,std::memory_order_acquire)){
+	break;
+	}
+}
 }
  
 void QTLAH::release() {
@@ -95,7 +104,8 @@ bool CheckRelease = valueSemaphore.fetch_add(1, std::memory_order_acquire);
       this->valueSemaphoreExpected=1; // Make sure it stays at 1
       this->valueSemaphore=1; // Make sure it stays at 1
     }*/
-   this->valueSemaphore=1; // Make sure it stays at 1
+   //this->valueSemaphore=1; // Make sure it stays at 1
+   this->valueSemaphore.fetch_add(1,std::memory_order_release);
 }
 /////////////////////////////////////////////////////////
 int QTLAH::countQintupleComas(char* ParamsCharArray) {
