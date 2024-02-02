@@ -174,9 +174,9 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoi
 else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTimePoint")){//CLear this node OtherClientNodeFutureTimePoints to avoid having anon-zero value eventhough the other node has finished transmitting and this one for some reason could no execute it
 //if (this->threadEmitQuBitRefAux.joinable()){
 	this->release();
-	//cout << "Check block release Process New Parameters" << endl;
-	while(this->RunThreadEmitQuBitFlag==false){usleep(10);}// Wait for Receiving thread to finish
+	//cout << "Check block release Process New Parameters" << endl;	
 	this->threadEmitQuBitRefAux.join();
+	//while(this->RunThreadEmitQuBitFlag==false){usleep(10);}// Wait for Receiving thread to finish
 	//cout << "Check block before acquire Process New Parameters" << endl;
 	this->acquire();
 	//cout << "Check block after acquire Process New Parameters" << endl;
