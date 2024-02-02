@@ -451,8 +451,8 @@ int QPLA::GetNumStoredQubitsNode(){
 if (this->threadReceiveQuBitRefAux.joinable()){
 this->threadReceiveQuBitRefAux.join();
 }
-
-while(this->RunThreadReceiveQuBitFlag==false){usleep(1000);}// Wait for Receiving thread to finish
+usleep(1000000);
+//while(this->RunThreadReceiveQuBitFlag==false){usleep(1000);}// Wait for Receiving thread to finish
 
 this->acquire();
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
