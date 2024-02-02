@@ -156,7 +156,7 @@ if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){this->E
 else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){this->ReceiveLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread
-	//cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
+	cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
 	std::chrono::milliseconds duration_back((unsigned int)atoi(ValuesCharArray[iHeaders]));
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
 	
@@ -234,7 +234,7 @@ return 0; // return 0 is for no error
 int QPLA::ThreadEmitQuBit(){
 cout << "Emiting Qubits" << endl;
 
-int MaxWhileRound=10000;
+int MaxWhileRound=100000;
 // Wait to receive the FutureTimePoint from client node
 this->acquire();
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
@@ -245,7 +245,7 @@ while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && 
 	};
 if (MaxWhileRound<=0){
 this->OtherClientNodeFutureTimePoint=Clock::now();
-cout << "QPLA:ThreadEmitQuBit could not obtain in time the TimePoint from the other node" << MaxWhileRound << endl;
+cout << "QPLA:ThreadEmitQuBit could not obtain in time the TimePoint from the other node" << endl;
 }// Provide a TimePoint to avoid blocking issues
 TimePoint FutureTimePoint=this->OtherClientNodeFutureTimePoint;
 this->release();
