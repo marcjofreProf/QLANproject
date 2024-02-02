@@ -776,7 +776,7 @@ try{
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor (it applies both to TCP and UDP)
 this->InfoNumStoredQubitsNodeFlag=false; // Reset the flag
-int SockListenTimeusec=99999; // negative means infinite time
+int SockListenTimeusec=999999; // negative means infinite time
 
 int isValidWhileLoopCount = 100; // Number of tries
 while(isValidWhileLoopCount>0){
