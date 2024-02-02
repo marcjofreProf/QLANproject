@@ -175,7 +175,9 @@ else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTi
 //if (this->threadEmitQuBitRefAux.joinable()){
 	this->release();
 	//cout << "Check block release Process New Parameters" << endl;	
-	this->threadEmitQuBitRefAux.join();
+	if (this->threadEmitQuBitRefAux.joinable()){
+		this->threadEmitQuBitRefAux.join();
+	}
 	//while(this->RunThreadEmitQuBitFlag==false){usleep(10);}// Wait for Receiving thread to finish
 	//cout << "Check block before acquire Process New Parameters" << endl;
 	this->acquire();
@@ -440,8 +442,12 @@ int QPLA::GetNumStoredQubitsNode(){
 //    } // upper try
 //  catch (...) { // Catches any exception
 //    }
-while(this->RunThreadReceiveQuBitFlag==false){usleep(10);}// Wait for Receiving thread to finish
+if (this->threadReceiveQuBitRefAux.joinable()){
 this->threadReceiveQuBitRefAux.join();
+}
+
+while(this->RunThreadReceiveQuBitFlag==false){usleep(10);}// Wait for Receiving thread to finish
+
 this->acquire();
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
 this->release();
