@@ -171,30 +171,30 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoi
 	//unsigned int time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count(); // Convert 
 	//cout << "time_as_count: " << time_as_count << endl;
 }
-else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTimePoint")){//CLear this node OtherClientNodeFutureTimePoints to avoid having anon-zero value eventhough the other node has finished transmitting and this one for some reason could no execute it
+else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTimePoint")){//CLear this node OtherClientNodeFutureTimePoints to avoid having a non-zero value eventhough the other node has finished transmitting and this one for some reason could no execute it
 //if (this->threadEmitQuBitRefAux.joinable()){
 	
 	//cout << "Check block release Process New Parameters" << endl;	
-	if (this->threadEmitQuBitRefAux.joinable()){
-	this->release();
-		this->threadEmitQuBitRefAux.join();
-	this->acquire();
-	}
+	//if (this->threadEmitQuBitRefAux.joinable()){
+	//this->release();
+	//	this->threadEmitQuBitRefAux.join();
+	//this->acquire();
+	//}
 	
-// Reset the ClientNodeFutureTimePoint
-this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
-char NewMessageParamsCharArray[NumBytesPayloadBuffer] = {0};
-strcpy(NewMessageParamsCharArray,"JoinOtherClientNodeThread_0_"); // Initiates the ParamsCharArray, so use strcpy
+	// Reset the ClientNodeFutureTimePoint
+	this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
+	char NewMessageParamsCharArray[NumBytesPayloadBuffer] = {0};
+	strcpy(NewMessageParamsCharArray,"JoinOtherClientNodeThread_0_"); // Initiates the ParamsCharArray, so use strcpy
 this->SetSendParametersAgent(NewMessageParamsCharArray);// Send parameter to the other node
 }
 else if (string(HeaderCharArray[iHeaders])==string("JoinOtherClientNodeThread")){
 	//cout << "JoinOtherClientNodeThread" << endl;
 	this->RunThreadReceiveQuBitFlag=true;
-	if (this->threadReceiveQuBitRefAux.joinable()){
-	this->release();
-	this->threadReceiveQuBitRefAux.join();
-	this->acquire();
-	}
+	//if (this->threadReceiveQuBitRefAux.joinable()){
+	//this->release();
+	//this->threadReceiveQuBitRefAux.join();
+	//this->acquire();
+	//}
 }
 else{// discard
 }
@@ -217,21 +217,10 @@ int QPLA::InitAgentProcess(){
 
 
 int QPLA::emitQuBit(){
-bool RunThreadFlag=true;
-/*try{
-//this->acquire();
- RunThreadFlag=!this->threadEmitQuBitRefAux.joinable();//(!this->threadEmitQuBitRefAux.joinable() && !this->threadReceiveQuBitRefAux.joinable());
- //this->release();
-    } // upper try
-  catch (...) { // Catches any exception
-  	RunThreadFlag=true;  
-  	//this->release();
-    }
-*/
-//this->acquire();
 if (this->RunThreadEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadEmitQuBitFlag=false;//disable that this thread can again be called
 this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
+this->threadEmitQuBitRefAux.detach();
 }
 else{
 cout << "Not possible to launch ThreadEmitQuBit" << endl;
@@ -333,22 +322,11 @@ this->RunThreadEmitQuBitFlag=true;//enable again that this thread can again be c
 }
 
 int QPLA::receiveQuBit(){
-//bool RunThreadFlag=true;
-/*try{
-//this->acquire();
-RunThreadFlag=!this->threadReceiveQuBitRefAux.joinable();//(!this->threadReceiveQuBitRefAux.joinable() && !this->threadEmitQuBitRefAux.joinable() ) ;
-//this->release();
-    } // upper try
-  catch (...) { // Catches any exception
-  	RunThreadFlag=true;  
-  	//this->release();
-    }*/
-    
+
 if (this->RunThreadReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
-//this->acquire();
 this->RunThreadReceiveQuBitFlag=false;//disable that this thread can again be called
 this->threadReceiveQuBitRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
-//this->release();
+this->threadReceiveQuBitRefAux.detach();
 }
 else{
 cout << "Not possible to launch ThreadReceiveQubit" << endl;
@@ -444,22 +422,6 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::GetNumStoredQubitsNode(){
-//this->acquire();
-
-//try{
-//if (this->threadReceiveQuBitRefAux.joinable()){
-//this->release();
-//this->threadReceiveQuBitRefAux.join();
-//this->acquire();
-//}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
-//    } // upper try
-//  catch (...) { // Catches any exception
-//    }
-
-//if (this->threadReceiveQuBitRefAux.joinable()){
-//this->threadReceiveQuBitRefAux.join();
-//}
-
 while(this->RunThreadReceiveQuBitFlag==false){usleep(1000);}// Wait for Receiving thread to finish
 
 this->acquire();
