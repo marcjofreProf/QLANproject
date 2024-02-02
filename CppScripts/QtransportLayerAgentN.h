@@ -139,6 +139,7 @@ private: // Functions/Methods
 	//
 	int QPLAemitQuBit();
 	int QPLAreceiveQuBit();
+	int GetNumStoredQubitsNode(char* IPorg,char* IPdest);
 	
 };
 

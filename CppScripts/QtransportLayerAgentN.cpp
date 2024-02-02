@@ -682,24 +682,10 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	else if(string(Type)==string("Control")){//Control message	
 		if (string(Command)==string("InfoRequest")){ // Request to provide information
 			if (string(Payload)==string("NumStoredQubitsNode")){
-			  int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
-			  // Generate the message
-			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-			strcpy(ParamsCharArray,IPorg);
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,IPdest);
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,"Operation");
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,"NumStoredQubitsNode");
-			strcat(ParamsCharArray,",");
-			char charNum[NumBytesBufferICPMAX] = {0};
-			sprintf(charNum, "%d", NumStoredQubitsNode);
-			strcat(ParamsCharArray,charNum);
-			strcat(ParamsCharArray,",");// Very important to end the message
-			//cout << "ParamsCharArray: " << ParamsCharArray << endl;
-			  // reply immediately with a message to requester		  
-			  this->ICPdiscoverSend(ParamsCharArray); 
+			  this->release();
+			  std::thread threadGetNumStoredQubitsNodeRefAux=std::thread(&QTLAN::GetNumStoredQubitsNode,this,IPorg,IPdest);
+			  threadGetNumStoredQubitsNodeRefAux.detach();
+			  this->acquire();
 			}
 			else if (string(Payload)==string("NodeAreYouThere?")){
 			// Mount message and send it to attached node
@@ -782,6 +768,30 @@ return 0;
 
 int QTLAN::QPLAreceiveQuBit() {
 this->QNLAagent.QLLAagent.QPLAagent.receiveQuBit();
+return 0;
+}
+
+int QTLAN::GetNumStoredQubitsNode(char* IPorg,char* IPdest) {
+int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
+  // Generate the message
+char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+strcpy(ParamsCharArray,IPorg);
+strcat(ParamsCharArray,",");
+strcat(ParamsCharArray,IPdest);
+strcat(ParamsCharArray,",");
+strcat(ParamsCharArray,"Operation");
+strcat(ParamsCharArray,",");
+strcat(ParamsCharArray,"NumStoredQubitsNode");
+strcat(ParamsCharArray,",");
+char charNum[NumBytesBufferICPMAX] = {0};
+sprintf(charNum, "%d", NumStoredQubitsNode);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,",");// Very important to end the message
+//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+  // reply immediately with a message to requester	
+this->acquire();	  
+this->ICPdiscoverSend(ParamsCharArray); 
+this->release();
 return 0;
 }
 
