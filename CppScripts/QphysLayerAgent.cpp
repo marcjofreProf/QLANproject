@@ -205,7 +205,7 @@ int QPLA::InitAgentProcess(){
 
 int QPLA::emitQuBit(){
 bool RunThreadFlag=true;
-try{
+/*try{
 //this->acquire();
  RunThreadFlag=!this->threadEmitQuBitRefAux.joinable();//(!this->threadEmitQuBitRefAux.joinable() && !this->threadReceiveQuBitRefAux.joinable());
  //this->release();
@@ -214,9 +214,9 @@ try{
   	RunThreadFlag=true;  
   	//this->release();
     }
-
+*/
 //this->acquire();
-if (RunThreadFlag){// Protection, do not run if there is a previous thread running
+if (this->RunThreadEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
 }
 else{
@@ -228,6 +228,7 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadEmitQuBit(){
+this->RunThreadEmitQuBitFlag=false;//disable that this thread can again be called
 cout << "Emiting Qubits" << endl;
 
 int MaxWhileRound=1000;
@@ -311,12 +312,13 @@ cout << "End Emiting Qubits" << endl;
 this->acquire();
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 this->release();
+this->RunThreadEmitQuBitFlag=true;//enable again that this thread can again be called
  return 0; // return 0 is for no error
 }
 
 int QPLA::receiveQuBit(){
 bool RunThreadFlag=true;
-try{
+/*try{
 //this->acquire();
 RunThreadFlag=!this->threadReceiveQuBitRefAux.joinable();//(!this->threadReceiveQuBitRefAux.joinable() && !this->threadEmitQuBitRefAux.joinable() ) ;
 //this->release();
@@ -324,9 +326,9 @@ RunThreadFlag=!this->threadReceiveQuBitRefAux.joinable();//(!this->threadReceive
   catch (...) { // Catches any exception
   	RunThreadFlag=true;  
   	//this->release();
-    }
+    }*/
     
-if (RunThreadFlag){// Protection, do not run if there is a previous thread running
+if (this->RunThreadReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 //this->acquire();
 this->threadReceiveQuBitRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
 //this->release();
@@ -339,7 +341,7 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadReceiveQubit(){
-
+this->RunThreadReceiveQuBitFlag=false;//disable that this thread can again be called
 int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
 
@@ -421,7 +423,7 @@ ParamsCharArray[NumBytesPayloadBuffer] = {0};
 strcpy(ParamsCharArray,"ClearOtherClientNodeFutureTimePoint_0_"); // Initiates the ParamsCharArray, so use strcpy
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 this->release();
-
+this->RunThreadReceiveQuBitFlag=true;//enable again that this thread can again be called
 return 0; // return 0 is for no error
 }
 

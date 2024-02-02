@@ -63,6 +63,8 @@ private: //Variables/Instances
 	// Private threads
 	std::thread threadEmitQuBitRefAux;
 	std::thread threadReceiveQuBitRefAux;
+	bool RunThreadEmitQuBitFlag=true;
+	bool RunThreadReceiveQuBitFlag=true;
         
 public: // Variables/Instances
 	enum ApplicationState { // State of the agent sequences
