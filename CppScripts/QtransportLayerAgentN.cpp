@@ -790,9 +790,9 @@ strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,",");// Very important to end the message
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
   // reply immediately with a message to requester	
-this->acquire();	  
+//this->acquire();	  
 this->ICPdiscoverSend(ParamsCharArray); 
-this->release();
+//this->release();
 cout << "We get here GetNumStoredQubitsNode" << endl;
 return 0;
 }
