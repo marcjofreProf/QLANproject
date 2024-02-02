@@ -234,7 +234,7 @@ return 0; // return 0 is for no error
 int QPLA::ThreadEmitQuBit(){
 cout << "Emiting Qubits" << endl;
 
-int MaxWhileRound=1000;
+int MaxWhileRound=10000;
 // Wait to receive the FutureTimePoint from client node
 this->acquire();
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
@@ -243,10 +243,13 @@ while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && 
 	usleep(100);//Maybe some sleep to reduce CPU consumption	
 	this->acquire();
 	};
-if (MaxWhileRound<=0){this->OtherClientNodeFutureTimePoint=Clock::now();}// Provide a TimePoint to avoid blocking issues
+if (MaxWhileRound<=0){
+this->OtherClientNodeFutureTimePoint=Clock::now();
+cout << "QPLA:ThreadEmitQuBit could not obtain in time the TimePoint from the other node" << MaxWhileRound << endl;
+}// Provide a TimePoint to avoid blocking issues
 TimePoint FutureTimePoint=this->OtherClientNodeFutureTimePoint;
 this->release();
-//cout << "MaxWhileRound: " << MaxWhileRound << endl;
+cout << "MaxWhileRound: " << MaxWhileRound << endl;
 MaxWhileRound=100;
 /////////////////////////////////////////////
 // Checks
