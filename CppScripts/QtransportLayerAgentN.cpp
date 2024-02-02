@@ -504,7 +504,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 }
 
 int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
-	//cout << "Node SendBuffer: " << this->SendBuffer << endl;
+	cout << "Node SendBuffer: " << this->SendBuffer << endl;
 	//cout << "Node SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
     const char* SendBufferAux = this->SendBuffer;
     int BytesSent=0;
@@ -793,6 +793,7 @@ strcat(ParamsCharArray,",");// Very important to end the message
 this->acquire();	  
 this->ICPdiscoverSend(ParamsCharArray); 
 this->release();
+cout << "We get here GetNumStoredQubitsNode" << endl;
 return 0;
 }
 

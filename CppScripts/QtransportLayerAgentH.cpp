@@ -669,6 +669,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			this->ICPmanagementSend(socket_fd_conn,IPorg);
 			}
 			else if (string(Command)==string("NumStoredQubitsNode")){// Expected/awaiting message
+				cout << "We are here NumStoredQubitsNode" << endl;
 				this->NumStoredQubitsNodeParamsIntArray[0]=atoi(Payload);
 				this->InfoNumStoredQubitsNodeFlag=true;				
 			}					
@@ -770,7 +771,7 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 }
 
 int QTLAH::RetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray){ // Send to the upper layer agent how many qubits are stored
-this->acquire();// Wait semaphore until it can proceed
+
 try{
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 
@@ -791,8 +792,9 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"NumStoredQubitsNode");
 strcat(this->SendBuffer,",");// Very important to end the message
-
+this->acquire();// Wait semaphore until it can proceed
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send mesage to node
+this->release();
 //usleep(999999);
 /*
 this->ReadFlagWait=true;
@@ -813,9 +815,9 @@ while(isValidWhileLoopCount>0){
 		memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 		ParamsIntArray[0]=-1;
 		isValidWhileLoopCount--;
-		this->release();// Non-block during sleeping
-		usleep(999999);
-		this->acquire(); // Re-acquire semaphore
+		//this->release();// Non-block during sleeping
+		usleep(99999);
+		//this->acquire(); // Re-acquire semaphore
 }
 }//while
 
@@ -825,7 +827,7 @@ while(isValidWhileLoopCount>0){
     }
 //cout << "Before release valueSemaphore: " << valueSemaphore << endl;
 //cout << "Before release valueSemaphoreExpected: " << valueSemaphoreExpected << endl;
-this->release(); // Release the semaphore
+//this->release(); // Release the semaphore
 //cout << "After release valueSemaphore: " << valueSemaphore << endl;
 //cout << "After release valueSemaphoreExpected: " << valueSemaphoreExpected << endl;
 return 0; // All OK
