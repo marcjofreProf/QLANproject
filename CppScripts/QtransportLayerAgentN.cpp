@@ -504,7 +504,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 }
 
 int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
-	cout << "Node SendBuffer: " << this->SendBuffer << endl;
+	//cout << "Node SendBuffer: " << this->SendBuffer << endl;
 	//cout << "Node SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
     const char* SendBufferAux = this->SendBuffer;
     int BytesSent=0;
@@ -789,10 +789,11 @@ sprintf(charNum, "%d", NumStoredQubitsNode);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,",");// Very important to end the message
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
-  // reply immediately with a message to requester	
-//this->acquire();	  
+  // reply immediately with a message to requester
+this->release();	
+this->acquire();	  
 this->ICPdiscoverSend(ParamsCharArray); 
-//this->release();
+this->release();
 cout << "We get here GetNumStoredQubitsNode" << endl;
 return 0;
 }
@@ -1044,7 +1045,7 @@ int main(int argc, char const * argv[]){
            case QTLAN::APPLICATION_RUNNING: {               
                // Do Some Work
                QTLANagent.ProcessNewMessage();
-               while(QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard)>0);// Make sure to remove all pending mesages in the socket
+               //while(QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard)>0);// Make sure to remove all pending mesages in the socket
                QTLANagent.m_pause(); // After procesing the request, pass to paused state
                break;
            }

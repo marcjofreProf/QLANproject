@@ -553,7 +553,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
            case QTLAH::APPLICATION_RUNNING: {               
                // Do Some Work
                this->ProcessNewMessage();
-               while(this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard)>0);// Make sure to remove all pending mesages in the socket
+               //while(this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard)>0);// Make sure to remove all pending mesages in the socket
                this->m_pause(); // After procesing the request, pass to paused state
                break;
            }
