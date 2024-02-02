@@ -172,14 +172,14 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoi
 	//cout << "time_as_count: " << time_as_count << endl;
 }
 else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTimePoint")){//CLear this node OtherClientNodeFutureTimePoints to avoid having anon-zero value eventhough the other node has finished transmitting and this one for some reason could no execute it
-if (this->threadEmitQuBitRefAux.joinable()){
+//if (this->threadEmitQuBitRefAux.joinable()){
 	this->release();
 	//cout << "Check block release Process New Parameters" << endl;
 	this->threadEmitQuBitRefAux.join();
 	//cout << "Check block before acquire Process New Parameters" << endl;
 	this->acquire();
 	//cout << "Check block after acquire Process New Parameters" << endl;
-}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
+//}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
 // Reset the ClientNodeFutureTimePoint
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 }
@@ -431,11 +431,11 @@ int QPLA::GetNumStoredQubitsNode(){
 //this->acquire();
 
 try{
-if (this->threadReceiveQuBitRefAux.joinable()){
+//if (this->threadReceiveQuBitRefAux.joinable()){
 //this->release();
 this->threadReceiveQuBitRefAux.join();
 //this->acquire();
-}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
+//}// Wait for the thread to finish. If we wait for the thread to finish, the upper layers get also
     } // upper try
   catch (...) { // Catches any exception
     }
