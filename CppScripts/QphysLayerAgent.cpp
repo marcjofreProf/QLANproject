@@ -220,6 +220,7 @@ bool RunThreadFlag=true;
 */
 //this->acquire();
 if (this->RunThreadEmitQuBitFlag){// Protection, do not run if there is a previous thread running
+this->RunThreadEmitQuBitFlag=false;//disable that this thread can again be called
 this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
 }
 else{
@@ -231,15 +232,14 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadEmitQuBit(){
-this->RunThreadEmitQuBitFlag=false;//disable that this thread can again be called
 cout << "Emiting Qubits" << endl;
 
 int MaxWhileRound=1000;
 // Wait to receive the FutureTimePoint from client node
 this->acquire();
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
-	MaxWhileRound--;
 	this->release();
+	MaxWhileRound--;	
 	usleep(100);//Maybe some sleep to reduce CPU consumption	
 	this->acquire();
 	};
@@ -320,7 +320,7 @@ this->RunThreadEmitQuBitFlag=true;//enable again that this thread can again be c
 }
 
 int QPLA::receiveQuBit(){
-bool RunThreadFlag=true;
+//bool RunThreadFlag=true;
 /*try{
 //this->acquire();
 RunThreadFlag=!this->threadReceiveQuBitRefAux.joinable();//(!this->threadReceiveQuBitRefAux.joinable() && !this->threadEmitQuBitRefAux.joinable() ) ;
@@ -333,6 +333,7 @@ RunThreadFlag=!this->threadReceiveQuBitRefAux.joinable();//(!this->threadReceive
     
 if (this->RunThreadReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 //this->acquire();
+this->RunThreadReceiveQuBitFlag=false;//disable that this thread can again be called
 this->threadReceiveQuBitRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
 //this->release();
 }
@@ -344,7 +345,6 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadReceiveQubit(){
-this->RunThreadReceiveQuBitFlag=false;//disable that this thread can again be called
 int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
 
