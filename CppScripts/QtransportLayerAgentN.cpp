@@ -684,7 +684,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			if (string(Payload)==string("NumStoredQubitsNode")){
 			  this->release();
 			  std::thread threadGetNumStoredQubitsNodeRefAux=std::thread(&QTLAN::GetNumStoredQubitsNode,this,IPorg,IPdest);
-			  threadGetNumStoredQubitsNodeRefAux.detach();
+			  threadGetNumStoredQubitsNodeRefAux.join();//detach();
 			  this->acquire();
 			}
 			else if (string(Payload)==string("NodeAreYouThere?")){
