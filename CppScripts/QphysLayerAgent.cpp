@@ -241,7 +241,7 @@ return 0; // return 0 is for no error
 
 int QPLA::ThreadEmitQuBit(){
 cout << "Emiting Qubits" << endl;
-
+GPIO outGPIO(this->EmitLinkNumberArray[0]);
 int MaxWhileRound=1000;
 // Wait to receive the FutureTimePoint from client node
 this->acquire();
@@ -292,13 +292,14 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
 	// Convert duration to desired time
 	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 	
 	};
+// After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
+
 //cout << "MaxWhileRound: " << MaxWhileRound << endl;
 
 //this->acquire();
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  
- cout << "Start Emiting Qubits" << endl;
- GPIO outGPIO(this->EmitLinkNumberArray[0]);
+ cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
  // Basic Output - Generate a pulse of 1 second period
  outGPIO.setDirection(OUTPUT);
  usleep(QuBitsUSecQuarterPeriodInt[0]);
@@ -347,7 +348,7 @@ return 0; // return 0 is for no error
 int QPLA::ThreadReceiveQubit(){
 int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
-
+GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
 // Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
 
@@ -396,13 +397,13 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
         if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
 	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption	
 };
-//this->acquire();
+// After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 //cout << "MaxWhileRound: " << MaxWhileRound << endl;
 
-cout << "Start Receiving Qubits" << endl;
+cout << "Start Receiving Qubits" << endl;// This line should be commented to reduce the itme jitter
 // Start measuring
  //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
- GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
+ 
  inGPIO.setDirection(INPUT);
  // Basic Input
  usleep(QuBitsUSecHalfPeriodInt[0]);

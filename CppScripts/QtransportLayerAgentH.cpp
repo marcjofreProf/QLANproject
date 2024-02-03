@@ -786,7 +786,7 @@ try{
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor (it applies both to TCP and UDP)
-this->InfoNumStoredQubitsNodeFlag=false; // Reset the flag
+
 int SockListenTimeusec=9999; // negative means infinite time
 
 int isValidWhileLoopCount = 1000; // Number of tries
@@ -801,26 +801,29 @@ if (ReadBytes>0){// Read block
 	this->ProcessNewMessage();		
 }
 */
-while(isValidWhileLoopCount>0){
-if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
 this->acquire();
-memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
-strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,this->IPaddressesSockets[3]);
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"Control");
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"InfoRequest");
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"NumStoredQubitsNode");
-strcat(this->SendBuffer,",");// Very important to end the message
+this->InfoNumStoredQubitsNodeFlag=false; // Reset the flag
+while(isValidWhileLoopCount>0){
+	if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
+	memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
+	strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
+	strcat(this->SendBuffer,",");
+	strcat(this->SendBuffer,this->IPaddressesSockets[3]);
+	strcat(this->SendBuffer,",");
+	strcat(this->SendBuffer,"Control");
+	strcat(this->SendBuffer,",");
+	strcat(this->SendBuffer,"InfoRequest");
+	strcat(this->SendBuffer,",");
+	strcat(this->SendBuffer,"NumStoredQubitsNode");
+	strcat(this->SendBuffer,",");// Very important to end the message
 
-this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send mesage to node
+	this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send mesage to node
+	}
 this->release();
 usleep(500000);// Give some time to have the chance to receive the response
-}
+this->acquire();
 	if (this->InfoNumStoredQubitsNodeFlag==true){
+		this->release();
 		ParamsIntArray[0]=this->NumStoredQubitsNodeParamsIntArray[0];	
 		isValidWhileLoopCount=0;
 	}
@@ -829,9 +832,10 @@ usleep(500000);// Give some time to have the chance to receive the response
 		//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 		ParamsIntArray[0]=-1;
 		isValidWhileLoopCount--;
+		if (isValidWhileLoopCount<=0){this->release();}
 }
 }//while
-usleep(1000000);// Give some time to have the chance to clear all pending responses
+
 } // try
   catch (...) { // Catches any exception
   cout << "Exception caught" << endl;
