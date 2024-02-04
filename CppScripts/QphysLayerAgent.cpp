@@ -166,18 +166,18 @@ else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]"))
 else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread
 	//cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
-	std::chrono::milliseconds duration_back((unsigned long long int)strtoull(ValuesCharArray[iHeaders],NULL,10));
+	std::chrono::microseconds duration_back((unsigned long long int)strtoull(ValuesCharArray[iHeaders],NULL,10));
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
 	
 	// Debugging
 	//TimePoint TimePointClockNow=Clock::now();
 	//auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
-	//unsigned int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+	//unsigned int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds) 
 	//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
 	//auto duration_since_epoch=this->OtherClientNodeFutureTimePoint.time_since_epoch();
 	// Convert duration to desired time
-	//unsigned int time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count(); // Convert 
+	//unsigned int time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epoch).count(); // Convert 
 	//cout << "time_as_count: " << time_as_count << endl;
 }
 else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTimePoint")){//CLear this node OtherClientNodeFutureTimePoints to avoid having a non-zero value eventhough the other node has finished transmitting and this one for some reason could no execute it
@@ -264,12 +264,12 @@ MaxWhileRound=100;
 TimePoint TimePointClockNow=Clock::now();
 auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 // Convert duration to desired time
-unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds)
+unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds)
 //cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
 
 auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
-unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 //cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
 unsigned long long int TimePointsDiff_time_as_count=0;
 long long int CheckTimePointsDiff_time_as_count=0;
@@ -281,17 +281,17 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
 	TimePointClockNow=Clock::now();
 	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
-	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 	//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=0;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
         if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
-        usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption
+        usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption
         //cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
         TimePointClockNow=Clock::now();
 	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
-	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 	
+	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 	
 	};
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 
@@ -357,13 +357,13 @@ GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
 TimePoint TimePointClockNow=Clock::now();
 auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 // Convert duration to desired time
-unsigned int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+unsigned int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 //cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
 //
-TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
+TimePoint FutureTimePoint = Clock::now()+std::chrono::microseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
 auto duration_since_epoch=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
-unsigned long long int time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count(); // Convert 
+unsigned long long int time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epoch).count(); // Convert 
 //cout << "time_as_count: " << time_as_count << endl;
 // Mount the Parameters message for the other node
 char ParamsCharArray[NumBytesPayloadBuffer] = {0};
@@ -385,18 +385,18 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 	TimePoint TimePointClockNow=Clock::now();
 	auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
-	unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+	unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 	//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
 	
 	auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 	// Convert duration to desired time
-	unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+	unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 	//cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
         unsigned long long int TimePointsDiff_time_as_count=0;
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=0;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
         if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
-	usleep(TimePointsDiff_time_as_count*999);//Maybe some sleep to reduce CPU consumption	
+	usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption	
 };
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 //cout << "MaxWhileRound: " << MaxWhileRound << endl;
