@@ -44,10 +44,10 @@ private: //Variables/Instances
 	int numberLinks=0;// Number of full duplex links directly connected to this physical quantum node
         int EmitLinkNumberArray[LinkNumberMAX]={60}; // Array indicating the GPIO numbers identifying the emit pins
         int ReceiveLinkNumberArray[LinkNumberMAX]={48}; // Array indicating the GPIO numbers identifying the receive pins
-        float QuBitsPerSecondVelocity[LinkNumberMAX]={10000.0}; // Array indicating the qubits per second velocity of each emit/receive pair 
-        int QuBitsUSecPeriodInt[LinkNumberMAX]={100};
-        int QuBitsUSecHalfPeriodInt[LinkNumberMAX]={50};
-        int QuBitsUSecQuarterPeriodInt[LinkNumberMAX]={25};
+        float QuBitsPerSecondVelocity[LinkNumberMAX]={1000.0}; // Array indicating the qubits per second velocity of each emit/receive pair 
+        int QuBitsUSecPeriodInt[LinkNumberMAX]={1000};
+        int QuBitsUSecHalfPeriodInt[LinkNumberMAX]={500};
+        int QuBitsUSecQuarterPeriodInt[LinkNumberMAX]={250};
         // Semaphore
 	std::atomic<int> valueSemaphore=1;// Start as 1 (open or acquireable)
 	// Payload messages
