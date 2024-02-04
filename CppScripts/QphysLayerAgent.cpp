@@ -242,6 +242,9 @@ return 0; // return 0 is for no error
 int QPLA::ThreadEmitQuBit(){
 cout << "Emiting Qubits" << endl;
 GPIO outGPIO(this->EmitLinkNumberArray[0]);
+outGPIO.setDirection(OUTPUT);
+outGPIO.streamOpen();
+outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
 int MaxWhileRound=1000;
 // Wait to receive the FutureTimePoint from client node
 this->acquire();
@@ -302,12 +305,11 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
  
  cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
  // Basic Output - Generate a pulse of 1 second period
- outGPIO.setDirection(OUTPUT);
  usleep(QuBitsUSecQuarterPeriodInt[0]);
  for (int iIterWrite=0;iIterWrite<NumQubitsMemoryBuffer;iIterWrite++){
-	 outGPIO.setValue(HIGH);
+	 outGPIO.streamWrite(HIGH);//outGPIO.setValue(HIGH);
 	 usleep(QuBitsUSecHalfPeriodInt[0]);
-	 outGPIO.setValue(LOW);
+	 outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
 	 usleep(QuBitsUSecHalfPeriodInt[0]);
  }
  //usleep(QuBitsUSecHalfPeriodInt[0]);
@@ -324,6 +326,7 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
    
  //cout << "Qubit emitted" << endl;
 cout << "End Emiting Qubits" << endl;
+outGPIO.streamClose();
 // Reset the ClientNodeFutureTimePoint
 this->acquire();
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
@@ -350,6 +353,8 @@ int QPLA::ThreadReceiveQubit(){
 int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
 GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
+inGPIO.setDirection(INPUT);
+
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
 // Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
 
@@ -405,7 +410,6 @@ cout << "Start Receiving Qubits" << endl;// This line should be commented to red
 // Start measuring
  //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
  
- inGPIO.setDirection(INPUT);
  // Basic Input
  usleep(QuBitsUSecHalfPeriodInt[0]);
  for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){	 
@@ -413,6 +417,7 @@ cout << "Start Receiving Qubits" << endl;// This line should be commented to red
 	 usleep(QuBitsUSecPeriodInt[0]);	 
  }
  cout << "End Receiving Qubits" << endl;
+ 
  // Count received QuBits
  for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){// Count how many qubits 
  	if (QuBitValueArray[iIterRead]==1){
