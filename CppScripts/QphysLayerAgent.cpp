@@ -27,7 +27,7 @@ Agent script for Quantum Physical Layer
 // Semaphore
 #include <atomic>
 // time points
-#define WaitTimeToFutureTimePoint 100 // It is the time barrier to try to achieve synchronization. considered millisecons (it can be changed on the transformatoin used)
+#define WaitTimeToFutureTimePoint 100000 // It is the time barrier to try to achieve synchronization. Considered microseconds (it can be changed on the transformatoin used)
 
 using namespace exploringBB; // API to easily use GPIO in c++
 /* A Simple GPIO application
