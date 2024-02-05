@@ -243,15 +243,15 @@ int QPLA::ThreadEmitQuBit(){
 cout << "Emiting Qubits" << endl;
 GPIO outGPIO(this->EmitLinkNumberArray[0]);
 outGPIO.setDirection(OUTPUT);
-outGPIO.streamOpen();
-outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
-//struct timespec requestHalfPeriod,requestQuarterPeriod,requestWhileWait;
-//requestHalfPeriod.tv_sec=0;
-//requestQuarterPeriod.tv_sec=0;
-//requestWhileWait.tv_sec=0;
-//requestHalfPeriod.tv_nsec = (long)QuBitsNanoSecHalfPeriodInt[0];
-//requestQuarterPeriod.tv_nsec = (long)QuBitsNanoSecQuarterPeriodInt[0];
-struct timespec requestWhileWait;
+//outGPIO.streamOpen();
+outGPIO.setValue(LOW);//outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
+struct timespec requestHalfPeriod,requestQuarterPeriod,requestWhileWait;
+requestHalfPeriod.tv_sec=0;
+requestQuarterPeriod.tv_sec=0;
+requestWhileWait.tv_sec=0;
+requestHalfPeriod.tv_nsec = (long)QuBitsNanoSecHalfPeriodInt[0];
+requestQuarterPeriod.tv_nsec = (long)QuBitsNanoSecQuarterPeriodInt[0];
+//struct timespec requestWhileWait;
 
 int MaxWhileRound=1000;
 // Wait to receive the FutureTimePoint from client node
@@ -326,13 +326,13 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  for (int iIterWrite=0;iIterWrite<NumQubitsMemoryBuffer;iIterWrite++){
-	 outGPIO.streamWrite(HIGH);//outGPIO.setValue(HIGH);
+	 outGPIO.setValue(HIGH);//outGPIO.streamWrite(HIGH);//outGPIO.setValue(HIGH);
 	 //clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
 	 TimePointFuture_time_as_count+=(long)QuBitsNanoSecHalfPeriodInt[0];
 	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 	requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
-	 outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
+	 outGPIO.setValue(LOW);//outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
 	 //clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
 	 TimePointFuture_time_as_count+=(long)QuBitsNanoSecHalfPeriodInt[0];
 	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
@@ -353,7 +353,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
    
  //cout << "Qubit emitted" << endl;
 cout << "End Emiting Qubits" << endl;
-outGPIO.streamClose();
+//outGPIO.streamClose();
 // Reset the ClientNodeFutureTimePoint
 this->acquire();
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
@@ -381,13 +381,13 @@ int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
 GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
 inGPIO.setDirection(INPUT);
-//struct timespec requestHalfPeriod,requestPeriod,requestWhileWait;
-//requestHalfPeriod.tv_sec=0;
-//requestPeriod.tv_sec=0;
-//requestWhileWait.tv_sec=0;
-//requestHalfPeriod.tv_nsec = (long)QuBitsNanoSecHalfPeriodInt[0];
-//requestPeriod.tv_nsec = (long)QuBitsNanoSecPeriodInt[0];
-struct timespec requestWhileWait;
+struct timespec requestHalfPeriod,requestPeriod,requestWhileWait;
+requestHalfPeriod.tv_sec=0;
+requestPeriod.tv_sec=0;
+requestWhileWait.tv_sec=0;
+requestHalfPeriod.tv_nsec = (long)QuBitsNanoSecHalfPeriodInt[0];
+requestPeriod.tv_nsec = (long)QuBitsNanoSecPeriodInt[0];
+//struct timespec requestWhileWait;
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
 // Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
 /*
