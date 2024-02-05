@@ -286,6 +286,7 @@ long long int CheckTimePointsDiff_time_as_count=0;
 CheckTimePointsDiff_time_as_count=(long long int)(TimeNow_time_as_count-TimePointFuture_time_as_count);
 cout << "CheckTimePointsDiff_time_as_count: " << CheckTimePointsDiff_time_as_count << endl;
 ///////////////////////////////////
+/*
 while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
 	MaxWhileRound--;	
 	TimePointClockNow=Clock::now();
@@ -304,6 +305,11 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
 	// Convert duration to desired time
 	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 	
 	};
+*/
+requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
+requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
+clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
+
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 
 //cout << "MaxWhileRound: " << MaxWhileRound << endl;
@@ -370,7 +376,7 @@ requestHalfPeriod.tv_nsec = (long)QuBitsNanoSecHalfPeriodInt[0];
 requestPeriod.tv_nsec = (long)QuBitsNanoSecPeriodInt[0];
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
 // Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
-
+/*
 // Debugging
 TimePoint TimePointClockNow=Clock::now();
 auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
@@ -378,7 +384,7 @@ auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 //cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
 //
-
+*/
 TimePoint FutureTimePoint = Clock::now()+std::chrono::nanoseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
 auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
@@ -397,7 +403,7 @@ strcat(ParamsCharArray,"_"); // Final _
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 this->release();
-
+/*
 unsigned long long int TimePointsDiff_time_as_count=0;
 int MaxWhileRound=100;
 while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
@@ -415,6 +421,11 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
         requestWhileWait.tv_nsec=(long)(TimePointsDiff_time_as_count);
 	if (TimePointsDiff_time_as_count>0){clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);}//clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption	
 };
+*/
+requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
+requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
+clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
+
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 //cout << "MaxWhileRound: " << MaxWhileRound << endl;
 
