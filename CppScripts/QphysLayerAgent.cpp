@@ -241,7 +241,7 @@ return 0; // return 0 is for no error
 
 int QPLA::ThreadEmitQuBit(){
 cout << "Emiting Qubits" << endl;
-GPIO outGPIO(this->EmitLinkNumberArray[0]);
+GPIO outGPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 outGPIO.setDirection(OUTPUT);
 //outGPIO.streamOpen();
 outGPIO.setValue(LOW);//outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
@@ -379,7 +379,7 @@ return 0; // return 0 is for no error
 int QPLA::ThreadReceiveQubit(){
 int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
-GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
+GPIO inGPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 inGPIO.setDirection(INPUT);
 //struct timespec requestHalfPeriod,requestQuarterPeriod,requestPeriod,requestWhileWait;
 //requestHalfPeriod.tv_sec=0;
