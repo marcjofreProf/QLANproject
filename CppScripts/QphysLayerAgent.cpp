@@ -453,10 +453,10 @@ cout << "Start Receiving Qubits" << endl;// This line should be commented to red
  
  // Basic Input
  ////clock_nanosleep(CLOCK_REALTIME,0,&requestQuarterPeriod,NULL);
- //TimePointFuture_time_as_count+=(long)QuBitsNanoSecQuarterPeriodInt[0];
- //requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
-//requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
-//clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
+ TimePointFuture_time_as_count+=(long)QuBitsNanoSecQuarterPeriodInt[0];
+ requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
+requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
+clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){	 
 	 QuBitValueArray[iIterRead]=inGPIO.getValue();
 	 //clock_nanosleep(CLOCK_REALTIME,0,&requestPeriod,NULL);	
