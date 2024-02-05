@@ -45,9 +45,9 @@ private: //Variables/Instances
         int EmitLinkNumberArray[LinkNumberMAX]={60}; // Array indicating the GPIO numbers identifying the emit pins
         int ReceiveLinkNumberArray[LinkNumberMAX]={48}; // Array indicating the GPIO numbers identifying the receive pins
         float QuBitsPerSecondVelocity[LinkNumberMAX]={1000.0}; // Array indicating the qubits per second velocity of each emit/receive pair 
-        int QuBitsUSecPeriodInt[LinkNumberMAX]={1000};
-        int QuBitsUSecHalfPeriodInt[LinkNumberMAX]={500};
-        int QuBitsUSecQuarterPeriodInt[LinkNumberMAX]={250};
+        int QuBitsNanoSecPeriodInt[LinkNumberMAX]={1000000};
+        int QuBitsNanoSecHalfPeriodInt[LinkNumberMAX]={500000};
+        int QuBitsNanoSecQuarterPeriodInt[LinkNumberMAX]={250000};
         // Semaphore
 	std::atomic<int> valueSemaphore=1;// Start as 1 (open or acquireable)
 	// Payload messages

@@ -245,6 +245,10 @@ GPIO outGPIO(this->EmitLinkNumberArray[0]);
 outGPIO.setDirection(OUTPUT);
 outGPIO.streamOpen();
 outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
+struct timespec requestHalfPeriod,requestQuarterPeriod;
+requestHalfPeriod.tv_nsec = QuBitsNanoSecHalfPeriodInt[0];
+requestQuarterPeriod.tv_nsec = QuBitsNanoSecQuarterPeriodInt[0];
+
 int MaxWhileRound=1000;
 // Wait to receive the FutureTimePoint from client node
 this->acquire();
@@ -305,12 +309,12 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
  
  cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
  // Basic Output - Generate a pulse of 1 second period
- usleep(QuBitsUSecQuarterPeriodInt[0]);
+ clock_nanosleep(CLOCK_REALTIME,0,&requestQuarterPeriod,NULL);
  for (int iIterWrite=0;iIterWrite<NumQubitsMemoryBuffer;iIterWrite++){
 	 outGPIO.streamWrite(HIGH);//outGPIO.setValue(HIGH);
-	 usleep(QuBitsUSecHalfPeriodInt[0]);
+	 clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
 	 outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
-	 usleep(QuBitsUSecHalfPeriodInt[0]);
+	 clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
  }
  //usleep(QuBitsUSecHalfPeriodInt[0]);
   
@@ -354,7 +358,9 @@ int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
 GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
 inGPIO.setDirection(INPUT);
-
+struct timespec requestHalfPeriod,requestPeriod;
+requestHalfPeriod.tv_nsec = QuBitsNanoSecHalfPeriodInt[0];
+requestPeriod.tv_nsec = QuBitsNanoSecPeriodInt[0];
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
 // Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
 
@@ -411,10 +417,10 @@ cout << "Start Receiving Qubits" << endl;// This line should be commented to red
  //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
  
  // Basic Input
- usleep(QuBitsUSecHalfPeriodInt[0]);
+ clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
  for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){	 
 	 QuBitValueArray[iIterRead]=inGPIO.getValue();
-	 usleep(QuBitsUSecPeriodInt[0]);	 
+	 clock_nanosleep(CLOCK_REALTIME,0,&requestPeriod,NULL);	 
  }
  cout << "End Receiving Qubits" << endl;
  
