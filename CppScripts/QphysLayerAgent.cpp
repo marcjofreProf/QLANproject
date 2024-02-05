@@ -243,8 +243,8 @@ int QPLA::ThreadEmitQuBit(){
 cout << "Emiting Qubits" << endl;
 GPIO outGPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 outGPIO.setDirection(OUTPUT);
-//outGPIO.streamOpen();
-outGPIO.setValue(LOW);//outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
+outGPIO.streamOpen();
+outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
 //struct timespec requestHalfPeriod,requestQuarterPeriod,requestWhileWait;
 //requestHalfPeriod.tv_sec=0;
 //requestQuarterPeriod.tv_sec=0;
@@ -326,13 +326,13 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 //requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 //clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  for (int iIterWrite=0;iIterWrite<NumQubitsMemoryBuffer;iIterWrite++){
-	 outGPIO.setValue(HIGH);//outGPIO.streamWrite(HIGH);//outGPIO.setValue(HIGH);
+	 outGPIO.streamWrite(HIGH);//outGPIO.setValue(HIGH);
 	 //clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
 	 TimePointFuture_time_as_count+=(long)QuBitsNanoSecHalfPeriodInt[0];
 	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 	requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
-	 outGPIO.setValue(LOW);//outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
+	 outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
 	 //clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
 	 TimePointFuture_time_as_count+=(long)QuBitsNanoSecHalfPeriodInt[0];
 	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
@@ -353,7 +353,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
    
  //cout << "Qubit emitted" << endl;
 cout << "End Emiting Qubits" << endl;
-//outGPIO.streamClose();
+outGPIO.streamClose();
 // Reset the ClientNodeFutureTimePoint
 this->acquire();
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
