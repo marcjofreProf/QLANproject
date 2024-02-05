@@ -226,6 +226,7 @@ int QPLA::InitAgentProcess(){
 
 
 int QPLA::emitQuBit(){
+this->acquire();
 if (this->RunThreadEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadEmitQuBitFlag=false;//disable that this thread can again be called
 this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
@@ -234,7 +235,7 @@ this->threadEmitQuBitRefAux.detach();
 else{
 cout << "Not possible to launch ThreadEmitQuBit" << endl;
 }
-//this->release();
+this->release();
 
 return 0; // return 0 is for no error
 }
@@ -357,13 +358,14 @@ outGPIO.streamClose();
 // Reset the ClientNodeFutureTimePoint
 this->acquire();
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
-this->release();
 this->RunThreadEmitQuBitFlag=true;//enable again that this thread can again be called
+this->release();
+
  return 0; // return 0 is for no error
 }
 
 int QPLA::receiveQuBit(){
-
+this->acquire();
 if (this->RunThreadReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadReceiveQuBitFlag=false;//disable that this thread can again be called
 this->threadReceiveQuBitRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
@@ -372,7 +374,7 @@ this->threadReceiveQuBitRefAux.detach();
 else{
 cout << "Not possible to launch ThreadReceiveQubit" << endl;
 }
-
+this->release();
 return 0; // return 0 is for no error
 }
 
@@ -479,15 +481,17 @@ this->NumStoredQubitsNode[0]=NumStoredQubitsNodeAux;
 ParamsCharArray[NumBytesPayloadBuffer] = {0};
 strcpy(ParamsCharArray,"ClearOtherClientNodeFutureTimePoint_0_"); // Initiates the ParamsCharArray, so use strcpy
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
-this->release();
 this->RunThreadReceiveQuBitFlag=true;//enable again that this thread can again be called
+this->release();
+
 return 0; // return 0 is for no error
 }
 
 int QPLA::GetNumStoredQubitsNode(){
-while(this->RunThreadReceiveQuBitFlag==false){usleep(1000);}// Wait for Receiving thread to finish
-
 this->acquire();
+while(this->RunThreadReceiveQuBitFlag==false){this->release();usleep(1000);this->acquire();}// Wait for Receiving thread to finish
+
+
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
 this->release();
 
