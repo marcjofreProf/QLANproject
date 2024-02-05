@@ -246,8 +246,11 @@ outGPIO.setDirection(OUTPUT);
 outGPIO.streamOpen();
 outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
 struct timespec requestHalfPeriod,requestQuarterPeriod,requestWhileWait;
-requestHalfPeriod.tv_nsec = QuBitsNanoSecHalfPeriodInt[0];
-requestQuarterPeriod.tv_nsec = QuBitsNanoSecQuarterPeriodInt[0];
+requestHalfPeriod.tv_sec=0;
+requestQuarterPeriod.tv_sec=0;
+requestWhileWait.tv_sec=0;
+requestHalfPeriod.tv_nsec = (long)QuBitsNanoSecHalfPeriodInt[0];
+requestQuarterPeriod.tv_nsec = (long)QuBitsNanoSecQuarterPeriodInt[0];
 
 int MaxWhileRound=1000;
 // Wait to receive the FutureTimePoint from client node
@@ -293,7 +296,7 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=0;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
         if (TimePointsDiff_time_as_count>(unsigned long long int)WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=(unsigned long long int)WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
-        requestWhileWait.tv_nsec=(int)(TimePointsDiff_time_as_count*1000);
+        requestWhileWait.tv_nsec=(long)(TimePointsDiff_time_as_count*1000);
 	if (TimePointsDiff_time_as_count>0){clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}// usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption
         //cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
         TimePointClockNow=Clock::now();
@@ -360,8 +363,11 @@ cout << "Receiving Qubits" << endl;
 GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
 inGPIO.setDirection(INPUT);
 struct timespec requestHalfPeriod,requestPeriod,requestWhileWait;
-requestHalfPeriod.tv_nsec = QuBitsNanoSecHalfPeriodInt[0];
-requestPeriod.tv_nsec = QuBitsNanoSecPeriodInt[0];
+requestHalfPeriod.tv_sec=0;
+requestPeriod.tv_sec=0;
+requestWhileWait.tv_sec=0;
+requestHalfPeriod.tv_nsec = (long)QuBitsNanoSecHalfPeriodInt[0];
+requestPeriod.tv_nsec = (long)QuBitsNanoSecPeriodInt[0];
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
 // Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
 
@@ -406,7 +412,7 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
         if (TimePointsDiff_time_as_count>(unsigned long long int)WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=(unsigned long long int)WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
         cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
-        requestWhileWait.tv_nsec=(int)(TimePointsDiff_time_as_count*1000);
+        requestWhileWait.tv_nsec=(long)(TimePointsDiff_time_as_count*1000);
 	if (TimePointsDiff_time_as_count>0){clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);}//clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption	
 };
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
