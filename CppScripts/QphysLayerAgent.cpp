@@ -321,10 +321,10 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
  // Basic Output - Generate a pulse of 1 second period
  ////clock_nanosleep(CLOCK_REALTIME,0,&requestQuarterPeriod,NULL);
- //TimePointFuture_time_as_count+=(long)QuBitsNanoSecQuarterPeriodInt[0];
- //requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
-//requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
-//clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
+ TimePointFuture_time_as_count+=(long)QuBitsNanoSecQuarterPeriodInt[0];
+ requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
+requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
+clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  for (int iIterWrite=0;iIterWrite<NumQubitsMemoryBuffer;iIterWrite++){
 	 outGPIO.setValue(HIGH);//outGPIO.streamWrite(HIGH);//outGPIO.setValue(HIGH);
 	 //clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
