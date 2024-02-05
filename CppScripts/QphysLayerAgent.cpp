@@ -27,7 +27,7 @@ Agent script for Quantum Physical Layer
 // Semaphore
 #include <atomic>
 // time points
-#define WaitTimeToFutureTimePoint 100000 // It is the time barrier to try to achieve synchronization. Considered microseconds (it can be changed on the transformatoin used)
+#define WaitTimeToFutureTimePoint 99000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
 
 using namespace exploringBB; // API to easily use GPIO in c++
 /* A Simple GPIO application
@@ -166,18 +166,18 @@ else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]"))
 else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread
 	//cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
-	std::chrono::microseconds duration_back((unsigned long long int)strtoull(ValuesCharArray[iHeaders],NULL,10));
+	std::chrono::nanoseconds duration_back((unsigned long long int)strtoull(ValuesCharArray[iHeaders],NULL,10));
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
 	
 	// Debugging
 	//TimePoint TimePointClockNow=Clock::now();
 	//auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
-	//unsigned int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds) 
+	//unsigned int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds) 
 	//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
 	//auto duration_since_epoch=this->OtherClientNodeFutureTimePoint.time_since_epoch();
 	// Convert duration to desired time
-	//unsigned int time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epoch).count(); // Convert 
+	//unsigned int time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epoch).count(); // Convert 
 	//cout << "time_as_count: " << time_as_count << endl;
 }
 else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTimePoint")){//CLear this node OtherClientNodeFutureTimePoints to avoid having a non-zero value eventhough the other node has finished transmitting and this one for some reason could no execute it
@@ -274,12 +274,12 @@ MaxWhileRound=100;
 TimePoint TimePointClockNow=Clock::now();
 auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 // Convert duration to desired time
-unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds)
+unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds)
 //cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
 
 auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
-unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 //cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
 unsigned long long int TimePointsDiff_time_as_count=0;
 long long int CheckTimePointsDiff_time_as_count=0;
@@ -291,18 +291,18 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
 	TimePointClockNow=Clock::now();
 	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
-	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 	//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=0;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
         if (TimePointsDiff_time_as_count>(unsigned long long int)WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=(unsigned long long int)WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
-        requestWhileWait.tv_nsec=(long)(TimePointsDiff_time_as_count*1000);
+        requestWhileWait.tv_nsec=(long)(TimePointsDiff_time_as_count);
 	if (TimePointsDiff_time_as_count>0){clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}// usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption
         //cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
         TimePointClockNow=Clock::now();
 	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
-	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 	
+	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 	
 	};
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 
@@ -375,14 +375,14 @@ requestPeriod.tv_nsec = (long)QuBitsNanoSecPeriodInt[0];
 TimePoint TimePointClockNow=Clock::now();
 auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 // Convert duration to desired time
-unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 //cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
 //
 
-TimePoint FutureTimePoint = Clock::now()+std::chrono::microseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
+TimePoint FutureTimePoint = Clock::now()+std::chrono::nanoseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
 auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
-unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochFutureTimePoint).count(); // Convert 
+unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Convert 
 //cout << "time_as_count: " << time_as_count << endl;
 // Mount the Parameters message for the other node
 char ParamsCharArray[NumBytesPayloadBuffer] = {0};
@@ -405,14 +405,14 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 	TimePointClockNow=Clock::now();
 	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	// Convert duration to desired time
-	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::microseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 	//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
 	        
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=0;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
         if (TimePointsDiff_time_as_count>(unsigned long long int)WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=(unsigned long long int)WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
         //cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
-        requestWhileWait.tv_nsec=(long)(TimePointsDiff_time_as_count*1000);
+        requestWhileWait.tv_nsec=(long)(TimePointsDiff_time_as_count);
 	if (TimePointsDiff_time_as_count>0){clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);}//clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption	
 };
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
