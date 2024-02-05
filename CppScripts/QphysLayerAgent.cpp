@@ -292,7 +292,7 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
 	//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=0;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
-        if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
+        if (TimePointsDiff_time_as_count>(unsigned long long int)WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=(unsigned long long int)WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
         requestWhileWait.tv_nsec=(int)(TimePointsDiff_time_as_count*1000);
 	if (TimePointsDiff_time_as_count>0){clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}// usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption
         //cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
@@ -404,7 +404,7 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 	        
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=0;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
-        if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
+        if (TimePointsDiff_time_as_count>(unsigned long long int)WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=(unsigned long long int)WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
         cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
         requestWhileWait.tv_nsec=(int)(TimePointsDiff_time_as_count*1000);
 	if (TimePointsDiff_time_as_count>0){clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);}//clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption	
