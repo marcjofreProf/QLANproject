@@ -245,7 +245,7 @@ GPIO outGPIO(this->EmitLinkNumberArray[0]);
 outGPIO.setDirection(OUTPUT);
 outGPIO.streamOpen();
 outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
-struct timespec requestHalfPeriod,requestQuarterPeriod;
+struct timespec requestHalfPeriod,requestQuarterPeriod,requestWhileWait;
 requestHalfPeriod.tv_nsec = QuBitsNanoSecHalfPeriodInt[0];
 requestQuarterPeriod.tv_nsec = QuBitsNanoSecQuarterPeriodInt[0];
 
@@ -293,7 +293,8 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=0;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
         if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
-        usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption
+        requestWhileWait.tv_nsec=TimePointsDiff_time_as_count*1000;
+	clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);// usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption
         //cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
         TimePointClockNow=Clock::now();
 	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
@@ -358,7 +359,7 @@ int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
 GPIO inGPIO(this->ReceiveLinkNumberArray[0]);
 inGPIO.setDirection(INPUT);
-struct timespec requestHalfPeriod,requestPeriod;
+struct timespec requestHalfPeriod,requestPeriod,requestWhileWait;
 requestHalfPeriod.tv_nsec = QuBitsNanoSecHalfPeriodInt[0];
 requestPeriod.tv_nsec = QuBitsNanoSecPeriodInt[0];
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
@@ -407,7 +408,8 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=0;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
         if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
-	usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption	
+        requestWhileWait.tv_nsec=TimePointsDiff_time_as_count*1000;
+	clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);//usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption	
 };
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 //cout << "MaxWhileRound: " << MaxWhileRound << endl;
