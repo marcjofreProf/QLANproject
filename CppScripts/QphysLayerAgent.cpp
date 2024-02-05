@@ -294,7 +294,7 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
         if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
         requestWhileWait.tv_nsec=(int)(TimePointsDiff_time_as_count*1000);
-	if (TimePointsDiff_time_as_count>0){clock_nanosleep(CLOCK_MONOTONIC,0,&requestWhileWait,NULL);}// usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption
+	if (TimePointsDiff_time_as_count>0){clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}// usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption
         //cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
         TimePointClockNow=Clock::now();
 	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
@@ -310,12 +310,12 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
  
  cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
  // Basic Output - Generate a pulse of 1 second period
- clock_nanosleep(CLOCK_MONOTONIC,0,&requestQuarterPeriod,NULL);
+ clock_nanosleep(CLOCK_REALTIME,0,&requestQuarterPeriod,NULL);
  for (int iIterWrite=0;iIterWrite<NumQubitsMemoryBuffer;iIterWrite++){
 	 outGPIO.streamWrite(HIGH);//outGPIO.setValue(HIGH);
-	 clock_nanosleep(CLOCK_MONOTONIC,0,&requestHalfPeriod,NULL);
+	 clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
 	 outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
-	 clock_nanosleep(CLOCK_MONOTONIC,0,&requestHalfPeriod,NULL);
+	 clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
  }
  //usleep(QuBitsUSecHalfPeriodInt[0]);
   
@@ -408,8 +408,9 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
         if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=0;}
         else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
         if (TimePointsDiff_time_as_count>WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
+        cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
         requestWhileWait.tv_nsec=(int)(TimePointsDiff_time_as_count*1000);
-	if (TimePointsDiff_time_as_count>0){clock_nanosleep(CLOCK_MONOTONIC,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);}//clock_nanosleep(CLOCK_MONOLITIC,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption	
+	if (TimePointsDiff_time_as_count>0){clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);}//clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption	
 };
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 //cout << "MaxWhileRound: " << MaxWhileRound << endl;
@@ -419,10 +420,10 @@ cout << "Start Receiving Qubits" << endl;// This line should be commented to red
  //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
  
  // Basic Input
- clock_nanosleep(CLOCK_MONOTONIC,0,&requestHalfPeriod,NULL);
+ clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
  for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){	 
 	 QuBitValueArray[iIterRead]=inGPIO.getValue();
-	 clock_nanosleep(CLOCK_MONOTONIC,0,&requestPeriod,NULL);	 
+	 clock_nanosleep(CLOCK_REALTIME,0,&requestPeriod,NULL);	 
  }
  cout << "End Receiving Qubits" << endl;
  
