@@ -423,7 +423,7 @@ strcat(ParamsCharArray,"_"); // Final _
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 this->release();
-usleep(10*WaitTimeAfterMainWhileLoop);// Give some time to be able to send the above message
+usleep(100*WaitTimeAfterMainWhileLoop);// Give some time to be able to send the above message
 /*
 unsigned long long int TimePointsDiff_time_as_count=0;
 int MaxWhileRound=100;
@@ -494,7 +494,7 @@ return 0; // return 0 is for no error
 
 int QPLA::GetNumStoredQubitsNode(){
 this->acquire();
-while(this->RunThreadReceiveQuBitFlag==false){this->release();usleep(10*WaitTimeAfterMainWhileLoop);this->acquire();}// Wait for Receiving thread to finish
+while(this->RunThreadReceiveQuBitFlag==false){this->release();usleep(100*WaitTimeAfterMainWhileLoop);this->acquire();}// Wait for Receiving thread to finish
 
 
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
