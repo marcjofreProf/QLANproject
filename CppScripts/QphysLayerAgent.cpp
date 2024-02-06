@@ -180,6 +180,7 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoi
 	//unsigned int time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epoch).count(); // Convert 
 	//cout << "time_as_count: " << time_as_count << endl;
 }
+/*
 else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTimePoint")){//CLear this node OtherClientNodeFutureTimePoints to avoid having a non-zero value eventhough the other node has finished transmitting and this one for some reason could no execute it
 //if (this->threadEmitQuBitRefAux.joinable()){
 	
@@ -192,7 +193,7 @@ else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTi
 	char NewMessageParamsCharArray[NumBytesPayloadBuffer] = {0};
 	strcpy(NewMessageParamsCharArray,"JoinOtherClientNodeThread_0_"); // Initiates the ParamsCharArray, so use strcpy
 this->SetSendParametersAgent(NewMessageParamsCharArray);// Send parameter to the other node
-	//this->RunThreadEmitQuBitFlag=true;
+	this->RunThreadEmitQuBitFlag=true;
 	// Reset the ClientNodeFutureTimePoint
 	this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 }
@@ -205,6 +206,7 @@ else if (string(HeaderCharArray[iHeaders])==string("JoinOtherClientNodeThread"))
 	//this->acquire();
 	//}
 }
+*/
 else{// discard
 }
 }
@@ -488,10 +490,12 @@ this->acquire();
 this->NumStoredQubitsNode[0]=NumStoredQubitsNodeAux;
 //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
 // Tell the other node to clear the TimePoint (this avoids having a time point in the other node after having finished this one (because it was not ocnsumed)
-ParamsCharArray[NumBytesPayloadBuffer] = {0};
-strcpy(ParamsCharArray,"ClearOtherClientNodeFutureTimePoint_0_"); // Initiates the ParamsCharArray, so use strcpy
-this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
-//this->RunThreadReceiveQuBitFlag=true;//enable again that this thread can again be called
+//ParamsCharArray[NumBytesPayloadBuffer] = {0};
+//strcpy(ParamsCharArray,"ClearOtherClientNodeFutureTimePoint_0_"); // Initiates the ParamsCharArray, so use strcpy
+//this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
+// Reset the ClientNodeFutureTimePoint
+this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
+this->RunThreadReceiveQuBitFlag=true;//enable again that this thread can again be called
 this->release();
 
 return 0; // return 0 is for no error
