@@ -194,7 +194,7 @@ else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTi
 this->SetSendParametersAgent(NewMessageParamsCharArray);// Send parameter to the other node
 	//this->RunThreadEmitQuBitFlag=true;
 	// Reset the ClientNodeFutureTimePoint
-	//this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
+	this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 }
 else if (string(HeaderCharArray[iHeaders])==string("JoinOtherClientNodeThread")){
 	//cout << "JoinOtherClientNodeThread" << endl;
@@ -362,7 +362,7 @@ cout << "End Emiting Qubits" << endl;
 
 // Reset the ClientNodeFutureTimePoint
 this->acquire();
-this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
+//this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 this->RunThreadEmitQuBitFlag=true;//enable again that this thread can again be called
 this->release();
 
