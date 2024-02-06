@@ -308,6 +308,7 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
 	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 	
 	};
 */
+this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum 
 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
@@ -340,6 +341,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 	requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  }
+ this->release();
  //usleep(QuBitsUSecHalfPeriodInt[0]);
   
  /* Not used. Just to know how to do fast writes
@@ -421,6 +423,7 @@ strcat(ParamsCharArray,"_"); // Final _
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 this->release();
+usleep(WaitTimeAfterMainWhileLoop);// Give some time to be able to send the above message
 /*
 unsigned long long int TimePointsDiff_time_as_count=0;
 int MaxWhileRound=100;
@@ -440,6 +443,7 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 	if (TimePointsDiff_time_as_count>0){clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);}//clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption	
 };
 */
+this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum priority
 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
@@ -465,6 +469,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 	requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL); 
  }
+ this->release();
  cout << "End Receiving Qubits" << endl;
  
  // Count received QuBits
@@ -489,7 +494,7 @@ return 0; // return 0 is for no error
 
 int QPLA::GetNumStoredQubitsNode(){
 this->acquire();
-while(this->RunThreadReceiveQuBitFlag==false){this->release();usleep(1000);this->acquire();}// Wait for Receiving thread to finish
+while(this->RunThreadReceiveQuBitFlag==false){this->release();usleep(WaitTimeAfterMainWhileLoop);this->acquire();}// Wait for Receiving thread to finish
 
 
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
