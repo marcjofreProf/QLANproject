@@ -837,6 +837,7 @@ int QTLAN::RetrieveIPSocketsHosts(){ // Ask the host about the other host IP
 
 try{
 // It is a "blocking" communication between host and node, because it is many read trials for reading
+this->acquire();
 int socket_fd_conn;
 if (string(SOCKtype)=="SOCK_DGRAM"){
 	socket_fd_conn=this->socket_fdArray[0]; // UDP works with socket descriptor
@@ -865,7 +866,7 @@ strcat(this->SendBuffer,"IPaddressesSockets");
 strcat(this->SendBuffer,",");// Very important to end the message
 usleep(99999);
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send message to node
-//usleep(999999);
+
 this->ReadFlagWait=true;
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 this->ReadFlagWait=false;
@@ -879,15 +880,18 @@ else{
 	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 	isValidWhileLoopCount--;
 	if (isValidWhileLoopCount==0){
+	this->release();
 	cout << "Exiting QtransportLayerAgentN since no initial IP addresses retrieved" << endl;
 	this->m_exit(); // Exit the application
 	}
 	else{
+	this->release();
 	usleep(9999);
+	this->acquire();
 	}
 }
 }//while
-
+this->release();
 } // try
   catch (...) { // Catches any exception
   cout << "Exception caught" << endl;
@@ -899,7 +903,7 @@ return 0; // All OK
 int QTLAN::NegotiateInitialParamsNode(){
 
  try{
- 
+ this->acquire();
 if (string(this->SCmode[1])==string("client")){
  // First check that the other node is with established connection
  
@@ -932,9 +936,9 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"NodeAreYouThere?");
 strcat(this->SendBuffer,",");// Very important to end the message
-//usleep(999999);
+
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send message to node
-//usleep(999999);
+
 this->ReadFlagWait=true;
 int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
 this->ReadFlagWait=false;
@@ -948,11 +952,14 @@ else{
 	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 	isValidWhileLoopCount--;
 	if (isValidWhileLoopCount==0){
+	this->release();
 	cout << "Exiting QtransportLayerAgentN since no initial parameters negotiation achieved" << endl;
 	this->m_exit(); // Exit the application
 	}
 	else{
-	usleep(9999);
+	this->release();
+		usleep(9999);
+	this->acquire();
 	}
 }
 }//while
@@ -963,7 +970,7 @@ else{
 else{//server
 // Expect to receive some information
 }
-
+this->release();
 } // try
   catch (...) { // Catches any exception
   cout << "Exception caught" << endl;

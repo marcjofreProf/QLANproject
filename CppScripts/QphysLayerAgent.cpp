@@ -515,7 +515,7 @@ this->threadRef.join();// Terminate the process thread
 
 int QPLA::NegotiateInitialParamsNode(){
 try{
- 
+ this->acquire();
 if (string(this->SCmode[0])==string("client")){
  char ParamsCharArray[NumBytesPayloadBuffer]="EmitLinkNumberArray[0]_48_ReceiveLinkNumberArray[0]_60_QuBitsPerSecondVelocity[0]_1000_";// Set initialization value for the other node
  this->SetSendParametersAgent(ParamsCharArray);// Set initialization values for the other node
@@ -523,7 +523,7 @@ if (string(this->SCmode[0])==string("client")){
 else{//server
 // Expect to receive some information
 }
-
+this->release();
 } // try
   catch (...) { // Catches any exception
   cout << "Exception caught" << endl;

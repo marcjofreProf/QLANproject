@@ -181,14 +181,14 @@ QLLA::~QLLA() {
 
 int QLLA::NegotiateInitialParamsNode(){
 try{
- 
+ this->acquire();
 if (string(this->SCmode[0])==string("client")){
 
 }
 else{//server
 // Expect to receive some information
 }
-
+this->release();
 } // try
   catch (...) { // Catches any exception
   cout << "Exception caught" << endl;
