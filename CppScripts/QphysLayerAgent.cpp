@@ -364,7 +364,8 @@ cout << "End Emiting Qubits" << endl;
 
 // Reset the ClientNodeFutureTimePoint
 this->acquire();
-//this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
+// Reset the ClientNodeFutureTimePoint
+this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 this->RunThreadEmitQuBitFlag=true;//enable again that this thread can again be called
 this->release();
 
@@ -493,8 +494,6 @@ this->NumStoredQubitsNode[0]=NumStoredQubitsNodeAux;
 //ParamsCharArray[NumBytesPayloadBuffer] = {0};
 //strcpy(ParamsCharArray,"ClearOtherClientNodeFutureTimePoint_0_"); // Initiates the ParamsCharArray, so use strcpy
 //this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
-// Reset the ClientNodeFutureTimePoint
-this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 this->RunThreadReceiveQuBitFlag=true;//enable again that this thread can again be called
 this->release();
 
