@@ -27,7 +27,7 @@ Agent script for Quantum Physical Layer
 // Semaphore
 #include <atomic>
 // time points
-#define WaitTimeToFutureTimePoint 499000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
+#define WaitTimeToFutureTimePoint 199000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
 
 using namespace exploringBB; // API to easily use GPIO in c++
 /* A Simple GPIO application
@@ -242,10 +242,12 @@ return 0; // return 0 is for no error
 
 int QPLA::ThreadEmitQuBit(){
 cout << "Emiting Qubits" << endl;
+this->acquire();
 GPIO outGPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 outGPIO.setDirection(OUTPUT);
 outGPIO.streamOpen();
 outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
+this->release();
 //struct timespec requestHalfPeriod,requestQuarterPeriod,requestWhileWait;
 //requestHalfPeriod.tv_sec=0;
 //requestQuarterPeriod.tv_sec=0;
@@ -341,6 +343,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 	requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  }
+ outGPIO.streamClose();
  this->release();
  //usleep(QuBitsUSecHalfPeriodInt[0]);
   
@@ -356,7 +359,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
    
  //cout << "Qubit emitted" << endl;
 cout << "End Emiting Qubits" << endl;
-outGPIO.streamClose();
+
 // Reset the ClientNodeFutureTimePoint
 this->acquire();
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
@@ -383,8 +386,10 @@ return 0; // return 0 is for no error
 int QPLA::ThreadReceiveQubit(){
 int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
+this->acquire();
 GPIO inGPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 inGPIO.setDirection(INPUT);
+this->release();
 //struct timespec requestHalfPeriod,requestQuarterPeriod,requestPeriod,requestWhileWait;
 //requestHalfPeriod.tv_sec=0;
 //requestQuarterPeriod.tv_sec=0;
