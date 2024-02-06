@@ -803,8 +803,21 @@ if (ReadBytes>0){// Read block
 */
 this->acquire();
 this->InfoNumStoredQubitsNodeFlag=false; // Reset the flag
+memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
+strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,this->IPaddressesSockets[3]);
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"Control");
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"InfoRequest");
+strcat(this->SendBuffer,",");
+strcat(this->SendBuffer,"NumStoredQubitsNode");
+strcat(this->SendBuffer,",");// Very important to end the message
+
+this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
 while(isValidWhileLoopCount>0){
-	if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
+	/*if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
 	memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
 	strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
 	strcat(this->SendBuffer,",");
@@ -818,7 +831,7 @@ while(isValidWhileLoopCount>0){
 	strcat(this->SendBuffer,",");// Very important to end the message
 
 	this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send mesage to node
-	}
+	}*/
 this->release();
 usleep(500000);// Give some time to have the chance to receive the response
 this->acquire();
