@@ -192,9 +192,9 @@ else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTi
 	char NewMessageParamsCharArray[NumBytesPayloadBuffer] = {0};
 	strcpy(NewMessageParamsCharArray,"JoinOtherClientNodeThread_0_"); // Initiates the ParamsCharArray, so use strcpy
 this->SetSendParametersAgent(NewMessageParamsCharArray);// Send parameter to the other node
-	this->RunThreadEmitQuBitFlag=true;
+	//this->RunThreadEmitQuBitFlag=true;
 	// Reset the ClientNodeFutureTimePoint
-	this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
+	//this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 }
 else if (string(HeaderCharArray[iHeaders])==string("JoinOtherClientNodeThread")){
 	//cout << "JoinOtherClientNodeThread" << endl;
@@ -361,10 +361,10 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 cout << "End Emiting Qubits" << endl;
 
 // Reset the ClientNodeFutureTimePoint
-//this->acquire();
-//this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
-//this->RunThreadEmitQuBitFlag=true;//enable again that this thread can again be called
-//this->release();
+this->acquire();
+this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
+this->RunThreadEmitQuBitFlag=true;//enable again that this thread can again be called
+this->release();
 
  return 0; // return 0 is for no error
 }
