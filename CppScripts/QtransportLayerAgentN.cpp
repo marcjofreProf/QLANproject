@@ -781,7 +781,7 @@ return 0;
 }
 
 int QTLAN::GetNumStoredQubitsNode(char* IPorg,char* IPdest) {
-int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
+int NumStoredQubitsNode=0;//this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
 //cout << "NumStoredQubitsNode: " << NumStoredQubitsNode << endl;
   // Generate the message
 char ParamsCharArray[NumBytesBufferICPMAX] = {0};
