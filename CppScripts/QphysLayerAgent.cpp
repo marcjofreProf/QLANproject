@@ -19,7 +19,7 @@ Agent script for Quantum Physical Layer
 #include "./BBBhw/GPIO.h"
 #include <stdlib.h>
 // Threading
-#define WaitTimeAfterMainWhileLoop 100
+#define WaitTimeAfterMainWhileLoop 1000
 // Payload messages
 #define NumBytesPayloadBuffer 1000
 #define NumParamMessagesMax 20
@@ -376,7 +376,7 @@ int QPLA::receiveQuBit(){
 this->acquire();
 if (this->RunThreadReceiveQuBitFlag and this->RunThreadEmitQuBitFlag and this->RunThreadAcquireNumStoredQubitsNode){// Protection, do not run if there is a previous thread running
 this->RunThreadReceiveQuBitFlag=false;//disable that this thread can again be called
-//this->RunThreadAcquireNumStoredQubitsNode=false;
+this->RunThreadAcquireNumStoredQubitsNode=false;
 this->threadReceiveQuBitRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
 this->threadReceiveQuBitRefAux.detach();
 }

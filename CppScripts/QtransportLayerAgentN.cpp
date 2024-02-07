@@ -29,7 +29,7 @@ Agent script for Quantum transport Layer Node
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
-#define WaitTimeAfterMainWhileLoop 100
+#define WaitTimeAfterMainWhileLoop 1000
 #include <thread>
 // Semaphore
 #include <atomic>
@@ -781,7 +781,7 @@ return 0;
 }
 
 int QTLAN::GetNumStoredQubitsNode(char* IPorg,char* IPdest) {
-int NumStoredQubitsNode=0;//this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
+int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
 //cout << "NumStoredQubitsNode: " << NumStoredQubitsNode << endl;
   // Generate the message
 char ParamsCharArray[NumBytesBufferICPMAX] = {0};
