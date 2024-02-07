@@ -376,7 +376,7 @@ int QPLA::receiveQuBit(){
 this->acquire();
 if (this->RunThreadReceiveQuBitFlag and this->RunThreadEmitQuBitFlag and this->RunThreadAcquireNumStoredQubitsNode){// Protection, do not run if there is a previous thread running
 this->RunThreadReceiveQuBitFlag=false;//disable that this thread can again be called
-this->RunThreadAcquireNumStoredQubitsNode=false;
+//this->RunThreadAcquireNumStoredQubitsNode=false;
 this->threadReceiveQuBitRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
 this->threadReceiveQuBitRefAux.detach();
 }
