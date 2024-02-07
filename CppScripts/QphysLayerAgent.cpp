@@ -504,7 +504,6 @@ int QPLA::GetNumStoredQubitsNode(){
 this->acquire();
 while(this->RunThreadReceiveQuBitFlag==false){this->release();usleep(100*WaitTimeAfterMainWhileLoop);this->acquire();}// Wait for Receiving thread to finish
 
-
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
 this->release();
 

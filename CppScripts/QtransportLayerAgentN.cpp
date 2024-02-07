@@ -741,12 +741,12 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			this->ReadParametersAgent(Payload);
 		}
 		else if (string(Command)==string("SendQubits")){// Send qubits to the requesting host			
-			//std::thread threadEmitQuBitRefAux=std::thread(&QTLAN::QPLAemitQuBit,this);
-			//threadEmitQuBitRefAux.detach();
+			std::thread threadEmitQuBitRefAux=std::thread(&QTLAN::QPLAemitQuBit,this);
+			threadEmitQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("ReceiveQubits")){// Read qubits to the attached node
-			//std::thread threadReceiveQuBitRefAux=std::thread(&QTLAN::QPLAreceiveQuBit,this);
-			//threadReceiveQuBitRefAux.detach();
+			std::thread threadReceiveQuBitRefAux=std::thread(&QTLAN::QPLAreceiveQuBit,this);
+			threadReceiveQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("print")){
 			cout << "New Message: "<< Payload << endl;
