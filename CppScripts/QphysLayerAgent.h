@@ -65,6 +65,7 @@ private: //Variables/Instances
 	std::thread threadReceiveQuBitRefAux;
 	bool RunThreadEmitQuBitFlag=true;
 	bool RunThreadReceiveQuBitFlag=true;
+	bool RunThreadAcquireNumStoredQubitsNode=true;
         
 public: // Variables/Instances
 	enum ApplicationState { // State of the agent sequences

@@ -1012,7 +1012,7 @@ int main(int argc, char const * argv[]){
  //}
  
  signal(SIGPIPE, SignalPIPEHandler);
- signal(SIGSEGV,SignalSegmentationFaultHandler);// Segmentation fault
+ //signal(SIGSEGV,SignalSegmentationFaultHandler);// Segmentation fault
  QTLAN QTLANagent(0); // Initiate the instance with 0 sessions connected. A session is composed of one server sockets descriptor active.
  QTLANagent.m_pause(); // Initiate in paused state.
  //cout << "Starting in pause state the QtransportLayerAgentN" << endl;

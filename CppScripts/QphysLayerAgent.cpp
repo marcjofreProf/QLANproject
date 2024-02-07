@@ -229,7 +229,7 @@ int QPLA::InitAgentProcess(){
 
 int QPLA::emitQuBit(){
 this->acquire();
-if (this->RunThreadEmitQuBitFlag and this->RunThreadReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
+if (this->RunThreadEmitQuBitFlag and this->RunThreadReceiveQuBitFlag and this->RunThreadAcquireNumStoredQubitsNode){// Protection, do not run if there is a previous thread running
 this->RunThreadEmitQuBitFlag=false;//disable that this thread can again be called
 this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
 this->threadEmitQuBitRefAux.detach();
@@ -374,8 +374,9 @@ this->release();
 
 int QPLA::receiveQuBit(){
 this->acquire();
-if (this->RunThreadReceiveQuBitFlag and this->RunThreadEmitQuBitFlag){// Protection, do not run if there is a previous thread running
+if (this->RunThreadReceiveQuBitFlag and this->RunThreadEmitQuBitFlag and this->RunThreadAcquireNumStoredQubitsNode){// Protection, do not run if there is a previous thread running
 this->RunThreadReceiveQuBitFlag=false;//disable that this thread can again be called
+this->RunThreadAcquireNumStoredQubitsNode=false;
 this->threadReceiveQuBitRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
 this->threadReceiveQuBitRefAux.detach();
 }
@@ -505,6 +506,7 @@ this->acquire();
 while(this->RunThreadReceiveQuBitFlag==false){this->release();usleep(100*WaitTimeAfterMainWhileLoop);this->acquire();}// Wait for Receiving thread to finish
 
 int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
+this->RunThreadAcquireNumStoredQubitsNode=true;
 this->release();
 
 return NumStoredQubitsNodeAux;
