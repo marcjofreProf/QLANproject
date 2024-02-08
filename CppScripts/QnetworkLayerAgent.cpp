@@ -36,10 +36,13 @@ void QNLA::acquire() {
 /*while(valueSemaphore==0);
 this->valueSemaphore=0; // Make sure it stays at 0
 */
+// https://stackoverflow.com/questions/61493121/when-can-memory-order-acquire-or-memory-order-release-be-safely-removed-from-com
+// https://medium.com/@pauljlucas/advanced-thread-safety-in-c-4cbab821356e
 int oldCount;
 while(true){
 	oldCount = this->valueSemaphore.load(std::memory_order_relaxed);
-	if (oldCount > 0 && this->valueSemaphore.compare_exchange_strong(oldCount,oldCount-1,std::memory_order_acquire)){
+	//if (oldCount > 0 && this->valueSemaphore.compare_exchange_strong(oldCount,oldCount-1,std::memory_order_acquire)){
+	if (oldCount > 0 && this->valueSemaphore.compare_exchange_weak(oldCount,oldCount-1,std::memory_order_release,std::memory_order_acquire)){
 	break;
 	}
 }
