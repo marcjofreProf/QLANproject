@@ -779,7 +779,7 @@ this->acquire();
 if (this->QPLAemitQuBitFlag==false){// No other thread checking this info
 	this->QPLAemitQuBitFlag=true; 
 	this->QNLAagent.QLLAagent.QPLAagent.emitQuBit();
-	this->QPLAemitQuBitFlag==false;
+	this->QPLAemitQuBitFlag=false;
 }
 this->release();
 return 0;
