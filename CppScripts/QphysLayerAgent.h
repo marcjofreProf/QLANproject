@@ -49,7 +49,7 @@ private: //Variables/Instances
         int QuBitsNanoSecHalfPeriodInt[LinkNumberMAX]={500000};
         int QuBitsNanoSecQuarterPeriodInt[LinkNumberMAX]={250000};
         // Semaphore
-	std::atomic<int> valueSemaphore=1;// Start as 1  (open or acquireable)
+	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	// Payload messages
 	char PayloadReadBuffer[NumBytesPayloadBuffer]={0}; //Buffer to read payload messages
 	char PayloadSendBuffer[NumBytesPayloadBuffer]={0}; //Buffer to send payload messages

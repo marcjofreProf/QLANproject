@@ -60,7 +60,7 @@ private: // Variables/Objects
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 	// Semaphore
-	std::atomic<int> valueSemaphore=1;// Start as 1 (open or acquireable)	
+	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)	
 	int valueSemaphoreExpected = 1;
 	// Status
 	bool InfoNumStoredQubitsNodeFlag=false;// Flag to account that there is informaiton on number Qubits in node
