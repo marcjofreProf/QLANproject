@@ -652,7 +652,7 @@ int QTLAN::UpdateSocketsInformation(){
 }
 
 int QTLAN::ProcessNewMessage(){
-//cout << "Node ReadBuffer: " << this->ReadBuffer << endl;
+cout << "Node ReadBuffer: " << this->ReadBuffer << endl;
 
 // Parse the message information
 char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
@@ -782,7 +782,7 @@ return 0;
 
 int QTLAN::GetNumStoredQubitsNode(char* IPorg,char* IPdest) {
 int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
-//cout << "NumStoredQubitsNode: " << NumStoredQubitsNode << endl;
+cout << "Node return NumStoredQubitsNode: " << NumStoredQubitsNode << endl;
   // Generate the message
 char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 strcpy(ParamsCharArray,IPorg);
@@ -803,7 +803,7 @@ strcat(ParamsCharArray,",");// Very important to end the message
 this->acquire();	  
 this->ICPdiscoverSend(ParamsCharArray); 
 this->release();
-//cout << "We get here GetNumStoredQubitsNode" << endl;
+cout << "We get here Node GetNumStoredQubitsNode" << endl;
 return 0;
 }
 

@@ -616,7 +616,7 @@ return 0; // All OK
 }
 
 int QTLAH::ProcessNewMessage(){
-//cout << "Host ReadBuffer: " << this->ReadBuffer << endl;
+cout << "Host ReadBuffer: " << this->ReadBuffer << endl;
 // Parse the message information
 char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
 strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
@@ -680,7 +680,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			this->ICPmanagementSend(socket_fd_conn,IPorg);
 			}
 			else if (string(Command)==string("NumStoredQubitsNode")){// Expected/awaiting message
-				//cout << "We are here NumStoredQubitsNode" << endl;
+				cout << "We are here NumStoredQubitsNode" << endl;
 				this->NumStoredQubitsNodeParamsIntArray[0]=atoi(Payload);
 				this->InfoNumStoredQubitsNodeFlag=true;				
 			}					
