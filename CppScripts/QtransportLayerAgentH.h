@@ -64,7 +64,7 @@ private: // Variables/Objects
 	int valueSemaphoreExpected = 1;
 	// Status
 	bool InfoNumStoredQubitsNodeFlag=false;// Flag to account that there is informaiton on number Qubits in node
-	int NumStoredQubitsNodeParamsIntArray[1]={0};// Array storing the Number Qubits stored in the node
+	int NumStoredQubitsNodeParamsIntArray[1]={0};// Array storing the Number Qubits stored in the node	
 
 public: // Functions
 	// Management

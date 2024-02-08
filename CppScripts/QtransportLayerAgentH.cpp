@@ -818,7 +818,7 @@ strcat(this->SendBuffer,"NumStoredQubitsNode");
 strcat(this->SendBuffer,",");// Very important to end the message
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);*/
 while(isValidWhileLoopCount>0){
-	if (isValidWhileLoopCount % 5 ==0){// Only try to resend the message once every 10 times
+	if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
 	memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
 	strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
 	strcat(this->SendBuffer,",");

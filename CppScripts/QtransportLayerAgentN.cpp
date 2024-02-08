@@ -781,27 +781,33 @@ return 0;
 }
 
 int QTLAN::GetNumStoredQubitsNode(char* IPorg,char* IPdest) {
-int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
-//cout << "Node return NumStoredQubitsNode: " << NumStoredQubitsNode << endl;
-  // Generate the message
-char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-strcpy(ParamsCharArray,IPorg);
-strcat(ParamsCharArray,",");
-strcat(ParamsCharArray,IPdest);
-strcat(ParamsCharArray,",");
-strcat(ParamsCharArray,"Operation");
-strcat(ParamsCharArray,",");
-strcat(ParamsCharArray,"NumStoredQubitsNode");
-strcat(ParamsCharArray,",");
-char charNum[NumBytesBufferICPMAX] = {0};
-sprintf(charNum, "%d", NumStoredQubitsNode);
-strcat(ParamsCharArray,charNum);
-strcat(ParamsCharArray,",");// Very important to end the message
-//cout << "ParamsCharArray: " << ParamsCharArray << endl;
-  // reply immediately with a message to requester
-
 this->acquire();	  
-this->ICPdiscoverSend(ParamsCharArray); 
+if (this->GetNumStoredQubitsNodeFlag==false){// No other thread checking this info
+	this->GetNumStoredQubitsNodeFlag=true; 
+	this->release();
+	int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
+	//cout << "Node return NumStoredQubitsNode: " << NumStoredQubitsNode << endl;
+	  // Generate the message
+	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+	strcpy(ParamsCharArray,IPorg);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,IPdest);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"Operation");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"NumStoredQubitsNode");
+	strcat(ParamsCharArray,",");
+	char charNum[NumBytesBufferICPMAX] = {0};
+	sprintf(charNum, "%d", NumStoredQubitsNode);
+	strcat(ParamsCharArray,charNum);
+	strcat(ParamsCharArray,",");// Very important to end the message
+	//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+	  // reply immediately with a message to requester
+
+	this->acquire();	  
+	this->ICPdiscoverSend(ParamsCharArray);
+	this->GetNumStoredQubitsNodeFlag=false; 
+}
 this->release();
 //cout << "We get here Node GetNumStoredQubitsNode" << endl;
 return 0;
