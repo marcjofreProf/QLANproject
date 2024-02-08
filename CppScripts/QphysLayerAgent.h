@@ -54,8 +54,8 @@ private: //Variables/Instances
 	char PayloadReadBuffer[NumBytesPayloadBuffer]={0}; //Buffer to read payload messages
 	char PayloadSendBuffer[NumBytesPayloadBuffer]={0}; //Buffer to send payload messages
 	// GPIO
-	//exploringBB::GPIO inGPIO; // Object for reading Qubits
-	//exploringBB::GPIO outGPIO; // Object for sending Qubits
+	GPIO* inGPIO; // Object for reading Qubits
+	GPIO* outGPIO; // Object for sending Qubits
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;//system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;

@@ -166,8 +166,18 @@ for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 //cout << "HeaderCharArray[iHeaders]: " << HeaderCharArray[iHeaders] << endl;
 // Missing to develop if there are different values
-if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){this->EmitLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);}
-else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){this->ReceiveLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);}
+if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){
+	this->EmitLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);	
+	outGPIO=new GPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
+	outGPIO->setDirection(OUTPUT);
+	outGPIO->streamOpen();
+	outGPIO->streamWrite(LOW);//outGPIO.setValue(LOW);
+}
+else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){
+this->ReceiveLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);
+	inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
+	inGPIO->setDirection(INPUT);
+}
 else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread
 	//cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
@@ -249,12 +259,6 @@ return 0; // return 0 is for no error
 
 int QPLA::ThreadEmitQuBit(){
 cout << "Emiting Qubits" << endl;
-//this->acquire();
-GPIO outGPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
-outGPIO.setDirection(OUTPUT);
-outGPIO.streamOpen();
-outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
-//this->release();
 //struct timespec requestHalfPeriod,requestQuarterPeriod,requestWhileWait;
 //requestHalfPeriod.tv_sec=0;
 //requestQuarterPeriod.tv_sec=0;
@@ -337,13 +341,13 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 //requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 //clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  for (int iIterWrite=0;iIterWrite<NumQubitsMemoryBuffer;iIterWrite++){
-	 outGPIO.streamWrite(HIGH);//outGPIO.setValue(HIGH);
+	 outGPIO->streamWrite(HIGH);//outGPIO.setValue(HIGH);
 	 //clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
 	 TimePointFuture_time_as_count+=(long)QuBitsNanoSecHalfPeriodInt[0];
 	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 	requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
-	 outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
+	 outGPIO->streamWrite(LOW);//outGPIO.setValue(LOW);
 	 //clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
 	 TimePointFuture_time_as_count+=(long)QuBitsNanoSecHalfPeriodInt[0];
 	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
@@ -351,7 +355,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  } 
  this->release();
- outGPIO.streamClose();
+ 
  //usleep(QuBitsUSecHalfPeriodInt[0]);
   
  /* Not used. Just to know how to do fast writes
@@ -395,10 +399,7 @@ return 0; // return 0 is for no error
 int QPLA::ThreadReceiveQubit(){
 int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
-//this->acquire();
-GPIO inGPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
-inGPIO.setDirection(INPUT);
-//this->release();
+
 //struct timespec requestHalfPeriod,requestQuarterPeriod,requestPeriod,requestWhileWait;
 //requestHalfPeriod.tv_sec=0;
 //requestQuarterPeriod.tv_sec=0;
@@ -437,7 +438,7 @@ strcat(ParamsCharArray,"_"); // Final _
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 this->release();
-usleep(100*WaitTimeAfterMainWhileLoop);// Give some time to be able to send the above message
+usleep((int)(100*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to be able to send the above message
 /*
 unsigned long long int TimePointsDiff_time_as_count=0;
 int MaxWhileRound=100;
@@ -476,7 +477,7 @@ cout << "Start Receiving Qubits" << endl;// This line should be commented to red
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){	 
-	 QuBitValueArray[iIterRead]=inGPIO.getValue();
+	 QuBitValueArray[iIterRead]=inGPIO->getValue();
 	 //clock_nanosleep(CLOCK_REALTIME,0,&requestPeriod,NULL);	
 	 TimePointFuture_time_as_count+=(long)QuBitsNanoSecPeriodInt[0];
 	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
@@ -519,6 +520,7 @@ return NumStoredQubitsNodeAux;
 
 QPLA::~QPLA() {
 // destructor
+outGPIO->streamClose();
 this->threadRef.join();// Terminate the process thread
 }
 
@@ -528,10 +530,17 @@ try{
 if (string(this->SCmode[0])==string("client")){
  char ParamsCharArray[NumBytesPayloadBuffer]="EmitLinkNumberArray[0]_48_ReceiveLinkNumberArray[0]_60_QuBitsPerSecondVelocity[0]_1000_";// Set initialization value for the other node
  this->SetSendParametersAgent(ParamsCharArray);// Set initialization values for the other node
+ inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
+inGPIO->setDirection(INPUT);
+outGPIO=new GPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
+outGPIO->setDirection(OUTPUT);
+outGPIO->streamOpen();
+outGPIO->streamWrite(LOW);//outGPIO.setValue(LOW);
 }
 else{//server
 // Expect to receive some information
 }
+
 this->release();
 } // try
   catch (...) { // Catches any exception
