@@ -616,7 +616,7 @@ return 0; // All OK
 }
 
 int QTLAH::ProcessNewMessage(){
-cout << "Host ReadBuffer: " << this->ReadBuffer << endl;
+//cout << "Host ReadBuffer: " << this->ReadBuffer << endl;
 // Parse the message information
 char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
 strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
@@ -680,7 +680,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			this->ICPmanagementSend(socket_fd_conn,IPorg);
 			}
 			else if (string(Command)==string("NumStoredQubitsNode")){// Expected/awaiting message
-				cout << "We are here NumStoredQubitsNode" << endl;
+				//cout << "We are here NumStoredQubitsNode" << endl;
 				this->NumStoredQubitsNodeParamsIntArray[0]=atoi(Payload);
 				this->InfoNumStoredQubitsNodeFlag=true;				
 			}					
@@ -818,7 +818,7 @@ strcat(this->SendBuffer,"NumStoredQubitsNode");
 strcat(this->SendBuffer,",");// Very important to end the message
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);*/
 while(isValidWhileLoopCount>0){
-	if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
+	if (isValidWhileLoopCount % 5 ==0){// Only try to resend the message once every 10 times
 	memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
 	strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
 	strcat(this->SendBuffer,",");
@@ -838,8 +838,8 @@ usleep((int)(100*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))
 this->acquire();
 	if (this->InfoNumStoredQubitsNodeFlag==true){
 		this->InfoNumStoredQubitsNodeFlag=false; // Reset the flag
-		this->release();
-		ParamsIntArray[0]=this->NumStoredQubitsNodeParamsIntArray[0];	
+		ParamsIntArray[0]=this->NumStoredQubitsNodeParamsIntArray[0];
+		this->release();			
 		isValidWhileLoopCount=0;
 	}
 	else{

@@ -652,7 +652,7 @@ int QTLAN::UpdateSocketsInformation(){
 }
 
 int QTLAN::ProcessNewMessage(){
-cout << "Node ReadBuffer: " << this->ReadBuffer << endl;
+//cout << "Node ReadBuffer: " << this->ReadBuffer << endl;
 
 // Parse the message information
 char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
@@ -782,7 +782,7 @@ return 0;
 
 int QTLAN::GetNumStoredQubitsNode(char* IPorg,char* IPdest) {
 int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
-cout << "Node return NumStoredQubitsNode: " << NumStoredQubitsNode << endl;
+//cout << "Node return NumStoredQubitsNode: " << NumStoredQubitsNode << endl;
   // Generate the message
 char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 strcpy(ParamsCharArray,IPorg);
@@ -803,7 +803,7 @@ strcat(ParamsCharArray,",");// Very important to end the message
 this->acquire();	  
 this->ICPdiscoverSend(ParamsCharArray); 
 this->release();
-cout << "We get here Node GetNumStoredQubitsNode" << endl;
+//cout << "We get here Node GetNumStoredQubitsNode" << endl;
 return 0;
 }
 
@@ -822,7 +822,7 @@ void QTLAN::AgentProcessRequestsPetitions(){// Check next thing to do
    	this->acquire();// Wait semaphore until it can proceed
     	
         this->release(); // Release the semaphore 
-        usleep(WaitTimeAfterMainWhileLoop);// Wait a few microseconds for other processes to enter
+        usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception
@@ -866,7 +866,9 @@ strcat(this->SendBuffer,"InfoRequest");
 strcat(this->SendBuffer,",");
 strcat(this->SendBuffer,"IPaddressesSockets");
 strcat(this->SendBuffer,",");// Very important to end the message
-usleep(99999);
+this->release();
+usleep(10*WaitTimeAfterMainWhileLoop);
+this->acquire();
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send message to node
 
 this->ReadFlagWait=true;
