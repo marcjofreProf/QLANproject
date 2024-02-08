@@ -788,7 +788,7 @@ try{
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor (it applies both to TCP and UDP)
 
-int SockListenTimeusec=9999; // negative means infinite time
+//int SockListenTimeusec=9999; // negative means infinite time
 
 int isValidWhileLoopCount = 1000; // Number of tries
 
@@ -803,7 +803,7 @@ if (ReadBytes>0){// Read block
 }
 */
 this->acquire();
-this->InfoNumStoredQubitsNodeFlag=false; // Reset the flag
+
 /*
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
 strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
@@ -834,9 +834,10 @@ while(isValidWhileLoopCount>0){
 	this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send mesage to node
 	}
 this->release();
-usleep(500000);// Give some time to have the chance to receive the response
+usleep((int)(100*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
 this->acquire();
 	if (this->InfoNumStoredQubitsNodeFlag==true){
+		this->InfoNumStoredQubitsNodeFlag=false; // Reset the flag
 		this->release();
 		ParamsIntArray[0]=this->NumStoredQubitsNodeParamsIntArray[0];	
 		isValidWhileLoopCount=0;
@@ -846,7 +847,10 @@ this->acquire();
 		//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 		ParamsIntArray[0]=-1;
 		isValidWhileLoopCount--;
-		if (isValidWhileLoopCount<=0){this->release();}
+		if (isValidWhileLoopCount<=0){
+			this->InfoNumStoredQubitsNodeFlag=false; // Reset the flag
+			this->release();
+		}
 }
 }//while
 

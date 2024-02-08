@@ -888,7 +888,7 @@ else{
 	}
 	else{
 	this->release();
-	usleep(9999);
+	usleep((int)(10*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
 	this->acquire();
 	}
 }
@@ -960,7 +960,7 @@ else{
 	}
 	else{
 	this->release();
-		usleep(9999);
+		usleep((int)(10*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
 	this->acquire();
 	}
 }
