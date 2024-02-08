@@ -1078,7 +1078,7 @@ int main(int argc, char const * argv[]){
 
         } // switch
         QTLANagent.release();
-        usleep(WaitTimeAfterMainWhileLoop*(1+rand()/RAND_MAX));// Wait a few microseconds for other processes to enter
+        usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception

@@ -206,7 +206,7 @@ void QLLA::AgentProcessRequestsPetitions(){// Check next thing to do
    	this->acquire();// Wait semaphore until it can proceed
     	this->ReadParametersAgent();// Reads messages from above layer
         this->release(); // Release the semaphore 
-        usleep(WaitTimeAfterMainWhileLoop*(1+rand()/RAND_MAX));// Wait a few microseconds for other processes to enter
+        usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception
