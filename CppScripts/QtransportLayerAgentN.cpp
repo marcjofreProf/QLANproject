@@ -775,12 +775,24 @@ return 0; // All OK
 }
 
 int QTLAN::QPLAemitQuBit() {
-this->QNLAagent.QLLAagent.QPLAagent.emitQuBit();
+this->acquire();	  
+if (this->QPLAemitQuBitFlag==false){// No other thread checking this info
+	this->QPLAemitQuBitFlag=true; 
+	this->QNLAagent.QLLAagent.QPLAagent.emitQuBit();
+	this->QPLAemitQuBitFlag==false;
+}
+this->release();
 return 0;
 }
 
 int QTLAN::QPLAreceiveQuBit() {
-this->QNLAagent.QLLAagent.QPLAagent.receiveQuBit();
+this->acquire();	  
+if (this->QPLAreceiveQuBitFlag==false){// No other thread checking this info
+	this->QPLAreceiveQuBitFlag=true; 
+	this->QNLAagent.QLLAagent.QPLAagent.receiveQuBit();
+	this->QPLAreceiveQuBitFlag=false;
+}
+this->release();
 return 0;
 }
 

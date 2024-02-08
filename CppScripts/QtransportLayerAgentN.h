@@ -74,6 +74,8 @@ private: // Variables/Objects
 	// Status info
 	bool OtherNodeThereFlag=false; // To check if the other node is there
 	bool InfoIPaddressesSocketsFlag=false;// To check if there is information for IPAddressesSockets
+	bool QPLAemitQuBitFlag=false;
+	bool QPLAreceiveQuBitFlag=false;
 	bool GetNumStoredQubitsNodeFlag=false;// Flag to check if another process is already trying to retrieve the number of qubits
 	
 public: // Functions/Methods

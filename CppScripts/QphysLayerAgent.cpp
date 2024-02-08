@@ -249,12 +249,12 @@ return 0; // return 0 is for no error
 
 int QPLA::ThreadEmitQuBit(){
 cout << "Emiting Qubits" << endl;
-this->acquire();
+//this->acquire();
 GPIO outGPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 outGPIO.setDirection(OUTPUT);
 outGPIO.streamOpen();
 outGPIO.streamWrite(LOW);//outGPIO.setValue(LOW);
-this->release();
+//this->release();
 //struct timespec requestHalfPeriod,requestQuarterPeriod,requestWhileWait;
 //requestHalfPeriod.tv_sec=0;
 //requestQuarterPeriod.tv_sec=0;
@@ -269,7 +269,7 @@ this->acquire();
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
 	this->release();
 	MaxWhileRound--;	
-	usleep(100);//Maybe some sleep to reduce CPU consumption	
+	usleep((int)(0.1*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//Maybe some sleep to reduce CPU consumption	
 	this->acquire();
 	};
 if (MaxWhileRound<=0){
@@ -349,9 +349,9 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 	requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
- }
- outGPIO.streamClose();
+ } 
  this->release();
+ outGPIO.streamClose();
  //usleep(QuBitsUSecHalfPeriodInt[0]);
   
  /* Not used. Just to know how to do fast writes
@@ -395,10 +395,10 @@ return 0; // return 0 is for no error
 int QPLA::ThreadReceiveQubit(){
 int NumStoredQubitsNodeAux=0;
 cout << "Receiving Qubits" << endl;
-this->acquire();
+//this->acquire();
 GPIO inGPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 inGPIO.setDirection(INPUT);
-this->release();
+//this->release();
 //struct timespec requestHalfPeriod,requestQuarterPeriod,requestPeriod,requestWhileWait;
 //requestHalfPeriod.tv_sec=0;
 //requestQuarterPeriod.tv_sec=0;
