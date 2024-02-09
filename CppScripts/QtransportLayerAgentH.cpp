@@ -470,8 +470,8 @@ else {// There might be at least one new message
 }
 
 int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
-	cout << "Host SendBuffer: " << this->SendBuffer << endl;
-	//cout << "Host SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
+//cout << "Host SendBuffer: " << this->SendBuffer << endl;
+//cout << "Host SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=0;
@@ -620,7 +620,7 @@ return 0; // All OK
 }
 
 int QTLAH::ProcessNewMessage(){
-cout << "Host ReadBuffer: " << this->ReadBuffer << endl;
+//cout << "Host ReadBuffer: " << this->ReadBuffer << endl;
 // Parse the message information
 char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
 strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
