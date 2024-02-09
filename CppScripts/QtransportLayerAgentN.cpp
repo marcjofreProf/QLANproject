@@ -614,7 +614,7 @@ int QTLAN::ICPdiscoverSend(char* ParamsCharArray){
     //cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
     // Understand which socket descriptor has to be used
     int socket_fd_conn;
-    for (int i=0; i<(NumSocketsMax); ++i){
+    for (int i=0; i<(NumSocketsMax); i++){
     	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
     	if (string(this->IPSocketsList[i])==string(IPaddressesSocketsAux)){
     	//cout << "Found socket file descriptor//connection to send" << endl;
@@ -807,6 +807,8 @@ if (this->GetNumStoredQubitsNodeFlag==false){// No other thread checking this in
 	int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
 	cout << "Node return NumStoredQubitsNode: " << NumStoredQubitsNode << endl;
 	  // Generate the message
+	cout<< "IPorg: " << IPorg << endl;
+	cout<< "IPdest: " << IPdest << endl;
 	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 	strcpy(ParamsCharArray,IPorg);
 	strcat(ParamsCharArray,",");
