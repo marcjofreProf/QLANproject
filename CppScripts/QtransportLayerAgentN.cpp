@@ -797,11 +797,11 @@ return 0;
 }
 
 int QTLAN::GetNumStoredQubitsNode(char* IPorg,char* IPdest) {
-//cout<< "Node before acquire" << endl;
+cout<< "Node before acquire" << endl;
 this->acquire();	  
-//cout<< "Node before this->GetNumStoredQubitsNodeFlag==false" << endl;
+cout<< "Node before this->GetNumStoredQubitsNodeFlag==false" << endl;
 if (this->GetNumStoredQubitsNodeFlag==false){// No other thread checking this info
-	//cout<< "Node after this->GetNumStoredQubitsNodeFlag==false" << endl;
+	cout<< "Node after this->GetNumStoredQubitsNodeFlag==false" << endl;
 	this->GetNumStoredQubitsNodeFlag=true; 
 	this->release();
 	int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link

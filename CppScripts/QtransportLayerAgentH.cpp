@@ -839,7 +839,7 @@ while(isValidWhileLoopCount>0){
 	this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send mesage to node
 	}
 this->release();
-usleep((int)(100*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
+usleep((int)(1000*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
 this->acquire();
 	if (this->InfoNumStoredQubitsNodeFlag==true){
 		this->InfoNumStoredQubitsNodeFlag=false; // Reset the flag
