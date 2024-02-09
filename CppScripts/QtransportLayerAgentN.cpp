@@ -805,7 +805,7 @@ if (this->GetNumStoredQubitsNodeFlag==false){// No other thread checking this in
 	this->GetNumStoredQubitsNodeFlag=true; 
 	this->release();
 	int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
-	//cout << "Node return NumStoredQubitsNode: " << NumStoredQubitsNode << endl;
+	cout << "Node return NumStoredQubitsNode: " << NumStoredQubitsNode << endl;
 	  // Generate the message
 	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 	strcpy(ParamsCharArray,IPorg);
