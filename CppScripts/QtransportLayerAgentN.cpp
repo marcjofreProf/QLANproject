@@ -797,8 +797,11 @@ return 0;
 }
 
 int QTLAN::GetNumStoredQubitsNode(char* IPorg,char* IPdest) {
+cout<< "Node before acquire" << endl;
 this->acquire();	  
+cout<< "Node before this->GetNumStoredQubitsNodeFlag==false" << endl;
 if (this->GetNumStoredQubitsNodeFlag==false){// No other thread checking this info
+	cout<< "Node after this->GetNumStoredQubitsNodeFlag==false" << endl;
 	this->GetNumStoredQubitsNodeFlag=true; 
 	this->release();
 	int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
@@ -819,10 +822,11 @@ if (this->GetNumStoredQubitsNodeFlag==false){// No other thread checking this in
 	strcat(ParamsCharArray,",");// Very important to end the message
 	//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 	  // reply immediately with a message to requester
-
+	cout<< "Node before second acquire" << endl;
 	this->acquire();	  
 	this->ICPdiscoverSend(ParamsCharArray);
-	this->GetNumStoredQubitsNodeFlag=false; 
+	this->GetNumStoredQubitsNodeFlag=false;
+	cout<< "Node after second acquire" << endl;
 }
 this->release();
 //cout << "We get here Node GetNumStoredQubitsNode" << endl;

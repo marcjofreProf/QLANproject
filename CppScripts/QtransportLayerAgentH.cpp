@@ -470,7 +470,7 @@ else {// There might be at least one new message
 }
 
 int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
-	//cout << "Host SendBuffer: " << this->SendBuffer << endl;
+	cout << "Host SendBuffer: " << this->SendBuffer << endl;
 	//cout << "Host SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
@@ -620,7 +620,7 @@ return 0; // All OK
 }
 
 int QTLAH::ProcessNewMessage(){
-//cout << "Host ReadBuffer: " << this->ReadBuffer << endl;
+cout << "Host ReadBuffer: " << this->ReadBuffer << endl;
 // Parse the message information
 char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
 strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
@@ -788,6 +788,7 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 int QTLAH::RetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray){ // Send to the upper layer agent how many qubits are stored
 
 try{
+this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor (it applies both to TCP and UDP)
@@ -806,7 +807,7 @@ if (ReadBytes>0){// Read block
 	this->ProcessNewMessage();		
 }
 */
-this->acquire();
+
 
 /*
 memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
