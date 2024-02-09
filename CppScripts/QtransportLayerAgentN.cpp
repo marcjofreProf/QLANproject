@@ -822,11 +822,12 @@ if (this->GetNumStoredQubitsNodeFlag==false){// No other thread checking this in
 	strcat(ParamsCharArray,",");// Very important to end the message
 	//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 	  // reply immediately with a message to requester
-	//cout<< "Node before second acquire" << endl;
-	this->acquire();	  
+	cout<< "Node before second acquire" << endl;
+	this->acquire();	
+	cout<< "Node after second acquire" << endl;  
 	this->ICPdiscoverSend(ParamsCharArray);
 	this->GetNumStoredQubitsNodeFlag=false;
-	//cout<< "Node after second acquire" << endl;
+	cout<< "Node after send" << endl;
 }
 this->release();
 //cout << "We get here Node GetNumStoredQubitsNode" << endl;
