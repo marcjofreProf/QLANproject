@@ -191,13 +191,12 @@ if (streamIn.is_open())
     {
 	//string StrValue;
 	int IntValue;
-	streamIn >> IntValue;
-	
+	streamIn >> IntValue;	
 	//getline(streamIn,StrValue);
 	streamIn.clear(); //< Now we can read again
 	streamIn.seekg(0, std::ios::beg); // back to the start!
 	//cout<<StrValue<<endl;
-	cout<<IntValue<<endl;
+	//cout<<IntValue<<endl;
 	//if (StrValue == "0") return LOW;
 	//else return HIGH;
 	return IntValue;
