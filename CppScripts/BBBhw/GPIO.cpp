@@ -173,7 +173,13 @@ int GPIO::streamOutOpen(){
 }
 
 int GPIO::streamOutWrite(GPIO_VALUE value){
+if (streamOut.is_open())
+    {
 	streamOut << value << std::flush;
+}
+else{
+cout << "BBB streamOut is not open!" << endl;
+}
 	return 0;
 }
 
@@ -181,10 +187,18 @@ int GPIO::streamInRead(){
 	//string StrValue;	
 	//streamIn >> StrValue;//std::flush;
 	//return stoi(StrValue);
-	
-	int IntValue;
-	streamIn >> IntValue;
-	return IntValue;
+if (streamIn.is_open())
+    {
+	string StrValue;
+	//int IntValue;
+	//streamIn >> IntValue;
+	getline(streamIn,StrValue);
+	return stoi(StrValue);
+}
+else{
+cout << "BBB streamIn is not open!" << endl;
+return 0;
+}
 }
 
 int GPIO::streamInClose(){
