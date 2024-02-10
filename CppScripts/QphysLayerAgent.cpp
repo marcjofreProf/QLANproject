@@ -244,23 +244,23 @@ int QPLA::InitAgentProcess(){
 }
 
 
-int QPLA::emitQuBit(){
+int QPLA::SimulateEmitQuBit(){
 this->acquire();
-if (this->RunThreadEmitQuBitFlag and this->RunThreadReceiveQuBitFlag and this->RunThreadAcquireNumStoredQubitsNode){// Protection, do not run if there is a previous thread running
-this->RunThreadEmitQuBitFlag=false;//disable that this thread can again be called
-this->threadEmitQuBitRefAux=std::thread(&QPLA::ThreadEmitQuBit,this);
-this->threadEmitQuBitRefAux.detach();
+if (this->RunThreadSimulateEmitQuBitFlag and this->RunThreadSimulateReceiveQuBitFlag and this->RunThreadAcquireSimulateNumStoredQubitsNode){// Protection, do not run if there is a previous thread running
+this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
+std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
+threadSimulateEmitQuBitRefAux.detach();
 }
 else{
-cout << "Not possible to launch ThreadEmitQuBit" << endl;
+cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
 }
 this->release();
 
 return 0; // return 0 is for no error
 }
 
-int QPLA::ThreadEmitQuBit(){
-cout << "Emiting Qubits" << endl;
+int QPLA::ThreadSimulateEmitQuBit(){
+cout << "Simulate Emiting Qubits" << endl;
 //struct timespec requestHalfPeriod,requestQuarterPeriod,requestWhileWait;
 //requestHalfPeriod.tv_sec=0;
 //requestQuarterPeriod.tv_sec=0;
@@ -377,30 +377,30 @@ cout << "End Emiting Qubits" << endl;
 this->acquire();
 // Reset the ClientNodeFutureTimePoint
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
-this->RunThreadEmitQuBitFlag=true;//enable again that this thread can again be called
+this->RunThreadSimulateEmitQuBitFlag=true;//enable again that this thread can again be called
 this->release();
 
  return 0; // return 0 is for no error
 }
 
-int QPLA::receiveQuBit(){
+int QPLA::SimulateReceiveQuBit(){
 this->acquire();
-if (this->RunThreadReceiveQuBitFlag and this->RunThreadEmitQuBitFlag and this->RunThreadAcquireNumStoredQubitsNode){// Protection, do not run if there is a previous thread running
-this->RunThreadReceiveQuBitFlag=false;//disable that this thread can again be called
-this->RunThreadAcquireNumStoredQubitsNode=false;
-this->threadReceiveQuBitRefAux=std::thread(&QPLA::ThreadReceiveQubit,this);
-this->threadReceiveQuBitRefAux.detach();
+if (this->RunThreadSimulateReceiveQuBitFlag and this->RunThreadSimulateEmitQuBitFlag and this->RunThreadAcquireSimulateNumStoredQubitsNode){// Protection, do not run if there is a previous thread running
+this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
+this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
+std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
+threadSimulateReceiveQuBitRefAux.detach();
 }
 else{
-cout << "Not possible to launch ThreadReceiveQubit" << endl;
+cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 }
 this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::ThreadReceiveQubit(){
-int NumStoredQubitsNodeAux=0;
-cout << "Receiving Qubits" << endl;
+int QPLA::ThreadSimulateReceiveQubit(){
+int SimulateNumStoredQubitsNodeAux=0;
+cout << "Simulate Receiving Qubits" << endl;
 
 //struct timespec requestHalfPeriod,requestQuarterPeriod,requestPeriod,requestWhileWait;
 //requestHalfPeriod.tv_sec=0;
@@ -479,7 +479,7 @@ cout << "Start Receiving Qubits" << endl;// This line should be commented to red
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){	 
-	 QuBitValueArray[iIterRead]=inGPIO->streamInRead();//getValue();
+	 SimulateQuBitValueArray[iIterRead]=inGPIO->streamInRead();//getValue();
 	 //clock_nanosleep(CLOCK_REALTIME,0,&requestPeriod,NULL);	
 	 TimePointFuture_time_as_count+=(long)QuBitsNanoSecPeriodInt[0];
 	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
@@ -491,33 +491,33 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  
  // Count received QuBits
  for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){// Count how many qubits 
- 	if (QuBitValueArray[iIterRead]==1){
- 		NumStoredQubitsNodeAux++;
+ 	if (SimulateQuBitValueArray[iIterRead]==1){
+ 		SimulateNumStoredQubitsNodeAux++;
  	} 	
  }
 
 this->acquire();
-this->NumStoredQubitsNode[0]=NumStoredQubitsNodeAux;
+this->SimulateNumStoredQubitsNode[0]=SimulateNumStoredQubitsNodeAux;
 //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
 // Tell the other node to clear the TimePoint (this avoids having a time point in the other node after having finished this one (because it was not ocnsumed)
 //ParamsCharArray[NumBytesPayloadBuffer] = {0};
 //strcpy(ParamsCharArray,"ClearOtherClientNodeFutureTimePoint_0_"); // Initiates the ParamsCharArray, so use strcpy
 //this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
-this->RunThreadReceiveQuBitFlag=true;//enable again that this thread can again be called
+this->RunThreadSimulateReceiveQuBitFlag=true;//enable again that this thread can again be called
 this->release();
 
 return 0; // return 0 is for no error
 }
 
-int QPLA::GetNumStoredQubitsNode(){
+int QPLA::GetSimulateNumStoredQubitsNode(){
 this->acquire();
-while(this->RunThreadReceiveQuBitFlag==false){this->release();usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
+while(this->RunThreadSimulateReceiveQuBitFlag==false){this->release();usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 
-int NumStoredQubitsNodeAux=this->NumStoredQubitsNode[0];
-this->RunThreadAcquireNumStoredQubitsNode=true;
+int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
+this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();
 
-return NumStoredQubitsNodeAux;
+return SimulateNumStoredQubitsNodeAux;
 }
 
 QPLA::~QPLA() {

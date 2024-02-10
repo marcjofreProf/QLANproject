@@ -63,8 +63,8 @@ private: // Variables/Objects
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)	
 	int valueSemaphoreExpected = 1;
 	// Status
-	bool InfoNumStoredQubitsNodeFlag=false;// Flag to account that there is informaiton on number Qubits in node
-	int NumStoredQubitsNodeParamsIntArray[1]={0};// Array storing the Number Qubits stored in the node	
+	bool InfoSimulateNumStoredQubitsNodeFlag=false;// Flag to account that there is informaiton on number Qubits in node
+	int SimulateNumStoredQubitsNodeParamsIntArray[1]={0};// Array storing the Number Qubits stored in the node	
 
 public: // Functions
 	// Management
@@ -83,7 +83,7 @@ public: // Functions
 	int InitAgentProcess(); // Initializer of the thread
 	// Requests. They have to be in semaphore structure to avoid collisions between main and thread
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the upper Agent to send message to specific host/node	
-	int RetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray); // Send to the upper layer agent how many qubits are stored
+	int SimulateRetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray); // Send to the upper layer agent how many qubits are stored
 	~QTLAH();  //destructor
 
 private: //Functions//Methods

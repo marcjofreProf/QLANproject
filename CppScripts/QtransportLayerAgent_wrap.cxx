@@ -4177,7 +4177,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_QTLAH_RetrieveNumStoredQubitsNode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_QTLAH_SimulateRetrieveNumStoredQubitsNode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
   int *arg2 = (int *) 0 ;
@@ -4190,10 +4190,10 @@ SWIGINTERN PyObject *_wrap_QTLAH_RetrieveNumStoredQubitsNode(PyObject *SWIGUNUSE
   PyObject * obj1 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:QTLAH_RetrieveNumStoredQubitsNode",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:QTLAH_SimulateRetrieveNumStoredQubitsNode",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_RetrieveNumStoredQubitsNode" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_SimulateRetrieveNumStoredQubitsNode" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
   }
   arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
   {
@@ -4208,7 +4208,7 @@ SWIGINTERN PyObject *_wrap_QTLAH_RetrieveNumStoredQubitsNode(PyObject *SWIGUNUSE
     arg2 = (int*) array_data(array2);
     arg3 = (int) array_size(array2,0);
   }
-  result = (int)(arg1)->RetrieveNumStoredQubitsNode(arg2,arg3);
+  result = (int)(arg1)->SimulateRetrieveNumStoredQubitsNode(arg2,arg3);
   resultobj = SWIG_From_int(static_cast< int >(result));
   {
     if (is_new_object2 && array2)
@@ -4268,7 +4268,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "QTLAH_m_exit", _wrap_QTLAH_m_exit, METH_VARARGS, NULL},
 	 { "QTLAH_InitAgentProcess", _wrap_QTLAH_InitAgentProcess, METH_VARARGS, NULL},
 	 { "QTLAH_SendMessageAgent", _wrap_QTLAH_SendMessageAgent, METH_VARARGS, NULL},
-	 { "QTLAH_RetrieveNumStoredQubitsNode", _wrap_QTLAH_RetrieveNumStoredQubitsNode, METH_VARARGS, NULL},
+	 { "QTLAH_SimulateRetrieveNumStoredQubitsNode", _wrap_QTLAH_SimulateRetrieveNumStoredQubitsNode, METH_VARARGS, NULL},
 	 { "delete_QTLAH", _wrap_delete_QTLAH, METH_VARARGS, NULL},
 	 { "QTLAH_swigregister", QTLAH_swigregister, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }

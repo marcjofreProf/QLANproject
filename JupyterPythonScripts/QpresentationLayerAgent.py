@@ -32,21 +32,21 @@ class QPLA:
 	def SendMessageAgent(self,ParamsDescendingCharArray): # Send message to the below Agent
 		self.QSLAagent.SendMessageAgent(ParamsDescendingCharArray)
 	
-	def RequestQubitsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRequestedQubits): # Request that host's node sends qubits to this host's node		
+	def SimulateRequestQubitsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRequestedQubits): # Request that host's node sends qubits to this host's node		
 		messagePayloadAux=str(NumRequestedQubits)
-		messageCommandAux="ReceiveQubits"
+		messageCommandAux="SimulateReceiveQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrgConNet
 		messageIPdest=IPhostDestConNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
 		messagePayloadAux=str(NumRequestedQubits)
-		messageCommandAux="SendQubits"
+		messageCommandAux="SimulateSendQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrgOpNet
 		messageIPdest=IPhostDestOpNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
 	
-	def RetrieveNumStoredQubitsNode(self,ParamsIntArray): # Supposing that node has received quBits, make use of them
-		self.QSLAagent.RetrieveNumStoredQubitsNode(ParamsIntArray)
+	def SimulateRetrieveNumStoredQubitsNode(self,ParamsIntArray): # Supposing that node has received quBits, make use of them
+		self.QSLAagent.SimulateRetrieveNumStoredQubitsNode(ParamsIntArray)

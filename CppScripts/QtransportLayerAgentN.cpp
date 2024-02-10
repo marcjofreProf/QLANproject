@@ -698,9 +698,9 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	}
 	else if(string(Type)==string("Control")){//Control message	
 		if (string(Command)==string("InfoRequest")){ // Request to provide information
-			if (string(Payload)==string("NumStoredQubitsNode")){
-			  std::thread threadGetNumStoredQubitsNodeRefAux=std::thread(&QTLAN::GetNumStoredQubitsNode,this,IPorg,IPdest);
-			  threadGetNumStoredQubitsNodeRefAux.detach();
+			if (string(Payload)==string("SimulateNumStoredQubitsNode")){
+			  std::thread threadGetSimulateNumStoredQubitsNodeRefAux=std::thread(&QTLAN::GetSimulateNumStoredQubitsNode,this,IPorg,IPdest);
+			  threadGetSimulateNumStoredQubitsNodeRefAux.detach();
 			}
 			else if (string(Payload)==string("NodeAreYouThere?")){
 			// Mount message and send it to attached node
@@ -744,13 +744,13 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			//cout << "New Message: "<< Payload << endl;
 			this->ReadParametersAgent(Payload);
 		}
-		else if (string(Command)==string("SendQubits")){// Send qubits to the requesting host			
-			std::thread threadEmitQuBitRefAux=std::thread(&QTLAN::QPLAemitQuBit,this);
-			threadEmitQuBitRefAux.detach();
+		else if (string(Command)==string("SimulateSendQubits")){// Send qubits to the requesting host			
+			std::thread threadSimulateEmitQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitQuBit,this);
+			threadSimulateEmitQuBitRefAux.detach();
 		}
-		else if (string(Command)==string("ReceiveQubits")){// Read qubits to the attached node
-			std::thread threadReceiveQuBitRefAux=std::thread(&QTLAN::QPLAreceiveQuBit,this);
-			threadReceiveQuBitRefAux.detach();
+		else if (string(Command)==string("SimulateReceiveQubits")){// Read qubits to the attached node
+			std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveQuBit,this);
+			threadSimulateReceiveQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("print")){
 			cout << "New Message: "<< Payload << endl;
@@ -774,38 +774,38 @@ memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 return 0; // All OK
 }
 
-int QTLAN::QPLAemitQuBit() {
+int QTLAN::QPLASimulateEmitQuBit() {
 this->acquire();	  
-if (this->QPLAemitQuBitFlag==false){// No other thread checking this info
-	this->QPLAemitQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.emitQuBit();
-	this->QPLAemitQuBitFlag=false;
+if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
+	this->QPLASimulateEmitQuBitFlag=true; 
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitQuBit();
+	this->QPLASimulateEmitQuBitFlag=false;
 }
 this->release();
 return 0;
 }
 
-int QTLAN::QPLAreceiveQuBit() {
+int QTLAN::QPLASimulateReceiveQuBit() {
 this->acquire();	  
-if (this->QPLAreceiveQuBitFlag==false){// No other thread checking this info
-	this->QPLAreceiveQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.receiveQuBit();
-	this->QPLAreceiveQuBitFlag=false;
+if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
+	this->QPLASimulateReceiveQuBitFlag=true; 
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveQuBit();
+	this->QPLASimulateReceiveQuBitFlag=false;
 }
 this->release();
 return 0;
 }
 
-int QTLAN::GetNumStoredQubitsNode(char* IPorg,char* IPdest) {
+int QTLAN::GetSimulateNumStoredQubitsNode(char* IPorg,char* IPdest) {
 //cout<< "Node before acquire" << endl;
 this->acquire();	  
-//cout<< "Node before this->GetNumStoredQubitsNodeFlag==false" << endl;
-if (this->GetNumStoredQubitsNodeFlag==false){// No other thread checking this info
-	//cout<< "Node after this->GetNumStoredQubitsNodeFlag==false" << endl;
-	this->GetNumStoredQubitsNodeFlag=true; 
+//cout<< "Node before this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
+if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking this info
+	//cout<< "Node after this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
+	this->GetSimulateNumStoredQubitsNodeFlag=true; 
 	this->release();
-	int NumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetNumStoredQubitsNode();// to be developed for more than one link
-	//cout << "Node return NumStoredQubitsNode: " << NumStoredQubitsNode << endl;
+	int SimulateNumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetSimulateNumStoredQubitsNode();// to be developed for more than one link
+	//cout << "Node return SimulateNumStoredQubitsNode: " << SimulateNumStoredQubitsNode << endl;
 	  // Generate the message
 	//cout<< "IPorg: " << IPorg << endl;
 	//cout<< "IPdest: " << IPdest << endl;
@@ -816,10 +816,10 @@ if (this->GetNumStoredQubitsNodeFlag==false){// No other thread checking this in
 	strcat(ParamsCharArray,",");
 	strcat(ParamsCharArray,"Operation");
 	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"NumStoredQubitsNode");
+	strcat(ParamsCharArray,"SimulateNumStoredQubitsNode");
 	strcat(ParamsCharArray,",");
 	char charNum[NumBytesBufferICPMAX] = {0};
-	sprintf(charNum, "%d", NumStoredQubitsNode);
+	sprintf(charNum, "%d", SimulateNumStoredQubitsNode);
 	strcat(ParamsCharArray,charNum);
 	strcat(ParamsCharArray,",");// Very important to end the message
 	//cout << "ParamsCharArray: " << ParamsCharArray << endl;
@@ -828,7 +828,7 @@ if (this->GetNumStoredQubitsNodeFlag==false){// No other thread checking this in
 	this->acquire();	
 	//cout<< "Node after second acquire" << endl;  
 	this->ICPdiscoverSend(ParamsCharArray);
-	this->GetNumStoredQubitsNodeFlag=false;
+	this->GetSimulateNumStoredQubitsNodeFlag=false;
 	//cout<< "Node after send" << endl;
 }
 this->release();

@@ -683,10 +683,10 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			//cout << "IPorg: " << IPorg << endl;
 			this->ICPmanagementSend(socket_fd_conn,IPorg);
 			}
-			else if (string(Command)==string("NumStoredQubitsNode")){// Expected/awaiting message
+			else if (string(Command)==string("SimulateNumStoredQubitsNode")){// Expected/awaiting message
 				//cout << "We are here NumStoredQubitsNode" << endl;
-				this->NumStoredQubitsNodeParamsIntArray[0]=atoi(Payload);
-				this->InfoNumStoredQubitsNodeFlag=true;				
+				this->SimulateNumStoredQubitsNodeParamsIntArray[0]=atoi(Payload);
+				this->InfoSimulateNumStoredQubitsNodeFlag=true;				
 			}					
 			else{
 			// Do not do anything
@@ -785,7 +785,7 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
     return 0; //All OK
 }
 
-int QTLAH::RetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray){ // Send to the upper layer agent how many qubits are stored
+int QTLAH::SimulateRetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray){ // Send to the upper layer agent how many qubits are stored
 
 try{
 this->acquire();
@@ -833,7 +833,7 @@ while(isValidWhileLoopCount>0){
 	strcat(this->SendBuffer,",");
 	strcat(this->SendBuffer,"InfoRequest");
 	strcat(this->SendBuffer,",");
-	strcat(this->SendBuffer,"NumStoredQubitsNode");
+	strcat(this->SendBuffer,"SimulateNumStoredQubitsNode");
 	strcat(this->SendBuffer,",");// Very important to end the message
 
 	this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send mesage to node
@@ -841,9 +841,9 @@ while(isValidWhileLoopCount>0){
 this->release();
 usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
 this->acquire();
-	if (this->InfoNumStoredQubitsNodeFlag==true){
-		this->InfoNumStoredQubitsNodeFlag=false; // Reset the flag
-		ParamsIntArray[0]=this->NumStoredQubitsNodeParamsIntArray[0];
+	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
+		this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
+		ParamsIntArray[0]=this->SimulateNumStoredQubitsNodeParamsIntArray[0];
 		this->release();			
 		isValidWhileLoopCount=0;
 	}
@@ -853,7 +853,7 @@ this->acquire();
 		ParamsIntArray[0]=-1;
 		isValidWhileLoopCount--;
 		if (isValidWhileLoopCount<=0){
-			this->InfoNumStoredQubitsNodeFlag=false; // Reset the flag
+			this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 			this->release();
 		}
 }

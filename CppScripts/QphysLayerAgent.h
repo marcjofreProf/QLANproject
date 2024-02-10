@@ -61,11 +61,9 @@ private: //Variables/Instances
 	using TimePoint = std::chrono::time_point<Clock>;
 	TimePoint OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
 	// Private threads
-	std::thread threadEmitQuBitRefAux;
-	std::thread threadReceiveQuBitRefAux;
-	bool RunThreadEmitQuBitFlag=true;
-	bool RunThreadReceiveQuBitFlag=true;
-	bool RunThreadAcquireNumStoredQubitsNode=true;
+	bool RunThreadSimulateEmitQuBitFlag=true;
+	bool RunThreadSimulateReceiveQuBitFlag=true;
+	bool RunThreadAcquireSimulateNumStoredQubitsNode=true;
         
 public: // Variables/Instances
 	enum ApplicationState { // State of the agent sequences
@@ -74,8 +72,8 @@ public: // Variables/Instances
 		APPLICATION_EXIT = -1,
 	    };
 	ApplicationState m_state;
-	int NumStoredQubitsNode[LinkNumberMAX]={0}; // Array indicating the number of stored qubits
-	int QuBitValueArray[NumQubitsMemoryBuffer]={0};
+	int SimulateNumStoredQubitsNode[LinkNumberMAX]={0}; // Array indicating the number of stored qubits
+	int SimulateQuBitValueArray[NumQubitsMemoryBuffer]={0};
 	char SCmode[1][NumBytesPayloadBuffer] = {0}; // Variable to know if the node instance is working as server or client to the other node
 
 public: // Functions/Methods
@@ -85,9 +83,9 @@ public: // Functions/Methods
 	int SendParametersAgent(char* ParamsCharArray);// The upper layer gets the information to be send
         int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node
         // General Input and Output functions
-	int emitQuBit();
-	int receiveQuBit();
-	int GetNumStoredQubitsNode();
+	int SimulateEmitQuBit();
+	int SimulateReceiveQuBit();
+	int GetSimulateNumStoredQubitsNode();
 	~QPLA();  //destructor
 
 private: // Functions/Methods	
@@ -119,8 +117,8 @@ private: // Functions/Methods
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 	// Particular process threads
-	int ThreadEmitQuBit();
-	int ThreadReceiveQubit();
+	int ThreadSimulateEmitQuBit();
+	int ThreadSimulateReceiveQubit();
 	
 };
 
