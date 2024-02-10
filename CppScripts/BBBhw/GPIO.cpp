@@ -193,6 +193,7 @@ if (streamIn.is_open())
 	//int IntValue;
 	//streamIn >> IntValue;
 	getline(streamIn,StrValue);
+	cout<<StrValue<<endl;
 	if (StrValue == "0") return LOW;
 	else return HIGH;
 }
