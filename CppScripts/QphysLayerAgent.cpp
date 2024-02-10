@@ -531,7 +531,7 @@ int QPLA::NegotiateInitialParamsNode(){
 try{
  this->acquire();
 if (string(this->SCmode[0])==string("client")){
-	 char ParamsCharArray[NumBytesPayloadBuffer]="EmitLinkNumberArray[0]_48_ReceiveLinkNumberArray[0]_60_QuBitsPerSecondVelocity[0]_10000000_";// Set initialization value for the other node
+	 char ParamsCharArray[NumBytesPayloadBuffer]="EmitLinkNumberArray[0]_48_ReceiveLinkNumberArray[0]_60_QuBitsPerSecondVelocity[0]_100000000_";// Set initialization value for the other node
 	 this->SetSendParametersAgent(ParamsCharArray);// Set initialization values for the other node
 	 inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 	inGPIO->setDirection(INPUT);
