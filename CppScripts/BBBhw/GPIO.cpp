@@ -194,9 +194,8 @@ if (streamIn.is_open())
 	//streamIn >> IntValue;
 	
 	getline(streamIn,StrValue);
-	streamIn.close();
-	streamIn.open((path + "value").c_str());
-	cout<<StrValue<<endl;
+	streamIn.clear(); //< Now we can read again
+	//cout<<StrValue<<endl;
 	//cout<<IntValue<<endl;
 	if (StrValue == "0") return LOW;
 	else return HIGH;
