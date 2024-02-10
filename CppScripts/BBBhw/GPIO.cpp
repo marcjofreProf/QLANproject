@@ -193,7 +193,8 @@ if (streamIn.is_open())
 	//int IntValue;
 	//streamIn >> IntValue;
 	getline(streamIn,StrValue);
-	return stoi(StrValue);
+	if (StrValue == "0") return LOW;
+	else return HIGH;
 }
 else{
 cout << "BBB streamIn is not open!" << endl;
