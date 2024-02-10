@@ -1,3 +1,4 @@
+trap "kill 0" EXIT
 echo 'Running PTP as master'
 sudo /etc/init.d/rsyslog stop # stop logging
 sudo timedatectl set-ntp false
@@ -7,4 +8,4 @@ sudo ./CppScripts/QtransportLayerAgentN server 192.168.9.2 192.168.9.1
 echo 'Stopped PTP as master'
 sudo /etc/init.d/rsyslog start # start logging
 # Kill all the launched processes with same group PID
-kill -INT $$
+#kill -INT $$
