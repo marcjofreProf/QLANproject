@@ -170,14 +170,15 @@ if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){
 	this->EmitLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);	
 	outGPIO=new GPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 	outGPIO->setDirection(OUTPUT);
-	outGPIO->streamOpen();
-	outGPIO->streamWrite(LOW);//outGPIO.setValue(LOW);
+	outGPIO->streamOutOpen();
+	outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);
 }
 else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){
 	this->ReceiveLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);
 	inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 	inGPIO->setDirection(INPUT);
 	inGPIO->setEdgeType(NONE);
+	inGPIO->streamInOpen();
 }
 else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread
@@ -342,13 +343,13 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 //requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 //clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  for (int iIterWrite=0;iIterWrite<NumQubitsMemoryBuffer;iIterWrite++){
-	 outGPIO->streamWrite(HIGH);//outGPIO.setValue(HIGH);
+	 outGPIO->streamOutWrite(HIGH);//outGPIO.setValue(HIGH);
 	 //clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
 	 TimePointFuture_time_as_count+=(long)QuBitsNanoSecHalfPeriodInt[0];
 	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 	requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
-	 outGPIO->streamWrite(LOW);//outGPIO.setValue(LOW);
+	 outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);
 	 //clock_nanosleep(CLOCK_REALTIME,0,&requestHalfPeriod,NULL);
 	 TimePointFuture_time_as_count+=(long)QuBitsNanoSecHalfPeriodInt[0];
 	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
@@ -478,7 +479,7 @@ cout << "Start Receiving Qubits" << endl;// This line should be commented to red
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){	 
-	 QuBitValueArray[iIterRead]=inGPIO->getValue();
+	 QuBitValueArray[iIterRead]=inGPIO->streamInRead();//getValue();
 	 //clock_nanosleep(CLOCK_REALTIME,0,&requestPeriod,NULL);	
 	 TimePointFuture_time_as_count+=(long)QuBitsNanoSecPeriodInt[0];
 	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
@@ -521,7 +522,8 @@ return NumStoredQubitsNodeAux;
 
 QPLA::~QPLA() {
 // destructor
-outGPIO->streamClose();
+outGPIO->streamOutClose();
+inGPIO->streamInClose();
 this->threadRef.join();// Terminate the process thread
 }
 
@@ -534,10 +536,11 @@ if (string(this->SCmode[0])==string("client")){
 	 inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 	inGPIO->setDirection(INPUT);
 	inGPIO->setEdgeType(NONE);
+	inGPIO->streamInOpen();
 	outGPIO=new GPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 	outGPIO->setDirection(OUTPUT);
-	outGPIO->streamOpen();
-	outGPIO->streamWrite(LOW);//outGPIO.setValue(LOW);
+	outGPIO->streamOutOpen();
+	outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);
 }
 else{//server
 // Expect to receive some information

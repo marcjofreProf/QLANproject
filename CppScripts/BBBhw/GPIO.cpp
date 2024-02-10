@@ -162,16 +162,34 @@ GPIO_EDGE GPIO::getEdgeType(){
 	else return NONE;
 }
 
-int GPIO::streamOpen(){
-	stream.open((path + "value").c_str());
+int GPIO::streamInOpen(){
+	streamIn.open((path + "value").c_str());
 	return 0;
 }
-int GPIO::streamWrite(GPIO_VALUE value){
-	stream << value << std::flush;
+
+int GPIO::streamOutOpen(){
+	streamOut.open((path + "value").c_str());
 	return 0;
 }
-int GPIO::streamClose(){
-	stream.close();
+
+int GPIO::streamOutWrite(GPIO_VALUE value){
+	streamOut << value << std::flush;
+	return 0;
+}
+
+int GPIO::streamInRead(){
+	string StrValue;
+	streamIn >> StrValue;//std::flush;
+	return stoi(StrValue);
+}
+
+int GPIO::streamInClose(){
+	streamIn.close();
+	return 0;
+}
+
+int GPIO::streamOutClose(){
+	streamOut.close();
 	return 0;
 }
 

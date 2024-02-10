@@ -28,6 +28,7 @@
 #include<fstream>
 using std::string;
 using std::ofstream;
+using std::ifstream;
 
 #define GPIO_PATH "/sys/class/gpio/"
 
@@ -59,9 +60,12 @@ public:
 	virtual void setDebounceTime(int time) { this->debounceTime = time; }
 
 	// Advanced OUTPUT: Faster write by keeping the stream alive (~20X)
-	virtual int streamOpen();
-	virtual int streamWrite(GPIO_VALUE);
-	virtual int streamClose();
+	virtual int streamInOpen();
+	virtual int streamOutOpen();
+	virtual int streamOutWrite(GPIO_VALUE);
+	virtual int streamInRead();
+	virtual int streamInClose();
+	virtual int streamOutClose();
 
 	virtual int toggleOutput(int time); //threaded invert output every X ms.
 	virtual int toggleOutput(int numberOfTimes, int time);
@@ -83,7 +87,8 @@ private:
 	string read(string path, string filename);
 	//int exportGPIO(); Not currently used - legacy
 	//int unexportGPIO(); Not currently used - legacy
-	ofstream stream;
+	ofstream streamOut;
+	ifstream streamIn;
 	pthread_t thread;
 	CallbackType callbackFunction;
 	bool threadRunning;
