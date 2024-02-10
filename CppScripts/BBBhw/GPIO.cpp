@@ -189,17 +189,17 @@ int GPIO::streamInRead(){
 	//return stoi(StrValue);
 if (streamIn.is_open())
     {
-	//string StrValue;
-	int IntValue;
-	streamIn >> IntValue;	
-	//getline(streamIn,StrValue);
+	string StrValue;
+	//int IntValue;
+	//streamIn >> IntValue;	
+	getline(streamIn,StrValue);
 	streamIn.clear(); //< Now we can read again
 	streamIn.seekg(0, std::ios::beg); // back to the start!
 	//cout<<StrValue<<endl;
 	//cout<<IntValue<<endl;
-	//if (StrValue == "0") return LOW;
-	//else return HIGH;
-	return IntValue;
+	if (StrValue == "0") return LOW;
+	else return HIGH;
+	//return IntValue;
 }
 else{
 cout << "BBB streamIn is not open!" << endl;
