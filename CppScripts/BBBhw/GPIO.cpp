@@ -180,6 +180,7 @@ int GPIO::streamOutWrite(GPIO_VALUE value){
 int GPIO::streamInRead(){
 	string StrValue;
 	streamIn >> StrValue;//std::flush;
+	cout<< StrValue << endl;
 	return stoi(StrValue);
 }
 
