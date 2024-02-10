@@ -177,6 +177,7 @@ else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]"))
 	this->ReceiveLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);
 	inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 	inGPIO->setDirection(INPUT);
+	inGPIO->setEdgeType(NONE);
 }
 else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread
@@ -532,6 +533,7 @@ if (string(this->SCmode[0])==string("client")){
 	 this->SetSendParametersAgent(ParamsCharArray);// Set initialization values for the other node
 	 inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 	inGPIO->setDirection(INPUT);
+	inGPIO->setEdgeType(NONE);
 	outGPIO=new GPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 	outGPIO->setDirection(OUTPUT);
 	outGPIO->streamOpen();
