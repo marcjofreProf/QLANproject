@@ -6,6 +6,6 @@ sudo ./linuxptp/ptp4l -i eth0 &
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w &
 sudo ./CppScripts/QtransportLayerAgentN client 192.168.8.2 192.168.8.1
 echo 'Stopped PTP as slave'
-sudo /etc/init.d/rsyslog start # start logging
+#sudo /etc/init.d/rsyslog start # start logging
 # Kill all the launched processes with same group PID
 #kill -INT $$
