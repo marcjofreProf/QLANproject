@@ -1,3 +1,6 @@
 [submodule "linuxptp"]
 	path = linuxptp
 	url = http://git.code.sf.net/p/linuxptp/code
+[submodule "am335x_pru_package"]
+	path = am335x_pru_package
+	url = https://github.com/beagleboard/am335x_pru_package
