@@ -57,13 +57,13 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Allocate and initialize memory
 	prussdrv_init();
 	if (prussdrv_open(PRU_EVTOUT_0) == -1) {  
-	   perror("prussdrv_open() failed. Execute as root: sudo su"); 
+	   perror("prussdrv_open() failed. Execute as root: sudo su. Message"); 
 	  } 
 	// Map PRU's interrupts
 	prussdrv_pruintc_init(&pruss_intc_initdata);
 	// Load and execute the PRU program on the PRU
-	//prussdrv_exec_program(PRU_Signal_NUM, "./PRUassemblerSignalsScript.bin");
-	//prussdrv_exec_program(PRU_Operation_NUM, "./PRUassemblerOperationsScript.bin");
+	prussdrv_exec_program(PRU_Signal_NUM, "./PRUassemblerSignalsScript.bin");
+	prussdrv_exec_program(PRU_Operation_NUM, "./PRUassemblerOperationsScript.bin");
 }
 
 GPIO::GPIO(int number) {
