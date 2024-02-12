@@ -39,7 +39,14 @@ using namespace std;
 
 namespace nsQphysLayerAgent {
 QPLA::QPLA() {// Constructor
-
+	inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
+	inGPIO->setDirection(INPUT);
+	inGPIO->setEdgeType(NONE);
+	inGPIO->streamInOpen();
+	outGPIO=new GPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
+	outGPIO->setDirection(OUTPUT);
+	outGPIO->streamOutOpen();
+	outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);
  
 }
 
@@ -166,6 +173,7 @@ for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 //cout << "HeaderCharArray[iHeaders]: " << HeaderCharArray[iHeaders] << endl;
 // Missing to develop if there are different values
+/*
 if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){
 	this->EmitLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);	
 	outGPIO=new GPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
@@ -180,7 +188,8 @@ else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]"))
 	inGPIO->setEdgeType(NONE);
 	inGPIO->streamInOpen();
 }
-else if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
+*/
+if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread
 	//cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
 	std::chrono::nanoseconds duration_back((unsigned long long int)strtoull(ValuesCharArray[iHeaders],NULL,10));
@@ -531,16 +540,8 @@ int QPLA::NegotiateInitialParamsNode(){
 try{
  this->acquire();
 if (string(this->SCmode[0])==string("client")){
-	 char ParamsCharArray[NumBytesPayloadBuffer]="EmitLinkNumberArray[0]_48_ReceiveLinkNumberArray[0]_60_QuBitsPerSecondVelocity[0]_1000_";// Set initialization value for the other node
+	 char ParamsCharArray[NumBytesPayloadBuffer]="QuBitsPerSecondVelocity[0]_1000_";// Set initialization value for the other node
 	 this->SetSendParametersAgent(ParamsCharArray);// Set initialization values for the other node
-	 inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
-	inGPIO->setDirection(INPUT);
-	inGPIO->setEdgeType(NONE);
-	inGPIO->streamInOpen();
-	outGPIO=new GPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
-	outGPIO->setDirection(OUTPUT);
-	outGPIO->streamOutOpen();
-	outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);
 }
 else{//server
 // Expect to receive some information
