@@ -36,6 +36,12 @@
 #include<unistd.h>
 #include<sys/epoll.h>
 #include<pthread.h>
+// PRU programming
+#include <stdio.h>
+#include <prussdrv.h>
+#include <pruss_intc_mapping.h>
+#define PRU_Operation_NUM 0 // PRU operation and handling with PRU0
+#define PRU_Signal_NUM 1 // Signals PINS with PRU1
 using namespace std;
 
 namespace exploringBB {
@@ -44,6 +50,20 @@ namespace exploringBB {
  *
  * @param number The GPIO number for the BBB
  */
+GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
+	// Initialize structure used by prussdrv_pruintc_intc
+	// PRUSS_INTC_INITDATA is found in pruss_intc_mapping.h
+	tpruss_intc_initdata pruss_intc_initdata = PRUSS_INTC_INITDATA;
+	// Allocate and initialize memory
+	prussdrv_init();
+	prussdrv_open(PRU_EVTOUT_0);
+	// Map PRU's interrupts
+	prussdrv_pruintc_init(&pruss_intc_initdata);
+	// Load and execute the PRU program on the PRU
+	prussdrv_exec_program(PRU_Signal_NUM, "./PRUassemblerSignalsScript.bin");
+	prussdrv_exec_program(PRU_Operation_NUM, "./PRUassemblerOperationsScript.bin");
+}
+
 GPIO::GPIO(int number) {
 	this->number = number;
 	this->debounceTime = 0;
@@ -316,6 +336,10 @@ int GPIO::waitForEdge(CallbackType callback){
 
 GPIO::~GPIO() {
 //	this->unexportGPIO();
+// Disable PRU and close memory mappings
+prussdrv_pru_disable(PRU_Signal_NUM);
+prussdrv_pru_disable(PRU_Operation_NUM);
+prussdrv_exit();
 }
 
 } /* namespace exploringBB */

@@ -54,6 +54,7 @@ private: //Variables/Instances
 	char PayloadReadBuffer[NumBytesPayloadBuffer]={0}; //Buffer to read payload messages
 	char PayloadSendBuffer[NumBytesPayloadBuffer]={0}; //Buffer to send payload messages
 	// GPIO
+	GPIO* PRUGPIO; // Object for handling PRU
 	GPIO* inGPIO; // Object for reading Qubits
 	GPIO* outGPIO; // Object for sending Qubits
 	// Time/synchronization management

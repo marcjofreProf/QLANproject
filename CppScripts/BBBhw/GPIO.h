@@ -44,8 +44,9 @@ private:
 	int number, debounceTime;
 	string name, path;
 
-public:
+public:	
 	GPIO(int number); //constructor will export the pin
+	GPIO(); // initializates PRU operation
 	virtual int getNumber() { return number; }
 
 	// General Input and Output Settings

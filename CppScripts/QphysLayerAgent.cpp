@@ -39,14 +39,16 @@ using namespace std;
 
 namespace nsQphysLayerAgent {
 QPLA::QPLA() {// Constructor
-	inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
-	inGPIO->setDirection(INPUT);
-	inGPIO->setEdgeType(NONE);
-	inGPIO->streamInOpen();
-	outGPIO=new GPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
-	outGPIO->setDirection(OUTPUT);
-	outGPIO->streamOutOpen();
-	outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);
+	PRUGPIO=new GPIO();// Initiates custom PRU code in BBB	
+	// The above pins initializatoins (and also in the destructor will not be needed in the future since it is done with PRU
+		inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
+		inGPIO->setDirection(INPUT);
+		inGPIO->setEdgeType(NONE);
+		inGPIO->streamInOpen();
+		outGPIO=new GPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
+		outGPIO->setDirection(OUTPUT);
+		outGPIO->streamOutOpen();
+		outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);
  
 }
 

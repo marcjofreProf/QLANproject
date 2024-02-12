@@ -1,1 +1,1 @@
-arm-linux-gnueabihf-g++ -static -I./BBBhw QtransportLayerAgentN.cpp QnetworkLayerAgent.cpp QlinkLayerAgent.cpp QphysLayerAgent.cpp ./BBBhw/GPIO.cpp -o QtransportLayerAgentN
+arm-linux-gnueabihf-g++ -static -I./BBBhw -I../am335x_pru_package/pru_sw/app_loader/include QtransportLayerAgentN.cpp QnetworkLayerAgent.cpp QlinkLayerAgent.cpp QphysLayerAgent.cpp ./BBBhw/GPIO.cpp ../am335x_pru_package/pru_sw/app_loader/interface/release/prussdrv.o  -o QtransportLayerAgentN
