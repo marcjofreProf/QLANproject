@@ -1,3 +1,4 @@
+
 // This DTS overlay sets up input and output pin for use by  
  // PRU1 via its Enhanced GPIO mode, which will let us access those pins  
  // by writing to R30 bits or reading from R31 bits.  
@@ -37,16 +38,18 @@
    //  
    // Beware: Many other PRU EGP pins are reserved by HDMI or onboard flash, which  
    // would need to be disabled first by editing uEnv.txt and rebooting.  
-   exclusive-use =  
-      "P8.45", "P8.46", "P8.43", "P8.44", "P8.41", "P8.42", "P8.39", "P8.40", "P8.27", "P8.29", "P8.28", "P8.30", "pru1";  
-   
-   gpio_pins: pinmux_gpio_pins {
+   exclusive-use = "P8.45", "P8.46", "P8.43", "P8.44", "P8.41", "P8.42", "P8.39", "P8.40", "P8.27", "P8.29", "P8.28", "P8.30", "pru1";  
+  
+fragment@0{
+  target = <&ocp>; 
+__overlay__{   
+gpio_pins: pinmux_gpio_pins {
 	// The GPIO pins
 	pinctrl-single,pins = <
-		0x0A0 0x27 	// Mode 6 input pull-down 
-		 0x0A4 0x27 	// Mode 6 input pull-down
-		 0x0A8 0x27 	// Mode 6 input pull-down
-		 0x0AC 0x27 	// Mode 6 input pull-down
+		 0x0A0 0x27	// Mode 6 input pull-down 
+		 0x0A4 0x27	// Mode 6 input pull-down
+		 0x0A8 0x27	// Mode 6 input pull-down
+		 0x0AC 0x27	// Mode 6 input pull-down
 		 0x0B0 0x07	// Mode 5 output pull down
 		 0x0B4 0x07	// Mode 5 output pull down
 		 0x0B8 0x07	// Mode 5 output pull down
@@ -58,10 +61,10 @@
 		>;
 		};
 	};
-   
-   /*
-   * Free up the pins used by the cape from the pinmux helpers.
-	 */
+ };
+  
+  // Free up the pins used by the cape from the pinmux helpers.
+	
 	fragment@1 {
 		target = <&ocp>;
 		__overlay__ {
@@ -88,13 +91,12 @@
 		};
 	};
 
-    
-   
+     
    // This enables the PRU and assigns the GPIO pins to it for use in EGP mode.  
    fragment@2 {  
     target = <&ocp>;  
     __overlay__ { 
-    	gpio_helper {
+	gpio_helper {
 		compatible = "gpio-of-helper"; 
 	      status = "okay";  
 	      pinctrl-names = "default";  
@@ -102,5 +104,5 @@
 	      }; 
     };  
    };  
-   
- }; 
+};   
+ 
