@@ -51,19 +51,19 @@ namespace exploringBB {
  * @param number The GPIO number for the BBB
  */
 GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
-	/*
 	// Initialize structure used by prussdrv_pruintc_intc
 	// PRUSS_INTC_INITDATA is found in pruss_intc_mapping.h
 	tpruss_intc_initdata pruss_intc_initdata = PRUSS_INTC_INITDATA;
 	// Allocate and initialize memory
 	prussdrv_init();
-	prussdrv_open(PRU_EVTOUT_0);
+	if (prussdrv_open(PRU_EVTOUT_0) == -1) {  
+	   perror("prussdrv_open() failed. Execute as root: sudo su"); 
+	  } 
 	// Map PRU's interrupts
 	prussdrv_pruintc_init(&pruss_intc_initdata);
 	// Load and execute the PRU program on the PRU
-	prussdrv_exec_program(PRU_Signal_NUM, "./PRUassemblerSignalsScript.bin");
-	prussdrv_exec_program(PRU_Operation_NUM, "./PRUassemblerOperationsScript.bin");
-	*/
+	//prussdrv_exec_program(PRU_Signal_NUM, "./PRUassemblerSignalsScript.bin");
+	//prussdrv_exec_program(PRU_Operation_NUM, "./PRUassemblerOperationsScript.bin");
 }
 
 GPIO::GPIO(int number) {
