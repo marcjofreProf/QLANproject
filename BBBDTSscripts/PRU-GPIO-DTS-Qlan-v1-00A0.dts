@@ -58,7 +58,7 @@
 		>;
 		};
 	};
-   };
+   
    /*
    * Free up the pins used by the cape from the pinmux helpers.
 	 */
