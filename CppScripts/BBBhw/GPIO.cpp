@@ -40,8 +40,8 @@
 #include <stdio.h>
 #include <prussdrv.h>
 #include <pruss_intc_mapping.h>
-#define PRU_Operation_NUM 1 // PRU operation and handling with PRU0
-#define PRU_Signal_NUM 0 // Signals PINS with PRU1
+#define PRU_Operation_NUM 0 // PRU operation and handling with PRU0
+#define PRU_Signal_NUM 1 // Signals PINS with PRU1
 using namespace std;
 
 namespace exploringBB {
@@ -65,9 +65,12 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassemblerSignalsScript.bin") == -1){
 		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerSignalsScript.bin");
 	}
-	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassemblerOperationsScript.bin") == -1){
-	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerOperationsScript.bin");
+	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassemblerSignalsScript.bin") == -1){
+		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerSignalsScript.bin");
 	}
+	//if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassemblerOperationsScript.bin") == -1){
+	//perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerOperationsScript.bin");
+	//}
 }
 
 GPIO::GPIO(int number) {

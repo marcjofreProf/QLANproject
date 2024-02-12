@@ -38,7 +38,7 @@
    //  
    // Beware: Many other PRU EGP pins are reserved by HDMI or onboard flash, which  
    // would need to be disabled first by editing uEnv.txt and rebooting.  
-   exclusive-use = "P8.45", "P8.46", "P8.43", "P8.44", "P8.41", "P8.42", "P8.39", "P8.40", "P8.27", "P8.29", "P8.28", "P8.30", "pru1";  
+   exclusive-use = "P8.11", "P8.16", "P8.45", "P8.46", "P8.43", "P8.44", "P8.41", "P8.42", "P8.39", "P8.40", "P8.27", "P8.29", "P8.28", "P8.30", "pru0", "pru1";  
   
 fragment@0{
   target = <&ocp>; 
@@ -62,17 +62,44 @@ gpio_pins: pinmux_gpio_pins {
 		};
 	};
  };
+ 
+ fragment@1 {  
+    target = <&am33xx_pinmux>;  
+    __overlay__ {  
+      example_pins: pinmux_pru_pru_pins {  
+   
+       // The offset and mode for pins P8_11 and P8_16 also come from the table linked above.
+       //  
+       // That table gives offset 0x34 for P8_11, and 0x38 for P8_16.
+       // It also shows us we want pinmux mode 6 for P8_11 in output mode,  
+       // and again pinmux mode 6 for P8_16 in input mode.
+       // 
+       // Table 9-60 in the TRM: http://www.ti.com/lit/ug/spruh73l/spruh73l.pdf  
+       // helps us calculate the rest of the configuration value.  
+       //  
+       // For P8_11, the other fields are all 0, so the value is just 0x06.  
+       //  
+       // For P8_16, we want it to be an input, so we also set bit 5, yielding  
+       // a value of 0x26. We could also set bits 3 and 4 to enable a pullup  
+       // or pulldown.  
+       pinctrl-single,pins = <  
+         0x34 0x06  
+         0x38 0x26  
+       >;  
+      };  
+    };  
+   }; 
   
   // Free up the pins used by the cape from the pinmux helpers.
 	
-	fragment@1 {
+	fragment@2 {
 		target = <&ocp>;
 		__overlay__ {
 			P8_45_pinmux { status = "disabled"; };	/* lcd_data0 */
 			P8_46_pinmux { status = "disabled"; };	/* lcd_data1 */
 			P8_43_pinmux { status = "disabled"; };	/* lcd_data2 */
 			P8_44_pinmux { status = "disabled"; };	/* lcd_data3 */
-			//P8_41_pinmux { status = "disabled"; };	/* lcd_data4 */
+			P8_41_pinmux { status = "disabled"; };	/* lcd_data4 */
 			P8_42_pinmux { status = "disabled"; };	/* lcd_data5 */
 			P8_39_pinmux { status = "disabled"; };	/* lcd_data6 */
 			P8_40_pinmux { status = "disabled"; };	/* lcd_data7 */
@@ -93,7 +120,7 @@ gpio_pins: pinmux_gpio_pins {
 
      
    // This enables the PRU and assigns the GPIO pins to it for use in EGP mode.  
-   fragment@2 {  
+   fragment@3 {  
     target = <&ocp>;  
     __overlay__ { 
 	gpio_helper {
@@ -104,5 +131,15 @@ gpio_pins: pinmux_gpio_pins {
 	      }; 
     };  
    };  
+   
+   // This enables the PRU and assigns the GPIO pins to it for use in EGP mode.  
+   fragment@4 {  
+    target = <&pruss>;  
+    __overlay__ {  
+      status = "okay";  
+      pinctrl-names = "default";  
+      pinctrl-0 = <&example_pins>;  
+    };  
+   }; 
 };   
  
