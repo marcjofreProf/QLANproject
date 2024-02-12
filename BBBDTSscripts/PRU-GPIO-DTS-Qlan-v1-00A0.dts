@@ -40,6 +40,7 @@
    exclusive-use =  
       "P8.45", "P8.46", "P8.43", "P8.44", "P8.41", "P8.42", "P8.39", "P8.40", "P8.27", "P8.29", "P8.28", "P8.30", "pru1";  
    
+   /*
    * Free up the pins used by the cape from the pinmux helpers.
 	 */
 	fragment@0 {
@@ -93,8 +94,6 @@
       };  
     };  
    };  
-
-/*
 	 
    
    // This enables the PRU and assigns the GPIO pins to it for use in EGP mode.  
