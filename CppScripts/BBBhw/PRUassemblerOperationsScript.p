@@ -11,4 +11,7 @@
 #define INS_PER_US		200	// 5ns per instruction
 #define INS_PER_DELAY_LOOP	2	// two instructions per delay loop
 
+#define DELAY 2*1000 * (INS_PER_US / INS_PER_DELAY_LOOP)
 
+START:
+	mov r0, DELAY
