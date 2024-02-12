@@ -62,7 +62,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Map PRU's interrupts
 	prussdrv_pruintc_init(&pruss_intc_initdata);
 	// Load and execute the PRU program on the PRU
-	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassemblerSignalsScript.bin") == -1){
+	if (prussdrv_exec_program(PRU_Signal_NUM, "./PRUassemblerSignalsScript.bin") == -1){
 		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerSignalsScript.bin");
 	}
 	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassemblerOperationsScript.bin") == -1){
