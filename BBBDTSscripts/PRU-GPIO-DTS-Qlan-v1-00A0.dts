@@ -72,7 +72,7 @@ gpio_pins: pinmux_gpio_pins {
 			P8_46_pinmux { status = "disabled"; };	/* lcd_data1 */
 			P8_43_pinmux { status = "disabled"; };	/* lcd_data2 */
 			P8_44_pinmux { status = "disabled"; };	/* lcd_data3 */
-			P8_41_pinmux { status = "disabled"; };	/* lcd_data4 */
+			//P8_41_pinmux { status = "disabled"; };	/* lcd_data4 */
 			P8_42_pinmux { status = "disabled"; };	/* lcd_data5 */
 			P8_39_pinmux { status = "disabled"; };	/* lcd_data6 */
 			P8_40_pinmux { status = "disabled"; };	/* lcd_data7 */
@@ -97,7 +97,7 @@ gpio_pins: pinmux_gpio_pins {
     target = <&ocp>;  
     __overlay__ { 
 	gpio_helper {
-		compatible = "gpio-of-helper"; 
+		//compatible = "gpio-of-helper"; 
 	      status = "okay";  
 	      pinctrl-names = "default";  
 	      pinctrl-0 = <&gpio_pins>; 
