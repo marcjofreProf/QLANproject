@@ -40,10 +40,29 @@
    exclusive-use =  
       "P8.45", "P8.46", "P8.43", "P8.44", "P8.41", "P8.42", "P8.39", "P8.40", "P8.27", "P8.29", "P8.28", "P8.30", "pru1";  
    
+   gpio_pins: pinmux_gpio_pins {
+	// The GPIO pins
+	pinctrl-single,pins = <
+		0x0A0 0x27 	// Mode 6 input pull-down 
+		 0x0A4 0x27 	// Mode 6 input pull-down
+		 0x0A8 0x27 	// Mode 6 input pull-down
+		 0x0AC 0x27 	// Mode 6 input pull-down
+		 0x0B0 0x07	// Mode 5 output pull down
+		 0x0B4 0x07	// Mode 5 output pull down
+		 0x0B8 0x07	// Mode 5 output pull down
+		 0x0BC 0x07	// Mode 5 output pull down
+		 0x0E0 0x07	// Mode 5 output pull down
+		 0x0E4 0x07	// Mode 5 output pull down
+		 0x0E8 0x07	// Mode 5 output pull down
+		 0x0EC 0x07	// Mode 5 output pull down
+		>;
+		};
+	};
+   };
    /*
    * Free up the pins used by the cape from the pinmux helpers.
 	 */
-	fragment@0 {
+	fragment@1 {
 		target = <&ocp>;
 		__overlay__ {
 			P8_45_pinmux { status = "disabled"; };	/* lcd_data0 */
@@ -69,40 +88,18 @@
 		};
 	};
 
-   fragment@1 {  
-    target = <&am33xx_pinmux>;  
-    __overlay__ {  
-      pru_pru_pins: pinmux_pru_pru_pins {  
-   
-       // Table 9-60 in the TRM: http://www.ti.com/lit/ug/spruh73l/spruh73l.pdf  
-       // helps us calculate the rest of the configuration value.  
-        
-       pinctrl-single,pins = <  
-         0x0A0 0x27 	// Mode 6 input pull-down 
-         0x0A4 0x27 	// Mode 6 input pull-down
-         0x0A8 0x27 	// Mode 6 input pull-down
-         0x0AC 0x27 	// Mode 6 input pull-down
-         0x0B0 0x07	// Mode 5 output pull down
-         0x0B4 0x07	// Mode 5 output pull down
-         0x0B8 0x07	// Mode 5 output pull down
-         0x0BC 0x07	// Mode 5 output pull down
-         0x0E0 0x07	// Mode 5 output pull down
-         0x0E4 0x07	// Mode 5 output pull down
-         0x0E8 0x07	// Mode 5 output pull down
-         0x0EC 0x07	// Mode 5 output pull down
-       >;  
-      };  
-    };  
-   };  
-	 
+    
    
    // This enables the PRU and assigns the GPIO pins to it for use in EGP mode.  
    fragment@2 {  
-    target = <&pruss>;  
-    __overlay__ {  
-      status = "okay";  
-      pinctrl-names = "default";  
-      pinctrl-0 = <&pru_pru_pins>;  
+    target = <&ocp>;  
+    __overlay__ { 
+    	gpio_helper {
+		compatible = "gpio-of-helper"; 
+	      status = "okay";  
+	      pinctrl-names = "default";  
+	      pinctrl-0 = <&gpio_pins>; 
+	      }; 
     };  
    };  
    
