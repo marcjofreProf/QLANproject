@@ -57,7 +57,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Allocate and initialize memory
 	prussdrv_init();
 	if (prussdrv_open(PRU_EVTOUT_0) == -1) {  
-	   perror("prussdrv_open() failed. Execute as root: sudo su. Message"); 
+	   perror("prussdrv_open() failed. Execute as root: sudo su or sudo. /boot/uEnv.txt has to be properly configured with iuo. Message"); 
 	  } 
 	// Map PRU's interrupts
 	prussdrv_pruintc_init(&pruss_intc_initdata);

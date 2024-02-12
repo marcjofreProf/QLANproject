@@ -1,5 +1,10 @@
 // PRU-ICSS program to operate and allow TimeTagging and Direct Memory Access management
-
+// But only if the Pinmux Mode has been set correctly with a device  
+ // tree overlay!  
+ //  
+ // Assemble in BBB with:  
+ // pasm -b PRUassemblerOperationsScript.p
+ 
 .origin 0				// start of program in PRU memory
 .entrypoinnt START			// program entry point (for debbuger)
 
