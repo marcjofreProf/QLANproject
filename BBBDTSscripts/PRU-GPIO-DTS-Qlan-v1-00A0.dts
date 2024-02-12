@@ -77,18 +77,18 @@
        // helps us calculate the rest of the configuration value.  
         
        pinctrl-single,pins = <  
-         0x0A0 0x26 	// Mode 6 input pull-down 
-         0x0A4 0x26 	// Mode 6 input pull-down
-         0x0A8 0x26 	// Mode 6 input pull-down
-         0x0AC 0x26 	// Mode 6 input pull-down
-         0x0B0 0x05	// Mode 5 output pull down
-         0x0B4 0x05	// Mode 5 output pull down
-         0x0B8 0x05	// Mode 5 output pull down
-         0x0BC 0x05	// Mode 5 output pull down
-         0x0E0 0x05	// Mode 5 output pull down
-         0x0E4 0x05	// Mode 5 output pull down
-         0x0E8 0x05	// Mode 5 output pull down
-         0x0EC 0x05	// Mode 5 output pull down
+         0x0A0 0x27 	// Mode 6 input pull-down 
+         0x0A4 0x27 	// Mode 6 input pull-down
+         0x0A8 0x27 	// Mode 6 input pull-down
+         0x0AC 0x27 	// Mode 6 input pull-down
+         0x0B0 0x07	// Mode 5 output pull down
+         0x0B4 0x07	// Mode 5 output pull down
+         0x0B8 0x07	// Mode 5 output pull down
+         0x0BC 0x07	// Mode 5 output pull down
+         0x0E0 0x07	// Mode 5 output pull down
+         0x0E4 0x07	// Mode 5 output pull down
+         0x0E8 0x07	// Mode 5 output pull down
+         0x0EC 0x07	// Mode 5 output pull down
        >;  
       };  
     };  
