@@ -62,8 +62,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Map PRU's interrupts
 	prussdrv_pruintc_init(&pruss_intc_initdata);
 	// Load and execute the PRU program on the PRU
-	prussdrv_exec_program(PRU_Signal_NUM, "./PRUassemblerSignalsScript.bin");
-	prussdrv_exec_program(PRU_Operation_NUM, "./PRUassemblerOperationsScript.bin");
+	prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassemblerSignalsScript.bin");
+	prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassemblerOperationsScript.bin");
 }
 
 GPIO::GPIO(int number) {
