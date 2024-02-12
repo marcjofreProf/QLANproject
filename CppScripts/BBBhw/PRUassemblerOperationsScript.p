@@ -14,4 +14,4 @@
 #define DELAY 2*1000 * (INS_PER_US / INS_PER_DELAY_LOOP)
 
 START:
-	mov r0, DELAY
+	jmp START

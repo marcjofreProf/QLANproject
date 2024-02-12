@@ -28,4 +28,8 @@ SIGNALOFF:
 DELAYOFF:
 	sub r0, r0, 1
 	QBNE DELAYOFF, r0, 0
+	jmp SIGNALON
+
+END:
+	halt
 
