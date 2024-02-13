@@ -47,6 +47,12 @@ private:
 public:	
 	GPIO(int number); //constructor will export the pin
 	GPIO(); // initializates PRU operation
+	// PRU 
+	virtual int DisablePRUs();
+	virtual int ReadTimeStamps();// Read the detected timestaps in four channels
+	virtual int SendTriggerSignals(); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+	virtual int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
+	// Non PRU
 	virtual int getNumber() { return number; }
 
 	// General Input and Output Settings

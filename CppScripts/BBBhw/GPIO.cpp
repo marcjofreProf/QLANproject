@@ -61,13 +61,29 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  } 
 	// Map PRU's interrupts
 	prussdrv_pruintc_init(&pruss_intc_initdata);
-	// Load and execute the PRU program on the PRU
-	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassemblerSignalsScript.bin") == -1){
-		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerSignalsScript.bin");
-	}
-	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassemblerOperationsScript.bin") == -1){
-		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerOperationsScript.bin");
-	}
+    
+}
+
+int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
+
+// Load and execute the PRU program on the PRU
+if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassemblerTimeTaggingDetectionScript.bin") == -1){
+	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerTimeTaggingDetectionScript.bin");
+}  
+
+}
+
+int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+
+// Load and execute the PRU program on the PRU
+if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassemblerSignalsScript.bin") == -1){
+	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerTriggerSignalsScript.bin");
+}
+	
+}
+
+int GPIO::SendEmulateQubits(){ // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
+
 }
 
 //PRU0 - Operation - getting iputs
@@ -75,9 +91,6 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 /******************************************************************************
 * Local Macro Declarations                                                    *
 ******************************************************************************/
-
-#define PRU_NUM 	 1
-
 #define DDR_BASEADDR     0x80000000
 #define OFFSET_DDR	 0x00001008
 
@@ -113,11 +126,11 @@ FILE* outfile;
 
 void dumpdata(void)
 {
-	unsigned short int *DDR_regaddr;
-	unsigned char* test;
-	int ln;
-	int x;
-	unsigned char tv;
+unsigned short int *DDR_regaddr;
+unsigned char* test;
+int ln;
+int x;
+unsigned char tv;
 
   unsigned short int* valp;
   unsigned short int val;
@@ -153,29 +166,14 @@ int main (void)
     int fin;
     char fname_new[255];
     
-    tpruss_intc_initdata pruss_intc_initdata = PRUSS_INTC_INITDATA;
-   
-    printf("\nINFO: Starting %s example.\r\n", "ADC");
-    /* Initialize the PRU */
-    prussdrv_init ();		
-
-    /* Open PRU Interrupt */
-    ret = prussdrv_open(PRU_EVTOUT_1);
-    if (ret)
-    {
-        printf("prussdrv_open open failed\n");
-        return (ret);
-    }
     
-    /* Get the interrupt initialized */
-    prussdrv_pruintc_init(&pruss_intc_initdata);
     
     // Open file
     outfile=fopen("data.csv", "w");
 
     /* Initialize example */
     printf("\tINFO: Initializing example.\r\n");
-    LOCAL_exampleInit(PRU_NUM);
+    LOCAL_exampleInit(PRU_Operation_NUM);
     
     /* Execute example on PRU */
     printf("\tINFO: Executing example.\r\n");
@@ -185,7 +183,7 @@ int main (void)
     
     sharedMem_int[OFFSET_SHAREDRAM]=0; // set to zero means no command
     // Execute program
-    prussdrv_exec_program (PRU_NUM, "./prucode_adc.bin");
+    prussdrv_exec_program (PRU_Operation_NUM, "./BBBhw/PRUassemblerOperationsScript.bin");
 		printf("Executing. \n");
 		sleep(1);
 		sharedMem_int[OFFSET_SHAREDRAM]=(unsigned int)2; // set to 2 means perform capture
@@ -219,7 +217,7 @@ int main (void)
     
     
     /* Disable PRU and close memory mapping*/
-    prussdrv_pru_disable(PRU_NUM); 
+    prussdrv_pru_disable(PRU_Operation_NUM); 
     prussdrv_exit ();
     munmap(ddrMem, 0x0FFFFFFF);
     close(mem_fd);
@@ -257,7 +255,7 @@ static int LOCAL_exampleInit (  )
     return(0);
 }
 
-// Operating system GPIO acces (slow but simple)
+// Operating system GPIO access (slow but simple)
 GPIO::GPIO(int number) {
 	this->number = number;
 	this->debounceTime = 0;
@@ -528,12 +526,17 @@ int GPIO::waitForEdge(CallbackType callback){
     return 0;
 }
 
-GPIO::~GPIO() {
-//	this->unexportGPIO();
+int GPIO::DisablePRUs(){
 // Disable PRU and close memory mappings
 prussdrv_pru_disable(PRU_Signal_NUM);
 prussdrv_pru_disable(PRU_Operation_NUM);
-prussdrv_exit();
+return 0;
+}
+
+GPIO::~GPIO() {
+//	this->unexportGPIO();
+	this->DisablePRUs();
+	prussdrv_exit();
 }
 
 } /* namespace exploringBB */

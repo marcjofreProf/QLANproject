@@ -1,4 +1,4 @@
-// PRU-ICSS program to control realtime GPIO pins and allow TimeTagging and Direct Memory Access management
+// PRU-ICSS program to control realtime GPIO pins
 // But only if the Pinmux Mode has been set correctly with a device  
  // tree overlay!  
  //  
@@ -11,12 +11,14 @@
 #define INS_PER_US		200	// 5ns per instruction
 #define INS_PER_DELAY_LOOP	2	// two instructions per delay loop
 
-#define DELAY 1// * (INS_PER_US / INS_PER_DELAY_LOOP)
+#define DELAY 1 * 1000 * (INS_PER_US / INS_PER_DELAY_LOOP) // in milliseconds
 #define PRU0_R31_VEC_VALID	32
 #define PRU_EVTOUT_0		3	// the event number that is sent back
 
+#define AllInterestOutputPinsAddress 0x0FFF // In hexadecimal setting to one the respective bits
+
 SIGNALON:
-	set r30, r30, 4
+	set r30, r30, AllInterestOutputPinsAddress
 	mov r0, DELAY
 
 DELAYON:
@@ -24,7 +26,7 @@ DELAYON:
 	QBNE DELAYON, r0, 0
 	
 SIGNALOFF:
-	clr r30, r30, 4
+	clr r30, r30, AllInterestOutputPinsAddress
 	mov r0, DELAY
 
 DELAYOFF:
