@@ -4,6 +4,7 @@
  //  
  // Assemble in BBB with:  
  // pasm -b PRUassemblerSignalsScript.p
+ // https://www.ofitselfso.com/BBBCSIO/Help/BBBCSIOHelp_PRUPinInOutExamplePASMCode.html
  
 .origin 0				// start of program in PRU memory
 .entrypoint SIGNALON			// program entry point (for debbuger)
@@ -15,10 +16,8 @@
 #define PRU0_R31_VEC_VALID	32
 #define PRU_EVTOUT_0		3	// the event number that is sent back
 
-#define AllInterestOutputPinsAddress 0x0FFF // In hexadecimal setting to one the respective bits
-
 SIGNALON:
-	set r30, r30, AllInterestOutputPinsAddress
+	mov r30, 0x0FFF
 	mov r0, DELAY
 
 DELAYON:
@@ -26,7 +25,7 @@ DELAYON:
 	QBNE DELAYON, r0, 0
 	
 SIGNALOFF:
-	clr r30, r30, AllInterestOutputPinsAddress
+	mov r30, 0x0000
 	mov r0, DELAY
 
 DELAYOFF:
