@@ -26,6 +26,20 @@
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0x00000FFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
 
+// *** LED routines, so that LED USR0 can be used for some simple debugging
+// *** Affects: r2, r3
+.macro LED_OFF
+		MOV r2, 1<<21
+    MOV r3, GPIO_BANK1 | GPIO_CLEARDATAOUT
+    SBBO r2, r3, 0, 4
+.endm
+
+.macro LED_ON
+		MOV r2, 1<<21
+    MOV r3, GPIO_BANK1 | GPIO_SETDATAOUT
+    SBBO r2, r3, 0, 4
+.endm
+
 INITIATIONS:
 	MOV R1, GPIO_BANK1+GPIO_SETDATAOUT  // load the address to we wish to set to r2. Note that the operation GPIO_BANK1+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
 	MOV R2, GPIO_BANK1+GPIO_CLEARDATAOUT // load the address we wish to write to r3. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
