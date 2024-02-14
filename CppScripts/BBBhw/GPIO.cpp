@@ -141,8 +141,6 @@ unsigned char tv;
   unsigned char v1, v2;
   rgb24[3]=0;
 	
-
-	
 	DDR_regaddr = ddrMem + OFFSET_DDR;
 	valp=(unsigned short int*)&sharedMem_int[OFFSET_SHAREDRAM+1];
 	for (x=0; x<2000; x++)
@@ -154,9 +152,7 @@ unsigned char tv;
 		valp++;
 		valp++;
 	}
-	printf("\n");
-
-	
+	printf("\n");	
 }
 
 
@@ -167,9 +163,7 @@ int main (void)
     void *DDR_paramaddr;
     void *DDR_ackaddr;
     int fin;
-    char fname_new[255];
-    
-    
+    char fname_new[255];    
     
     // Open file
     outfile=fopen("data.csv", "w");
@@ -225,15 +219,14 @@ int main (void)
     munmap(ddrMem, 0x0FFFFFFF);
     close(mem_fd);
 
-    return(0);
+    return 0;
 }
 */
 /*****************************************************************************
 * Local Function Definitions                                                 *
 *****************************************************************************/
 /*
-static int LOCAL_exampleInit (  )
-{
+static int LOCAL_exampleInit(){
     void *DDR_regaddr1, *DDR_regaddr2, *DDR_regaddr3;	
     
     prussdrv_map_prumem(PRUSS1_SHARED_DATARAM, &sharedMem);
@@ -255,7 +248,7 @@ static int LOCAL_exampleInit (  )
     }
     
 
-    return(0);
+    return 0;
 }
 */
 // Operating system GPIO access (slow but simple)

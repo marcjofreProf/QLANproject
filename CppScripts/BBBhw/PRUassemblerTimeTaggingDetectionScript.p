@@ -56,7 +56,6 @@ DEL1:
 
 
 START:
-
     // Enable OCP master port
     LBCO      r0, CONST_PRUCFG, 4, 4
     CLR     r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
@@ -80,9 +79,7 @@ START:
     //Store values from read from the DDR memory into PRU shared RAM
     //SBCO      r0, CONST_PRUSHAREDRAM, 0, 12
 
-
 		LED_OFF
-
 
 START1:
 		SET r30.t11	// disable the data bus
@@ -133,10 +130,7 @@ WAITRISE1:
 		MOV r1, 1
 		SBCO r1, CONST_PRUSHAREDRAM, 0, 4 // Put contents of r1 into shared RAM
 		JMP START1 // finished, wait for next command		
-		
-
-
-
+	
 EXIT:
     // Send notification to Host for program completion
     MOV       r31.b0, PRU1_ARM_INTERRUPT+16

@@ -1077,10 +1077,12 @@ int main(int argc, char const * argv[]){
  // Then await for next actions
  
  bool isValidWhileLoop = true;
- 
+ string user_input;
  while(isValidWhileLoop){ 
    try{
  	try {
+ 	getline(cin,user_input);
+ 	if( user_input == "q"){isValidWhileLoop=false;} //Check if users wants to exit by pressing "q" letter 
     	// Code that might throw an exception 
  	// Check if there are need messages or actions to be done by the node
  	QTLANagent.acquire();
@@ -1098,9 +1100,7 @@ int main(int argc, char const * argv[]){
                // Maybe do some checks if necessary 
                break;
            }
-           case QTLAN::APPLICATION_EXIT: {    
-               cout << "Exiting the QtransportLayerAgentN" << endl;
-               QTLANagent.StopICPconnections(QTLANagent.ParamArgc);
+           case QTLAN::APPLICATION_EXIT: {                  
                isValidWhileLoop=false;//break;
            }
            default: {
@@ -1120,7 +1120,8 @@ int main(int argc, char const * argv[]){
   cout << "Exception caught" << endl;
     }
     } // while
-   
+  cout << "Exiting the QtransportLayerAgentN" << endl;
+  QTLANagent.StopICPconnections(QTLANagent.ParamArgc);
  return 0; // Everything Ok
 }
 
