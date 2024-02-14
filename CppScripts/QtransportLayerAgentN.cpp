@@ -1082,7 +1082,8 @@ int main(int argc, char const * argv[]){
    try{
  	try {
  	getline(cin,user_input);
- 	if( user_input == "q"){isValidWhileLoop=false;} //Check if users wants to exit by pressing "q" letter 
+ 	if(user_input == "q"){isValidWhileLoop=false;} //Check if users wants to exit by pressing "q" letter 
+ 	cout << user_input<<endl;
     	// Code that might throw an exception 
  	// Check if there are need messages or actions to be done by the node
  	QTLANagent.acquire();
