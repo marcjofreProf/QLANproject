@@ -89,7 +89,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	*/
     	// For fast debugging
 	// Load and execute the PRU program on the PRU
-	if (prussdrv_exec_program(0, "./BBBhw/PRUassTestScript.bin") == -1){
+	if (prussdrv_exec_program(1, "./BBBhw/PRUassTestScript.bin") == -1){
 		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTestScript.bin");
 	}
 	
@@ -97,7 +97,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  prussdrv_pru_wait_event(PRU_EVTOUT_0);  
 	  cout << "PRU all done" << endl;  
 	   
-	  prussdrv_pru_disable(0);  
+	  prussdrv_pru_disable(1);  
 	  prussdrv_exit(); 
 }
 
