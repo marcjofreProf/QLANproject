@@ -1122,6 +1122,7 @@ int main(int argc, char const * argv[]){
     } // while
   cout << "Exiting the QtransportLayerAgentN" << endl;
   QTLANagent.StopICPconnections(QTLANagent.ParamArgc);
+  QTLANagent.~QTLAN();
  return 0; // Everything Ok
 }
 
