@@ -88,7 +88,17 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	LOCAL_DDMinit();
 	*/
     	// For fast debugging
-	this->SendTriggerSignals();
+	// Load and execute the PRU program on the PRU
+	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTestScript.bin") == -1){
+		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTestScript.bin");
+	}
+	
+	// Wait for the PRU to let us know it's done  
+	  prussdrv_pru_wait_event(PRU_EVTOUT_0);  
+	  cout << "PRU all done" << endl;  
+	   
+	  prussdrv_pru_disable(PRU_Signal_NUM);  
+	  prussdrv_exit(); 
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
@@ -490,7 +500,6 @@ return 0;
 }
 
 GPIO::~GPIO() {
-/*
 //	this->unexportGPIO();
 	this->DisablePRUs();
 	//fclose(outfile); 
@@ -498,7 +507,6 @@ GPIO::~GPIO() {
 	munmap(ddrMem, 0x0FFFFFFF);
 	close(mem_fd); // Device
 	streamDDRpru.close();
-*/
 }
 
 } /* namespace exploringBB */
