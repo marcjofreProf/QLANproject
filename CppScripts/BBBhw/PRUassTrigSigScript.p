@@ -46,7 +46,7 @@ INITIATIONS:
 	MOV r3, AllOutputInterestPinsHigh // load R3 with the LEDs enable/disable bit
 
 SIGNALON:	// for setting just one pin would be set r30, r30, #Bit number	
-	SBBO r3, r1, 0, 2 // write the contents of R3 out to the memory address contained in R1. Use no offset from that address and copy least significant 2 bytes of R2
+	//SBBO r3, r1, 0, 2 // write the contents of R3 out to the memory address contained in R1. Use no offset from that address and copy least significant 2 bytes of R2
 	mov r0, DELAY
 
 DELAYON:
@@ -54,13 +54,13 @@ DELAYON:
 	QBNE DELAYON, r0, 0
 	
 SIGNALOFF:      // for clearing just one pin would be clr r30, r30, #Bit number	
-	SBBO r3, r2, 0, 2 // write the contents of R3 out to the memory address contained in R2. Use no offset from that address and copy least significant 2 bytes of R2
+	//SBBO r3, r2, 0, 2 // write the contents of R3 out to the memory address contained in R2. Use no offset from that address and copy least significant 2 bytes of R2
 	mov r0, DELAY
 
 DELAYOFF:
 	sub r0, r0, 1
 	QBNE DELAYOFF, r0, 0
-	jmp SIGNALON
+	//jmp SIGNALON
 
 EXIT:
 	mov r31.b0, PRU0_R31_VEC_VALID | PRU_EVTOUT_0
