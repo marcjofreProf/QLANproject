@@ -1076,14 +1076,13 @@ int main(int argc, char const * argv[]){
  
  // Then await for next actions
  
- bool isValidWhileLoop = true;
- string user_input;
+ bool isValidWhileLoop;
+ if (QTLANagent.getState()==QTLAN::APPLICATION_EXIT){isValidWhileLoop = false;}
+ else{isValidWhileLoop = true;}
+ 
  while(isValidWhileLoop){ 
    try{
  	try {
- 	getline(cin,user_input);
- 	if(user_input == "q"){isValidWhileLoop=false;} //Check if users wants to exit by pressing "q" letter 
- 	cout << user_input<<endl;
     	// Code that might throw an exception 
  	// Check if there are need messages or actions to be done by the node
  	QTLANagent.acquire();
