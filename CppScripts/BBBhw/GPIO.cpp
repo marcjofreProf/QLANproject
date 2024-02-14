@@ -139,7 +139,7 @@ return 0;// all ok
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 
 // Load and execute the PRU program on the PRU
-if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassemblerSignalsScript.bin") == -1){
+if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassemblerTriggerSignalsScript.bin") == -1){
 	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerTriggerSignalsScript.bin");
 }
 return 0;// all ok	
