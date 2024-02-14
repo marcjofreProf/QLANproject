@@ -104,8 +104,8 @@ unsigned int ret;
     sharedMem_int[OFFSET_SHAREDRAM]=0; // set to zero means no command
     // Execute program
     // Load and execute the PRU program on the PRU
-if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassemblerTimeTaggingDetectionScript.bin") == -1){
-	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerTimeTaggingDetectionScript.bin");
+if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
+	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTaggDetScript.bin");
 }
 	sleep(1);
 	sharedMem_int[OFFSET_SHAREDRAM]=(unsigned int)2; // set to 2 means perform capture
@@ -140,8 +140,8 @@ return 0;// all ok
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 
 // Load and execute the PRU program on the PRU
-if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassemblerTriggerSignalsScript.bin") == -1){
-	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerTriggerSignalsScript.bin");
+if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
+	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTrigSigScript.bin");
 }
 return 0;// all ok	
 }

@@ -3,7 +3,7 @@
  // tree overlay!  
  //  
  // Assemble in BBB with:  
- // pasm -b PRUassemblerSignalsScript.p
+ // pasm -b PRUassTrigSigScript.p
  // https://www.ofitselfso.com/BBBCSIO/Help/BBBCSIOHelp_PRUPinInOutExamplePASMCode.html
  
 .origin 0				// start of program in PRU memory

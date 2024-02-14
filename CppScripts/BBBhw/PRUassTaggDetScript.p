@@ -5,7 +5,7 @@
 .origin 0
 .entrypoint START
 
-#include "PRUassemblerTimeTaggingDetectionScript.hp"
+#include "PRUassTaggDetScript.hp"
 
 #define GPIO_BANK1 0x4804c000 // this is the address of the BBB GPIO Bank1 Register. We set bits in special locations in offsets here to put a GPIO high or low.
 #define GPIO_CLEARDATAOUT 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
