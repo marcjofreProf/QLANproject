@@ -83,10 +83,10 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	if (!streamDDRpru.is_open()) {
         	cout << "Failed to open the streamDDRpru file." << endl;
         }
-	
+	/*
         // Initialize DDM
 	LOCAL_DDMinit();
-	  
+	*/
     	// For fast debugging
 	this->SendTriggerSignals();
 }
