@@ -1,27 +1,16 @@
 // PRUassemblerTimeTaggingDetectionScript.p
-//
-// BBB Schematic  BBB port Assign Bit
-// -------------  -------- ------ ------------
-// LCD_DATA0      P8.45    D0     PRU1_R31_0
-// LCD_DATA1      P8.46    D1     PRU1_R31_1
-// LCD_DATA2      P8.43    D2     PRU1_R31_2
-// LCD_DATA3      P8.44    D3     PRU1_R31_3
-// LCD_DATA4      P8.41    D4     PRU1_R31_4
-// LCD_DATA5      P8.42    D5     PRU1_R31_5
-// LCD_DATA6      P8.39    D6     PRU1_R31_6
-// LCD_DATA7      P8.40    D7     PRU1_R31_7
-// LCD_PCLK       P8.28    CLK    PRU1_R31_10
-// LCD_DE         P8.30    *EN    PRU1_R30_11
-                                  
+// Time Tagging functionality on PRU0 with Shared Memory Access (not Direct MEmory Access)
+                                 
 
 .origin 0
 .entrypoint START
 
 #include "PRUassemblerTimeTaggingDetectionScript.hp"
 
-#define GPIO1 0x4804c000
-#define GPIO_CLEARDATAOUT 0x190
-#define GPIO_SETDATAOUT 0x194
+#define GPIO_BANK1 0x4804c000 // this is the address of the BBB GPIO Bank1 Register. We set bits in special locations in offsets here to put a GPIO high or low.
+#define GPIO_CLEARDATAOUT 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
+// GPIO goes low. If a bit is 0 it is ignored.
+#define GPIO_SETDATAOUT 0x194 // at this offset various GPIOs are associated with a bit position. Writing a 32 bit value to this offset enables them (sets them high) if there is a 1 in a corresponding bit. A zero in a bit position here is ignored - it does NOT turn the associated GPIO off.
 
 #define SHARED 0x10000
 
@@ -39,13 +28,13 @@
 // *** Affects: r2, r3
 .macro LED_OFF
 		MOV r2, 1<<21
-    MOV r3, GPIO1 | GPIO_CLEARDATAOUT
+    MOV r3, GPIO_BANK1 | GPIO_CLEARDATAOUT
     SBBO r2, r3, 0, 4
 .endm
 
 .macro LED_ON
 		MOV r2, 1<<21
-    MOV r3, GPIO1 | GPIO_SETDATAOUT
+    MOV r3, GPIO_BANK1 | GPIO_SETDATAOUT
     SBBO r2, r3, 0, 4
 .endm
 

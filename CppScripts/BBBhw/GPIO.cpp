@@ -61,7 +61,9 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  } 
 	// Map PRU's interrupts
 	prussdrv_pruintc_init(&pruss_intc_initdata);
-    
+    	
+    	// For fast debugging
+	this->SendTriggerSignals();
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
@@ -70,7 +72,7 @@ int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassemblerTimeTaggingDetectionScript.bin") == -1){
 	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerTimeTaggingDetectionScript.bin");
 }  
-
+return 0;// all ok
 }
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
@@ -79,11 +81,12 @@ int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physical
 if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassemblerSignalsScript.bin") == -1){
 	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerTriggerSignalsScript.bin");
 }
-	
+return 0;// all ok	
 }
 
 int GPIO::SendEmulateQubits(){ // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
 
+return 0;// all ok
 }
 
 //PRU0 - Operation - getting iputs
@@ -102,13 +105,13 @@ int GPIO::SendEmulateQubits(){ // Emulates sending 2 entangled qubits through th
 * Local Function Declarations                                                 *
 ******************************************************************************/
 
-static int LOCAL_exampleInit ( );
+//static int LOCAL_exampleInit ( );
 
 
 /******************************************************************************
 * Global Variable Definitions                                                 *
 ******************************************************************************/
-
+/*
 static int mem_fd;
 static void *ddrMem, *sharedMem;
 
@@ -117,13 +120,13 @@ static int chunk;
 static unsigned int *sharedMem_int;
 
 FILE* outfile;
-
+*/
 
 /******************************************************************************
 * Global Function Definitions                                                 *
 ******************************************************************************/
 
-
+/*
 void dumpdata(void)
 {
 unsigned short int *DDR_regaddr;
@@ -171,11 +174,11 @@ int main (void)
     // Open file
     outfile=fopen("data.csv", "w");
 
-    /* Initialize example */
+    // Initialize example 
     printf("\tINFO: Initializing example.\r\n");
     LOCAL_exampleInit(PRU_Operation_NUM);
     
-    /* Execute example on PRU */
+    // Execute example on PRU 
     printf("\tINFO: Executing example.\r\n");
     
     DDR_paramaddr = ddrMem + OFFSET_DDR - 8;
@@ -216,7 +219,7 @@ int main (void)
 
     
     
-    /* Disable PRU and close memory mapping*/
+    // Disable PRU and close memory mapping
     prussdrv_pru_disable(PRU_Operation_NUM); 
     prussdrv_exit ();
     munmap(ddrMem, 0x0FFFFFFF);
@@ -224,11 +227,11 @@ int main (void)
 
     return(0);
 }
-
+*/
 /*****************************************************************************
 * Local Function Definitions                                                 *
 *****************************************************************************/
-
+/*
 static int LOCAL_exampleInit (  )
 {
     void *DDR_regaddr1, *DDR_regaddr2, *DDR_regaddr3;	
@@ -236,14 +239,14 @@ static int LOCAL_exampleInit (  )
     prussdrv_map_prumem(PRUSS1_SHARED_DATARAM, &sharedMem);
     sharedMem_int = (unsigned int*) sharedMem;
 
-    /* open the device */
+    // open the device 
     mem_fd = open("/dev/mem", O_RDWR);
     if (mem_fd < 0) {
         printf("Failed to open /dev/mem (%s)\n", strerror(errno));
         return -1;
     }	
 
-    /* map the DDR memory */
+    // map the DDR memory
     ddrMem = mmap(0, 0x0FFFFFFF, PROT_WRITE | PROT_READ, MAP_SHARED, mem_fd, DDR_BASEADDR);
     if (ddrMem == NULL) {
         printf("Failed to map the device (%s)\n", strerror(errno));
@@ -254,7 +257,7 @@ static int LOCAL_exampleInit (  )
 
     return(0);
 }
-
+*/
 // Operating system GPIO access (slow but simple)
 GPIO::GPIO(int number) {
 	this->number = number;
