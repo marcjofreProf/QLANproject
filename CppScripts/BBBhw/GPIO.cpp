@@ -490,7 +490,6 @@ return 0;
 }
 
 GPIO::~GPIO() {
-/*
 //	this->unexportGPIO();
 	this->DisablePRUs();
 	//fclose(outfile); 
@@ -498,7 +497,6 @@ GPIO::~GPIO() {
 	munmap(ddrMem, 0x0FFFFFFF);
 	close(mem_fd); // Device
 	streamDDRpru.close();
-	*/
 }
 
 } /* namespace exploringBB */
