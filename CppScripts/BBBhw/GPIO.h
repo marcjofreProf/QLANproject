@@ -45,9 +45,11 @@ private:
 	string name, path;
 
 public:	
-	GPIO(int number); //constructor will export the pin
+	GPIO(int number); //constructor will export the pin	
+	// PRU
 	GPIO(); // initializates PRU operation
-	// PRU 
+	virtual int LOCAL_DDMinit();
+	virtual int DDRdumpdata();
 	virtual int DisablePRUs();
 	virtual int ReadTimeStamps();// Read the detected timestaps in four channels
 	virtual int SendTriggerSignals(); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
@@ -89,6 +91,13 @@ public:
 	virtual ~GPIO();  //destructor will unexport the pin
 
 private:
+	// PRU
+	static int mem_fd;
+	static void *ddrMem, *sharedMem;
+	static int chunk;
+	static unsigned int *sharedMem_int;
+	FILE* outfile;
+	// Non-PRU
 	int write(string path, string filename, string value);
 	int write(string path, string filename, int value);
 	string read(string path, string filename);
