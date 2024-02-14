@@ -32,7 +32,7 @@ using std::ifstream;
 using std::fstream;
 
 #define GPIO_PATH "/sys/class/gpio/"
-#define PRUdataPATH "/home/debian/Scripts/QLANproject/PRUdata/"
+#define PRUdataPATH "../PRUdata/"
 
 namespace exploringBB {
 
