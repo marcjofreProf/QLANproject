@@ -75,58 +75,55 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Map PRU's interrupts
 	prussdrv_pruintc_init(&pruss_intc_initdata);
     	
+    	// Open file where temporally are stored timetaggs
+    	//outfile=fopen("data.csv", "w");
+	streamDDRpru.open(string(PRUdataPATH) + string("TimetaggingData"), std::ios::in | std::ios::out);// Open for write and read
+	
+	if (!streamDDRpru.is_open()) {
+        	cout << "Failed to open the streamDDRpru file." << endl;
+        }
+	
+        // Initialize DDM
+	LOCAL_DDMinit();
+	    
     	// For fast debugging
 	this->SendTriggerSignals();
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
-
-// Load and execute the PRU program on the PRU
-if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassemblerTimeTaggingDetectionScript.bin") == -1){
-	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerTimeTaggingDetectionScript.bin");
-}
-
 unsigned int ret;
     int i;
     void *DDR_paramaddr;
     void *DDR_ackaddr;
     int fin;
-    char fname_new[255];    
-    
-    // Open file
-    outfile=fopen("data.csv", "w");
-
-    // Initialize example 
-    printf("\tINFO: Initializing example.\r\n");
-    LOCAL_DDMinit();
-    
-    // Execute example on PRU 
-    printf("\tINFO: Executing example.\r\n");
-    
+    char fname_new[255];     
     DDR_paramaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 8;
     DDR_ackaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 4;
     
     sharedMem_int[OFFSET_SHAREDRAM]=0; // set to zero means no command
     // Execute program
-    prussdrv_exec_program (PRU_Operation_NUM, "./BBBhw/PRUassemblerOperationsScript.bin");
-		sleep(1);
-		sharedMem_int[OFFSET_SHAREDRAM]=(unsigned int)2; // set to 2 means perform capture
-		
-		// give some time for the PRU code to execute
-		sleep(1);
-		//printf("Waiting for ack (curr=%d). \n", sharedMem_int[OFFSET_SHAREDRAM]);
-		fin=0;
-		do
+    // Load and execute the PRU program on the PRU
+if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassemblerTimeTaggingDetectionScript.bin") == -1){
+	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassemblerTimeTaggingDetectionScript.bin");
+}
+	sleep(1);
+	sharedMem_int[OFFSET_SHAREDRAM]=(unsigned int)2; // set to 2 means perform capture
+
+	// give some time for the PRU code to execute
+	sleep(1);
+	//printf("Waiting for ack (curr=%d). \n", sharedMem_int[OFFSET_SHAREDRAM]);
+	fin=0;
+	do
+	{
+		if ( sharedMem_int[OFFSET_SHAREDRAM] == 1 )
 		{
-			if ( sharedMem_int[OFFSET_SHAREDRAM] == 1 )
-			{
-				// we have received the ack!
-				this->DDRdumpdata(); // Store to file
-				sharedMem_int[OFFSET_SHAREDRAM] = 0;
-				fin=1;
-				//printf("Ack\n");
-			}
-		} while(!fin);
+			// we have received the ack!
+			this->DDRdumpdata(); // Store to file
+			sharedMem_int[OFFSET_SHAREDRAM] = 0;
+			fin=1;
+			//printf("Ack\n");
+		}
+	} while(!fin);
 
 		
 		
@@ -134,19 +131,7 @@ unsigned int ret;
     //printf("Done\n");
     //prussdrv_pru_clear_event (PRU1_ARM_INTERRUPT);
 
- 		   	
-
-		fclose(outfile);
-
-    
-    
-    // Disable PRU and close memory mapping
-    prussdrv_pru_disable(PRU_Operation_NUM); 
-    prussdrv_exit ();
-    munmap(ddrMem, 0x0FFFFFFF);
-    close(mem_fd);
-
-    return 0;
+ 	
   
 return 0;// all ok
 }
@@ -186,11 +171,12 @@ for (x=0; x<2000; x++){
 	val=*valp;
 	val=val & 0xff; // we're just interested in 8 bits
 
-	fprintf(outfile, "%d\n", val);
+	//fprintf(outfile, "%d\n", val);
+	streamDDRpru << val << endl;
 	valp++;
 	valp++;
 }
-printf("\n");
+
 return 0; // all ok
 }
 
@@ -498,13 +484,18 @@ int GPIO::DisablePRUs(){
 // Disable PRU and close memory mappings
 prussdrv_pru_disable(PRU_Signal_NUM);
 prussdrv_pru_disable(PRU_Operation_NUM);
+
 return 0;
 }
 
 GPIO::~GPIO() {
 //	this->unexportGPIO();
 	this->DisablePRUs();
+	//fclose(outfile); 
 	prussdrv_exit();
+	munmap(ddrMem, 0x0FFFFFFF);
+	close(mem_fd); // Device
+	streamDDRpru.close();
 }
 
 } /* namespace exploringBB */

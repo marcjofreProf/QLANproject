@@ -40,16 +40,17 @@ using namespace std;
 namespace nsQphysLayerAgent {
 QPLA::QPLA() {// Constructor
 	PRUGPIO=new GPIO();// Initiates custom PRU code in BBB	
+	/* Very slow GPIO BBB not used anymore
 	// The above pins initializatoins (and also in the destructor will not be needed in the future since it is done with PRU
-		inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
-		inGPIO->setDirection(INPUT);
-		inGPIO->setEdgeType(NONE);
-		inGPIO->streamInOpen();
-		outGPIO=new GPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
-		outGPIO->setDirection(OUTPUT);
-		outGPIO->streamOutOpen();
-		outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);
- 
+	inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
+	inGPIO->setDirection(INPUT);
+	inGPIO->setEdgeType(NONE);
+	inGPIO->streamInOpen();
+	outGPIO=new GPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
+	outGPIO->setDirection(OUTPUT);
+	outGPIO->streamOutOpen();
+	outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);
+	*/
 }
 
 ////////////////////////////////////////////////////////
@@ -337,7 +338,7 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
 this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum 
 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
-clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
+clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 
@@ -347,6 +348,8 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  
  cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
+ 
+ /* Very slow GPIO BBB not used anymore
  // Basic Output - Generate a pulse of 1 second period
  ////clock_nanosleep(CLOCK_REALTIME,0,&requestQuarterPeriod,NULL);
  //TimePointFuture_time_as_count+=(long)QuBitsNanoSecQuarterPeriodInt[0];
@@ -366,21 +369,11 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 	requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
- } 
+ }
+ */
+ 
  this->release();
  
- //usleep(QuBitsUSecHalfPeriodInt[0]);
-  
- /* Not used. Just to know how to do fast writes
- // Fast write to GPIO 1 million times
-   outGPIO.streamOpen();
-   for (int i=0; i<1000000; i++){
-      outGPIO.streamWrite(HIGH);
-      outGPIO.streamWrite(LOW);
-   }
-   outGPIO.streamClose();
-   */
-   
  //cout << "Qubit emitted" << endl;
 cout << "End Emiting Qubits" << endl;
 
@@ -474,7 +467,7 @@ while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
 this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum priority
 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
-clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
+clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrier
 
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 //cout << "MaxWhileRound: " << MaxWhileRound << endl;
@@ -484,6 +477,8 @@ cout << "Start Receiving Qubits" << endl;// This line should be commented to red
  //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
  
  // Basic Input
+ 
+ /* Very slow GPIO BBB not used anymore
  ////clock_nanosleep(CLOCK_REALTIME,0,&requestQuarterPeriod,NULL);
  TimePointFuture_time_as_count+=(long)QuBitsNanoSecQuarterPeriodInt[0];
  requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
@@ -497,6 +492,8 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 	requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL); 
  }
+ */
+ 
  this->release();
  cout << "End Receiving Qubits" << endl;
  
@@ -533,8 +530,11 @@ return SimulateNumStoredQubitsNodeAux;
 
 QPLA::~QPLA() {
 // destructor
+/* Very slow GPIO BBB not used anymore
 outGPIO->streamOutClose();
 inGPIO->streamInClose();
+*/
+delete PRUGPIO; // Destructor for the PRUGPIO instance
 this->threadRef.join();// Terminate the process thread
 }
 

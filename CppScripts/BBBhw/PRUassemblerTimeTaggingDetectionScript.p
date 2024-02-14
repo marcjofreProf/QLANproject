@@ -58,18 +58,18 @@ DEL1:
 START:
     // Enable OCP master port
     LBCO      r0, CONST_PRUCFG, 4, 4
-    CLR     r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
+    CLR       r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
     SBCO      r0, CONST_PRUCFG, 4, 4
 
-    // Configure the programmable pointer register for PRU0 by setting c28_pointer[15:0]
+    // Configure the programmable pointer register for PRU by setting c28_pointer[15:0]
     // field to 0x0100.  This will make C28 point to 0x00010000 (PRU shared RAM).
-    MOV     r0, 0x00000100
+    MOV       r0, 0x00000100
     MOV       r1, CTPPR_0
     ST32      r0, r1
 
-    // Configure the programmable pointer register for PRU0 by setting c31_pointer[15:0]
+    // Configure the programmable pointer register for PRU by setting c31_pointer[15:0]
     // field to 0x0010.  This will make C31 point to 0x80001000 (DDR memory).
-    MOV     r0, 0x00100000
+    MOV       r0, 0x00100000
     MOV       r1, CTPPR_1
     ST32      r0, r1
 
@@ -79,11 +79,11 @@ START:
     //Store values from read from the DDR memory into PRU shared RAM
     //SBCO      r0, CONST_PRUSHAREDRAM, 0, 12
 
-		LED_OFF
+    LED_OFF
 
 START1:
 		SET r30.t11	// disable the data bus
-		MOV r6, ACQRAM // PRU shared RAM
+		MOV r6, ACQRAM  // PRU shared RAM
 		MOV r4, MASK0
 		MOV r7, RECORDS // This will be the loop counter to read the entire set of data
 		MOV r0, 7	// pipeline bit counter

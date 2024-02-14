@@ -29,8 +29,10 @@
 using std::string;
 using std::ofstream;
 using std::ifstream;
+using std::fstream;
 
 #define GPIO_PATH "/sys/class/gpio/"
+#define PRUdataPATH "/home/debian/Scripts/QLANproject/PRUdata/"
 
 namespace exploringBB {
 
@@ -96,7 +98,8 @@ private:
 	static void *ddrMem, *sharedMem;
 	static int chunk;
 	static unsigned int *sharedMem_int;
-	FILE* outfile;
+	//FILE* outfile;
+	fstream streamDDRpru;
 	// Non-PRU
 	int write(string path, string filename, string value);
 	int write(string path, string filename, int value);
