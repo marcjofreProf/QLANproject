@@ -42,7 +42,7 @@ namespace nsQphysLayerAgent {
 class QPLA {
 private: //Variables/Instances		
 	int numberLinks=0;// Number of full duplex links directly connected to this physical quantum node
-        int EmitLinkNumberArray[LinkNumberMAX]={60}; // Array indicating the GPIO numbers identifying the emit pins
+        int EmitLinkNumberArray[LinkNumberMAX]={66}; // Array indicating the GPIO numbers identifying the emit pins
         int ReceiveLinkNumberArray[LinkNumberMAX]={48}; // Array indicating the GPIO numbers identifying the receive pins
         float QuBitsPerSecondVelocity[LinkNumberMAX]={1000.0}; // Array indicating the qubits per second velocity of each emit/receive pair 
         int QuBitsNanoSecPeriodInt[LinkNumberMAX]={1000000};
