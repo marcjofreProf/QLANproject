@@ -77,6 +77,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
     	
     	// Open file where temporally are stored timetaggs
     	//outfile=fopen("data.csv", "w");
+	/*
 	streamDDRpru.open(string(PRUdataPATH) + string("TimetaggingData"), std::ios::in | std::ios::out);// Open for write and read
 	
 	if (!streamDDRpru.is_open()) {
@@ -85,7 +86,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
         // Initialize DDM
 	LOCAL_DDMinit();
-	    
+	*/  
     	// For fast debugging
 	this->SendTriggerSignals();
 }
