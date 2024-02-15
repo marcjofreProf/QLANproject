@@ -79,7 +79,7 @@ START:
     //Store values from read from the DDR memory into PRU shared RAM
     //SBCO      r0, CONST_PRUSHAREDRAM, 0, 12
 
-    LED_OFF
+//    LED_OFF // LED_ON not used because it slows down capture
 
 START1:
 		SET r30.t11	// disable the data bus
@@ -126,10 +126,10 @@ WAITRISE1:
 		SET r30.t11	// disable the data bus
 		
 		// we're done. Signal to the application		
-		LED_ON
+//		LED_ON// this slows down the capturing
 		MOV r1, 1
 		SBCO r1, CONST_PRUSHAREDRAM, 0, 4 // Put contents of r1 into shared RAM
-		JMP START1 // finished, wait for next command		
+		JMP START1 // finished, wait for next command. So it continuosly loops	
 	
 EXIT:
     // Send notification to Host for program completion

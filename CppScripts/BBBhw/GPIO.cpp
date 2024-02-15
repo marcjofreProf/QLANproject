@@ -87,7 +87,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
         // Initialize DDM
 	LOCAL_DDMinit();
 	
-	
+	/*/ Doing debbuging checks - Debugging 1
 	// Load and execute the PRU program on the PRU
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
 		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTrigSigScript.bin");
@@ -104,7 +104,19 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  
 	  prussdrv_pru_disable(PRU_Signal_NUM);
 	  prussdrv_pru_disable(PRU_Operation_NUM);  
-	  prussdrv_exit(); 
+	  prussdrv_exit(); */
+	  
+	  // Doing debbuging checks - Debugging 2
+	  this->SendTriggerSignals();
+	  this->ReadTimeStamps();
+	  
+	  munmap(ddrMem, 0x0FFFFFFF);
+	  close(mem_fd); // Device
+	  streamDDRpru.close();
+	  prussdrv_pru_disable(PRU_Signal_NUM);
+	  prussdrv_pru_disable(PRU_Operation_NUM);  
+	  prussdrv_exit();
+	  
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
