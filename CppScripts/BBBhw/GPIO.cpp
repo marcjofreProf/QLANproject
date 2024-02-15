@@ -83,21 +83,27 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	if (!streamDDRpru.is_open()) {
         	cout << "Failed to open the streamDDRpru file." << endl;
         }
-	/*
+	
         // Initialize DDM
 	LOCAL_DDMinit();
-	*/
+	
+	
+	// Load and execute the PRU program on the PRU
+	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
+		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTrigSigScript.bin");
+	}
     	// For fast debugging
 	// Load and execute the PRU program on the PRU
-	if (prussdrv_exec_program(1, "./BBBhw/PRUassTrigSigScript.bin") == -1){
-		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTrigSigScript.bin");
+	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
+		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTaggDetScript.bin");
 	}
 	
 	// Wait for the PRU to let us know it's done  
 	  prussdrv_pru_wait_event(PRU_EVTOUT_0);  
-	  cout << "PRU all done" << endl;  
-	   
-	  prussdrv_pru_disable(1);  
+	  cout << "PRUs all done" << endl;  
+	  
+	  prussdrv_pru_disable(PRU_Signal_NUM);
+	  prussdrv_pru_disable(PRU_Operation_NUM);  
 	  prussdrv_exit(); 
 }
 
@@ -140,9 +146,7 @@ if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") 
 		
     //prussdrv_pru_wait_event (PRU_EVTOUT_1);
     //printf("Done\n");
-    //prussdrv_pru_clear_event (PRU1_ARM_INTERRUPT);
-
- 	
+    //prussdrv_pru_clear_event (PRU1_ARM_INTERRUPT); 	
   
 return 0;// all ok
 }

@@ -22,7 +22,7 @@
 // Memory location where to store the data to be acquired:
 #define ACQRAM 0x00010004
 // Length of acquisition:
-#define RECORDS 2000
+#define RECORDS 2000 // Seems 2000 readings and it matches in the host c++ script
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r2, r3
@@ -91,7 +91,7 @@ START1:
 		// wait for command
 CMDLOOP:
 		DEL
-		LBCO r12, CONST_PRUSHAREDRAM, 0, 4
+		LBCO r12, CONST_PRUSHAREDRAM, 0, 4 // Load to r12 the content of CONST_PRUSHAREDRAM with affset 0, and the 4 bytes
 		QBEQ CMDLOOP, r12, 0 // loop until we get an instruction
 		QBEQ CMDLOOP, r12, 1 // loop until we get an instruction
 		// ok, we have an instruction. Assume it means 'begin capture'
@@ -101,18 +101,18 @@ CAPTURE:
 		CLR r30.t11	// enable data bus
 CAPTURE1:
 		// wait for 7th rising edge, since we have a pipeline in the ADC
-		WBC r31.t10 // wait for clock to be low
-		WBS r31.t10 // wait for clock rising edge
+//		WBC r31.t10 // wait for clock to be low// This should check the different inputs pins at the same time
+//		WBS r31.t10 // wait for clock rising edge// This should check the different inputs pins at the same time
 		SUB r0, r0, 1 // decrement pipeline counter
 		QBNE CAPTURE1, r0, 0 // loop until we have completed the pipeline delay
 		// ok, on the next (i.e. 8th) rising edge, we must start capturing
 
 CAPTURELOOP:
 		// First byte:
-		WBC r31.t10	// Ensure CLK is actually low
+//		WBC r31.t10	// Ensure CLK is actually low// This should check the different inputs pins at the same time
 WAITRISE1:
 		// Now wait until CLK rising edge
-		WBS r31.t10
+//		WBS r31.t10 // This should check the different inputs pins at the same time
 		MOV r2, r31	// Read in the data (i.e. after 5nsec of clock rising edge)
 		MOV r2, r31	// Read in the data (i.e. after 5nsec of clock rising edge)
 		MOV r2, r31	// Read in the data (i.e. after 5nsec of clock rising edge)
