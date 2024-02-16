@@ -229,7 +229,7 @@ return 0; // all ok
 
 int GPIO::LOCAL_DDMinit(){
     //void *DDR_regaddr1, *DDR_regaddr2, *DDR_regaddr3;    
-    prussdrv_map_prumem(PRUSS0_SHARED_DATARAM, &sharedMem);
+    prussdrv_map_prumem(PRUSS0_SHARED_DATARAM, &sharedMem);// Maps the PRU DRAM and IRAM memory to input pointer. Memory is then accessed by an array.
     sharedMem_int = (unsigned int*) sharedMem;
 
     // open the device 
