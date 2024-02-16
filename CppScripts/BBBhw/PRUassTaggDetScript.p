@@ -7,34 +7,34 @@
 
 #include "PRUassTaggDetScript.hp"
 
-#define GPIO_BANK1 0x4804c000 // this is the address of the BBB GPIO Bank1 Register. We set bits in special locations in offsets here to put a GPIO high or low.
+#define GPIO1_BANK 0x4804c000 // this is the address of the BB GPIO1 Bank Register for PR0. We set bits in special locations in offsets here to put a GPIO high or low.
 #define GPIO_CLEARDATAOUT 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
 // GPIO goes low. If a bit is 0 it is ignored.
 #define GPIO_SETDATAOUT 0x194 // at this offset various GPIOs are associated with a bit position. Writing a 32 bit value to this offset enables them (sets them high) if there is a 1 in a corresponding bit. A zero in a bit position here is ignored - it does NOT turn the associated GPIO off.
 
-#define SHARED 0x10000
+#define SHARED 0x10000 // somehow the base address for shared memory
 
-#define MASK0 0x000000ff
+//#define MASK0 0x000000ff // not really used
 
 // Memory location of command:
-#define CMD 0x00010000
+#define CMD 0x00010000 // seems to coincide with the position 0 of the SHARED
 
 // Memory location where to store the data to be acquired:
-#define ACQRAM 0x00010004
+#define ACQRAM 0x00010004 // Seems to have an offset of 4 with respect the SHARED, which corresponds to 8*4=31 bits
 // Length of acquisition:
 #define RECORDS 2000 // Seems 2000 readings and it matches in the host c++ script
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
-// *** Affects: r2, r3
+// *** Affects: r2, r3. Each PRU has its of 32 registers
 .macro LED_OFF
-		MOV r2, 1<<21
-    MOV r3, GPIO_BANK1 | GPIO_CLEARDATAOUT
+    MOV r2, 1<<21
+    MOV r3, GPIO1_BANK | GPIO_CLEARDATAOUT
     SBBO r2, r3, 0, 4
 .endm
 
 .macro LED_ON
-		MOV r2, 1<<21
-    MOV r3, GPIO_BANK1 | GPIO_SETDATAOUT
+    MOV r2, 1<<21
+    MOV r3, GPIO1_BANK | GPIO_SETDATAOUT
     SBBO r2, r3, 0, 4
 .endm
 
@@ -55,14 +55,15 @@ DEL1:
 .endm
 
 
-START:
-    // Enable OCP master port
-    LBCO      r0, CONST_PRUCFG, 4, 4
+START:// This is only run once    
+    LBCO      r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
+    // OCP master port is the protocol to enable communication between the PRUs and the host processor
     CLR       r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
     SBCO      r0, CONST_PRUCFG, 4, 4
 
     // Configure the programmable pointer register for PRU by setting c28_pointer[15:0]
     // field to 0x0100.  This will make C28 point to 0x00010000 (PRU shared RAM).
+    // http://www.embedded-things.com/bbb/understanding-bbb-pru-shared-memory-access/
     MOV       r0, 0x00000100
     MOV       r1, CTPPR_0
     ST32      r0, r1
@@ -84,14 +85,14 @@ START:
 START1:
 		SET r30.t11	// disable the data bus
 		MOV r6, ACQRAM  // PRU shared RAM
-		MOV r4, MASK0
+//		MOV r4, MASK0 // Not really used
 		MOV r7, RECORDS // This will be the loop counter to read the entire set of data
-		MOV r0, 7	// pipeline bit counter
+		MOV r0, 7	// pipeline bit counter. Related to the number of samples per record
 		MOV r11, CMD
 		// wait for command
 CMDLOOP:
 		DEL
-		LBCO r12, CONST_PRUSHAREDRAM, 0, 4 // Load to r12 the content of CONST_PRUSHAREDRAM with affset 0, and the 4 bytes
+		LBCO r12, CONST_PRUSHAREDRAM, 0, 4 // Load to r12 the content of CONST_PRUSHAREDRAM with offset 0, and the 4 bytes
 		QBEQ CMDLOOP, r12, 0 // loop until we get an instruction
 		QBEQ CMDLOOP, r12, 1 // loop until we get an instruction
 		// ok, we have an instruction. Assume it means 'begin capture'
@@ -113,10 +114,13 @@ CAPTURELOOP:
 WAITRISE1:
 		// Now wait until CLK rising edge
 //		WBS r31.t10 // This should check the different inputs pins at the same time
+		// Why 3 repetitive captures below??? Maybe here we should read some internal clock for the time tagging functionality
 		MOV r2, r31	// Read in the data (i.e. after 5nsec of clock rising edge)
 		MOV r2, r31	// Read in the data (i.e. after 5nsec of clock rising edge)
 		MOV r2, r31	// Read in the data (i.e. after 5nsec of clock rising edge)
-		//AND r1, r2, r4 // We're just interested in a portion of r31 (i.e. 8 bits)
+		//AND r1, r2, r4 // We're just interested in a portion of r31 (i.e. 8 bits).
+		//Actually, maybe only 4 bits (only four detecton channels) but maybe it is difficult to have only 4, maybe 8 is the minimum.
+		//https://elinux.org/Ti_AM33XX_PRUSSv2#Beaglebone_PRU_connections_and_modes
 		// we can now write it to RAM (address in r6)
 		SBBO r2.b0, r6, 0, 1 // Put contents of r1 into the address at r6
 		ADD r6, r6, 4 // increment DDR address by 4 bytes
@@ -133,7 +137,8 @@ WAITRISE1:
 	
 EXIT:
     // Send notification to Host for program completion
-    MOV       r31.b0, PRU1_ARM_INTERRUPT+16
+    MOV R31.b0, PRU0_R31_VEC_VALID | PRU_EVTOUT_0
+    MOV       r31.b0, PRU0_ARM_INTERRUPT+16
 
     // Halt the processor
     HALT

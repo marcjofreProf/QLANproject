@@ -46,11 +46,18 @@
 /******************************************************************************
 * Local Macro Declarations                                                    *
 ******************************************************************************/
-#define DDR_BASEADDR     0x80000000
-#define OFFSET_DDR	 0x00001008
+#define AM33XX_PRUSS_IRAM_SIZE 8192
+#define AM33XX_PRUSS_DRAM_SIZE 8192
 
-#define OFFSET_SHAREDRAM 0
-#define PRUSS1_SHARED_DATARAM    4
+#define DDR_BASEADDR 0x80000000
+#define OFFSET_DDR 0x00001000
+#define OFFSET_SHAREDRAM 0x00000000 //equivalent with 0x00002000
+
+#define PRUSS0_PRU0_DATARAM 0
+#define PRUSS0_PRU1_DATARAM 1
+#define PRUSS0_PRU0_IRAM 2
+#define PRUSS0_PRU1_IRAM 3
+#define PRUSS0_SHARED_DATARAM 4
 
 using namespace std;
 
@@ -85,32 +92,30 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
         }
 	
         // Initialize DDM
-	LOCAL_DDMinit();
+	LOCAL_DDMinit(); // DDR (Double Data Rate): A class of memory technology used in DRAM where data is transferred on both the rising and falling edges of the clock signal, effectively doubling the data rate without increasing the clock frequency.
 	
-	/*/ Doing debbuging checks - Debugging 1
-	// Load and execute the PRU program on the PRU
-	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
-		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTrigSigScript.bin");
-	}
-    	// For fast debugging
-	// Load and execute the PRU program on the PRU
+	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
+	// Timetagging
+	sharedMem_int[OFFSET_SHAREDRAM]=0; // set to zero means no command. PRU0 idle
+	    // Execute program
+	    // Load and execute the PRU program on the PRU0
 	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
 		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTaggDetScript.bin");
 	}
 	
-	// Wait for the PRU to let us know it's done  
-	  prussdrv_pru_wait_event(PRU_EVTOUT_0);  
-	  cout << "PRUs all done" << endl;  
+	// Generate signals
+	sharedMem_int[]=0; // set to zero means no command. PRU1 idle
+	// Load and execute the PRU program on the PRU1
+	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
+		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTrigSigScript.bin");
+	}
+	
 	  
-	  prussdrv_pru_disable(PRU_Signal_NUM);
-	  prussdrv_pru_disable(PRU_Operation_NUM);  
-	  prussdrv_exit(); */
-	  
-	  // Doing debbuging checks - Debugging 2
+	  // Doing debbuging checks - Debugging 1
 	  this->SendTriggerSignals();
 	  this->ReadTimeStamps();
 	  
-	  munmap(ddrMem, 0x0FFFFFFF);
+	  munmap(ddrMem, 0x0FFFFFFF); // remove any mappings for those entire pages containing any part of the address space of the process starting at addr and continuing for len bytes. 
 	  close(mem_fd); // Device
 	  streamDDRpru.close();
 	  prussdrv_pru_disable(PRU_Signal_NUM);
@@ -120,55 +125,65 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
-unsigned int ret;
-    int i;
-    void *DDR_paramaddr;
-    void *DDR_ackaddr;
-    int fin;
-    char fname_new[255];     
-    DDR_paramaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 8;
-    DDR_ackaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 4;
-    
-    sharedMem_int[OFFSET_SHAREDRAM]=0; // set to zero means no command
-    // Execute program
-    // Load and execute the PRU program on the PRU
-if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
-	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTaggDetScript.bin");
-}
-	sleep(1);
-	sharedMem_int[OFFSET_SHAREDRAM]=(unsigned int)2; // set to 2 means perform capture
+//unsigned int ret;
+//int i;
+//void *DDR_paramaddr;
+//void *DDR_ackaddr;
+//bool fin;
+//char fname_new[255];     
+//DDR_paramaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 8;
+//DDR_ackaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 4;
 
-	// give some time for the PRU code to execute
-	sleep(1);
-	//printf("Waiting for ack (curr=%d). \n", sharedMem_int[OFFSET_SHAREDRAM]);
-	fin=0;
-	do
+
+sharedMem_int[OFFSET_SHAREDRAM]=(unsigned int)2; // set to 2 means perform capture
+
+// give some time for the PRU code to execute
+//sleep(1);// Maybe not needed
+//printf("Waiting for ack (curr=%d). \n", sharedMem_int[OFFSET_SHAREDRAM]);
+bool fin=false;
+do // This is blocking
+{
+	if (sharedMem_int[OFFSET_SHAREDRAM] == 1)// Seems that it checks if it has finished the acquisition
 	{
-		if ( sharedMem_int[OFFSET_SHAREDRAM] == 1 )
-		{
-			// we have received the ack!
-			this->DDRdumpdata(); // Store to file
-			sharedMem_int[OFFSET_SHAREDRAM] = 0;
-			fin=1;
-			//printf("Ack\n");
-		}
-	} while(!fin);
+		// we have received the ack!
+		this->DDRdumpdata(); // Store to file
+		sharedMem_int[OFFSET_SHAREDRAM] = 0; // Here clears the value
+		fin=true;
+		//printf("Ack\n");
+	}
+} while(!fin);
 
 		
-		
-    //prussdrv_pru_wait_event (PRU_EVTOUT_1);
-    //printf("Done\n");
-    //prussdrv_pru_clear_event (PRU1_ARM_INTERRUPT); 	
+// Never accomplished because this signals are in the EXIT part of the assembler that never arrive	
+//prussdrv_pru_wait_event(PRU_EVTOUT_0);
+//prussdrv_pru_clear_event(PRU0_ARM_INTERRUPT); 	
   
 return 0;// all ok
 }
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+// Here there should be the instruction command to tell PRU1 to start generating signals
+// We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
+sharedMem_int[]=(unsigned int)2; // set to 2 means perform signals
 
-// Load and execute the PRU program on the PRU
-if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
-	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTrigSigScript.bin");
+// Here we should wait for the PRU1 to finish, we can check it with the value modified in command
+bool fin=false;
+do // This is blocking
+{
+if (sharedMem_int[] == 1)// Seems that it checks if it has finished the sequence
+{
+	
+	sharedMem_int[] = 0; // Here clears the value
+	fin=true;
+	//printf("Ack\n");
 }
+} while(!fin);
+
+
+// Never accomplished because this signals are in the EXIT part of the assembler that never arrive
+//prussdrv_pru_wait_event(PRU_EVTOUT_1);
+//prussdrv_pru_clear_event(PRU1_ARM_INTERRUPT); 
+
 return 0;// all ok	
 }
 
@@ -180,21 +195,22 @@ return 0;// all ok
 //PRU0 - Operation - getting iputs
 
 int GPIO::DDRdumpdata(){
-unsigned short int *DDR_regaddr;
-unsigned char* test;
-int ln;
+//unsigned short int *DDR_regaddr;
+//unsigned char* test;
+//int ln;
 int x;
-unsigned char tv;
+//unsigned char tv;
 
 unsigned short int* valp;
 unsigned short int val;
-unsigned char rgb24[4];
-unsigned char v1, v2;
-rgb24[3]=0;
+//unsigned char rgb24[4];
+//unsigned char v1, v2;
+//rgb24[3]=0;
 
-DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
-valp=(unsigned short int*)&sharedMem_int[OFFSET_SHAREDRAM+1];
-for (x=0; x<2000; x++){
+//DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
+valp=(unsigned short int*)&sharedMem_int[OFFSET_SHAREDRAM+1]; // Coincides with ACQRAM in PRUassTaggDetScript.p // Notice that in PRUassTaggDetScript.p in hexadecimal an offset of 4 (times 8)=32 bits, which coincides with the +1 here
+unsigned int NumRecords=2000; //Number of records per run. It is also defined in PRUassTaggDetScript.p
+for (x=0; x<NumRecords; x++){
 	val=*valp;
 	val=val & 0xff; // we're just interested in 8 bits
 
@@ -212,15 +228,14 @@ return 0; // all ok
 *****************************************************************************/
 
 int GPIO::LOCAL_DDMinit(){
-    void *DDR_regaddr1, *DDR_regaddr2, *DDR_regaddr3;	
-    
-    prussdrv_map_prumem(PRUSS1_SHARED_DATARAM, &sharedMem);
+    //void *DDR_regaddr1, *DDR_regaddr2, *DDR_regaddr3;    
+    prussdrv_map_prumem(PRUSS0_SHARED_DATARAM, &sharedMem);
     sharedMem_int = (unsigned int*) sharedMem;
 
     // open the device 
     mem_fd = open("/dev/mem", O_RDWR);
     if (mem_fd < 0) {
-        perror("Failed to open /dev/mem");
+        perror("Failed to open /dev/mem: ");
         return -1;
     }	
 

@@ -21,8 +21,8 @@
 
 #define INS_PER_US		200	// 5ns per instruction fo rBeaglebone black
 #define INS_PER_DELAY_LOOP	2	// two instructions per delay loop
-
-#define DELAY 1 * 1000 * (INS_PER_US / INS_PER_DELAY_LOOP) // in milliseconds
+#define NUM_REPETITIONS		65535	// Maximum value possible storable to limit the number of cycles. This is wuite limited in number but very controllable (maybe more than one register can be used)
+#define DELAY 1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
 #define PRU0_R31_VEC_VALID	32
 #define PRU_EVTOUT_0		3	// the event number that is sent back
 
@@ -30,7 +30,7 @@
 #define AllOutputInterestPinsHigh 0x000000FF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
-// *** Affects: r2, r3
+// *** Affects: r2, r3. Each PRU has its of 32 registers
 .macro LED_OFF
     MOV r2, 1<<21
     MOV r3, GPIO1_BANK | GPIO_CLEARDATAOUT
@@ -49,6 +49,7 @@ INITIATIONS:
 	MOV r3, AllOutputInterestPinsHigh // load R3 with the LEDs enable/disable bits
 	mov r4, 0x00000000
 
+// With delays to produce longer pulses
 SIGNALON:	// for setting just one pin would be set r30, r30, #Bit number
 	//set r30, r30, 6	
 	mov r30.b0, r3.b0 // write the contents of r3 byte 0 to magic r30 output byte 0
@@ -66,10 +67,16 @@ SIGNALOFF:      // for clearing just one pin would be clr r30, r30, #Bit number
 DELAYOFF:
 	sub r0, r0, 1
 	QBNE DELAYOFF, r0, 0
-	jmp SIGNALON
+	jmp SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
+
+
+// Without delays (fastest possible)
+
+
 
 EXIT:
-	mov r31.b0, PRU0_R31_VEC_VALID | PRU_EVTOUT_0
+	mov r31.b0, PRU1_R31_VEC_VALID | PRU_EVTOUT_1
+	MOV       r31.b0, PRU1_ARM_INTERRUPT+16
 	halt
 
 ERR:
