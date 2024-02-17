@@ -46,10 +46,11 @@
 /******************************************************************************
 * Local Macro Declarations                                                    *
 ******************************************************************************/
-#define AM33XX_PRUSS_IRAM_SIZE 8192
-#define AM33XX_PRUSS_DRAM_SIZE 8192
+#define AM33XX_PRUSS_IRAM_SIZE 8192 // Instructions RAM (where .p assembler instructions are loaded)
+#define AM33XX_PRUSS_DRAM_SIZE 8192 // Data RAM
+#define AM33XX_PRUSS_SHAREDRAM_SIZE 12000 // Data RAM
 
-#define DDR_BASEADDR 0x80000000
+#define DDR_BASEADDR 0x80000000 //0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
 #define OFFSET_DDR 0x00001000
 #define OFFSET_SHAREDRAM 0x00000000 //equivalent with 0x00002000
 
@@ -63,8 +64,12 @@ using namespace std;
 
 namespace exploringBB {
 void* exploringBB::GPIO::ddrMem = nullptr; // Define and initialize ddrMem
-void* exploringBB::GPIO::sharedMem = nullptr; // Define and initialize 
+void* exploringBB::GPIO::sharedMem = nullptr; // Define and initialize
+void* exploringBB::GPIO::pru0dataMem = nullptr; // Define and initialize 
+void* exploringBB::GPIO::pru1dataMem = nullptr; // Define and initialize 
 unsigned int* exploringBB::GPIO::sharedMem_int = nullptr;// Define and initialize
+unsigned int* exploringBB::GPIO::pru0dataMem_int = nullptr;// Define and initialize
+unsigned int* exploringBB::GPIO::pru1dataMem_int = nullptr;// Define and initialize
 int exploringBB::GPIO::mem_fd = -1;// Define and initialize 
 /**
  *
@@ -85,10 +90,13 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
     	// Open file where temporally are stored timetaggs
     	//outfile=fopen("data.csv", "w");
 	
-	streamDDRpru.open(string(PRUdataPATH) + string("TimetaggingData"), std::ios::in | std::ios::out | std::ios::app);// Open for write and read
+	streamDDRpru.open(string(PRUdataPATH) + string("TimetaggingData"), std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
 	
 	if (!streamDDRpru.is_open()) {
         	cout << "Failed to open the streamDDRpru file." << endl;
+        }
+        else{// Clear up the old file
+        	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
         }
 	
         // Initialize DDM
@@ -96,7 +104,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Timetagging
-	sharedMem_int[OFFSET_SHAREDRAM]=0; // set to zero means no command. PRU0 idle
+	pru0dataMem_int[0]=0; // set to zero means no command. PRU0 idle
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
 	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
@@ -104,7 +112,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	
 	// Generate signals
-	sharedMem_int[]=0; // set to zero means no command. PRU1 idle
+	pru1dataMem_int[0]=0; // set to zero means no command. PRU1 idle
 	// Load and execute the PRU program on the PRU1
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
 		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTrigSigScript.bin");
@@ -112,10 +120,11 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	  
 	  // Doing debbuging checks - Debugging 1
+	  sleep(1);// Give some time to load programs in PRUs and initiate
 	  this->SendTriggerSignals();
 	  this->ReadTimeStamps();
 	  
-	  munmap(ddrMem, 0x0FFFFFFF); // remove any mappings for those entire pages containing any part of the address space of the process starting at addr and continuing for len bytes. 
+	  //munmap(ddrMem, 0x0FFFFFFF); // remove any mappings for those entire pages containing any part of the address space of the process starting at addr and continuing for len bytes. 
 	  close(mem_fd); // Device
 	  streamDDRpru.close();
 	  prussdrv_pru_disable(PRU_Signal_NUM);
@@ -135,7 +144,7 @@ int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 //DDR_ackaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 4;
 
 
-sharedMem_int[OFFSET_SHAREDRAM]=(unsigned int)2; // set to 2 means perform capture
+pru0dataMem_int[0]=(unsigned int)2; // set to 2 means perform capture
 
 // give some time for the PRU code to execute
 //sleep(1);// Maybe not needed
@@ -143,11 +152,11 @@ sharedMem_int[OFFSET_SHAREDRAM]=(unsigned int)2; // set to 2 means perform captu
 bool fin=false;
 do // This is blocking
 {
-	if (sharedMem_int[OFFSET_SHAREDRAM] == 1)// Seems that it checks if it has finished the acquisition
+	if (pru0dataMem_int[0] == 1)// Seems that it checks if it has finished the acquisition
 	{
 		// we have received the ack!
 		this->DDRdumpdata(); // Store to file
-		sharedMem_int[OFFSET_SHAREDRAM] = 0; // Here clears the value
+		pru0dataMem_int[0] = 0; // Here clears the value
 		fin=true;
 		//printf("Ack\n");
 	}
@@ -164,16 +173,16 @@ return 0;// all ok
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
-sharedMem_int[]=(unsigned int)2; // set to 2 means perform signals
+pru1dataMem_int[0]=(unsigned int)2; // set to 2 means perform signals
 
 // Here we should wait for the PRU1 to finish, we can check it with the value modified in command
 bool fin=false;
 do // This is blocking
 {
-if (sharedMem_int[] == 1)// Seems that it checks if it has finished the sequence
+if (pru1dataMem_int[0] == 1)// Seems that it checks if it has finished the sequence
 {
 	
-	sharedMem_int[] = 0; // Here clears the value
+	pru1dataMem_int[0] = 0; // Here clears the value
 	fin=true;
 	//printf("Ack\n");
 }
@@ -181,7 +190,7 @@ if (sharedMem_int[] == 1)// Seems that it checks if it has finished the sequence
 
 
 // Never accomplished because this signals are in the EXIT part of the assembler that never arrive
-//prussdrv_pru_wait_event(PRU_EVTOUT_1);
+//prussdrv_pru_wait_event(PRU_EVTOUT_0);
 //prussdrv_pru_clear_event(PRU1_ARM_INTERRUPT); 
 
 return 0;// all ok	
@@ -202,25 +211,68 @@ int x;
 //unsigned char tv;
 
 unsigned short int* valp;
-unsigned short int val;
+unsigned int valCycleCountPRU;
+unsigned int valOverflowCycleCountPRU;
+unsigned long long int extendedCounterPRU;
+unsigned short int val; // 16 bits
+unsigned short int valBitsInterest; // 16 bits
 //unsigned char rgb24[4];
 //unsigned char v1, v2;
 //rgb24[3]=0;
 
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
-valp=(unsigned short int*)&sharedMem_int[OFFSET_SHAREDRAM+1]; // Coincides with ACQRAM in PRUassTaggDetScript.p // Notice that in PRUassTaggDetScript.p in hexadecimal an offset of 4 (times 8)=32 bits, which coincides with the +1 here
+valp=(unsigned short int*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
 unsigned int NumRecords=2000; //Number of records per run. It is also defined in PRUassTaggDetScript.p
 for (x=0; x<NumRecords; x++){
+	// First 32 bits is the CYCLEcount of the PRU
+	valCycleCountPRU=*valp;
+	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
+	valp++;
+	// Second 32 bits is the overflow register for CYCLEcount
+	valOverflowCycleCountPRU=*valp;
+	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
+	valp++;
+	// Mount the extended counter value
+	extendedCounterPRU=valCycleCountPRU<<valOverflowCycleCountPRU;
+	extendedCounterPRU=static_cast<unsigned long long int>(valOverflowCycleCountPRU) << 32) | valCycleCountPRU;
+	// Then, the last 32 bits is the channels detected
 	val=*valp;
-	val=val & 0xff; // we're just interested in 8 bits
-
+	valBitsInterest=this->packBits(val); // we're just interested in 4 bits
+	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
+	valp++;
 	//fprintf(outfile, "%d\n", val);
-	streamDDRpru << val << endl;
-	valp++;
-	valp++;
+	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;	
 }
 
 return 0; // all ok
+}
+
+// Function to pack bits 1, 2, 3, and 5 of an unsigned int into a single byte
+uint8_t GPIO::packBits(unsigned short int value) {
+    // Isolate bits 1, 2, 3, and 5 and shift them to their new positions
+    uint8_t bit1 = (value >> 1) & 0x1; // Bit 1 stays in position 0
+    uint8_t bit2 = (value >> 1) & 0x2; // Bit 2 shifts to position 1
+    uint8_t bit3 = (value >> 1) & 0x4; // Bit 3 shifts to position 2
+    uint8_t bit5 = (value >> 2) & 0x8; // Bit 5 shifts to position 3, skipping the original position of bit 4
+
+    // Combine the bits into a single byte
+    return bit1 | bit2 | bit3 | bit5;
+}
+
+int GPIO::RetrieveNumStoredQuBits(){
+if (streamDDRpru.is_open()){
+	streamDDRpru.seekg(0, std::ios::beg); // back to the start!
+	string StrLine;
+	int lineCount = 0;
+        while (getline(streamDDRpru, StrLine)) {// While true
+            lineCount++; // Increment line count for each line read
+        }
+	return lineCount;
+}
+else{
+cout << "RetrieveNumStoredQuBits: BBB streamDDRpru is not open!" << endl;
+return -1;
+}
 }
 
 /*****************************************************************************
@@ -229,9 +281,16 @@ return 0; // all ok
 
 int GPIO::LOCAL_DDMinit(){
     //void *DDR_regaddr1, *DDR_regaddr2, *DDR_regaddr3;    
-    prussdrv_map_prumem(PRUSS0_SHARED_DATARAM, &sharedMem);// Maps the PRU DRAM and IRAM memory to input pointer. Memory is then accessed by an array.
+    prussdrv_map_prumem(PRUSS0_SHARED_DATARAM, &sharedMem);// Maps the PRU shared RAM memory is then accessed by an array.
     sharedMem_int = (unsigned int*) sharedMem;
-
+    
+    prussdrv_map_prumem(PRUSS0_PRU0_DATARAM, &pru0dataMem);// Maps the PRU0 DRAM memory to input pointer. Memory is then accessed by an array.
+    pru0dataMem_int = (unsigned int*) pru0dataMem;
+    
+    prussdrv_map_prumem(PRUSS0_PRU1_DATARAM, &pru1dataMem);// Maps the PRU1 DRAM memory to input pointer. Memory is then accessed by an array.
+    pru1dataMem_int = (unsigned int*) pru1dataMem;
+    
+    /*
     // open the device 
     mem_fd = open("/dev/mem", O_RDWR);
     if (mem_fd < 0) {
@@ -245,8 +304,7 @@ int GPIO::LOCAL_DDMinit(){
         perror("Failed to map the device: ");
         close(mem_fd);
         return -1;
-    }
-    
+    }*/    
 
     return 0;
 }
@@ -535,7 +593,7 @@ GPIO::~GPIO() {
 	this->DisablePRUs();
 	//fclose(outfile); 
 	prussdrv_exit();
-	munmap(ddrMem, 0x0FFFFFFF);
+	//munmap(ddrMem, 0x0FFFFFFF);
 	close(mem_fd); // Device
 	streamDDRpru.close();
 }

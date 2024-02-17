@@ -42,11 +42,28 @@ enum GPIO_VALUE{ LOW=0, HIGH=1 };
 enum GPIO_EDGE{ NONE, RISING, FALLING, BOTH };
 
 class GPIO {
-private:
+//public: //Variables
+
+private:// Variables
+	// PRU
+	static int mem_fd;
+	static void *ddrMem, *sharedMem, *pru0dataMem, *pru1dataMem;
+	//static int chunk;
+	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
+	//FILE* outfile;
+	fstream streamDDRpru;
+	// Non PRU
 	int number, debounceTime;
 	string name, path;
+	ofstream streamOut;
+	ifstream streamIn;
+	pthread_t thread;
+	CallbackType callbackFunction;
+	bool threadRunning;
+	int togglePeriod;  //default 100ms
+	int toggleNumber;  //default -1 (infinite)
 
-public:	
+public:	// Functions/Methods
 	GPIO(int number); //constructor will export the pin	
 	// PRU
 	GPIO(); // initializates PRU operation
@@ -56,9 +73,9 @@ public:
 	virtual int ReadTimeStamps();// Read the detected timestaps in four channels
 	virtual int SendTriggerSignals(); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	virtual int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
+	virtual int RetrieveNumStoredQuBits(); // Reads the fstream file to retrieve number of stored timetagged qubits
 	// Non PRU
 	virtual int getNumber() { return number; }
-
 	// General Input and Output Settings
 	virtual int setDirection(GPIO_DIRECTION);
 	virtual GPIO_DIRECTION getDirection();
@@ -92,27 +109,15 @@ public:
 
 	virtual ~GPIO();  //destructor will unexport the pin
 
-private:
+private: // Functions/Methods
 	// PRU
-	static int mem_fd;
-	static void *ddrMem, *sharedMem;
-	static int chunk;
-	static unsigned int *sharedMem_int;
-	//FILE* outfile;
-	fstream streamDDRpru;
+	packBits();
 	// Non-PRU
 	int write(string path, string filename, string value);
 	int write(string path, string filename, int value);
 	string read(string path, string filename);
 	//int exportGPIO(); Not currently used - legacy
 	//int unexportGPIO(); Not currently used - legacy
-	ofstream streamOut;
-	ifstream streamIn;
-	pthread_t thread;
-	CallbackType callbackFunction;
-	bool threadRunning;
-	int togglePeriod;  //default 100ms
-	int toggleNumber;  //default -1 (infinite)
 	friend void* threadedPoll(void *value);
 	friend void* threadedToggle(void *value);
 };

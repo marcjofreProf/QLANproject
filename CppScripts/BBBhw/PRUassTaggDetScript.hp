@@ -1,7 +1,7 @@
-// prucode_adc.hp
+// PRUassTaggDetScript.hp
 
-#ifndef __PRUCODE_ADC_HP__
-#define __PRUCODE_ADC_HP__
+#ifndef __PRUCODE_PRUassTaggDetScript_HP__
+#define __PRUCODE_PRUassTaggDetScript_HP__
 
 // Definitions
 
@@ -15,17 +15,20 @@
 
 #define CONST_PRUCFG         C4
 #define CONST_PRUDRAM        C24
-#define CONST_PRUSHAREDRAM   C28
-#define CONST_DDR            C31
+#define CONST_PRUSHAREDRAM   C28 // mapping shared memory
+#define 		     C29 //
+#define CONST_DDR            C31 //used specifically for accessing external memory regions, such as DDR memory, which is shared with the main ARM processor.
 
-// Address for the Constant table Block Index Register (CTBIR)
-#define CTBIR          0x24020
-
-// Address for the Constant table Programmable Pointer Register 0(CTPPR_0)
-#define CTPPR_0         0x24028
-
-// Address for the Constant table Programmable Pointer Register 1(CTPPR_1)
-#define CTPPR_1         0x2402C
+#define PRU0_CTRL            0x22000
+#define PRU1_CTRL            0x24000
+ 
+#define CTPPR0               0x28
+#define CTPPR1               0x2C
+ 
+#define OWN_RAM              0x000 // current PRU data RAM
+#define OTHER_RAM            0x020 // The other PRU data ram
+#define SHARED_RAM           0x100 // equivalent with 0x120. The global memory map is shown in Table 6 (page 20) and identifies 0x00010000 as being the start of the 12Kb of shared memory. Therefore, value of 0x00012000 is somewhere inside the shared memory (albeit not at the beginning).
+#define DDR_MEM		     0x80001000 // 0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
 
 // Macros
 
@@ -75,7 +78,7 @@
 
 .assign Global, r2, *, global
 
-#endif // __PRUCODE_ADC_HP__
+#endif // __PRUCODE_PRUassTaggDetScript_HP__
 
 
 

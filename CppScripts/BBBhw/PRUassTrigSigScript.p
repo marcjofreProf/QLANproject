@@ -19,67 +19,107 @@
 #define GPIO_CLEARDATAOUT 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
 // GPIO goes low. If a bit is 0 it is ignored.
 
-#define INS_PER_US		200	// 5ns per instruction fo rBeaglebone black
-#define INS_PER_DELAY_LOOP	2	// two instructions per delay loop
-#define NUM_REPETITIONS		65535	// Maximum value possible storable to limit the number of cycles. This is wuite limited in number but very controllable (maybe more than one register can be used)
+#define INS_PER_US		200		// 5ns per instruction fo rBeaglebone black
+#define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
+#define NUM_REPETITIONS		1000000	//4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used)
 #define DELAY 1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
-#define PRU0_R31_VEC_VALID	32
+#define PRU1_R31_VEC_VALID	32
 #define PRU_EVTOUT_0		3	// the event number that is sent back
+// Refer to this mapping in the file - pruss_intc_mapping.h
+#define PRU0_PRU1_INTERRUPT     17
+#define PRU1_PRU0_INTERRUPT     18
+#define PRU0_ARM_INTERRUPT      19
+#define PRU1_ARM_INTERRUPT      20
+#define ARM_PRU0_INTERRUPT      21
+#define ARM_PRU1_INTERRUPT      22
+
+#define CONST_PRUCFG         C4
+#define CONST_PRUDRAM        C24 // allow the PRU to map portions of the system's memory into its own address space. In particular we will map its own data RAM
 
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0x000000FF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
+#define AllOutputInterestPinsLow 0x00000000// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r2, r3. Each PRU has its of 32 registers
 .macro LED_OFF
     MOV r2, 1<<21
-    MOV r3, GPIO1_BANK | GPIO_CLEARDATAOUT
+    MOV r3, GPIO2_BANK | GPIO_CLEARDATAOUT
     SBBO r2, r3, 0, 4
 .endm
 
 .macro LED_ON
     MOV r2, 1<<21
-    MOV r3, GPIO1_BANK | GPIO_SETDATAOUT
+    MOV r3, GPIO2_BANK | GPIO_SETDATAOUT
     SBBO r2, r3, 0, 4
 .endm
 
 INITIATIONS:
-	MOV r1, GPIO2_BANK | GPIO_SETDATAOUT  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
-	MOV r2, GPIO2_BANK | GPIO_CLEARDATAOUT // load the address we wish to cleare to r2. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
-	MOV r3, AllOutputInterestPinsHigh // load R3 with the LEDs enable/disable bits
-	mov r4, 0x00000000
-
-// With delays to produce longer pulses
-SIGNALON:	// for setting just one pin would be set r30, r30, #Bit number
-	//set r30, r30, 6	
-	mov r30.b0, r3.b0 // write the contents of r3 byte 0 to magic r30 output byte 0
-	mov r0, DELAY
-
-DELAYON:
-	sub r0, r0, 1
-	QBNE DELAYON, r0, 0
+//	MOV r1, GPIO2_BANK | GPIO_SETDATAOUT  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
+//	MOV r2, GPIO2_BANK | GPIO_CLEARDATAOUT // load the address we wish to cleare to r2. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
+	LED_ON	// just for signaling initiations
+	LED_OFF	// just for signaling initiations
 	
-SIGNALOFF:      // for clearing just one pin would be clr r30, r30, #Bit number	
-	//clr r30, r30, 6
-	mov r30.b0, r4.b0 // write the contents of r4 byte 0 to magic r30 byte 0
-	mov r0, DELAY
+	LBCO      r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
+	// OCP master port is the protocol to enable communication between the PRUs and the host processor
+	CLR       r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
+	SBCO      r0, CONST_PRUCFG, 4, 4
 
-DELAYOFF:
-	sub r0, r0, 1
-	QBNE DELAYOFF, r0, 0
-	jmp SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
+	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
+	// This will make C24 point to 0x00000000 (PRU data RAM).
+	MOV       r0, 0x00000000
+	SBBO 	  r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
+	
+	mov r1, AllOutputInterestPinsHigh // load r1 with the pins enable bits
+	mov r2, AllOutputInterestPinsLow  // load r2 with the pins disable bits
+	
+
+//// With delays to produce longer pulses
+//SIGNALON:	// for setting just one pin would be set r30, r30, #Bit number
+//	//set r30, r30, 6	
+//	mov r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
+//	mov r0, DELAY
+//
+//DELAYON:
+//	sub r0, r0, 1
+//	QBNE DELAYON, r0, 0
+//	
+//SIGNALOFF:      // for clearing just one pin would be clr r30, r30, #Bit number	
+//	//clr r30, r30, 6
+//	mov r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
+//	mov r0, DELAY
+//
+//DELAYOFF:
+//	sub r0, r0, 1
+//	QBNE DELAYOFF, r0, 0
+//	jmp SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
 
 
 // Without delays (fastest possible)
-
-
+CMDLOOP:
+//	DEL
+	LBCO r3, CONST_PRUDRAM, 0, 4 // Load to r3 the content of CONST_PRUDRAM with offset 0, and the 4 bytes
+	QBEQ CMDLOOP, r3, 0 // loop until we get an instruction. Code 0 means idle
+	QBEQ CMDLOOP, r3, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
+	// ok, we have an instruction (code 2). Assume it means 'begin signals'
+	mov r3, NUM_REPETITIONS// load r3 with the number of cycles
+SIGNALON:	
+	mov r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
+	sub r3, r3, 1	// Substract 1 count cycle
+SIGNALOFF:
+	mov r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
+	QBGT SIGNALON, r3, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
+	// The following lines do not consume "signal speed"
+	MOV r3, 1 // code 1 means that we have finished. Re-use of register r3
+	SBCO r3, CONST_PRUDRAM, 0, 4 // Put contents of r3 into CONST_PRUDRAM
+	jmp CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
-	mov r31.b0, PRU1_R31_VEC_VALID | PRU_EVTOUT_1
-	MOV       r31.b0, PRU1_ARM_INTERRUPT+16
+	mov r31.b0, PRU1_R31_VEC_VALID | PRU_EVTOUT_0
+	MOV r31.b0, PRU1_ARM_INTERRUPT+16
 	halt
 
-ERR:
+ERR:	// Signal error
 	LED_ON
 	JMP ERR
 

@@ -41,7 +41,7 @@ namespace nsQphysLayerAgent {
 QPLA::QPLA() {// Constructor
 	PRUGPIO=new GPIO();// Initiates custom PRU code in BBB	
 	 //Very slow GPIO BBB not used anymore
-	// The above pins initializatoins (and also in the destructor will not be needed in the future since it is done with PRU
+	/*// The above pins initializatoins (and also in the destructor will not be needed in the future since it is done with PRU
 	inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
 	inGPIO->setDirection(INPUT);
 	inGPIO->setEdgeType(NONE);
@@ -348,6 +348,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch ba
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  
  cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
+ PRUGPIO->SendTriggerSignals();
  
  /* Very slow GPIO BBB not used anymore
  // Basic Output - Generate a pulse of 1 second period
@@ -472,12 +473,13 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch b
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 //cout << "MaxWhileRound: " << MaxWhileRound << endl;
 
-cout << "Start Receiving Qubits" << endl;// This line should be commented to reduce the itme jitter
+cout << "Start Receiving Qubits" << endl;// This line should be commented to reduce the time jitter
+
 // Start measuring
  //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
  
- // Basic Input
- 
+ PRUGPIO->ReadTimeStamps();
+ // Basic Input 
  /* Very slow GPIO BBB not used anymore
  ////clock_nanosleep(CLOCK_REALTIME,0,&requestQuarterPeriod,NULL);
  TimePointFuture_time_as_count+=(long)QuBitsNanoSecQuarterPeriodInt[0];
@@ -497,12 +499,16 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  this->release();
  cout << "End Receiving Qubits" << endl;
  
+ SimulateNumStoredQubitsNodeAux=PRUGPIO->RetrieveNumStoredQuBits();
+ /*
+ // Basic input
  // Count received QuBits
  for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){// Count how many qubits 
  	if (SimulateQuBitValueArray[iIterRead]==1){
  		SimulateNumStoredQubitsNodeAux++;
  	} 	
  }
+ */
 
 this->acquire();
 this->SimulateNumStoredQubitsNode[0]=SimulateNumStoredQubitsNodeAux;
