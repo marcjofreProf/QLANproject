@@ -59,6 +59,8 @@
 // r2 is reserved with the value for pins disable bits
 // r3 is reserved with the number of cycles counter
 
+// r10 is arbitrary used for operations
+
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
 // r30 is reserved for output pins
@@ -75,7 +77,8 @@ INITIATIONS:
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
 	MOV	r0, 0x00000000
-	SBBO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
+	MOV	r10, CONST_PRUDRAM
+	SBBO	r0, r10, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
 	LED_ON	// just for signaling initiations
 	LED_OFF	// just for signaling initiations

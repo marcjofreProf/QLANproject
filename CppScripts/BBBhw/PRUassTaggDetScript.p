@@ -12,6 +12,7 @@
 // Length of acquisition:
 #define RECORDS 850 // 850 readings and it matches in the host c++ script
 #define MAX_VALUE_BEFORE_RESET 0x0FFFFFFF // Using one bit less of the length of the register to avoid overflow occuring in the time of execution of TIMETAG
+define MAX_VALUE_BEFORE_RESETmostsigByte	127
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
 .macro LED_OFF
@@ -34,6 +35,8 @@
 // r5 reserved for holding the auxiliary DWT_CYCCNT count
 // r6 reserved for holding the DWT_CYCCNT count value
 
+// r10 is arbitrary used for operations
+
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
 // r30 is reserved for output pins
@@ -47,23 +50,27 @@ INITIATIONS:// This is only run once
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM, where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
 	MOV	r0, OWNRAM
-	SBBO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
+	MOV	r10, CONST_PRUDRAM
+	SBBO	r0, r10, 0, 4  // Load the base address of PRU0 Data RAM into C24
 
 	// Configure the programmable pointer register for PRU by setting c28_pointer[15:0] // related to shared RAM
 	// This will make C28 point to 0x00010000 (PRU shared RAM).
 	// http://www.embedded-things.com/bbb/understanding-bbb-pru-shared-memory-access/	
 	MOV	r0, SHARED_RAM                  // Set C28 to point to shared RAM
-	SBBO	r0, CONST_PRUSHAREDRAM, 0, 4
+	MOV	r10, CONST_PRUSHAREDRAM
+	SBBO	r0, r10, 0, 4
 	
 	// Make C29 point to the PRU control registers
-	MOV	r0, PRU0_CTRL	
-	SBBO	r0, CONST_PRUCTRLREG, 0, 4
+	MOV	r0, PRU0_CTRL
+	MOV	r10, CONST_PRUCTRLREG
+	SBBO	r0, r10, 0, 4
 
 //	// Configure the programmable pointer register for PRU by setting c31_pointer[15:0] // related to ddr.
 //	// This will make C31 point to 0x80001000 (DDR memory). 0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
 //	https://groups.google.com/g/beagleboard/c/ukEEblzz9Gk
 //	MOV	r0, DDR_MEM                    // Set C31 to point to ddr
-//	SBBO    r0, CONST_DDR, 0, 4
+//	MOV	r10, CONST_DDR
+//	SBBO    r0, r10, 0, 4
 
 	//Load values from external DDR Memory into Registers R0/R1/R2
 	//LBCO      r0, CONST_DDR, 0, 12
@@ -94,7 +101,7 @@ START1:
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT:
 	LBCO	r6, CONST_PRUCTRLREG, 0xC, 4 // r6 maps the value of DWT_CYCCNT
-	QBGT	RESET_CYCLECNT, r6, MAX_VALUE_BEFORE_RESET // If r6 > MAX_VALUE_BEFORE_RESET, go to reset
+	QBGT	RESET_CYCLECNT, r6.b4, MAX_VALUE_BEFORE_RESETmostsigByte // If r6 > MAX_VALUE_BEFORE_RESET, go to reset
 
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and the 4 bytes
