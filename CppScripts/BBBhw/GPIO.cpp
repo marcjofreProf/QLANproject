@@ -211,9 +211,10 @@ int x;
 //unsigned char tv;
 
 unsigned short int* valp;
-unsigned int valCycleCountPRU;
-unsigned int valOverflowCycleCountPRU;
-unsigned long long int extendedCounterPRU;
+unsigned int valCycleCountPRU; // 32 bits // Made relative to each acquition run
+unsigned int valAuxCycleCountPRU; // 32 bits
+unsigned int valOverflowCycleCountPRU; // 32 bits
+unsigned long long int extendedCounterPRU; // 64 bits
 unsigned short int val; // 16 bits
 unsigned short int valBitsInterest; // 16 bits
 //unsigned char rgb24[4];
@@ -222,19 +223,22 @@ unsigned short int valBitsInterest; // 16 bits
 
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=(unsigned short int*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
-unsigned int NumRecords=2000; //Number of records per run. It is also defined in PRUassTaggDetScript.p
+unsigned int NumRecords=1000; //Number of records per run. It is also defined in PRUassTaggDetScript.p
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the CYCLEcount of the PRU
 	valCycleCountPRU=*valp;
 	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
 	valp++;
 	// Second 32 bits is the overflow register for CYCLEcount
+	valAuxCycleCountPRU=*valp;
+	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
+	valp++;
+	// Third 32 bits is the overflow register for CYCLEcount
 	valOverflowCycleCountPRU=*valp;
 	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
 	valp++;
 	// Mount the extended counter value
-	extendedCounterPRU=valCycleCountPRU<<valOverflowCycleCountPRU;
-	extendedCounterPRU=static_cast<unsigned long long int>(valOverflowCycleCountPRU) << 32) | valCycleCountPRU;
+	extendedCounterPRU=static_cast<unsigned long long int>(valOverflowCycleCountPRU) << 32) | (valCycleCountPRU+valAuxCycleCountPRU);
 	// Then, the last 32 bits is the channels detected
 	val=*valp;
 	valBitsInterest=this->packBits(val); // we're just interested in 4 bits
@@ -248,12 +252,12 @@ return 0; // all ok
 }
 
 // Function to pack bits 1, 2, 3, and 5 of an unsigned int into a single byte
-uint8_t GPIO::packBits(unsigned short int value) {
+unsigned short int GPIO::packBits(unsigned short int value) {
     // Isolate bits 1, 2, 3, and 5 and shift them to their new positions
-    uint8_t bit1 = (value >> 1) & 0x1; // Bit 1 stays in position 0
-    uint8_t bit2 = (value >> 1) & 0x2; // Bit 2 shifts to position 1
-    uint8_t bit3 = (value >> 1) & 0x4; // Bit 3 shifts to position 2
-    uint8_t bit5 = (value >> 2) & 0x8; // Bit 5 shifts to position 3, skipping the original position of bit 4
+    unsigned short int bit1 = (value >> 1) & 0x1; // Bit 1 stays in position 0
+    unsigned short int bit2 = (value >> 1) & 0x2; // Bit 2 shifts to position 1
+    unsigned short int bit3 = (value >> 1) & 0x4; // Bit 3 shifts to position 2
+    unsigned short int bit5 = (value >> 2) & 0x8; // Bit 5 shifts to position 3, skipping the original position of bit 4
 
     // Combine the bits into a single byte
     return bit1 | bit2 | bit3 | bit5;

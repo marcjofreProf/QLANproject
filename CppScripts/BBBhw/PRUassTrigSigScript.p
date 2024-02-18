@@ -41,83 +41,93 @@
 #define AllOutputInterestPinsLow 0x00000000// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
-// *** Affects: r2, r3. Each PRU has its of 32 registers
+// *** Affects: r28, r29. Each PRU has its of 32 registers
 .macro LED_OFF
-    MOV r2, 1<<21
-    MOV r3, GPIO2_BANK | GPIO_CLEARDATAOUT
-    SBBO r2, r3, 0, 4
+	MOV	r28, 1<<21
+	MOV	r29, GPIO2_BANK | GPIO_CLEARDATAOUT
+	SBBO	r28, r29, 0, 4
 .endm
 
 .macro LED_ON
-    MOV r2, 1<<21
-    MOV r3, GPIO2_BANK | GPIO_SETDATAOUT
-    SBBO r2, r3, 0, 4
+	MOV	r28, 1<<21
+	MOV	r29, GPIO2_BANK | GPIO_SETDATAOUT
+	SBBO	r28, r29, 0, 4
 .endm
 
+// r0 is arbitrary used for operations
+// r1 is reserved with the value for pins enable bits
+// r2 is reserved with the value for pins disable bits
+// r3 is reserved with the number of cycles counter
+
+// r28 is mainly used for LED indicators operations
+// r29 is mainly used for LED indicators operations
+// r30 is reserved for output pins
+// r31 is reserved for inputs pins
 INITIATIONS:
 //	MOV r1, GPIO2_BANK | GPIO_SETDATAOUT  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
 //	MOV r2, GPIO2_BANK | GPIO_CLEARDATAOUT // load the address we wish to cleare to r2. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
-	LED_ON	// just for signaling initiations
-	LED_OFF	// just for signaling initiations
-	
-	LBCO      r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
+		
+	LBCO	r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
 	// OCP master port is the protocol to enable communication between the PRUs and the host processor
-	CLR       r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
-	SBCO      r0, CONST_PRUCFG, 4, 4
+	CLR	r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
+	SBCO	r0, CONST_PRUCFG, 4, 4
 
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
-	MOV       r0, 0x00000000
-	SBBO 	  r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
+	MOV	r0, 0x00000000
+	SBBO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
-	mov r1, AllOutputInterestPinsHigh // load r1 with the pins enable bits
-	mov r2, AllOutputInterestPinsLow  // load r2 with the pins disable bits
+	LED_ON	// just for signaling initiations
+	LED_OFF	// just for signaling initiations
+	
+	MOV	r1, AllOutputInterestPinsHigh // load r1 with the pins enable bits
+	MOV	r2, AllOutputInterestPinsLow  // load r2 with the pins disable bits
 	
 
 //// With delays to produce longer pulses
 //SIGNALON:	// for setting just one pin would be set r30, r30, #Bit number
-//	//set r30, r30, 6	
-//	mov r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
-//	mov r0, DELAY
+//	//SET r30, r30, 6	
+//	MOV r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
+//	MOV r0, DELAY
 //
 //DELAYON:
-//	sub r0, r0, 1
+//	SUB r0, r0, 1
 //	QBNE DELAYON, r0, 0
 //	
 //SIGNALOFF:      // for clearing just one pin would be clr r30, r30, #Bit number	
-//	//clr r30, r30, 6
-//	mov r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
-//	mov r0, DELAY
+//	//CLR r30, r30, 6
+//	MOV r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
+//	MOV r0, DELAY
 //
 //DELAYOFF:
 //	sub r0, r0, 1
 //	QBNE DELAYOFF, r0, 0
-//	jmp SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
+//	JMP SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
 
 
 // Without delays (fastest possible)
 CMDLOOP:
 //	DEL
-	LBCO r3, CONST_PRUDRAM, 0, 4 // Load to r3 the content of CONST_PRUDRAM with offset 0, and the 4 bytes
-	QBEQ CMDLOOP, r3, 0 // loop until we get an instruction. Code 0 means idle
-	QBEQ CMDLOOP, r3, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
+	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r3 the content of CONST_PRUDRAM with offset 0, and the 4 bytes
+	QBEQ	CMDLOOP, r0, 0 // loop until we get an instruction. Code 0 means idle
+	QBEQ	CMDLOOP, r0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
 	// ok, we have an instruction (code 2). Assume it means 'begin signals'
-	mov r3, NUM_REPETITIONS// load r3 with the number of cycles
+	MOV	r3, NUM_REPETITIONS// load r3 with the number of cycles
 SIGNALON:	
-	mov r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
-	sub r3, r3, 1	// Substract 1 count cycle
+	MOV	r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
+	SUB	r3, r3, 1	// Substract 1 count cycle
 SIGNALOFF:
-	mov r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
-	QBGT SIGNALON, r3, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
+	MOV	r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
+	QBGT	SIGNALON, r3, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
 	// The following lines do not consume "signal speed"
-	MOV r3, 1 // code 1 means that we have finished. Re-use of register r3
-	SBCO r3, CONST_PRUDRAM, 0, 4 // Put contents of r3 into CONST_PRUDRAM
-	jmp CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
+	MOV	r0, 1 // code 1 means that we have finished. Re-use of register r3
+	SBCO	r0, CONST_PRUDRAM, 0, 4 // Put contents of r3 into CONST_PRUDRAM
+	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
-	mov r31.b0, PRU1_R31_VEC_VALID | PRU_EVTOUT_0
-	MOV r31.b0, PRU1_ARM_INTERRUPT+16
-	halt
+	MOV	r31.b0, PRU1_R31_VEC_VALID | PRU_EVTOUT_0
+	MOV	r31.b0, PRU1_ARM_INTERRUPT+16
+	HALT
 
 ERR:	// Signal error
 	LED_ON

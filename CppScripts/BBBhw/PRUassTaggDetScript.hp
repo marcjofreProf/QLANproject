@@ -13,15 +13,18 @@
 #define ARM_PRU0_INTERRUPT      21
 #define ARM_PRU1_INTERRUPT      22
 
+// In the context of the AM335x Programmable Real-time Units (PRUs), "CXX" generally refers to the Constant Table Pointer Registers, such as C24, C25, C26, C27, C28, C29, C30, and C31. These registers are a key feature of the PRU's architecture, designed to facilitate efficient access to various memory regions and peripherals within the device. Each PRU core in the AM335x processors has its own set of these constant table registers.
 #define CONST_PRUCFG         C4
-#define CONST_PRUDRAM        C24
+#define CONST_PRUDRAM        C24 // mapping PRU own RAM
 #define CONST_PRUSHAREDRAM   C28 // mapping shared memory
-#define 		     C29 //
+#define CONST_PRUCTRLREG     C29 // PRU control registers
 #define CONST_DDR            C31 //used specifically for accessing external memory regions, such as DDR memory, which is shared with the main ARM processor.
 
 #define PRU0_CTRL            0x22000
 #define PRU1_CTRL            0x24000
- 
+
+#define PRU0_CTRLREG	     0x00000220
+
 #define CTPPR0               0x28
 #define CTPPR1               0x2C
  
@@ -30,53 +33,61 @@
 #define SHARED_RAM           0x100 // equivalent with 0x120. The global memory map is shown in Table 6 (page 20) and identifies 0x00010000 as being the start of the 12Kb of shared memory. Therefore, value of 0x00012000 is somewhere inside the shared memory (albeit not at the beginning).
 #define DDR_MEM		     0x80001000 // 0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
 
-// Macros
+#define PRU0_R31_VEC_VALID	32
+#define PRU_EVTOUT_0		3	// the event number that is sent back
 
-.macro  LD32
-.mparam dst,src
-    LBBO    dst,src,#0x00,4
-.endm
+#define GPIO1_BANK 0x4804c000 // this is the address of the BB GPIO1 Bank Register for PR0. We set bits in special locations in offsets here to put a GPIO high or low.
+#define GPIO_CLEARDATAOUT 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
+// GPIO goes low. If a bit is 0 it is ignored.
+#define GPIO_SETDATAOUT 0x194 // at this offset various GPIOs are associated with a bit position. Writing a 32 bit value to this offset enables them (sets them high) if there is a 1 in a corresponding bit. A zero in a bit position here is ignored - it does NOT turn the associated GPIO off.
 
-.macro  LD16
-.mparam dst,src
-    LBBO    dst,src,#0x00,2
-.endm
-
-.macro  LD8
-.mparam dst,src
-    LBBO    dst,src,#0x00,1
-.endm
-
-.macro ST32
-.mparam src,dst
-    SBBO    src,dst,#0x00,4
-.endm
-
-.macro ST16
-.mparam src,dst
-    SBBO    src,dst,#0x00,2
-.endm
-
-.macro ST8
-.mparam src,dst
-    SBBO    src,dst,#0x00,1
-.endm
-
+// Macros - NOT USED
+//
+//.macro  LD32
+//.mparam dst,src
+//    LBBO    dst,src,#0x00,4
+//.endm
+//
+//.macro  LD16
+//.mparam dst,src
+//    LBBO    dst,src,#0x00,2
+//.endm
+//
+//.macro  LD8
+//.mparam dst,src
+//    LBBO    dst,src,#0x00,1
+//.endm
+//
+//.macro ST32
+//.mparam src,dst
+//    SBBO    src,dst,#0x00,4
+//.endm
+//
+//.macro ST16
+//.mparam src,dst
+//    SBBO    src,dst,#0x00,2
+//.endm
+//
+//.macro ST8
+//.mparam src,dst
+//    SBBO    src,dst,#0x00,1
+//.endm
+//
 // ***************************************
 // *    Global Structure Definitions     *
 // ***************************************
-
-.struct Global
-    .u32 regPointer
-    .u32 regVal
-.ends
-
+//
+//.struct Global
+//    .u32 regPointer
+//    .u32 regVal
+//.ends
+//
 
 // ***************************************
 // *     Global Register Assignments     *
 // ***************************************
-
-.assign Global, r2, *, global
+//
+//.assign Global, r2, *, global
 
 #endif // __PRUCODE_PRUassTaggDetScript_HP__
 
