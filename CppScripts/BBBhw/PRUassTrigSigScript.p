@@ -36,6 +36,8 @@
 #define CONST_PRUCFG         C4
 #define CONST_PRUDRAM        C24 // allow the PRU to map portions of the system's memory into its own address space. In particular we will map its own data RAM
 
+#define PRU1_CTRL            0x00024000
+
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0x000000FF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
 #define AllOutputInterestPinsLow 0x00000000// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
@@ -77,7 +79,7 @@ INITIATIONS:
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
 	MOV	r0, 0x00000000
-	MOV	r10, CONST_PRUDRAM
+	LBCO	r10, PRU1_CTRL+0x12//CONST_PRUDRAM
 	SBBO	r0, r10, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
 	LED_ON	// just for signaling initiations

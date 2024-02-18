@@ -50,19 +50,19 @@ INITIATIONS:// This is only run once
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM, where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
 	MOV	r0, OWNRAM
-	MOV	r10, CONST_PRUDRAM
+	MOV	r10, PRU0_CTRL+0x12//CONST_PRUDRAM
 	SBBO	r0, r10, 0, 4  // Load the base address of PRU0 Data RAM into C24
 
 	// Configure the programmable pointer register for PRU by setting c28_pointer[15:0] // related to shared RAM
 	// This will make C28 point to 0x00010000 (PRU shared RAM).
 	// http://www.embedded-things.com/bbb/understanding-bbb-pru-shared-memory-access/	
 	MOV	r0, SHARED_RAM                  // Set C28 to point to shared RAM
-	MOV	r10, CONST_PRUSHAREDRAM
+	MOV	r10, PRU0_CTRL + CTPPR0offset //CONST_PRUSHAREDRAM
 	SBBO	r0, r10, 0, 4
 	
 	// Make C29 point to the PRU control registers
 	MOV	r0, PRU0_CTRL
-	MOV	r10, CONST_PRUCTRLREG
+	MOV	r10, PRU0_CTRL + CTPPR1offset //CONST_PRUCTRLREG
 	SBBO	r0, r10, 0, 4
 
 //	// Configure the programmable pointer register for PRU by setting c31_pointer[15:0] // related to ddr.
@@ -101,7 +101,9 @@ START1:
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT:
 	LBCO	r6, CONST_PRUCTRLREG, 0xC, 4 // r6 maps the value of DWT_CYCCNT
-	QBGT	RESET_CYCLECNT, r6.b4, MAX_VALUE_BEFORE_RESETmostsigByte // If r6 > MAX_VALUE_BEFORE_RESET, go to reset
+	MOV	r10,0x00000000
+	MOV	r10.b0, r6.b4
+	QBGT	RESET_CYCLECNT, r10, MAX_VALUE_BEFORE_RESETmostsigByte // If r6.b4 > MAX_VALUE_BEFORE_RESET, go to reset
 
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and the 4 bytes
@@ -111,7 +113,7 @@ CMDLOOP:
 	LED_OFF // Indicate that we start acquisiton of timetagging
 	MOV	r1, SHARED  // PRU shared RAM
 	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4// store the current value of DWT_CYCCNT into r5.
-	ADD	r5, r5, 7 // accounts to remove clock skews (when resetting DWT_CYCCNT; between last line of CHECK_CYCLECNT and last line of RESET_CYCLECNT). This has to be improved because there are functions that take more than one clock cycle
+	ADD	r5, r5, 9 // accounts to remove clock skews (when resetting DWT_CYCCNT; between last line of CHECK_CYCLECNT and last line of RESET_CYCLECNT). This has to be improved because there are functions that take more than one clock cycle
 	LBCO	r2, CONST_PRUCTRLREG, 0, 4 //  r2 maps the control register 	
 	// Reset CYCLECNT // We make CYCLECNT relative from this point to maximize the chances that it will not overflow
 	CLR	r2.t3
