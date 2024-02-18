@@ -12,7 +12,7 @@
 // Length of acquisition:
 #define RECORDS 850 // 850 readings and it matches in the host c++ script
 #define MAX_VALUE_BEFORE_RESET 0x0FFFFFFF // Using one bit less of the length of the register to avoid overflow occuring in the time of execution of TIMETAG
-define MAX_VALUE_BEFORE_RESETmostsigByte	127
+#define MAX_VALUE_BEFORE_RESETmostsigByte	127
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
 .macro LED_OFF
@@ -50,19 +50,19 @@ INITIATIONS:// This is only run once
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM, where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
 	MOV	r0, OWNRAM
-	MOV	r10, PRU0_CTRL+0x12//CONST_PRUDRAM
+	MOV	r10, PRU0_CTRL | 0x12//CONST_PRUDRAM
 	SBBO	r0, r10, 0, 4  // Load the base address of PRU0 Data RAM into C24
 
 	// Configure the programmable pointer register for PRU by setting c28_pointer[15:0] // related to shared RAM
 	// This will make C28 point to 0x00010000 (PRU shared RAM).
 	// http://www.embedded-things.com/bbb/understanding-bbb-pru-shared-memory-access/	
 	MOV	r0, SHARED_RAM                  // Set C28 to point to shared RAM
-	MOV	r10, PRU0_CTRL + CTPPR0offset //CONST_PRUSHAREDRAM
+	MOV	r10, PRU0_CTRL | CTPPR0offset //CONST_PRUSHAREDRAM
 	SBBO	r0, r10, 0, 4
 	
 	// Make C29 point to the PRU control registers
 	MOV	r0, PRU0_CTRL
-	MOV	r10, PRU0_CTRL + CTPPR1offset //CONST_PRUCTRLREG
+	MOV	r10, PRU0_CTRL | CTPPR1offset //CONST_PRUCTRLREG
 	SBBO	r0, r10, 0, 4
 
 //	// Configure the programmable pointer register for PRU by setting c31_pointer[15:0] // related to ddr.
@@ -102,8 +102,8 @@ START1:
 CHECK_CYCLECNT:
 	LBCO	r6, CONST_PRUCTRLREG, 0xC, 4 // r6 maps the value of DWT_CYCCNT
 	MOV	r10,0x00000000
-	MOV	r10.b0, r6.b4
-	QBGT	RESET_CYCLECNT, r10, MAX_VALUE_BEFORE_RESETmostsigByte // If r6.b4 > MAX_VALUE_BEFORE_RESET, go to reset
+	MOV	r10.b0, r6.b3
+	QBGT	RESET_CYCLECNT, r10, MAX_VALUE_BEFORE_RESETmostsigByte // If r6.b3 > MAX_VALUE_BEFORE_RESET, go to reset
 
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and the 4 bytes
