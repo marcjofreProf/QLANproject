@@ -211,9 +211,9 @@ int x;
 
 unsigned short int* valp;
 unsigned int valCycleCountPRU; // 32 bits // Made relative to each acquition run
-unsigned int valAuxCycleCountPRU; // 32 bits
 unsigned int valOverflowCycleCountPRU; // 32 bits
 unsigned long long int extendedCounterPRU; // 64 bits
+unsigned long long int auxUnskewingFactor=9; // Related to the number of instruction when a reset happens and are lost the counts; // 64 bits
 unsigned short int val; // 16 bits
 unsigned short int valBitsInterest; // 16 bits
 //unsigned char rgb24[4];
@@ -222,23 +222,19 @@ unsigned short int valBitsInterest; // 16 bits
 
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=(unsigned short int*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
-unsigned int NumRecords=850; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 12KB=12×1024bytes=12×1024×8bits=98304bits; maybe a max of 850 is safe (since each capture takes 112 bits)
+unsigned int NumRecords=1024; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 12KB=12×1024bytes=12×1024×8bits=98304bits; maybe a max of 1200 is safe (since each capture takes 80 bits)
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
 	valCycleCountPRU=*valp;
 	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
 	valp++;
-	// Second 32 bits is the auxiliary register for DWT_CYCCNT
-	valAuxCycleCountPRU=*valp;
-	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
-	valp++;
-	// Third 32 bits is the overflow register for DWT_CYCCNT
+	// Second 32 bits is the overflow register for DWT_CYCCNT
 	valOverflowCycleCountPRU=*valp;
 	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
 	valp++;
 	// Mount the extended counter value
-	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + static_cast<unsigned long long int>(valCycleCountPRU)+static_cast<unsigned long long int>(valAuxCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
-	// Then, the last 32 bits is the channels detected
+	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
+	// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
 	val=*valp;
 	valBitsInterest=this->packBits(val); // we're just interested in 4 bits
 	valp++; // signle 16 bits increment because 2 bytes stored

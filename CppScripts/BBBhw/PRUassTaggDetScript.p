@@ -10,7 +10,7 @@
 #define MASKevents 0x2E // P9_27-30, which corresponds to r31 bits 1,2,3 and 5
 
 // Length of acquisition:
-#define RECORDS 850 // 850 readings and it matches in the host c++ script
+#define RECORDS 1024 // 1024 readings and it matches in the host c++ script
 #define MAX_VALUE_BEFORE_RESET 0x0FFFFFFF // Using one bit less of the length of the register to avoid overflow occuring in the time of execution of TIMETAG
 #define MAX_VALUE_BEFORE_RESETmostsigByte	127
 // *** LED routines, so that LED USR0 can be used for some simple debugging
@@ -32,8 +32,8 @@
 // r2 reserved mapping control register
 // r3 reserved for overflow DWT_CYCCNT counter
 // r4 reserved for holding the RECORDS (re-loaded at each iteration)
-// r5 reserved for holding the auxiliary DWT_CYCCNT count
-// r6 reserved for holding the DWT_CYCCNT count value
+// r5 reserved for holding the DWT_CYCCNT count value
+// r6 reserved for checking comparison if DWT_CYCCNT has to reset
 
 // r10 is arbitrary used for operations
 
@@ -82,28 +82,31 @@ INITIATIONS:// This is only run once
 	
 	MOV	r3, 0  // Initialize overflow counter in r3	
 	SUB	r3, r3, 1    // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter
-
-RESET_CYCLECNT:
-        // Reset cycle counter register (DWT_CYCCNT) here by writing to its control register or using the appropriate mechanism    
+	MOV	r6,0x00000000			// Zero r6 register
+	
+	// Reset cycle counter register (DWT_CYCCNT) here by writing to its control register or using the appropriate mechanism    
         // Disabling and Enable cycle counter by setting bit 3 (COUNTENABLE) of the control register to re-start cycle counter
+        LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps control register
+
+RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
+	// The below could be optimized - then change the skew number in c++ code
         LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps control register	
 	CLR	r2.t3
 	SBCO	r2, CONST_PRUCTRLREG, 0, 4
 	LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps control register
 	SET	r2.t3
-	SBCO	r2, CONST_PRUCTRLREG, 0, 4 // Sets to zero DWT_CYCCNT	
+	SBCO	r2, CONST_PRUCTRLREG, 0, 4 // Sets to zero DWT_CYCCNT
+	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
 	ADD	r3, r3, 1    // Increment overflow counter
 
-START1:
+//START1:
 //	SET r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data		
-		
+	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
-CHECK_CYCLECNT:
-	LBCO	r6, CONST_PRUCTRLREG, 0xC, 4 // r6 maps the value of DWT_CYCCNT
-	MOV	r10,0x00000000			// Zero r10 register
-	MOV	r10.b0, r6.b3
-	QBGT	RESET_CYCLECNT, r10, MAX_VALUE_BEFORE_RESETmostsigByte // If r6.b3 > MAX_VALUE_BEFORE_RESET, go to reset
+CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
+	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts
+	MOV	r6.b0, r5.b3
+	QBGT	RESET_CYCLECNT, r6, MAX_VALUE_BEFORE_RESETmostsigByte // If r5.b3 > MAX_VALUE_BEFORE_RESET, go to reset
 
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and the 4 bytes
@@ -112,15 +115,7 @@ CMDLOOP:
 	// ok, we have an instruction. Assume it means 'begin capture'
 	LED_OFF // Indicate that we start acquisiton of timetagging
 	LBCO	r1, CONST_PRUSHAREDRAM, 0, 4  // reset r1 address to point at the beggining of PRU shared RAM
-	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4// store the current value of DWT_CYCCNT into r5.
-	ADD	r5, r5, 9 // accounts to remove clock skews (when resetting DWT_CYCCNT; between last line of CHECK_CYCLECNT and last line of RESET_CYCLECNT). This has to be improved because there are functions that take more than one clock cycle
-	LBCO	r2, CONST_PRUCTRLREG, 0, 4 //  r2 maps the control register 	
-	// Reset CYCLECNT // We make CYCLECNT relative from this point to maximize the chances that it will not overflow
-	CLR	r2.t3
-	SBCO	r2, CONST_PRUCTRLREG, 0, 4
-	LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps the control register
-	SET	r2.t3
-	SBCO  	r2, CONST_PRUCTRLREG, 0, 4 // Sets to zero DWT_CYCCNT
+	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 		
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register, say R0
@@ -135,11 +130,8 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 
 TIMETAG:
 	// Time part
-	LBCO	r6, CONST_PRUCTRLREG, 0xC, 4 // r2 maps the value of DWT_CYCCNT
-	SBBO 	r6, r1, 0, 4 // Put contents of DWT_CYCCNT into the address at r1.
-	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved
-	// Here include the auxiliary CYCLECNT count
-	SBBO 	r5, r1, 0, 4 // Put contents of auxiliary DWT_CYCCNT into the address at r1
+	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r2 maps the value of DWT_CYCCNT
+	SBBO 	r5, r1, 0, 4 // Put contents of DWT_CYCCNT into the address at r1.
 	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved
 	// Here include the overflow register
 	SBBO 	r3, r1, 0, 4 // Put contents of overflow DWT_CYCCNT into the address at r1
@@ -157,7 +149,7 @@ TIMETAG:
 	LED_ON// this signals that we are done with the timetagging acqusition
 	MOV 	r0, 1
 	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r1 into CONST_PRUDRAM
-	JMP 	START1 // finished, wait for next command. So it continuosly loops	
+	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:
 	// Send notification to Host for program completion
