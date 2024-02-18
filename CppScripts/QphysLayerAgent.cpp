@@ -444,6 +444,7 @@ strcat(ParamsCharArray,"_"); // Final _
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
+PRUGPIO->ClearStoredQuBits();
 this->release();
 usleep((int)(100*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to be able to send the above message
 /*

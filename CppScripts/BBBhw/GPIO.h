@@ -74,6 +74,7 @@ public:	// Functions/Methods
 	virtual int SendTriggerSignals(); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	virtual int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
 	virtual int RetrieveNumStoredQuBits(); // Reads the fstream file to retrieve number of stored timetagged qubits
+	virtual int ClearStoredQuBits(); // Send the writting pointer back to the beggining - effectively clearing stored QuBits
 	// Non PRU
 	virtual int getNumber() { return number; }
 	// General Input and Output Settings
@@ -111,7 +112,7 @@ public:	// Functions/Methods
 
 private: // Functions/Methods
 	// PRU
-	unsigned short int packBits();
+	unsigned short int packBits(unsigned short int value);
 	// Non-PRU
 	int write(string path, string filename, string value);
 	int write(string path, string filename, int value);

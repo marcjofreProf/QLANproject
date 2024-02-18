@@ -180,8 +180,7 @@ bool fin=false;
 do // This is blocking
 {
 if (pru1dataMem_int[0] == 1)// Seems that it checks if it has finished the sequence
-{
-	
+{	
 	pru1dataMem_int[0] = 0; // Here clears the value
 	fin=true;
 	//printf("Ack\n");
@@ -223,27 +222,26 @@ unsigned short int valBitsInterest; // 16 bits
 
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=(unsigned short int*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
-unsigned int NumRecords=1000; //Number of records per run. It is also defined in PRUassTaggDetScript.p
+unsigned int NumRecords=850; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 12KB=12×1024bytes=12×1024×8bits=98304bits; maybe a max of 850 is safe (since each capture takes 112 bits)
 for (x=0; x<NumRecords; x++){
-	// First 32 bits is the CYCLEcount of the PRU
+	// First 32 bits is the DWT_CYCCNT of the PRU
 	valCycleCountPRU=*valp;
 	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
 	valp++;
-	// Second 32 bits is the overflow register for CYCLEcount
+	// Second 32 bits is the auxiliary register for DWT_CYCCNT
 	valAuxCycleCountPRU=*valp;
 	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
 	valp++;
-	// Third 32 bits is the overflow register for CYCLEcount
+	// Third 32 bits is the overflow register for DWT_CYCCNT
 	valOverflowCycleCountPRU=*valp;
 	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
 	valp++;
 	// Mount the extended counter value
-	extendedCounterPRU=static_cast<unsigned long long int>(valOverflowCycleCountPRU) << 32) | (valCycleCountPRU+valAuxCycleCountPRU);
+	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + static_cast<unsigned long long int>(valCycleCountPRU)+static_cast<unsigned long long int>(valAuxCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 	// Then, the last 32 bits is the channels detected
 	val=*valp;
 	valBitsInterest=this->packBits(val); // we're just interested in 4 bits
-	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
-	valp++;
+	valp++; // signle 16 bits increment because 2 bytes stored
 	//fprintf(outfile, "%d\n", val);
 	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;	
 }
@@ -263,14 +261,28 @@ unsigned short int GPIO::packBits(unsigned short int value) {
     return bit1 | bit2 | bit3 | bit5;
 }
 
+int GPIO::ClearStoredQuBits(){
+if (streamDDRpru.is_open()){
+	streamDDRpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
+	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	return 0; // all ok
+}
+else{
+cout << "ClearStoredQuBits: BBB streamDDRpru is not open!" << endl;
+return -1;
+}
+}
+
 int GPIO::RetrieveNumStoredQuBits(){
 if (streamDDRpru.is_open()){
-	streamDDRpru.seekg(0, std::ios::beg); // back to the start!
+	streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
 	string StrLine;
 	int lineCount = 0;
+	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
         while (getline(streamDDRpru, StrLine)) {// While true
             lineCount++; // Increment line count for each line read
         }
+        streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	return lineCount;
 }
 else{

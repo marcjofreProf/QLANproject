@@ -14,32 +14,35 @@
 #define ARM_PRU1_INTERRUPT      22
 
 // In the context of the AM335x Programmable Real-time Units (PRUs), "CXX" generally refers to the Constant Table Pointer Registers, such as C24, C25, C26, C27, C28, C29, C30, and C31. These registers are a key feature of the PRU's architecture, designed to facilitate efficient access to various memory regions and peripherals within the device. Each PRU core in the AM335x processors has its own set of these constant table registers.
+// these are like registers but constants, no operations can be performed, so they are good for storing addresses of interest
 #define CONST_PRUCFG         C4
 #define CONST_PRUDRAM        C24 // mapping PRU own RAM
 #define CONST_PRUSHAREDRAM   C28 // mapping shared memory
 #define CONST_PRUCTRLREG     C29 // PRU control registers
 #define CONST_DDR            C31 //used specifically for accessing external memory regions, such as DDR memory, which is shared with the main ARM processor.
 
-#define PRU0_CTRL            0x22000
-#define PRU1_CTRL            0x24000
+#define PRU0_CTRL            0x00022000
+#define PRU1_CTRL            0x00024000
 
-#define PRU0_CTRLREG	     0x00000220
-
-#define CTPPR0               0x28
-#define CTPPR1               0x2C
+#define CTPPR0offset         0x28 // offset (thats is why it does not have the 8 values) from PRUO_CTRL or from PRU1_CTRL
+#define CTPPR1offset         0x2C // offset (thats is why it does not have the 8 values) from PRUO_CTRL or from PRU1_CTRL
  
-#define OWN_RAM              0x000 // current PRU data RAM
-#define OTHER_RAM            0x020 // The other PRU data ram
-#define SHARED_RAM           0x100 // equivalent with 0x120. The global memory map is shown in Table 6 (page 20) and identifies 0x00010000 as being the start of the 12Kb of shared memory. Therefore, value of 0x00012000 is somewhere inside the shared memory (albeit not at the beginning).
+#define OWN_RAM              0x00000000 // current PRU data RAM
+#define OTHER_RAM            0x00002000 // The other PRU data ram (2000*32bits=64000; 64000/8=8K
+#define SHARED_RAM           0x00010000 // equivalent with 0x00012000. The global memory map is shown in Table 6 (page 20) and identifies 0x00010000 as being the start of the 12Kb of shared memory. Therefore, value of 0x00012000 is somewhere inside the shared memory (albeit not at the beginning).
 #define DDR_MEM		     0x80001000 // 0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
 
 #define PRU0_R31_VEC_VALID	32
 #define PRU_EVTOUT_0		3	// the event number that is sent back
 
-#define GPIO1_BANK 0x4804c000 // this is the address of the BB GPIO1 Bank Register for PR0. We set bits in special locations in offsets here to put a GPIO high or low.
-#define GPIO_CLEARDATAOUT 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
+#define GPIO0_BANK 0x44E07000
+#define GPIO1_BANK 0x4804c000 // this is the address of the BB GPIO1 Bank Register for PR0
+#define GPIO2_BANK 0x481ac000 // this is the address of the BBB GPIO2 Bank Register for PRU1. We set bits in special locations in offsets here to put a GPIO high or low.
+#define GPIO3_BANK 0x481AE000
+
+#define GPIO_CLEARDATAOUToffset 0x190 //Offsets from GPIOX_BANK. We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
 // GPIO goes low. If a bit is 0 it is ignored.
-#define GPIO_SETDATAOUT 0x194 // at this offset various GPIOs are associated with a bit position. Writing a 32 bit value to this offset enables them (sets them high) if there is a 1 in a corresponding bit. A zero in a bit position here is ignored - it does NOT turn the associated GPIO off.
+#define GPIO_SETDATAOUToffset 0x194 //Offsets from GPIOX_BANK. At this offset various GPIOs are associated with a bit position. Writing a 32 bit value to this offset enables them (sets them high) if there is a 1 in a corresponding bit. A zero in a bit position here is ignored - it does NOT turn the associated GPIO off.
 
 // Macros - NOT USED
 //

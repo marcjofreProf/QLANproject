@@ -14,9 +14,9 @@
 #define GPIO2_BANK 0x481ac000 // this is the address of the BBB GPIO2 Bank Register for PRU1. We set bits in special locations in offsets here to put a GPIO high or low.
 #define GPIO3_BANK 0x481AE000
 
-#define GPIO_SETDATAOUT 0x194 // at this offset various GPIOs are associated with a bit position. Writing a 32 bit value to this offset enables them (sets them high) if there is a 1 in a corresponding bit. A zero in a bit position here is ignored - it does NOT turn the associated GPIO off.
+#define GPIO_SETDATAOUToffset 0x194 // at this offset various GPIOs are associated with a bit position. Writing a 32 bit value to this offset enables them (sets them high) if there is a 1 in a corresponding bit. A zero in a bit position here is ignored - it does NOT turn the associated GPIO off.
 
-#define GPIO_CLEARDATAOUT 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
+#define GPIO_CLEARDATAOUToffset 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
 // GPIO goes low. If a bit is 0 it is ignored.
 
 #define INS_PER_US		200		// 5ns per instruction fo rBeaglebone black
@@ -44,13 +44,13 @@
 // *** Affects: r28, r29. Each PRU has its of 32 registers
 .macro LED_OFF
 	MOV	r28, 1<<21
-	MOV	r29, GPIO2_BANK | GPIO_CLEARDATAOUT
+	MOV	r29, GPIO2_BANK | GPIO_CLEARDATAOUToffset
 	SBBO	r28, r29, 0, 4
 .endm
 
 .macro LED_ON
 	MOV	r28, 1<<21
-	MOV	r29, GPIO2_BANK | GPIO_SETDATAOUT
+	MOV	r29, GPIO2_BANK | GPIO_SETDATAOUToffset
 	SBBO	r28, r29, 0, 4
 .endm
 
@@ -64,8 +64,8 @@
 // r30 is reserved for output pins
 // r31 is reserved for inputs pins
 INITIATIONS:
-//	MOV r1, GPIO2_BANK | GPIO_SETDATAOUT  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
-//	MOV r2, GPIO2_BANK | GPIO_CLEARDATAOUT // load the address we wish to cleare to r2. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
+//	MOV r1, GPIO2_BANK | GPIO_SETDATAOUToffset  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
+//	MOV r2, GPIO2_BANK | GPIO_CLEARDATAOUToffset // load the address we wish to cleare to r2. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
 		
 	LBCO	r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
 	// OCP master port is the protocol to enable communication between the PRUs and the host processor

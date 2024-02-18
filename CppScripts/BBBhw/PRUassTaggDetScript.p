@@ -10,28 +10,29 @@
 #define MASKevents 0x2E // P9_27-30, which corresponds to r31 bits 1,2,3 and 5
 
 // Length of acquisition:
-#define RECORDS 1000 // Seems 1000 readings and it matches in the host c++ script
-#define MAX_VALUE_BEFORE_RESET 0xFFFFFFFF // It has to be improved, because overflow will occur in the time of execution probably
+#define RECORDS 850 // 850 readings and it matches in the host c++ script
+#define MAX_VALUE_BEFORE_RESET 0x0FFFFFFF // Using one bit less of the length of the register to avoid overflow occuring in the time of execution of TIMETAG
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
 .macro LED_OFF
 	MOV	r28, 1<<21
-	MOV	r29, GPIO1_BANK | GPIO_CLEARDATAOUT
+	MOV	r29, GPIO1_BANK | GPIO_CLEARDATAOUToffset
 	SBBO	r28, r29, 0, 4
 .endm
 
 .macro LED_ON
 	MOV	r28, 1<<21
-	MOV	r29, GPIO1_BANK | GPIO_SETDATAOUT
+	MOV	r29, GPIO1_BANK | GPIO_SETDATAOUToffset
 	SBBO	r28, r29, 0, 4
 .endm
 
 // r0 is arbitrary used for operations
 // r1 reserved pointing to SHARED
-// r2 reserved mapping CYCLECNT
-// r3 reserved for overflow counter
+// r2 reserved mapping control register
+// r3 reserved for overflow DWT_CYCCNT counter
 // r4 reserved for holding the RECORDS (re-loaded at each iteration)
-// r5 reserved for holding the auxiliary CYCLECNT count
+// r5 reserved for holding the auxiliary DWT_CYCCNT count
+// r6 reserved for holding the DWT_CYCCNT count value
 
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
@@ -55,7 +56,7 @@ INITIATIONS:// This is only run once
 	SBBO	r0, CONST_PRUSHAREDRAM, 0, 4
 	
 	// Make C29 point to the PRU control registers
-	MOV	r0, PRU0_CTRLREG	
+	MOV	r0, PRU0_CTRL	
 	SBBO	r0, CONST_PRUCTRLREG, 0, 4
 
 //	// Configure the programmable pointer register for PRU by setting c31_pointer[15:0] // related to ddr.
@@ -71,20 +72,19 @@ INITIATIONS:// This is only run once
 
         LED_ON	// just for signaling initiations
 	LED_OFF	// just for signaling initiations
-
-	MOV	r1, SHARED  // PRU shared RAM
+	
 	MOV	r3, 0  // Initialize overflow counter in r3	
 	SUB	r3, r3, 1    // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter
 
 RESET_CYCLECNT:
-        // Reset CYCLECNT here by writing to its control register or using the appropriate mechanism    
+        // Reset cycle counter register (DWT_CYCCNT) here by writing to its control register or using the appropriate mechanism    
         // Disabling and Enable cycle counter by setting bit 3 (COUNTENABLE) of the control register to re-start cycle counter
-        LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps de CYCLECNT	
+        LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps control register	
 	CLR	r2.t3
 	SBCO	r2, CONST_PRUCTRLREG, 0, 4
-	LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps de CYCLECNT
+	LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps control register
 	SET	r2.t3
-	SBCO	r2, CONST_PRUCTRLREG, 0, 4		
+	SBCO	r2, CONST_PRUCTRLREG, 0, 4 // Sets to zero DWT_CYCCNT	
 	ADD	r3, r3, 1    // Increment overflow counter
 
 START1:
@@ -93,23 +93,25 @@ START1:
 		
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT:
-	LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps de CYCLECNT
-	QBGT	RESET_CYCLECNT, r2, MAX_VALUE_BEFORE_RESET // If r2 > MAX_VALUE_BEFORE_RESET, go to reset
+	LBCO	r6, CONST_PRUCTRLREG, 0xC, 4 // r6 maps the value of DWT_CYCCNT
+	QBGT	RESET_CYCLECNT, r6, MAX_VALUE_BEFORE_RESET // If r6 > MAX_VALUE_BEFORE_RESET, go to reset
 
 CMDLOOP:
-	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r12 the content of CONST_PRUDRAM with offset 0, and the 4 bytes
+	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and the 4 bytes
 	QBEQ	CHECK_CYCLECNT, r0, 0 // loop until we get an instruction
 	QBEQ	CHECK_CYCLECNT, r0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
 	LED_OFF // Indicate that we start acquisiton of timetagging
-	LBCO	r2, CONST_PRUCTRLREG, 0, 4 // store the current value of CYCLECOUNT into r2.
-	MOV	r5, r2 // store the current value of CYCLECOUNT into r5.
+	MOV	r1, SHARED  // PRU shared RAM
+	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4// store the current value of DWT_CYCCNT into r5.
+	ADD	r5, r5, 7 // accounts to remove clock skews (when resetting DWT_CYCCNT; between last line of CHECK_CYCLECNT and last line of RESET_CYCLECNT). This has to be improved because there are functions that take more than one clock cycle
+	LBCO	r2, CONST_PRUCTRLREG, 0, 4 //  r2 maps the control register 	
 	// Reset CYCLECNT // We make CYCLECNT relative from this point to maximize the chances that it will not overflow
 	CLR	r2.t3
 	SBCO	r2, CONST_PRUCTRLREG, 0, 4
-	LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps de CYCLECNT
+	LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps the control register
 	SET	r2.t3
-	SBCO  	r2, CONST_PRUCTRLREG, 0, 4
+	SBCO  	r2, CONST_PRUCTRLREG, 0, 4 // Sets to zero DWT_CYCCNT
 		
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register, say R0
@@ -124,18 +126,18 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 
 TIMETAG:
 	// Time part
-	LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps de CYCLECNT
-	SBBO 	r2, r1, 0, 4 // Put contents of CYCLEcount into the address at r1.
+	LBCO	r6, CONST_PRUCTRLREG, 0xC, 4 // r2 maps the value of DWT_CYCCNT
+	SBBO 	r6, r1, 0, 4 // Put contents of DWT_CYCCNT into the address at r1.
 	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved
 	// Here include the auxiliary CYCLECNT count
-	SBBO 	r5, r1, 0, 4 // Put contents of overflowCYCLEcount into the address at r1
+	SBBO 	r5, r1, 0, 4 // Put contents of auxiliary DWT_CYCCNT into the address at r1
 	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved
 	// Here include the overflow register
-	SBBO 	r3, r1, 0, 4 // Put contents of overflowCYCLEcount into the address at r1
+	SBBO 	r3, r1, 0, 4 // Put contents of overflow DWT_CYCCNT into the address at r1
 	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved	
 	// Channels detection
 	SBBO 	r0.b0, r1, 0, 1 // Put contents of r0 into the address at r1
-	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved
+	ADD 	r1, r1, 2 // increment address by 2 bytes // This can be improved
 	
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
