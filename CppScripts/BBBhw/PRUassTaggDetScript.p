@@ -111,7 +111,7 @@ CMDLOOP:
 	QBEQ	CHECK_CYCLECNT, r0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
 	LED_OFF // Indicate that we start acquisiton of timetagging
-	MOV	r1, CONST_PRUSHAREDRAM  // reset r1 address to point at the beggining of PRU shared RAM
+	LBCO	r1, CONST_PRUSHAREDRAM, 0, 4  // reset r1 address to point at the beggining of PRU shared RAM
 	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4// store the current value of DWT_CYCCNT into r5.
 	ADD	r5, r5, 9 // accounts to remove clock skews (when resetting DWT_CYCCNT; between last line of CHECK_CYCLECNT and last line of RESET_CYCLECNT). This has to be improved because there are functions that take more than one clock cycle
 	LBCO	r2, CONST_PRUCTRLREG, 0, 4 //  r2 maps the control register 	
