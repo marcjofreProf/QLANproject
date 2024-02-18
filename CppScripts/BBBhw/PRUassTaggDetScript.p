@@ -101,7 +101,7 @@ START1:
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT:
 	LBCO	r6, CONST_PRUCTRLREG, 0xC, 4 // r6 maps the value of DWT_CYCCNT
-	MOV	r10,0x00000000
+	MOV	r10,0x00000000			// Zero r10 register
 	MOV	r10.b0, r6.b3
 	QBGT	RESET_CYCLECNT, r10, MAX_VALUE_BEFORE_RESETmostsigByte // If r6.b3 > MAX_VALUE_BEFORE_RESET, go to reset
 
@@ -111,7 +111,7 @@ CMDLOOP:
 	QBEQ	CHECK_CYCLECNT, r0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
 	LED_OFF // Indicate that we start acquisiton of timetagging
-	MOV	r1, SHARED  // PRU shared RAM
+	MOV	r1, CONST_PRUSHAREDRAM  // reset r1 address to point at the beggining of PRU shared RAM
 	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4// store the current value of DWT_CYCCNT into r5.
 	ADD	r5, r5, 9 // accounts to remove clock skews (when resetting DWT_CYCCNT; between last line of CHECK_CYCLECNT and last line of RESET_CYCLECNT). This has to be improved because there are functions that take more than one clock cycle
 	LBCO	r2, CONST_PRUCTRLREG, 0, 4 //  r2 maps the control register 	
