@@ -103,12 +103,12 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts
 	MOV	r6.b0, r5.b3
-	QBGT	RESET_CYCLECNT, r6.b0, MAX_VALUE_BEFORE_RESETmostsigByte // If r5.b3 > MAX_VALUE_BEFORE_RESET, go to reset
+//	QBGT	RESET_CYCLECNT, r6.b0, MAX_VALUE_BEFORE_RESETmostsigByte // If r5.b3 > MAX_VALUE_BEFORE_RESET, go to reset
 
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
-	QBEQ	CHECK_CYCLECNT, r0, 0 // loop until we get an instruction
-	QBEQ	CHECK_CYCLECNT, r0, 1 // loop until we get an instruction
+//	QBEQ	CHECK_CYCLECNT, r0, 0 // loop until we get an instruction
+//	QBEQ	CHECK_CYCLECNT, r0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
 	LED_ON // Indicate that we start acquisiton of timetagging
 	MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
