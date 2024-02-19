@@ -286,7 +286,7 @@ for (x=0; x<NumRecords; x++){
 	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
 	valp++;
 	// Mount the extended counter value
-	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
+	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU-1)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU-1)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 	// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
 	val=*valp;
 	valBitsInterest=this->packBits(val); // we're just interested in 4 bits

@@ -60,7 +60,7 @@ INITIATIONS:// This is only run once
 //	MOV	r10, PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
 	SBCO	r0, CONST_PRUSHAREDRAM, 0, 4
 	
-	// Make c28_pointer[15:0] point to the PRU control registers
+	// Make c29_pointer[15:0] point to the PRU control registers
 	MOV	r0, PRU0_CTRL
 //	MOV	r10, PRU0_CTRL | C29add //CONST_PRUCTRLREG
 	SBCO	r0, CONST_PRUCTRLREG, 0, 4
@@ -81,12 +81,9 @@ INITIATIONS:// This is only run once
 	LED_OFF	// just for signaling initiations
 	
 	MOV	r3, 0  // Initialize overflow counter in r3	
-	SUB	r3, r3, 1    // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter
-	MOV	r6,0x00000000			// Zero r6 register
+//	SUB	r3, r3, 1    This might produce error (accounted in c++ script that we start from 1) // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter
+	MOV	r6, 0			// Zero r6 register
 	
-	// Reset cycle counter register (DWT_CYCCNT) here by writing to its control register or using the appropriate mechanism    
-        // Disabling and Enable cycle counter by setting bit 3 (COUNTENABLE) of the control register to re-start cycle counter
-        LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps control register
 
 RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	// The below could be optimized - then change the skew number in c++ code
@@ -106,7 +103,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts
 	MOV	r6.b0, r5.b3
-	QBGT	RESET_CYCLECNT, r6, MAX_VALUE_BEFORE_RESETmostsigByte // If r5.b3 > MAX_VALUE_BEFORE_RESET, go to reset
+	QBGT	RESET_CYCLECNT, r6.b0, MAX_VALUE_BEFORE_RESETmostsigByte // If r5.b3 > MAX_VALUE_BEFORE_RESET, go to reset
 
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
@@ -119,12 +116,12 @@ CMDLOOP:
 		
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register, say R0
-	MOV 	r0, r31
+	MOV 	r0.b0, r31.b0
 	// Mask the relevant bits you're interested in
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
 	AND 	r0, r0, MASKevents
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
-	QBNE 	WAIT_FOR_EVENT, r0, 0
+//	QBNE 	WAIT_FOR_EVENT, r0.b0, 0
 	// If the program reaches this point, at least one of the bits is high
 	// Proceed with the rest of the program
 
