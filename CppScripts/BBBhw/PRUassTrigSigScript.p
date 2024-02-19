@@ -124,7 +124,7 @@ SIGNALON:
 	SUB	r3, r3, 1	// Substract 1 count cycle
 SIGNALOFF:
 	MOV	r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
-	QBGT	SIGNALON, r3, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
+	QBNE	SIGNALON, r3, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
 	// The following lines do not consume "signal speed"
 	MOV	r0, 1 // code 1 means that we have finished.
 	SBCO	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
