@@ -203,6 +203,9 @@ else if (CheckTimeFlag==true){// too much time
 		cout << "GPIO::SendTriggerSignals took to much. Resetting PRU1" << endl;
 		fin=true;
 	}
+else{
+cout << "pru1dataMem_int[0]: " << pru1dataMem_int[0] << endl;
+}
 } while(!fin);
 
 
