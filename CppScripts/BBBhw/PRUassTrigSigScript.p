@@ -112,12 +112,11 @@ INITIATIONS:
 //	JMP SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
 
 
-// Without delays (fastest possible)
+// Without delays (fastest possible) and CMD controlled
 CMDLOOP:
-//	DEL
-	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r3 the content of CONST_PRUDRAM with offset 0, and the 4 bytes
-	QBEQ	CMDLOOP, r0, 0 // loop until we get an instruction. Code 0 means idle
-	QBEQ	CMDLOOP, r0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
+//	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r3 the content of CONST_PRUDRAM with offset 0, and the 4 bytes
+//	QBEQ	CMDLOOP, r0, 0 // loop until we get an instruction. Code 0 means idle
+//	QBEQ	CMDLOOP, r0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
 	// ok, we have an instruction (code 2). Assume it means 'begin signals'
 	MOV	r3, NUM_REPETITIONS// load r3 with the number of cycles
 SIGNALON:	
@@ -128,7 +127,7 @@ SIGNALOFF:
 	QBGT	SIGNALON, r3, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
 	// The following lines do not consume "signal speed"
 	MOV	r0, 1 // code 1 means that we have finished. Re-use of register r3
-	SBCO	r0, CONST_PRUDRAM, 0, 4 // Put contents of r3 into CONST_PRUDRAM
+//	SBCO	r0, CONST_PRUDRAM, 0, 4 // Put contents of r3 into CONST_PRUDRAM
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
