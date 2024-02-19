@@ -266,7 +266,7 @@ unsigned short int* valp;
 unsigned int valCycleCountPRU; // 32 bits // Made relative to each acquition run
 unsigned int valOverflowCycleCountPRU; // 32 bits
 unsigned long long int extendedCounterPRU; // 64 bits
-unsigned long long int auxUnskewingFactor=9; // Related to the number of instruction when a reset happens and are lost the counts; // 64 bits
+unsigned long long int auxUnskewingFactor=11; // Related to the number of instruction when a reset happens and are lost the counts; // 64 bits
 unsigned short int val; // 16 bits
 unsigned short int valBitsInterest; // 16 bits
 //unsigned char rgb24[4];
