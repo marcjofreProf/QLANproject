@@ -69,7 +69,7 @@ INITIATIONS:// This is only run once
 //	// This will make C31 point to 0x80001000 (DDR memory). 0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
 //	https://groups.google.com/g/beagleboard/c/ukEEblzz9Gk
 //	MOV	r0, DDR_MEM                    // Set C31 to point to ddr
-//	MOV	r10, CONST_DDR
+//	MOV	r10, PRU0_CTRL | C31add
 //	SBBO    r0, r10, 0, 4
 
 	//Load values from external DDR Memory into Registers R0/R1/R2

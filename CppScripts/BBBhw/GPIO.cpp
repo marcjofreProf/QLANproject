@@ -36,6 +36,8 @@
 #include<unistd.h>
 #include<sys/epoll.h>
 #include<pthread.h>
+// Time/synchronization management
+#include <chrono>
 // PRU programming
 #include <stdio.h>
 #include <sys/mman.h>
@@ -126,7 +128,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  // Doing debbuging checks - Debugging 1
 	  sleep(1);// Give some time to load programs in PRUs and initiate
 	  this->SendTriggerSignals();
-	  this->ReadTimeStamps();
+	  //this->ReadTimeStamps();
 	  
 	  //munmap(ddrMem, 0x0FFFFFFF); // remove any mappings for those entire pages containing any part of the address space of the process starting at addr and continuing for len bytes. 
 	  close(mem_fd); // Device
@@ -146,20 +148,26 @@ int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 //char fname_new[255];     
 //DDR_paramaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 8;
 //DDR_ackaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 4;
-
-
+int WaitTimeToFutureTimePoint=15000;
+TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);
+bool CheckTimeFlag=false;
 pru0dataMem_int[0]=(unsigned int)2; // set to 2 means perform capture
 
 bool fin=false;
 do // This is blocking
 {
-	if (pru0dataMem_int[0] == 1)// Seems that it checks if it has finished the acquisition
+	CheckTimeFlag=(Clock::now()>FutureTimePoint);
+	if (pru0dataMem_int[0] == 1 and CheckTimeFlag==false)// Seems that it checks if it has finished the acquisition
 	{
 		// we have received the ack!
 		this->DDRdumpdata(); // Store to file
 		pru0dataMem_int[0] = 0; // Here clears the value
 		fin=true;
 		//printf("Ack\n");
+	}
+	else if (CheckTimeFlag==true){// too much time
+		prussdrv_pru_reset(PRU_Operation_NUM);// Reset the PRU
+		cout << "GPIO::ReadTimeStamps took to much time the TimeTagg. Resetting PRU0" << endl;
 	}
 } while(!fin);
 
@@ -184,7 +192,6 @@ if (pru1dataMem_int[0] == 1)// Seems that it checks if it has finished the seque
 {	
 	pru1dataMem_int[0] = 0; // Here clears the value
 	fin=true;
-	//printf("Ack\n");
 }
 } while(!fin);
 

@@ -26,6 +26,8 @@
 #define GPIO_H_
 #include<string>
 #include<fstream>
+// Time/synchronization management
+#include <chrono>
 using std::string;
 using std::ofstream;
 using std::ifstream;
@@ -52,6 +54,10 @@ private:// Variables
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
 	//FILE* outfile;
 	fstream streamDDRpru;
+	// Time/synchronization management
+	using Clock = std::chrono::system_clock;//system_clock;steady_clock;high_resolution_clock
+	using TimePoint = std::chrono::time_point<Clock>;
+	TimePoint OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
 	// Non PRU
 	int number, debounceTime;
 	string name, path;

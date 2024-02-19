@@ -31,6 +31,8 @@
 #define C27add		     0x26
 #define C28add		     0x28 // offset (thats is why it does not have the 8 values) from PRUO_CTRL or from PRU1_CTRL
 #define C29add               0x30 // offset (thats is why it does not have the 8 values) from PRUO_CTRL or from PRU1_CTRL
+#define C30add               0x32
+#define C31add               0x34
  
 #define OWN_RAM              0x00000000 // current PRU data RAM
 #define OTHER_RAM            0x00002000 // The other PRU data ram (2000*32bits=64000; 64000/8=8K
