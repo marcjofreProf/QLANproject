@@ -182,17 +182,25 @@ return 0;// all ok
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
+int WaitTimeToFutureTimePoint=15000;
+TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);
+bool CheckTimeFlag=false;
 pru1dataMem_int[0]=(unsigned int)2; // set to 2 means perform signals
 
 // Here we should wait for the PRU1 to finish, we can check it with the value modified in command
 bool fin=false;
 do // This is blocking
 {
-if (pru1dataMem_int[0] == 1)// Seems that it checks if it has finished the sequence
+CheckTimeFlag=(Clock::now()>FutureTimePoint);
+if (pru1dataMem_int[0] == 1 and CheckTimeFlag==false)// Seems that it checks if it has finished the sequence
 {	
 	pru1dataMem_int[0] = 0; // Here clears the value
 	fin=true;
 }
+else if (CheckTimeFlag==true){// too much time
+		prussdrv_pru_reset(PRU_Signal_NUM);// Reset the PRU
+		cout << "GPIO::SendTriggerSignals took to much. Resetting PRU1" << endl;
+	}
 } while(!fin);
 
 
