@@ -109,7 +109,7 @@ CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of l
 	QBGT	RESET_CYCLECNT, r6, MAX_VALUE_BEFORE_RESETmostsigByte // If r5.b3 > MAX_VALUE_BEFORE_RESET, go to reset
 
 CMDLOOP:
-	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and the 4 bytes
+	LBCO	r0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 1 bytes
 	QBEQ	CHECK_CYCLECNT, r0, 0 // loop until we get an instruction
 	QBEQ	CHECK_CYCLECNT, r0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
@@ -148,7 +148,7 @@ TIMETAG:
 	// we're done. Signal to the application		
 	LED_ON// this signals that we are done with the timetagging acqusition
 	MOV 	r0, 1
-	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r1 into CONST_PRUDRAM
+	SBCO 	r0, CONST_PRUDRAM, 0, 1 // Put contents of r1 into CONST_PRUDRAM
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:
