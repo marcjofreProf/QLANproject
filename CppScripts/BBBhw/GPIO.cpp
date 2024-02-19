@@ -168,6 +168,7 @@ do // This is blocking
 	else if (CheckTimeFlag==true){// too much time
 		prussdrv_pru_reset(PRU_Operation_NUM);// Reset the PRU
 		cout << "GPIO::ReadTimeStamps took to much time the TimeTagg. Resetting PRU0" << endl;
+		fin=true;
 	}
 } while(!fin);
 
@@ -200,6 +201,7 @@ if (pru1dataMem_int[0] == 1 and CheckTimeFlag==false)// Seems that it checks if 
 else if (CheckTimeFlag==true){// too much time
 		prussdrv_pru_reset(PRU_Signal_NUM);// Reset the PRU
 		cout << "GPIO::SendTriggerSignals took to much. Resetting PRU1" << endl;
+		fin=true;
 	}
 } while(!fin);
 
