@@ -193,9 +193,11 @@ bool fin=false;
 do // This is blocking
 {
 CheckTimeFlag=(Clock::now()>FutureTimePoint);
+cout << "CheckTimeFlag: " << CheckTimeFlag << endl;
 if (pru1dataMem_int[0] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the sequence
 {	
 	pru1dataMem_int[0] = (unsigned int)0; // Here clears the value
+	cout << "GPIO::SendTriggerSignals finished" << endl;
 	fin=true;
 }
 else if (CheckTimeFlag==true){// too much time
