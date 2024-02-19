@@ -126,7 +126,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	  
 	  // Doing debbuging checks - Debugging 1
-	  sleep(1);// Give some time to load programs in PRUs and initiate
+	  sleep(5);// Give some time to load programs in PRUs and initiate
 	  this->SendTriggerSignals();
 	  //this->ReadTimeStamps();
 	  
