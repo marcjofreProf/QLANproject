@@ -113,7 +113,7 @@ CMDLOOP:
 	QBEQ	CHECK_CYCLECNT, r0, 0 // loop until we get an instruction
 	QBEQ	CHECK_CYCLECNT, r0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
-	LED_OFF // Indicate that we start acquisiton of timetagging
+	LED_ON // Indicate that we start acquisiton of timetagging
 	LBCO	r1, CONST_PRUSHAREDRAM, 0, 4  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 		
@@ -146,7 +146,7 @@ TIMETAG:
 //	SET r30.t11	// disable the data bus
 	
 	// we're done. Signal to the application		
-	LED_ON// this signals that we are done with the timetagging acqusition
+	LED_OFF// this signals that we are done with the timetagging acqusition
 	MOV 	r0, 1
 	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r1 into CONST_PRUDRAM
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
