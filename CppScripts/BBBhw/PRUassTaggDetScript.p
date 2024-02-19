@@ -50,27 +50,27 @@ INITIATIONS:// This is only run once
 	// Configure the programmable pointer register for PRU by setting c24_pointer[3:0] // related to pru data RAM, where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
 	MOV	r0, OWN_RAM
-	MOV	r10, PRU0_CTRL | C24add//CONST_PRUDRAM
-	SBBO	r0, r10, 0, 4  // Load the base address of PRU0 Data RAM into C24
+//	MOV	r10, PRU0_CTRL | C24add//CONST_PRUDRAM
+	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 
 	// Configure the programmable pointer register for PRU by setting c28_pointer[15:0] // related to shared RAM
 	// This will make C28 point to 0x00010000 (PRU shared RAM).
 	// http://www.embedded-things.com/bbb/understanding-bbb-pru-shared-memory-access/	
 	MOV	r0, SHARED_RAM                  // Set C28 to point to shared RAM
-	MOV	r10, PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
-	SBBO	r0, r10, 0, 4
+//	MOV	r10, PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
+	SBCO	r0, CONST_PRUSHAREDRAM, 0, 4
 	
 	// Make c28_pointer[15:0] point to the PRU control registers
 	MOV	r0, PRU0_CTRL
-	MOV	r10, PRU0_CTRL | C29add //CONST_PRUCTRLREG
-	SBBO	r0, r10, 0, 4
+//	MOV	r10, PRU0_CTRL | C29add //CONST_PRUCTRLREG
+	SBCO	r0, CONST_PRUCTRLREG, 0, 4
 
 //	// Configure the programmable pointer register for PRU by setting c31_pointer[15:0] // related to ddr.
 //	// This will make C31 point to 0x80001000 (DDR memory). 0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
 //	https://groups.google.com/g/beagleboard/c/ukEEblzz9Gk
 //	MOV	r0, DDR_MEM                    // Set C31 to point to ddr
-//	MOV	r10, PRU0_CTRL | C31add
-//	SBBO    r0, r10, 0, 4
+//	//MOV	r10, PRU0_CTRL | C31add
+//	SBCO    r0, CONST_DDR, 0, 4
 
 	//Load values from external DDR Memory into Registers R0/R1/R2
 	//LBCO      r0, CONST_DDR, 0, 12
