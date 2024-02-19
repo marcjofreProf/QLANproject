@@ -110,7 +110,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Timetagging
-	pru0dataMem_int[0]=0; // set to zero means no command. PRU0 idle
+	pru0dataMem_int[0]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
 	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
@@ -118,7 +118,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	
 	// Generate signals
-	pru1dataMem_int[0]=0; // set to zero means no command. PRU1 idle
+	pru1dataMem_int[0]=(unsigned int)0; // set to zero means no command. PRU1 idle
 	// Load and execute the PRU program on the PRU1
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
 		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTrigSigScript.bin");
@@ -157,11 +157,11 @@ bool fin=false;
 do // This is blocking
 {
 	CheckTimeFlag=(Clock::now()>FutureTimePoint);
-	if (pru0dataMem_int[0] == 1 and CheckTimeFlag==false)// Seems that it checks if it has finished the acquisition
+	if (pru0dataMem_int[0] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the acquisition
 	{
 		// we have received the ack!
 		this->DDRdumpdata(); // Store to file
-		pru0dataMem_int[0] = 0; // Here clears the value
+		pru0dataMem_int[0] = (unsigned int)0; // Here clears the value
 		fin=true;
 		//printf("Ack\n");
 	}
@@ -193,9 +193,9 @@ bool fin=false;
 do // This is blocking
 {
 CheckTimeFlag=(Clock::now()>FutureTimePoint);
-if (pru1dataMem_int[0] == 1 and CheckTimeFlag==false)// Seems that it checks if it has finished the sequence
+if (pru1dataMem_int[0] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the sequence
 {	
-	pru1dataMem_int[0] = 0; // Here clears the value
+	pru1dataMem_int[0] = (unsigned int)0; // Here clears the value
 	fin=true;
 }
 else if (CheckTimeFlag==true){// too much time
