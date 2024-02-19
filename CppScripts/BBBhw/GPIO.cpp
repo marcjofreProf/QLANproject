@@ -110,12 +110,12 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Timetagging
-	pru0dataMem_int[0]=(unsigned int)0; // set to zero means no command. PRU0 idle
+	//pru0dataMem_int[0]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
-	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
-		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTaggDetScript.bin");
-	}
+	//if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
+	//	perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTaggDetScript.bin");
+	//}
 	
 	// Generate signals
 	pru1dataMem_int[0]=(unsigned int)0; // set to zero means no command. PRU1 idle
@@ -209,7 +209,8 @@ unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::c
 TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);
 auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
-unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds)
+cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
 
 bool CheckTimeFlag=false;
 pru1dataMem_int[0]=(unsigned int)2; // set to 2 means perform signals
@@ -218,26 +219,26 @@ pru1dataMem_int[0]=(unsigned int)2; // set to 2 means perform signals
 bool fin=false;
 do // This is blocking
 {
-TimePointClockNow=Clock::now();
-duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
-TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count();
-
-CheckTimeFlag=(TimeNow_time_as_count>TimePointFuture_time_as_count);
-cout << "CheckTimeFlag: " << CheckTimeFlag << endl;
-if (pru1dataMem_int[0] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the sequence
-{	
-	pru1dataMem_int[0] = (unsigned int)0; // Here clears the value
-	cout << "GPIO::SendTriggerSignals finished" << endl;
-	fin=true;
-}
-else if (CheckTimeFlag==true){// too much time
-		prussdrv_pru_reset(PRU_Signal_NUM);// Reset the PRU
-		cout << "GPIO::SendTriggerSignals took to much. Resetting PRU1" << endl;
+	TimePointClockNow=Clock::now();
+	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
+	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count();
+	cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
+	CheckTimeFlag=(TimeNow_time_as_count>TimePointFuture_time_as_count);
+	cout << "CheckTimeFlag: " << CheckTimeFlag << endl;
+	if (pru1dataMem_int[0] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the sequence
+	{	
+		pru1dataMem_int[0] = (unsigned int)0; // Here clears the value
+		cout << "GPIO::SendTriggerSignals finished" << endl;
 		fin=true;
 	}
-else{
-cout << "pru1dataMem_int[0]: " << pru1dataMem_int[0] << endl;
-}
+	else if (CheckTimeFlag==true){// too much time
+			prussdrv_pru_reset(PRU_Signal_NUM);// Reset the PRU
+			cout << "GPIO::SendTriggerSignals took to much. Resetting PRU1" << endl;
+			fin=true;
+		}
+	else{
+	cout << "pru1dataMem_int[0]: " << pru1dataMem_int[0] << endl;
+	}
 } while(!fin);
 
 
