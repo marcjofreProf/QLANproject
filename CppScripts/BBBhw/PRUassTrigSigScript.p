@@ -127,7 +127,7 @@ SIGNALOFF:
 	QBGT	SIGNALON, r3, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
 	// The following lines do not consume "signal speed"
 	MOV	r0, 1 // code 1 means that we have finished.
-//	SBCO	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
+	SBCO	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
