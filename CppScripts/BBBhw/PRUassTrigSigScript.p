@@ -81,8 +81,8 @@ INITIATIONS:
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
 	MOV	r0, OWN_RAM
-	MOV	r10, PRU1_CTRL | C24add//CONST_PRUDRAM
-	SBBO	r0, r10, 0, 4  // Load the base address of PRU0 Data RAM into C24
+//	MOV	r10, PRU1_CTRL | C24add//CONST_PRUDRAM
+	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
 	LED_ON	// just for signaling initiations
 	LED_OFF	// just for signaling initiations
@@ -116,7 +116,7 @@ INITIATIONS:
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and the 4 bytes
 	QBEQ	CMDLOOP, r0, 0 // loop until we get an instruction. Code 0 means idle
-//	QBEQ	CMDLOOP, r0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
+	QBEQ	CMDLOOP, r0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
 	// ok, we have an instruction (code 2). Assume it means 'begin signals'
 	MOV	r3, NUM_REPETITIONS// load r3 with the number of cycles
 SIGNALON:	
@@ -126,8 +126,8 @@ SIGNALOFF:
 	MOV	r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
 	QBGT	SIGNALON, r3, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
 	// The following lines do not consume "signal speed"
-	MOV	r0, 1 // code 1 means that we have finished. Re-use of register r3
-	SBCO	r0, CONST_PRUDRAM, 0, 4 // Put contents of r3 into CONST_PRUDRAM
+	MOV	r0, 1 // code 1 means that we have finished.
+	SBCO	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
