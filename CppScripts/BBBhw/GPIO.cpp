@@ -131,7 +131,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  this->ReadTimeStamps();
 	  
 	  //munmap(ddrMem, 0x0FFFFFFF); // remove any mappings for those entire pages containing any part of the address space of the process starting at addr and continuing for len bytes. 
-	  close(mem_fd); // Device
+	  //close(mem_fd); // Device
 	  streamDDRpru.close();
 	  prussdrv_pru_disable(PRU_Signal_NUM);
 	  prussdrv_pru_disable(PRU_Operation_NUM);  
@@ -659,7 +659,7 @@ GPIO::~GPIO() {
 	//fclose(outfile); 
 	prussdrv_exit();
 	//munmap(ddrMem, 0x0FFFFFFF);
-	close(mem_fd); // Device
+	//close(mem_fd); // Device
 	streamDDRpru.close();
 }
 
