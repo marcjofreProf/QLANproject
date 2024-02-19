@@ -149,14 +149,29 @@ int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 //DDR_paramaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 8;
 //DDR_ackaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 4;
 int WaitTimeToFutureTimePoint=15000;
+
+TimePoint TimePointClockNow=Clock::now();
+auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
+// Convert duration to desired time
+unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds)
+//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
+
 TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);
+auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
+// Convert duration to desired time
+unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+
 bool CheckTimeFlag=false;
 pru0dataMem_int[0]=(unsigned int)2; // set to 2 means perform capture
 
 bool fin=false;
 do // This is blocking
 {
-	CheckTimeFlag=(Clock::now()>FutureTimePoint);
+TimePointClockNow=Clock::now();
+duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
+TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count();
+
+CheckTimeFlag=(TimeNow_time_as_count>TimePointFuture_time_as_count);
 	if (pru0dataMem_int[0] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the acquisition
 	{
 		// we have received the ack!
@@ -184,7 +199,18 @@ int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physical
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
 int WaitTimeToFutureTimePoint=15000;
+
+TimePoint TimePointClockNow=Clock::now();
+auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
+// Convert duration to desired time
+unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds)
+//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
+
 TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);
+auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
+// Convert duration to desired time
+unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+
 bool CheckTimeFlag=false;
 pru1dataMem_int[0]=(unsigned int)2; // set to 2 means perform signals
 
@@ -192,7 +218,11 @@ pru1dataMem_int[0]=(unsigned int)2; // set to 2 means perform signals
 bool fin=false;
 do // This is blocking
 {
-CheckTimeFlag=(Clock::now()>FutureTimePoint);
+TimePointClockNow=Clock::now();
+duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
+TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count();
+
+CheckTimeFlag=(TimeNow_time_as_count>TimePointFuture_time_as_count);
 cout << "CheckTimeFlag: " << CheckTimeFlag << endl;
 if (pru1dataMem_int[0] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the sequence
 {	
