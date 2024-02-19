@@ -171,7 +171,8 @@ TimePointClockNow=Clock::now();
 duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count();
 
-CheckTimeFlag=(TimeNow_time_as_count>TimePointFuture_time_as_count);
+if (TimeNow_time_as_count>TimePointFuture_time_as_count){CheckTimeFlag=true;}
+else{CheckTimeFlag=false;}
 	if (pru0dataMem_int[0] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the acquisition
 	{
 		// we have received the ack!
@@ -223,7 +224,8 @@ do // This is blocking
 	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
 	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count();
 	cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
-	CheckTimeFlag=(TimeNow_time_as_count>TimePointFuture_time_as_count);
+	if (TimeNow_time_as_count>TimePointFuture_time_as_count){CheckTimeFlag=true;}
+	else{CheckTimeFlag=false;}
 	cout << "CheckTimeFlag: " << CheckTimeFlag << endl;
 	if (pru1dataMem_int[0] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the sequence
 	{	
