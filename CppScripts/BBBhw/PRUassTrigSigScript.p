@@ -116,7 +116,7 @@ INITIATIONS:
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and the 4 bytes
 	QBEQ	CMDLOOP, r0, 0 // loop until we get an instruction. Code 0 means idle
-//	QBEQ	CMDLOOP, r0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
+	QBEQ	CMDLOOP, r0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
 	// ok, we have an instruction (code 2). Assume it means 'begin signals'
 	MOV	r3, NUM_REPETITIONS// load r3 with the number of cycles
 SIGNALON:	
