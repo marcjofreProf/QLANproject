@@ -111,7 +111,7 @@ CMDLOOP:
 	QBEQ	CHECK_CYCLECNT, r0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
 	LED_ON // Indicate that we start acquisiton of timetagging
-	LBCO	r1, CONST_PRUSHAREDRAM, 0, 4  // reset r1 address to point at the beggining of PRU shared RAM
+	MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 		
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
@@ -119,22 +119,22 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	MOV 	r0.b0, r31.b0
 	// Mask the relevant bits you're interested in
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
-	AND 	r0, r0, MASKevents
+	AND 	r0.b0, r0.b0, MASKevents
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
-//	QBNE 	WAIT_FOR_EVENT, r0.b0, 0
+	QBNE 	WAIT_FOR_EVENT, r0.b0, 0
 	// If the program reaches this point, at least one of the bits is high
 	// Proceed with the rest of the program
 
 TIMETAG:
 	// Time part
-	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r2 maps the value of DWT_CYCCNT
-	SBBO 	r5, r1, 0, 4 // Put contents of DWT_CYCCNT into the address at r1.
+	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r5 maps the value of DWT_CYCCNT
+	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address at r1.
 	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved
 	// Here include the overflow register
-	SBBO 	r3, r1, 0, 4 // Put contents of overflow DWT_CYCCNT into the address at r1
+	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address at r1
 	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved	
 	// Channels detection
-	SBBO 	r0.b0, r1, 0, 1 // Put contents of r0 into the address at r1
+	SBCO 	r0.w0, CONST_PRUSHAREDRAM, r1, 2 // Put contents of r0 into the address at r1
 	ADD 	r1, r1, 2 // increment address by 2 bytes // This can be improved
 	
 	// Check to see if we still need to read more data
@@ -145,7 +145,7 @@ TIMETAG:
 	// we're done. Signal to the application		
 	LED_OFF// this signals that we are done with the timetagging acqusition
 	MOV 	r0, 1
-	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r1 into CONST_PRUDRAM
+	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:
