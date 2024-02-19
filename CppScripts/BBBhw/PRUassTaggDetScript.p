@@ -47,22 +47,22 @@ INITIATIONS:// This is only run once
 	CLR	r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
 	SBCO	r0, CONST_PRUCFG, 4, 4
     
-	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM, where the commands will be found
+	// Configure the programmable pointer register for PRU by setting c24_pointer[3:0] // related to pru data RAM, where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
 	MOV	r0, OWN_RAM
-	MOV	r10, PRU0_CTRL | 0x12//CONST_PRUDRAM
+	MOV	r10, PRU0_CTRL | C24add//CONST_PRUDRAM
 	SBBO	r0, r10, 0, 4  // Load the base address of PRU0 Data RAM into C24
 
 	// Configure the programmable pointer register for PRU by setting c28_pointer[15:0] // related to shared RAM
 	// This will make C28 point to 0x00010000 (PRU shared RAM).
 	// http://www.embedded-things.com/bbb/understanding-bbb-pru-shared-memory-access/	
 	MOV	r0, SHARED_RAM                  // Set C28 to point to shared RAM
-	MOV	r10, PRU0_CTRL | CTPPR0offset //CONST_PRUSHAREDRAM
+	MOV	r10, PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
 	SBBO	r0, r10, 0, 4
 	
-	// Make C29 point to the PRU control registers
+	// Make c28_pointer[15:0] point to the PRU control registers
 	MOV	r0, PRU0_CTRL
-	MOV	r10, PRU0_CTRL | CTPPR1offset //CONST_PRUCTRLREG
+	MOV	r10, PRU0_CTRL | C29add //CONST_PRUCTRLREG
 	SBBO	r0, r10, 0, 4
 
 //	// Configure the programmable pointer register for PRU by setting c31_pointer[15:0] // related to ddr.

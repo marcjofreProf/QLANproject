@@ -44,7 +44,7 @@
 #define PRU_Operation_NUM 0 // PRU operation and handling with PRU0
 #define PRU_Signal_NUM 1 // Signals PINS with PRU1
 /******************************************************************************
-* Local Macro Declarations                                                    *
+* Local Macro Declarations - Global Space point of View                       *
 ******************************************************************************/
 #define AM33XX_PRUSS_IRAM_SIZE 8192 // Instructions RAM (where .p assembler instructions are loaded)
 #define AM33XX_PRUSS_DRAM_SIZE 8192 // Data RAM
@@ -52,7 +52,11 @@
 
 #define DDR_BASEADDR 0x80000000 //0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
 #define OFFSET_DDR 0x00001000
-#define OFFSET_SHAREDRAM 0x00000000 //equivalent with 0x00002000
+#define SHAREDRAM 0x00010000
+#define OFFSET_SHAREDRAM 0x00000000 //Global Memory Map (from the perspective of the host) equivalent with 0x00002000
+
+#define PRU0_DATARAM 0x00000000 //Global Memory Map (from the perspective of the host)
+#define PRU1_DATARAM 0x00002000 //Global Memory Map (from the perspective of the host)
 
 #define PRUSS0_PRU0_DATARAM 0
 #define PRUSS0_PRU1_DATARAM 1
@@ -146,9 +150,6 @@ int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 
 pru0dataMem_int[0]=(unsigned int)2; // set to 2 means perform capture
 
-// give some time for the PRU code to execute
-//sleep(1);// Maybe not needed
-//printf("Waiting for ack (curr=%d). \n", sharedMem_int[OFFSET_SHAREDRAM]);
 bool fin=false;
 do // This is blocking
 {
@@ -221,7 +222,7 @@ unsigned short int valBitsInterest; // 16 bits
 //rgb24[3]=0;
 
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
-valp=(unsigned short int*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
+valp=(unsigned short int*)&sharedMem_int[SHAREDRAM+OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
 unsigned int NumRecords=1024; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 12KB=12×1024bytes=12×1024×8bits=98304bits; maybe a max of 1200 is safe (since each capture takes 80 bits)
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
