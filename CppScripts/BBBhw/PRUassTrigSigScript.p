@@ -81,7 +81,7 @@ INITIATIONS:
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
 	MOV	r0, OWN_RAM
-	MOV	r10, PRU0_CTRL | C24add//CONST_PRUDRAM
+	MOV	r10, PRU1_CTRL | C24add//CONST_PRUDRAM
 	SBBO	r0, r10, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
 	LED_ON	// just for signaling initiations
