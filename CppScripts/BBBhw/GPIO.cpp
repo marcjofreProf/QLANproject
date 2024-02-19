@@ -52,13 +52,13 @@
 #define AM33XX_PRUSS_DRAM_SIZE 8192 // Data RAM
 #define AM33XX_PRUSS_SHAREDRAM_SIZE 12000 // Data RAM
 
-#define DDR_BASEADDR 0x80000000 //0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
+#define DDR_BASEADDR 0x80000000 //0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present// Already initiated at this position with LOCAL_DDMinit
 #define OFFSET_DDR 0x00001000
-#define SHAREDRAM 0x00010000
+#define SHAREDRAM 0x00010000 // Already initiated at this position with LOCAL_DDMinit
 #define OFFSET_SHAREDRAM 0x00000000 //Global Memory Map (from the perspective of the host) equivalent with 0x00002000
 
-#define PRU0_DATARAM 0x00000000 //Global Memory Map (from the perspective of the host)
-#define PRU1_DATARAM 0x00002000 //Global Memory Map (from the perspective of the host)
+#define PRU0_DATARAM 0x00000000 //Global Memory Map (from the perspective of the host)// Already initiated at this position with LOCAL_DDMinit
+#define PRU1_DATARAM 0x00002000 //Global Memory Map (from the perspective of the host)// Already initiated at this position with LOCAL_DDMinit
 
 #define PRUSS0_PRU0_DATARAM 0
 #define PRUSS0_PRU1_DATARAM 1
@@ -274,7 +274,7 @@ unsigned short int valBitsInterest; // 16 bits
 //rgb24[3]=0;
 
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
-valp=(unsigned short int*)&sharedMem_int[SHAREDRAM+OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
+valp=(unsigned short int*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
 unsigned int NumRecords=1024; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 12KB=12×1024bytes=12×1024×8bits=98304bits; maybe a max of 1200 is safe (since each capture takes 80 bits)
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
