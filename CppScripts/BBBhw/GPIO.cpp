@@ -262,7 +262,7 @@ int GPIO::DDRdumpdata(){
 int x;
 //unsigned char tv;
 
-unsigned short int* valp;
+unsigned short int* valp; // 16 bits
 unsigned int valCycleCountPRU; // 32 bits // Made relative to each acquition run
 unsigned int valOverflowCycleCountPRU; // 32 bits
 unsigned long long int extendedCounterPRU; // 64 bits
@@ -280,11 +280,11 @@ for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
 	valCycleCountPRU=*valp;
 	cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
-	valp=valp+4;// 4 times 8 bits
+	valp=valp+2;// 2 times 16 bits
 	// Second 32 bits is the overflow register for DWT_CYCCNT
 	valOverflowCycleCountPRU=*valp;
 	cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
-	valp=valp+4;// 4 times 8 bits
+	valp=valp+2;// 2 times 16 bits
 	// Mount the extended counter value
 	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 	cout << "extendedCounterPRU: " << extendedCounterPRU << endl;
@@ -293,7 +293,7 @@ for (x=0; x<NumRecords; x++){
 	cout << "val: " << val << endl;
 	valBitsInterest=this->packBits(val); // we're just interested in 4 bits
 	cout << "valBitsInterest: " << valBitsInterest << endl;
-	valp=valp+2;// 2 times 8 bits
+	valp=valp+1;// 1 times 16 bits
 	//fprintf(outfile, "%d\n", val);
 	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;	
 }
