@@ -74,10 +74,10 @@
 using namespace std;
 
 namespace exploringBB {
-//void* exploringBB::GPIO::ddrMem = nullptr; // Define and initialize ddrMem
-//void* exploringBB::GPIO::sharedMem = nullptr; // Define and initialize
-//void* exploringBB::GPIO::pru0dataMem = nullptr; // Define and initialize 
-//void* exploringBB::GPIO::pru1dataMem = nullptr; // Define and initialize
+void* exploringBB::GPIO::ddrMem = nullptr; // Define and initialize ddrMem
+void* exploringBB::GPIO::sharedMem = nullptr; // Define and initialize
+void* exploringBB::GPIO::pru0dataMem = nullptr; // Define and initialize 
+void* exploringBB::GPIO::pru1dataMem = nullptr; // Define and initialize
 void* exploringBB::GPIO::pru_int = nullptr;// Define and initialize
 unsigned int* exploringBB::GPIO::sharedMem_int = nullptr;// Define and initialize
 unsigned int* exploringBB::GPIO::pru0dataMem_int = nullptr;// Define and initialize
@@ -382,7 +382,7 @@ int GPIO::LOCAL_DDMinit(){
         close(mem_fd);
         return -1;
     }*/
-    
+    /*
     mem_fd = open ("/dev/mem", O_RDWR | O_SYNC);
     if (mem_fd == -1) {
         printf ("ERROR: could not open /dev/mem.\n\n");
@@ -392,11 +392,20 @@ int GPIO::LOCAL_DDMinit(){
     if (pru_int == MAP_FAILED) {
         printf ("ERROR: could not map memory.\n\n");
         return -1;
-    }
+    }*/
     
-    pru0dataMem_int =     (unsigned int*)pru_int + PRU0_DATARAM + DATARAMoffset;   // Points to 0x200 of PRU0 memory
-    pru1dataMem_int =     (unsigned int*)pru_int + PRU1_DATARAM + DATARAMoffset;   // Points to 0x200 of PRU1 memory
-    sharedMem_int   = 	  (unsigned int*)pru_int + SHAREDRAM; // Points to start of shared memory
+    //pru0dataMem_int =     (unsigned int*)pru_int + PRU0_DATARAM/4 + DATARAMoffset/4;   // Points to 0x200 of PRU0 memory
+    //pru1dataMem_int =     (unsigned int*)pru_int + PRU1_DATARAM/4 + DATARAMoffset/4;   // Points to 0x200 of PRU1 memory
+    //sharedMem_int   = 	  (unsigned int*)pru_int + SHAREDRAM/4; // Points to start of shared memory
+    
+    prussdrv_map_prumem(PRUSS0_PRU0_DATARAM, &pru0dataMem);// Maps the PRU0 DRAM memory to input pointer. Memory is then accessed by an array.
+    pru0dataMem_int = (unsigned int*)pru0dataMem+DATARAMoffset;
+    
+    sharedMem_int = (unsigned int*) sharedMem+SHAREDRAM;
+    
+    prussdrv_map_prumem(PRUSS0_PRU1_DATARAM, &pru1dataMem);// Maps the PRU1 DRAM memory to input pointer. Memory is then accessed by an array.
+    pru1dataMem_int = (unsigned int*)pru1dataMem+DATARAMoffset;   
+    
 
     return 0;
 }
@@ -686,10 +695,10 @@ GPIO::~GPIO() {
 	//fclose(outfile); 
 	prussdrv_exit();
 	//munmap(ddrMem, 0x0FFFFFFF);
-	close(mem_fd); // Device
-	if(munmap(pru_int, PRU_LEN)) {
-		cout << "GPIO destructor: munmap failed" << endl;
-	}
+	//close(mem_fd); // Device
+	//if(munmap(pru_int, PRU_LEN)) {
+	//	cout << "GPIO destructor: munmap failed" << endl;
+	//}
 	streamDDRpru.close();
 }
 
