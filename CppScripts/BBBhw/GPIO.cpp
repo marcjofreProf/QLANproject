@@ -56,7 +56,7 @@
 #define DDR_BASEADDR 0x80000000 //0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present// Already initiated at this position with LOCAL_DDMinit
 #define OFFSET_DDR 0x00001000
 #define SHAREDRAM 0x00010000 // Already initiated at this position with LOCAL_DDMinit
-#define OFFSET_SHAREDRAM 0x00000800 //0x00000000 //Global Memory Map (from the perspective of the host) equivalent with 0x00002000
+#define OFFSET_SHAREDRAM 0x00000000 //Global Memory Map (from the perspective of the host) equivalent with 0x00002000
 
 #define PRU0_DATARAM 0x00000000 //Global Memory Map (from the perspective of the host)// Already initiated at this position with LOCAL_DDMinit
 #define PRU1_DATARAM 0x00002000 //Global Memory Map (from the perspective of the host)// Already initiated at this position with LOCAL_DDMinit
