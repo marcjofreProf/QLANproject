@@ -37,6 +37,7 @@
 // r3 reserved for overflow DWT_CYCCNT counter
 // r4 reserved for holding the RECORDS (re-loaded at each iteration)
 // r5 reserved for holding the DWT_CYCCNT count value
+// r6 reserved test
 
 // r10 is arbitrary used for operations
 
@@ -82,7 +83,7 @@ INITIATIONS:// This is only run once
 
         LED_ON	// just for signaling initiations
 	LED_OFF	// just for signaling initiations
-	
+	MOV r6, 1
 	MOV	r3, 0  // Initialize overflow counter in r3	
 	SUB	r3, r3, 1  // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter
 	// Initial Re-initialization of DWT_CYCCNT
@@ -137,13 +138,16 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 TIMETAG:
 	// Time part
 	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r5 maps the value of DWT_CYCCNT
-	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address at r1.
+	//SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address at r1.
+	SBCO 	r6, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address at r1.
 	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved
 	// Here include the overflow register
-	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address at r1
+	//SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address at r1
+	SBCO 	r6, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address at r1.
 	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved	
 	// Channels detection
-	SBCO 	r0.w0, CONST_PRUSHAREDRAM, r1, 2 // Put contents of r0 into the address at r1
+	//SBCO 	r0.w0, CONST_PRUSHAREDRAM, r1, 2 // Put contents of r0 into the address at r1
+	SBCO 	r6.w0, CONST_PRUSHAREDRAM, r1, 2 // Put contents of DWT_CYCCNT into the address at r1.
 	ADD 	r1, r1, 2 // increment address by 2 bytes // This can be improved	
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
