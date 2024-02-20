@@ -116,7 +116,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Timetagging
-	pru0dataMem_int[DATARAMoffset/4]=(unsigned int)0; // set to zero means no command. PRU0 idle
+	pru0dataMem_int[DATARAMoffset*4]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
 	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
@@ -124,7 +124,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	
 	// Generate signals
-	pru1dataMem_int[DATARAMoffset/4]=(unsigned int)0; // set to zero means no command. PRU1 idle
+	pru1dataMem_int[DATARAMoffset*4]=(unsigned int)0; // set to zero means no command. PRU1 idle
 	// Load and execute the PRU program on the PRU1
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
 		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTrigSigScript.bin");
@@ -169,7 +169,7 @@ auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 
 bool CheckTimeFlag=false;
-pru0dataMem_int[DATARAMoffset/4]=(unsigned int)2; // set to 2 means perform capture
+pru0dataMem_int[DATARAMoffset*4]=(unsigned int)2; // set to 2 means perform capture
 
 bool fin=false;
 do // This is blocking
@@ -180,11 +180,11 @@ TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(du
 
 if (TimeNow_time_as_count>TimePointFuture_time_as_count){CheckTimeFlag=true;}
 else{CheckTimeFlag=false;}
-	if (pru0dataMem_int[DATARAMoffset/4] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the acquisition
+	if (pru0dataMem_int[DATARAMoffset*4] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the acquisition
 	{
 		// we have received the ack!
 		this->DDRdumpdata(); // Store to file
-		pru0dataMem_int[DATARAMoffset/4] = (unsigned int)0; // Here clears the value
+		pru0dataMem_int[DATARAMoffset*4] = (unsigned int)0; // Here clears the value
 		fin=true;
 		//printf("Ack\n");
 	}
@@ -221,7 +221,7 @@ unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cas
 //cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
 
 bool CheckTimeFlag=false;
-pru1dataMem_int[DATARAMoffset/4]=(unsigned int)2; // set to 2 means perform signals
+pru1dataMem_int[DATARAMoffset*4]=(unsigned int)2; // set to 2 means perform signals
 
 // Here we should wait for the PRU1 to finish, we can check it with the value modified in command
 bool fin=false;
@@ -234,9 +234,9 @@ do // This is blocking
 	if (TimeNow_time_as_count>TimePointFuture_time_as_count){CheckTimeFlag=true;}
 	else{CheckTimeFlag=false;}
 	//cout << "CheckTimeFlag: " << CheckTimeFlag << endl;
-	if (pru1dataMem_int[DATARAMoffset/4] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the sequence
+	if (pru1dataMem_int[DATARAMoffset*4] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the sequence
 	{	
-		pru1dataMem_int[DATARAMoffset/4] = (unsigned int)0; // Here clears the value
+		pru1dataMem_int[DATARAMoffset*4] = (unsigned int)0; // Here clears the value
 		//cout << "GPIO::SendTriggerSignals finished" << endl;
 		fin=true;
 	}
@@ -281,7 +281,7 @@ unsigned short int valBitsInterest; // 16 bits
 //rgb24[3]=0;
 
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
-valp=(unsigned short int*)&sharedMem_int[SHAREDRAM/4+OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
+valp=(unsigned short int*)&sharedMem_int[SHAREDRAM*4+OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
 unsigned int NumRecords=1024; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 12KB=12×1024bytes=12×1024×8bits=98304bits; maybe a max of 1200 is safe (since each capture takes 80 bits)
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
