@@ -269,8 +269,8 @@ unsigned int valCycleCountPRU; // 32 bits // Made relative to each acquition run
 unsigned int valOverflowCycleCountPRU; // 32 bits
 unsigned long long int extendedCounterPRU; // 64 bits
 unsigned long long int auxUnskewingFactor=6; // Related to the number of instruction when a reset happens and are lost the counts; // 64 bits
-unsigned short int val; // 16 bits
-unsigned short int valBitsInterest; // 16 bits
+unsigned int val; // 16 bits
+unsigned int valBitsInterest; // 16 bits
 //unsigned char rgb24[4];
 //unsigned char v1, v2;
 //rgb24[3]=0;
@@ -307,12 +307,12 @@ return 0; // all ok
 }
 
 // Function to pack bits 1, 2, 3, and 5 of an unsigned int into a single byte
-unsigned short int GPIO::packBits(unsigned short int value) {
+unsigned int GPIO::packBits(unsigned int value) {
     // Isolate bits 1, 2, 3, and 5 and shift them to their new positions
-    unsigned short int bit1 = (value >> 1) & 0x0001; // Bit 1 stays in position 0
-    unsigned short int bit2 = (value >> 1) & 0x0002; // Bit 2 shifts to position 1
-    unsigned short int bit3 = (value >> 1) & 0x0004; // Bit 3 shifts to position 2
-    unsigned short int bit5 = (value >> 2) & 0x0008; // Bit 5 shifts to position 3, skipping the original position of bit 4
+    unsigned int bit1 = (value >> 1) & 0x0001; // Bit 1 stays in position 0
+    unsigned int bit2 = (value >> 1) & 0x0002; // Bit 2 shifts to position 1
+    unsigned int bit3 = (value >> 1) & 0x0004; // Bit 3 shifts to position 2
+    unsigned int bit5 = (value >> 2) & 0x0008; // Bit 5 shifts to position 3, skipping the original position of bit 4
 
     // Combine the bits into a single byte
     return bit1 | bit2 | bit3 | bit5;

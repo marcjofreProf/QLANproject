@@ -118,7 +118,7 @@ public:	// Functions/Methods
 
 private: // Functions/Methods
 	// PRU
-	unsigned short int packBits(unsigned short int value);
+	unsigned int packBits(unsigned int value);
 	// Non-PRU
 	int write(string path, string filename, string value);
 	int write(string path, string filename, int value);
