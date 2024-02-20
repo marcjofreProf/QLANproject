@@ -92,45 +92,45 @@ INITIATIONS:
 	
 
 //// With delays to produce longer pulses
-//SIGNALON:	// for setting just one pin would be set r30, r30, #Bit number
-//	//SET r30, r30, 6	
-//	MOV r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
-//	MOV r0, DELAY
-//
-//DELAYON:
-//	SUB r0, r0, 1
-//	QBNE DELAYON, r0, 0
-//	
-//SIGNALOFF:      // for clearing just one pin would be clr r30, r30, #Bit number	
-//	//CLR r30, r30, 6
-//	MOV r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
-//	MOV r0, DELAY
-//
-//DELAYOFF:
-//	sub r0, r0, 1
-//	QBNE DELAYOFF, r0, 0
-//	JMP SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
+SIGNALON:	// for setting just one pin would be set r30, r30, #Bit number
+	//SET r30, r30, 6	
+	MOV r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
+	MOV r0, DELAY
+
+DELAYON:
+	SUB r0, r0, 1
+	QBNE DELAYON, r0, 0
+	
+SIGNALOFF:      // for clearing just one pin would be clr r30, r30, #Bit number	
+	//CLR r30, r30, 6
+	MOV r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
+	MOV r0, DELAY
+
+DELAYOFF:
+	sub r0, r0, 1
+	QBNE DELAYOFF, r0, 0
+	JMP SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
 
 
 // Without delays (fastest possible) and CMD controlled
-CMDLOOP:
-	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
-	QBEQ	CMDLOOP, r0, 0 // loop until we get an instruction. Code 0 means idle
-	QBEQ	CMDLOOP, r0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
-	// ok, we have an instruction (code 2). Assume it means 'begin signals'
-	LED_ON
-	MOV	r3, NUM_REPETITIONS// load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
-SIGNALON:	
-	MOV	r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
-	SUB	r3, r3, 1	// Substract 1 count cycle
-SIGNALOFF:
-	MOV	r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
-	QBNE	SIGNALON, r3, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
-	// The following lines do not consume "signal speed"	
-	MOV	r0, 1 // code 1 means that we have finished.
-	SBCO	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
-	LED_OFF
-	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
+//CMDLOOP:
+//	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
+//	QBEQ	CMDLOOP, r0, 0 // loop until we get an instruction. Code 0 means idle
+//	QBEQ	CMDLOOP, r0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
+//	// ok, we have an instruction (code 2). Assume it means 'begin signals'
+//	LED_ON
+//	MOV	r3, NUM_REPETITIONS// load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
+//SIGNALON:	
+//	MOV	r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
+//	SUB	r3, r3, 1	// Substract 1 count cycle
+//SIGNALOFF:
+//	MOV	r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
+//	QBNE	SIGNALON, r3, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
+//	// The following lines do not consume "signal speed"	
+//	MOV	r0, 1 // code 1 means that we have finished.
+//	SBCO	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
+//	LED_OFF
+//	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
 	MOV	r31.b0, PRU1_R31_VEC_VALID | PRU_EVTOUT_0
