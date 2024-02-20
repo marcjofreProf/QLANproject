@@ -7,7 +7,7 @@
 
 #include "PRUassTaggDetScript.hp"
 
-#define MASKevents 0x2E // P9_27-30, which corresponds to r31 bits 1,2,3 and 5
+#define MASKevents 0x002E // P9_27-30, which corresponds to r31 bits 1,2,3 and 5
 
 // Length of acquisition:
 #define RECORDS 1024 // 1024 readings and it matches in the host c++ script
@@ -85,7 +85,13 @@ INITIATIONS:// This is only run once
 	
 	MOV	r3, 0  // Initialize overflow counter in r3	
 	SUB	r3, r3, 1  // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter
+	// Initial Re-initialization of DWT_CYCCNT
 	LBCO	r2.b0, CONST_PRUCTRLREG, 0, 1 // r2 maps b0 control register
+	CLR	r2.t3
+	SBCO	r2.b0, CONST_PRUCTRLREG, 0, 1 // stops DWT_CYCCNT
+	//LBCO	r2.b0, CONST_PRUCTRLREG, 0, 1 // r2 maps b0 control register
+	SET	r2.t3
+	SBCO	r2.b0, CONST_PRUCTRLREG, 0, 1 // Restarts DWT_CYCCNT
 
 RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	// The below could be optimized - then change the skew number in c++ code
@@ -104,7 +110,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts
-	QBLT	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte < r5.b3, go to reset
+	QBLT	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte < r5.b3, go to RESET_CYCLECNT
 
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
@@ -120,9 +126,9 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	MOV 	r0.b0, r31.b0
 	// Mask the relevant bits you're interested in
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
-	AND 	r0.b0, r0.b0, MASKevents // Interested specifically to the bits with MASKevents
+	AND 	r0.w0, r0.w0, MASKevents // Interested specifically to the bits with MASKevents
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
-	QBNE 	WAIT_FOR_EVENT, r0.b0, 0
+	QBNE 	WAIT_FOR_EVENT, r0.w0, 0
 	// If the program reaches this point, at least one of the bits is high
 	// Proceed with the rest of the program
 
