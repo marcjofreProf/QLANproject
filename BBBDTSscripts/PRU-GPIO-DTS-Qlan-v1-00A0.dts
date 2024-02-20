@@ -58,7 +58,7 @@
       example_pins: pinmux_pru_pru_pins {  
        // https://elinux.org/Ti_AM33XX_PRUSSv2#Beaglebone_PRU_connections_and_modes
        // The offset and mode for pins P8_11 and P8_16 also come from the table linked above.
-       // 	        Bits 0..2 are the multiplexer mode (these two pins are both 6)
+       // 	        Bits 0..2 are the multiplexer mode
        //		Bit 3 enables (0) or disables (1) the internal pullup/pulldown resistor
        //		Bit 4 is 0 for pulldown, 1 for pullup
        //		Bit 5 is 0 to disable input, 1 to enable input.
@@ -77,23 +77,23 @@
        // a value of 0x26. We could also set bits 3 and 4 to enable a pullup  
        // or pulldown.  
        pinctrl-single,pins = < 
-         0x1A4 0x08      // Mode 6 input pull-down
-         0x19C 0x08      // Mode 6 input pull-down
-         0x194 0x08      // Mode 6 input pull-down
-         0x198 0x08      // Mode 6 input pull-down
+         0x1A4 0x26      // Mode 6 input pull-down input enable
+         0x19C 0x26      // Mode 6 input pull-down input enable
+         0x194 0x26      // Mode 6 input pull-down input enable
+         0x198 0x26      // Mode 6 input pull-down input enable
          
-         0x0E0 0x06	// Mode 5 output pull down
-         0x0E4 0x06	// Mode 5 output pull down
-         0x0E8 0x06	// Mode 5 output pull down
-         0x0EC 0x06	// Mode 5 output pull down
-         0x0B8 0x06	// Mode 5 output pull down
-         0x0BC 0x06	// Mode 5 output pull down
-         0x0B0 0x06	// Mode 5 output pull down
-         0x0B4 0x06	// Mode 5 output pull down
-         0x0A8 0x06	// Mode 5 output pull-down
-         0x0AC 0x06	// Mode 5 output pull-down
-         0x0A0 0x06	// Mode 5 output pull-down 
-	 0x0A4 0x06	// Mode 5 output pull-down 
+         0x0E0 0x05	// Mode 5 output pull down
+         0x0E4 0x05	// Mode 5 output pull down
+         0x0E8 0x05	// Mode 5 output pull down
+         0x0EC 0x05	// Mode 5 output pull down
+         0x0B8 0x05	// Mode 5 output pull down
+         0x0BC 0x05	// Mode 5 output pull down
+         0x0B0 0x05	// Mode 5 output pull down
+         0x0B4 0x05	// Mode 5 output pull down
+         0x0A8 0x05	// Mode 5 output pull-down
+         0x0AC 0x05	// Mode 5 output pull-down
+         0x0A0 0x05	// Mode 5 output pull-down 
+	 0x0A4 0x05	// Mode 5 output pull-down 
        >;  
       };  
     };  
