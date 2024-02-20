@@ -12,7 +12,7 @@
 // Length of acquisition:
 #define RECORDS 1024 // 1024 readings and it matches in the host c++ script
 #define MAX_VALUE_BEFORE_RESET 0x0FFFFFFF // Using one bit less of the length of the register to avoid overflow occuring in the time of execution of TIMETAG
-#define MAX_VALUE_BEFORE_RESETmostsigByte	0x7F // 127 in decimal
+#define MAX_VALUE_BEFORE_RESETmostsigByte 0x7F // 127 in decimal
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
 .macro LED_OFF
@@ -104,7 +104,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts
-	QBGT	RESET_CYCLECNT, MAX_VALUE_BEFORE_RESETmostsigByte, r5.b3 // If r5.b3 > MAX_VALUE_BEFORE_RESETmostsigByte, go to reset
+	QBLT	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte < r5.b3, go to reset
 
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
