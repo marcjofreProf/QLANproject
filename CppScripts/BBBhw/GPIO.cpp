@@ -155,7 +155,7 @@ int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 //char fname_new[255];     
 //DDR_paramaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 8;
 //DDR_ackaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 4;
-int WaitTimeToFutureTimePoint=15000;
+int WaitTimeToFutureTimePoint=20000;
 
 TimePoint TimePointClockNow=Clock::now();
 auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
@@ -401,7 +401,7 @@ int GPIO::LOCAL_DDMinit(){
     prussdrv_map_prumem(PRUSS0_PRU0_DATARAM, &pru0dataMem);// Maps the PRU0 DRAM memory to input pointer. Memory is then accessed by an array.
     pru0dataMem_int = (unsigned int*)pru0dataMem;// + DATARAMoffset/4;
     
-    sharedMem_int = (unsigned int*)pru0dataMem + SHAREDRAM/8;
+    sharedMem_int = (unsigned int*)pru0dataMem + SHAREDRAM/4-4;
     
     prussdrv_map_prumem(PRUSS0_PRU1_DATARAM, &pru1dataMem);// Maps the PRU1 DRAM memory to input pointer. Memory is then accessed by an array.
     pru1dataMem_int = (unsigned int*)pru1dataMem;// + DATARAMoffset/4;   
