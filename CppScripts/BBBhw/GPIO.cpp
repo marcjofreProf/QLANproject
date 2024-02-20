@@ -126,7 +126,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	  
 	  // Doing debbuging checks - Debugging 1
-	  sleep(5);// Give some time to load programs in PRUs and initiate
+	  sleep(1);// Give some time to load programs in PRUs and initiate
 	  this->SendTriggerSignals();
 	  this->ReadTimeStamps();
 	  
@@ -266,7 +266,7 @@ unsigned short int* valp;
 unsigned int valCycleCountPRU; // 32 bits // Made relative to each acquition run
 unsigned int valOverflowCycleCountPRU; // 32 bits
 unsigned long long int extendedCounterPRU; // 64 bits
-unsigned long long int auxUnskewingFactor=8; // Related to the number of instruction when a reset happens and are lost the counts; // 64 bits
+unsigned long long int auxUnskewingFactor=6; // Related to the number of instruction when a reset happens and are lost the counts; // 64 bits
 unsigned short int val; // 16 bits
 unsigned short int valBitsInterest; // 16 bits
 //unsigned char rgb24[4];
@@ -288,7 +288,7 @@ for (x=0; x<NumRecords; x++){
 	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
 	valp++;
 	// Mount the extended counter value
-	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU-1)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU-1)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
+	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 	cout << "extendedCounterPRU: " << extendedCounterPRU << endl;
 	// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
 	val=*valp;
@@ -306,10 +306,10 @@ return 0; // all ok
 // Function to pack bits 1, 2, 3, and 5 of an unsigned int into a single byte
 unsigned short int GPIO::packBits(unsigned short int value) {
     // Isolate bits 1, 2, 3, and 5 and shift them to their new positions
-    unsigned short int bit1 = (value >> 1) & 0x1; // Bit 1 stays in position 0
-    unsigned short int bit2 = (value >> 1) & 0x2; // Bit 2 shifts to position 1
-    unsigned short int bit3 = (value >> 1) & 0x4; // Bit 3 shifts to position 2
-    unsigned short int bit5 = (value >> 2) & 0x8; // Bit 5 shifts to position 3, skipping the original position of bit 4
+    unsigned short int bit1 = (value >> 1) & 0x0001; // Bit 1 stays in position 0
+    unsigned short int bit2 = (value >> 1) & 0x0002; // Bit 2 shifts to position 1
+    unsigned short int bit3 = (value >> 1) & 0x0004; // Bit 3 shifts to position 2
+    unsigned short int bit5 = (value >> 2) & 0x0008; // Bit 5 shifts to position 3, skipping the original position of bit 4
 
     // Combine the bits into a single byte
     return bit1 | bit2 | bit3 | bit5;

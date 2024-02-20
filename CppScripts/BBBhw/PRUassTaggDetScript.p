@@ -84,17 +84,17 @@ INITIATIONS:// This is only run once
 	LED_OFF	// just for signaling initiations
 	
 	MOV	r3, 0  // Initialize overflow counter in r3	
-//	SUB	r3, r3, 1    This might produce error (accounted in c++ script that we start from 1) // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter
-	
+	SUB	r3, r3, 1  // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter
+	LBCO	r2.b0, CONST_PRUCTRLREG, 0, 1 // r2 maps b0 control register
 
 RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	// The below could be optimized - then change the skew number in c++ code
-        LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps control register	
+        //LBCO	r2.b0, CONST_PRUCTRLREG, 0, 1 // r2 maps b0 control register	
 	CLR	r2.t3
-	SBCO	r2, CONST_PRUCTRLREG, 0, 4 // stops DWT_CYCCNT
-	LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps control register
+	SBCO	r2.b0, CONST_PRUCTRLREG, 0, 1 // stops DWT_CYCCNT
+	//LBCO	r2.b0, CONST_PRUCTRLREG, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
-	SBCO	r2, CONST_PRUCTRLREG, 0, 4 // Restarts DWT_CYCCNT
+	SBCO	r2.b0, CONST_PRUCTRLREG, 0, 1 // Restarts DWT_CYCCNT
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
 	ADD	r3, r3, 1    // Increment overflow counter
 
@@ -141,12 +141,11 @@ TIMETAG:
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
-//	SET r30.t11	// disable the data bus
-	
-	// we're done. Signal to the application		
-	LED_OFF// this signals that we are done with the timetagging acqusition
+//	SET r30.t11	// disable the data bus	
+	// we're done. Signal to the application	
 	MOV 	r0, 1
 	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
+	LED_OFF// this signals that we are done with the timetagging acqusition
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:

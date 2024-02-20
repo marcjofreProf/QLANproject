@@ -126,10 +126,10 @@ SIGNALON:
 SIGNALOFF:
 	MOV	r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
 	QBNE	SIGNALON, r3, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
-	// The following lines do not consume "signal speed"
-	LED_OFF
+	// The following lines do not consume "signal speed"	
 	MOV	r0, 1 // code 1 means that we have finished.
 	SBCO	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
+	LED_OFF
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
