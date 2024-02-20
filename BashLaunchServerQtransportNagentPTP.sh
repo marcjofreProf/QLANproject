@@ -5,7 +5,6 @@ sudo timedatectl set-ntp false
 sudo ./linuxptp/ptp4l -i eth0 &
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w &
 echo 'Enabling BBB pins'
-sudo config-pin P9_24 pruin
 sudo config-pin P9_27 pruin
 sudo config-pin P9_28 pruin
 sudo config-pin P9_29 pruin

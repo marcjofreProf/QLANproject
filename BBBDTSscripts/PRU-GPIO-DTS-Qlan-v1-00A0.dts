@@ -34,7 +34,7 @@
    // shows which pins can be used with PRU0 and PRU1 for input and output via  
    // registers R31 and R30.  
    // Our output pin, P8_27, 28, 29, 30, 39, 40, 41, 42, 43, 44, 45, 46, corresponds to PRU 1
-   // Our input pin, P9_24, 27, 28, 29 and 30, corresponds to PRU 0
+   // Our input pin, P9_27, 28, 29 and 30, corresponds to PRU 0
    //  
    // Beware: Many other PRU EGP pins are reserved by HDMI or onboard flash, which  
    // would need to be disabled first by editing uEnv.txt and rebooting.  
@@ -76,8 +76,7 @@
        // For P8_16, we want it to be an input, so we also set bit 5, yielding  
        // a value of 0x26. We could also set bits 3 and 4 to enable a pullup  
        // or pulldown.  
-       pinctrl-single,pins = <  
-         0x184 0x26      // Mode 6 input pull-down
+       pinctrl-single,pins = < 
          0x1A4 0x26      // Mode 6 input pull-down
          0x19C 0x26      // Mode 6 input pull-down
          0x194 0x26      // Mode 6 input pull-down

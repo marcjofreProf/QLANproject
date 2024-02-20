@@ -1,6 +1,5 @@
 sudo /etc/init.d/rsyslog stop # stop logging
 echo 'Enabling BBB pins'
-sudo config-pin P9_24 pruin
 sudo config-pin P9_27 pruin
 sudo config-pin P9_28 pruin
 sudo config-pin P9_29 pruin
