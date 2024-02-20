@@ -280,15 +280,15 @@ unsigned int NumRecords=1024; //Number of records per run. It is also defined in
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
 	valCycleCountPRU=*valp;
-	cout << "valCycleCountPRU: " << std::bitset<32>(valCycleCountPRU) << endl;
+	cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
 	valp=valp+2;// 2 times 16 bits
 	// Second 32 bits is the overflow register for DWT_CYCCNT
 	valOverflowCycleCountPRU=*valp;
-	cout << "valOverflowCycleCountPRU: " << std::bitset<32>(valOverflowCycleCountPRU) << endl;
+	cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
 	valp=valp+2;// 2 times 16 bits
 	// Mount the extended counter value
 	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
-	cout << "extendedCounterPRU: " << std::bitset<64>(extendedCounterPRU) << endl;
+	cout << "extendedCounterPRU: " << extendedCounterPRU << endl;
 	// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
 	val=*valp;
 	cout << "val: " << std::bitset<16>(val) << endl;
