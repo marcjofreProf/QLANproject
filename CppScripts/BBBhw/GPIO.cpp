@@ -394,9 +394,9 @@ int GPIO::LOCAL_DDMinit(){
         return -1;
     }
     
-    pru0dataMem_int =     (unsigned int*)pru_int + PRU0_DATARAM/4 + DATARAMoffset/4;   // Points to 0x200 of PRU0 memory
-    pru1dataMem_int =     (unsigned int*)pru_int + PRU1_DATARAM/4 + DATARAMoffset/4;   // Points to 0x200 of PRU1 memory
-    sharedMem_int   = 	  (unsigned int*)pru_int + SHAREDRAM/4; // Points to start of shared memory
+    pru0dataMem_int =     (unsigned int*)pru_int + PRU0_DATARAM + DATARAMoffset;   // Points to 0x200 of PRU0 memory
+    pru1dataMem_int =     (unsigned int*)pru_int + PRU1_DATARAM + DATARAMoffset;   // Points to 0x200 of PRU1 memory
+    sharedMem_int   = 	  (unsigned int*)pru_int + SHAREDRAM; // Points to start of shared memory
 
     return 0;
 }
