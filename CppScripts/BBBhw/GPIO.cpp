@@ -279,17 +279,22 @@ unsigned int NumRecords=1024; //Number of records per run. It is also defined in
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
 	valCycleCountPRU=*valp;
+	cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
 	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
 	valp++;
 	// Second 32 bits is the overflow register for DWT_CYCCNT
 	valOverflowCycleCountPRU=*valp;
+	cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
 	valp++; // Double increment because it is a 16 bit pointer instead of 32 bits
 	valp++;
 	// Mount the extended counter value
 	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU-1)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU-1)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
+	cout << "extendedCounterPRU: " << extendedCounterPRU << endl;
 	// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
 	val=*valp;
+	cout << "val: " << val << endl;
 	valBitsInterest=this->packBits(val); // we're just interested in 4 bits
+	cout << "valBitsInterest: " << valBitsInterest << endl;
 	valp++; // signle 16 bits increment because 2 bytes stored
 	//fprintf(outfile, "%d\n", val);
 	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;	
