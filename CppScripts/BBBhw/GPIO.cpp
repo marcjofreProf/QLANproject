@@ -53,6 +53,9 @@
 #define AM33XX_PRUSS_DRAM_SIZE 8192 // Data RAM
 #define AM33XX_PRUSS_SHAREDRAM_SIZE 12000 // Data RAM
 
+#define PRU_ADDR        0x4A300000      // Start of PRU memory Page 184 am335x TRM
+#define PRU_LEN         0x80000         // Length of PRU memory
+
 #define DDR_BASEADDR 0x80000000 //0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present// Already initiated at this position with LOCAL_DDMinit
 #define OFFSET_DDR 0x00001000
 #define SHAREDRAM 0x00010000 // Already initiated at this position with LOCAL_DDMinit
@@ -60,6 +63,7 @@
 
 #define PRU0_DATARAM 0x00000000 //Global Memory Map (from the perspective of the host)// Already initiated at this position with LOCAL_DDMinit
 #define PRU1_DATARAM 0x00002000 //Global Memory Map (from the perspective of the host)// Already initiated at this position with LOCAL_DDMinit
+#define DATARAMoffset	     0x00000200 // Offset from Base OWN_RAM to avoid collision with some data 
 
 #define PRUSS0_PRU0_DATARAM 0
 #define PRUSS0_PRU1_DATARAM 1
@@ -70,10 +74,11 @@
 using namespace std;
 
 namespace exploringBB {
-void* exploringBB::GPIO::ddrMem = nullptr; // Define and initialize ddrMem
-void* exploringBB::GPIO::sharedMem = nullptr; // Define and initialize
-void* exploringBB::GPIO::pru0dataMem = nullptr; // Define and initialize 
-void* exploringBB::GPIO::pru1dataMem = nullptr; // Define and initialize 
+//void* exploringBB::GPIO::ddrMem = nullptr; // Define and initialize ddrMem
+//void* exploringBB::GPIO::sharedMem = nullptr; // Define and initialize
+//void* exploringBB::GPIO::pru0dataMem = nullptr; // Define and initialize 
+//void* exploringBB::GPIO::pru1dataMem = nullptr; // Define and initialize
+void* exploringBB::GPIO::pru_int = nullptr;// Define and initialize
 unsigned int* exploringBB::GPIO::sharedMem_int = nullptr;// Define and initialize
 unsigned int* exploringBB::GPIO::pru0dataMem_int = nullptr;// Define and initialize
 unsigned int* exploringBB::GPIO::pru1dataMem_int = nullptr;// Define and initialize
@@ -269,8 +274,8 @@ unsigned int valCycleCountPRU; // 32 bits // Made relative to each acquition run
 unsigned int valOverflowCycleCountPRU; // 32 bits
 unsigned long long int extendedCounterPRU; // 64 bits
 unsigned long long int auxUnskewingFactor=6; // Related to the number of instruction when a reset happens and are lost the counts; // 64 bits
-unsigned int val; // 16 bits
-unsigned int valBitsInterest; // 16 bits
+unsigned short int val; // 16 bits
+unsigned short int valBitsInterest; // 16 bits
 //unsigned char rgb24[4];
 //unsigned char v1, v2;
 //rgb24[3]=0;
@@ -295,24 +300,23 @@ for (x=0; x<NumRecords; x++){
 	cout << "val: " << std::bitset<16>(val) << endl;
 	valBitsInterest=this->packBits(val); // we're just interested in 4 bits
 	cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;
-	valp=valp+2;// 1 times 16 bits
+	valp=valp+1;// 1 times 16 bits
 	//fprintf(outfile, "%d\n", val);
 	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;	
 }
 
-cout << "sharedMem: " << sharedMem << endl;
 cout << "sharedMem_int: " << sharedMem_int << endl;
 
 return 0; // all ok
 }
 
 // Function to pack bits 1, 2, 3, and 5 of an unsigned int into a single byte
-unsigned int GPIO::packBits(unsigned int value) {
+unsigned short int GPIO::packBits(unsigned short int value) {
     // Isolate bits 1, 2, 3, and 5 and shift them to their new positions
-    unsigned int bit1 = (value >> 1) & 0x0001; // Bit 1 stays in position 0
-    unsigned int bit2 = (value >> 1) & 0x0002; // Bit 2 shifts to position 1
-    unsigned int bit3 = (value >> 1) & 0x0004; // Bit 3 shifts to position 2
-    unsigned int bit5 = (value >> 2) & 0x0008; // Bit 5 shifts to position 3, skipping the original position of bit 4
+    unsigned short int bit1 = (value >> 1) & 0x0001; // Bit 1 stays in position 0
+    unsigned short int bit2 = (value >> 1) & 0x0002; // Bit 2 shifts to position 1
+    unsigned short int bit3 = (value >> 1) & 0x0004; // Bit 3 shifts to position 2
+    unsigned short int bit5 = (value >> 2) & 0x0008; // Bit 5 shifts to position 3, skipping the original position of bit 4
 
     // Combine the bits into a single byte
     return bit1 | bit2 | bit3 | bit5;
@@ -354,7 +358,7 @@ return -1;
 *****************************************************************************/
 
 int GPIO::LOCAL_DDMinit(){
-    //void *DDR_regaddr1, *DDR_regaddr2, *DDR_regaddr3;    
+    /*//void *DDR_regaddr1, *DDR_regaddr2, *DDR_regaddr3;    
     prussdrv_map_prumem(PRUSS0_SHARED_DATARAM, &sharedMem);// Maps the PRU shared RAM memory is then accessed by an array.
     sharedMem_int = (unsigned int*) sharedMem;
         
@@ -364,7 +368,6 @@ int GPIO::LOCAL_DDMinit(){
     prussdrv_map_prumem(PRUSS0_PRU1_DATARAM, &pru1dataMem);// Maps the PRU1 DRAM memory to input pointer. Memory is then accessed by an array.
     pru1dataMem_int = (unsigned int*) pru1dataMem;
     
-    /*
     // open the device 
     mem_fd = open("/dev/mem", O_RDWR);
     if (mem_fd < 0) {
@@ -378,7 +381,22 @@ int GPIO::LOCAL_DDMinit(){
         perror("Failed to map the device: ");
         close(mem_fd);
         return -1;
-    }*/    
+    }*/
+    
+    mem_fd = open ("/dev/mem", O_RDWR | O_SYNC);
+    if (mem_fd == -1) {
+        printf ("ERROR: could not open /dev/mem.\n\n");
+        return -1;
+    }
+    pru_int = mmap (0, PRU_LEN, PROT_READ | PROT_WRITE, MAP_SHARED, mem_fd, PRU_ADDR);
+    if (pru_int == MAP_FAILED) {
+        printf ("ERROR: could not map memory.\n\n");
+        return -1;
+    }
+    
+    pru0dataMem_int =     (unsigned int*)pru_int + PRU0_DATARAM/4 + DATARAMoffset/4;   // Points to 0x200 of PRU0 memory
+    pru1dataMem_int =     (unsigned int*)pru_int + PRU1_DATARAM/4 + DATARAMoffset/4;   // Points to 0x200 of PRU1 memory
+    sharedMem_int   = 	  (unsigned int*)pru_int + SHAREDRAM/4; // Points to start of shared memory
 
     return 0;
 }
@@ -668,7 +686,10 @@ GPIO::~GPIO() {
 	//fclose(outfile); 
 	prussdrv_exit();
 	//munmap(ddrMem, 0x0FFFFFFF);
-	//close(mem_fd); // Device
+	close(mem_fd); // Device
+	if(munmap(pru_int, PRU_LEN)) {
+		cout << "GPIO destructor: munmap failed" << endl;
+	}
 	streamDDRpru.close();
 }
 

@@ -49,7 +49,8 @@ class GPIO {
 private:// Variables
 	// PRU
 	static int mem_fd;
-	static void *ddrMem, *sharedMem, *pru0dataMem, *pru1dataMem;
+	//static void *ddrMem, *sharedMem, *pru0dataMem, *pru1dataMem;
+	static void *pru_int;       // Points to start of PRU memory.
 	//static int chunk;
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
 	//FILE* outfile;
@@ -118,7 +119,7 @@ public:	// Functions/Methods
 
 private: // Functions/Methods
 	// PRU
-	unsigned int packBits(unsigned int value);
+	unsigned short int packBits(unsigned short int value);
 	// Non-PRU
 	int write(string path, string filename, string value);
 	int write(string path, string filename, int value);

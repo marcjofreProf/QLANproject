@@ -37,6 +37,7 @@
 #define CONST_PRUDRAM        C24 // allow the PRU to map portions of the system's memory into its own address space. In particular we will map its own data RAM
 
 #define OWN_RAM              0x00000000 // current PRU data RAM
+#define OWN_RAMoffset	     0x00000200 // Offset from Base OWN_RAM to avoid collision with some data tht PRU might store
 #define PRU1_CTRL            0x00024000
 #define C24add		     0x20
 
@@ -80,7 +81,7 @@ INITIATIONS:
 
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
-	MOV	r0, OWN_RAM
+	MOV	r0, OWN_RAM | OWN_RAMoffset
 //	MOV	r10, PRU1_CTRL | C24add//CONST_PRUDRAM
 	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
