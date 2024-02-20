@@ -70,18 +70,18 @@
          0x194 0x36      // Mode 6 input pull-down input enable
          0x198 0x36      // Mode 6 input pull-down input enable
          
-         0x0E0 0x05	// Mode 5 output pull down
-         0x0E4 0x05	// Mode 5 output pull down
-         0x0E8 0x05	// Mode 5 output pull down
-         0x0EC 0x05	// Mode 5 output pull down
-         0x0B8 0x05	// Mode 5 output pull down
-         0x0BC 0x05	// Mode 5 output pull down
-         0x0B0 0x05	// Mode 5 output pull down
-         0x0B4 0x05	// Mode 5 output pull down
-         0x0A8 0x05	// Mode 5 output pull-down
-         0x0AC 0x05	// Mode 5 output pull-down
-         0x0A0 0x05	// Mode 5 output pull-down 
-	 0x0A4 0x05	// Mode 5 output pull-down 
+         0x0E0 0x15	// Mode 5 output pull down
+         0x0E4 0x15	// Mode 5 output pull down
+         0x0E8 0x15	// Mode 5 output pull down
+         0x0EC 0x15	// Mode 5 output pull down
+         0x0B8 0x15	// Mode 5 output pull down
+         0x0BC 0x15	// Mode 5 output pull down
+         0x0B0 0x15	// Mode 5 output pull down
+         0x0B4 0x15	// Mode 5 output pull down
+         0x0A8 0x15	// Mode 5 output pull-down
+         0x0AC 0x15	// Mode 5 output pull-down
+         0x0A0 0x15	// Mode 5 output pull-down 
+	 0x0A4 0x15	// Mode 5 output pull-down 
        >;  
       };  
     };  
