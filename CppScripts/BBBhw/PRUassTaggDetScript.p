@@ -10,7 +10,7 @@
 #define MASKevents 0x002E // P9_27-30, which corresponds to r31 bits 1,2,3 and 5
 
 // Length of acquisition:
-#define RECORDS 128 //1024 // 1024 readings and it matches in the host c++ script
+#define RECORDS 1024 // 1024 readings and it matches in the host c++ script
 #define MAX_VALUE_BEFORE_RESET 0x0FFFFFFF // Using one bit less of the length of the register to avoid overflow occuring in the time of execution of TIMETAG
 #define MAX_VALUE_BEFORE_RESETmostsigByte 0x7F // 127 in decimal
 // *** LED routines, so that LED USR0 can be used for some simple debugging
