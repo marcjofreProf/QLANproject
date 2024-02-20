@@ -275,7 +275,8 @@ unsigned short int valBitsInterest; // 16 bits
 //rgb24[3]=0;
 
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
-valp=(unsigned short int*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
+//valp=(unsigned short int*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
+valp=(unsigned short int*)sharedMem_int;
 unsigned int NumRecords=1024; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 12KB=12×1024bytes=12×1024×8bits=98304bits; maybe a max of 1200 is safe (since each capture takes 80 bits)
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
@@ -298,6 +299,9 @@ for (x=0; x<NumRecords; x++){
 	//fprintf(outfile, "%d\n", val);
 	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;	
 }
+
+cout << "sharedMem: " << sharedMem << endl;
+cout << "sharedMem_int: " << sharedMem_int << endl;
 
 return 0; // all ok
 }
@@ -353,7 +357,7 @@ int GPIO::LOCAL_DDMinit(){
     //void *DDR_regaddr1, *DDR_regaddr2, *DDR_regaddr3;    
     prussdrv_map_prumem(PRUSS0_SHARED_DATARAM, &sharedMem);// Maps the PRU shared RAM memory is then accessed by an array.
     sharedMem_int = (unsigned int*) sharedMem;
-    
+        
     prussdrv_map_prumem(PRUSS0_PRU0_DATARAM, &pru0dataMem);// Maps the PRU0 DRAM memory to input pointer. Memory is then accessed by an array.
     pru0dataMem_int = (unsigned int*) pru0dataMem;
     
