@@ -77,10 +77,10 @@
        // a value of 0x26. We could also set bits 3 and 4 to enable a pullup  
        // or pulldown.  
        pinctrl-single,pins = < 
-         0x1A4 0x26      // Mode 6 input pull-down
-         0x19C 0x26      // Mode 6 input pull-down
-         0x194 0x26      // Mode 6 input pull-down
-         0x198 0x26      // Mode 6 input pull-down
+         0x1A4 0x06      // Mode 6 input pull-down
+         0x19C 0x06      // Mode 6 input pull-down
+         0x194 0x06      // Mode 6 input pull-down
+         0x198 0x06      // Mode 6 input pull-down
          
          0x0E0 0x06	// Mode 5 output pull down
          0x0E4 0x06	// Mode 5 output pull down
