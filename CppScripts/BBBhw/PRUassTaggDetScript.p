@@ -7,10 +7,10 @@
 
 #include "PRUassTaggDetScript.hp"
 
-#define MASKevents 0x0000002E // P9_27-30, which corresponds to r31 bits 1,2,3 and 5
+#define MASKevents 0x002E // P9_27-30, which corresponds to r31 bits 1,2,3 and 5
 
 // Length of acquisition:
-#define RECORDS 1024 // 1024 readings and it matches in the host c++ script
+#define RECORDS 128 //1024 // 1024 readings and it matches in the host c++ script
 #define MAX_VALUE_BEFORE_RESET 0x0FFFFFFF // Using one bit less of the length of the register to avoid overflow occuring in the time of execution of TIMETAG
 #define MAX_VALUE_BEFORE_RESETmostsigByte 0x7F // 127 in decimal
 // *** LED routines, so that LED USR0 can be used for some simple debugging
@@ -127,9 +127,9 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	MOV 	r0.b0, r31.b0
 	// Mask the relevant bits you're interested in
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
-	AND 	r0, r0, MASKevents // Interested specifically to the bits with MASKevents
+	AND 	r0.w0, r0.w0, MASKevents // Interested specifically to the bits with MASKevents
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
-	QBNE 	WAIT_FOR_EVENT, r0, 0
+	QBNE 	WAIT_FOR_EVENT, r0.w0, 0
 	// If the program reaches this point, at least one of the bits is high
 	// Proceed with the rest of the program
 
@@ -142,7 +142,7 @@ TIMETAG:
 	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address at r1
 	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved	
 	// Channels detection
-	SBCO 	r0, CONST_PRUSHAREDRAM, r1, 2 // Put contents of r0 into the address at r1
+	SBCO 	r0.w0, CONST_PRUSHAREDRAM, r1, 2 // Put contents of r0 into the address at r1
 	ADD 	r1, r1, 2 // increment address by 2 bytes // This can be improved	
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1

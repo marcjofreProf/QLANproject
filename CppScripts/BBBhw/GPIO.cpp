@@ -276,7 +276,7 @@ unsigned short int valBitsInterest; // 16 bits
 
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=(unsigned short int*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
-unsigned int NumRecords=1024; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 12KB=12×1024bytes=12×1024×8bits=98304bits; maybe a max of 1200 is safe (since each capture takes 80 bits)
+unsigned int NumRecords=128;//1024; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 12KB=12×1024bytes=12×1024×8bits=98304bits; maybe a max of 1200 is safe (since each capture takes 80 bits)
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
 	valCycleCountPRU=*valp;
