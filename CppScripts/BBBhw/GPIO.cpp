@@ -295,7 +295,7 @@ for (x=0; x<NumRecords; x++){
 	cout << "val: " << std::bitset<16>(val) << endl;
 	valBitsInterest=this->packBits(val); // we're just interested in 4 bits
 	cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;
-	valp=valp+1;// 1 times 16 bits
+	valp=valp+2;// 1 times 16 bits
 	//fprintf(outfile, "%d\n", val);
 	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;	
 }
