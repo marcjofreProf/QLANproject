@@ -399,12 +399,12 @@ int GPIO::LOCAL_DDMinit(){
     //sharedMem_int   = 	  (unsigned int*)pru_int + SHAREDRAM/4; // Points to start of shared memory
     
     prussdrv_map_prumem(PRUSS0_PRU0_DATARAM, &pru0dataMem);// Maps the PRU0 DRAM memory to input pointer. Memory is then accessed by an array.
-    pru0dataMem_int = (unsigned int*)pru0dataMem+DATARAMoffset/2;
+    pru0dataMem_int = (unsigned int*)pru0dataMem+DATARAMoffset/8;
     
-    sharedMem_int = pru0dataMem_int+SHAREDRAM/2;
+    sharedMem_int = pru0dataMem_int+SHAREDRAM/8;
     
     prussdrv_map_prumem(PRUSS0_PRU1_DATARAM, &pru1dataMem);// Maps the PRU1 DRAM memory to input pointer. Memory is then accessed by an array.
-    pru1dataMem_int = (unsigned int*)pru1dataMem+DATARAMoffset/2;   
+    pru1dataMem_int = (unsigned int*)pru1dataMem+DATARAMoffset/8;   
     
 
     return 0;
