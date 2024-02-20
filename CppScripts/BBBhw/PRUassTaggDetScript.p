@@ -37,7 +37,6 @@
 // r3 reserved for overflow DWT_CYCCNT counter
 // r4 reserved for holding the RECORDS (re-loaded at each iteration)
 // r5 reserved for holding the DWT_CYCCNT count value
-// r6 reserved for tests
 
 // r10 is arbitrary used for operations
 
@@ -93,7 +92,6 @@ INITIATIONS:// This is only run once
 	//LBCO	r2.b0, CONST_PRUCTRLREG, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBCO	r2.b0, CONST_PRUCTRLREG, 0, 1 // Restarts DWT_CYCCNT
-	MOV r6, 0
 
 RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	// The below could be optimized - then change the skew number in c++ code
@@ -131,20 +129,20 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
 	AND 	r0.w0, r0.w0, MASKevents // Interested specifically to the bits with MASKevents
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
-	QBNE 	WAIT_FOR_EVENT, r0.w0, 0
+	QBEQ 	WAIT_FOR_EVENT, r0.w0, 0
 	// If the program reaches this point, at least one of the bits is high
 	// Proceed with the rest of the program
 
 TIMETAG:
 	// Time part
 	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r5 maps the value of DWT_CYCCNT
-	SBCO 	r6, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address at r1.
+	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address at r1.
 	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved
 	// Here include the overflow register
-	SBCO 	r6, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address at r1
+	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address at r1
 	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved	
 	// Channels detection
-	SBCO 	r6.w0, CONST_PRUSHAREDRAM, r1, 2 // Put contents of r0 into the address at r1
+	SBCO 	r0.w0, CONST_PRUSHAREDRAM, r1, 2 // Put contents of r0 into the address at r1
 	ADD 	r1, r1, 2 // increment address by 2 bytes // This can be improved	
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
