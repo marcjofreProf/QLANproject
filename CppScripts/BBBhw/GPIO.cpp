@@ -313,6 +313,7 @@ unsigned short int GPIO::packBits(unsigned short int value) {
 int GPIO::ClearStoredQuBits(){
 if (streamDDRpru.is_open()){
 	streamDDRpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
+	streamDDRpru<<""; // Really clearing the content of the file
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	return 0; // all ok
 }

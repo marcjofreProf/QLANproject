@@ -37,7 +37,6 @@
 // r3 reserved for overflow DWT_CYCCNT counter
 // r4 reserved for holding the RECORDS (re-loaded at each iteration)
 // r5 reserved for holding the DWT_CYCCNT count value
-// r6 reserved for checking comparison if DWT_CYCCNT has to reset
 
 // r10 is arbitrary used for operations
 
@@ -86,7 +85,6 @@ INITIATIONS:// This is only run once
 	
 	MOV	r3, 0  // Initialize overflow counter in r3	
 //	SUB	r3, r3, 1    This might produce error (accounted in c++ script that we start from 1) // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter
-	MOV	r6, 0			// Zero r6 register
 	
 
 RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
@@ -106,7 +104,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts
-	QBGE	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If r5.b3 > MAX_VALUE_BEFORE_RESETmostsigByte, go to reset
+	QBGT	RESET_CYCLECNT, MAX_VALUE_BEFORE_RESETmostsigByte, r5.b3 // If r5.b3 > MAX_VALUE_BEFORE_RESETmostsigByte, go to reset
 
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
@@ -122,7 +120,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	MOV 	r0.b0, r31.b0
 	// Mask the relevant bits you're interested in
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
-	AND 	r0.b0, r0.b0, MASKevents
+	AND 	r0.b0, r0.b0, MASKevents // Interested specifically to the bits with MASKevents
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
 	QBNE 	WAIT_FOR_EVENT, r0.b0, 0
 	// If the program reaches this point, at least one of the bits is high
