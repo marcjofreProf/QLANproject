@@ -287,11 +287,11 @@ for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
 	valCycleCountPRU=*valp;
 	cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
-	valp=valp+2;// 2 times 16 bits
+	valp=valp+4;// 2 times 16 bits
 	// Second 32 bits is the overflow register for DWT_CYCCNT
 	valOverflowCycleCountPRU=*valp;
 	cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
-	valp=valp+2;// 2 times 16 bits
+	valp=valp+4;// 2 times 16 bits
 	// Mount the extended counter value
 	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 	cout << "extendedCounterPRU: " << extendedCounterPRU << endl;
@@ -300,7 +300,7 @@ for (x=0; x<NumRecords; x++){
 	cout << "val: " << std::bitset<16>(val) << endl;
 	valBitsInterest=this->packBits(val); // we're just interested in 4 bits
 	cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;
-	valp=valp+1;// 1 times 16 bits
+	valp=valp+2;// 1 times 16 bits
 	//fprintf(outfile, "%d\n", val);
 	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;	
 }
@@ -358,7 +358,7 @@ return -1;
 *****************************************************************************/
 
 int GPIO::LOCAL_DDMinit(){
-    /*//void *DDR_regaddr1, *DDR_regaddr2, *DDR_regaddr3;    
+    //void *DDR_regaddr1, *DDR_regaddr2, *DDR_regaddr3;    
     prussdrv_map_prumem(PRUSS0_SHARED_DATARAM, &sharedMem);// Maps the PRU shared RAM memory is then accessed by an array.
     sharedMem_int = (unsigned int*) sharedMem;
         
@@ -367,7 +367,7 @@ int GPIO::LOCAL_DDMinit(){
     
     prussdrv_map_prumem(PRUSS0_PRU1_DATARAM, &pru1dataMem);// Maps the PRU1 DRAM memory to input pointer. Memory is then accessed by an array.
     pru1dataMem_int = (unsigned int*) pru1dataMem;
-    
+    /*
     // open the device 
     mem_fd = open("/dev/mem", O_RDWR);
     if (mem_fd < 0) {
@@ -397,15 +397,15 @@ int GPIO::LOCAL_DDMinit(){
     //pru0dataMem_int =     (unsigned int*)pru_int + PRU0_DATARAM/4 + DATARAMoffset/4;   // Points to 0x200 of PRU0 memory
     //pru1dataMem_int =     (unsigned int*)pru_int + PRU1_DATARAM/4 + DATARAMoffset/4;   // Points to 0x200 of PRU1 memory
     //sharedMem_int   = 	  (unsigned int*)pru_int + SHAREDRAM/4; // Points to start of shared memory
-    
+    /*
     prussdrv_map_prumem(PRUSS0_PRU0_DATARAM, &pru0dataMem);// Maps the PRU0 DRAM memory to input pointer. Memory is then accessed by an array.
     pru0dataMem_int = (unsigned int*)pru0dataMem;// + DATARAMoffset/4;
     
-    sharedMem_int = (unsigned int*)pru0dataMem + SHAREDRAM/4-4;
+    sharedMem_int = (unsigned int*)pru0dataMem + SHAREDRAM/4;
     
     prussdrv_map_prumem(PRUSS0_PRU1_DATARAM, &pru1dataMem);// Maps the PRU1 DRAM memory to input pointer. Memory is then accessed by an array.
     pru1dataMem_int = (unsigned int*)pru1dataMem;// + DATARAMoffset/4;   
-    
+    */
 
     return 0;
 }
