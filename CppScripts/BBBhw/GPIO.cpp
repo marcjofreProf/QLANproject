@@ -120,15 +120,19 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	pru0dataMem_int[0]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
-	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
-		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTaggDetScript.bin");
+	if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
+		if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
+		perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
+		}
 	}
 	
 	// Generate signals
 	pru1dataMem_int[0]=(unsigned int)0; // set to zero means no command. PRU1 idle
 	// Load and execute the PRU program on the PRU1
+	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
-		perror("prussdrv_exec_program non successfull writing of ./BBBhw/PRUassTrigSigScript.bin");
+		perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
+		}
 	}
 	
 	  
