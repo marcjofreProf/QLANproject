@@ -264,6 +264,7 @@ std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQ
 threadSimulateEmitQuBitRefAux.detach();
 }
 else{
+this->RunThreadSimulateEmitQuBitFlag=true;
 cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
 }
 this->release();
@@ -385,9 +386,9 @@ cout << "End Emiting Qubits" << endl;
 
 int QPLA::SimulateReceiveQuBit(){
 this->acquire();
-cout << "this->RunThreadSimulateReceiveQuBitFlag: " << this->RunThreadSimulateReceiveQuBitFlag << endl;
-cout << "this->RunThreadSimulateEmitQuBitFlag: " << this->RunThreadSimulateEmitQuBitFlag << endl;
-cout << "this->RunThreadAcquireSimulateNumStoredQubitsNode: " << this->RunThreadAcquireSimulateNumStoredQubitsNode << endl;
+//cout << "this->RunThreadSimulateReceiveQuBitFlag: " << this->RunThreadSimulateReceiveQuBitFlag << endl;
+//cout << "this->RunThreadSimulateEmitQuBitFlag: " << this->RunThreadSimulateEmitQuBitFlag << endl;
+//cout << "this->RunThreadAcquireSimulateNumStoredQubitsNode: " << this->RunThreadAcquireSimulateNumStoredQubitsNode << endl;
 
 if (this->RunThreadSimulateReceiveQuBitFlag and this->RunThreadSimulateEmitQuBitFlag and this->RunThreadAcquireSimulateNumStoredQubitsNode){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
@@ -396,6 +397,8 @@ std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateRe
 threadSimulateReceiveQuBitRefAux.detach();
 }
 else{
+this->RunThreadSimulateReceiveQuBitFlag=true;
+this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 }
 this->release();
