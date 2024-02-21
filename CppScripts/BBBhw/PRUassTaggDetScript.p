@@ -1,6 +1,6 @@
 // PRUassTaggDetScript.p
 // Time Tagging functionality on PRU0 with Shared Memory Access (not Direct Memory Access nor DDR)
-                                 
+// It is pending studying if it is worth making use of DMA or DDR in terms of larger memory space or transfer speed
 
 .origin 0
 .entrypoint INITIATIONS
@@ -106,17 +106,17 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 //	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
 //	SET	r2.t3
 //	SBBO	r2, r6, 0, 4 // Restarts DWT_CYCCNT
-	SBCO	r7, CONST_PRUCTRLREG, 0xC, 4 // Resets DWT_CYCNT
+	SBCO	r7, CONST_PRUCTRLREG, 0xC, 4 // Resets DWT_CYCNT.Account that we lose 2 cycle counts
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
-	ADD	r3, r3, 1    // Increment overflow counter
+	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 
 //START1:
 //	SET r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts
-	QBLT	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte < r5.b3, go to RESET_CYCLECNT
+	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 1 cycle count here
+	QBLT	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte < r5.b3, go to RESET_CYCLECNT. Account that we lose 2 cycle counts
 
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
@@ -157,7 +157,8 @@ TIMETAG:
 	// we're done. Signal to the application	
 	MOV 	r0, 1
 	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
-//	LED_OFF// this signals that we are done with the timetagging acqusition
+	LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
+	LED_OFF
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:

@@ -348,7 +348,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch ba
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  
  cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
- PRUGPIO->SendTriggerSignals();
+ PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of 1024
  
  /* Very slow GPIO BBB not used anymore
  // Basic Output - Generate a pulse of 1 second period
@@ -479,7 +479,7 @@ cout << "Start Receiving Qubits" << endl;// This line should be commented to red
 // Start measuring
  //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
  
- PRUGPIO->ReadTimeStamps();
+ PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of 1024 qubit timetags
  // Basic Input 
  /* Very slow GPIO BBB not used anymore
  ////clock_nanosleep(CLOCK_REALTIME,0,&requestQuarterPeriod,NULL);
@@ -500,7 +500,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  this->release();
  cout << "End Receiving Qubits" << endl;
  
- SimulateNumStoredQubitsNodeAux=PRUGPIO->RetrieveNumStoredQuBits();
+ 
  /*
  // Basic input
  // Count received QuBits
@@ -512,6 +512,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  */
 
 this->acquire();
+SimulateNumStoredQubitsNodeAux=PRUGPIO->RetrieveNumStoredQuBits();
 this->SimulateNumStoredQubitsNode[0]=SimulateNumStoredQubitsNodeAux;
 //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
 // Tell the other node to clear the TimePoint (this avoids having a time point in the other node after having finished this one (because it was not ocnsumed)
