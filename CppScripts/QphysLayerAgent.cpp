@@ -372,18 +372,13 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch ba
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  }
  */
- 
+ // Reset the ClientNodeFutureTimePoint
+this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
+this->RunThreadSimulateEmitQuBitFlag=true;//enable again that this thread can again be called
  this->release();
  
  //cout << "Qubit emitted" << endl;
 cout << "End Emiting Qubits" << endl;
-
-// Reset the ClientNodeFutureTimePoint
-this->acquire();
-// Reset the ClientNodeFutureTimePoint
-this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
-this->RunThreadSimulateEmitQuBitFlag=true;//enable again that this thread can again be called
-this->release();
 
  return 0; // return 0 is for no error
 }
