@@ -132,7 +132,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	
 	  
-	  /*// Doing debbuging checks - Debugging 1
+	  // Doing debbuging checks - Debugging 1
 	  sleep(2);// Give some time to load programs in PRUs and initiate
 	  std::thread threadReadTimeStampsAux=std::thread(&GPIO::ReadTimeStamps,this);
 	  std::thread threadSendTriggerSignalsAux=std::thread(&GPIO::SendTriggerSignals,this);
@@ -145,7 +145,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  streamDDRpru.close();
 	  prussdrv_pru_disable(PRU_Signal_NUM);
 	  prussdrv_pru_disable(PRU_Operation_NUM);  
-	  prussdrv_exit();*/	  
+	  prussdrv_exit();	  
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
