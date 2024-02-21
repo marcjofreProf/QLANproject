@@ -390,6 +390,10 @@ this->release();
 
 int QPLA::SimulateReceiveQuBit(){
 this->acquire();
+cout << "this->RunThreadSimulateReceiveQuBitFlag: " << this->RunThreadSimulateReceiveQuBitFlag << endl;
+cout << "this->RunThreadSimulateEmitQuBitFlag: " << this->RunThreadSimulateEmitQuBitFlag << endl;
+cout << "this->RunThreadAcquireSimulateNumStoredQubitsNode: " << this->RunThreadAcquireSimulateNumStoredQubitsNode << endl;
+
 if (this->RunThreadSimulateReceiveQuBitFlag and this->RunThreadSimulateEmitQuBitFlag and this->RunThreadAcquireSimulateNumStoredQubitsNode){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
