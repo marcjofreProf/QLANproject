@@ -303,7 +303,7 @@ for (x=0; x<NumRecords; x++){
 	valBitsInterest=*valp;
 	//if (x==0 or x== 512 or x==1023){cout << "val: " << std::bitset<16>(val) << endl;}
 	//valBitsInterest=this->packBits(val); // we're just interested in 4 bits
-	//if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}
+	if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}
 	valp=valp+1;// 1 times 16 bits
 	//fprintf(outfile, "%d\n", val);
 	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;	
