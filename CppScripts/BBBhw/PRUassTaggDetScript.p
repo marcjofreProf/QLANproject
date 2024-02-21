@@ -38,6 +38,7 @@
 // r4 reserved for holding the RECORDS (re-loaded at each iteration)
 // r5 reserved for holding the DWT_CYCCNT count value
 // r6 reserved Control register
+// r7 reserved for zeroing
 
 // r10 is arbitrary used for operations
 
@@ -68,7 +69,7 @@ INITIATIONS:// This is only run once
 //	MOV	r0, PRU0_CTRL
 //	MOV	r10, PRU0_CTRL | C29add //CONST_PRUCTRLREG
 //	SBCO	r0, CONST_PRUCTRLREG, 0, 4
-	MOV 	r6, 0x00000220
+	MOV 	r6, 0x22000
 
 //	// Configure the programmable pointer register for PRU by setting c31_pointer[15:0] // related to ddr.
 //	// This will make C31 point to 0x80001000 (DDR memory). 0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
@@ -88,22 +89,24 @@ INITIATIONS:// This is only run once
 	MOV	r3, 0  // Initialize overflow counter in r3	
 	SUB	r3, r3, 1  // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter
 	// Initial Re-initialization of DWT_CYCCNT
-	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
-	CLR	r2.t3
-	SBBO	r2, r6, 0, 4 // stops DWT_CYCCNT
-	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
+//	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+//	CLR	r2.t3
+//	SBBO	r2, r6, 0, 4 // stops DWT_CYCCNT
+	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
-	SBBO	r2, r6, 0, 4 // Restarts DWT_CYCCNT
+	SBBO	r2, r6, 0, 1 // Restarts DWT_CYCCNT
+	mov r7, 0
 
 RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	// The below could be optimized - then change the skew number in c++ code
 	// LBCO and SBCO instructions with byte count 4 take 2 cycles. 
-        LBBO	r2, r6, 0, 4 // r2 maps b0 control register	
-	CLR	r2.t3
-	SBBO	r2, r6, 0, 4 // stops DWT_CYCCNT
-	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
-	SET	r2.t3
-	SBBO	r2, r6, 0, 4 // Restarts DWT_CYCCNT
+//      LBBO	r2, r6, 0, 4 // r2 maps b0 control register	
+//	CLR	r2.t3
+//	SBBO	r2, r6, 0, 4 // stops DWT_CYCCNT
+//	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
+//	SET	r2.t3
+//	SBBO	r2, r6, 0, 4 // Restarts DWT_CYCCNT
+	SBBO	r7, r6, 0xC, 4
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
 	ADD	r3, r3, 1    // Increment overflow counter
 
