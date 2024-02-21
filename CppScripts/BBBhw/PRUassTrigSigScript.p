@@ -21,7 +21,7 @@
 
 #define INS_PER_US		200		// 5ns per instruction fo rBeaglebone black
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
-#define NUM_REPETITIONS		8388480// 65535 // Atention because MOV only handles up to 65535	//4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used)
+#define NUM_REPETITIONS		4294967295// 65535 // Atention because MOV only handles up to 65535	//4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used)
 #define DELAY 1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
 #define PRU1_R31_VEC_VALID	32
 #define PRU_EVTOUT_0		3	// the event number that is sent back
