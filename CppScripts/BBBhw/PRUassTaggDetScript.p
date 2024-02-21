@@ -7,7 +7,7 @@
 
 #include "PRUassTaggDetScript.hp"
 
-#define MASKevents 0x002E // P9_27-30, which corresponds to r31 bits 1,2,3 and 5
+#define MASKevents 0x2E // P9_27-30, which corresponds to r31 bits 1,2,3 and 5
 
 // Length of acquisition:
 #define RECORDS 1024 // 1024 readings and it matches in the host c++ script
@@ -130,12 +130,12 @@ CMDLOOP:
 		
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register, say R0
-	MOV 	r0.w0, r31.w0
+	MOV 	r0.b0, r31.b0
 	// Mask the relevant bits you're interested in
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
-	AND 	r0.w0, r0.w0, MASKevents // Interested specifically to the bits with MASKevents
+	AND 	r0.b0, r0.b0, MASKevents // Interested specifically to the bits with MASKevents
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
-	QBEQ 	WAIT_FOR_EVENT, r0, 0
+	QBEQ 	WAIT_FOR_EVENT, r0.b0, 0
 	// If the program reaches this point, at least one of the bits is high
 	// Proceed with the rest of the program
 
