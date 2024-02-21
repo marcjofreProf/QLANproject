@@ -22,7 +22,7 @@
 #define INS_PER_US		200		// 5ns per instruction fo rBeaglebone black
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
 #define NUM_REPETITIONS		4294967295// 65535 // Atention because MOV only handles up to 65535	//4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used)
-#define DELAY 1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
+#define DELAY 1//1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
 #define PRU1_R31_VEC_VALID	32
 #define PRU_EVTOUT_0		3	// the event number that is sent back
 // Refer to this mapping in the file - pruss_intc_mapping.h
@@ -108,7 +108,7 @@ INITIATIONS:
 //	MOV r0, DELAY
 //
 //DELAYOFF:
-//	sub r0, r0, 1
+//	SUB r0, r0, 1
 //	QBNE DELAYOFF, r0, 0
 //	JMP SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
 
@@ -124,9 +124,17 @@ CMDLOOP:
 SIGNALON:	
 	MOV	r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
 	SUB	r3, r3, 1	// Substract 1 count cycle
+	MOV	r0, DELAY
+DELAYON:
+	SUB 	r0, r0, 1
+	QBNE	 DELAYON, r0, 0
 SIGNALOFF:
 	MOV	r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
 	QBNE	SIGNALON, r3, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
+	MOV	r0, DELAY
+DELAYOFF:
+	SUB 	r0, r0, 1
+	QBNE 	DELAYOFF, r0, 0
 	// The following lines do not consume "signal speed"	
 	MOV	r0, 1 // code 1 means that we have finished.
 	SBCO	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
