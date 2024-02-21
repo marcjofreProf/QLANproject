@@ -66,10 +66,11 @@ INITIATIONS:// This is only run once
 	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
 	
 	// Make c0_pointer point to the PRU control registers
-	//MOV	r0, 0x22000//PRU0_CTRL
+	MOV	r0, 0x220//PRU0_CTRL
 	//MOV	r10, 0x22000+0x2C// //CONST_PRUCTRLREG
 	//SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUCTRLREG, 0, 4
-	MOV 	r6, 0x22000
+	SBCO	r0, CONST_PRUCTRLREG, 0, 4
+	//MOV 	r6, 0x22000
 
 //	// Configure the programmable pointer register for PRU by setting c31_pointer[15:0] // related to ddr.
 //	// This will make C31 point to 0x80001000 (DDR memory). 0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
@@ -92,9 +93,9 @@ INITIATIONS:// This is only run once
 //	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 //	CLR	r2.t3
 //	SBBO	r2, r6, 0, 4 // stops DWT_CYCCNT
-	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+	LBCO	r2, CONST_PRUCTRLREG, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
-	SBBO	r2, r6, 0, 1 // Restarts DWT_CYCCNT
+	SBCO	r2, CONST_PRUCTRLREG, 0, 1 // Restarts DWT_CYCCNT
 	ZERO	&r7, 4 //MOV	r7, 0 // Register for clearing other registers
 
 RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
@@ -106,7 +107,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 //	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
 //	SET	r2.t3
 //	SBBO	r2, r6, 0, 4 // Restarts DWT_CYCCNT
-	SBBO	r7, r6, 0xC, 4 // Resets DWT_CYCNT.Account that we lose 2 cycle counts
+	SBCO	r7, CONST_PRUCTRLREG, 0xC, 4 // Resets DWT_CYCNT.Account that we lose 2 cycle counts
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 
@@ -115,7 +116,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	LBBO	r5, r6, 0xC, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 1 cycle count here
+	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 1 cycle count here
 	QBLT	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte < r5.b3, go to RESET_CYCLECNT. Account that we lose 2 cycle counts
 
 CMDLOOP:
@@ -141,7 +142,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 
 TIMETAG:
 	// Time part
-	LBBO	r5, r6, 0xC, 4 // r5 maps the value of DWT_CYCCNT
+	LBCO	r5, CONST_PRUCTRLREG, 0xC, 4 // r5 maps the value of DWT_CYCCNT
 	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address at r1.
 	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved
 	// Here include the overflow register
