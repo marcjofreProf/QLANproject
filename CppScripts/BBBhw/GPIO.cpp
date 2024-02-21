@@ -135,7 +135,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  sleep(1);// Give some time to load programs in PRUs and initiate
 	  this->SendTriggerSignals();
 	  this->ReadTimeStamps();
-	  this->DDRdumpdata(); // Store to file
+	  //this->DDRdumpdata(); // Store to file
 	  
 	  //munmap(ddrMem, 0x0FFFFFFF); // remove any mappings for those entire pages containing any part of the address space of the process starting at addr and continuing for len bytes. 
 	  //close(mem_fd); // Device

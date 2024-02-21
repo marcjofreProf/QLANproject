@@ -44,7 +44,7 @@
 #define PRU_EVTOUT_0		3	// the event number that is sent back
 
 #define GPIO0_BANK 0x44E07000
-#define GPIO1_BANK 0x4804c000 // this is the address of the BB GPIO1 Bank Register for PR0
+#define GPIO1_BANK 0x4804c000 // this is the address of the BBB GPIO1 Bank Register for PR0
 #define GPIO2_BANK 0x481ac000 // this is the address of the BBB GPIO2 Bank Register for PRU1. We set bits in special locations in offsets here to put a GPIO high or low.
 #define GPIO3_BANK 0x481AE000
 
