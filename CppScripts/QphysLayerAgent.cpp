@@ -339,6 +339,7 @@ while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
 this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum 
 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
+this->RunThreadSimulateEmitQuBitFlag=true;//enable again that this thread can again be called
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
@@ -375,7 +376,6 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch ba
  */
  // Reset the ClientNodeFutureTimePoint
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
-this->RunThreadSimulateEmitQuBitFlag=true;//enable again that this thread can again be called
  this->release();
  
  //cout << "Qubit emitted" << endl;
