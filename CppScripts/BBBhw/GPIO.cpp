@@ -288,11 +288,11 @@ unsigned int NumRecords=1024; //Number of records per run. It is also defined in
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
 	valCycleCountPRU=*valp;
-	//if (x==0 or x== 512 or x==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
+	if (x==0 or x== 512 or x==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
 	valp=valp+2;// 2 times 16 bits
 	// Second 32 bits is the overflow register for DWT_CYCCNT
 	valOverflowCycleCountPRU=*valp-1;//Account that it starts with a 1 offset
-	//if (x==0 or x== 512 or x==1023){cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;}
+	if (x==0 or x== 512 or x==1023){cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;}
 	valp=valp+2;// 2 times 16 bits
 	// Mount the extended counter value
 	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
@@ -301,7 +301,7 @@ for (x=0; x<NumRecords; x++){
 	valBitsInterest=*valp;
 	//if (x==0 or x== 512 or x==1023){cout << "val: " << std::bitset<16>(val) << endl;}
 	//valBitsInterest=this->packBits(val); // we're just interested in 4 bits
-	//if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}
+	if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}
 	valp=valp+1;// 1 times 16 bits
 	//fprintf(outfile, "%d\n", val);
 	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;	
