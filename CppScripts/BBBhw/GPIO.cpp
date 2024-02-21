@@ -132,7 +132,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	
 	  
-	  // Doing debbuging checks - Debugging 1
+	  /*// Doing debbuging checks - Debugging 1
 	  sleep(2);// Give some time to load programs in PRUs and initiate
 	  std::thread threadReadTimeStampsAux=std::thread(&GPIO::ReadTimeStamps,this);
 	  std::thread threadSendTriggerSignalsAux=std::thread(&GPIO::SendTriggerSignals,this);
@@ -145,7 +145,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  streamDDRpru.close();
 	  prussdrv_pru_disable(PRU_Signal_NUM);
 	  prussdrv_pru_disable(PRU_Operation_NUM);  
-	  prussdrv_exit();
+	  prussdrv_exit();*/
 	  
 	  
 }
@@ -290,20 +290,20 @@ unsigned int NumRecords=1024; //Number of records per run. It is also defined in
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
 	valCycleCountPRU=*valp;
-	if (x==0 or x== 512 or x==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
+	//if (x==0 or x== 512 or x==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
 	valp=valp+2;// 2 times 16 bits
 	// Second 32 bits is the overflow register for DWT_CYCCNT
 	valOverflowCycleCountPRU=*valp-1;//Account that it starts with a 1 offset
-	if (x==0 or x== 512 or x==1023){cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;}
+	//if (x==0 or x== 512 or x==1023){cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;}
 	valp=valp+2;// 2 times 16 bits
 	// Mount the extended counter value
 	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
-	if (x==0 or x== 512 or x==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
+	//if (x==0 or x== 512 or x==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
 	// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
 	valBitsInterest=*valp;
 	//if (x==0 or x== 512 or x==1023){cout << "val: " << std::bitset<16>(val) << endl;}
 	//valBitsInterest=this->packBits(val); // we're just interested in 4 bits
-	if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}
+	//if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}
 	valp=valp+1;// 1 times 16 bits
 	//fprintf(outfile, "%d\n", val);
 	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;	
