@@ -190,8 +190,8 @@ else{CheckTimeFlag=false;}
 		//printf("Ack\n");
 	}
 	else if (CheckTimeFlag==true){// too much time
-		prussdrv_pru_reset(PRU_Operation_NUM);// Reset the PRU
-		cout << "GPIO::ReadTimeStamps took to much time the TimeTagg. Resetting PRU0" << endl;
+		//prussdrv_pru_reset(PRU_Operation_NUM);// Reset the PRU
+		cout << "GPIO::ReadTimeStamps took to much time the TimeTagg." << endl;
 		fin=true;
 	}
 } while(!fin);
@@ -242,8 +242,8 @@ do // This is blocking
 		fin=true;
 	}
 	else if (CheckTimeFlag==true){// too much time
-			prussdrv_pru_reset(PRU_Signal_NUM);// Reset the PRU
-			cout << "GPIO::SendTriggerSignals took to much. Resetting PRU1" << endl;
+			//prussdrv_pru_reset(PRU_Signal_NUM);// Reset the PRU
+			cout << "GPIO::SendTriggerSignals took to much time" << endl;
 			fin=true;
 		}
 } while(!fin);
