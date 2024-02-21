@@ -63,7 +63,7 @@ INITIATIONS:// This is only run once
 	// http://www.embedded-things.com/bbb/understanding-bbb-pru-shared-memory-access/	
 	MOV	r0, SHARED_RAM // 0x100                  // Set C28 to point to shared RAM
 //	MOV	r10, 0x22000+0x28//PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
-	SBBO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
+	SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
 	
 	// Make c29_pointer[15:0] point to the PRU control registers
 	MOV	r0, PRU0_CTRL
