@@ -91,17 +91,17 @@ INITIATIONS:// This is only run once
 	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
 	CLR	r2.t3
 	SBBO	r2, r6, 0, 4 // stops DWT_CYCCNT
-	//LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps b0 control register
+	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r6, 0, 4 // Restarts DWT_CYCCNT
 
 RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	// The below could be optimized - then change the skew number in c++ code
 	// LBCO and SBCO instructions with byte count 4 take 2 cycles. 
-        //LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps b0 control register	
+        LBBO	r2, r6, 0, 4 // r2 maps b0 control register	
 	CLR	r2.t3
 	SBBO	r2, r6, 0, 4 // stops DWT_CYCCNT
-	//LBCO	r2, CONST_PRUCTRLREG, 0, 4 // r2 maps b0 control register
+	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r6, 0, 4 // Restarts DWT_CYCCNT
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
