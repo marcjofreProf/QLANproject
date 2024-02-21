@@ -22,8 +22,8 @@
 #define CONST_PRUCTRLREG     C29 // PRU control registers
 #define CONST_DDR            C31 //used specifically for accessing external memory regions, such as DDR memory, which is shared with the main ARM processor.
 
-#define PRU0_CTRL            0x00022000
-#define PRU1_CTRL            0x00024000
+#define PRU0_CTRL            0x220
+#define PRU1_CTRL            0x240
 
 #define C24add		     0x20 // only modifiable bits[3:0]
 #define C25add		     0x22 // only modifiable bits[3:0] 
@@ -37,7 +37,7 @@
 #define OWN_RAM              0x00000000 // current PRU data RAM
 #define OWN_RAMoffset	     0x00000200 // Offset from Base OWN_RAM to avoid collision with some data tht PRU might store
 #define OTHER_RAM            0x00002000 // The other PRU data ram (2000*32bits=64000; 64000/8=8K
-#define SHARED_RAM           0x00010000 // equivalent with 0x00012000. The global memory map is shown in Table 6 (page 20) and identifies 0x00010000 as being the start of the 12Kb of shared memory. Therefore, value of 0x00012000 is somewhere inside the shared memory (albeit not at the beginning).
+#define SHARED_RAM           0x100 // equivalent with 0x120. Attention since C28 or C29 constant registers used, only few bytes to write The global memory map is shown in Table 6 (page 20) and identifies 0x00010000 as being the start of the 12Kb of shared memory. Therefore, value of 0x00012000 is somewhere inside the shared memory (albeit not at the beginning).
 #define DDR_MEM		     0x80001000 // 0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
 
 #define PRU0_R31_VEC_VALID	32
