@@ -65,11 +65,11 @@ INITIATIONS:// This is only run once
 	MOV	r10, 0x22000+0x28//PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
 	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
 	
-	// Make c0_pointer point to the PRU control registers
-	MOV	r0, 0x220//PRU0_CTRL
-	//MOV	r10, 0x22000+0x2C// //CONST_PRUCTRLREG
-	//SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUCTRLREG, 0, 4
-	SBCO	r0, CONST_PRUCTRLREG, 0, 4
+	// Make c30_pointer point to the PRU control registers
+	MOV	r0, 0x00022000//PRU0_CTRL
+	MOV	r10, 0x22000+0x2C// //CONST_PRUCTRLREG
+	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUCTRLREG, 0, 4
+	//SBCO	r0, CONST_PRUCTRLREG, 0, 4
 	//MOV 	r6, 0x22000
 
 //	// Configure the programmable pointer register for PRU by setting c31_pointer[15:0] // related to ddr.
