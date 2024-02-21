@@ -7,7 +7,7 @@
 
 #include "PRUassTaggDetScript.hp"
 
-#define MASKevents 0x2E // P9_27-30, which corresponds to r31 bits 1,2,3 and 5
+#define MASKevents 0x0F // P9_28-31, which corresponds to r31 bits 0,1,2,3
 
 // Length of acquisition:
 #define RECORDS 1024 // 1024 readings and it matches in the host c++ script
