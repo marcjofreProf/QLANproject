@@ -103,10 +103,16 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
     	// Open file where temporally are stored timetaggs
     	//outfile=fopen("data.csv", "w");
 	
-	streamDDRpru.open(string(PRUdataPATH) + string("TimetaggingData"), std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
+	streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
 	
 	if (!streamDDRpru.is_open()) {
-        	cout << "Failed to open the streamDDRpru file." << endl;
+		streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
+		if (!streamDDRpru.is_open()) {
+	        	cout << "Failed to open the streamDDRpru file." << endl;
+	        }
+	        else{// Clear up the old file
+        	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations	        
+	        }
         }
         else{// Clear up the old file
         	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
@@ -122,7 +128,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	    // Load and execute the PRU program on the PRU0
 	if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
 		if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
-		perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
+			perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
 		}
 	}
 	
@@ -130,8 +136,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	pru1dataMem_int[0]=(unsigned int)0; // set to zero means no command. PRU1 idle
 	// Load and execute the PRU program on the PRU1
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
-	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
-		perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
+		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
+			perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
 		}
 	}
 	

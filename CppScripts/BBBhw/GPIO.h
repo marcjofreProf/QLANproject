@@ -34,7 +34,8 @@ using std::ifstream;
 using std::fstream;
 
 #define GPIO_PATH "/sys/class/gpio/"
-#define PRUdataPATH "../PRUdata/"
+#define PRUdataPATH1 "./PRUdata/"
+#define PRUdataPATH2 "../PRUdata/"
 
 namespace exploringBB {
 
