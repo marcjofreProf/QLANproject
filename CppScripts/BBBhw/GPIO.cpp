@@ -157,7 +157,7 @@ int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 //char fname_new[255];     
 //DDR_paramaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 8;
 //DDR_ackaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 4;
-int WaitTimeToFutureTimePoint=20000;
+int WaitTimeToFutureTimePoint=1000;
 
 TimePoint TimePointClockNow=Clock::now();
 auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
@@ -208,7 +208,7 @@ return 0;// all ok
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
-int WaitTimeToFutureTimePoint=20000;
+int WaitTimeToFutureTimePoint=1000;
 
 TimePoint TimePointClockNow=Clock::now();
 auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
