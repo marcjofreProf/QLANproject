@@ -38,7 +38,7 @@
    //  
    // Beware: Many other PRU EGP pins are reserved by HDMI or onboard flash, which  
    // would need to be disabled first by editing uEnv.txt and rebooting.  
-   exclusive-use = "P9.28", "P9.29", "P9.30", "P9.31", "P8.45", "P8.46", "P8.43", "P8.44", "P8.41", "P8.42", "P8.39", "P8.40", "P8.27", "P8.29", "P8.28", "P8.30", "pru0", "pru1";  
+   exclusive-use = "P8.15","P8.16","P8.25","P8.27","P9.28", "P9.29", "P9.30", "P9.31", "P8.45", "P8.46", "P8.43", "P8.44", "P8.41", "P8.42", "P8.39", "P8.40", "P8.27", "P8.29", "P8.28", "P8.30", "pru0", "pru1";  
   
 //fragment@0{
 //  target = <&ocp>; 
@@ -69,6 +69,10 @@
          0x194 0x26      // Mode 6 input pull-down input enable
          0x198 0x26      // Mode 6 input pull-down input enable
          0x190 0x26      // Mode 6 input pull-down input enable
+         0x1A4 0x26      // Mode 6 input pull-down input enable
+         0x1AC 0x26      // Mode 6 input pull-down input enable
+         0x038 0x26      // Mode 6 input pull-down input enable
+         0x03C 0x26      // Mode 6 input pull-down input enable
          
          0x0E0 0x15	// Mode 5 output pull-up
          0x0E4 0x15	// Mode 5 output pull-up

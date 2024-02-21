@@ -55,8 +55,8 @@ INITIATIONS:// This is only run once
 	// Configure the programmable pointer register for PRU by setting c24_pointer[3:0] // related to pru data RAM, where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
 	MOV	r0, OWN_RAM// | OWN_RAMoffset // When using assembler, the PRU does not put data in the first addresses of OWN_RAM (when using c++ PRU direct programming the PRU  might use some initial addresses of OWN_RAM space
-//	MOV	r10, PRU0_CTRL | C24add//CONST_PRUDRAM
-	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
+	MOV	r10, 0x22000+0x20// | C24add//CONST_PRUDRAM
+	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 
 	// Configure the programmable pointer register for PRU by setting c28_pointer[15:0] // related to shared RAM
 	// This will make C28 point to 0x00010000 (PRU shared RAM).
@@ -65,9 +65,9 @@ INITIATIONS:// This is only run once
 	MOV	r10, 0x22000+0x28//PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
 	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
 	
-	// Make c29_pointer[15:0] point to the PRU control registers
+	// Make c26_pointer point to the PRU control registers
 	MOV	r0, PRU0_CTRL
-	MOV	r10, PRU0_CTRL+0x32// | C29add //CONST_PRUCTRLREG
+	MOV	r10, 0x22000+0x24// //CONST_PRUCTRLREG
 	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUCTRLREG, 0, 4
 //	MOV 	r6, 0x22000
 
