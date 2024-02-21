@@ -207,7 +207,7 @@ return 0;// all ok
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
-int WaitTimeToFutureTimePoint=15000;
+int WaitTimeToFutureTimePoint=20000;
 
 TimePoint TimePointClockNow=Clock::now();
 auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
@@ -290,7 +290,7 @@ for (x=0; x<NumRecords; x++){
 	if (x==0 or x== 512 or x==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
 	valp=valp+2;// 2 times 16 bits
 	// Second 32 bits is the overflow register for DWT_CYCCNT
-	valOverflowCycleCountPRU=*valp;
+	valOverflowCycleCountPRU=*valp-1;//Account that it starts with a 1 offset
 	if (x==0 or x== 512 or x==1023){cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;}
 	valp=valp+2;// 2 times 16 bits
 	// Mount the extended counter value
