@@ -264,7 +264,6 @@ std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQ
 threadSimulateEmitQuBitRefAux.detach();
 }
 else{
-this->RunThreadSimulateEmitQuBitFlag=true;
 cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
 }
 this->release();
@@ -397,8 +396,6 @@ std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateRe
 threadSimulateReceiveQuBitRefAux.detach();
 }
 else{
-this->RunThreadSimulateReceiveQuBitFlag=true;
-this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 }
 this->release();
