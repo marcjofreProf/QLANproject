@@ -124,6 +124,9 @@ CMDLOOP:
 	QBEQ	CHECK_CYCLECNT, r0, 0 // loop until we get an instruction
 	QBEQ	CHECK_CYCLECNT, r0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
+	// We remove the command from the host (in case there is a reset from host, we are saved)
+	MOV 	r0, 0 
+	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
 //	LED_ON // Indicate that we start acquisiton of timetagging
 	ZERO	&r1, 4 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data

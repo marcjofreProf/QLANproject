@@ -201,7 +201,10 @@ else{CheckTimeFlag=false;}
 		//printf("Ack\n");
 	}
 	else if (CheckTimeFlag==true){// too much time
-		prussdrv_pru_reset(PRU_Operation_NUM);// Reset the PRU
+		pru0dataMem_int[0]=(unsigned int)0; // set to zero means no command.
+		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
+		prussdrv_pru_disable(PRU_Operation_NUM);// Disable the PRU
+		prussdrv_pru_enable(PRU_Operation_NUM);// Enable the PRU from 0
 		cout << "GPIO::ReadTimeStamps took to much time the TimeTagg. Reset PRU0." << endl;
 		fin=true;
 	}
@@ -253,9 +256,12 @@ do // This is blocking
 		fin=true;
 	}
 	else if (CheckTimeFlag==true){// too much time
-			prussdrv_pru_reset(PRU_Signal_NUM);// Reset the PRU
-			cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1" << endl;
-			fin=true;
+		pru1dataMem_int[0]=(unsigned int)0; // set to zero means no command.		
+		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
+		prussdrv_pru_disable(PRU_Signal_NUM);// Disable the PRU
+		prussdrv_pru_enable(PRU_Signal_NUM);// Enable the PRU from 0
+		cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1" << endl;
+		fin=true;
 		}
 } while(!fin);
 
