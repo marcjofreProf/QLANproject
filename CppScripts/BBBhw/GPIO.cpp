@@ -202,14 +202,14 @@ else{CheckTimeFlag=false;}
 	}
 	else if (CheckTimeFlag==true){// too much time
 		pru0dataMem_int[0]=(unsigned int)0; // set to zero means no command.
-		if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
-			if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
-				perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
-			}
-		}
+		//if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
+		//	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
+		//		perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
+		//	}
+		//}
 		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
-		//prussdrv_pru_disable(PRU_Operation_NUM);// Disable the PRU
-		//prussdrv_pru_enable(PRU_Operation_NUM);// Enable the PRU from 0
+		prussdrv_pru_disable(PRU_Operation_NUM);// Disable the PRU
+		prussdrv_pru_enable(PRU_Operation_NUM);// Enable the PRU from 0
 		//prussdrv_pru_reset(PRU_Operation_NUM);
 		cout << "GPIO::ReadTimeStamps took to much time the TimeTagg. Reset PRU0." << endl;
 		fin=true;
@@ -263,14 +263,14 @@ do // This is blocking
 	}
 	else if (CheckTimeFlag==true){// too much time		
 		pru1dataMem_int[0]=(unsigned int)0; // set to zero means no command.
-		if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
-			if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
-				perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
-			}
-		}		
+		//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
+		//	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
+		//		perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
+		//	}
+		//}		
 		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
-		//prussdrv_pru_disable(PRU_Signal_NUM);// Disable the PRU
-		//prussdrv_pru_enable(PRU_Signal_NUM);// Enable the PRU from 0
+		prussdrv_pru_disable(PRU_Signal_NUM);// Disable the PRU
+		prussdrv_pru_enable(PRU_Signal_NUM);// Enable the PRU from 0
 		//prussdrv_pru_reset(PRU_Signal_NUM);
 		cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1" << endl;
 		fin=true;
