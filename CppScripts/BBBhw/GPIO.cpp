@@ -103,19 +103,12 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
     	// Open file where temporally are stored timetaggs
     	//outfile=fopen("data.csv", "w");
 	
-	streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
-	
+	streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
 	if (!streamDDRpru.is_open()) {
-		streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
+		streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
 		if (!streamDDRpru.is_open()) {
 	        	cout << "Failed to open the streamDDRpru file." << endl;
 	        }
-	        else{// Clear up the old file
-        	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations	        
-	        }
-        }
-        else{// Clear up the old file
-        	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
         }
 	
         // Initialize DDM
@@ -194,11 +187,9 @@ if (TimeNow_time_as_count>TimePointFuture_time_as_count){CheckTimeFlag=true;}
 else{CheckTimeFlag=false;}
 	if (pru0dataMem_int[0] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the acquisition
 	{
-		// we have received the ack!
 		this->DDRdumpdata(); // Store to file
 		pru0dataMem_int[0] = (unsigned int)0; // Here clears the value
 		fin=true;
-		//printf("Ack\n");
 	}
 	else if (CheckTimeFlag==true){// too much time
 		pru0dataMem_int[0]=(unsigned int)0; // set to zero means no command.
@@ -324,15 +315,17 @@ for (x=0; x<NumRecords; x++){
 	valp=valp+2;// 2 times 16 bits
 	// Mount the extended counter value
 	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
-	if (x==0 or x== 512 or x==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
+	//if (x==0 or x== 512 or x==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
 	// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
 	valBitsInterest=*valp;
 	//if (x==0 or x== 512 or x==1023){cout << "val: " << std::bitset<16>(val) << endl;}
 	//valBitsInterest=this->packBits(val); // we're just interested in 4 bits
-	if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}
+	//if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}
 	valp=valp+1;// 1 times 16 bits
 	//fprintf(outfile, "%d\n", val);
-	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
+	streamDDRpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
+	streamDDRpru.write(reinterpret_cast<const char*>(&valBitsInterest), sizeof(valBitsInterest));
+	//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
 }
 streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 
@@ -355,14 +348,22 @@ unsigned short int GPIO::packBits(unsigned short int value) {
 
 int GPIO::ClearStoredQuBits(){
 if (streamDDRpru.is_open()){
-	streamDDRpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
-	streamDDRpru<<""; // Really clearing the content of the file
-	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	streamDDRpru.close();
+	//streamDDRpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
+	//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
+	if (!streamDDRpru.is_open()) {
+		streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
+		if (!streamDDRpru.is_open()) {
+	        	cout << "Failed to re-open the streamDDRpru file." << endl;
+	        	return -1;
+	        }
+        }
 	return 0; // all ok
 }
 else{
-cout << "ClearStoredQuBits: BBB streamDDRpru is not open!" << endl;
-return -1;
+	cout << "ClearStoredQuBits: BBB streamDDRpru is not open!" << endl;
+	return -1;
 }
 }
 
@@ -371,14 +372,13 @@ if (streamDDRpru.is_open()){
 	streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
 	string StrLine;
 	int lineCount = 0;
-	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	int iIter=0;
-        while (getline(streamDDRpru, StrLine)) {// While true
-            lineCount++; // Increment line count for each line read
-            std::istringstream iss(StrLine); // Use the line as a source for the istringstream
-    	    iss >> TimeTaggs[iIter]>> ChannelTags[iIter];
-    	    cout << "TimeTaggs[iIter]: " << TimeTaggs[iIter] << endl;
-    	    cout << "ChannelTags[iIter]: " << ChannelTags[iIter] << endl;
+	unsigned long long int ValueReadTest;
+        while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
+	        TimeTaggs[lineCount]=ValueReadTest; 
+    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
+    	    cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
+    	    cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
+    	    lineCount++; // Increment line count for each line read    	    
     	    }
         streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	return lineCount;
