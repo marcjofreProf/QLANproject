@@ -471,7 +471,7 @@ else {// There might be at least one new message
 		}
 		// Process the message
 		else{// (valread>0){
-			cout << "Host Received message: " << this->ReadBuffer << endl;
+			//cout << "Host Received message: " << this->ReadBuffer << endl;
 			//cout << "valread: " << valread << endl;
 			return valread;
 		}
@@ -703,12 +703,12 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 					if (i==0){
 						strcpy(SubPayload,strtok(Payload,":"));
 						this->SimulateNumStoredQubitsNodeParamsIntArray[0]=atoi(SubPayload);
-						cout << "atoi(SubPayload): " << atoi(SubPayload) << endl;
+						//cout << "atoi(SubPayload): " << atoi(SubPayload) << endl;
 					}
 					else{
 						strcpy(SubPayload,strtok(NULL,":"));
 						this->TimeTaggsDetAnalytics[i-1]=stof(SubPayload);
-						cout << "stof(SubPayload): " << stof(SubPayload) << endl;
+						//cout << "stof(SubPayload): " << stof(SubPayload) << endl;
 					}
 				}
 				this->InfoSimulateNumStoredQubitsNodeFlag=true;				

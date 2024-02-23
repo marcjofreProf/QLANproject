@@ -376,8 +376,8 @@ if (streamDDRpru.is_open()){
         while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
 	        TimeTaggs[lineCount]=ValueReadTest; 
     	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
-    	    cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
-    	    cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
+    	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
+    	    //cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
     	    lineCount++; // Increment line count for each line read    	    
     	    }
         streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
