@@ -471,7 +471,7 @@ else {// There might be at least one new message
 		}
 		// Process the message
 		else{// (valread>0){
-			//cout << "Received message: " << this->ReadBuffer << endl;
+			cout << "Host Received message: " << this->ReadBuffer << endl;
 			//cout << "valread: " << valread << endl;
 			return valread;
 		}
@@ -709,6 +709,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 						this->TimeTaggsDetAnalytics[i-1]=stof(SubPayload);
 					}
 				}
+				cout << "TimeTaggsDetAnalytics: " << this->TimeTaggsDetAnalytics << endl;
 				this->InfoSimulateNumStoredQubitsNodeFlag=true;				
 			}					
 			else{

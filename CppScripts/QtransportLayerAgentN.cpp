@@ -521,7 +521,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 }
 
 int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
-	//cout << "Node SendBuffer: " << this->SendBuffer << endl;
+	cout << "Node SendBuffer: " << this->SendBuffer << endl;
 	//cout << "Node SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
     const char* SendBufferAux = this->SendBuffer;
     int BytesSent=0;
@@ -676,8 +676,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ReadBufferAux,ReadBufferAuxOriginal); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 	for (int iIterDump=0;iIterDump<(5*iIterMessages);iIterDump++){
-	if (iIterDump==0){strtok(ReadBufferAux,",");}
-	else{strtok(NULL,",");}
+		if (iIterDump==0){strtok(ReadBufferAux,",");}
+		else{strtok(NULL,",");}
 	}
 	if (iIterMessages==0){strcpy(IPdest,strtok(ReadBufferAux,","));}
 	else{strcpy(IPdest,strtok(NULL,","));}
@@ -856,7 +856,7 @@ if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking
 	strcat(ParamsCharArray,charNum);
 	strcat(ParamsCharArray,":");// End Separate different Payloads with :
 	strcat(ParamsCharArray,",");// Very important to end the message
-	//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+	cout << "ParamsCharArray: " << ParamsCharArray << endl;
 	  // reply immediately with a message to requester
 	//cout<< "Node before second acquire" << endl;
 	this->acquire();	
