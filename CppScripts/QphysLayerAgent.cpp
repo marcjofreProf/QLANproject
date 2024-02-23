@@ -562,6 +562,13 @@ TimeTaggsDetAnalytics[4]=(float)TimeTaggsDetAnalytics[4]+1.0;
 }
 if (i>1){
 TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*((float)(TimeTaggs[i]-TimeTaggs[i-1]));
+
+// Debugging
+if ((TimeTaggs[i]-TimeTaggs[i-1])>100){
+cout << "TimeTaggs[i]: " << TimeTaggs[i] << endl;
+cout << "TimeTaggs[i-1]: " << TimeTaggs[i-1] << endl;
+}
+
 }
 }
 

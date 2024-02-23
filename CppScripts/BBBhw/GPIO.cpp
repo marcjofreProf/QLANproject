@@ -350,7 +350,7 @@ unsigned short int GPIO::packBits(unsigned short int value) {
 int GPIO::ClearStoredQuBits(){
 if (streamDDRpru.is_open()){
 	streamDDRpru.close();
-	//streamDDRpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
+	
 	//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
 	if (!streamDDRpru.is_open()) {
@@ -360,6 +360,7 @@ if (streamDDRpru.is_open()){
 	        	return -1;
 	        }
         }
+        streamDDRpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
 	return 0; // all ok
 }
 else{
