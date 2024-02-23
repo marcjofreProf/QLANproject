@@ -834,25 +834,25 @@ if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking
 	strcat(ParamsCharArray,charNum);
 	// Include param analytics info
 	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.2f", TimeTaggsDetAnalytics[0]);
+	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[0]);
 	strcat(ParamsCharArray,charNum);
 	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.2f", TimeTaggsDetAnalytics[1]);
+	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[1]);
 	strcat(ParamsCharArray,charNum);
 	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.2f", TimeTaggsDetAnalytics[2]);
+	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[2]);
 	strcat(ParamsCharArray,charNum);
 	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.2f", TimeTaggsDetAnalytics[3]);
+	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[3]);
 	strcat(ParamsCharArray,charNum);
 	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.2f", TimeTaggsDetAnalytics[4]);
+	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[4]);
 	strcat(ParamsCharArray,charNum);
 	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.2f", TimeTaggsDetAnalytics[5]);
+	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[5]);
 	strcat(ParamsCharArray,charNum);
 	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.2f", TimeTaggsDetAnalytics[6]);
+	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[6]);
 	strcat(ParamsCharArray,charNum);
 	strcat(ParamsCharArray,":");// End Separate different Payloads with :
 	strcat(ParamsCharArray,",");// Very important to end the message
