@@ -30,7 +30,7 @@
 #include<fstream>
 #include<bitset>
 #include<string>
-#include<sstream>
+#include <sstream> // For istringstream
 #include<cstdlib>
 #include<cstdio>
 #include<fcntl.h>
@@ -208,10 +208,10 @@ else{CheckTimeFlag=false;}
 		//	}
 		//}
 		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
-		prussdrv_pru_disable(PRU_Operation_NUM);// Disable the PRU
-		prussdrv_pru_enable(PRU_Operation_NUM);// Enable the PRU from 0
+		//prussdrv_pru_disable(PRU_Operation_NUM);// Disable the PRU
+		//prussdrv_pru_enable(PRU_Operation_NUM);// Enable the PRU from 0
 		//prussdrv_pru_reset(PRU_Operation_NUM);
-		cout << "GPIO::ReadTimeStamps took to much time the TimeTagg. Reset PRU0." << endl;
+		cout << "GPIO::ReadTimeStamps took to much time the TimeTagg. Reset PRUO if necessari." << endl;
 		fin=true;
 	}
 } while(!fin);
@@ -269,10 +269,10 @@ do // This is blocking
 		//	}
 		//}		
 		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
-		prussdrv_pru_disable(PRU_Signal_NUM);// Disable the PRU
-		prussdrv_pru_enable(PRU_Signal_NUM);// Enable the PRU from 0
+		//prussdrv_pru_disable(PRU_Signal_NUM);// Disable the PRU
+		//prussdrv_pru_enable(PRU_Signal_NUM);// Enable the PRU from 0
 		//prussdrv_pru_reset(PRU_Signal_NUM);
-		cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1" << endl;
+		cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1 if necessari." << endl;
 		fin=true;
 		}
 } while(!fin);
@@ -332,7 +332,8 @@ for (x=0; x<NumRecords; x++){
 	//if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}
 	valp=valp+1;// 1 times 16 bits
 	//fprintf(outfile, "%d\n", val);
-	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;	
+	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
+	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 }
 
 //cout << "sharedMem_int: " << sharedMem_int << endl;
@@ -365,15 +366,19 @@ return -1;
 }
 }
 
-int GPIO::RetrieveNumStoredQuBits(){
+int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned short int* ChannelTags){
 if (streamDDRpru.is_open()){
 	streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
 	string StrLine;
 	int lineCount = 0;
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	int iIter=0;
         while (getline(streamDDRpru, StrLine)) {// While true
             lineCount++; // Increment line count for each line read
-        }
+            streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+            std::istringstream iss(StrLine); // Use the line as a source for the istringstream
+    	    iss >> TimeTaggs[iIter] >> ChannelTags[iIter];
+    	    }
         streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	return lineCount;
 }

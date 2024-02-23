@@ -804,7 +804,18 @@ if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking
 	//cout<< "Node after this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
 	this->GetSimulateNumStoredQubitsNodeFlag=true; 
 	this->release();
-	int SimulateNumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetSimulateNumStoredQubitsNode();// to be developed for more than one link
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Compute interesting analystics on the Timetaggs and deteciton so that not all data has to be transfered thorugh sockets
+	// Param 0: Num detections channel 1
+	// Param 1: Num detections channel 2
+	// Param 2: Num detections channel 3
+	// Param 3: Num detections channel 4
+	// Param 4: Multidetection events
+	// Param 5: Mean time difference between tags
+	// Param 6: std time difference between tags
+	int NumTimetaggDetAnalytics=7;
+	float TimeTaggsDetAnalytics[NumTimetaggDetAnalytics]={0.0};
+	int SimulateNumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetSimulateNumStoredQubitsNode(TimeTaggsDetAnalytics);// to be developed for more than one link
 	//cout << "Node return SimulateNumStoredQubitsNode: " << SimulateNumStoredQubitsNode << endl;
 	  // Generate the message
 	//cout<< "IPorg: " << IPorg << endl;
@@ -819,8 +830,31 @@ if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking
 	strcat(ParamsCharArray,"SimulateNumStoredQubitsNode");
 	strcat(ParamsCharArray,",");
 	char charNum[NumBytesBufferICPMAX] = {0};
-	sprintf(charNum, "%d", SimulateNumStoredQubitsNode);
+	sprintf(charNum, "%d", SimulateNumStoredQubitsNode);//
 	strcat(ParamsCharArray,charNum);
+	// Include param analytics info
+	strcat(ParamsCharArray,":");// Separate different Payloads with :
+	sprintf(charNum, "%.2f", TimeTaggsDetAnalytics[0]);
+	strcat(ParamsCharArray,charNum);
+	strcat(ParamsCharArray,":");// Separate different Payloads with :
+	sprintf(charNum, "%.2f", TimeTaggsDetAnalytics[1]);
+	strcat(ParamsCharArray,charNum);
+	strcat(ParamsCharArray,":");// Separate different Payloads with :
+	sprintf(charNum, "%.2f", TimeTaggsDetAnalytics[2]);
+	strcat(ParamsCharArray,charNum);
+	strcat(ParamsCharArray,":");// Separate different Payloads with :
+	sprintf(charNum, "%.2f", TimeTaggsDetAnalytics[3]);
+	strcat(ParamsCharArray,charNum);
+	strcat(ParamsCharArray,":");// Separate different Payloads with :
+	sprintf(charNum, "%.2f", TimeTaggsDetAnalytics[4]);
+	strcat(ParamsCharArray,charNum);
+	strcat(ParamsCharArray,":");// Separate different Payloads with :
+	sprintf(charNum, "%.2f", TimeTaggsDetAnalytics[5]);
+	strcat(ParamsCharArray,charNum);
+	strcat(ParamsCharArray,":");// Separate different Payloads with :
+	sprintf(charNum, "%.2f", TimeTaggsDetAnalytics[6]);
+	strcat(ParamsCharArray,charNum);
+	strcat(ParamsCharArray,":");// End Separate different Payloads with :
 	strcat(ParamsCharArray,",");// Very important to end the message
 	//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 	  // reply immediately with a message to requester

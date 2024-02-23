@@ -64,7 +64,8 @@ private: // Variables/Objects
 	int valueSemaphoreExpected = 1;
 	// Status
 	bool InfoSimulateNumStoredQubitsNodeFlag=false;// Flag to account that there is informaiton on number Qubits in node
-	int SimulateNumStoredQubitsNodeParamsIntArray[1]={0};// Array storing the Number Qubits stored in the node	
+	int SimulateNumStoredQubitsNodeParamsIntArray[1]={0};// Array storing the Number Qubits stored in the node
+	float TimeTaggsDetAnalytics[7]={0.0};// Array containing the timetaggs detections analytics (proceesses wby the nodes)	
 
 public: // Functions
 	// Management
@@ -83,7 +84,7 @@ public: // Functions
 	int InitAgentProcess(); // Initializer of the thread
 	// Requests. They have to be in semaphore structure to avoid collisions between main and thread
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the upper Agent to send message to specific host/node	
-	int SimulateRetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray); // Send to the upper layer agent how many qubits are stored
+	int SimulateRetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray,float* ParamsFloatArray,int nFloatarray); // Send to the upper layer agent how many qubits are stored, and some statistics of the detections
 	~QTLAH();  //destructor
 
 private: //Functions//Methods
@@ -111,6 +112,7 @@ private: //Functions//Methods
 	// Process and execute requests
 	int ProcessNewMessage(); // main function perferming the required operatons to process the task
 	int countQintupleComas(char* ParamsCharArray);
+	int countColons(char* ParamsCharArray);
 };
 
 

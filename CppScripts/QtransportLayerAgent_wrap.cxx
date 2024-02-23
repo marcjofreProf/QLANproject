@@ -4182,15 +4182,20 @@ SWIGINTERN PyObject *_wrap_QTLAH_SimulateRetrieveNumStoredQubitsNode(PyObject *S
   nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
   int *arg2 = (int *) 0 ;
   int arg3 ;
+  float *arg4 = (float *) 0 ;
+  int arg5 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyArrayObject *array2 = NULL ;
   int is_new_object2 = 0 ;
+  PyArrayObject *array4 = NULL ;
+  int is_new_object4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:QTLAH_SimulateRetrieveNumStoredQubitsNode",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOO:QTLAH_SimulateRetrieveNumStoredQubitsNode",&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_SimulateRetrieveNumStoredQubitsNode" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
@@ -4208,12 +4213,30 @@ SWIGINTERN PyObject *_wrap_QTLAH_SimulateRetrieveNumStoredQubitsNode(PyObject *S
     arg2 = (int*) array_data(array2);
     arg3 = (int) array_size(array2,0);
   }
-  result = (int)(arg1)->SimulateRetrieveNumStoredQubitsNode(arg2,arg3);
+  {
+    npy_intp size[1] = {
+      -1 
+    };
+    array4 = obj_to_array_contiguous_allow_conversion(obj2,
+      NPY_FLOAT,
+      &is_new_object4);
+    if (!array4 || !require_dimensions(array4, 1) ||
+      !require_size(array4, size, 1)) SWIG_fail;
+    arg4 = (float*) array_data(array4);
+    arg5 = (int) array_size(array4,0);
+  }
+  result = (int)(arg1)->SimulateRetrieveNumStoredQubitsNode(arg2,arg3,arg4,arg5);
   resultobj = SWIG_From_int(static_cast< int >(result));
   {
     if (is_new_object2 && array2)
     {
       Py_DECREF(array2); 
+    }
+  }
+  {
+    if (is_new_object4 && array4)
+    {
+      Py_DECREF(array4); 
     }
   }
   return resultobj;
@@ -4222,6 +4245,12 @@ fail:
     if (is_new_object2 && array2)
     {
       Py_DECREF(array2); 
+    }
+  }
+  {
+    if (is_new_object4 && array4)
+    {
+      Py_DECREF(array4); 
     }
   }
   return NULL;

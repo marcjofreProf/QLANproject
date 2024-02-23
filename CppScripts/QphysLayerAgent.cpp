@@ -28,6 +28,10 @@ Agent script for Quantum Physical Layer
 #include <atomic>
 // time points
 #define WaitTimeToFutureTimePoint 199000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
+//Qubits
+#define NumQubitsMemoryBuffer 2048
+// MAthemtical calculations
+#include <cmath>
 
 using namespace exploringBB; // API to easily use GPIO in c++
 /* A Simple GPIO application
@@ -403,7 +407,6 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadSimulateReceiveQubit(){
-int SimulateNumStoredQubitsNodeAux=0;
 cout << "Simulate Receiving Qubits" << endl;
 
 //struct timespec requestHalfPeriod,requestQuarterPeriod,requestPeriod,requestWhileWait;
@@ -444,6 +447,8 @@ strcat(ParamsCharArray,"_"); // Final _
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
 PRUGPIO->ClearStoredQuBits();
+TimeTaggs[NumQubitsMemoryBuffer]={0}; // Clear the array
+ChannelTags[NumQubitsMemoryBuffer]={0}; // Clear the array
 this->release();
 usleep((int)(100*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to be able to send the above message
 /*
@@ -511,8 +516,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  */
 
 this->acquire();
-SimulateNumStoredQubitsNodeAux=PRUGPIO->RetrieveNumStoredQuBits();
-this->SimulateNumStoredQubitsNode[0]=SimulateNumStoredQubitsNodeAux;
+this->SimulateNumStoredQubitsNode[0]=PRUGPIO->RetrieveNumStoredQuBits(TimeTaggs,ChannelTags);
 //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
 // Tell the other node to clear the TimePoint (this avoids having a time point in the other node after having finished this one (because it was not ocnsumed)
 //ParamsCharArray[NumBytesPayloadBuffer] = {0};
@@ -524,11 +528,46 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::GetSimulateNumStoredQubitsNode(){
+int QPLA::GetSimulateNumStoredQubitsNode(float* TimeTaggsDetAnalytics){
 this->acquire();
 while(this->RunThreadSimulateReceiveQuBitFlag==false){this->release();usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
-
 int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Compute interesting analystics on the Timetaggs and deteciton so that not all data has to be transfered thorugh sockets
+// Param 0: Num detections channel 1
+// Param 1: Num detections channel 2
+// Param 2: Num detections channel 3
+// Param 3: Num detections channel 4
+// Param 4: Multidetection events
+// Param 5: Mean time difference between tags
+// Param 6: std time difference between tags
+for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
+if (ChannelTags[i]&0x0001==1){
+TimeTaggsDetAnalytics[0]=(float)TimeTaggsDetAnalytics[0]+1.0;
+}
+if ((ChannelTags[i]>>1)&0x0001==1){
+TimeTaggsDetAnalytics[1]=(float)TimeTaggsDetAnalytics[1]+1.0;
+}
+if ((ChannelTags[i]>>2)&0x0001==1){
+TimeTaggsDetAnalytics[2]=(float)TimeTaggsDetAnalytics[2]+1.0;
+}
+if ((ChannelTags[i]>>3)&0x0001==1){
+TimeTaggsDetAnalytics[3]=(float)TimeTaggsDetAnalytics[3]+1.0;
+}
+if ((ChannelTags[i]&0x0001+(ChannelTags[i]>>1)&0x0001+(ChannelTags[i]>>2)&0x0001+(ChannelTags[i]>>3)&0x0001)>1){
+TimeTaggsDetAnalytics[4]=(float)TimeTaggsDetAnalytics[4]+1.0;
+}
+if (i>0){
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(float)(TimeTaggs[i]-TimeTaggs[i-1]);
+}
+}
+if ((SimulateNumStoredQubitsNodeAux-1)>0){TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]/float(SimulateNumStoredQubitsNodeAux-1);}
+
+for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
+TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+pow((float)(TimeTaggs[i]-TimeTaggs[i-1])-TimeTaggsDetAnalytics[5],2);
+}
+if ((SimulateNumStoredQubitsNodeAux-1)>0){TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]/float(SimulateNumStoredQubitsNodeAux-1));}
+
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();
 

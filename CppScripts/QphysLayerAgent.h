@@ -42,12 +42,14 @@ namespace nsQphysLayerAgent {
 class QPLA {
 private: //Variables/Instances		
 	int numberLinks=0;// Number of full duplex links directly connected to this physical quantum node
-        int EmitLinkNumberArray[LinkNumberMAX]={60}; // Array indicating the GPIO numbers identifying the emit pins
-        int ReceiveLinkNumberArray[LinkNumberMAX]={48}; // Array indicating the GPIO numbers identifying the receive pins
-        float QuBitsPerSecondVelocity[LinkNumberMAX]={1000.0}; // Array indicating the qubits per second velocity of each emit/receive pair 
-        int QuBitsNanoSecPeriodInt[LinkNumberMAX]={1000000};
-        int QuBitsNanoSecHalfPeriodInt[LinkNumberMAX]={500000};
-        int QuBitsNanoSecQuarterPeriodInt[LinkNumberMAX]={250000};// Not exacte quarter period since it should be 2.5
+	unsigned long long int TimeTaggs[NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections
+	unsigned short int ChannelTags[NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs
+        //int EmitLinkNumberArray[LinkNumberMAX]={60}; // Array indicating the GPIO numbers identifying the emit pins
+        //int ReceiveLinkNumberArray[LinkNumberMAX]={48}; // Array indicating the GPIO numbers identifying the receive pins
+        float QuBitsPerSecondVelocity[LinkNumberMAX]={1000000.0}; // Array indicating the qubits per second velocity of each emit/receive pair 
+        //int QuBitsNanoSecPeriodInt[LinkNumberMAX]={1000000};
+        //int QuBitsNanoSecHalfPeriodInt[LinkNumberMAX]={500000};
+        //int QuBitsNanoSecQuarterPeriodInt[LinkNumberMAX]={250000};// Not exacte quarter period since it should be 2.5
         // Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	// Payload messages
@@ -55,8 +57,8 @@ private: //Variables/Instances
 	char PayloadSendBuffer[NumBytesPayloadBuffer]={0}; //Buffer to send payload messages
 	// GPIO
 	GPIO* PRUGPIO; // Object for handling PRU
-	GPIO* inGPIO; // Object for reading Qubits
-	GPIO* outGPIO; // Object for sending Qubits
+	//GPIO* inGPIO; // Slow (not used) Object for reading Qubits
+	//GPIO* outGPIO; // Slow (not used) Object for sending Qubits
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;//system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
@@ -86,7 +88,7 @@ public: // Functions/Methods
         // General Input and Output functions
 	int SimulateEmitQuBit();
 	int SimulateReceiveQuBit();
-	int GetSimulateNumStoredQubitsNode();
+	int GetSimulateNumStoredQubitsNode(float* TimeTaggsDetAnalytics);
 	~QPLA();  //destructor
 
 private: // Functions/Methods	

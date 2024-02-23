@@ -48,5 +48,5 @@ class QPLA:
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
 	
-	def SimulateRetrieveNumStoredQubitsNode(self,ParamsIntArray): # Supposing that node has received quBits, make use of them
-		self.QSLAagent.SimulateRetrieveNumStoredQubitsNode(ParamsIntArray)
+	def SimulateRetrieveNumStoredQubitsNode(self,ParamsIntArray,ParamsFloatArray): # Supposing that node has received quBits, make use of them
+		self.QSLAagent.SimulateRetrieveNumStoredQubitsNode(ParamsIntArray,ParamsFloatArray)

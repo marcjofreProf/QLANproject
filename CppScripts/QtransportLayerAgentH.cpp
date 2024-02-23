@@ -123,6 +123,18 @@ int QTLAH::countQintupleComas(char* ParamsCharArray) {
 
   return comasCount/5;
 }
+
+int QTLAH::countColons(char* ParamsCharArray) {
+  int colonCount = 0;
+
+  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+    if (ParamsCharArray[i] == ':') {
+      colonCount++;
+    }
+  }
+
+  return colonCount;
+}
 ////////////////////////////////////////////////////////
 int QTLAH::InitAgentProcess(){
 	// Then, regularly check for next job/action without blocking		  	
@@ -685,7 +697,18 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			}
 			else if (string(Command)==string("SimulateNumStoredQubitsNode")){// Expected/awaiting message
 				//cout << "We are here NumStoredQubitsNode" << endl;
-				this->SimulateNumStoredQubitsNodeParamsIntArray[0]=atoi(Payload);
+				int NumSubPayloads=this->countColons(Payload)-1;
+				char SubPayload[NumBytesBufferICPMAX] = {0};				
+				for (int i=0;i<NumSubPayloads;i++){					
+					if (i==0){
+						strcpy(SubPayload,strtok(Payload,":"));
+						this->SimulateNumStoredQubitsNodeParamsIntArray[0]=atoi(SubPayload);
+					}
+					else{
+						strcpy(SubPayload,strtok(NULL,":"));
+						this->TimeTaggsDetAnalytics[i-1]=stof(SubPayload);
+					}
+				}
 				this->InfoSimulateNumStoredQubitsNodeFlag=true;				
 			}					
 			else{
@@ -785,7 +808,7 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
     return 0; //All OK
 }
 
-int QTLAH::SimulateRetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray){ // Send to the upper layer agent how many qubits are stored
+int QTLAH::SimulateRetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray,float* ParamsFloatArray,int nFloatarray){ // Send to the upper layer agent how many qubits are stored
 
 try{
 this->acquire();
@@ -844,6 +867,7 @@ this->acquire();
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
 		this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 		ParamsIntArray[0]=this->SimulateNumStoredQubitsNodeParamsIntArray[0];
+		ParamsFloatArray=this->TimeTaggsDetAnalytics;
 		this->release();			
 		isValidWhileLoopCount=0;
 	}
