@@ -541,9 +541,10 @@ int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 // Param 4: Multidetection events
 // Param 5: Mean time difference between tags
 // Param 6: std time difference between tags
-cout << "TimeTaggs: "<< TimeTaggs << endl;
-cout << "ChannelTags: "<< ChannelTags << endl;
+
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
+cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
+cout << "ChannelTags[i]: "<< ChannelTags[i] << endl;
 if (ChannelTags[i]&0x0001==1){
 TimeTaggsDetAnalytics[0]=(float)TimeTaggsDetAnalytics[0]+1.0;
 }
