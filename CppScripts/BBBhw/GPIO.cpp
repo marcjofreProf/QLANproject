@@ -324,12 +324,12 @@ for (x=0; x<NumRecords; x++){
 	valp=valp+2;// 2 times 16 bits
 	// Mount the extended counter value
 	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
-	//if (x==0 or x== 512 or x==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
+	if (x==0 or x== 512 or x==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
 	// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
 	valBitsInterest=*valp;
 	//if (x==0 or x== 512 or x==1023){cout << "val: " << std::bitset<16>(val) << endl;}
 	//valBitsInterest=this->packBits(val); // we're just interested in 4 bits
-	//if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}
+	if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}
 	valp=valp+1;// 1 times 16 bits
 	//fprintf(outfile, "%d\n", val);
 	streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
