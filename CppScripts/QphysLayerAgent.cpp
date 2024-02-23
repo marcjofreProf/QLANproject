@@ -568,6 +568,14 @@ TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+pow((float)(TimeTaggs[i]-TimeT
 }
 if ((SimulateNumStoredQubitsNodeAux-1)>0){TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]/float(SimulateNumStoredQubitsNodeAux-1));}
 
+cout << "TimeTaggsDetAnalytics[0]: " << TimeTaggsDetAnalytics[0] << endl;
+cout << "TimeTaggsDetAnalytics[1]: " << TimeTaggsDetAnalytics[1] << endl;
+cout << "TimeTaggsDetAnalytics[2]: " << TimeTaggsDetAnalytics[2] << endl;
+cout << "TimeTaggsDetAnalytics[3]: " << TimeTaggsDetAnalytics[3] << endl;
+cout << "TimeTaggsDetAnalytics[4]: " << TimeTaggsDetAnalytics[4] << endl;
+cout << "TimeTaggsDetAnalytics[5]: " << TimeTaggsDetAnalytics[5] << endl;
+cout << "TimeTaggsDetAnalytics[6]: " << TimeTaggsDetAnalytics[6] << endl;
+
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();
 

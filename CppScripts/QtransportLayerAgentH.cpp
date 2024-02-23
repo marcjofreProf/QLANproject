@@ -703,10 +703,12 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 					if (i==0){
 						strcpy(SubPayload,strtok(Payload,":"));
 						this->SimulateNumStoredQubitsNodeParamsIntArray[0]=atoi(SubPayload);
+						cout << "atoi(SubPayload): " << atoi(SubPayload) << endl;
 					}
 					else{
 						strcpy(SubPayload,strtok(NULL,":"));
 						this->TimeTaggsDetAnalytics[i-1]=stof(SubPayload);
+						cout << "stof(SubPayload): " << stof(SubPayload) << endl;
 					}
 				}
 				cout << "TimeTaggsDetAnalytics: " << this->TimeTaggsDetAnalytics << endl;
