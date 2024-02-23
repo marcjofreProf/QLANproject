@@ -323,11 +323,11 @@ for (x=0; x<NumRecords; x++){
 	//if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}
 	valp=valp+1;// 1 times 16 bits
 	//fprintf(outfile, "%d\n", val);
+	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	streamDDRpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
 	streamDDRpru.write(reinterpret_cast<const char*>(&valBitsInterest), sizeof(valBitsInterest));
 	//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
 }
-streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 
 //cout << "sharedMem_int: " << sharedMem_int << endl;
 
@@ -370,18 +370,18 @@ else{
 int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned short int* ChannelTags){
 if (streamDDRpru.is_open()){
 	streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
-	string StrLine;
 	int lineCount = 0;
 	unsigned long long int ValueReadTest;
+	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
         while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
 	        TimeTaggs[lineCount]=ValueReadTest; 
     	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
     	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
     	    //cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
-    	    lineCount++; // Increment line count for each line read    	    
+    	    lineCount++; // Increment line count for each line read
+    	    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
     	    }
-        streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	return lineCount;
+        return lineCount;
 }
 else{
 cout << "RetrieveNumStoredQuBits: BBB streamDDRpru is not open!" << endl;
