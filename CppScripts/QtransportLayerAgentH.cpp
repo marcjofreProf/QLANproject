@@ -697,7 +697,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			}
 			else if (string(Command)==string("SimulateNumStoredQubitsNode")){// Expected/awaiting message
 				//cout << "We are here NumStoredQubitsNode" << endl;
-				int NumSubPayloads=this->countColons(Payload)-1;
+				int NumSubPayloads=this->countColons(Payload);
 				char SubPayload[NumBytesBufferICPMAX] = {0};				
 				for (int i=0;i<NumSubPayloads;i++){					
 					if (i==0){
@@ -711,7 +711,6 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 						cout << "stof(SubPayload): " << stof(SubPayload) << endl;
 					}
 				}
-				cout << "TimeTaggsDetAnalytics: " << this->TimeTaggsDetAnalytics << endl;
 				this->InfoSimulateNumStoredQubitsNodeFlag=true;				
 			}					
 			else{
@@ -870,7 +869,13 @@ this->acquire();
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
 		this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 		ParamsIntArray[0]=this->SimulateNumStoredQubitsNodeParamsIntArray[0];
-		ParamsFloatArray=this->TimeTaggsDetAnalytics;
+		ParamsFloatArray[0]=this->TimeTaggsDetAnalytics[0];
+		ParamsFloatArray[1]=this->TimeTaggsDetAnalytics[1];
+		ParamsFloatArray[2]=this->TimeTaggsDetAnalytics[2];
+		ParamsFloatArray[3]=this->TimeTaggsDetAnalytics[3];
+		ParamsFloatArray[4]=this->TimeTaggsDetAnalytics[4];
+		ParamsFloatArray[5]=this->TimeTaggsDetAnalytics[5];
+		ParamsFloatArray[6]=this->TimeTaggsDetAnalytics[6];
 		this->release();			
 		isValidWhileLoopCount=0;
 	}

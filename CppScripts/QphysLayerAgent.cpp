@@ -554,19 +554,19 @@ TimeTaggsDetAnalytics[2]=(float)TimeTaggsDetAnalytics[2]+1.0;
 if ((ChannelTags[i]>>3)&0x0001==1){
 TimeTaggsDetAnalytics[3]=(float)TimeTaggsDetAnalytics[3]+1.0;
 }
-if ((ChannelTags[i]&0x0001+(ChannelTags[i]>>1)&0x0001+(ChannelTags[i]>>2)&0x0001+(ChannelTags[i]>>3)&0x0001)>1){
+if (((float)(ChannelTags[i]&0x0001)+(float)((ChannelTags[i]>>1)&0x0001)+(float)((ChannelTags[i]>>2)&0x0001)+(float)((ChannelTags[i]>>3)&0x0001))>1.0){
 TimeTaggsDetAnalytics[4]=(float)TimeTaggsDetAnalytics[4]+1.0;
 }
 if (i>0){
 TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(float)(TimeTaggs[i]-TimeTaggs[i-1]);
 }
 }
-if ((SimulateNumStoredQubitsNodeAux-1)>0){TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]/float(SimulateNumStoredQubitsNodeAux-1);}
+if ((SimulateNumStoredQubitsNodeAux-1)>0){TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]/((float)(SimulateNumStoredQubitsNodeAux-1));}
 
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
 TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+pow((float)(TimeTaggs[i]-TimeTaggs[i-1])-TimeTaggsDetAnalytics[5],2);
 }
-if ((SimulateNumStoredQubitsNodeAux-1)>0){TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]/float(SimulateNumStoredQubitsNodeAux-1));}
+if ((SimulateNumStoredQubitsNodeAux-1)>0){TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]/((float)(SimulateNumStoredQubitsNodeAux-1)));}
 
 cout << "TimeTaggsDetAnalytics[0]: " << TimeTaggsDetAnalytics[0] << endl;
 cout << "TimeTaggsDetAnalytics[1]: " << TimeTaggsDetAnalytics[1] << endl;
