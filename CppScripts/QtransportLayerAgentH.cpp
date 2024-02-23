@@ -820,7 +820,7 @@ int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node
 
 //int SockListenTimeusec=9999; // negative means infinite time
 
-int isValidWhileLoopCount = 1000; // Number of tries
+int isValidWhileLoopCount = 10; // Number of tries
 
 //usleep(999999);
 /*
