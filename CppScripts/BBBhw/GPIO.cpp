@@ -325,6 +325,7 @@ for (x=0; x<NumRecords; x++){
 	//fprintf(outfile, "%d\n", val);
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	streamDDRpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
+	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	streamDDRpru.write(reinterpret_cast<const char*>(&valBitsInterest), sizeof(valBitsInterest));
 	//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
 }
@@ -375,6 +376,7 @@ if (streamDDRpru.is_open()){
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
         while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
 	        TimeTaggs[lineCount]=ValueReadTest; 
+	        streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
     	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
     	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
     	    //cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
