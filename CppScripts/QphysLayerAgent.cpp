@@ -575,15 +575,15 @@ cout << "TimeTaggs[i-1]: " << TimeTaggs[i-1] << endl;
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
 if (i>0){TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*pow((float)(TimeTaggs[i]-TimeTaggs[i-1])-TimeTaggsDetAnalytics[5],2.0);}
 }
+TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
-
-//cout << "TimeTaggsDetAnalytics[0]: " << TimeTaggsDetAnalytics[0] << endl;
-//cout << "TimeTaggsDetAnalytics[1]: " << TimeTaggsDetAnalytics[1] << endl;
-//cout << "TimeTaggsDetAnalytics[2]: " << TimeTaggsDetAnalytics[2] << endl;
-//cout << "TimeTaggsDetAnalytics[3]: " << TimeTaggsDetAnalytics[3] << endl;
-//cout << "TimeTaggsDetAnalytics[4]: " << TimeTaggsDetAnalytics[4] << endl;
-//cout << "TimeTaggsDetAnalytics[5]: " << TimeTaggsDetAnalytics[5] << endl;
-//cout << "TimeTaggsDetAnalytics[6]: " << TimeTaggsDetAnalytics[6] << endl;
+cout << "TimeTaggsDetAnalytics[0]: " << TimeTaggsDetAnalytics[0] << endl;
+cout << "TimeTaggsDetAnalytics[1]: " << TimeTaggsDetAnalytics[1] << endl;
+cout << "TimeTaggsDetAnalytics[2]: " << TimeTaggsDetAnalytics[2] << endl;
+cout << "TimeTaggsDetAnalytics[3]: " << TimeTaggsDetAnalytics[3] << endl;
+cout << "TimeTaggsDetAnalytics[4]: " << TimeTaggsDetAnalytics[4] << endl;
+cout << "TimeTaggsDetAnalytics[5]: " << TimeTaggsDetAnalytics[5] << endl;
+cout << "TimeTaggsDetAnalytics[6]: " << TimeTaggsDetAnalytics[6] << endl;
 
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();
