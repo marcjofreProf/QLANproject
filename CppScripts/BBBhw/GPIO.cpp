@@ -378,6 +378,8 @@ if (streamDDRpru.is_open()){
             streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
             std::istringstream iss(StrLine); // Use the line as a source for the istringstream
     	    iss >> TimeTaggs[iIter] >> ChannelTags[iIter];
+    	    cout << "TimeTaggs[iIter]: " << TimeTaggs[iIter] << endl;
+    	    cout << "ChannelTags[iIter]: " << ChannelTags[iIter] << endl;
     	    }
         streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	return lineCount;
