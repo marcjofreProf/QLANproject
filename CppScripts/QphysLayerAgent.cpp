@@ -353,7 +353,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch ba
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  
  cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
- PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of 1024
+ PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of 2048
  
  /* Very slow GPIO BBB not used anymore
  // Basic Output - Generate a pulse of 1 second period
@@ -483,7 +483,7 @@ cout << "Start Receiving Qubits" << endl;// This line should be commented to red
 // Start measuring
  //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
  
- PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of 1024 qubit timetags
+ PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of 2048 qubit timetags
  // Basic Input 
  /* Very slow GPIO BBB not used anymore
  ////clock_nanosleep(CLOCK_REALTIME,0,&requestQuarterPeriod,NULL);
@@ -542,22 +542,25 @@ int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 // Param 5: Mean time difference between tags
 // Param 6: std time difference between tags
 
+// Check that we now exceed the QuBits buffer size
+if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
+
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 //cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
 //cout << "ChannelTags[i]: "<< ChannelTags[i] << endl;
-if (ChannelTags[i]&0x0001==1){
+if (ChannelTags[i]&0x01==1){
 TimeTaggsDetAnalytics[0]=(float)TimeTaggsDetAnalytics[0]+1.0;
 }
-if ((ChannelTags[i]>>1)&0x0001==1){
+if ((ChannelTags[i]>>1)&0x01==1){
 TimeTaggsDetAnalytics[1]=(float)TimeTaggsDetAnalytics[1]+1.0;
 }
-if ((ChannelTags[i]>>2)&0x0001==1){
+if ((ChannelTags[i]>>2)&0x01==1){
 TimeTaggsDetAnalytics[2]=(float)TimeTaggsDetAnalytics[2]+1.0;
 }
-if ((ChannelTags[i]>>3)&0x0001==1){
+if ((ChannelTags[i]>>3)&0x01==1){
 TimeTaggsDetAnalytics[3]=(float)TimeTaggsDetAnalytics[3]+1.0;
 }
-if (((float)(ChannelTags[i]&0x0001)+(float)((ChannelTags[i]>>1)&0x0001)+(float)((ChannelTags[i]>>2)&0x0001)+(float)((ChannelTags[i]>>3)&0x0001))>1.0){
+if (((float)(ChannelTags[i]&0x01)+(float)((ChannelTags[i]>>1)&0x01)+(float)((ChannelTags[i]>>2)&0x01)+(float)((ChannelTags[i]>>3)&0x01))>1.0){
 TimeTaggsDetAnalytics[4]=(float)TimeTaggsDetAnalytics[4]+1.0;
 }
 if (i>1){

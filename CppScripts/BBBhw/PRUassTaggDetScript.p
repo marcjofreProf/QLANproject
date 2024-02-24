@@ -10,7 +10,7 @@
 #define MASKevents 0x0F // P9_28-31, which corresponds to r31 bits 0,1,2,3
 
 // Length of acquisition:
-#define RECORDS 1024 // 1024 readings and it matches in the host c++ script
+#define RECORDS 2048 // readings and it matches in the host c++ script
 #define MAX_VALUE_BEFORE_RESETmostsigByte 0x80 // 128 in decimal
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
@@ -130,6 +130,9 @@ CMDLOOP:
 	ZERO	&r1, 4 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 //	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	// Here include once the overflow register
+	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address offset at r1
+	ADD 	r1, r1, 4 // increment address by 4 bytes
 		
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register, say R0
@@ -143,16 +146,13 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Proceed with the rest of the program
 
 TIMETAG:
-	// Time part
+	// Time counter part
 	LBBO	r5, r6, 0xC, 4 // r5 maps the value of DWT_CYCCNT
-	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address at r1.
-	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved
-	// Here include the overflow register
-	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address at r1
-	ADD 	r1, r1, 4 // increment address by 4 bytes // This can be improved	
+	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address offset at r1.
+	ADD 	r1, r1, 4 // increment address by 4 bytes		
 	// Channels detection
-	SBCO 	r0.w0, CONST_PRUSHAREDRAM, r1, 2 // Put contents of r0 into the address at r1
-	ADD 	r1, r1, 2 // increment address by 2 bytes // This can be improved	
+	SBCO 	r0.b0, CONST_PRUSHAREDRAM, r1, 1 // Put contents of r0.b0 into the address offset at r1
+	ADD 	r1, r1, 1 // increment address by 1 bytes	
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished

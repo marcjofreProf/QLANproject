@@ -43,7 +43,7 @@ class QPLA {
 private: //Variables/Instances		
 	int numberLinks=0;// Number of full duplex links directly connected to this physical quantum node
 	unsigned long long int TimeTaggs[NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections
-	unsigned short int ChannelTags[NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs
+	unsigned char ChannelTags[NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs
         //int EmitLinkNumberArray[LinkNumberMAX]={60}; // Array indicating the GPIO numbers identifying the emit pins
         //int ReceiveLinkNumberArray[LinkNumberMAX]={48}; // Array indicating the GPIO numbers identifying the receive pins
         float QuBitsPerSecondVelocity[LinkNumberMAX]={1000000.0}; // Array indicating the qubits per second velocity of each emit/receive pair 

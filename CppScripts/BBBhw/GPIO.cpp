@@ -160,7 +160,7 @@ int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 //char fname_new[255];     
 //DDR_paramaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 8;
 //DDR_ackaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 4;
-int WaitTimeToFutureTimePoint=500;
+int WaitTimeToFutureTimePoint=5000; // The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s.
 
 TimePoint TimePointClockNow=Clock::now();
 auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
@@ -202,7 +202,7 @@ else{CheckTimeFlag=false;}
 		//prussdrv_pru_disable(PRU_Operation_NUM);// Disable the PRU
 		//prussdrv_pru_enable(PRU_Operation_NUM);// Enable the PRU from 0
 		//prussdrv_pru_reset(PRU_Operation_NUM);
-		cout << "GPIO::ReadTimeStamps took to much time the TimeTagg. Reset PRUO if necessari." << endl;
+		cout << "GPIO::ReadTimeStamps took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessari." << endl;
 		fin=true;
 	}
 } while(!fin);
@@ -290,38 +290,43 @@ int GPIO::DDRdumpdata(){
 int x;
 //unsigned char tv;
 
-unsigned short int* valp; // 16 bits
+unsigned char* valp; // 8 bits
 unsigned int valCycleCountPRU; // 32 bits // Made relative to each acquition run
 unsigned int valOverflowCycleCountPRU; // 32 bits
 unsigned long long int extendedCounterPRU; // 64 bits
 unsigned long long int auxUnskewingFactor=6; // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits
-//unsigned short int val; // 16 bits
-unsigned short int valBitsInterest; // 16 bits
+//unsigned char val; // 8 bits
+unsigned char valBitsInterest; // 8 bits
 //unsigned char rgb24[4];
 //unsigned char v1, v2;
 //rgb24[3]=0;
 
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
-valp=(unsigned short int*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
-unsigned int NumRecords=1024; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 12KB=12×1024bytes=12×1024×8bits=98304bits; maybe a max of 1200 is safe (since each capture takes 80 bits)
+valp=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
+//for each capture bursts, at the beggining is stored the overflow counter of 32 bits. From there, each capture consists of 32 bits of the DWT_CYCCNT register and 8 bits of the channels detected (40 bits per detection tag).
+// The shared memory space has 12KB=12×1024bytes=12×1024×8bits=98304bits.
+//Doing numbers, we can store up to 2456 captures. To be in the safe side, we can do 2048 captures
+
+unsigned int NumRecords=2048; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 
+
+// First 32 bits is the overflow register for DWT_CYCCNT
+valOverflowCycleCountPRU=*valp-0x00000001;//Account that it starts with a 1 offset
+//if (x==0 or x== 512 or x==1023){cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;}
+valp=valp+4;// 4 times 8 bits
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
 	valCycleCountPRU=*valp;
 	//if (x==0 or x== 512 or x==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
-	valp=valp+2;// 2 times 16 bits
-	// Second 32 bits is the overflow register for DWT_CYCCNT
-	valOverflowCycleCountPRU=*valp-1;//Account that it starts with a 1 offset
-	//if (x==0 or x== 512 or x==1023){cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;}
-	valp=valp+2;// 2 times 16 bits
+	valp=valp+4;// 4 times 8 bits	
 	// Mount the extended counter value
 	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 	//if (x==0 or x== 512 or x==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
 	// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
 	valBitsInterest=*valp;
-	//if (x==0 or x== 512 or x==1023){cout << "val: " << std::bitset<16>(val) << endl;}
+	//if (x==0 or x== 512 or x==1023){cout << "val: " << std::bitset<8>(val) << endl;}
 	//valBitsInterest=this->packBits(val); // we're just interested in 4 bits
 	//if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}
-	valp=valp+1;// 1 times 16 bits
+	valp=valp+1;// 1 times 8 bits
 	//fprintf(outfile, "%d\n", val);
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	streamDDRpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
@@ -336,12 +341,12 @@ return 0; // all ok
 }
 
 // Function to pack bits 1, 2, 3, and 5 of an unsigned int into a single byte
-unsigned short int GPIO::packBits(unsigned short int value) {
+unsigned char GPIO::packBits(unsigned char value) {
     // Isolate bits 1, 2, 3, and 5 and shift them to their new positions
-    unsigned short int bit1 = (value >> 1) & 0x0001; // Bit 0 stays in position 0
-    unsigned short int bit2 = (value >> 1) & 0x0002; // Bit 2 shifts to position 1
-    unsigned short int bit3 = (value >> 1) & 0x0004; // Bit 3 shifts to position 2
-    unsigned short int bit5 = (value >> 2) & 0x0008; // Bit 5 shifts to position 3, skipping the original position of bit 4
+    unsigned char bit1 = (value >> 1) & 0x01; // Bit 0 stays in position 0
+    unsigned char bit2 = (value >> 1) & 0x02; // Bit 2 shifts to position 1
+    unsigned char bit3 = (value >> 1) & 0x04; // Bit 3 shifts to position 2
+    unsigned char bit5 = (value >> 2) & 0x08; // Bit 5 shifts to position 3, skipping the original position of bit 4
 
     // Combine the bits into a single byte
     return bit1 | bit2 | bit3 | bit5;
@@ -369,7 +374,7 @@ else{
 }
 }
 
-int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned short int* ChannelTags){
+int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags){
 if (streamDDRpru.is_open()){
 	streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
 	int lineCount = 0;
