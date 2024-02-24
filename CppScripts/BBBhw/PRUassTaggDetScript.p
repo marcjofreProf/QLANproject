@@ -71,7 +71,7 @@ INITIATIONS:// This is only run once
 	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
 	
 	//// Make c30_pointer point to the PRU control registers
-	MOV	r0, 0x260//PRU0_CTRL
+	MOV	r0, 0x2200//PRU0_CTRL
 	MOV	r10, 0x22000+0x2C// //CONST_PRUCTRLREG
 	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUCTRLREG, 0, 4
 	//SBCO	r0, CONST_PRUCTRLREG, 0, 4
