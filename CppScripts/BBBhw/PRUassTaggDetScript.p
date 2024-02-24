@@ -71,9 +71,9 @@ INITIATIONS:// This is only run once
 	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
 	
 	//// Make c30_pointer point to the PRU control registers
-	//MOV	r0, 0x220//PRU0_CTRL
-	//MOV	r10, 0x24000+0x2C// //CONST_PRUCTRLREG
-	//SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUCTRLREG, 0, 4
+	MOV	r0, 0x260//PRU0_CTRL
+	MOV	r10, 0x24000+0x2C// //CONST_PRUCTRLREG
+	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUCTRLREG, 0, 4
 	//SBCO	r0, CONST_PRUCTRLREG, 0, 4
 	//MOV 	r6, 0x22000
 
@@ -98,9 +98,9 @@ INITIATIONS:// This is only run once
 //	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 //	CLR	r2.t3
 //	SBBO	r2, r6, 0, 4 // stops DWT_CYCCNT
-	LBCO	r2, CONST_PRUCFG, 0, 1 // r2 maps b0 control register
+	LBCO	r2, CONST_PRUCTRLREG, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
-	SBCO	r2, CONST_PRUCFG, 0, 1 // Enables DWT_CYCCNT
+	SBCO	r2, CONST_PRUCTRLREG, 0, 1 // Enables DWT_CYCCNT
 	// Initializations for faster execution
 	ZERO	&r7, 4 //MOV	r7, 0 // Register for clearing other registers
 	LDI	r8, 1
@@ -119,7 +119,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 //	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
 //	SET	r2.t3
 //	SBBO	r2, r6, 0, 4 // Restarts DWT_CYCCNT
-	SBCO	r7, CONST_PRUCFG, r11, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SBCO	r7, CONST_PRUCTRLREG, r11, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
 	ADD	r3, r3, r8    // Increment overflow counter. Account that we lose 1 cycle count
 
@@ -128,7 +128,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	LBCO	r5, CONST_PRUCFG, r11, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 1 cycle count here
+	LBCO	r5, CONST_PRUCTRLREG, r11, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 1 cycle count here
 	QBLT	RESET_CYCLECNT, r5.b3, r12.b0 // If MAX_VALUE_BEFORE_RESETmostsigByte < r5.b3, go to RESET_CYCLECNT. Account that we lose 2 cycle counts
 
 CMDLOOP:
@@ -159,7 +159,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 
 TIMETAG:
 	// Time counter part
-	LBCO	r5, CONST_PRUCFG, r11, 4 // r5 maps the value of DWT_CYCCNT
+	LBCO	r5, CONST_PRUCTRLREG, r11, 4 // r5 maps the value of DWT_CYCCNT
 	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address offset at r1.
 	ADD 	r1, r1, r9 // increment address by 4 bytes		
 	// Channels detection
