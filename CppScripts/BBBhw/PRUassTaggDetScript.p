@@ -154,11 +154,11 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 
 TIMETAG:
 	// Time counter part
-	LBBO	r5, r6, r11, r9 // r5 maps the value of DWT_CYCCNT
-	SBCO 	r5, CONST_PRUSHAREDRAM, r1, r9 // Put contents of DWT_CYCCNT into the address offset at r1.
+	LBBO	r5, r6, r11, 4 // r5 maps the value of DWT_CYCCNT
+	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address offset at r1.
 	ADD 	r1, r1, r9 // increment address by 4 bytes		
 	// Channels detection
-	SBCO 	r0.b0, CONST_PRUSHAREDRAM, r1, r8 // Put contents of r0.b0 into the address offset at r1
+	SBCO 	r0.b0, CONST_PRUSHAREDRAM, r1, 1 // Put contents of r0.b0 into the address offset at r1
 	ADD 	r1, r1, r8 // increment address by 1 bytes	
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, r8
