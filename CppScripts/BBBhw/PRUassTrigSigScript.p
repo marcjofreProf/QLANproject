@@ -132,14 +132,14 @@ CMDLOOP:
 	//LED_ON
 	MOV	r3, NUM_REPETITIONS// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
 SIGNALON:	
-	LDI	r30.b0, r1.b0	// Faster exectuion	MOV	r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
+	LDI	r30.w0, r1.w0	// Faster exectuion	MOV	r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
 	SUB	r3, r3, 1	// Substract 1 count cycle
 //	MOV	r0, DELAY
 //DELAYON:
 //	SUB 	r0, r0, 1
 //	QBNE	DELAYON, r0, 0
 SIGNALOFF:
-	LDI	r30.b0, r2.b0	// Faster execution with LDI. MOV	r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
+	LDI	r30.w0, r2.w0	// Faster execution with LDI. MOV	r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
 	QBNE	SIGNALON, r3, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
 //	MOV	r0, DELAY
 //DELAYOFF:
