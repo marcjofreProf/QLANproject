@@ -320,7 +320,7 @@ valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*
 valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts with a 1 offset
 //if (x==0 or x== 512 or x==1023){cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;}
-
+streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
 	valCycleCountPRU=static_cast<unsigned int>(*valp);
@@ -342,9 +342,9 @@ for (x=0; x<NumRecords; x++){
 	//valBitsInterest=this->packBits(val); // we're just interested in 4 bits
 	//if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}	
 	//fprintf(outfile, "%d\n", val);
-	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	streamDDRpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
-	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	streamDDRpru.write(reinterpret_cast<const char*>(&valBitsInterest), sizeof(valBitsInterest));
 	//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
 }
@@ -401,7 +401,7 @@ if (streamDDRpru.is_open()){
     	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
     	    //cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
     	    lineCount++; // Increment line count for each line read
-    	    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
+    	    //streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
     	    }
         return lineCount;
 }
