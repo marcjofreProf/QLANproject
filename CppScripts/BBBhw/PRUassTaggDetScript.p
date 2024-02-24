@@ -36,12 +36,12 @@
 // r3 reserved for overflow DWT_CYCCNT counter
 // r4 reserved for holding the RECORDS (re-loaded at each iteration)
 // r5 reserved for holding the DWT_CYCCNT count value
-// r6 reserved Control register
+// r6 reserved Control register offset 0x2000 value
 // r7 reserved for 0 value (zeroing registers)
 // For faster execution
 // r8 reserved for 1 value
 // r9 reserved for 4 value
-// r11 reserved for 0xC value
+// r11 reserved for 0x200C value
 // r12 reserved for MAX_VALUE_BEFORE_RESETmostsigByte value
 // r13 reserved for MASKevents value
 // r14 reserved for RECORDS value
@@ -70,13 +70,6 @@ INITIATIONS:// This is only run once
 	MOV	r10, 0x22000+0x28//PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
 	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
 	
-	//// Make c30_pointer point to the PRU control registers
-	//MOV	r0, 0x2200//PRU0_CTRL
-	//MOV	r10, 0x22000+0x2C// //CONST_PRUCTRLREG
-	//SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUCTRLREG, 0, 4
-	//SBCO	r0, CONST_PRUCTRLREG, 0, 4
-	//MOV 	r6, 0x22000
-
 //	// Configure the programmable pointer register for PRU by setting c31_pointer[15:0] // related to ddr.
 //	// This will make C31 point to 0x80001000 (DDR memory). 0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
 //	https://groups.google.com/g/beagleboard/c/ukEEblzz9Gk
