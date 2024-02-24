@@ -291,12 +291,12 @@ int x;
 //unsigned char tv;
 
 unsigned char* valp; // 8 bits
-unsigned int valCycleCountPRU; // 32 bits // Made relative to each acquition run
-unsigned int valOverflowCycleCountPRU; // 32 bits
-unsigned long long int extendedCounterPRU; // 64 bits
+unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquition run
+unsigned int valOverflowCycleCountPRU=0; // 32 bits
+unsigned long long int extendedCounterPRU=0; // 64 bits
 unsigned long long int auxUnskewingFactor=6; // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits
 //unsigned char val; // 8 bits
-unsigned char valBitsInterest; // 8 bits
+unsigned char valBitsInterest=0; // 8 bits
 //unsigned char rgb24[4];
 //unsigned char v1, v2;
 //rgb24[3]=0;
@@ -310,23 +310,37 @@ valp=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED 
 unsigned int NumRecords=2048; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 
 
 // First 32 bits is the overflow register for DWT_CYCCNT
-valOverflowCycleCountPRU=*valp-0x00000001;//Account that it starts with a 1 offset
+valOverflowCycleCountPRU=static_cast<unsigned int>(*valp);
+valp++;// 1 times 8 bits
+valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*valp))<<8;
+valp++;// 1 times 8 bits
+valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
+valp++;// 1 times 8 bits
+valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
+valp++;// 1 times 8 bits
+valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts with a 1 offset
 //if (x==0 or x== 512 or x==1023){cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;}
-valp=valp+4;// 4 times 8 bits
+
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
-	valCycleCountPRU=*valp;
+	valCycleCountPRU=static_cast<unsigned int>(*valp);
+	valp++;// 1 times 8 bits
+	valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<8;
+	valp++;// 1 times 8 bits
+	valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
+	valp++;// 1 times 8 bits
+	valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
+	valp++;// 1 times 8 bits
 	//if (x==0 or x== 512 or x==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
-	valp=valp+4;// 4 times 8 bits	
 	// Mount the extended counter value
 	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 	//if (x==0 or x== 512 or x==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
 	// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
-	valBitsInterest=*valp;
+	valBitsInterest=static_cast<unsigned char>(*valp);
+	valp++;// 1 times 8 bits
 	//if (x==0 or x== 512 or x==1023){cout << "val: " << std::bitset<8>(val) << endl;}
 	//valBitsInterest=this->packBits(val); // we're just interested in 4 bits
-	//if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}
-	valp=valp+1;// 1 times 8 bits
+	//if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}	
 	//fprintf(outfile, "%d\n", val);
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	streamDDRpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
