@@ -37,8 +37,11 @@
 // r4 reserved for holding the RECORDS (re-loaded at each iteration)
 // r5 reserved for holding the DWT_CYCCNT count value
 // r6 reserved Control register
-// r7 reserved for zeroing registers
-
+// r7 reserved for 0 value (zeroing registers)
+// For faster execution
+// r8 reserved for 1 value
+// r9 reserved for 4 value
+// r11 reserved for 0xC value
 // r10 is arbitrary used for operations
 
 // r28 is mainly used for LED indicators operations
@@ -95,7 +98,11 @@ INITIATIONS:// This is only run once
 	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r6, 0, 1 // Restarts DWT_CYCCNT
+	// Initializations for faster execution
 	ZERO	&r7, 4 //MOV	r7, 0 // Register for clearing other registers
+	LDI	r8, 1
+	LDI	r9, 4
+	LDI	r11, 0xC
 
 RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	// The below could be optimized - then change the skew number in c++ code
@@ -141,21 +148,21 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
 	AND 	r0.b0, r0.b0, MASKevents // Interested specifically to the bits with MASKevents
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
-	QBEQ 	WAIT_FOR_EVENT, r0.b0, 0
+	QBEQ 	WAIT_FOR_EVENT, r0.b0, r7
 	// If the program reaches this point, at least one of the bits is high
 	// Proceed with the rest of the program
 
 TIMETAG:
 	// Time counter part
-	LBBO	r5, r6, 0xC, 4 // r5 maps the value of DWT_CYCCNT
-	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address offset at r1.
-	ADD 	r1, r1, 4 // increment address by 4 bytes		
+	LBBO	r5, r6, r11, r9 // r5 maps the value of DWT_CYCCNT
+	SBCO 	r5, CONST_PRUSHAREDRAM, r1, r9 // Put contents of DWT_CYCCNT into the address offset at r1.
+	ADD 	r1, r1, r9 // increment address by 4 bytes		
 	// Channels detection
-	SBCO 	r0.b0, CONST_PRUSHAREDRAM, r1, 1 // Put contents of r0.b0 into the address offset at r1
-	ADD 	r1, r1, 1 // increment address by 1 bytes	
+	SBCO 	r0.b0, CONST_PRUSHAREDRAM, r1, r8 // Put contents of r0.b0 into the address offset at r1
+	ADD 	r1, r1, r8 // increment address by 1 bytes	
 	// Check to see if we still need to read more data
-	SUB 	r4, r4, 1
-	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
+	SUB 	r4, r4, r8
+	QBNE 	WAIT_FOR_EVENT, r4, r7 // loop if we've not finished
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	// we're done. Signal to the application	
 	MOV 	r0, 1
