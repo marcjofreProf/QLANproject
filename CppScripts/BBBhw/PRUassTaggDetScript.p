@@ -120,7 +120,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 //	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
 //	SET	r2.t3
 //	SBBO	r2, r6, 0, 4 // Restarts DWT_CYCCNT
-	SBCO	r7, CONST_PRUCTRLREG, r6, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SBCO	r7, CONST_PRUCTRLREG, r11, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
 	ADD	r3, r3, r8    // Increment overflow counter. Account that we lose 1 cycle count
 
