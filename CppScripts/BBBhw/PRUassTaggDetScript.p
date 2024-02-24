@@ -93,14 +93,7 @@ INITIATIONS:// This is only run once
 //	LED_OFF	// just for signaling initiations
 	
 	ZERO	&r3, 4 //MOV	r3, 0  // Initialize overflow counter in r3	
-//	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter
-	// Initial Re-initialization of DWT_CYCCNT
-//	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
-//	CLR	r2.t3
-//	SBBO	r2, r6, 0, 4 // stops DWT_CYCCNT
-	LBCO	r2, CONST_PRUCTRLREG,r6, 1 // r2 maps b0 control register
-	SET	r2.t3
-	SBCO	r2, CONST_PRUCTRLREG, r6, 1 // Enables DWT_CYCCNT
+//	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
 	// Initializations for faster execution
 	LDI	r6, 0x2000
 	ZERO	&r7, 4 //MOV	r7, 0 // Register for clearing other registers
@@ -110,6 +103,13 @@ INITIATIONS:// This is only run once
 	LDI	r12, MAX_VALUE_BEFORE_RESETmostsigByte
 	LDI	r13, MASKevents
 	LDI	r14, RECORDS
+	// Initial Re-initialization of DWT_CYCCNT
+//	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+//	CLR	r2.t3
+//	SBBO	r2, r6, 0, 4 // stops DWT_CYCCNT
+	LBCO	r2, CONST_PRUCTRLREG,r6, 1 // r2 maps b0 control register
+	SET	r2.t3
+	SBCO	r2, CONST_PRUCTRLREG, r6, 1 // Enables DWT_CYCCNT
 
 RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	// The below could be optimized - then change the skew number in c++ code
