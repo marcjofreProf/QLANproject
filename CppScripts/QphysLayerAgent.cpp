@@ -566,11 +566,11 @@ TimeTaggsDetAnalytics[4]=(float)TimeTaggsDetAnalytics[4]+1.0;
 if (i>1){
 TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*((float)(TimeTaggs[i]-TimeTaggs[i-1]));
 
-// Debugging
-if ((TimeTaggs[i]-TimeTaggs[i-1])>100){
-cout << "TimeTaggs[i]: " << TimeTaggs[i] << endl;
-cout << "TimeTaggs[i-1]: " << TimeTaggs[i-1] << endl;
-}
+//// Debugging
+//if ((TimeTaggs[i]-TimeTaggs[i-1])>100){
+//cout << "TimeTaggs[i]: " << TimeTaggs[i] << endl;
+//cout << "TimeTaggs[i-1]: " << TimeTaggs[i-1] << endl;
+//}
 
 }
 }
@@ -580,13 +580,13 @@ if (i>0){TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((float)Simulate
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
-cout << "TimeTaggsDetAnalytics[0]: " << TimeTaggsDetAnalytics[0] << endl;
-cout << "TimeTaggsDetAnalytics[1]: " << TimeTaggsDetAnalytics[1] << endl;
-cout << "TimeTaggsDetAnalytics[2]: " << TimeTaggsDetAnalytics[2] << endl;
-cout << "TimeTaggsDetAnalytics[3]: " << TimeTaggsDetAnalytics[3] << endl;
-cout << "TimeTaggsDetAnalytics[4]: " << TimeTaggsDetAnalytics[4] << endl;
-cout << "TimeTaggsDetAnalytics[5]: " << TimeTaggsDetAnalytics[5] << endl;
-cout << "TimeTaggsDetAnalytics[6]: " << TimeTaggsDetAnalytics[6] << endl;
+//cout << "TimeTaggsDetAnalytics[0]: " << TimeTaggsDetAnalytics[0] << endl;
+//cout << "TimeTaggsDetAnalytics[1]: " << TimeTaggsDetAnalytics[1] << endl;
+//cout << "TimeTaggsDetAnalytics[2]: " << TimeTaggsDetAnalytics[2] << endl;
+//cout << "TimeTaggsDetAnalytics[3]: " << TimeTaggsDetAnalytics[3] << endl;
+//cout << "TimeTaggsDetAnalytics[4]: " << TimeTaggsDetAnalytics[4] << endl;
+//cout << "TimeTaggsDetAnalytics[5]: " << TimeTaggsDetAnalytics[5] << endl;
+//cout << "TimeTaggsDetAnalytics[6]: " << TimeTaggsDetAnalytics[6] << endl;
 
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();
