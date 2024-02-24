@@ -71,9 +71,9 @@ INITIATIONS:// This is only run once
 	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
 	
 	//// Make c30_pointer point to the PRU control registers
-	MOV	r0, 0x2200//PRU0_CTRL
-	MOV	r10, 0x22000+0x2C// //CONST_PRUCTRLREG
-	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUCTRLREG, 0, 4
+	//MOV	r0, 0x2200//PRU0_CTRL
+	//MOV	r10, 0x22000+0x2C// //CONST_PRUCTRLREG
+	//SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUCTRLREG, 0, 4
 	//SBCO	r0, CONST_PRUCTRLREG, 0, 4
 	//MOV 	r6, 0x22000
 
@@ -98,14 +98,15 @@ INITIATIONS:// This is only run once
 //	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 //	CLR	r2.t3
 //	SBBO	r2, r6, 0, 4 // stops DWT_CYCCNT
-	LBCO	r2, CONST_PRUCTRLREG, 0, 1 // r2 maps b0 control register
+	LBCO	r2, CONST_PRUCTRLREG,r6, 1 // r2 maps b0 control register
 	SET	r2.t3
-	SBCO	r2, CONST_PRUCTRLREG, 0, 1 // Enables DWT_CYCCNT
+	SBCO	r2, CONST_PRUCTRLREG, r6, 1 // Enables DWT_CYCCNT
 	// Initializations for faster execution
+	LDI	r6, 0x2000
 	ZERO	&r7, 4 //MOV	r7, 0 // Register for clearing other registers
 	LDI	r8, 1
 	LDI	r9, 4
-	LDI	r11, 0xC
+	LDI	r11, 0x200C
 	LDI	r12, MAX_VALUE_BEFORE_RESETmostsigByte
 	LDI	r13, MASKevents
 	LDI	r14, RECORDS
@@ -119,7 +120,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 //	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
 //	SET	r2.t3
 //	SBBO	r2, r6, 0, 4 // Restarts DWT_CYCCNT
-	SBCO	r7, CONST_PRUCTRLREG, r11, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SBCO	r7, CONST_PRUCTRLREG, r6, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
 	ADD	r3, r3, r8    // Increment overflow counter. Account that we lose 1 cycle count
 
