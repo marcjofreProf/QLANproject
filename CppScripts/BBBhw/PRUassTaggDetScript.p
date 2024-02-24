@@ -139,7 +139,7 @@ CMDLOOP:
 	// We remove the command from the host (in case there is a reset from host, we are saved)
 	SBCO 	r7, CONST_PRUDRAM, r7, 4 // Put contents of r0 into CONST_PRUDRAM
 //	LED_ON // Indicate that we start acquisiton of timetagging
-	MOV	r1, r9 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
+	MOV	r1, r7 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, r14 // This will be the loop counter to read the entire set of data
 //	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	// Here include once the overflow register
