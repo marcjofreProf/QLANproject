@@ -37,6 +37,8 @@
 // r4 reserved for holding the RECORDS (re-loaded at each iteration)
 // r5 reserved for holding the DWT_CYCCNT count value
 // r6 reserved for 0 value (zeroing registers)
+// r7 reserved for 0x2000 Control register offset
+// r8 reserved for 0x200C DWT_CYCCNT offset
 // For faster execution
 
 // r10 is arbitrary used for operations
@@ -63,7 +65,7 @@ INITIATIONS:// This is only run once
 	MOV	r0, SHARED_RAM // 0x100                  // Set C28 to point to shared RAM
 	MOV	r10, 0x22000+0x28//PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
 	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
-	
+		
 //	// Configure the programmable pointer register for PRU by setting c31_pointer[15:0] // related to ddr.
 //	// This will make C31 point to 0x80001000 (DDR memory). 0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
 //	https://groups.google.com/g/beagleboard/c/ukEEblzz9Gk
@@ -78,18 +80,19 @@ INITIATIONS:// This is only run once
 
 //      LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
-	
-	ZERO	&r3, 4 //MOV	r3, 0  // Initialize overflow counter in r3	
+	MOV	r7, 0x2000
+	MOV	r8, 0x200C
+	LDI	r3, 0 //MOV	r3, 0  // Initialize overflow counter in r3	
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
 	// Initializations for faster execution
-	ZERO	&r6, 4 //MOV	r6, 0 // Register for clearing other registers
+	LDI	r6, 0 //MOV	r6, 0 // Register for clearing other registers
 	// Initial Re-initialization of DWT_CYCCNT
-	LBCO	r2, CONST_PRUCTRLREG, 0x2000, 1 // r2 maps b0 control register
+	LBCO	r2, CONST_PRUCTRLREG,r7, 1 // r2 maps b0 control register
 	CLR	r2.t3
-	SBBO	r2, CONST_PRUCTRLREG, 0x2000, 1 // stops DWT_CYCCNT
-	LBCO	r2, CONST_PRUCTRLREG,0x2000, 1 // r2 maps b0 control register
+	SBCO	r2, CONST_PRUCTRLREG,r7, 1 // stops DWT_CYCCNT
+	LBCO	r2, CONST_PRUCTRLREG,r7, 1 // r2 maps b0 control register
 	SET	r2.t3
-	SBCO	r2, CONST_PRUCTRLREG,0x2000, 1 // Enables DWT_CYCCNT
+	SBCO	r2, CONST_PRUCTRLREG,r7, 1 // Enables DWT_CYCCNT
 
 RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	// The below could be optimized - then change the skew number in c++ code
@@ -100,7 +103,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 //	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
 //	SET	r2.t3
 //	SBBO	r2, r6, 0, 4 // Restarts DWT_CYCCNT
-	SBCO	r6, CONST_PRUCTRLREG, 0x200C, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SBCO	r6, CONST_PRUCTRLREG, r8, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 
@@ -109,7 +112,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	LBCO	r5, CONST_PRUCTRLREG, 0x200C, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 1 cycle count here
+	LBCO	r5, CONST_PRUCTRLREG, r8, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 1 cycle count here
 	QBLT	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte < r5.b3, go to RESET_CYCLECNT. Account that we lose 2 cycle counts
 
 CMDLOOP:
@@ -121,7 +124,7 @@ CMDLOOP:
 	SBCO 	r6, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
 //	LED_ON // Indicate that we start acquisiton of timetagging
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
-	LDI	r4, RECORDS	//MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
+	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 //	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	// Here include once the overflow register
 	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address offset at r1
@@ -140,7 +143,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 
 TIMETAG:
 	// Time counter part
-	LBCO	r5, CONST_PRUCTRLREG, 0x200C, 4 // r5 maps the value of DWT_CYCCNT
+	LBCO	r5, CONST_PRUCTRLREG, r8, 4 // r5 maps the value of DWT_CYCCNT
 	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address offset at r1.
 	ADD 	r1, r1, 4 // increment address by 4 bytes		
 	// Channels detection
@@ -156,9 +159,9 @@ TIMETAG:
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF
 	// Re-make sure that DWT_CYCCNT is enabled
-	LBCO	r2, CONST_PRUCTRLREG,0x2000, 1 // r2 maps b0 control register
+	LBCO	r2, CONST_PRUCTRLREG,r7, 1 // r2 maps b0 control register
 	SET	r2.t3
-	SBCO	r2, CONST_PRUCTRLREG,0x2000, 1 // Enables DWT_CYCCNT
+	SBCO	r2, CONST_PRUCTRLREG,r7, 1 // Enables DWT_CYCCNT
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:
