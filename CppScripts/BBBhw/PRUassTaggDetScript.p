@@ -36,15 +36,9 @@
 // r3 reserved for overflow DWT_CYCCNT counter
 // r4 reserved for holding the RECORDS (re-loaded at each iteration)
 // r5 reserved for holding the DWT_CYCCNT count value
-// r6 reserved Control register offset 0x2000 value
-// r7 reserved for 0 value (zeroing registers)
+// r6 reserved for 0 value (zeroing registers)
 // For faster execution
-// r8 reserved for 1 value
-// r9 reserved for 4 value
-// r11 reserved for 0x200C value
-// r12 reserved for MAX_VALUE_BEFORE_RESETmostsigByte value
-// r13 reserved for MASKevents value
-// r14 reserved for RECORDS value
+
 // r10 is arbitrary used for operations
 
 // r28 is mainly used for LED indicators operations
@@ -88,21 +82,14 @@ INITIATIONS:// This is only run once
 	ZERO	&r3, 4 //MOV	r3, 0  // Initialize overflow counter in r3	
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
 	// Initializations for faster execution
-	LDI	r6, 0x2000
-	ZERO	&r7, 4 //MOV	r7, 0 // Register for clearing other registers
-	LDI	r8, 1
-	LDI	r9, 4
-	LDI	r11, 0x200C
-	LDI	r12, MAX_VALUE_BEFORE_RESETmostsigByte
-	LDI	r13, MASKevents
-	LDI	r14, RECORDS
+	ZERO	&r6, 4 //MOV	r6, 0 // Register for clearing other registers
 	// Initial Re-initialization of DWT_CYCCNT
-//	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
-//	CLR	r2.t3
-//	SBBO	r2, r6, 0, 4 // stops DWT_CYCCNT
-	LBCO	r2, CONST_PRUCTRLREG,r6, 1 // r2 maps b0 control register
+	LBCO	r2, CONST_PRUCTRLREG, 0x2000, 1 // r2 maps b0 control register
+	CLR	r2.t3
+	SBBO	r2, CONST_PRUCTRLREG, 0x2000, 1 // stops DWT_CYCCNT
+	LBCO	r2, CONST_PRUCTRLREG,0x2000, 1 // r2 maps b0 control register
 	SET	r2.t3
-	SBCO	r2, CONST_PRUCTRLREG, r6, 1 // Enables DWT_CYCCNT
+	SBCO	r2, CONST_PRUCTRLREG,0x2000, 1 // Enables DWT_CYCCNT
 
 RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	// The below could be optimized - then change the skew number in c++ code
@@ -113,60 +100,65 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 //	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
 //	SET	r2.t3
 //	SBBO	r2, r6, 0, 4 // Restarts DWT_CYCCNT
-	SBCO	r7, CONST_PRUCTRLREG, r11, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SBCO	r6, CONST_PRUCTRLREG, 0x200C, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
-	ADD	r3, r3, r8    // Increment overflow counter. Account that we lose 1 cycle count
+	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 
 //START1:
 //	SET r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	LBCO	r5, CONST_PRUCTRLREG, r11, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 1 cycle count here
-	QBLT	RESET_CYCLECNT, r5.b3, r12.b0 // If MAX_VALUE_BEFORE_RESETmostsigByte < r5.b3, go to RESET_CYCLECNT. Account that we lose 2 cycle counts
+	LBCO	r5, CONST_PRUCTRLREG, 0x200C, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 1 cycle count here
+	QBLT	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte < r5.b3, go to RESET_CYCLECNT. Account that we lose 2 cycle counts
 
 CMDLOOP:
-	LBCO	r0, CONST_PRUDRAM, r7, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
-	QBEQ	CHECK_CYCLECNT, r0, r7 // loop until we get an instruction
-	QBEQ	CHECK_CYCLECNT, r0, r8 // loop until we get an instruction
+	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
+	QBEQ	CHECK_CYCLECNT, r0, 0 // loop until we get an instruction
+	QBEQ	CHECK_CYCLECNT, r0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
 	// We remove the command from the host (in case there is a reset from host, we are saved)
-	SBCO 	r7, CONST_PRUDRAM, r7, 4 // Put contents of r0 into CONST_PRUDRAM
+	SBCO 	r6, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
 //	LED_ON // Indicate that we start acquisiton of timetagging
-	MOV	r1, r7 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
-	MOV	r4, r14 // This will be the loop counter to read the entire set of data
+	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
+	LDI	r4, RECORDS	//MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 //	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	// Here include once the overflow register
 	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address offset at r1
-	ADD 	r1, r1, r9 // increment address by 4 bytes
+	ADD 	r1, r1, 4 // increment address by 4 bytes
 		
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register, say R0
 	MOV 	r0.b0, r31.b0
 	// Mask the relevant bits you're interested in
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
-	AND 	r0.b0, r0.b0, r13.b0 // Interested specifically to the bits with MASKevents
+	AND 	r0.b0, r0.b0, MASKevents // Interested specifically to the bits with MASKevents
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
-	QBEQ 	WAIT_FOR_EVENT, r0.b0, r7
+	QBEQ 	WAIT_FOR_EVENT, r0.b0, 0
 	// If the program reaches this point, at least one of the bits is high
 	// Proceed with the rest of the program
 
 TIMETAG:
 	// Time counter part
-	LBCO	r5, CONST_PRUCTRLREG, r11, 4 // r5 maps the value of DWT_CYCCNT
+	LBCO	r5, CONST_PRUCTRLREG, 0x200C, 4 // r5 maps the value of DWT_CYCCNT
 	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address offset at r1.
-	ADD 	r1, r1, r9 // increment address by 4 bytes		
+	ADD 	r1, r1, 4 // increment address by 4 bytes		
 	// Channels detection
 	SBCO 	r0.b0, CONST_PRUSHAREDRAM, r1, 1 // Put contents of r0.b0 into the address offset at r1
-	ADD 	r1, r1, r8 // increment address by 1 bytes	
+	ADD 	r1, r1, 1 // increment address by 1 bytes	
 	// Check to see if we still need to read more data
-	SUB 	r4, r4, r8
-	QBNE 	WAIT_FOR_EVENT, r4, r7 // loop if we've not finished
+	SUB 	r4, r4, 1
+	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-	// we're done. Signal to the application	
-	SBCO 	r8, CONST_PRUDRAM, r7, 4 // Put contents of r0 into CONST_PRUDRAM
-	LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
-	LED_OFF
+	// we're done. Signal to the application
+	LDI	r0, 1	
+	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
+	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
+	//LED_OFF
+	// Re-make sure that DWT_CYCCNT is enabled
+	LBCO	r2, CONST_PRUCTRLREG,0x2000, 1 // r2 maps b0 control register
+	SET	r2.t3
+	SBCO	r2, CONST_PRUCTRLREG,0x2000, 1 // Enables DWT_CYCCNT
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:

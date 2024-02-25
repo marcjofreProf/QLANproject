@@ -42,8 +42,8 @@
 #define C24add		     0x20
 
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
-#define AllOutputInterestPinsHigh 0x000000FF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
-#define AllOutputInterestPinsLow 0x00000000// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
+#define AllOutputInterestPinsHigh 0xFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
+#define AllOutputInterestPinsLow 0x00// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
@@ -60,13 +60,7 @@
 .endm
 
 // r0 is arbitrary used for operations
-// r1 is reserved with the value for pins enable bits
-// r2 is reserved with the value for pins disable bits
-// r3 is reserved with the number of cycles counter
-// For faster execution
-// r4 reserved for 0 value
-// r5 reserved for 1 value
-// r6 reserved for 4 value
+// r1 is reserved with the number of cycles counter
 
 // r10 is arbitrary used for operations
 
@@ -91,13 +85,6 @@ INITIATIONS:
 	
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
-	
-	MOV	r1, AllOutputInterestPinsHigh // load r1 with the pins enable bits
-	MOV	r2, AllOutputInterestPinsLow  // load r2 with the pins disable bits
-	// Initializations for faster execution
-	MOV	r4, 0
-	MOV	r5, 1
-	MOV	r6, 4	
 
 //// With delays to produce longer pulses
 //SIGNALON:	// for setting just one pin would be set r30, r30, #Bit number
@@ -130,17 +117,17 @@ CMDLOOP:
 	MOV 	r0, 0 
 	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
 	//LED_ON
-	MOV	r3, NUM_REPETITIONS// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
+	MOV	r1, NUM_REPETITIONS// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
 SIGNALON:	
-	MOV	r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
-	SUB	r3, r3, r5	// Substract 1 count cycle
+	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents of r1 byte 0 to magic r30 output byte 0
+	SUB	r1, r1, 1	// Substract 1 count cycle
 //	MOV	r0, DELAY
 //DELAYON:
 //	SUB 	r0, r0, 1
 //	QBNE	DELAYON, r0, 0
 SIGNALOFF:
-	MOV	r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
-	QBNE	SIGNALON, r3, r4 // condition jump to SIGNALON because we have not finished the number of repetitions
+	MOV	r30.b0, AllOutputInterestPinsLow // write the contents of r2 byte 0 to magic r30 byte 0
+	QBNE	SIGNALON, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
 //	MOV	r0, DELAY
 //DELAYOFF:
 //	SUB 	r0, r0, 1
