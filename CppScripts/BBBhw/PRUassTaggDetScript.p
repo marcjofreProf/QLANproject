@@ -37,8 +37,14 @@
 // r4 reserved for holding the RECORDS (re-loaded at each iteration)
 // r5 reserved for holding the DWT_CYCCNT count value
 // r6 reserved for 0 value (zeroing registers)
+//// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
+// We cannot use Constan table pointers since the base addresses are too far
 // r7 reserved for 0x22000 Control register
 // r8 reserved for 0x2200C DWT_CYCCNT
+//// If using IET timer (potentially adjusted to synchronization protocols)
+// We can use Constant table pointers C26
+// CONST_IETREG 0x0002E000
+// IET Count 0xC offset
 
 // r10 is arbitrary used for operations
 
@@ -57,6 +63,11 @@ INITIATIONS:// This is only run once
 	MOV	r0, OWN_RAM// | OWN_RAMoffset // When using assembler, the PRU does not put data in the first addresses of OWN_RAM (when using c++ PRU direct programming the PRU  might use some initial addresses of OWN_RAM space
 	//MOV	r10, 0x22000+0x20// | C24add//CONST_PRUDRAM
 	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
+	
+	// This will make C26 point to 0x0002E000 (IET).
+	MOV	r0, 0xE000// | OWN_RAMoffset // When using assembler, the PRU does not put data in the first addresses of OWN_RAM (when using c++ PRU direct programming the PRU  might use some initial addresses of OWN_RAM space
+	//MOV	r10, 0x22000+0x20// | C24add//CONST_PRUDRAM
+	SBCO	r0, CONST_IETREG, 0, 2  // Load the base address of PRU0 Data RAM into C24
 
 	// Configure the programmable pointer register for PRU by setting c28_pointer[15:0] // related to shared RAM
 	// This will make C28 point to 0x00010000 (PRU shared RAM).
@@ -79,30 +90,32 @@ INITIATIONS:// This is only run once
 
 //      LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
-	MOV	r7, 0x22000
-	MOV	r8, 0x2200C
+// If using cycle counter
+	//MOV	r7, 0x22000
+	//MOV	r8, 0x2200C
 	LDI	r3, 0 //MOV	r3, 0  // Initialize overflow counter in r3	
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
 	// Initializations for faster execution
 	LDI	r6, 0 //MOV	r6, 0 // Register for clearing other registers
+	
 	// Initial Re-initialization of DWT_CYCCNT
-	LBBO	r2, r7, 0, 1 // r2 maps b0 control register
-	CLR	r2.t3
-	SBBO	r2, r7, 0, 1 // stops DWT_CYCCNT
-	LBBO	r2, r7, 0, 1 // r2 maps b0 control register
-	SET	r2.t3
-	SBBO	r2, r7, 0, 1 // Enables DWT_CYCCNT
+	//LBBO	r2, r7, 0, 1 // r2 maps b0 control register
+	//CLR	r2.t3
+	//SBBO	r2, r7, 0, 1 // stops DWT_CYCCNT
+	//LBBO	r2, r7, 0, 1 // r2 maps b0 control register
+	//SET	r2.t3
+	//SBBO	r2, r7, 0, 1 // Enables DWT_CYCCNT
+	//SBBO	r6, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	
+	// Initial Re-initialization for IET counter
+	LBCO	r2, CONST_IETREG, 0, 1 //
+	SET	r2.t4 // Define increment value to 1
+	SET	r2.t0 // Enable
+	SBCO	r2, CONST_IETREG, 0, 1 // Enables IET count
+	SBCO	r6, CONST_IETREG, 0xC, 4 // Clear IET count
 
-RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	// The below could be optimized - then change the skew number in c++ code
-	// LBCO and SBCO instructions with byte count 4 take 2 cycles. 
-//      LBBO	r2, r6, 0, 4 // r2 maps b0 control register	
-//	CLR	r2.t3
-//	SBBO	r2, r6, 0, 4 // stops DWT_CYCCNT
-//	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
-//	SET	r2.t3
-//	SBBO	r2, r6, 0, 4 // Restarts DWT_CYCCNT
-	SBBO	r6, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
+	SBCO	r6, CONST_IETREG, 0, 4 // Clear IET count. SBBO	r6, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 
@@ -111,7 +124,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 1 cycle count here
+	LBCO	r5, CONST_IETREG, 0xC, 4 // LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 1 cycle count here
 	QBLT	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte < r5.b3, go to RESET_CYCLECNT. Account that we lose 2 cycle counts
 
 CMDLOOP:
@@ -142,7 +155,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 
 TIMETAG:
 	// Time counter part
-	LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT
+	LBCO	r5, CONST_IETREG, 0xC, 4 //LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT
 	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address offset at r1.
 	ADD 	r1, r1, 4 // increment address by 4 bytes		
 	// Channels detection
@@ -155,12 +168,8 @@ TIMETAG:
 	// we're done. Signal to the application
 	LDI	r0, 1	
 	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
-	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
-	//LED_OFF
-	// Re-make sure that DWT_CYCCNT is enabled
-	LBBO	r2, r7,0, 1 // r2 maps b0 control register
-	SET	r2.t3
-	SBBO	r2, r7,0, 1 // Enables DWT_CYCCNT
+	LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
+	LED_OFF
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:

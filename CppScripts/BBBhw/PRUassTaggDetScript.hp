@@ -19,7 +19,7 @@
 #define CONST_PRUCFG         C4
 #define CONST_PRUDRAM        C24 // mapping PRU own RAM
 #define CONST_PRUSHAREDRAM   C28 // mapping shared memory
-#define CONST_PRUCTRLREG     C0 // points to 0x00020000
+#define CONST_IETREG         C26 // points to 0x0002E000
 //#define CONST_DDR            C31 //used specifically for accessing external memory regions, such as DDR memory, which is shared with the main ARM processor.
 
 #define PRU0_CTRL            0x220
