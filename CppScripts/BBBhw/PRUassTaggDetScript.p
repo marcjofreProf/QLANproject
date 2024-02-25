@@ -65,9 +65,9 @@ INITIATIONS:// This is only run once
 	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
 	// This will make C26 point to 0x0002E000 (IET).
-	MOV	r0, 0xE000// | OWN_RAMoffset // When using assembler, the PRU does not put data in the first addresses of OWN_RAM (when using c++ PRU direct programming the PRU  might use some initial addresses of OWN_RAM space
+	MOV	r0, 0x0002E000// | OWN_RAMoffset // When using assembler, the PRU does not put data in the first addresses of OWN_RAM (when using c++ PRU direct programming the PRU  might use some initial addresses of OWN_RAM space
 	//MOV	r10, 0x22000+0x20// | C24add//CONST_PRUDRAM
-	SBCO	r0, CONST_IETREG, 0, 2  // Load the base address of PRU0 Data RAM into C24
+	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of PRU0 Data RAM into C24
 
 	// Configure the programmable pointer register for PRU by setting c28_pointer[15:0] // related to shared RAM
 	// This will make C28 point to 0x00010000 (PRU shared RAM).
@@ -114,7 +114,7 @@ INITIATIONS:// This is only run once
 	SBCO	r6, CONST_IETREG, 0xC, 4 // Clear IET count
 
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	SBCO	r6, CONST_IETREG, 0, 4 // Clear IET count. SBBO	r6, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SBCO	r6, CONST_IETREG, 0xC, 4 // Clear IET count. SBBO	r6, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 
