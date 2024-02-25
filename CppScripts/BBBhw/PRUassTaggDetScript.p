@@ -108,10 +108,9 @@ INITIATIONS:// This is only run once
 	//SBBO	r6, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	
 	// Initial Re-initialization for IET counter
-	LBCO	r2, CONST_IETREG, 0, 1 //
-	SET	r2.t4 // Define increment value to 1
-	SET	r2.t0 // Enable
-	SBCO	r2, CONST_IETREG, 0, 1 // Enables IET count
+	//LBCO	r2, CONST_IETREG, 0, 1 //
+	MOV	r0, 0x11 // Enable and Define increment value to 1
+	SBCO	r0, CONST_IETREG, 0, 1 // Enables IET count
 	SBCO	r6, CONST_IETREG, 0xC, 4 // Clear IET count
 
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
