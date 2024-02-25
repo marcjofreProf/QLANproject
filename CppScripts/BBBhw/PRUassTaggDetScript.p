@@ -37,9 +37,8 @@
 // r4 reserved for holding the RECORDS (re-loaded at each iteration)
 // r5 reserved for holding the DWT_CYCCNT count value
 // r6 reserved for 0 value (zeroing registers)
-// r7 reserved for 0x2000 Control register offset
-// r8 reserved for 0x200C DWT_CYCCNT offset
-// For faster execution
+// r7 reserved for 0x22000 Control register
+// r8 reserved for 0x2200C DWT_CYCCNT
 
 // r10 is arbitrary used for operations
 
@@ -80,19 +79,19 @@ INITIATIONS:// This is only run once
 
 //      LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
-	MOV	r7, 0x2000
-	MOV	r8, 0x200C
+	MOV	r7, 0x22000
+	MOV	r8, 0x2200C
 	LDI	r3, 0 //MOV	r3, 0  // Initialize overflow counter in r3	
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
 	// Initializations for faster execution
 	LDI	r6, 0 //MOV	r6, 0 // Register for clearing other registers
 	// Initial Re-initialization of DWT_CYCCNT
-	LBCO	r2, CONST_PRUCTRLREG,r7, 1 // r2 maps b0 control register
+	LBBO	r2, r7, 0, 1 // r2 maps b0 control register
 	CLR	r2.t3
-	SBCO	r2, CONST_PRUCTRLREG,r7, 1 // stops DWT_CYCCNT
-	LBCO	r2, CONST_PRUCTRLREG,r7, 1 // r2 maps b0 control register
+	SBBO	r2, r7, 0, 1 // stops DWT_CYCCNT
+	LBBO	r2, r7, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
-	SBCO	r2, CONST_PRUCTRLREG,r7, 1 // Enables DWT_CYCCNT
+	SBBO	r2, r7, 0, 1 // Enables DWT_CYCCNT
 
 RESET_CYCLECNT:// This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	// The below could be optimized - then change the skew number in c++ code
@@ -103,7 +102,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 //	LBBO	r2, r6, 0, 4 // r2 maps b0 control register
 //	SET	r2.t3
 //	SBBO	r2, r6, 0, 4 // Restarts DWT_CYCCNT
-	SBCO	r6, CONST_PRUCTRLREG, r8, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SBBO	r6, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 
@@ -112,7 +111,7 @@ RESET_CYCLECNT:// This instruciton block has to contain the minimum number of li
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	LBCO	r5, CONST_PRUCTRLREG, r8, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 1 cycle count here
+	LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 1 cycle count here
 	QBLT	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte < r5.b3, go to RESET_CYCLECNT. Account that we lose 2 cycle counts
 
 CMDLOOP:
@@ -143,7 +142,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 
 TIMETAG:
 	// Time counter part
-	LBCO	r5, CONST_PRUCTRLREG, r8, 4 // r5 maps the value of DWT_CYCCNT
+	LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT
 	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address offset at r1.
 	ADD 	r1, r1, 4 // increment address by 4 bytes		
 	// Channels detection
@@ -159,9 +158,9 @@ TIMETAG:
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF
 	// Re-make sure that DWT_CYCCNT is enabled
-	LBCO	r2, CONST_PRUCTRLREG,r7, 1 // r2 maps b0 control register
+	LBBO	r2, r7,0, 1 // r2 maps b0 control register
 	SET	r2.t3
-	SBCO	r2, CONST_PRUCTRLREG,r7, 1 // Enables DWT_CYCCNT
+	SBBO	r2, r7,0, 1 // Enables DWT_CYCCNT
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:
