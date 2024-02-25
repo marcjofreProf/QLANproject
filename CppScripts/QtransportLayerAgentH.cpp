@@ -876,6 +876,7 @@ this->acquire();
 		ParamsFloatArray[4]=this->TimeTaggsDetAnalytics[4];
 		ParamsFloatArray[5]=this->TimeTaggsDetAnalytics[5];
 		ParamsFloatArray[6]=this->TimeTaggsDetAnalytics[6];
+		ParamsFloatArray[7]=this->TimeTaggsDetAnalytics[7];
 		this->release();			
 		isValidWhileLoopCount=0;
 	}

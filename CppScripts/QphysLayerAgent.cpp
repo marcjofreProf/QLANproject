@@ -541,6 +541,7 @@ int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 // Param 4: Multidetection events
 // Param 5: Mean time difference between tags
 // Param 6: std time difference between tags
+// Param 7: time value first count tags
 
 // Check that we now exceed the QuBits buffer size
 if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
@@ -579,6 +580,7 @@ for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
 if (i>0){TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*pow((float)(TimeTaggs[i]-TimeTaggs[i-1])-TimeTaggsDetAnalytics[5],2.0);}
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
+TimeTaggsDetAnalytics[7]=TimeTaggs[0];
 
 //cout << "TimeTaggsDetAnalytics[0]: " << TimeTaggsDetAnalytics[0] << endl;
 //cout << "TimeTaggsDetAnalytics[1]: " << TimeTaggsDetAnalytics[1] << endl;
@@ -587,6 +589,7 @@ TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 //cout << "TimeTaggsDetAnalytics[4]: " << TimeTaggsDetAnalytics[4] << endl;
 //cout << "TimeTaggsDetAnalytics[5]: " << TimeTaggsDetAnalytics[5] << endl;
 //cout << "TimeTaggsDetAnalytics[6]: " << TimeTaggsDetAnalytics[6] << endl;
+//cout << "TimeTaggsDetAnalytics[7]: " << TimeTaggsDetAnalytics[7] << endl;
 
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();

@@ -813,7 +813,8 @@ if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking
 	// Param 4: Multidetection events
 	// Param 5: Mean time difference between tags
 	// Param 6: std time difference between tags
-	int NumTimetaggDetAnalytics=7;
+	// Param 7: time value first count tags
+	int NumTimetaggDetAnalytics=8;
 	float TimeTaggsDetAnalytics[NumTimetaggDetAnalytics]={0.0};
 	int SimulateNumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetSimulateNumStoredQubitsNode(TimeTaggsDetAnalytics);// to be developed for more than one link
 	//cout << "Node return SimulateNumStoredQubitsNode: " << SimulateNumStoredQubitsNode << endl;
@@ -853,6 +854,9 @@ if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking
 	strcat(ParamsCharArray,charNum);
 	strcat(ParamsCharArray,":");// Separate different Payloads with :
 	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[6]);
+	strcat(ParamsCharArray,charNum);
+	strcat(ParamsCharArray,":");// Separate different Payloads with :
+	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[7]);
 	strcat(ParamsCharArray,charNum);
 	strcat(ParamsCharArray,":");// End Separate different Payloads with :
 	strcat(ParamsCharArray,",");// Very important to end the message
