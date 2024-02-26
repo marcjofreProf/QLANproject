@@ -548,8 +548,8 @@ int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
 
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
-cout << "ChannelTags[i]: "<< std::bitset<8>(ChannelTags[i]) << endl;
+//cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
+//cout << "ChannelTags[i]: "<< std::bitset<8>(ChannelTags[i]) << endl;
 if (ChannelTags[i]&0x01==1){TimeTaggsDetAnalytics[0]++;}
 if ((ChannelTags[i]>>1)&0x01==1){TimeTaggsDetAnalytics[1]++;}
 if ((ChannelTags[i]>>2)&0x01==1){TimeTaggsDetAnalytics[2]++;}

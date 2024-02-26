@@ -1,9 +1,10 @@
+// This signals scripts outputs iteratively channel 1, then channel 2, channel 3, channel 4 and then a time off (also to allow for some management); copied for two output signals . Outputing at maxium 100 MHz.
 // PRU-ICSS program to control realtime GPIO pins
 // But only if the Pinmux Mode has been set correctly with a device  
  // tree overlay!  
  //  
  // Assemble in BBB with:  
- // pasm -b PRUassTrigSigScript.p
+ // pasm -b PRUassTrigSigScriptHist4Sig.p
  // https://www.ofitselfso.com/BBBCSIO/Help/BBBCSIOHelp_PRUPinInOutExamplePASMCode.html
  
 .origin 0				// start of program in PRU memory
@@ -21,7 +22,7 @@
 
 #define INS_PER_US		200		// 5ns per instruction for Beaglebone black
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
-#define NUM_REPETITIONS		33554432	//4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used)
+#define NUM_REPETITIONS		16777216	//4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used)
 #define DELAY 1//1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
 #define PRU1_R31_VEC_VALID	32
 #define PRU_EVTOUT_0		3	// the event number that is sent back
@@ -42,8 +43,6 @@
 #define PRU1_CTRL            0x240
 
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
-#define AllOutputInterestPinsHigh 0xFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
-#define AllOutputInterestPinsLow 0x00// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
@@ -126,20 +125,28 @@ CMDLOOP:
 PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled by the other PRU
 	LBCO	r0.b0, CONST_IETREG, 0xC, 1
-	AND	r0, r0, 0x00000003 // Since the signals have a minimum period of 4 clock cycles
+	AND	r0, r0, 0x0000000F // Since the signals have a minimum period of 2 clock cycles and there are 5 combinations (Ch1, Ch2, Ch3, Ch4, NoCh
+	QBEQ	SIGNALON, r0.b0, 9 // Coincides with a 9
+	QBEQ	SIGNALON, r0.b0, 8 // Coincides with a 8
+	QBEQ	SIGNALON, r0.b0, 7 // Coincides with a 7
+	QBEQ	SIGNALON, r0.b0, 6 // Coincides with a 6
+	QBEQ	SIGNALON, r0.b0, 5 // Coincides with a 5
+	QBEQ	SIGNALON, r0.b0, 4 // Coincides with a 4
 	QBEQ	SIGNALON, r0.b0, 3 // Coincides with a 3
 	QBEQ	SIGNALON, r0.b0, 2 // Coincides with a 2
 	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
 	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
 SIGNALON:	
-	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents of r1 byte 0 to magic r30 output byte 0
-	SUB	r1, r1, 1	// Substract 1 count cycle
-//	MOV	r0, DELAY
-//DELAYON:
-//	SUB 	r0, r0, 1
-//	QBNE	DELAYON, r0, 0
+	MOV	r30.b0, 0x11 // Double channels 1. write to magic r30 output byte 0
+	MOV	r30.b0, 0x00 // All off
+	MOV	r30.b0, 0x22 // Double channels 2. write to magic r30 output byte 0
+	MOV	r30.b0, 0x00 // All off
+	MOV	r30.b0, 0x44 // Double channels 3. write to magic r30 output byte 0
+	MOV	r30.b0, 0x00 // All off
+	MOV	r30.b0, 0x88 // Double channels 4. write to magic r30 output byte 0
+	MOV	r30.b0, 0x00 // All off
 SIGNALOFF:
-	MOV	r30.b0, AllOutputInterestPinsLow // write the contents of r2 byte 0 to magic r30 byte 0
+	SUB	r1, r1, 1 // Decrement counter
 	QBNE	SIGNALON, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
 //	MOV	r0, DELAY
 //DELAYOFF:

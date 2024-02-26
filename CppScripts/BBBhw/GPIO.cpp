@@ -128,9 +128,9 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Generate signals
 	pru1dataMem_int[0]=(unsigned int)0; // set to zero means no command. PRU1 idle
 	// Load and execute the PRU program on the PRU1
-	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
-		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
-			perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
+	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
+		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
+			perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScriptHist4Sig.bin");//perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
 		}
 	}
 	
@@ -193,11 +193,6 @@ else{CheckTimeFlag=false;}
 	}
 	else if (CheckTimeFlag==true){// too much time
 		pru0dataMem_int[0]=(unsigned int)0; // set to zero means no command.
-		//if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
-		//	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
-		//		perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
-		//	}
-		//}
 		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
 		//prussdrv_pru_disable(PRU_Operation_NUM);// Disable the PRU
 		//prussdrv_pru_enable(PRU_Operation_NUM);// Enable the PRU from 0
@@ -253,12 +248,7 @@ do // This is blocking
 		fin=true;
 	}
 	else if (CheckTimeFlag==true){// too much time		
-		pru1dataMem_int[0]=(unsigned int)0; // set to zero means no command.
-		//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
-		//	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
-		//		perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
-		//	}
-		//}		
+		pru1dataMem_int[0]=(unsigned int)0; // set to zero means no command.	
 		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
 		//prussdrv_pru_disable(PRU_Signal_NUM);// Disable the PRU
 		//prussdrv_pru_enable(PRU_Signal_NUM);// Enable the PRU from 0
