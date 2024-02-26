@@ -202,7 +202,7 @@ else{CheckTimeFlag=false;}
 		//prussdrv_pru_disable(PRU_Operation_NUM);// Disable the PRU
 		//prussdrv_pru_enable(PRU_Operation_NUM);// Enable the PRU from 0
 		//prussdrv_pru_reset(PRU_Operation_NUM);
-		cout << "GPIO::ReadTimeStamps took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessari." << endl;
+		cout << "GPIO::ReadTimeStamps took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
 		fin=true;
 	}
 } while(!fin);
@@ -218,7 +218,7 @@ return 0;// all ok
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
-int WaitTimeToFutureTimePoint=500;
+int WaitTimeToFutureTimePoint=1000;
 
 TimePoint TimePointClockNow=Clock::now();
 auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
@@ -263,7 +263,7 @@ do // This is blocking
 		//prussdrv_pru_disable(PRU_Signal_NUM);// Disable the PRU
 		//prussdrv_pru_enable(PRU_Signal_NUM);// Enable the PRU from 0
 		//prussdrv_pru_reset(PRU_Signal_NUM);
-		cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1 if necessari." << endl;
+		cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1 if necessary." << endl;
 		fin=true;
 		}
 } while(!fin);

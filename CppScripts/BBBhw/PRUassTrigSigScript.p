@@ -125,6 +125,7 @@ CMDLOOP:
 	MOV	r1, NUM_REPETITIONS// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
 PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled by the other PRU
+	MOV 	r0, 0 // Randomize that IEP timer is read at different clock counts and not always at the same position
 	LBCO	r0, CONST_IETREG, 0xC, 4
 	AND	r0.b0, r0.b0, 0x03 // Since the signals have a minimum period of 4 clock cycles
 	QBNE	PSEUDOSYNCH, r0.b0, 0 // Coincides with a zero

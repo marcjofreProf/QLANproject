@@ -115,7 +115,7 @@ INITIATIONS:// This is only run once
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Clear IET count
 
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	SBCO	r7, CONST_IETREG, 0xC, 4 // Clear IET count. SBBO	r7, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SBCO	r7, CONST_IETREG, 0xC, 4 // Clear IET count. SBBO	r7, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 12 cycle counts
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 
@@ -124,7 +124,7 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	LBCO	r5, CONST_IETREG, 0xC, 4 // LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 1 cycle count here
+	LBCO	r5, CONST_IETREG, 0xC, 4 // LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts. Account that we lose 6 cycle count here
 	QBLT	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte < r5.b3, go to RESET_CYCLECNT. Account that we lose 2 cycle counts
 
 CMDLOOP:
