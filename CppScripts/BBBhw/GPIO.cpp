@@ -294,7 +294,7 @@ unsigned char* valp; // 8 bits
 unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquition run
 unsigned int valOverflowCycleCountPRU=0; // 32 bits
 unsigned long long int extendedCounterPRU=0; // 64 bits
-unsigned long long int auxUnskewingFactor=6; // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits
+unsigned long long int auxUnskewingFactor=0; // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits
 //unsigned char val; // 8 bits
 unsigned char valBitsInterest=0; // 8 bits
 //unsigned char rgb24[4];

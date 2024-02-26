@@ -36,7 +36,8 @@
 // r3 reserved for overflow DWT_CYCCNT counter
 // r4 reserved for holding the RECORDS (re-loaded at each iteration)
 // r5 reserved for holding the DWT_CYCCNT count value
-// r6 reserved for 0 value (zeroing registers)
+// r6 reserved because detected channels are concatenated with r5 in the write to SHARED RAM
+// r7 reserved for 0 value (zeroing registers)
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
 // r7 reserved for 0x22000 Control register
@@ -96,7 +97,7 @@ INITIATIONS:// This is only run once
 	LDI	r3, 0 //MOV	r3, 0  // Initialize overflow counter in r3	
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
 	// Initializations for faster execution
-	LDI	r6, 0 //MOV	r6, 0 // Register for clearing other registers
+	LDI	r7, 0 //MOV	r6, 0 // Register for clearing other registers
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	//LBBO	r2, r7, 0, 1 // r2 maps b0 control register
@@ -105,16 +106,16 @@ INITIATIONS:// This is only run once
 	//LBBO	r2, r7, 0, 1 // r2 maps b0 control register
 	//SET	r2.t3
 	//SBBO	r2, r7, 0, 1 // Enables DWT_CYCCNT
-	//SBBO	r6, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	//SBBO	r7, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	
 	// Initial Re-initialization for IET counter
 	//LBCO	r2, CONST_IETREG, 0, 1 //
 	MOV	r0, 0x11 // Enable and Define increment value to 1
 	SBCO	r0, CONST_IETREG, 0, 1 // Enables IET count
-	SBCO	r6, CONST_IETREG, 0xC, 4 // Clear IET count
+	SBCO	r7, CONST_IETREG, 0xC, 4 // Clear IET count
 
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	SBCO	r6, CONST_IETREG, 0xC, 4 // Clear IET count. SBBO	r6, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SBCO	r7, CONST_IETREG, 0xC, 4 // Clear IET count. SBBO	r7, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 
@@ -132,7 +133,7 @@ CMDLOOP:
 	QBEQ	CHECK_CYCLECNT, r0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
 	// We remove the command from the host (in case there is a reset from host, we are saved)
-	SBCO 	r6, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
+	SBCO 	r7, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
 //	LED_ON // Indicate that we start acquisiton of timetagging
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
@@ -143,23 +144,27 @@ CMDLOOP:
 		
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register, say R0
-	MOV 	r0.b0, r31.b0
+	MOV 	r6.b0, r31.b0
 	// Mask the relevant bits you're interested in
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
-	AND 	r0.b0, r0.b0, MASKevents // Interested specifically to the bits with MASKevents
+	//AND 	r6.b0, r6.b0, MASKevents // Interested specifically to the bits with MASKevents. MAybe there are never counts in this first 8 bits if there is not explicitly a signal.
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
-	QBEQ 	WAIT_FOR_EVENT, r0.b0, 0
+	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0
 	// If the program reaches this point, at least one of the bits is high
 	// Proceed with the rest of the program
 
 TIMETAG:
-	// Time counter part
+	// Faster Concatenated Time counter and Detectoin channels
 	LBCO	r5, CONST_IETREG, 0xC, 4 //LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT
-	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address offset at r1.
-	ADD 	r1, r1, 4 // increment address by 4 bytes		
-	// Channels detection
-	SBCO 	r0.b0, CONST_PRUSHAREDRAM, r1, 1 // Put contents of r0.b0 into the address offset at r1
-	ADD 	r1, r1, 1 // increment address by 1 bytes	
+	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 5 // Put contents of r5 and r6.b0 of DWT_CYCCNT into the address offset at r1.
+	ADD 	r1, r1, 5 // increment address by 5 bytes
+	//// Slow Time counter part
+	//LBCO	r5, CONST_IETREG, 0xC, 4 //LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT
+	//SBCO 	r5, CONST_PRUSHAREDRAM, r1, 4 // Put contents of DWT_CYCCNT into the address offset at r1.
+	//ADD 	r1, r1, 4 // increment address by 4 bytes		
+	//// Slow Channels detection
+	//SBCO 	r0.b0, CONST_PRUSHAREDRAM, r1, 1 // Put contents of r0.b0 into the address offset at r1
+	//ADD 	r1, r1, 1 // increment address by 1 bytes	
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished

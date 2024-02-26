@@ -35,6 +35,7 @@
 
 #define CONST_PRUCFG         C4
 #define CONST_PRUDRAM        C24 // allow the PRU to map portions of the system's memory into its own address space. In particular we will map its own data RAM
+#define CONST_IETREG	     C26
 
 #define OWN_RAM              0x00000000 // current PRU data RAM
 #define OWN_RAMoffset	     0x00000200 // Offset from Base OWN_RAM to avoid collision with some data tht PRU might store
@@ -83,6 +84,11 @@ INITIATIONS:
 	//MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
 	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
+	// This will make C26 point to 0x0002E000 (IET).
+	MOV	r0, 0x0002E000// | OWN_RAMoffset // When using assembler, the PRU does not put data in the first addresses of OWN_RAM (when using c++ PRU direct programming the PRU  might use some initial addresses of OWN_RAM space
+	//MOV	r10, 0x22000+0x20// | C24add//CONST_PRUDRAM
+	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of PRU0 Data RAM into C24
+	
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
@@ -118,6 +124,12 @@ CMDLOOP:
 	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
 	//LED_ON
 	MOV	r1, NUM_REPETITIONS// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
+PSEUDOSYNCH:
+	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled by the other PRU
+	LBCO	r0, CONST_IETREG, 0xC, 4
+	AND	r0.b0, r0.b0, 0x03 // Since the tsignals have a minimum period of 4 clock cycles
+	QBLT	PSEUDOSYNCH, r0.b0, 0 // Coincides with a zero
+	
 SIGNALON:	
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents of r1 byte 0 to magic r30 output byte 0
 	SUB	r1, r1, 1	// Substract 1 count cycle
