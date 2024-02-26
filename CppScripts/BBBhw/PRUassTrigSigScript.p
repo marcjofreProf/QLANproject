@@ -126,9 +126,11 @@ CMDLOOP:
 PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled by the other PRU
 	LBCO	r0.b0, CONST_IETREG, 0xC, 1
-	AND	r0.b0, r0.b0, 0x03 // Since the signals have a minimum period of 4 clock cycles
-	QBNE	PSEUDOSYNCH, r0.b0, 0 // Coincides with a zero
-	
+	AND	r0, r0, 0x00000003 // Since the signals have a minimum period of 4 clock cycles
+	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a zero
+SYNCHBACKCOUNTER:
+	SUB	r0, r0, 1
+	QBNE	SYNCHBACKCOUNTER, r0.b0, 0 // Coincides with a zero
 SIGNALON:	
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents of r1 byte 0 to magic r30 output byte 0
 	SUB	r1, r1, 1	// Substract 1 count cycle
