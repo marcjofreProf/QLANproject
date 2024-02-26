@@ -13,10 +13,9 @@ sudo config-pin P8_15 pruin
 sudo config-pin P8_16 pruin
 sudo config-pin P9_25 pruin
 sudo config-pin P9_27 pruin
-sudo config-pin P8_11 pruin
-sudo config-pin P8_12 pruin
 sudo config-pin P9_41 pruin
-sudo config-pin P9_42 pruin
+sudo config-pin P9_91 pruin
+sudo config-pin P9_92 pruin
 sudo config-pin P8_27 pruout
 sudo config-pin P8_28 pruout
 sudo config-pin P8_29 pruout
