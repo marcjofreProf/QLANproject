@@ -21,7 +21,7 @@
 
 #define INS_PER_US		200		// 5ns per instruction for Beaglebone black
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
-#define NUM_REPETITIONS		16777216	//4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used)
+#define NUM_REPETITIONS		33554432	//4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used)
 #define DELAY 1//1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
 #define PRU1_R31_VEC_VALID	32
 #define PRU_EVTOUT_0		3	// the event number that is sent back
@@ -127,7 +127,10 @@ PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled by the other PRU
 	LBCO	r0.b0, CONST_IETREG, 0xC, 1
 	AND	r0, r0, 0x00000003 // Since the signals have a minimum period of 4 clock cycles
-	LOOP	SIGNALON, r0	
+	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
+	QBEQ	SIGNALON, r0.b0, 3 // Coincides with a 1
+	QBEQ	SIGNALON, r0.b0, 2 // Coincides with a 2
+	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 3
 SIGNALON:	
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents of r1 byte 0 to magic r30 output byte 0
 	SUB	r1, r1, 1	// Substract 1 count cycle

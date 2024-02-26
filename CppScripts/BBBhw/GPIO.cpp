@@ -218,7 +218,7 @@ return 0;// all ok
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
-int WaitTimeToFutureTimePoint=1000;
+int WaitTimeToFutureTimePoint=2000;
 
 TimePoint TimePointClockNow=Clock::now();
 auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
@@ -294,7 +294,7 @@ unsigned char* valp; // 8 bits
 unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquition run
 unsigned int valOverflowCycleCountPRU=0; // 32 bits
 unsigned long long int extendedCounterPRU=0; // 64 bits
-unsigned long long int auxUnskewingFactor=0; // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits
+unsigned long long int auxUnskewingFactor=14; // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits
 //unsigned char val; // 8 bits
 unsigned char valBitsInterest=0; // 8 bits
 //unsigned char rgb24[4];
