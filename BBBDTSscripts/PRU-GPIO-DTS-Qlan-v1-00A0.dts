@@ -34,11 +34,11 @@
    // shows which pins can be used with PRU0 and PRU1 for input and output via  
    // registers R31 and R30.  
    // Our output pin, P8_27, 28, 29, 30, 39, 40, 41, 42, 43, 44, 45, 46, corresponds to PRU 1
-   // Our input pin, P9_28, 29 and 30 and 31, corresponds to PRU 0
+   // Our input pin, P8_15, P8_16, P8_11, P8_12, P9_25, P9_41, P9_27, P9_42, P9_28, P9_29, P9_30 and P_31, corresponds to PRU 0
    //  
    // Beware: Many other PRU EGP pins are reserved by HDMI or onboard flash, which  
    // would need to be disabled first by editing uEnv.txt and rebooting.  
-   exclusive-use = "P8.15","P8.16","P8.25","P8.27","P9.28", "P9.29", "P9.30", "P9.31", "P8.45", "P8.46", "P8.43", "P8.44", "P8.41", "P8.42", "P8.39", "P8.40", "P8.27", "P8.29", "P8.28", "P8.30", "pru0", "pru1";  
+   exclusive-use = "P8.15","P8.16", "P8.11", "P8.12","P9.25", "P9.41", "P9.27", "P9.42", "P9.28", "P9.29", "P9.30", "P9.31", "P8.45", "P8.46", "P8.43", "P8.44", "P8.41", "P8.42", "P8.39", "P8.40", "P8.27", "P8.29", "P8.28", "P8.30", "pru0", "pru1";  
   
 //fragment@0{
 //  target = <&ocp>; 
@@ -73,19 +73,23 @@
          0x1AC 0x26      // Mode 6 input pull-down input enable
          0x038 0x26      // Mode 6 input pull-down input enable
          0x03C 0x26      // Mode 6 input pull-down input enable
+         0x1A0 0x26      // Mode 6 input pull-down input enable
+         0x1A8 0x26      // Mode 6 input pull-down input enable
+         0x034 0x26      // Mode 6 input pull-down input enable
+         0x030 0x26      // Mode 6 input pull-down input enable
          
-         0x0E0 0x15	// Mode 5 output pull-up
-         0x0E4 0x15	// Mode 5 output pull-up
-         0x0E8 0x15	// Mode 5 output pull-up
-         0x0EC 0x15	// Mode 5 output pull-up
-         0x0B8 0x15	// Mode 5 output pull-up
-         0x0BC 0x15	// Mode 5 output pull-up
-         0x0B0 0x15	// Mode 5 output pull-up
-         0x0B4 0x15	// Mode 5 output pull-up
-         0x0A8 0x15	// Mode 5 output pull-up
-         0x0AC 0x15	// Mode 5 output pull-up
-         0x0A0 0x15	// Mode 5 output pull-up
-	 0x0A4 0x15	// Mode 5 output pull-up
+         0x0E0 0x15	 // Mode 5 output pull-up
+         0x0E4 0x15	 // Mode 5 output pull-up
+         0x0E8 0x15	 // Mode 5 output pull-up
+         0x0EC 0x15	 // Mode 5 output pull-up
+         0x0B8 0x15	 // Mode 5 output pull-up
+         0x0BC 0x15	 // Mode 5 output pull-up
+         0x0B0 0x15	 // Mode 5 output pull-up
+         0x0B4 0x15	 // Mode 5 output pull-up
+         0x0A8 0x15	 // Mode 5 output pull-up
+         0x0AC 0x15	 // Mode 5 output pull-up
+         0x0A0 0x15	 // Mode 5 output pull-up
+	 0x0A4 0x15	 // Mode 5 output pull-up
        >;  
       };  
     };  

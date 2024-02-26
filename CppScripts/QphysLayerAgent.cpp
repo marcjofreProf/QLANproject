@@ -548,24 +548,17 @@ int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
 
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-//cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
-//cout << "ChannelTags[i]: "<< std::bitset<8>(ChannelTags[i]) << endl;
-if (ChannelTags[i]&0x01==1){
-TimeTaggsDetAnalytics[0]=(float)TimeTaggsDetAnalytics[0]+1.0;
-}
-if ((ChannelTags[i]>>1)&0x01==1){
-TimeTaggsDetAnalytics[1]=(float)TimeTaggsDetAnalytics[1]+1.0;
-}
-if ((ChannelTags[i]>>2)&0x01==1){
-TimeTaggsDetAnalytics[2]=(float)TimeTaggsDetAnalytics[2]+1.0;
-}
-if ((ChannelTags[i]>>3)&0x01==1){
-TimeTaggsDetAnalytics[3]=(float)TimeTaggsDetAnalytics[3]+1.0;
-}
+cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
+cout << "ChannelTags[i]: "<< std::bitset<8>(ChannelTags[i]) << endl;
+if (ChannelTags[i]&0x01==1){TimeTaggsDetAnalytics[0]++;}
+if ((ChannelTags[i]>>1)&0x01==1){TimeTaggsDetAnalytics[1]++;}
+if ((ChannelTags[i]>>2)&0x01==1){TimeTaggsDetAnalytics[2]++;}
+if ((ChannelTags[i]>>3)&0x01==1){TimeTaggsDetAnalytics[3]++;}
+
 if (((float)(ChannelTags[i]&0x01)+(float)((ChannelTags[i]>>1)&0x01)+(float)((ChannelTags[i]>>2)&0x01)+(float)((ChannelTags[i]>>3)&0x01))>1.0){
 TimeTaggsDetAnalytics[4]=(float)TimeTaggsDetAnalytics[4]+1.0;
 }
-if (i>1){
+if (i>1){//Compute the mean value
 TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*((float)(TimeTaggs[i]-TimeTaggs[i-1]));
 
 //// Debugging
