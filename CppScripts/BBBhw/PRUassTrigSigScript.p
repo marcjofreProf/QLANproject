@@ -128,7 +128,7 @@ PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled by the other PRU
 	LBCO	r0, CONST_IETREG, 0xC, 4
 	AND	r0.b0, r0.b0, 0x03 // Since the tsignals have a minimum period of 4 clock cycles
-	QBLT	PSEUDOSYNCH, r0.b0, 0 // Coincides with a zero
+	QBNE	PSEUDOSYNCH, r0.b0, 0 // Coincides with a zero
 	
 SIGNALON:	
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents of r1 byte 0 to magic r30 output byte 0
