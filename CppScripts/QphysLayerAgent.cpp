@@ -12,6 +12,7 @@ Agent script for Quantum Physical Layer
 #include<unistd.h> //for usleep
 #include <stdio.h>
 #include <string.h>
+#include<bitset>
 // Time/synchronization management
 #include <chrono>
 
@@ -548,7 +549,7 @@ if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubit
 
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
-cout << "ChannelTags[i]: "<< ChannelTags[i] << endl;
+cout << "ChannelTags[i]: "<< std::bitset<8>(ChannelTags[i]) << endl;
 if (ChannelTags[i]&0x01==1){
 TimeTaggsDetAnalytics[0]=(float)TimeTaggsDetAnalytics[0]+1.0;
 }

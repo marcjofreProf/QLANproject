@@ -40,7 +40,6 @@
 #define OWN_RAM              0x00000000 // current PRU data RAM
 #define OWN_RAMoffset	     0x00000200 // Offset from Base OWN_RAM to avoid collision with some data tht PRU might store
 #define PRU1_CTRL            0x240
-#define C24add		     0x20
 
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0xFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
@@ -84,7 +83,7 @@ INITIATIONS:
 	//MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
 	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
-	//// This will make C26 point to 0x0002E000 (IET).
+	//// This will make C26 point to 0x0002E000 (IET). Done by the other PRU
 	//MOV	r0, 0x0002E000// | OWN_RAMoffset // When using assembler, the PRU does not put data in the first addresses of OWN_RAM (when using c++ PRU direct programming the PRU  might use some initial addresses of OWN_RAM space
 	////MOV	r10, 0x22000+0x20// | C24add//CONST_PRUDRAM
 	//SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of PRU0 Data RAM into C24
@@ -124,11 +123,11 @@ CMDLOOP:
 	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
 	//LED_ON
 	MOV	r1, NUM_REPETITIONS// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
-//PSEUDOSYNCH:
-//	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled by the other PRU
-//	LBCO	r0, CONST_IETREG, 0xC, 4
-//	AND	r0.b0, r0.b0, 0x03 // Since the signals have a minimum period of 4 clock cycles
-//	QBNE	PSEUDOSYNCH, r0.b0, 0 // Coincides with a zero
+PSEUDOSYNCH:
+	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled by the other PRU
+	LBCO	r0, CONST_IETREG, 0xC, 4
+	AND	r0.b0, r0.b0, 0x03 // Since the signals have a minimum period of 4 clock cycles
+	QBNE	PSEUDOSYNCH, r0.b0, 0 // Coincides with a zero
 	
 SIGNALON:	
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents of r1 byte 0 to magic r30 output byte 0
