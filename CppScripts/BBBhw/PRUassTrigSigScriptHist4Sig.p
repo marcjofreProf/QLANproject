@@ -147,8 +147,8 @@ SIGNALON:
 	MOV	r30.b0, 0x00 // All off
 SIGNALOFF:
 	SUB	r1, r1, 1 // Decrement counter
-	//QBNE	SIGNALON, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
-	QBA	SIGNALON//PSEUDOSYNCH// Debbuging - Infinite loop
+	QBNE	SIGNALON, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
+	//QBA	SIGNALON//PSEUDOSYNCH// Debbuging - Infinite loop
 //	MOV	r0, DELAY
 //DELAYOFF:
 //	SUB 	r0, r0, 1
