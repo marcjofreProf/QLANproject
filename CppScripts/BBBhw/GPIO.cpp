@@ -349,6 +349,7 @@ for (x=0; x<NumRecords; x++){
 
 // Store the last IEP counter carry over if it exceed 0x7FFFFFFF;
 if (valCycleCountPRU >= 0x8000000){this->valCarryOnCycleCountPRU=valCycleCountPRU & 0x7FFFFFFF;}
+else{this->valCarryOnCycleCountPRU=0;}
 
 //cout << "sharedMem_int: " << sharedMem_int << endl;
 
