@@ -347,7 +347,7 @@ for (x=0; x<NumRecords; x++){
 	//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
 }
 
-// Store the last IEP counter carry over if it exceed 0x7FFFFFFF;
+// Store the last IEP counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
 if (valCycleCountPRU >= 0x8000000){this->valCarryOnCycleCountPRU=valCycleCountPRU & 0x7FFFFFFF;}
 else{this->valCarryOnCycleCountPRU=0;}
 
