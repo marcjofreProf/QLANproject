@@ -286,7 +286,7 @@ unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquition r
 unsigned int valOverflowCycleCountPRU=0; // 32 bits
 //unsigned int valIEPtimerFinalCounts=0; // 32 bits
 unsigned long long int extendedCounterPRU=0; // 64 bits
-unsigned long long int auxUnskewingFactorResetCycle=0; // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU
+unsigned long long int auxUnskewingFactorResetCycle=8; // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the priodicity
 //unsigned char val; // 8 bits
 unsigned char valBitsInterest=0; // 8 bits
 //unsigned char rgb24[4];
@@ -348,7 +348,8 @@ for (x=0; x<NumRecords; x++){
 }
 
 // Store the last IEP counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
-if (valCycleCountPRU >= 0x8000000){this->valCarryOnCycleCountPRU=valCycleCountPRU & 0x7FFFFFFF;}
+unsigned int AfterCountsThreshold=0x0000001E;
+if (valCycleCountPRU >= (0x8000000-AfterCountsThreshold)){this->valCarryOnCycleCountPRU=valCycleCountPRU & 0x7FFFFFFF;}
 else{this->valCarryOnCycleCountPRU=0;}
 
 //cout << "sharedMem_int: " << sharedMem_int << endl;

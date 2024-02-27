@@ -159,7 +159,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 
 TIMETAG:
 	// Faster Concatenated Time counter and Detectoin channels
-	LBCO	r5, CONST_IETREG, 0xC, 4 //LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT
+	LBCO	r5, CONST_IETREG, 0xC, 4 //LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT. From here account for counts until reset to adjust the threshold in GPIO c++
 	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 5 // Put contents of r5 and r6.b0 of DWT_CYCCNT into the address offset at r1.
 	ADD 	r1, r1, 5 // increment address by 5 bytes
 	//// Slow Time counter part
