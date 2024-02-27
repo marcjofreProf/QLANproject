@@ -38,10 +38,11 @@
 // r5 reserved for holding the DWT_CYCCNT count value
 // r6 reserved because detected channels are concatenated with r5 in the write to SHARED RAM
 // r7 reserved for 0 value (zeroing registers)
+// r8 reserved for immediate value of IEP counter
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
-// r7 reserved for 0x22000 Control register
-// r8 reserved for 0x2200C DWT_CYCCNT
+// r11 reserved for 0x22000 Control register
+// r12 reserved for 0x2200C DWT_CYCCNT
 //// If using IET timer (potentially adjusted to synchronization protocols)
 // We can use Constant table pointers C26
 // CONST_IETREG 0x0002E000
@@ -95,6 +96,7 @@ INITIATIONS:// This is only run once
 	//MOV	r7, 0x22000
 	//MOV	r8, 0x2200C
 	LDI	r3, 0 //MOV	r3, 0  // Initialize overflow counter in r3	
+	LDI 	r5, 0 // Initialize for the first time r5
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
 	// Initializations for faster execution
 	LDI	r7, 0 //MOV	r6, 0 // Register for clearing other registers
@@ -114,8 +116,10 @@ INITIATIONS:// This is only run once
 	SBCO	r0, CONST_IETREG, 0, 1 // Enables IET count
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Clear IET count
 
+NORMSTEPS: // So that always takes the same amount of counts for reset
+	QBA     CHECK_CYCLECNT
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	SBCO	r7, CONST_IETREG, 0xC, 4 // Clear IET count. SBBO	r7, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 12 cycle counts
+	SBCO	r7, CONST_IETREG, 0xC, 4 // SBBO	r7, r8, 0, 4 // Clear DWT_CYCNT. Account that we lose 12 cycle counts
 	// Non critical but necessary instructions once DWT_CYCCNT has been reset	
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 
@@ -125,15 +129,15 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	LBCO	r5, CONST_IETREG, 0xC, 4 // LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts.
-	QBLT	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte < r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
+	QBLE	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte <= r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
 
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
-	QBEQ	CHECK_CYCLECNT, r0, 0 // loop until we get an instruction
+	QBEQ	NORMSTEPS, r0, 0 // loop until we get an instruction
 	QBEQ	CHECK_CYCLECNT, r0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
 	// We remove the command from the host (in case there is a reset from host, we are saved)
-	SBCO 	r7, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
+	SBCO 	r7, CONST_PRUDRAM, 0, 4 // Put contents of r7 into CONST_PRUDRAM
 //	LED_ON // Indicate that we start acquisiton of timetagging
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
@@ -172,8 +176,8 @@ TIMETAG:
 	// we're done. Signal to the application
 	LDI	r0, 1	
 	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
-	LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
-	LED_OFF
+	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
+	//LED_OFF
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:

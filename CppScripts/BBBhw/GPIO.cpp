@@ -281,10 +281,12 @@ int x;
 //unsigned char tv;
 
 unsigned char* valp; // 8 bits
+unsigned char* valpAux; // 8 bits
 unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquition run
 unsigned int valOverflowCycleCountPRU=0; // 32 bits
+//unsigned int valIEPtimerFinalCounts=0; // 32 bits
 unsigned long long int extendedCounterPRU=0; // 64 bits
-unsigned long long int auxUnskewingFactor=0; // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits
+unsigned long long int auxUnskewingFactorResetCycle=0; // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU
 //unsigned char val; // 8 bits
 unsigned char valBitsInterest=0; // 8 bits
 //unsigned char rgb24[4];
@@ -293,6 +295,7 @@ unsigned char valBitsInterest=0; // 8 bits
 
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
+//valpAux=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
 //for each capture bursts, at the beggining is stored the overflow counter of 32 bits. From there, each capture consists of 32 bits of the DWT_CYCCNT register and 8 bits of the channels detected (40 bits per detection tag).
 // The shared memory space has 12KB=12×1024bytes=12×1024×8bits=98304bits.
 //Doing numbers, we can store up to 2456 captures. To be in the safe side, we can do 2048 captures
@@ -309,7 +312,12 @@ valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
 valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts with a 1 offset
-//if (x==0 or x== 512 or x==1023){cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;}
+//cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
+
+//unsigned long long int auxUnskewingFinalCyc=; // Related to the number of instructions after all adquisition (this happens always, independent that IEP is reset
+//valpAux=valpAux+4+5*NumRecords;
+//valIEPtimerFinalCounts=static_cast<unsigned int>(*valpAux) & 0x7FFFFFF;// Do not account for the most significat bit
+//cout << "valIEPtimerFinalCounts: " << valIEPtimerFinalCounts << endl;
 streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
@@ -323,7 +331,7 @@ for (x=0; x<NumRecords; x++){
 	valp++;// 1 times 8 bits
 	//if (x==0 or x== 512 or x==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
 	// Mount the extended counter value
-	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactor) + static_cast<unsigned long long int>(valCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
+	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactorResetCycle) + static_cast<unsigned long long int>(valCycleCountPRU) + static_cast<unsigned long long int>(this->valCarryOnCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 	//if (x==0 or x== 512 or x==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
 	// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
 	valBitsInterest=static_cast<unsigned char>(*valp);
@@ -338,6 +346,9 @@ for (x=0; x<NumRecords; x++){
 	streamDDRpru.write(reinterpret_cast<const char*>(&valBitsInterest), sizeof(valBitsInterest));
 	//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
 }
+
+// Store the last IEP counter carry over if it exceed 0x7FFFFFFF;
+if (valCycleCountPRU >= 0x8000000){this->valCarryOnCycleCountPRU=valCycleCountPRU & 0x7FFFFFFF;}
 
 //cout << "sharedMem_int: " << sharedMem_int << endl;
 

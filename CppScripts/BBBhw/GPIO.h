@@ -54,6 +54,7 @@ private:// Variables
 	static void *pru_int;       // Points to start of PRU memory.
 	//static int chunk;
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
+	unsigned int valCarryOnCycleCountPRU=0; // 32 bits
 	//FILE* outfile;
 	fstream streamDDRpru;
 	// Time/synchronization management
