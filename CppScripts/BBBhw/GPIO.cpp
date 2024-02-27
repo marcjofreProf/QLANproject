@@ -348,8 +348,8 @@ for (x=0; x<NumRecords; x++){
 }
 
 // Store the last IEP counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
-unsigned int AfterCountsThreshold=0x0000FFFF;//1E;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust
-if (valCycleCountPRU >= (0x8000000-AfterCountsThreshold)){this->valCarryOnCycleCountPRU=valCycleCountPRU & 0x7FFFFFFF;}
+unsigned int AfterCountsThreshold=0x00000020;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust
+if (valCycleCountPRU >= (0x80000000-AfterCountsThreshold)){this->valCarryOnCycleCountPRU=valCycleCountPRU & 0x7FFFFFFF;}
 else{this->valCarryOnCycleCountPRU=0;}
 
 //cout << "sharedMem_int: " << sharedMem_int << endl;
