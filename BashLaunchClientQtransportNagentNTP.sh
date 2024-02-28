@@ -1,6 +1,7 @@
 trap "kill 0" EXIT
 echo 'Running PTP as slave'
 sudo /etc/init.d/rsyslog stop # stop logging
+sudo systemctl start systemd-timesyncd # start system synch
 sudo timedatectl set-ntp true # Start NTP
 echo 'Enabling BBB pins'
 sudo config-pin P9_28 pruin
