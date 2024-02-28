@@ -1,4 +1,5 @@
 sudo /etc/init.d/rsyslog stop # stop logging
+sudo timedatectl set-ntp false # Stop NTP
 echo 'Enabling BBB pins'
 sudo config-pin P9_28 pruin
 sudo config-pin P9_29 pruin
@@ -24,6 +25,7 @@ sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo ./CppScripts/QtransportLayerAgentN server 192.168.9.2 192.168.9.1
+sudo timedatectl set-ntp true # Start NTP
 #sudo /etc/init.d/rsyslog start # start logging
 # Kill all the launched processes with same group PID
 #kill -INT $$

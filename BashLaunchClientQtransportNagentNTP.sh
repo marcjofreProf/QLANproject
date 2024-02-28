@@ -1,5 +1,7 @@
+trap "kill 0" EXIT
+echo 'Running PTP as slave'
 sudo /etc/init.d/rsyslog stop # stop logging
-sudo timedatectl set-ntp false # Stop NTP
+sudo timedatectl set-ntp true # Start NTP
 echo 'Enabling BBB pins'
 sudo config-pin P9_28 pruin
 sudo config-pin P9_29 pruin
@@ -26,5 +28,7 @@ sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo ./CppScripts/QtransportLayerAgentN client 192.168.8.2 192.168.8.1
 sudo timedatectl set-ntp true # Start NTP
+echo 'Stopped PTP as slave'
 #sudo /etc/init.d/rsyslog start # start logging
-
+# Kill all the launched processes with same group PID
+#kill -INT $$
