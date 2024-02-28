@@ -132,9 +132,7 @@ CMDLOOP:
 PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
 	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
-	AND	r0, r0, 0x0000000F // Since the signals have a minimum period of 2 clock cycles and there are 5 combinations (Ch1, Ch2, Ch3, Ch4, NoCh
-	QBEQ	SIGNALON, r0.b0, 9 // Coincides with a 9
-	QBEQ	SIGNALON, r0.b0, 8 // Coincides with a 8
+	AND	r0, r0, 0x00000007 // Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) we can get a value between 0 and 7
 	QBEQ	SIGNALON, r0.b0, 7 // Coincides with a 7
 	QBEQ	SIGNALON, r0.b0, 6 // Coincides with a 6
 	QBEQ	SIGNALON, r0.b0, 5 // Coincides with a 5

@@ -585,7 +585,7 @@ TimeTaggsDetAnalytics[7]=TimeTaggs[0];
 //cout << "TimeTaggsDetAnalytics[6]: " << TimeTaggsDetAnalytics[6] << endl;
 //cout << "TimeTaggsDetAnalytics[7]: " << TimeTaggsDetAnalytics[7] << endl;
 
-/// Part to analyze if there is absolute synch between clocks with channel 1 and and histogram periodic signals of 5 steps (ch1, ch2, ch3, ch4 and off).Where only channel timetagg 1 is connected.
+/// Part to analyze if there is absolute synch between clocks with channel 1 and and histogram periodic signals of 4 steps (ch1, ch2, ch3, ch4).
 // Accordingly a complete sycle has 10 counts (2 counts for each step)
 // Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
 // Accordingly, the std wrapped count difference is stored in TimeTaggsDetAnalytics[6]
@@ -596,11 +596,11 @@ cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference
 TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*((float)((TimeTaggs[i]-TimeTaggs[i-1])%10));
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*((float)((TimeTaggs[i]-TimeTaggs[i-1])%8));
 }
 
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*pow((float)((TimeTaggs[i]-TimeTaggs[i-1])%10)-TimeTaggsDetAnalytics[5],2.0);
+TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*pow((float)((TimeTaggs[i]-TimeTaggs[i-1])%8)-TimeTaggsDetAnalytics[5],2.0);
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 ////////////////////////////////

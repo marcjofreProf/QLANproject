@@ -370,8 +370,30 @@ valp++;// 1 times 8 bits
 cout << "valDWT_CYCCNTreupdate: " << valDWT_CYCCNTreupdate << endl;
 //////////////////////////////////////////////////////////////////////////////*/
 
+///////////////////////////////////////////////////////////////////////////////////////
+// Checking control - Clock skew and threshold
+unsigned int valSkewCounts=static_cast<unsigned int>(*valp);
+valp++;// 1 times 8 bits
+valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valp))<<8;
+valp++;// 1 times 8 bits
+valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valp))<<16;
+valp++;// 1 times 8 bits
+valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valp))<<24;
+cout << "valSkewCounts: " << valSkewCounts << endl;
+
+unsigned int valThresholdResetCounts=static_cast<unsigned int>(*valp);
+valp++;// 1 times 8 bits
+valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valp))<<8;
+valp++;// 1 times 8 bits
+valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valp))<<16;
+valp++;// 1 times 8 bits
+valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valp))<<24;
+valp++;// 1 times 8 bits
+cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
+//////////////////////////////////////////////////////////////////////////////*/
+
 // Store the last IEP counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
-unsigned int AfterCountsThreshold=0x00000016;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust
+unsigned int AfterCountsThreshold=0x00000000;//16;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust
 if (valCycleCountPRU >= (0x80000000-AfterCountsThreshold)){this->valCarryOnCycleCountPRU=valCycleCountPRU & 0x7FFFFFFF;}
 else{this->valCarryOnCycleCountPRU=0;}
 
