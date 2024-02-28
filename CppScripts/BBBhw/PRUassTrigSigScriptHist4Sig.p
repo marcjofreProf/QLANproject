@@ -91,8 +91,8 @@ INITIATIONS:
 	////MOV	r10, 0x22000+0x20// | C24add//CONST_PRUDRAM
 	//SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	// Using cycle counter
-	MOV	r2, 0x22000
-	MOV	r3, 0x2200C
+	//MOV	r2, 0x22000
+	//MOV	r3, 0x2200C
 	
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
@@ -130,8 +130,8 @@ CMDLOOP:
 	//LED_ON
 	MOV	r1, NUM_REPETITIONS// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
 PSEUDOSYNCH:
-	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCCNT (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
-	LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
+	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
+	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
 	AND	r0, r0, 0x0000000F // Since the signals have a minimum period of 2 clock cycles and there are 5 combinations (Ch1, Ch2, Ch3, Ch4, NoCh
 	QBEQ	SIGNALON, r0.b0, 9 // Coincides with a 9
 	QBEQ	SIGNALON, r0.b0, 8 // Coincides with a 8
@@ -154,7 +154,7 @@ SIGNALON:
 	MOV	r30.b0, 0x00 // All off
 SIGNALOFF:
 	SUB	r1, r1, 1 // Decrement counter
-	QBNE	SIGNALON, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
+	QBNE	PSEUDOSYNCH, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
 	//QBA	SIGNALON//PSEUDOSYNCH// Debbuging - Infinite loop
 //	MOV	r0, DELAY
 //DELAYOFF:

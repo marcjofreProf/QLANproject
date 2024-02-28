@@ -346,8 +346,8 @@ for (x=0; x<NumRecords; x++){
 	streamDDRpru.write(reinterpret_cast<const char*>(&valBitsInterest), sizeof(valBitsInterest));
 	//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
 }
-///////////////////////////////////////////////////////////////////////////////////////
-// Checking control
+/*///////////////////////////////////////////////////////////////////////////////////////
+// Checking control - If discipling PRU cycle clocks
 unsigned int valDWT_CYCCNTFinalCounts=static_cast<unsigned int>(*valp);
 valp++;// 1 times 8 bits
 valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valp))<<8;
@@ -368,7 +368,7 @@ valp++;// 1 times 8 bits
 valDWT_CYCCNTreupdate=valDWT_CYCCNTreupdate | (static_cast<unsigned int>(*valp))<<24;
 valp++;// 1 times 8 bits
 cout << "valDWT_CYCCNTreupdate: " << valDWT_CYCCNTreupdate << endl;
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////*/
 
 // Store the last IEP counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
 unsigned int AfterCountsThreshold=0x00000016;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust
