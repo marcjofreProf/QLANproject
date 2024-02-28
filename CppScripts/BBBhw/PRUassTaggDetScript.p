@@ -52,8 +52,8 @@
 // CONST_IETREG 0x0002E000
 // IET Count 0xC offset
 
-
 // r14 is arbitrary used for operations
+// r15 is arbitrary used for operations
 
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
@@ -106,6 +106,9 @@ INITIATIONS:// This is only run once
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
 	// Initializations for faster execution
 	LDI	r7, 0 //MOV	r6, 0 // Register for clearing other registers
+	LDI	r8, 0
+	MOV	r9, 0xFFFFFFFF // For the initial skew count monitor
+	LDI	r10, 0
 	MOV	r11, 0xFFFFFFFF // For the initial thresdhol reset count we need to start with a high number
 	
 	// Initial Re-initialization of DWT_CYCCNT
@@ -133,6 +136,7 @@ NORMSTEPS: // So that always takes the same amount of counts for reset
 	QBA     CHECK_CYCLECNT
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	//SUB	r10, r9, r5 // Make the difference between counters
+	LBBO	r8, r13, 0, 4 // read DWT_CYCNT
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Reset IEP counter to account for difference with DWT_CYCCNT. Account that we lose 12 cycle counts
 	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset
 	LBBO	r9, r13, 0, 4 // read DWT_CYCNT	
@@ -143,10 +147,9 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 //	SET r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
-CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	LBBO	r11, r13, 0, 4 // read DWT_CYCNT
+CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew	
 	LBCO	r5, CONST_IETREG, 0xC, 4 // LBBO	// from here, if a reset of count we will lose some counts.
-	LBBO	r8, r13, 0, 4 // read DWT_CYCNT		
+	LBBO	r11, r13, 0, 4 // read DWT_CYCNT		
 	QBLE	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte <= r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
@@ -182,7 +185,7 @@ TIMETAG:
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
-	SUB	r14, r11, r10 // Threshold reset counts
+	SUB	r15, r11, r10 // Threshold reset counts
 	LBBO	r10, r13, 0, 4 // read DWT_CYCNT
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	//// For checking control, place as the last value the current counter of DWT_CYCCNT as well as the last IEP timer count - DWT_CYCCNT comparison
@@ -195,7 +198,7 @@ TIMETAG:
 	SUB	r14, r9, r8 // Skew counts
 	SBCO 	r14, CONST_PRUSHAREDRAM, r1, 4
 	ADD 	r1, r1, 4 // increment address by 4 bytes	
-	SBCO 	r14, CONST_PRUSHAREDRAM, r1, 4
+	SBCO 	r15, CONST_PRUSHAREDRAM, r1, 4
 	ADD 	r1, r1, 4 // increment address by 4 bytes
 	// we're done. Signal to the application
 	LDI	r0, 1	
