@@ -116,18 +116,18 @@ INITIATIONS:// This is only run once
 	MOV	r0, 0x11 // Enable and Define increment value to 1
 	SBCO	r0, CONST_IETREG, 0, 1 // Enables IET count
 	
-	// Keep close together the clearing of the counters (always IEP timer first)
-	SBCO	r7, CONST_IETREG, 0xC, 4 // Clear IEP timer count
+	// Keep close together the clearing of the counters (keep order)
 	SBBO	r7, r12, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SBCO	r7, CONST_IETREG, 0xC, 4 // Clear IEP timer count	
 	
 	LBCO	r5, CONST_IETREG, 0xC, 4 // Read once IEP timer count
 
 NORMSTEPS: // So that always takes the same amount of counts for reset
 	QBA     CHECK_CYCLECNT
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	SUB	r0, r7, r9 // MAke the difference between counters
-	SBCO	r0, CONST_IETREG, 0xC, 4 // Reset IEP counter to account for difference with DWT_CYCCNT. Account that we lose 12 cycle counts
-	SBBO	r7, r12, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SUB	r0, r9, r7 // Make the difference between counters
+	SBBO	r0, r12, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SBCO	r7, CONST_IETREG, 0xC, 4 // Reset IEP counter to account for difference with DWT_CYCCNT. Account that we lose 12 cycle counts	
 	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset	
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 
@@ -136,8 +136,8 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	LBCO	r5, CONST_IETREG, 0xC, 4 // LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts.
 	LBBO	r9, r12, 0 , 4 // Read DWT_CYCCNT
+	LBCO	r5, CONST_IETREG, 0xC, 4 // LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts.	
 	QBLE	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte <= r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
 
 CMDLOOP:
