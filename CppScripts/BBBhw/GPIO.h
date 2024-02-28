@@ -61,6 +61,7 @@ private:// Variables
 	using Clock = std::chrono::system_clock;//system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
 	TimePoint OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
+	bool FirstTimeDDRdumpdata=true; // First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
 	// Non PRU
 	int number, debounceTime;
 	string name, path;

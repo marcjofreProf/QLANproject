@@ -133,7 +133,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 			perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScriptHist4Sig.bin");//perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
 		}
 	}
-	sleep(5);// Give some time to load programs in PRUs and initiate
+	sleep(3);// Give some time to load programs in PRUs and initiate
 	  
 	  /*// Doing debbuging checks - Debugging 1	  
 	  std::thread threadReadTimeStampsAux=std::thread(&GPIO::ReadTimeStamps,this);
@@ -335,8 +335,8 @@ valpAux++;// 1 times 8 bits
 valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<16;
 valpAux++;// 1 times 8 bits
 valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<24;
-cout << "valSkewCounts: " << valSkewCounts << endl;
-
+//cout << "valSkewCounts: " << valSkewCounts << endl;
+valSkewCounts=valSkewCounts+7; // The 7 here is an estimation of th einstruction sthat are not accounted for. SBC0 is 6 counts
 unsigned int valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
 valpAux++;// 1 times 8 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<8;
@@ -345,7 +345,7 @@ valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*va
 valpAux++;// 1 times 8 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<24;
 valpAux++;// 1 times 8 bits
-cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
+//cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
 //////////////////////////////////////////////////////////////////////////////*/
 
 unsigned long long int auxUnskewingFactorResetCycle=static_cast<unsigned long long int>(valSkewCounts); // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
@@ -392,7 +392,11 @@ for (x=0; x<NumRecords; x++){
 }
 
 // Store the last IEP counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
-unsigned int AfterCountsThreshold=valThresholdResetCounts;//0x00000000;//16;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust
+unsigned int AfterCountsThreshold=0;
+// The twelve below is an estimation since there are instructions that are not accounted for
+if (this->FirstTimeDDRdumpdata){AfterCountsThreshold=6400+18;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
+else{AfterCountsThreshold=valThresholdResetCounts+18;};//0x00000000;//16;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust
+this->FirstTimeDDRdumpdata=false;
 if (valCycleCountPRU >= (0x80000000-AfterCountsThreshold)){this->valCarryOnCycleCountPRU=valCycleCountPRU & 0x7FFFFFFF;}
 else{this->valCarryOnCycleCountPRU=0;}
 
