@@ -133,10 +133,9 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 			perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScriptHist4Sig.bin");//perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
 		}
 	}
-	
+	sleep(5);// Give some time to load programs in PRUs and initiate
 	  
-	  /*// Doing debbuging checks - Debugging 1
-	  sleep(2);// Give some time to load programs in PRUs and initiate
+	  /*// Doing debbuging checks - Debugging 1	  
 	  std::thread threadReadTimeStampsAux=std::thread(&GPIO::ReadTimeStamps,this);
 	  std::thread threadSendTriggerSignalsAux=std::thread(&GPIO::SendTriggerSignals,this);
 	  threadReadTimeStampsAux.join();	
@@ -281,13 +280,12 @@ int x;
 //unsigned char tv;
 
 unsigned char* valp; // 8 bits
-//unsigned char* valpAux; // 8 bits
+unsigned char* valpAux; // 8 bits
 unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquition run
 unsigned int valOverflowCycleCountPRU=0; // 32 bits
 //unsigned int valIEPtimerFinalCounts=0; // 32 bits
 unsigned long long int extendedCounterPRU=0; // 64 bits
 unsigned long long int extendedCounterPRUaux=0; // 64 bits
-unsigned long long int auxUnskewingFactorResetCycle=0; // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
 //unsigned char val; // 8 bits
 unsigned char valBitsInterest=0; // 8 bits
 //unsigned char rgb24[4];
@@ -296,13 +294,61 @@ unsigned char valBitsInterest=0; // 8 bits
 
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
-//valpAux=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
 //for each capture bursts, at the beggining is stored the overflow counter of 32 bits. From there, each capture consists of 32 bits of the DWT_CYCCNT register and 8 bits of the channels detected (40 bits per detection tag).
 // The shared memory space has 12KB=12×1024bytes=12×1024×8bits=98304bits.
 //Doing numbers, we can store up to 2456 captures. To be in the safe side, we can do 2048 captures
 
 unsigned int NumRecords=2048; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 
 
+valpAux=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
+valpAux=valpAux+4+5*NumRecords;
+/*///////////////////////////////////////////////////////////////////////////////////////
+// Checking control - If discipling PRU cycle clocks
+unsigned int valDWT_CYCCNTFinalCounts=static_cast<unsigned int>(*valpAux);
+valpAux++;// 1 times 8 bits
+valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valpAux))<<8;
+valpAux++;// 1 times 8 bits
+valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valpAux))<<16;
+valpAux++;// 1 times 8 bits
+valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valpAux))<<24;
+cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
+cout << "valDWT_CYCCNTFinalCounts: " << valDWT_CYCCNTFinalCounts << endl;
+cout << "Diff PRU timers: " << static_cast<int>(valDWT_CYCCNTFinalCounts)-static_cast<int>(valCycleCountPRU) << endl;
+
+unsigned int valDWT_CYCCNTreupdate=static_cast<unsigned int>(*valpAux);
+valpAux++;// 1 times 8 bits
+valDWT_CYCCNTreupdate=valDWT_CYCCNTreupdate | (static_cast<unsigned int>(*valpAux))<<8;
+valpAux++;// 1 times 8 bits
+valDWT_CYCCNTreupdate=valDWT_CYCCNTreupdate | (static_cast<unsigned int>(*valpAux))<<16;
+valpAux++;// 1 times 8 bits
+valDWT_CYCCNTreupdate=valDWT_CYCCNTreupdate | (static_cast<unsigned int>(*valpAux))<<24;
+valpAux++;// 1 times 8 bits
+cout << "valDWT_CYCCNTreupdate: " << valDWT_CYCCNTreupdate << endl;
+//////////////////////////////////////////////////////////////////////////////*/
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Checking control - Clock skew and threshold
+unsigned int valSkewCounts=static_cast<unsigned int>(*valpAux);
+valpAux++;// 1 times 8 bits
+valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<8;
+valpAux++;// 1 times 8 bits
+valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<16;
+valpAux++;// 1 times 8 bits
+valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<24;
+cout << "valSkewCounts: " << valSkewCounts << endl;
+
+unsigned int valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
+valpAux++;// 1 times 8 bits
+valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<8;
+valpAux++;// 1 times 8 bits
+valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<16;
+valpAux++;// 1 times 8 bits
+valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<24;
+valpAux++;// 1 times 8 bits
+cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
+//////////////////////////////////////////////////////////////////////////////*/
+
+unsigned long long int auxUnskewingFactorResetCycle=static_cast<unsigned long long int>(valSkewCounts); // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
 // First 32 bits is the overflow register for DWT_CYCCNT
 valOverflowCycleCountPRU=static_cast<unsigned int>(*valp);
 valp++;// 1 times 8 bits
@@ -315,8 +361,6 @@ valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts with a 1 offset
 //cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactorResetCycle) + static_cast<unsigned long long int>(this->valCarryOnCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
-
-//valpAux=valpAux+4+5*NumRecords;
 
 streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 for (x=0; x<NumRecords; x++){
@@ -346,54 +390,9 @@ for (x=0; x<NumRecords; x++){
 	streamDDRpru.write(reinterpret_cast<const char*>(&valBitsInterest), sizeof(valBitsInterest));
 	//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
 }
-/*///////////////////////////////////////////////////////////////////////////////////////
-// Checking control - If discipling PRU cycle clocks
-unsigned int valDWT_CYCCNTFinalCounts=static_cast<unsigned int>(*valp);
-valp++;// 1 times 8 bits
-valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valp))<<8;
-valp++;// 1 times 8 bits
-valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valp))<<16;
-valp++;// 1 times 8 bits
-valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valp))<<24;
-cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
-cout << "valDWT_CYCCNTFinalCounts: " << valDWT_CYCCNTFinalCounts << endl;
-cout << "Diff PRU timers: " << static_cast<int>(valDWT_CYCCNTFinalCounts)-static_cast<int>(valCycleCountPRU) << endl;
-
-unsigned int valDWT_CYCCNTreupdate=static_cast<unsigned int>(*valp);
-valp++;// 1 times 8 bits
-valDWT_CYCCNTreupdate=valDWT_CYCCNTreupdate | (static_cast<unsigned int>(*valp))<<8;
-valp++;// 1 times 8 bits
-valDWT_CYCCNTreupdate=valDWT_CYCCNTreupdate | (static_cast<unsigned int>(*valp))<<16;
-valp++;// 1 times 8 bits
-valDWT_CYCCNTreupdate=valDWT_CYCCNTreupdate | (static_cast<unsigned int>(*valp))<<24;
-valp++;// 1 times 8 bits
-cout << "valDWT_CYCCNTreupdate: " << valDWT_CYCCNTreupdate << endl;
-//////////////////////////////////////////////////////////////////////////////*/
-
-///////////////////////////////////////////////////////////////////////////////////////
-// Checking control - Clock skew and threshold
-unsigned int valSkewCounts=static_cast<unsigned int>(*valp);
-valp++;// 1 times 8 bits
-valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valp))<<8;
-valp++;// 1 times 8 bits
-valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valp))<<16;
-valp++;// 1 times 8 bits
-valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valp))<<24;
-cout << "valSkewCounts: " << valSkewCounts << endl;
-
-unsigned int valThresholdResetCounts=static_cast<unsigned int>(*valp);
-valp++;// 1 times 8 bits
-valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valp))<<8;
-valp++;// 1 times 8 bits
-valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valp))<<16;
-valp++;// 1 times 8 bits
-valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valp))<<24;
-valp++;// 1 times 8 bits
-cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
-//////////////////////////////////////////////////////////////////////////////*/
 
 // Store the last IEP counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
-unsigned int AfterCountsThreshold=0x00000000;//16;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust
+unsigned int AfterCountsThreshold=valThresholdResetCounts;//0x00000000;//16;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust
 if (valCycleCountPRU >= (0x80000000-AfterCountsThreshold)){this->valCarryOnCycleCountPRU=valCycleCountPRU & 0x7FFFFFFF;}
 else{this->valCarryOnCycleCountPRU=0;}
 
