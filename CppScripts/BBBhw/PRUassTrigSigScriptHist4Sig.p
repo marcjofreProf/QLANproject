@@ -123,7 +123,7 @@ CMDLOOP:
 	//LED_ON
 	MOV	r1, NUM_REPETITIONS// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
 PSEUDOSYNCH:
-	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled by the other PRU
+	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and keeps disciplined with the Cycle counter by the other PRU)
 	LBCO	r0.b0, CONST_IETREG, 0xC, 1
 	AND	r0, r0, 0x0000000F // Since the signals have a minimum period of 2 clock cycles and there are 5 combinations (Ch1, Ch2, Ch3, Ch4, NoCh
 	QBEQ	SIGNALON, r0.b0, 9 // Coincides with a 9
