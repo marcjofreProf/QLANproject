@@ -121,14 +121,14 @@ INITIATIONS:// This is only run once
 	SBBO	r7, r12, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Clear IEP timer count	
 	
-	// REad nce the counters
-	LBBO	r9, r12, 0 , 4 // Read DWT_CYCCNT
+	// REad once the counters (keep the reading order along the script)
 	LBCO	r5, CONST_IETREG, 0xC, 4 // Read once IEP timer count
+	LBBO	r9, r12, 0 , 4 // Read DWT_CYCCNT	
 
 NORMSTEPS: // So that always takes the same amount of counts for reset
 	QBA     CHECK_CYCLECNT
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	SUB	r10, r9, r5 // Make the difference between counters
+	SUB	r10, r5, r9 // Make the difference between counters
 	SBBO	r10, r12, 0, 4 // Update DWT_CYCNT. Account that we lose 2 cycle counts
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Reset IEP counter to account for difference with DWT_CYCCNT. Account that we lose 12 cycle counts	
 	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset	
@@ -139,8 +139,8 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	LBBO	r9, r12, 0 , 4 // Read DWT_CYCCNT
-	LBCO	r5, CONST_IETREG, 0xC, 4 // LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts.	
+	LBCO	r5, CONST_IETREG, 0xC, 4 // LBBO	r5, r8, 0, 4 // r5 maps the value of DWT_CYCCNT // from here, if a reset of DWT_CYCCNT happens we will lose some counts.
+	LBBO	r9, r12, 0 , 4 // Read DWT_CYCCNT		
 	QBLE	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte <= r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
 
 CMDLOOP:

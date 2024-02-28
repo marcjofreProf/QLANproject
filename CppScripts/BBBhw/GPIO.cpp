@@ -357,7 +357,7 @@ valp++;// 1 times 8 bits
 valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valp))<<24;
 cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
 cout << "valDWT_CYCCNTFinalCounts: " << valDWT_CYCCNTFinalCounts << endl;
-cout << "Diff PRU timers: " << static_cast<int>(valCycleCountPRU)-static_cast<int>(valDWT_CYCCNTFinalCounts) << endl;
+cout << "Diff PRU timers: " << static_cast<int>(valDWT_CYCCNTFinalCounts)-static_cast<int>(valCycleCountPRU) << endl;
 
 unsigned int valDWT_CYCCNTreupdate=static_cast<unsigned int>(*valp);
 valp++;// 1 times 8 bits
