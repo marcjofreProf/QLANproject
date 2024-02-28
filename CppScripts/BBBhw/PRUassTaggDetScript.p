@@ -93,9 +93,10 @@ INITIATIONS:// This is only run once
 
 //      LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
-// If using cycle counter
+	// Using cycle counter
 	MOV	r11, 0x22000
 	MOV	r12, 0x2200C
+	// Initializations
 	LDI	r3, 0 //MOV	r3, 0  // Initialize overflow counter in r3	
 	LDI 	r5, 0 // Initialize for the first time r5
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
@@ -182,6 +183,10 @@ TIMETAG:
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	// For cheching control, place as the last value the current counter of DWT_CYCCNT
+	LBBO	r9, r12, 0 , 4 // Read DWT_CYCCNT
+	SBCO 	r9, CONST_PRUSHAREDRAM, r1, 4
+	ADD 	r1, r1, 4 // increment address by 4 bytes
 	// we're done. Signal to the application
 	LDI	r0, 1	
 	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
@@ -192,7 +197,7 @@ TIMETAG:
 	SET	r2.t3
 	SBBO	r2, r11, 0, 1 // Enables DWT_CYCCNT
 	MOV	r0, 0x11 // Enable and Define increment value to 1
-	SBCO	r0, CONST_IETREG, 0, 1 // Enables IET count
+	SBCO	r0, CONST_IETREG, 0, 1 // Enables IET count	
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:

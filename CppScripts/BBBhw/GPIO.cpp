@@ -281,11 +281,12 @@ int x;
 //unsigned char tv;
 
 unsigned char* valp; // 8 bits
-unsigned char* valpAux; // 8 bits
+//unsigned char* valpAux; // 8 bits
 unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquition run
 unsigned int valOverflowCycleCountPRU=0; // 32 bits
 //unsigned int valIEPtimerFinalCounts=0; // 32 bits
 unsigned long long int extendedCounterPRU=0; // 64 bits
+unsigned long long int extendedCounterPRUaux=0; // 64 bits
 unsigned long long int auxUnskewingFactorResetCycle=0; // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
 //unsigned char val; // 8 bits
 unsigned char valBitsInterest=0; // 8 bits
@@ -312,12 +313,11 @@ valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
 valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts with a 1 offset
-//cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
+cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
+extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactorResetCycle) + static_cast<unsigned long long int>(this->valCarryOnCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 
-//unsigned long long int auxUnskewingFinalCyc=; // Related to the number of instructions after all adquisition (this happens always, independent that IEP is reset
 //valpAux=valpAux+4+5*NumRecords;
-//valIEPtimerFinalCounts=static_cast<unsigned int>(*valpAux) & 0x7FFFFFF;// Do not account for the most significat bit
-//cout << "valIEPtimerFinalCounts: " << valIEPtimerFinalCounts << endl;
+
 streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 for (x=0; x<NumRecords; x++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
@@ -331,7 +331,7 @@ for (x=0; x<NumRecords; x++){
 	valp++;// 1 times 8 bits
 	//if (x==0 or x== 512 or x==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
 	// Mount the extended counter value
-	extendedCounterPRU=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactorResetCycle) + static_cast<unsigned long long int>(valCycleCountPRU) + static_cast<unsigned long long int>(this->valCarryOnCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
+	extendedCounterPRU=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
 	//if (x==0 or x== 512 or x==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
 	// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
 	valBitsInterest=static_cast<unsigned char>(*valp);
@@ -346,6 +346,30 @@ for (x=0; x<NumRecords; x++){
 	streamDDRpru.write(reinterpret_cast<const char*>(&valBitsInterest), sizeof(valBitsInterest));
 	//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
 }
+///////////////////////////////////////////////////////////////////////////////////////
+// Checking control
+unsigned int valDWT_CYCCNTFinalCounts=static_cast<unsigned int>(*valp);
+valp++;// 1 times 8 bits
+valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valp))<<8;
+valp++;// 1 times 8 bits
+valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valp))<<16;
+valp++;// 1 times 8 bits
+valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valp))<<24;
+valp++;// 1 times 8 bits
+valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts-1;//Account that it starts with a 1 offset
+cout << "valDWT_CYCCNTFinalCounts: " << valDWT_CYCCNTFinalCounts << endl;
+cout << "Diff PRU timers: " << valOverflowCycleCountPRU-valDWT_CYCCNTFinalCounts << endl;
+
+unsigned int valDWT_CYCCNTreupdate=static_cast<unsigned int>(*valp);
+valp++;// 1 times 8 bits
+valDWT_CYCCNTreupdate=valDWT_CYCCNTreupdate | (static_cast<unsigned int>(*valp))<<8;
+valp++;// 1 times 8 bits
+valDWT_CYCCNTreupdate=valDWT_CYCCNTreupdate | (static_cast<unsigned int>(*valp))<<16;
+valp++;// 1 times 8 bits
+valDWT_CYCCNTreupdate=valDWT_CYCCNTreupdate | (static_cast<unsigned int>(*valp))<<24;
+valp++;// 1 times 8 bits
+cout << "valDWT_CYCCNTreupdate: " << valDWT_CYCCNTreupdate << endl;
+//////////////////////////////////////////////////////////////////////////////
 
 // Store the last IEP counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
 unsigned int AfterCountsThreshold=0x00000016;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust

@@ -61,6 +61,10 @@
 
 // r0 is arbitrary used for operations
 // r1 is reserved with the number of cycles counter
+//// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
+// We cannot use Constan table pointers since the base addresses are too far
+// r2 reserved for 0x22000 Control register
+// r3 reserved for 0x2200C DWT_CYCCNT
 
 // r10 is arbitrary used for operations
 
@@ -87,6 +91,10 @@ INITIATIONS:
 	//MOV	r0, 0x0002E000// | OWN_RAMoffset // When using assembler, the PRU does not put data in the first addresses of OWN_RAM (when using c++ PRU direct programming the PRU  might use some initial addresses of OWN_RAM space
 	////MOV	r10, 0x22000+0x20// | C24add//CONST_PRUDRAM
 	//SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of PRU0 Data RAM into C24
+	
+	// Using cycle counter
+	MOV	r2, 0x22000
+	MOV	r3, 0x2200C
 	
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
@@ -124,8 +132,8 @@ CMDLOOP:
 	//LED_ON
 	MOV	r1, NUM_REPETITIONS// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
 PSEUDOSYNCH:
-	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and keeps disciplined with the Cycle counter by the other PRU)
-	LBCO	r0.b0, CONST_IETREG, 0xC, 1
+	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCCNT (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
+	LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
 	AND	r0, r0, 0x00000003 // Since the signals have a minimum period of 4 clock cycles
 	QBEQ	SIGNALON, r0.b0, 3 // Coincides with a 3
 	QBEQ	SIGNALON, r0.b0, 2 // Coincides with a 2
