@@ -148,8 +148,7 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew	
-	LBCO	r5, CONST_IETREG, 0xC, 4 // LBBO	// from here, if a reset of count we will lose some counts.
-	LBBO	r11, r13, 0, 4 // read DWT_CYCNT		
+	LBCO	r5, CONST_IETREG, 0xC, 4 // LBBO	// from here, if a reset of count we will lose some counts.		
 	QBLE	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte <= r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
 CMDLOOP:
 	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
@@ -185,8 +184,8 @@ TIMETAG:
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
-	SUB	r15, r11, r10 // Threshold reset counts
 	LBBO	r10, r13, 0, 4 // read DWT_CYCNT
+	SUB	r15, r11, r10 // Threshold reset counts	
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	//// For checking control, place as the last value the current counter of DWT_CYCCNT as well as the last IEP timer count - DWT_CYCCNT comparison
 	//LBBO	r9, r13, 0 , 4 // Read DWT_CYCCNT
@@ -211,6 +210,7 @@ TIMETAG:
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
 	MOV	r0, 0x11 // Enable and Define increment value to 1
 	SBCO	r0, CONST_IETREG, 0, 1 // Enables IET count	
+	LBBO	r11, r13, 0, 4 // read DWT_CYCNT
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:
