@@ -126,8 +126,8 @@ INITIATIONS:// This is only run once
 NORMSTEPS: // So that always takes the same amount of counts for reset
 	QBA     CHECK_CYCLECNT
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	SUB	r0, r9, r7 // Make the difference between counters
-	SBBO	r0, r12, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SUB	r10, r9, r7 // Make the difference between counters
+	SBBO	r10, r12, 0, 4 // Update DWT_CYCNT. Account that we lose 2 cycle counts
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Reset IEP counter to account for difference with DWT_CYCCNT. Account that we lose 12 cycle counts	
 	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset	
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
@@ -183,9 +183,11 @@ TIMETAG:
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-	// For cheching control, place as the last value the current counter of DWT_CYCCNT
+	// For checking control, place as the last value the current counter of DWT_CYCCNT as well as the last IEP timer count - DWT_CYCCNT comparison
 	LBBO	r9, r12, 0 , 4 // Read DWT_CYCCNT
 	SBCO 	r9, CONST_PRUSHAREDRAM, r1, 4
+	ADD 	r1, r1, 4 // increment address by 4 bytes
+	SBCO 	r10, CONST_PRUSHAREDRAM, r1, 4
 	ADD 	r1, r1, 4 // increment address by 4 bytes
 	// we're done. Signal to the application
 	LDI	r0, 1	

@@ -313,7 +313,7 @@ valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
 valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts with a 1 offset
-cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
+//cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactorResetCycle) + static_cast<unsigned long long int>(this->valCarryOnCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 
 //valpAux=valpAux+4+5*NumRecords;
@@ -357,8 +357,9 @@ valp++;// 1 times 8 bits
 valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valp))<<24;
 valp++;// 1 times 8 bits
 valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts-1;//Account that it starts with a 1 offset
+cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
 cout << "valDWT_CYCCNTFinalCounts: " << valDWT_CYCCNTFinalCounts << endl;
-cout << "Diff PRU timers: " << valOverflowCycleCountPRU-valDWT_CYCCNTFinalCounts << endl;
+cout << "Diff PRU timers: " << valCycleCountPRU-valDWT_CYCCNTFinalCounts << endl;
 
 unsigned int valDWT_CYCCNTreupdate=static_cast<unsigned int>(*valp);
 valp++;// 1 times 8 bits
