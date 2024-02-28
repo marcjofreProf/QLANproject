@@ -121,12 +121,14 @@ INITIATIONS:// This is only run once
 	SBBO	r7, r12, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Clear IEP timer count	
 	
+	// REad nce the counters
+	LBBO	r9, r12, 0 , 4 // Read DWT_CYCCNT
 	LBCO	r5, CONST_IETREG, 0xC, 4 // Read once IEP timer count
 
 NORMSTEPS: // So that always takes the same amount of counts for reset
 	QBA     CHECK_CYCLECNT
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	SUB	r10, r9, r7 // Make the difference between counters
+	SUB	r10, r9, r5 // Make the difference between counters
 	SBBO	r10, r12, 0, 4 // Update DWT_CYCNT. Account that we lose 2 cycle counts
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Reset IEP counter to account for difference with DWT_CYCCNT. Account that we lose 12 cycle counts	
 	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset	

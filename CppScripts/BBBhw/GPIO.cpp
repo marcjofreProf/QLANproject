@@ -355,11 +355,9 @@ valp++;// 1 times 8 bits
 valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valp))<<16;
 valp++;// 1 times 8 bits
 valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valp))<<24;
-valp++;// 1 times 8 bits
-valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts-1;//Account that it starts with a 1 offset
 cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
 cout << "valDWT_CYCCNTFinalCounts: " << valDWT_CYCCNTFinalCounts << endl;
-cout << "Diff PRU timers: " << valCycleCountPRU-valDWT_CYCCNTFinalCounts << endl;
+cout << "Diff PRU timers: " << static_cast<int>(valCycleCountPRU)-static_cast<int>(valDWT_CYCCNTFinalCounts) << endl;
 
 unsigned int valDWT_CYCCNTreupdate=static_cast<unsigned int>(*valp);
 valp++;// 1 times 8 bits
