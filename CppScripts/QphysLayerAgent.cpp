@@ -276,18 +276,10 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::ThreadSimulateEmitQuBit(){
-cout << "Simulate Emiting Qubits" << endl;
-//struct timespec requestHalfPeriod,requestQuarterPeriod,requestWhileWait;
-//requestHalfPeriod.tv_sec=0;
-//requestQuarterPeriod.tv_sec=0;
-//requestWhileWait.tv_sec=0;
-//requestHalfPeriod.tv_nsec = (long)QuBitsNanoSecHalfPeriodInt[0];
-//requestQuarterPeriod.tv_nsec = (long)QuBitsNanoSecQuarterPeriodInt[0];
+struct timespec QPLA::GetFutureTimePointOtherNode(){
 struct timespec requestWhileWait;
-
 int MaxWhileRound=1000;
-// Wait to receive the FutureTimePoint from client node
+// Wait to receive the FutureTimePoint from other node
 this->acquire();
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
 	this->release();
@@ -297,12 +289,12 @@ while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && 
 	};
 if (MaxWhileRound<=0){
 this->OtherClientNodeFutureTimePoint=Clock::now();
-cout << "QPLA:ThreadEmitQuBit could not obtain in time the TimePoint from the other node" << endl;
+cout << "QPLA could not obtain in time the TimePoint from the other node" << endl;
 }// Provide a TimePoint to avoid blocking issues
 TimePoint FutureTimePoint=this->OtherClientNodeFutureTimePoint;
 this->release();
 //cout << "MaxWhileRound: " << MaxWhileRound << endl;
-MaxWhileRound=100;
+
 /////////////////////////////////////////////
 // Checks
 TimePoint TimePointClockNow=Clock::now();
@@ -319,38 +311,24 @@ unsigned long long int TimePointsDiff_time_as_count=0;
 long long int CheckTimePointsDiff_time_as_count=0;
 CheckTimePointsDiff_time_as_count=(long long int)(TimeNow_time_as_count-TimePointFuture_time_as_count);
 cout << "CheckTimePointsDiff_time_as_count: " << CheckTimePointsDiff_time_as_count << endl;
-///////////////////////////////////
-/*
-while(TimeNow_time_as_count<TimePointFuture_time_as_count && MaxWhileRound>0){
-	MaxWhileRound--;	
-	TimePointClockNow=Clock::now();
-	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
-	// Convert duration to desired time
-	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
-	//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
-        if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=0;}
-        else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
-        if (TimePointsDiff_time_as_count>(unsigned long long int)WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=(unsigned long long int)WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
-        requestWhileWait.tv_nsec=(long)(TimePointsDiff_time_as_count);
-	if (TimePointsDiff_time_as_count>0){clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}// usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption
-        //cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
-        TimePointClockNow=Clock::now();
-	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
-	// Convert duration to desired time
-	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 	
-	};
-*/
-this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum 
 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
-this->RunThreadSimulateEmitQuBitFlag=true;//enable again that this thread can again be called
+///////////////////////////////////
+return requestWhileWait;
+}
+
+int QPLA::ThreadSimulateEmitQuBit(){
+cout << "Simulate Emiting Qubits" << endl;
+
+// Related to time synchornization
+struct timespec requestWhileWait=this->SetFutureTimePointOtherNode();
+
+this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum
+this->RunThreadSimulateEmitQuBitFlag=true;//enable again that this thread can again be called. It is okey since it entered a block semaphore part and then no other sempahored part will run until this one finishes. At the same time, returning to true at this point allows the read to not go out of scope and losing this flag parameter
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 
-//cout << "MaxWhileRound: " << MaxWhileRound << endl;
-
-//this->acquire();
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  
  cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
@@ -407,9 +385,7 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::ThreadSimulateReceiveQubit(){
-cout << "Simulate Receiving Qubits" << endl;
-
+struct timespec QPLA::SetFutureTimePointOtherNode(){
 //struct timespec requestHalfPeriod,requestQuarterPeriod,requestPeriod,requestWhileWait;
 //requestHalfPeriod.tv_sec=0;
 //requestQuarterPeriod.tv_sec=0;
@@ -420,7 +396,7 @@ cout << "Simulate Receiving Qubits" << endl;
 //requestPeriod.tv_nsec = (long)QuBitsNanoSecPeriodInt[0];
 struct timespec requestWhileWait;
 // Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
-// Somehow, here it is assumed that the two system clocks are quite snchronized (maybe with the Precise Time Protocol)
+// Somehow, here it is assumed that the two system clocks are quite synchronized (maybe with the Precise Time Protocol)
 /*
 // Debugging
 TimePoint TimePointClockNow=Clock::now();
@@ -438,46 +414,35 @@ unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cas
 // Mount the Parameters message for the other node
 char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 strcpy(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Initiates the ParamsCharArray, so use strcpy
-
 char charNum[NumBytesPayloadBuffer] = {0}; 
 sprintf(charNum, "%llu", TimePointFuture_time_as_count);//%llu: unsigned long long int
 strcat(ParamsCharArray,charNum);
-
 strcat(ParamsCharArray,"_"); // Final _
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
+requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
+requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
+this->release();
+usleep((int)(100*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to be able to send the above message
+//////////////////////////
+return requestWhileWait;
+}
+
+int QPLA::ThreadSimulateReceiveQubit(){
+cout << "Simulate Receiving Qubits" << endl;
+
+// Related to time synchronization
+struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
+
+this->acquire();
 PRUGPIO->ClearStoredQuBits();
 TimeTaggs[NumQubitsMemoryBuffer]={0}; // Clear the array
 ChannelTags[NumQubitsMemoryBuffer]={0}; // Clear the array
-this->release();
-usleep((int)(100*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to be able to send the above message
-/*
-unsigned long long int TimePointsDiff_time_as_count=0;
-int MaxWhileRound=100;
-while(Clock::now()<FutureTimePoint && MaxWhileRound>0){
-	MaxWhileRound--;
-	TimePointClockNow=Clock::now();
-	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
-	// Convert duration to desired time
-	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
-	//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
-	        
-        if (TimeNow_time_as_count>=TimePointFuture_time_as_count){TimePointsDiff_time_as_count=0;}
-        else{TimePointsDiff_time_as_count=TimePointFuture_time_as_count-TimeNow_time_as_count;}
-        if (TimePointsDiff_time_as_count>(unsigned long long int)WaitTimeToFutureTimePoint){TimePointsDiff_time_as_count=(unsigned long long int)WaitTimeToFutureTimePoint;}//conditions to not get extremely large sleeps
-        //cout << "TimePointsDiff_time_as_count: " << TimePointsDiff_time_as_count << endl;
-        requestWhileWait.tv_nsec=(long)(TimePointsDiff_time_as_count);
-	if (TimePointsDiff_time_as_count>0){clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);}//clock_nanosleep(CLOCK_REALTIME,0,&requestWhileWait,NULL);}//usleep(TimePointsDiff_time_as_count);//Maybe some sleep to reduce CPU consumption	
-};
-*/
-this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum priority
-requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
-requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
+// So that there are no segmentation faults by grabbing the CLOCK REALTIME and also this has maximum priority
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrier
 
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
-//cout << "MaxWhileRound: " << MaxWhileRound << endl;
 
 cout << "Start Receiving Qubits" << endl;// This line should be commented to reduce the time jitter
 

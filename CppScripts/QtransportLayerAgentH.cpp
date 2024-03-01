@@ -16,7 +16,6 @@ Agent script for Quantum transport Layer Host
 #include <sys/socket.h>
 #include <fcntl.h>
 #define PORT 8010
-#define NumSocketsMax 2
 #define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 #define IPcharArrayLengthMAX 15
 #define SockListenTimeusecStandard 50
@@ -43,12 +42,14 @@ QTLAH::QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAsce
  
  //cout << "The value of the input is: "<< ParamsDescendingCharArray << endl;
 // Parse the ParamsDescendingCharArray
-strcpy(this->IPaddressesSockets[0],strtok(ParamsDescendingCharArray,","));
+strcpy(this->SCmode[0],"client"); // to know if this host instance is client or server
+strcpy(this->SCmode[1],strtok(ParamsDescendingCharArray,",")); // to know if this host instance is client or server
+
+strcpy(this->IPaddressesSockets[0],strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
 strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
 strcpy(this->IPaddressesSockets[2],strtok(NULL,","));// Host own IP in operaton network
 strcpy(this->IPaddressesSockets[3],strtok(NULL,","));// Host own IP in control network
-strcpy(this->SCmode[0],"client"); // to know if this host instance is client or server
-strcpy(this->SCmode[1],strtok(NULL,",")); // to know if this host instance is client or server
+
 
 //cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
 //cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
@@ -150,16 +151,25 @@ int QTLAH::InitAgentProcess(){
 int QTLAH::InitiateICPconnections() {
 int RetValue=0;
 if (string(SOCKtype)=="SOCK_DGRAM"){
-	// UDP philosophy is different since it is not connection oriented. Actually, we are tellgin to listen to a port, and if we want also specifically to an IP (which we might want to do to keep better track of things)
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[3],this->IPSocketsList[0]); // Listen to the port
+	// UDP philosophy is different since it is not connection oriented. Actually, we are telling to listen to a port, and if we want also specifically to an IP (which we might want to do to keep better track of things)
+	// The sockets for receiving
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[1],this->IPSocketsList[0]); // Listen to the port
 	
 	if (RetValue>-1){
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPaddressesSockets[2],this->IPSocketsList[1]);} // Open port and listen as server
-	// The socket for sending
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[2],this->IPaddressesSockets[3],this->IPSocketsList[1]);} // Open port and listen as server
 	
-	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[3],this->IPSocketsList[0]);}// In order to send datagrams
+	if (string(this->SCmode[1])==string("dealer")){
+		if (RetValue>-1){
+		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[2],this->new_socketArray[2],this->IPaddressesSockets[2],this->IPaddressesSockets[4],this->IPSocketsList[2]);} // Open port and listen as server
+	}
+	// The sockets for sending	
+	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[1],this->IPSocketsList[0]);}// In order to send datagrams
 	
-	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[1],this->IPaddressesSockets[1],this->IPaddressesSockets[2],this->IPSocketsList[1]);}// In order to send datagrams
+	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[1],this->IPaddressesSockets[2],this->IPaddressesSockets[3],this->IPSocketsList[1]);}// In order to send datagrams
+	if (string(this->SCmode[1])==string("dealer")){
+		if (RetValue>-1){
+		RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[2],this->IPaddressesSockets[2],this->IPaddressesSockets[4],this->IPSocketsList[2]);} // Open port and listen as server
+	}
 }
 else{// TCP
 	// This agent applies to hosts. So, regarding sockets, different situations apply
@@ -174,17 +184,23 @@ else{// TCP
 	 // since the paradigm is always to establish first node connections and then hosts connections, apparently there are no conflics confusing how is connecting to or from.
 	
 	// First connect to the attached node
-	this->ICPmanagementOpenClient(this->socket_fdArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[3],this->IPSocketsList[0]); // Connect as client to own node
+	RetValue=this->ICPmanagementOpenClient(this->socket_fdArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[1],this->IPSocketsList[0]); // Connect as client to own node
+	if (RetValue==-1){this->m_exit();} // Exit application
 	// Then either connect to the server host (acting as client) or open server listening (acting as server)
 	//cout << "Check - SCmode[1]: " << this->SCmode[1] << endl;
 	if (string(this->SCmode[1])==string("client")){
 		//cout << "Check - Generating connection as client" << endl;	
-		this->ICPmanagementOpenClient(this->socket_fdArray[1],this->IPaddressesSockets[1],this->IPaddressesSockets[2],this->IPSocketsList[1]); // Connect as client to destination host
+		RetValue=this->ICPmanagementOpenClient(this->socket_fdArray[1],this->IPaddressesSockets[2],this->IPaddressesSockets[3],this->IPSocketsList[1]); // Connect as client to destination host
 	}
-	else{// server
+	else{// server. suppossedly in both situations being server or delear, it will become server to the client (the client will conntect to this host)
 		//cout << "Check - Generating connection as server" << endl;
-		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[1],this->IPaddressesSockets[2],this->IPSocketsList[1]); // Open port and listen as server
+		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[2],this->IPaddressesSockets[3],this->IPSocketsList[1]); // Open port and listen as server
 		
+	}
+	if (RetValue==-1){this->m_exit();} // Exit application
+	
+	if (string(this->SCmode[1])==string("dealer")){
+		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[2],this->new_socketArray[2],this->IPaddressesSockets[2],this->IPaddressesSockets[4],this->IPSocketsList[2]); // Open port and listen as server
 	}
 }
 	if (RetValue==-1){this->m_exit();} // Exit application
@@ -682,10 +698,14 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,"IPaddressesSockets");
 			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,IPaddressesSockets[1]);
-			strcat(ParamsCharArray,":");
 			strcat(ParamsCharArray,IPaddressesSockets[2]);
 			strcat(ParamsCharArray,":");
+			strcat(ParamsCharArray,IPaddressesSockets[3]);
+			strcat(ParamsCharArray,":");
+			if (string(this->SCmode[1])==string("dealer")){
+			strcat(ParamsCharArray,IPaddressesSockets[4]);
+			strcat(ParamsCharArray,":");
+			}
 			strcat(ParamsCharArray,",");// Very important to end the message
 			strcpy(this->SendBuffer,ParamsCharArray);
 			int socket_fd_conn=this->socket_fdArray[0];// Socket descriptor to the attached node (it applies both to TCP and UDP

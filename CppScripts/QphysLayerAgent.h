@@ -122,6 +122,8 @@ private: // Functions/Methods
 	// Particular process threads
 	int ThreadSimulateEmitQuBit();
 	int ThreadSimulateReceiveQubit();
+	struct timespec SetFutureTimePointOtherNode();
+	struct timespec GetFutureTimePointOtherNode();
 	
 };
 

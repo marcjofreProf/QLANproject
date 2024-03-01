@@ -46,15 +46,15 @@ public: // Variables/Objects
 	nsQnetworkLayerAgent::QNLA QNLAagent; // Instance of the below agent
 	int ParamArgc=0; // Number of passed parameters
 	int numberSessions=0;
-	char IPaddressesSockets[NumSocketsMax+2][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks
+	char IPaddressesSockets[NumSocketsMax+2][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks	
 	// IPaddressesSockets[0]: IP host attached ConNet
-	// IPaddressesSockets[1]: IP host other OpNet
-	// IPaddressesSockets[2]: IP node attached ConNet
-	// IPaddressesSockets[3]: IP host attached OpNet
-	char IPSocketsList[NumSocketsMax][IPcharArrayLengthMAX]; // IP address where the socket descriptors are pointing to	
+	// IPaddressesSockets[1]: IP node ConNet
+	// IPaddressesSockets[2]: IP host attached OpNet
+	// IPaddressesSockets[3]: IP host other OpNet
+	// IPaddressesSockets[4]: IP host other OpNet
+	char IPSocketsList[1][IPcharArrayLengthMAX]; // IP address where the socket descriptors are pointing to	
 	// IPSocketsList[0]: IP host attached ConNet
-	// IPSocketsList[1]: Not used/IP node intermediate OpNet
-	char SCmode[NumSocketsMax][NumBytesBufferICPMAX] = {0}; // Variable to know if the node instance is working as server or client to the other node
+	char SCmode[2][NumBytesBufferICPMAX] = {0}; // Variable to know if the node instance is working as server or client to the other node
 
 private: // Variables/Objects		
 	// Member Variables Such As Window Handle, Time Etc.,

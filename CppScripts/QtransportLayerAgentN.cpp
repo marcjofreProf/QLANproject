@@ -17,7 +17,6 @@ Agent script for Quantum transport Layer Node
 #include <signal.h>
 #include <sys/socket.h>
 #define PORT 8010
-#define NumSocketsMax 2
 #define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 #define IPcharArrayLengthMAX 15
 #define SockListenTimeusecStandard 50
@@ -273,9 +272,10 @@ return 0; // All Ok
 int QTLAN::InitiateICPconnections(int argc){
 int RetValue = 0;
 if (string(SOCKtype)=="SOCK_DGRAM"){
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[2],this->IPSocketsList[0]);// Listen to the port
-	
-	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[2],this->IPSocketsList[0]);}// In order to send datagrams
+	// The sockets for receiving
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[1],this->IPSocketsList[0]);// Listen to the port
+	// The sockets for sending	
+	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[1],this->IPSocketsList[0]);}// In order to send datagrams
 }
 else{// TCP
 	// This agent applies to nodes. So, regarding sockets, different situations apply
@@ -288,16 +288,8 @@ else{// TCP
 	//	- initiate the instance by ./QtransportLayerAgentN IPnextNodeOperation
 	// since the paradigm is always to establish first server connection and then, evenually, client connection, apparently there are no conflics confusing how is connecting to or from. 
 
-	// First, opening server listening socket 
-	
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[2],this->IPSocketsList[0]);
-	// Not needed because provided in the initialization strcpy(this->IPaddressesSockets[0],this->IPSocketsList[0]);
-	// Eventually, if it is an intermediate node
-	if (argc > 3){ // Establish client connection with next node
-	// First parse the parama passed IP address
-
-	//QTLANagent.ICPmanagementOpenClient(QTLANagent.socket_fdArray[1],char* IPaddressesSockets)
-	}
+	// First, opening server listening socket	
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[1],this->IPSocketsList[0]);
 }
 	if (RetValue==-1){this->m_exit();} // Exit application
 	else{this->numberSessions=1;} // Update indicators
@@ -693,7 +685,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	//cout << "Payload: " << Payload << endl;
 	//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
 	// Identify what to do and execute it
-	if (string(Type)==string("Operation")){// Operation message. Forward to the host (there should not be messages of this type in the QtransportLayerAgent. So not develop
+	if (string(Type)==string("Operation")){// Operation message. Forward to the host (there should not be messages of this type in the QtransportLayerAgentN. So not develop
 		// Do not do anything
 	}
 	else if(string(Type)==string("Control")){//Control message	
@@ -736,8 +728,9 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			}
 		}
 		else if (string(Command)==string("IPaddressesSockets")){
-			strcpy(this->IPaddressesSockets[1],strtok(Payload,":"));
+			strcpy(this->IPaddressesSockets[2],strtok(Payload,":"));
 			strcpy(this->IPaddressesSockets[3],strtok(NULL,":"));
+			if (string(this->SCmode[1])==string("dealer")){strcpy(this->IPaddressesSockets[4],strtok(NULL,":"));}
 			InfoIPaddressesSocketsFlag=true;
 		}		
 		else if (string(Command)==string("InfoProcess")){// Params messages
@@ -1087,11 +1080,11 @@ int main(int argc, char const * argv[]){
  //cout << "Starting in pause state the QtransportLayerAgentN" << endl;
  // Save some given parameters to the instance of the object
  QTLANagent.ParamArgc=argc;
- strcpy(QTLANagent.SCmode[1],argv[1]); // to know if this host instance is client or server
+ strcpy(QTLANagent.SCmode[1],argv[1]); // to know if this host instance is client or server or dealer
  cout << "QTLANagent.SCmode[1]: " << QTLANagent.SCmode[1] << endl;
- strcpy(QTLANagent.IPaddressesSockets[2],argv[2]); // To know its own IP in the control network
- cout << "QTLANagent.IPaddressesSockets[2]: " << QTLANagent.IPaddressesSockets[2] << endl;
- strcpy(QTLANagent.IPaddressesSockets[0],argv[3]); // To know the other host IP in the control network
+ strcpy(QTLANagent.IPaddressesSockets[1],argv[2]); // To know its own IP in the control network
+ cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[2] << endl;
+ strcpy(QTLANagent.IPaddressesSockets[0],argv[3]); // To know the host IP in the control network
  cout << "QTLANagent.IPaddressesSockets[0]: " << QTLANagent.IPaddressesSockets[0] << endl;
  // Then the sub agents threads can be started
  QTLANagent.QNLAagent.InitAgentProcess();

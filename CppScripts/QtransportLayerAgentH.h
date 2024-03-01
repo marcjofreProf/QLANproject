@@ -11,7 +11,7 @@ Header declaration file for Quantum transport Layer Agent Host
 #ifndef QtransportLayerAgentH_H_
 #define QtransportLayerAgentH_H_
 // ICP connections
-#define NumSocketsMax 2
+#define NumSocketsMax 3
 #define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 #define IPcharArrayLengthMAX 15
 // Threading
@@ -43,10 +43,11 @@ private: // Variables/Objects
 	ApplicationState m_state;
 	char IPaddressesSockets[NumSocketsMax+2][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks
 	// IPaddressesSockets[0]: IP node attached ConNet
-	// IPaddressesSockets[1]: IP host other OpNet
+	// IPaddressesSockets[1]: IP host attached ConNet
 	// IPaddressesSockets[2]: IP host attached OpNet
-	// IPaddressesSockets[3]: IP host attached ConNet
-	char SCmode[NumSocketsMax][NumBytesBufferICPMAX] = {0}; // Variable to know if the host instance is working as server or client
+	// IPaddressesSockets[3]: IP host other OpNet
+	// IPaddressesSockets[4]: IP host other OpNet
+	char SCmode[2][NumBytesBufferICPMAX] = {0}; // Variable to know if the host instance is working as server or client
 	int socket_fdArray[NumSocketsMax]; // socket descriptor, an integer (like a file-handle)
 	int socket_SendUDPfdArray[NumSocketsMax]; // socket descriptor, an integer (like a file-handle), for sending in UDP
 	int new_socketArray[NumSocketsMax]; // socket between client and server, an integer. Created by the server.
