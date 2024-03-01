@@ -731,7 +731,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		// The node of a host is always identified in the Array in position 0	
 		    //cout << "SendBuffer: " << this->SendBuffer << endl;
 		    int socket_fd_conn;
-		    
+		    // Mount message
 		    char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 			strcpy(ParamsCharArray,IPdest);
 			strcat(ParamsCharArray,",");
@@ -754,8 +754,20 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
 			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[3]);
 		    }
-		    
-		    strcpy(this->SendBuffer,ParamsCharArray);			
+		    // Mount message
+		    char ParamsCharArrayAux[NumBytesBufferICPMAX] = {0};
+			strcpy(ParamsCharArrayAux,IPdest);
+			strcat(ParamsCharArrayAux,",");
+			strcat(ParamsCharArrayAux,IPorg);
+			strcat(ParamsCharArrayAux,",");
+			strcat(ParamsCharArrayAux,Type);
+			strcat(ParamsCharArrayAux,",");
+			strcat(ParamsCharArrayAux,Command);
+			strcat(ParamsCharArrayAux,",");
+			strcat(ParamsCharArrayAux,Payload);
+			strcat(ParamsCharArrayAux,",");// Very important to end the message
+			//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+		    strcpy(this->SendBuffer,ParamsCharArrayAux);			
 		    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
 			    socket_fd_conn=this->socket_fdArray[2];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
 			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[4]);
@@ -768,6 +780,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		else{// It does not come from its node and it is a control message, so it has to forward to its node
 		   // The node of a host is always identified in the Array in position 0	
 		    //cout << "SendBuffer: " << this->SendBuffer << endl;
+		    // Mount message
 		    char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 			strcpy(ParamsCharArray,IPdest);
 			strcat(ParamsCharArray,",");

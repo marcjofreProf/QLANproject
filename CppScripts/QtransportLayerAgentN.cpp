@@ -819,8 +819,17 @@ if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking
 	  // reply immediately with a message to requester
 	//cout<< "Node before second acquire" << endl;
 	this->acquire();	
-	//cout<< "Node after second acquire" << endl;  
-	this->ICPdiscoverSend(ParamsCharArray);
+	//cout<< "Node after second acquire" << endl;	
+	strcpy(this->SendBuffer,ParamsCharArray);
+	int socket_fd_conn;
+    	if (string(SOCKtype)=="SOCK_DGRAM"){// Client sends on the file descriptor
+    		socket_fd_conn=this->socket_fdArray[0];
+    	}
+    	else{// server sends on the socket connection
+    		//cout << "socket_fd_conn" << socket_fd_conn << endl;
+    		socket_fd_conn=this->new_socketArray[0];
+    	}      
+    	this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
 	this->GetSimulateNumStoredQubitsNodeFlag=false;
 	//cout<< "Node after send" << endl;
 }
