@@ -416,7 +416,7 @@ this->acquire();
 //cout << "this->RunThreadSimulateEmitQuBitFlag: " << this->RunThreadSimulateEmitQuBitFlag << endl;
 //cout << "this->RunThreadAcquireSimulateNumStoredQubitsNode: " << this->RunThreadAcquireSimulateNumStoredQubitsNode << endl;
 
-if (this->RunThreadSimulateReceiveQuBitFlag and this->RunThreadAcquireSimulateNumStoredQubitsNode){// Protection, do not run if there is a previous thread running
+if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
