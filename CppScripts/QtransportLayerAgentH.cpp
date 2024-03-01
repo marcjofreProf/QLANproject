@@ -49,7 +49,7 @@ strcpy(this->IPaddressesSockets[0],strtok(NULL,","));//Null indicates we are usi
 strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
 strcpy(this->IPaddressesSockets[2],strtok(NULL,","));
 strcpy(this->IPaddressesSockets[3],strtok(NULL,","));
-if (string(this->SCmode[1])==string("dealer")){strcpy(this->IPaddressesSockets[4],strtok(NULL,","));}
+strcpy(this->IPaddressesSockets[4],strtok(NULL,","));
 
 //cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
 //cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
@@ -158,18 +158,13 @@ if (string(SOCKtype)=="SOCK_DGRAM"){
 	if (RetValue>-1){
 	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[3],this->IPaddressesSockets[2],this->IPSocketsList[1]);} // Open port and listen as server
 	
-	if (string(this->SCmode[1])==string("dealer")){
-		if (RetValue>-1){
-		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[2],this->new_socketArray[2],this->IPaddressesSockets[4],this->IPaddressesSockets[2],this->IPSocketsList[2]);} // Open port and listen as server
-	}
+	if (RetValue>-1){RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[2],this->new_socketArray[2],this->IPaddressesSockets[4],this->IPaddressesSockets[2],this->IPSocketsList[2]);} // Open port and listen as server
 	// The sockets for sending	
 	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[1],this->IPSocketsList[0]);}// In order to send datagrams
 	
 	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[1],this->IPaddressesSockets[3],this->IPaddressesSockets[2],this->IPSocketsList[1]);}// In order to send datagrams
-	if (string(this->SCmode[1])==string("dealer")){
-		if (RetValue>-1){
-		RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[2],this->IPaddressesSockets[4],this->IPaddressesSockets[2],this->IPSocketsList[2]);} // Open port and listen as server
-	}
+	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[2],this->IPaddressesSockets[4],this->IPaddressesSockets[2],this->IPSocketsList[2]);} // Open port and listen as server
+
 }
 else{// TCP
 	// This agent applies to hosts. So, regarding sockets, different situations apply
@@ -199,14 +194,11 @@ else{// TCP
 	}
 	if (RetValue==-1){this->m_exit();} // Exit application
 	
-	if (string(this->SCmode[1])==string("dealer")){
-		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[2],this->new_socketArray[2],this->IPaddressesSockets[4],this->IPaddressesSockets[2],this->IPSocketsList[2]); // Open port and listen as server
-	}
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[2],this->new_socketArray[2],this->IPaddressesSockets[4],this->IPaddressesSockets[2],this->IPSocketsList[2]); // Open port and listen as server
 }
 	if (RetValue==-1){this->m_exit();} // Exit application
 	this->numberSessions=1;
-	if (string(this->SCmode[1])==string("dealer")){this->NumSockets=3;}
-	else{this->NumSockets=2;}
+	this->NumSockets=3;
 		
 	return 0; // All OK
 }
@@ -756,23 +748,21 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		    strcpy(this->SendBuffer,ParamsCharArray);			
 		    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
 			    socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
-			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[1]);
+			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[3]);
 		    }
 		    else{ //host acts as server		    
 			    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
-			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[1]);
+			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[3]);
 		    }
 		    
-		    strcpy(this->SendBuffer,ParamsCharArray);
-		    if (string(this->SCmode[1])==string("dealer")){// It also sends it to the other host
-			    if (string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
-				    socket_fd_conn=this->socket_fdArray[2];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
-				    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[2]);
-			    }
-			    else{ //host acts as server		    
-				    socket_fd_conn=this->new_socketArray[2];  // host acts as server to the other host, so it needs the socket connection   
-				    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[2]);
-			    }		    
+		    strcpy(this->SendBuffer,ParamsCharArray);			
+		    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
+			    socket_fd_conn=this->socket_fdArray[2];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
+			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[4]);
+		    }
+		    else{ //host acts as server		    
+			    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
+			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[4]);
 		    }
 		}	
 		else{// It does not come from its node and it is a control message, so it has to forward to its node
