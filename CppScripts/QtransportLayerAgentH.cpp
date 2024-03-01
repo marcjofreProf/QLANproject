@@ -482,7 +482,7 @@ else {// There might be at least one new message
 		}
 		// Process the message
 		else{// (valread>0){
-			//cout << "Host Received message: " << this->ReadBuffer << endl;
+			cout << "Host Received message: " << this->ReadBuffer << endl;
 			//cout << "valread: " << valread << endl;
 			return valread;
 		}
@@ -493,8 +493,8 @@ else {// There might be at least one new message
 }
 
 int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
-//cout << "Host SendBuffer: " << this->SendBuffer << endl;
-//cout << "Host SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
+cout << "Host SendBuffer: " << this->SendBuffer << endl;
+cout << "Host SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=0;
@@ -681,27 +681,31 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	// Identify what to do and execute it
 	if (string(Type)==string("Operation")){// Operation message. 
 		//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
-		if(string(IPorg)==string(this->IPaddressesSockets[0]) and string(IPdest)==string(this->IPaddressesSockets[1])){// Information provided by the attached node to this host
+		if(string(IPdest)==string(this->IPaddressesSockets[1]) or string(IPdest)==string(this->IPaddressesSockets[2])){// Information for this host
 			if (string(Command)==string("SimulateNumStoredQubitsNode")){// Reply message. Expected/awaiting message
-				//cout << "We are here NumStoredQubitsNode" << endl;
+				cout << "We are here NumStoredQubitsNode" << endl;
+				cout << "Payload: " << Payload << endl;
 				int NumSubPayloads=this->countColons(Payload);
 				char SubPayload[NumBytesBufferICPMAX] = {0};				
 				for (int i=0;i<NumSubPayloads;i++){					
 					if (i==0){
 						strcpy(SubPayload,strtok(Payload,":"));
 						this->SimulateNumStoredQubitsNodeParamsIntArray[0]=atoi(SubPayload);
-						//cout << "atoi(SubPayload): " << atoi(SubPayload) << endl;
+						cout << "atoi(SubPayload): " << atoi(SubPayload) << endl;
 					}
 					else{
 						strcpy(SubPayload,strtok(NULL,":"));
 						this->TimeTaggsDetAnalytics[i-1]=stof(SubPayload);
-						//cout << "stof(SubPayload): " << stof(SubPayload) << endl;
+						cout << "stof(SubPayload): " << stof(SubPayload) << endl;
 					}
 				}
 				this->InfoSimulateNumStoredQubitsNodeFlag=true;				
-			}					
+			}
+			else if (string(Command)==string("print")){
+				cout << "New Message: "<< Payload << endl;
+			}				
 			else{
-			// Do not do anything
+				cout << "Host does not have this Operational message: "<< Command << endl;
 			}			
 		}
 		else if (string(IPdest)!=string(this->IPaddressesSockets[1]) and string(IPdest)!=string(this->IPaddressesSockets[2])){// Message not for this host, forward it			
@@ -716,12 +720,9 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,Payload);
 			strcat(ParamsCharArray,",");// Very important to end the message
-			//cout << "ParamsCharArray: " << ParamsCharArray << endl;	
+			cout << "ParamsCharArray: " << ParamsCharArray << endl;	
 			this->ICPdiscoverSend(ParamsCharArray);
-		}
-		else if (string(Command)==string("print")){
-			cout << "New Message: "<< Payload << endl;
-		}		
+		}				
 		else{//Default
 			cout << "Operational message to host not handled: "<< Payload << endl;
 		}
@@ -860,28 +861,28 @@ try{
 this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 
-int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor (it applies both to TCP and UDP)
 int isValidWhileLoopCount = 10; // Number of tries
-
+char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+strcpy(ParamsCharArray,IPhostReply);
+strcat(ParamsCharArray,",");
+strcat(ParamsCharArray,IPhostRequest);
+strcat(ParamsCharArray,",");
+strcat(ParamsCharArray,"Control");
+strcat(ParamsCharArray,",");
+strcat(ParamsCharArray,"InfoRequest");
+strcat(ParamsCharArray,",");
+strcat(ParamsCharArray,"SimulateNumStoredQubitsNode");
+strcat(ParamsCharArray,",");// Very important to end the message
+//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 while(isValidWhileLoopCount>0){
 	if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
-	memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
-	strcpy(this->SendBuffer,IPhostReply);
-	strcat(this->SendBuffer,",");
-	strcat(this->SendBuffer,IPhostRequest);
-	strcat(this->SendBuffer,",");
-	strcat(this->SendBuffer,"Control");
-	strcat(this->SendBuffer,",");
-	strcat(this->SendBuffer,"InfoRequest");
-	strcat(this->SendBuffer,",");
-	strcat(this->SendBuffer,"SimulateNumStoredQubitsNode");
-	strcat(this->SendBuffer,",");// Very important to end the message
-	this->ICPmanagementSend(socket_fd_conn,IPhostReply); // send mesage to node
+	this->ICPdiscoverSend(ParamsCharArray); // send mesage to node
 	}
 	this->release();
 	usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
 	this->acquire();
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
+		cout << "We received info for SimulateRetrieveNumStoredQubitsNode" << endl;
 		this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 		ParamsIntArray[0]=this->SimulateNumStoredQubitsNodeParamsIntArray[0];
 		ParamsFloatArray[0]=this->TimeTaggsDetAnalytics[0];

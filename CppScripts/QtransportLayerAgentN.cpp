@@ -777,9 +777,9 @@ if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking
 	//cout<< "IPorg: " << IPorg << endl;
 	//cout<< "IPdest: " << IPdest << endl;
 	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-	strcpy(ParamsCharArray,IPorg);
+	strcpy(ParamsCharArray,IPdest);
 	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,IPdest);
+	strcat(ParamsCharArray,IPorg);
 	strcat(ParamsCharArray,",");
 	strcat(ParamsCharArray,"Operation");
 	strcat(ParamsCharArray,",");
