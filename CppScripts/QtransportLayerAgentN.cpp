@@ -774,8 +774,8 @@ if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking
 	int SimulateNumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetSimulateNumStoredQubitsNode(TimeTaggsDetAnalytics);// to be developed for more than one link
 	//cout << "Node return SimulateNumStoredQubitsNode: " << SimulateNumStoredQubitsNode << endl;
 	  // Generate the message
-	//cout<< "IPorg: " << IPorg << endl;
-	//cout<< "IPdest: " << IPdest << endl;
+	cout<< "IPorg: " << IPorg << endl;
+	cout<< "IPdest: " << IPdest << endl;
 	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 	strcpy(ParamsCharArray,IPorg);
 	strcat(ParamsCharArray,",");
