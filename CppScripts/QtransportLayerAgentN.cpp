@@ -691,8 +691,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	else if(string(Type)==string("Control")){//Control message	
 		if (string(Command)==string("InfoRequest")){ // Request to provide information
 			if (string(Payload)==string("SimulateNumStoredQubitsNode")){
-			  cout << "IPorg: " << IPorg << endl;
-			  cout << "IPdest: " << IPdest << endl;
+			  //cout << "IPorg: " << IPorg << endl;
+			  //cout << "IPdest: " << IPdest << endl;
 			  std::thread threadGetSimulateNumStoredQubitsNodeRefAux=std::thread(&QTLAN::GetSimulateNumStoredQubitsNode,this,IPorg,IPdest);
 			  threadGetSimulateNumStoredQubitsNodeRefAux.detach();
 			}
@@ -776,8 +776,8 @@ if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking
 	int SimulateNumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetSimulateNumStoredQubitsNode(TimeTaggsDetAnalytics);// to be developed for more than one link
 	//cout << "Node return SimulateNumStoredQubitsNode: " << SimulateNumStoredQubitsNode << endl;
 	  // Generate the message
-	//cout<< "IPorg: " << IPorg << endl;
-	//cout<< "IPdest: " << IPdest << endl;
+	cout<< "IPorg: " << IPorg << endl;
+	cout<< "IPdest: " << IPdest << endl;
 	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 	strcpy(ParamsCharArray,IPorg);
 	strcat(ParamsCharArray,",");

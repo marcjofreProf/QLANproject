@@ -201,7 +201,7 @@ if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){thi
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread	
 	std::chrono::nanoseconds duration_back((unsigned long long int)strtoull(ValuesCharArray[iHeaders],NULL,10));
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
-	cout << "OtherClientNodeFutureTimePoint: " << (unsigned long long int)strtoull(ValuesCharArray[iHeaders],NULL,10) << endl;
+	//cout << "OtherClientNodeFutureTimePoint: " << (unsigned long long int)strtoull(ValuesCharArray[iHeaders],NULL,10) << endl;
 	// Debugging
 	//TimePoint TimePointClockNow=Clock::now();
 	//auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
