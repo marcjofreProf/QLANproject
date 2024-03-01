@@ -693,7 +693,9 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			if (string(Payload)==string("SimulateNumStoredQubitsNode")){
 			  cout << "IPorg: " << IPorg << endl;
 			  cout << "IPdest: " << IPdest << endl;
-			  std::thread threadGetSimulateNumStoredQubitsNodeRefAux=std::thread(&QTLAN::GetSimulateNumStoredQubitsNode,this,IPorg,IPdest);
+			  strcpy(this->IPorgAux,IPorg);
+			  strcpy(this->IPdestAux,IPdest);
+			  std::thread threadGetSimulateNumStoredQubitsNodeRefAux=std::thread(&QTLAN::GetSimulateNumStoredQubitsNode,this);
 			  threadGetSimulateNumStoredQubitsNodeRefAux.detach();
 			}
 			else{
@@ -753,7 +755,7 @@ this->release();
 return 0;
 }
 
-int QTLAN::GetSimulateNumStoredQubitsNode(char* IPorg,char* IPdest) {
+int QTLAN::GetSimulateNumStoredQubitsNode() {
 //cout<< "Node before acquire" << endl;
 this->acquire();	  
 //cout<< "Node before this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
@@ -776,12 +778,12 @@ if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking
 	int SimulateNumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetSimulateNumStoredQubitsNode(TimeTaggsDetAnalytics);// to be developed for more than one link
 	//cout << "Node return SimulateNumStoredQubitsNode: " << SimulateNumStoredQubitsNode << endl;
 	  // Generate the message
-	cout<< "IPorg: " << IPorg << endl;
-	cout<< "IPdest: " << IPdest << endl;
+	cout<< "this->IPorgAux: " << this->IPorgAux << endl;
+	cout<< "this->IPdestAux: " << this->IPdestAux << endl;
 	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-	strcpy(ParamsCharArray,IPorg);
+	strcpy(ParamsCharArray,this->IPorgAux);
 	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,IPdest);
+	strcat(ParamsCharArray,this->IPdestAux);
 	strcat(ParamsCharArray,",");
 	strcat(ParamsCharArray,"Operation");
 	strcat(ParamsCharArray,",");

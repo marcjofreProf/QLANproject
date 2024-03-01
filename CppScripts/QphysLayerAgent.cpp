@@ -296,7 +296,7 @@ strcat(ParamsCharArray,"_"); // Final _
 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 this->acquire();
-//this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
+this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 this->release();
 usleep((int)(100*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to be able to send the above message
 //////////////////////////

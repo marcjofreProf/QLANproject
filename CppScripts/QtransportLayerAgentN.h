@@ -74,6 +74,8 @@ private: // Variables/Objects
 	bool QPLASimulateEmitQuBitFlag=false;
 	bool QPLASimulateReceiveQuBitFlag=false;
 	bool GetSimulateNumStoredQubitsNodeFlag=false;// Flag to check if another process is already trying to retrieve the number of qubits
+	char IPorgAux[IPcharArrayLengthMAX]={0};
+	char IPdestAux[IPcharArrayLengthMAX]={0};
 	
 public: // Functions/Methods
 	// Sempahore
@@ -137,7 +139,7 @@ private: // Functions/Methods
 	//
 	int QPLASimulateEmitQuBit();
 	int QPLASimulateReceiveQuBit();
-	int GetSimulateNumStoredQubitsNode(char* IPorg,char* IPdest);
+	int GetSimulateNumStoredQubitsNode();
 	
 };
 
