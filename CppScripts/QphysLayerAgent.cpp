@@ -199,7 +199,7 @@ else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]"))
 */
 if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread
-	//cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
+	cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
 	std::chrono::nanoseconds duration_back((unsigned long long int)strtoull(ValuesCharArray[iHeaders],NULL,10));
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
 	
@@ -293,7 +293,7 @@ char charNum[NumBytesPayloadBuffer] = {0};
 sprintf(charNum, "%llu", TimePointFuture_time_as_count);//%llu: unsigned long long int
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,"_"); // Final _
-//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+cout << "ParamsCharArray: " << ParamsCharArray << endl;
 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 this->acquire();
@@ -436,6 +436,7 @@ cout << "Simulate Receiving Qubits" << endl;
 struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
 
 this->acquire();
+this->RunThreadSimulateReceiveQuBitFlag=true;//enable again that this thread can again be call
 PRUGPIO->ClearStoredQuBits();
 TimeTaggs[NumQubitsMemoryBuffer]={0}; // Clear the array
 ChannelTags[NumQubitsMemoryBuffer]={0}; // Clear the array
@@ -466,8 +467,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL); 
  }
  */
- 
- this->release();
+
  cout << "End Receiving Qubits" << endl;
  
  
@@ -481,14 +481,12 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  }
  */
 
-this->acquire();
 this->SimulateNumStoredQubitsNode[0]=PRUGPIO->RetrieveNumStoredQuBits(TimeTaggs,ChannelTags);
 //cout << "The value of the input is: "<< inGPIO.getValue() << endl;
 // Tell the other node to clear the TimePoint (this avoids having a time point in the other node after having finished this one (because it was not ocnsumed)
 //ParamsCharArray[NumBytesPayloadBuffer] = {0};
 //strcpy(ParamsCharArray,"ClearOtherClientNodeFutureTimePoint_0_"); // Initiates the ParamsCharArray, so use strcpy
-//this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
-this->RunThreadSimulateReceiveQuBitFlag=true;//enable again that this thread can again be called
+//this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodeed
 this->release();
 
 return 0; // return 0 is for no error
@@ -589,13 +587,6 @@ this->threadRef.join();// Terminate the process thread
 int QPLA::NegotiateInitialParamsNode(){
 try{
  this->acquire();
-if (string(this->SCmode[0])==string("client")){
-	 char ParamsCharArray[NumBytesPayloadBuffer]="QuBitsPerSecondVelocity[0]_1000_";// Set initialization value for the other node
-	 this->SetSendParametersAgent(ParamsCharArray);// Set initialization values for the other node
-}
-else{//server
-// Expect to receive some information
-}
 
 this->release();
 } // try
