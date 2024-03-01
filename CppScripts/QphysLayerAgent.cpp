@@ -320,6 +320,8 @@ this->OtherClientNodeFutureTimePoint=Clock::now();
 cout << "QPLA could not obtain in time the TimePoint from the other node" << endl;
 }// Provide a TimePoint to avoid blocking issues
 TimePoint FutureTimePoint=this->OtherClientNodeFutureTimePoint;
+ // Reset the ClientNodeFutureTimePoint
+this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 this->release();
 //cout << "MaxWhileRound: " << MaxWhileRound << endl;
 
@@ -341,6 +343,7 @@ CheckTimePointsDiff_time_as_count=(long long int)(TimeNow_time_as_count-TimePoin
 cout << "CheckTimePointsDiff_time_as_count: " << CheckTimePointsDiff_time_as_count << endl;
 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
+
 ///////////////////////////////////
 return requestWhileWait;
 }
@@ -400,8 +403,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch ba
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  }
  */
- // Reset the ClientNodeFutureTimePoint
-this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
+
  this->release();
  
  //cout << "Qubit emitted" << endl;
@@ -467,10 +469,6 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL); 
  }
  */
-
- cout << "End Receiving Qubits" << endl;
- 
- 
  /*
  // Basic input
  // Count received QuBits
@@ -482,13 +480,8 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  */
 
 this->SimulateNumStoredQubitsNode[0]=PRUGPIO->RetrieveNumStoredQuBits(TimeTaggs,ChannelTags);
-//cout << "The value of the input is: "<< inGPIO.getValue() << endl;
-// Tell the other node to clear the TimePoint (this avoids having a time point in the other node after having finished this one (because it was not ocnsumed)
-//ParamsCharArray[NumBytesPayloadBuffer] = {0};
-//strcpy(ParamsCharArray,"ClearOtherClientNodeFutureTimePoint_0_"); // Initiates the ParamsCharArray, so use strcpy
-//this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodeed
 this->release();
-
+cout << "End Receiving Qubits" << endl;
 return 0; // return 0 is for no error
 }
 
