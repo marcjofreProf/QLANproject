@@ -110,9 +110,9 @@ memset(this->PayloadSendBuffer, 0, sizeof(this->PayloadSendBuffer));// Reset buf
 if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none_;Link;none_none_;Phys;none_none_;")){
 	 // Generate the message	 
 	memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
-	strcpy(this->SendBuffer,this->IPaddressesSockets[1]);
+	strcpy(this->SendBuffer,this->IPaddressesSockets[0]);
 	strcat(this->SendBuffer,",");
-	strcat(this->SendBuffer,this->IPaddressesSockets[2]);
+	strcat(this->SendBuffer,this->IPaddressesSockets[1]);
 	strcat(this->SendBuffer,",");
 	strcat(this->SendBuffer,"Control");
 	strcat(this->SendBuffer,",");
@@ -128,7 +128,7 @@ if (string(ParamsCharArray)!=string("Trans;none_none_;Net;none_none_;Link;none_n
 	else{
 		socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
 	}
-	this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send message to node
+	this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send message to host
 }
 //this->release();Does not need it since it is within the while loop
 
@@ -694,44 +694,11 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			  std::thread threadGetSimulateNumStoredQubitsNodeRefAux=std::thread(&QTLAN::GetSimulateNumStoredQubitsNode,this,IPorg,IPdest);
 			  threadGetSimulateNumStoredQubitsNodeRefAux.detach();
 			}
-			else if (string(Payload)==string("NodeAreYouThere?")){
-			// Mount message and send it to attached node
-			 // Generate the message		
-			memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
-			strcpy(this->SendBuffer,this->IPaddressesSockets[1]); //IP attached host to the other node
-			//cout << "this->IPaddressesSockets[1]: " << this->IPaddressesSockets[1] << endl;
-			strcat(this->SendBuffer,",");
-			strcat(this->SendBuffer,this->IPaddressesSockets[2]); // This attached host so that the other node can reply
-			//cout << "this->IPaddressesSockets[2]: " << this->IPaddressesSockets[2] << endl;
-			strcat(this->SendBuffer,",");
-			strcat(this->SendBuffer,"Control");
-			strcat(this->SendBuffer,",");
-			strcat(this->SendBuffer,"InfoRequest");
-			strcat(this->SendBuffer,",");
-			strcat(this->SendBuffer,"YesIamHere");
-			strcat(this->SendBuffer,",");// Very important to end the message
-			//cout << "this->SendBuffer: " << this->SendBuffer << endl;
-			//cout << "Node responding that I am here" << endl;	
-			int socket_fd_conn;	
-			if (string(SOCKtype)=="SOCK_DGRAM"){
-				socket_fd_conn=this->socket_fdArray[0]; // UDP works with socket descriptor
-			}
-			else{
-				socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
-			}
-			this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[1]); // send message to node
-			}
 			else if (string(Payload)==string("YesIamHere")){this->OtherNodeThereFlag=true;}
 			else{
 			//discard
 			cout << "Node does not have this information "<< Payload << endl;
 			}
-		}
-		else if (string(Command)==string("IPaddressesSockets")){
-			strcpy(this->IPaddressesSockets[2],strtok(Payload,":"));
-			strcpy(this->IPaddressesSockets[3],strtok(NULL,":"));
-			if (string(this->SCmode[1])==string("dealer")){strcpy(this->IPaddressesSockets[4],strtok(NULL,":"));}
-			InfoIPaddressesSocketsFlag=true;
 		}		
 		else if (string(Command)==string("InfoProcess")){// Params messages
 			//cout << "New Message: "<< Payload << endl;
@@ -895,154 +862,6 @@ void QTLAN::AgentProcessRequestsPetitions(){// Check next thing to do
     } // while
 }
 
-int QTLAN::RetrieveIPSocketsHosts(){ // Ask the host about the other host IP
-
-try{
-// It is a "blocking" communication between host and node, because it is many read trials for reading
-this->acquire();
-int socket_fd_conn;
-if (string(SOCKtype)=="SOCK_DGRAM"){
-	socket_fd_conn=this->socket_fdArray[0]; // UDP works with socket descriptor
-}
-else{
-	socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
-}
-
-int SockListenTimeusec=9999999; // Negative means infinite
-this->InfoIPaddressesSocketsFlag=false;// Reset flag indicating information
-int isValidWhileLoopCount = 5; // Number of tries
-
-while(isValidWhileLoopCount>0){
-memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
-strcpy(this->SendBuffer,this->IPaddressesSockets[0]); //IP attached host
-//cout << "this->IPaddressesSockets[0]: " << this->IPaddressesSockets[0] << endl;
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,this->IPaddressesSockets[2]);
-//cout << "this->IPaddressesSockets[2]: " << this->IPaddressesSockets[2] << endl;
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"Operation");
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"InfoRequest");
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"IPaddressesSockets");
-strcat(this->SendBuffer,",");// Very important to end the message
-this->release();
-usleep(10*WaitTimeAfterMainWhileLoop);
-this->acquire();
-this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send message to node
-
-this->ReadFlagWait=true;
-int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
-this->ReadFlagWait=false;
-//cout << "ReadBytes: " << ReadBytes << endl;
-if (ReadBytes>0){// Read block	
-	this->ProcessNewMessage();		
-}
-if (this->InfoIPaddressesSocketsFlag==true){isValidWhileLoopCount=0;}
-else{
-	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
-	isValidWhileLoopCount--;
-	if (isValidWhileLoopCount==0){
-	this->release();
-	cout << "Exiting QtransportLayerAgentN since no initial IP addresses retrieved" << endl;
-	this->m_exit(); // Exit the application
-	}
-	else{
-	this->release();
-	usleep((int)(10*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
-	this->acquire();
-	}
-}
-}//while
-this->release();
-} // try
-  catch (...) { // Catches any exception
-  cout << "Exception caught" << endl;
-    }
-
-return 0; // All OK
-}
-
-int QTLAN::NegotiateInitialParamsNode(){
-
- try{
- this->acquire();
-if (string(this->SCmode[1])==string("client")){
- // First check that the other node is with established connection
- 
-this->OtherNodeThereFlag=false;// Reset the value
-// It is a "blocking" communication between host and node, because it is many read trials for reading
-
-int socket_fd_conn;
-if (string(SOCKtype)=="SOCK_DGRAM"){
-	socket_fd_conn=this->socket_fdArray[0]; // UDP works with socket descriptor
-}
-else{
-	socket_fd_conn=this->new_socketArray[0];   // The first point probably to the host
-}
-
-int SockListenTimeusec=9999999; // Negative means infinite
-
-int isValidWhileLoopCount = 15; // Number of tries
-
-while(isValidWhileLoopCount>0){
-memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
-strcpy(this->SendBuffer,this->IPaddressesSockets[1]); //IP attached host to the other node
-//cout << "this->IPaddressesSockets[1]: " << this->IPaddressesSockets[1] << endl;
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,this->IPaddressesSockets[2]); // This attached host so that the other node can reply
-//cout << "this->IPaddressesSockets[2]: " << this->IPaddressesSockets[2] << endl;
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"Control");
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"InfoRequest");
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"NodeAreYouThere?");
-strcat(this->SendBuffer,",");// Very important to end the message
-
-this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send message to node
-
-this->ReadFlagWait=true;
-int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
-this->ReadFlagWait=false;
-//cout << "ReadBytes: " << ReadBytes << endl;
-if (ReadBytes>0){// Read block	
-	this->ProcessNewMessage();	
-}
-if (this->OtherNodeThereFlag==true){isValidWhileLoopCount=0;}
-else{
-	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
-	isValidWhileLoopCount--;
-	if (isValidWhileLoopCount==0){
-	this->release();
-	cout << "Exiting QtransportLayerAgentN since no initial parameters negotiation achieved" << endl;
-	this->m_exit(); // Exit the application
-	}
-	else{
-	this->release();
-		usleep((int)(10*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
-	this->acquire();
-	}
-}
-}//while
-
-//cout << "SendParametersAgent()" << endl;
- this->SendParametersAgent();
-}
-else{//server
-// Expect to receive some information
-}
-this->release();
-} // try
-  catch (...) { // Catches any exception
-  cout << "Exception caught" << endl;
-    }
-
-return 0;// All OK
-}
-
 } /* namespace nsQnetworkLayerAgentN */
 
 
@@ -1083,30 +902,17 @@ int main(int argc, char const * argv[]){
  strcpy(QTLANagent.SCmode[1],argv[1]); // to know if this host instance is client or server or dealer
  cout << "QTLANagent.SCmode[1]: " << QTLANagent.SCmode[1] << endl;
  strcpy(QTLANagent.IPaddressesSockets[1],argv[2]); // To know its own IP in the control network
- cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[2] << endl;
+ cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[1] << endl;
  strcpy(QTLANagent.IPaddressesSockets[0],argv[3]); // To know the host IP in the control network
  cout << "QTLANagent.IPaddressesSockets[0]: " << QTLANagent.IPaddressesSockets[0] << endl;
  // Then the sub agents threads can be started
  QTLANagent.QNLAagent.InitAgentProcess();
  QTLANagent.InitiateBelowAgentsObjects();
  
- // One of the firsts things to do for a node is to initialize listening ICP socket connection with it host or with its adjacent nodes.
+ // One of the firsts things to do for a node is to initialize listening ICP socket connection with its host
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
- // Discover some IP addresses of interest 
- QTLANagent.RetrieveIPSocketsHosts();
- /*
- cout << "QTLANagent.IPaddressesSockets[0]: " << QTLANagent.IPaddressesSockets[0] << endl;
- cout << "QTLANagent.IPaddressesSockets[1]: " << QTLANagent.IPaddressesSockets[1] << endl;
- cout << "QTLANagent.IPaddressesSockets[2]: " << QTLANagent.IPaddressesSockets[2] << endl;
- cout << "QTLANagent.IPaddressesSockets[3]: " << QTLANagent.IPaddressesSockets[3] << endl;
- cout << "QTLANagent.IPSocketsList[0]: " << QTLANagent.IPSocketsList[0] << endl;
- cout << "QTLANagent.IPSocketsList[1]: " << QTLANagent.IPSocketsList[1] << endl;
- */
- // Then negotiate some parameters
- QTLANagent.NegotiateInitialParamsNode(); 
- 
- // Then await for next actions
- 
+  
+ // Then await for next actions 
  bool isValidWhileLoop;
  if (QTLANagent.getState()==QTLAN::APPLICATION_EXIT){isValidWhileLoop = false;}
  else{isValidWhileLoop = true;}

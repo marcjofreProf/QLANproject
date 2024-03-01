@@ -12,7 +12,7 @@ Header declaration file for Quantum transport Layer Agent Node
 #define QtransportLayerAgentN_H_
 
 // ICP connections
-#define NumSocketsMax 2
+#define NumSocketsMax 1
 #define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 #define IPcharArrayLengthMAX 15
 
@@ -46,12 +46,9 @@ public: // Variables/Objects
 	nsQnetworkLayerAgent::QNLA QNLAagent; // Instance of the below agent
 	int ParamArgc=0; // Number of passed parameters
 	int numberSessions=0;
-	char IPaddressesSockets[NumSocketsMax+2][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks	
+	char IPaddressesSockets[2][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks	
 	// IPaddressesSockets[0]: IP host attached ConNet
 	// IPaddressesSockets[1]: IP node ConNet
-	// IPaddressesSockets[2]: IP host attached OpNet
-	// IPaddressesSockets[3]: IP host other OpNet
-	// IPaddressesSockets[4]: IP host other OpNet
 	char IPSocketsList[1][IPcharArrayLengthMAX]; // IP address where the socket descriptors are pointing to	
 	// IPSocketsList[0]: IP host attached ConNet
 	char SCmode[2][NumBytesBufferICPMAX] = {0}; // Variable to know if the node instance is working as server or client to the other node
@@ -106,8 +103,6 @@ public: // Functions/Methods
 	// Payload information parameters
 	int SendParametersAgent();// The upper layer gets the information to be send
         int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node
-        int RetrieveIPSocketsHosts();
-	int NegotiateInitialParamsNode();
 	~QTLAN();  //destructor
 
 private: // Functions/Methods

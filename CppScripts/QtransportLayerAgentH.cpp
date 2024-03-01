@@ -685,37 +685,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	// Identify what to do and execute it
 	if (string(Type)==string("Operation")){// Operation message. 
 		//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
-		if(string(IPorg)==string(this->IPSocketsList[0]) and string(IPdest)==string(this->IPaddressesSockets[3])){// Information requested by the attached node
-			if (string(Command)==string("InfoRequest") and string(Payload)==string("IPaddressesSockets")){
-			// Mount message and send it to attached node
-			 // Generate the message
-			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-			strcpy(ParamsCharArray,IPorg);
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,IPdest);
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,"Control");
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,"IPaddressesSockets");
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,IPaddressesSockets[2]);
-			strcat(ParamsCharArray,":");
-			strcat(ParamsCharArray,IPaddressesSockets[3]);
-			strcat(ParamsCharArray,":");
-			if (string(this->SCmode[1])==string("dealer")){
-			strcat(ParamsCharArray,IPaddressesSockets[4]);
-			strcat(ParamsCharArray,":");
-			}
-			strcat(ParamsCharArray,",");// Very important to end the message
-			strcpy(this->SendBuffer,ParamsCharArray);
-			int socket_fd_conn=this->socket_fdArray[0];// Socket descriptor to the attached node (it applies both to TCP and UDP
-			//cout << "this->SendBuffer: " << this->SendBuffer << endl;
-			//cout << "socket_fd_conn: " << socket_fd_conn << endl;
-			//cout << "IPdest: " << IPdest << endl;
-			//cout << "IPorg: " << IPorg << endl;
-			this->ICPmanagementSend(socket_fd_conn,IPorg);
-			}
-			else if (string(Command)==string("SimulateNumStoredQubitsNode")){// Expected/awaiting message
+		if(string(IPorg)==string(this->IPSocketsList[0]) and string(IPdest)==string(this->IPaddressesSockets[1])){// Information provided by the attached node to this host
+			if (string(Command)==string("SimulateNumStoredQubitsNode")){// Reply message. Expected/awaiting message
 				//cout << "We are here NumStoredQubitsNode" << endl;
 				int NumSubPayloads=this->countColons(Payload);
 				char SubPayload[NumBytesBufferICPMAX] = {0};				
@@ -744,12 +715,12 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		// Do not do anything
 		}
 	}
-	else if(string(Type)==string("Control")){//Control message. If it is not meant for this process, forward to the node
+	else if(string(Type)==string("Control")){//Control message are not meant for host, so forward it accordingly
 		strcpy(this->SendBuffer,this->ReadBuffer);
 		//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
 		//cout << "IPorg: " << IPorg << endl;
 		//cout << "IPaddressesSockets: " << IPaddressesSockets[0] << endl;
-		if (string(IPorg)==string(this->IPaddressesSockets[0])){ // If it comes from its attached node and destination at this host (if destination is another host, then means that has to go to else), it means it has to forward it to the other host (so it can forward it to its attached node)
+		if (string(IPorg)==string(this->IPaddressesSockets[0])){ // If it comes from its attached node and is a control message then it is not for this host
 		// The node of a host is always identified in the Array in position 0	
 		    //cout << "SendBuffer: " << this->SendBuffer << endl;
 		    int socket_fd_conn;
@@ -762,7 +733,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[1]);
 		    }
 		}	
-		else{// It has to forward to its node
+		else{// It does not come from its node and it is a control message, so it has to forward to its node
 		   // The node of a host is always identified in the Array in position 0	
 		    //cout << "SendBuffer: " << this->SendBuffer << endl;
 		    int socket_fd_conn=this->socket_fdArray[0];  // the host always acts as client to the node, so it needs the socket descriptor   (it applies both to TCP and UDP)
@@ -771,7 +742,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	}
 	else{// Info message; Default
 		if (string(Command)==string("print")){
-			cout << "New Message: "<< Payload << endl;
+			cout << "Message not handled: "<< Payload << endl;
 		}
 		else{//Default
 		// Do not do anything
@@ -837,42 +808,14 @@ this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 
 int socket_fd_conn=this->socket_fdArray[0];   // host acts as client to the node, so it needs the socket descriptor (it applies both to TCP and UDP)
-
-//int SockListenTimeusec=9999; // negative means infinite time
-
 int isValidWhileLoopCount = 10; // Number of tries
 
-//usleep(999999);
-/*
-this->ReadFlagWait=true;
-int ReadBytes=this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec);
-this->ReadFlagWait=false;
-//cout << "ReadBytes: " << ReadBytes << endl;
-if (ReadBytes>0){// Read block	
-	this->ProcessNewMessage();		
-}
-*/
-
-
-/*
-memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
-strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,this->IPaddressesSockets[3]);
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"Control");
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"InfoRequest");
-strcat(this->SendBuffer,",");
-strcat(this->SendBuffer,"NumStoredQubitsNode");
-strcat(this->SendBuffer,",");// Very important to end the message
-this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);*/
 while(isValidWhileLoopCount>0){
 	if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
 	memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
-	strcpy(this->SendBuffer, this->IPaddressesSockets[0]);
+	strcpy(this->SendBuffer,this->IPaddressesSockets[0]);
 	strcat(this->SendBuffer,",");
-	strcat(this->SendBuffer,this->IPaddressesSockets[3]);
+	strcat(this->SendBuffer,this->IPaddressesSockets[1]);
 	strcat(this->SendBuffer,",");
 	strcat(this->SendBuffer,"Control");
 	strcat(this->SendBuffer,",");
@@ -880,12 +823,11 @@ while(isValidWhileLoopCount>0){
 	strcat(this->SendBuffer,",");
 	strcat(this->SendBuffer,"SimulateNumStoredQubitsNode");
 	strcat(this->SendBuffer,",");// Very important to end the message
-
 	this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send mesage to node
 	}
-this->release();
-usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
-this->acquire();
+	this->release();
+	usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
+	this->acquire();
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
 		this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 		ParamsIntArray[0]=this->SimulateNumStoredQubitsNodeParamsIntArray[0];
@@ -909,7 +851,7 @@ this->acquire();
 			this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 			this->release();
 		}
-}
+	}
 }//while
 
 } // try
