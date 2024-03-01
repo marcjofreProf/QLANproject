@@ -777,9 +777,9 @@ if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking
 	//cout<< "IPorg: " << IPorg << endl;
 	//cout<< "IPdest: " << IPdest << endl;
 	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-	strcpy(ParamsCharArray,IPdest);
+	strcpy(ParamsCharArray,IPorg);
 	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,IPorg);
+	strcat(ParamsCharArray,IPdest);
 	strcat(ParamsCharArray,",");
 	strcat(ParamsCharArray,"Operation");
 	strcat(ParamsCharArray,",");
@@ -815,7 +815,7 @@ if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking
 	strcat(ParamsCharArray,charNum);
 	strcat(ParamsCharArray,":");// End Separate different Payloads with :
 	strcat(ParamsCharArray,",");// Very important to end the message
-	//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+	cout << "ParamsCharArray: " << ParamsCharArray << endl;
 	  // reply immediately with a message to requester
 	//cout<< "Node before second acquire" << endl;
 	this->acquire();	
