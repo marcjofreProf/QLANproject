@@ -735,14 +735,25 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		}
 	}
 	else if(string(Type)==string("Control")){//Control message are not meant for host, so forward it accordingly
-		strcpy(this->SendBuffer,this->ReadBuffer);
-		//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
-		//cout << "IPorg: " << IPorg << endl;
-		//cout << "IPaddressesSockets: " << IPaddressesSockets[0] << endl;
-		if (string(IPorg)==string(this->IPaddressesSockets[0])){ // If it comes from its attached node and is a control message then it is not for this host
+		if (string(IPorg)==string(this->IPaddressesSockets[0])){ // If it comes from its attached node and is a control message then it is not for this host, forward it to other hosts' nodes
 		// The node of a host is always identified in the Array in position 0	
 		    //cout << "SendBuffer: " << this->SendBuffer << endl;
 		    int socket_fd_conn;
+		    
+		    char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+			strcpy(ParamsCharArray,IPdest);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,IPorg);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,Type);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,Command);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,Payload);
+			strcat(ParamsCharArray,",");// Very important to end the message
+			//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+			
+		    strcpy(this->SendBuffer,ParamsCharArray);			
 		    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
 			    socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
 			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[1]);
@@ -752,6 +763,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[1]);
 		    }
 		    
+		    strcpy(this->SendBuffer,ParamsCharArray);
 		    if (string(this->SCmode[1])==string("dealer")){// It also sends it to the other host
 			    if (string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
 				    socket_fd_conn=this->socket_fdArray[2];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
@@ -766,17 +778,25 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		else{// It does not come from its node and it is a control message, so it has to forward to its node
 		   // The node of a host is always identified in the Array in position 0	
 		    //cout << "SendBuffer: " << this->SendBuffer << endl;
+		    char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+			strcpy(ParamsCharArray,IPdest);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,IPorg);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,Type);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,Command);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,Payload);
+			strcat(ParamsCharArray,",");// Very important to end the message
+			//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+		    strcpy(this->SendBuffer,ParamsCharArray);
 		    int socket_fd_conn=this->socket_fdArray[0];  // the host always acts as client to the node, so it needs the socket descriptor   (it applies both to TCP and UDP)
 		    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
 		}  
 	}
-	else{// Info message; Default
-		if (string(Command)==string("print")){
-			cout << "Message not handled by host: "<< Payload << endl;
-		}
-		else{//Default
-		// Do not do anything
-		}
+	else{// 
+		cout << "Message not handled by host: "<< Payload << endl;
 	}  
 }// for
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
@@ -878,6 +898,7 @@ while(isValidWhileLoopCount>0){
 		ParamsIntArray[0]=-1;
 		isValidWhileLoopCount--;
 		if (isValidWhileLoopCount<=0){
+			cout << "Host did not achieve to RetrieveNumStoredQubitsNode" << endl;
 			this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 			this->release();
 		}

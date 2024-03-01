@@ -47,29 +47,29 @@ class QPLA:
 		messageIPdest=IPhostDestConNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)		
-		
-	def SimulateSendEntangledQubitsHost(self,IPhostDest1OpNet,IPhostOrg1OpNet,IPhostDest2OpNet,IPhostOrg2OpNet,IPnodeDestConNet,IPhostOrgConNet,128) # Request that the other nodes of the specified hosts get ready to receive entangled qubits from the dealer's node
-		messagePayloadAux=str(NumRequestedQubits)
+	
+	def SimulateSendEntangledQubitsHost(self,IPhostDest1OpNet,IPhostOrg1OpNet,IPhostDest2OpNet,IPhostOrg2OpNet,IPnodeDestConNet,IPhostOrgConNet,NumSendQubits): # Request that the other nodes of the specified hosts get ready to receive entangled qubits from the dealer's node
+		messagePayloadAux=str(NumSendQubits)
 		messageCommandAux="SimulateSendQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrgConNet
 		messageIPdest=IPnodeDestConNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
-		messagePayloadAux=str(NumRequestedQubits)
+		messagePayloadAux=str(NumSendQubits)
 		messageCommandAux="SimulateReceiveQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrg1OpNet
 		messageIPdest=IPhostDest1OpNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
-		messagePayloadAux=str(NumRequestedQubits)
+		messagePayloadAux=str(NumSendQubits)
 		messageCommandAux="SimulateReceiveQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrg2OpNet
 		messageIPdest=IPhostDest2OpNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-		self.QSLAagent.SendMessageAgent(messageAuxChar)		
+		self.QSLAagent.SendMessageAgent(messageAuxChar)	
 	
 	def SimulateRetrieveNumStoredQubitsNode(self,IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray): # Supposing that node has received quBits, make use of them
 		self.QSLAagent.SimulateRetrieveNumStoredQubitsNode(IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray)

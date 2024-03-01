@@ -686,7 +686,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
 	// Identify what to do and execute it
 	if (string(Type)==string("Operation")){// Operation message. Forward to the host (there should not be messages of this type in the QtransportLayerAgentN. So not develop
-		// Do not do anything
+		cout << "Operation message to node not handled: "<< Payload << endl;
 	}
 	else if(string(Type)==string("Control")){//Control message	
 		if (string(Command)==string("InfoRequest")){ // Request to provide information
@@ -718,13 +718,9 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			cout << "Control message to node not handled: "<< Payload << endl;
 		}
 	}
-	else{// Info message; Default
-		if (string(Command)==string("print")){
-			cout << "Message not handled by node: "<< Payload << endl;
-		}
-		else{//Default
+	else{//Default
 		// Do not do anything
-		}
+		cout << "Message not handled by node: "<< Payload << endl;
 	}  
 }// for
 // Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
