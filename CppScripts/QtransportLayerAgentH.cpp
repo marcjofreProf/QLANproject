@@ -855,28 +855,27 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 }
 
 int QTLAH::SimulateRetrieveNumStoredQubitsNode(char* IPhostReply,char* IPhostRequest, int* ParamsIntArray,int nIntarray,float* ParamsFloatArray,int nFloatarray){ // Send to the upper layer agent how many qubits are stored
-
 try{
 this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 
 int isValidWhileLoopCount = 10; // Number of tries
-char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-strcpy(ParamsCharArray,IPhostReply);
-strcat(ParamsCharArray,",");
-strcat(ParamsCharArray,IPhostRequest);
-strcat(ParamsCharArray,",");
-strcat(ParamsCharArray,"Control");
-strcat(ParamsCharArray,",");
-strcat(ParamsCharArray,"InfoRequest");
-strcat(ParamsCharArray,",");
-strcat(ParamsCharArray,"SimulateNumStoredQubitsNode");
-strcat(ParamsCharArray,",");// Very important to end the message
-//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+
 while(isValidWhileLoopCount>0){
 	if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
+	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+	strcpy(ParamsCharArray,IPhostReply);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,IPhostRequest);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"Control");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"InfoRequest");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"SimulateNumStoredQubitsNode");
+	strcat(ParamsCharArray,",");// Very important to end the message
 	//cout << "ParamsCharArray: " << ParamsCharArray << endl;
-	this->ICPdiscoverSend(ParamsCharArray); // send mesage to node
+	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 	}
 	this->release();
 	usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response

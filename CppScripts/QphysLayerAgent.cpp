@@ -198,11 +198,10 @@ else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]"))
 }
 */
 if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
-else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread
-	cout << "OtherClientNodeFutureTimePoint: " << (unsigned int)atoi(ValuesCharArray[iHeaders]) << endl;
+else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread	
 	std::chrono::nanoseconds duration_back((unsigned long long int)strtoull(ValuesCharArray[iHeaders],NULL,10));
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
-	
+	cout << "OtherClientNodeFutureTimePoint: " << (unsigned long long int)strtoull(ValuesCharArray[iHeaders],NULL,10) << endl;
 	// Debugging
 	//TimePoint TimePointClockNow=Clock::now();
 	//auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
