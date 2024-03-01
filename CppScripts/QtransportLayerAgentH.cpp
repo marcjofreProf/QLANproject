@@ -482,7 +482,7 @@ else {// There might be at least one new message
 		}
 		// Process the message
 		else{// (valread>0){
-			cout << "Host Received message: " << this->ReadBuffer << endl;
+			//cout << "Host Received message: " << this->ReadBuffer << endl;
 			//cout << "valread: " << valread << endl;
 			return valread;
 		}
@@ -493,8 +493,8 @@ else {// There might be at least one new message
 }
 
 int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
-cout << "Host SendBuffer: " << this->SendBuffer << endl;
-cout << "Host SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
+//cout << "Host SendBuffer: " << this->SendBuffer << endl;
+//cout << "Host SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=0;
@@ -729,8 +729,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	}
 	else if(string(Type)==string("Control")){//Control message are not meant for host, so forward it accordingly
 		if (string(IPorg)==string(this->IPaddressesSockets[0])){ // If it comes from its attached node and is a control message then it is not for this host, forward it to other hosts' nodes
-		// The node of a host is always identified in the Array in position 0	
-		    //cout << "SendBuffer: " << this->SendBuffer << endl;
+		// The node of a host is always identified in the Array in position 0			    
 		    int socket_fd_conn;
 		    // Mount message
 		    char ParamsCharArray[NumBytesBufferICPMAX] = {0};
@@ -744,7 +743,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,Payload);
 			strcat(ParamsCharArray,",");// Very important to end the message
-			//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+			cout << "ParamsCharArray: " << ParamsCharArray << endl;
 			
 		    strcpy(this->SendBuffer,ParamsCharArray);			
 		    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
@@ -767,7 +766,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArrayAux,",");
 			strcat(ParamsCharArrayAux,Payload);
 			strcat(ParamsCharArrayAux,",");// Very important to end the message
-			//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+			cout << "ParamsCharArray: " << ParamsCharArray << endl;
 		    strcpy(this->SendBuffer,ParamsCharArrayAux);			
 		    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
 			    socket_fd_conn=this->socket_fdArray[2];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
@@ -876,6 +875,7 @@ strcat(ParamsCharArray,",");// Very important to end the message
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
 while(isValidWhileLoopCount>0){
 	if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
+	//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to node
 	}
 	this->release();
