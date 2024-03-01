@@ -42,14 +42,14 @@ QTLAH::QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAsce
  
  //cout << "The value of the input is: "<< ParamsDescendingCharArray << endl;
 // Parse the ParamsDescendingCharArray
-strcpy(this->SCmode[0],"client"); // to know if this host instance is client or server
+strcpy(this->SCmode[0],"client"); // to know if this host instance is client or server to the node. It is always client
 strcpy(this->SCmode[1],strtok(ParamsDescendingCharArray,",")); // to know if this host instance is client or server
 
 strcpy(this->IPaddressesSockets[0],strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
 strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are using the same pointer as the last strtok
-strcpy(this->IPaddressesSockets[2],strtok(NULL,","));// Host own IP in operaton network
-strcpy(this->IPaddressesSockets[3],strtok(NULL,","));// Host own IP in control network
-
+strcpy(this->IPaddressesSockets[2],strtok(NULL,","));
+strcpy(this->IPaddressesSockets[3],strtok(NULL,","));
+if (string(this->SCmode[1])==string("dealer")){strcpy(this->IPaddressesSockets[4],strtok(NULL,","));}
 
 //cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
 //cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
@@ -156,19 +156,19 @@ if (string(SOCKtype)=="SOCK_DGRAM"){
 	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[1],this->IPSocketsList[0]); // Listen to the port
 	
 	if (RetValue>-1){
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[2],this->IPaddressesSockets[3],this->IPSocketsList[1]);} // Open port and listen as server
+	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[3],this->IPaddressesSockets[2],this->IPSocketsList[1]);} // Open port and listen as server
 	
 	if (string(this->SCmode[1])==string("dealer")){
 		if (RetValue>-1){
-		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[2],this->new_socketArray[2],this->IPaddressesSockets[2],this->IPaddressesSockets[4],this->IPSocketsList[2]);} // Open port and listen as server
+		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[2],this->new_socketArray[2],this->IPaddressesSockets[4],this->IPaddressesSockets[2],this->IPSocketsList[2]);} // Open port and listen as server
 	}
 	// The sockets for sending	
 	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[1],this->IPSocketsList[0]);}// In order to send datagrams
 	
-	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[1],this->IPaddressesSockets[2],this->IPaddressesSockets[3],this->IPSocketsList[1]);}// In order to send datagrams
+	if (RetValue>-1){RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[1],this->IPaddressesSockets[3],this->IPaddressesSockets[2],this->IPSocketsList[1]);}// In order to send datagrams
 	if (string(this->SCmode[1])==string("dealer")){
 		if (RetValue>-1){
-		RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[2],this->IPaddressesSockets[2],this->IPaddressesSockets[4],this->IPSocketsList[2]);} // Open port and listen as server
+		RetValue=this->ICPmanagementOpenClient(this->socket_SendUDPfdArray[2],this->IPaddressesSockets[4],this->IPaddressesSockets[2],this->IPSocketsList[2]);} // Open port and listen as server
 	}
 }
 else{// TCP
@@ -190,21 +190,24 @@ else{// TCP
 	//cout << "Check - SCmode[1]: " << this->SCmode[1] << endl;
 	if (string(this->SCmode[1])==string("client")){
 		//cout << "Check - Generating connection as client" << endl;	
-		RetValue=this->ICPmanagementOpenClient(this->socket_fdArray[1],this->IPaddressesSockets[2],this->IPaddressesSockets[3],this->IPSocketsList[1]); // Connect as client to destination host
+		RetValue=this->ICPmanagementOpenClient(this->socket_fdArray[1],this->IPaddressesSockets[3],this->IPaddressesSockets[2],this->IPSocketsList[1]); // Connect as client to destination host
 	}
 	else{// server. suppossedly in both situations being server or delear, it will become server to the client (the client will conntect to this host)
 		//cout << "Check - Generating connection as server" << endl;
-		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[2],this->IPaddressesSockets[3],this->IPSocketsList[1]); // Open port and listen as server
+		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[1],this->new_socketArray[1],this->IPaddressesSockets[3],this->IPaddressesSockets[2],this->IPSocketsList[1]); // Open port and listen as server
 		
 	}
 	if (RetValue==-1){this->m_exit();} // Exit application
 	
 	if (string(this->SCmode[1])==string("dealer")){
-		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[2],this->new_socketArray[2],this->IPaddressesSockets[2],this->IPaddressesSockets[4],this->IPSocketsList[2]); // Open port and listen as server
+		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[2],this->new_socketArray[2],this->IPaddressesSockets[4],this->IPaddressesSockets[2],this->IPSocketsList[2]); // Open port and listen as server
 	}
 }
 	if (RetValue==-1){this->m_exit();} // Exit application
 	this->numberSessions=1;
+	if (string(this->SCmode[1])==string("dealer")){this->NumSockets=3;}
+	else{this->NumSockets=2;}
+		
 	return 0; // All OK
 }
 
@@ -407,7 +410,7 @@ else {// There might be at least one new message
 			    // Filling information 
 			    orgaddr.sin_family    = AF_INET; // IPv4 
 			    
-			    for (int i=0; i<(NumSocketsMax); i++){
+			    for (int i=0; i<(NumSockets); i++){
 				//cout << "socket_fd_conn: " << socket_fd_conn << endl;
 			    	//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
 			    	if (socket_fd_conn==socket_fdArray[i]){
@@ -421,7 +424,7 @@ else {// There might be at least one new message
 			    }
 			    
 			//cout << "valread: " << valread << endl;
-			//for (int i=0; i<(NumSocketsMax); i++){
+			//for (int i=0; i<(NumSockets); i++){
 			//	cout << "socket_fd_conn: " << socket_fd_conn << endl;
 			//    	cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
 			//    	if (socket_fd_conn==socket_fdArray[i]){
@@ -438,7 +441,7 @@ else {// There might be at least one new message
 			    memset(&orgaddr, 0, sizeof(orgaddr));		       
 			    // Filling information 
 			    orgaddr.sin_family    = AF_INET; // IPv4
-			    for (int i=0; i<(NumSocketsMax); i++){
+			    for (int i=0; i<(NumSockets); i++){
 				//cout << "socket_fd_conn: " << socket_fd_conn << endl;
 			    	//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
 			    	if (socket_fd_conn==socket_fdArray[i]){
@@ -452,7 +455,7 @@ else {// There might be at least one new message
 			    }
 			    
 			//cout << "valread: " << valread << endl;
-			//for (int i=0; i<(NumSocketsMax); i++){
+			//for (int i=0; i<(NumSockets); i++){
 			//	cout << "socket_fd_conn: " << socket_fd_conn << endl;
 			//    	cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
 			//    	if (socket_fd_conn==socket_fdArray[i]){
@@ -467,7 +470,7 @@ else {// There might be at least one new message
 		if (valread <= 0){
 			if (valread<0){
 				cout << strerror(errno) << endl;
-				for (int i=0; i<(NumSocketsMax); i++){
+				for (int i=0; i<(NumSockets); i++){
 				//cout << "socket_fd_conn: " << socket_fd_conn << endl;
 			    	//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
 			    	if (socket_fd_conn==socket_fdArray[i]){
@@ -514,7 +517,7 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	    destaddr.sin_port = htons(PORT); 
 	    destaddr.sin_addr.s_addr = inet_addr(IPaddressesSockets); 
 	    
-	    for (int i=0; i<(NumSocketsMax); i++){
+	    for (int i=0; i<(NumSockets); i++){
 	    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
 	    	if (socket_fd_conn==socket_fdArray[i]){
 	    		//cout << "socket_fd_conn: " << socket_fd_conn << endl;
@@ -642,7 +645,7 @@ if(this->ICPmanagementRead(socket_fd_conn,SockListenTimeusec)>0){this->m_start()
 
 // Update the socketReadIter
 this->socketReadIter++; // Variable to read each time a different socket
-this->socketReadIter=this->socketReadIter % NumSocketsMax;
+this->socketReadIter=this->socketReadIter % NumSockets;
 
 return 0; // All OK
 }
@@ -670,7 +673,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	else{strtok(NULL,",");}
 	}
 	if (iIterMessages==0){strcpy(IPdest,strtok(ReadBufferAux,","));}
-	else{strcpy(IPdest,strtok(NULL,","));}
+	else{
+	strcpy(IPdest,strtok(NULL,","));}
 	strcpy(IPorg,strtok(NULL,","));
 	strcpy(Type,strtok(NULL,","));
 	strcpy(Command,strtok(NULL,","));
@@ -685,7 +689,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	// Identify what to do and execute it
 	if (string(Type)==string("Operation")){// Operation message. 
 		//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
-		if(string(IPorg)==string(this->IPSocketsList[0]) and string(IPdest)==string(this->IPaddressesSockets[1])){// Information provided by the attached node to this host
+		if(string(IPorg)==string(this->IPaddressesSockets[0]) and string(IPdest)==string(this->IPaddressesSockets[1])){// Information provided by the attached node to this host
 			if (string(Command)==string("SimulateNumStoredQubitsNode")){// Reply message. Expected/awaiting message
 				//cout << "We are here NumStoredQubitsNode" << endl;
 				int NumSubPayloads=this->countColons(Payload);
@@ -708,11 +712,26 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			// Do not do anything
 			}			
 		}
+		else if (string(IPdest)!=string(this->IPaddressesSockets[1]) and string(IPdest)!=string(this->IPaddressesSockets[2])){// Message not for this host, forward it			
+			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+			strcpy(ParamsCharArray,IPdest);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,IPorg);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,Type);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,Command);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,Payload);
+			strcat(ParamsCharArray,",");// Very important to end the message
+			//cout << "ParamsCharArray: " << ParamsCharArray << endl;	
+			this->ICPdiscoverSend(ParamsCharArray);
+		}
 		else if (string(Command)==string("print")){
 			cout << "New Message: "<< Payload << endl;
 		}		
 		else{//Default
-		// Do not do anything
+			cout << "Operational message to host not handled: "<< Payload << endl;
 		}
 	}
 	else if(string(Type)==string("Control")){//Control message are not meant for host, so forward it accordingly
@@ -732,6 +751,17 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
 			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[1]);
 		    }
+		    
+		    if (string(this->SCmode[1])==string("dealer")){// It also sends it to the other host
+			    if (string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
+				    socket_fd_conn=this->socket_fdArray[2];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
+				    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[2]);
+			    }
+			    else{ //host acts as server		    
+				    socket_fd_conn=this->new_socketArray[2];  // host acts as server to the other host, so it needs the socket connection   
+				    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[2]);
+			    }		    
+		    }
 		}	
 		else{// It does not come from its node and it is a control message, so it has to forward to its node
 		   // The node of a host is always identified in the Array in position 0	
@@ -742,7 +772,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	}
 	else{// Info message; Default
 		if (string(Command)==string("print")){
-			cout << "Message not handled: "<< Payload << endl;
+			cout << "Message not handled by host: "<< Payload << endl;
 		}
 		else{//Default
 		// Do not do anything
@@ -764,7 +794,7 @@ int QTLAH::ICPdiscoverSend(char* ParamsCharArray){
     //cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
     // Understand which socket descriptor has to be used
     int socket_fd_conn;
-    for (int i=0; i<NumSocketsMax; ++i){
+    for (int i=0; i<NumSockets; ++i){
     	if (string(this->IPSocketsList[i])==string(IPaddressesSocketsAux)){
     	//cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
     	//cout << "this->IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
@@ -801,7 +831,7 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
     return 0; //All OK
 }
 
-int QTLAH::SimulateRetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray,float* ParamsFloatArray,int nFloatarray){ // Send to the upper layer agent how many qubits are stored
+int QTLAH::SimulateRetrieveNumStoredQubitsNode(char* IPhostReply,char* IPhostRequest, int* ParamsIntArray,int nIntarray,float* ParamsFloatArray,int nFloatarray){ // Send to the upper layer agent how many qubits are stored
 
 try{
 this->acquire();
@@ -813,9 +843,9 @@ int isValidWhileLoopCount = 10; // Number of tries
 while(isValidWhileLoopCount>0){
 	if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
 	memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
-	strcpy(this->SendBuffer,this->IPaddressesSockets[0]);
+	strcpy(this->SendBuffer,IPhostReply);
 	strcat(this->SendBuffer,",");
-	strcat(this->SendBuffer,this->IPaddressesSockets[1]);
+	strcat(this->SendBuffer,IPhostRequest);
 	strcat(this->SendBuffer,",");
 	strcat(this->SendBuffer,"Control");
 	strcat(this->SendBuffer,",");
@@ -823,7 +853,7 @@ while(isValidWhileLoopCount>0){
 	strcat(this->SendBuffer,",");
 	strcat(this->SendBuffer,"SimulateNumStoredQubitsNode");
 	strcat(this->SendBuffer,",");// Very important to end the message
-	this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]); // send mesage to node
+	this->ICPmanagementSend(socket_fd_conn,IPhostReply); // send mesage to node
 	}
 	this->release();
 	usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response

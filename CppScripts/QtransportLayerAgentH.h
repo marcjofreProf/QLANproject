@@ -11,7 +11,6 @@ Header declaration file for Quantum transport Layer Agent Host
 #ifndef QtransportLayerAgentH_H_
 #define QtransportLayerAgentH_H_
 // ICP connections
-#define NumSocketsMax 3
 #define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 #define IPcharArrayLengthMAX 15
 // Threading
@@ -41,17 +40,17 @@ public: // Variables/Objects
 	int numberSessions=0;
 private: // Variables/Objects	
 	ApplicationState m_state;
-	char IPaddressesSockets[NumSocketsMax+2][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks
+	char IPaddressesSockets[5][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks
 	// IPaddressesSockets[0]: IP node attached ConNet
 	// IPaddressesSockets[1]: IP host attached ConNet
 	// IPaddressesSockets[2]: IP host attached OpNet
 	// IPaddressesSockets[3]: IP host other OpNet
 	// IPaddressesSockets[4]: IP host other OpNet
 	char SCmode[2][NumBytesBufferICPMAX] = {0}; // Variable to know if the host instance is working as server or client
-	int socket_fdArray[NumSocketsMax]; // socket descriptor, an integer (like a file-handle)
-	int socket_SendUDPfdArray[NumSocketsMax]; // socket descriptor, an integer (like a file-handle), for sending in UDP
-	int new_socketArray[NumSocketsMax]; // socket between client and server, an integer. Created by the server.
-	char IPSocketsList[NumSocketsMax][IPcharArrayLengthMAX]; // IP address where the socket descriptors are pointing to
+	int socket_fdArray[3]; // socket descriptor, an integer (like a file-handle)
+	int socket_SendUDPfdArray[3]; // socket descriptor, an integer (like a file-handle), for sending in UDP
+	int new_socketArray[3]; // socket between client and server, an integer. Created by the server.
+	char IPSocketsList[3][IPcharArrayLengthMAX]; // IP address where the socket descriptors are pointing to
 	// IPSocketsList[0]: IP node attached ConNet
 	// IPSocketsList[1]: IP host other OpNet
 	char ReadBuffer[NumBytesBufferICPMAX] = {0};// Buffer to read ICP messages
@@ -66,7 +65,8 @@ private: // Variables/Objects
 	// Status
 	bool InfoSimulateNumStoredQubitsNodeFlag=false;// Flag to account that there is informaiton on number Qubits in node
 	int SimulateNumStoredQubitsNodeParamsIntArray[1]={0};// Array storing the Number Qubits stored in the node
-	float TimeTaggsDetAnalytics[7]={0.0};// Array containing the timetaggs detections analytics (proceesses wby the nodes)	
+	float TimeTaggsDetAnalytics[7]={0.0};// Array containing the timetaggs detections analytics (proceesses wby the nodes)
+	int NumSockets=0;
 
 public: // Functions
 	// Management
@@ -85,7 +85,7 @@ public: // Functions
 	int InitAgentProcess(); // Initializer of the thread
 	// Requests. They have to be in semaphore structure to avoid collisions between main and thread
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the upper Agent to send message to specific host/node	
-	int SimulateRetrieveNumStoredQubitsNode(int* ParamsIntArray,int nIntarray,float* ParamsFloatArray,int nFloatarray); // Send to the upper layer agent how many qubits are stored, and some statistics of the detections
+	int SimulateRetrieveNumStoredQubitsNode(char* IPhostReplyOpNet,char* IPhostRequestOpNet, int* ParamsIntArray,int nIntarray,float* ParamsFloatArray,int nFloatarray); // Send to the upper layer agent how many qubits are stored, and some statistics of the detections
 	~QTLAH();  //destructor
 
 private: //Functions//Methods

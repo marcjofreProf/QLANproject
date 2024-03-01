@@ -95,7 +95,6 @@ except __builtin__.Exception:
         pass
     _newclass = 0
 
-NumSocketsMax = _QtransportLayerAgent.NumSocketsMax
 NumBytesBufferICPMAX = _QtransportLayerAgent.NumBytesBufferICPMAX
 IPcharArrayLengthMAX = _QtransportLayerAgent.IPcharArrayLengthMAX
 class QTLAH(_object):
@@ -140,8 +139,8 @@ class QTLAH(_object):
     def SendMessageAgent(self, ParamsDescendingCharArray):
         return _QtransportLayerAgent.QTLAH_SendMessageAgent(self, ParamsDescendingCharArray)
 
-    def SimulateRetrieveNumStoredQubitsNode(self, ParamsIntArray, ParamsFloatArray):
-        return _QtransportLayerAgent.QTLAH_SimulateRetrieveNumStoredQubitsNode(self, ParamsIntArray, ParamsFloatArray)
+    def SimulateRetrieveNumStoredQubitsNode(self, IPhostReplyOpNet, IPhostRequestOpNet, ParamsIntArray, ParamsFloatArray):
+        return _QtransportLayerAgent.QTLAH_SimulateRetrieveNumStoredQubitsNode(self, IPhostReplyOpNet, IPhostRequestOpNet, ParamsIntArray, ParamsFloatArray)
     __swig_destroy__ = _QtransportLayerAgent.delete_QTLAH
     __del__ = lambda self: None
 QTLAH_swigregister = _QtransportLayerAgent.QTLAH_swigregister

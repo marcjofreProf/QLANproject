@@ -260,20 +260,48 @@ int QPLA::InitAgentProcess(){
 	return 0; //All OK
 }
 
-
-int QPLA::SimulateEmitQuBit(){
+struct timespec QPLA::SetFutureTimePointOtherNode(){// It is responsability of the host to distribute this time point to the other host's nodes
+//struct timespec requestHalfPeriod,requestQuarterPeriod,requestPeriod,requestWhileWait;
+//requestHalfPeriod.tv_sec=0;
+//requestQuarterPeriod.tv_sec=0;
+//requestPeriod.tv_sec=0;
+//requestWhileWait.tv_sec=0;
+//requestHalfPeriod.tv_nsec = (long)QuBitsNanoSecHalfPeriodInt[0];
+//requestQuarterPeriod.tv_nsec = (long)QuBitsNanoSecQuarterPeriodInt[0];
+//requestPeriod.tv_nsec = (long)QuBitsNanoSecPeriodInt[0];
+struct timespec requestWhileWait;
+// Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
+// Somehow, here it is assumed that the two system clocks are quite synchronized (maybe with the Precise Time Protocol)
+/*
+// Debugging
+TimePoint TimePointClockNow=Clock::now();
+auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
+// Convert duration to desired time
+unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
+//
+*/
+TimePoint FutureTimePoint = Clock::now()+std::chrono::nanoseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
+auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
+// Convert duration to desired time
+unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Convert 
+//cout << "time_as_count: " << time_as_count << endl;
+// Mount the Parameters message for the other node
+char ParamsCharArray[NumBytesPayloadBuffer] = {0};
+strcpy(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Initiates the ParamsCharArray, so use strcpy
+char charNum[NumBytesPayloadBuffer] = {0}; 
+sprintf(charNum, "%llu", TimePointFuture_time_as_count);//%llu: unsigned long long int
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,"_"); // Final _
+//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
+requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 this->acquire();
-if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
-this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
-std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
-threadSimulateEmitQuBitRefAux.detach();
-}
-else{
-cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
-}
+this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 this->release();
-
-return 0; // return 0 is for no error
+usleep((int)(100*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to be able to send the above message
+//////////////////////////
+return requestWhileWait;
 }
 
 struct timespec QPLA::GetFutureTimePointOtherNode(){
@@ -315,6 +343,22 @@ requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 ///////////////////////////////////
 return requestWhileWait;
+}
+
+
+int QPLA::SimulateEmitQuBit(){
+this->acquire();
+if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
+this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
+std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
+threadSimulateEmitQuBitRefAux.detach();
+}
+else{
+cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
+}
+this->release();
+
+return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadSimulateEmitQuBit(){
@@ -383,50 +427,6 @@ cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 }
 this->release();
 return 0; // return 0 is for no error
-}
-
-struct timespec QPLA::SetFutureTimePointOtherNode(){
-//struct timespec requestHalfPeriod,requestQuarterPeriod,requestPeriod,requestWhileWait;
-//requestHalfPeriod.tv_sec=0;
-//requestQuarterPeriod.tv_sec=0;
-//requestPeriod.tv_sec=0;
-//requestWhileWait.tv_sec=0;
-//requestHalfPeriod.tv_nsec = (long)QuBitsNanoSecHalfPeriodInt[0];
-//requestQuarterPeriod.tv_nsec = (long)QuBitsNanoSecQuarterPeriodInt[0];
-//requestPeriod.tv_nsec = (long)QuBitsNanoSecPeriodInt[0];
-struct timespec requestWhileWait;
-// Client sets a future TimePoint for measurement and communicates it to the server (the one sending the qubits)
-// Somehow, here it is assumed that the two system clocks are quite synchronized (maybe with the Precise Time Protocol)
-/*
-// Debugging
-TimePoint TimePointClockNow=Clock::now();
-auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
-// Convert duration to desired time
-unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
-//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
-//
-*/
-TimePoint FutureTimePoint = Clock::now()+std::chrono::nanoseconds(WaitTimeToFutureTimePoint);// Set a time point in the future
-auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
-// Convert duration to desired time
-unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Convert 
-//cout << "time_as_count: " << time_as_count << endl;
-// Mount the Parameters message for the other node
-char ParamsCharArray[NumBytesPayloadBuffer] = {0};
-strcpy(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Initiates the ParamsCharArray, so use strcpy
-char charNum[NumBytesPayloadBuffer] = {0}; 
-sprintf(charNum, "%llu", TimePointFuture_time_as_count);//%llu: unsigned long long int
-strcat(ParamsCharArray,charNum);
-strcat(ParamsCharArray,"_"); // Final _
-//cout << "ParamsCharArray: " << ParamsCharArray << endl;
-requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
-requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
-this->acquire();
-this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other node
-this->release();
-usleep((int)(100*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to be able to send the above message
-//////////////////////////
-return requestWhileWait;
 }
 
 int QPLA::ThreadSimulateReceiveQubit(){

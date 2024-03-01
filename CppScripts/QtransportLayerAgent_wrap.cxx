@@ -4180,77 +4180,101 @@ fail:
 SWIGINTERN PyObject *_wrap_QTLAH_SimulateRetrieveNumStoredQubitsNode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
-  int *arg2 = (int *) 0 ;
-  int arg3 ;
-  float *arg4 = (float *) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  int *arg4 = (int *) 0 ;
   int arg5 ;
+  float *arg6 = (float *) 0 ;
+  int arg7 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  PyArrayObject *array2 = NULL ;
-  int is_new_object2 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
   PyArrayObject *array4 = NULL ;
   int is_new_object4 = 0 ;
+  PyArrayObject *array6 = NULL ;
+  int is_new_object6 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:QTLAH_SimulateRetrieveNumStoredQubitsNode",&obj0,&obj1,&obj2)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOOOO:QTLAH_SimulateRetrieveNumStoredQubitsNode",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_SimulateRetrieveNumStoredQubitsNode" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
   }
   arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
-  {
-    npy_intp size[1] = {
-      -1 
-    };
-    array2 = obj_to_array_contiguous_allow_conversion(obj1,
-      NPY_INT,
-      &is_new_object2);
-    if (!array2 || !require_dimensions(array2, 1) ||
-      !require_size(array2, size, 1)) SWIG_fail;
-    arg2 = (int*) array_data(array2);
-    arg3 = (int) array_size(array2,0);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "QTLAH_SimulateRetrieveNumStoredQubitsNode" "', argument " "2"" of type '" "char *""'");
   }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "QTLAH_SimulateRetrieveNumStoredQubitsNode" "', argument " "3"" of type '" "char *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
   {
     npy_intp size[1] = {
       -1 
     };
-    array4 = obj_to_array_contiguous_allow_conversion(obj2,
-      NPY_FLOAT,
+    array4 = obj_to_array_contiguous_allow_conversion(obj3,
+      NPY_INT,
       &is_new_object4);
     if (!array4 || !require_dimensions(array4, 1) ||
       !require_size(array4, size, 1)) SWIG_fail;
-    arg4 = (float*) array_data(array4);
+    arg4 = (int*) array_data(array4);
     arg5 = (int) array_size(array4,0);
   }
-  result = (int)(arg1)->SimulateRetrieveNumStoredQubitsNode(arg2,arg3,arg4,arg5);
-  resultobj = SWIG_From_int(static_cast< int >(result));
   {
-    if (is_new_object2 && array2)
-    {
-      Py_DECREF(array2); 
-    }
+    npy_intp size[1] = {
+      -1 
+    };
+    array6 = obj_to_array_contiguous_allow_conversion(obj4,
+      NPY_FLOAT,
+      &is_new_object6);
+    if (!array6 || !require_dimensions(array6, 1) ||
+      !require_size(array6, size, 1)) SWIG_fail;
+    arg6 = (float*) array_data(array6);
+    arg7 = (int) array_size(array6,0);
   }
+  result = (int)(arg1)->SimulateRetrieveNumStoredQubitsNode(arg2,arg3,arg4,arg5,arg6,arg7);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   {
     if (is_new_object4 && array4)
     {
       Py_DECREF(array4); 
+    }
+  }
+  {
+    if (is_new_object6 && array6)
+    {
+      Py_DECREF(array6); 
     }
   }
   return resultobj;
 fail:
-  {
-    if (is_new_object2 && array2)
-    {
-      Py_DECREF(array2); 
-    }
-  }
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   {
     if (is_new_object4 && array4)
     {
       Py_DECREF(array4); 
+    }
+  }
+  {
+    if (is_new_object6 && array6)
+    {
+      Py_DECREF(array6); 
     }
   }
   return NULL;
@@ -5013,7 +5037,6 @@ SWIG_init(void) {
   
   import_array();
   
-  SWIG_Python_SetConstant(d, "NumSocketsMax",SWIG_From_int(static_cast< int >(3)));
   SWIG_Python_SetConstant(d, "NumBytesBufferICPMAX",SWIG_From_int(static_cast< int >(4096)));
   SWIG_Python_SetConstant(d, "IPcharArrayLengthMAX",SWIG_From_int(static_cast< int >(15)));
   SWIG_Python_SetConstant(d, "QTLAH_APPLICATION_RUNNING",SWIG_From_int(static_cast< int >(nsQtransportLayerAgentH::QTLAH::APPLICATION_RUNNING)));

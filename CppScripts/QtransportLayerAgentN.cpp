@@ -694,7 +694,6 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			  std::thread threadGetSimulateNumStoredQubitsNodeRefAux=std::thread(&QTLAN::GetSimulateNumStoredQubitsNode,this,IPorg,IPdest);
 			  threadGetSimulateNumStoredQubitsNodeRefAux.detach();
 			}
-			else if (string(Payload)==string("YesIamHere")){this->OtherNodeThereFlag=true;}
 			else{
 			//discard
 			cout << "Node does not have this information "<< Payload << endl;
@@ -716,12 +715,12 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			cout << "New Message: "<< Payload << endl;
 		}
 		else{//Default
-		// Do not do anything
+			cout << "Control message to node not handled: "<< Payload << endl;
 		}
 	}
 	else{// Info message; Default
 		if (string(Command)==string("print")){
-			cout << "New Message: "<< Payload << endl;
+			cout << "Message not handled by node: "<< Payload << endl;
 		}
 		else{//Default
 		// Do not do anything
