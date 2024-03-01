@@ -437,7 +437,6 @@ cout << "Simulate Receiving Qubits" << endl;
 struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
 
 this->acquire();
-this->RunThreadSimulateReceiveQuBitFlag=true;//enable again that this thread can again be call
 PRUGPIO->ClearStoredQuBits();
 TimeTaggs[NumQubitsMemoryBuffer]={0}; // Clear the array
 ChannelTags[NumQubitsMemoryBuffer]={0}; // Clear the array
@@ -479,6 +478,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
  */
 
 this->SimulateNumStoredQubitsNode[0]=PRUGPIO->RetrieveNumStoredQuBits(TimeTaggs,ChannelTags);
+this->RunThreadSimulateReceiveQuBitFlag=true;//enable again that this thread can again be call
 this->release();
 cout << "End Receiving Qubits" << endl;
 return 0; // return 0 is for no error

@@ -757,7 +757,6 @@ return 0;
 
 int QTLAN::GetSimulateNumStoredQubitsNode() {
 //cout<< "Node before acquire" << endl;
-usleep(10*WaitTimeAfterMainWhileLoop);// Make sure that the receive thread enters first.
 this->acquire();	  
 //cout<< "Node before this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
 if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking this info
