@@ -665,8 +665,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	else{strtok(NULL,",");}
 	}
 	if (iIterMessages==0){strcpy(IPdest,strtok(ReadBufferAux,","));}
-	else{
-	strcpy(IPdest,strtok(NULL,","));}
+	else{strcpy(IPdest,strtok(NULL,","));}
 	strcpy(IPorg,strtok(NULL,","));
 	strcpy(Type,strtok(NULL,","));
 	strcpy(Command,strtok(NULL,","));
@@ -720,7 +719,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,Payload);
 			strcat(ParamsCharArray,",");// Very important to end the message
-			cout << "ParamsCharArray: " << ParamsCharArray << endl;	
+			//cout << "ParamsCharArray: " << ParamsCharArray << endl;	
 			this->ICPdiscoverSend(ParamsCharArray);
 		}				
 		else{//Default
@@ -743,7 +742,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,Payload);
 			strcat(ParamsCharArray,",");// Very important to end the message
-			cout << "ParamsCharArray: " << ParamsCharArray << endl;
+			//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 			
 		    strcpy(this->SendBuffer,ParamsCharArray);			
 		    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
@@ -766,7 +765,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArrayAux,",");
 			strcat(ParamsCharArrayAux,Payload);
 			strcat(ParamsCharArrayAux,",");// Very important to end the message
-			cout << "ParamsCharArray: " << ParamsCharArray << endl;
+			//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 		    strcpy(this->SendBuffer,ParamsCharArrayAux);			
 		    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
 			    socket_fd_conn=this->socket_fdArray[2];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
@@ -792,7 +791,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,Payload);
 			strcat(ParamsCharArray,",");// Very important to end the message
-			cout << "ParamsCharArray: " << ParamsCharArray << endl;
+			//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 		    strcpy(this->SendBuffer,ParamsCharArray);
 		    int socket_fd_conn=this->socket_fdArray[0];  // the host always acts as client to the node, so it needs the socket descriptor   (it applies both to TCP and UDP)
 		    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);

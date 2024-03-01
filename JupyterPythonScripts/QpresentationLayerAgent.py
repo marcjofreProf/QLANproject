@@ -59,17 +59,17 @@ class QPLA:
 		messagePayloadAux=str(NumSendQubits)
 		messageCommandAux="SimulateReceiveQubits"
 		messageTypeAux="Control"
+		messageIPorg=IPhostOrg2OpNet
+		messageIPdest=IPhostDest2OpNet
+		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
+		self.QSLAagent.SendMessageAgent(messageAuxChar)		
+		messagePayloadAux=str(NumSendQubits)
+		messageCommandAux="SimulateReceiveQubits"
+		messageTypeAux="Control"
 		messageIPorg=IPhostOrg1OpNet
 		messageIPdest=IPhostDest1OpNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
-		messagePayloadAux=str(NumSendQubits)
-		messageCommandAux="SimulateReceiveQubits"
-		messageTypeAux="Control"
-		messageIPorg=IPhostOrg2OpNet
-		messageIPdest=IPhostDest2OpNet
-		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-		self.QSLAagent.SendMessageAgent(messageAuxChar)	
-	
+		
 	def SimulateRetrieveNumStoredQubitsNode(self,IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray): # Supposing that node has received quBits, make use of them
 		self.QSLAagent.SimulateRetrieveNumStoredQubitsNode(IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray)
