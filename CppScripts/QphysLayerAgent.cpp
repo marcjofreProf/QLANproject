@@ -349,10 +349,11 @@ return requestWhileWait;
 
 
 int QPLA::SimulateEmitQuBit(){
+struct timespec requestWhileWait=this->SetFutureTimePointOtherNode();
 this->acquire();
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
-std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
+std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this,requestWhileWait);
 threadSimulateEmitQuBitRefAux.detach();
 }
 else{
@@ -363,11 +364,8 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::ThreadSimulateEmitQuBit(){
+int QPLA::ThreadSimulateEmitQuBit(struct timespec requestWhileWait){
 cout << "Simulate Emiting Qubits" << endl;
-
-// Related to time synchornization
-struct timespec requestWhileWait=this->SetFutureTimePointOtherNode();
 
 this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum
 this->RunThreadSimulateEmitQuBitFlag=true;//enable again that this thread can again be called. It is okey since it entered a block semaphore part and then no other sempahored part will run until this one finishes. At the same time, returning to true at this point allows the read to not go out of scope and losing this flag parameter
@@ -412,11 +410,11 @@ cout << "End Emiting Qubits" << endl;
 }
 
 int QPLA::SimulateReceiveQuBit(){
+struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
 this->acquire();
-
 if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
-std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
+std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this,requestWhileWait);
 threadSimulateReceiveQuBitRefAux.detach();
 }
 else{
@@ -426,15 +424,10 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::ThreadSimulateReceiveQubit(){
+int QPLA::ThreadSimulateReceiveQubit(struct timespec requestWhileWait){
 cout << "Simulate Receiving Qubits" << endl;
 this->acquire();
 PRUGPIO->ClearStoredQuBits();
-this->release();
-// Related to time synchronization
-struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
-
-this->acquire();
 this->RunThreadSimulateReceiveQuBitFlag=true;//enable again that this thread can again be call
 TimeTaggs[NumQubitsMemoryBuffer]={0}; // Clear the array
 ChannelTags[NumQubitsMemoryBuffer]={0}; // Clear the array
