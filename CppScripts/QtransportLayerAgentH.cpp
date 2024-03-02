@@ -868,10 +868,10 @@ usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)))
 this->acquire();
 }
 this->SimulateRetrieveNumStoredQubitsNodeFlag=true;
-int isValidWhileLoopCount = 10; // Number of tries If it needs more than one trial is because the sockets are not working correctly. It is best to reboot nodes
+int isValidWhileLoopCount = 50; // Number of tries If it needs more than one trial is because the sockets are not working correctly. It is best to reboot nodes
 this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 while(isValidWhileLoopCount>0){
-	if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
+	if (isValidWhileLoopCount % 50 ==0){// Only try to resend the message once every 10 times
 	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 	strcpy(ParamsCharArray,IPhostReply);
 	strcat(ParamsCharArray,",");
@@ -900,6 +900,7 @@ while(isValidWhileLoopCount>0){
 		ParamsFloatArray[5]=this->TimeTaggsDetAnalytics[5];
 		ParamsFloatArray[6]=this->TimeTaggsDetAnalytics[6];
 		ParamsFloatArray[7]=this->TimeTaggsDetAnalytics[7];
+		
 		this->SimulateRetrieveNumStoredQubitsNodeFlag=false;
 		this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 		this->release();			
