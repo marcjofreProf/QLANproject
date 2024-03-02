@@ -67,6 +67,7 @@ private: // Variables/Objects
 	int SimulateNumStoredQubitsNodeParamsIntArray[1]={0};// Array storing the Number Qubits stored in the node
 	float TimeTaggsDetAnalytics[8]={0.0};// Array containing the timetaggs detections analytics (proceesses by the nodes)
 	int NumSockets=0;
+	bool SimulateRetrieveNumStoredQubitsNodeFlag=false; // Flag to only allow one process for ask to retrieve QuBits info
 
 public: // Functions
 	// Management

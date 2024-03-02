@@ -34,28 +34,21 @@ class QPLA:
 	
 	def SimulateRequestQubitsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRequestedQubits): # Request that host's node sends qubits to this host's node		
 		messagePayloadAux=str(NumRequestedQubits)
-		messageCommandAux="SimulateSendQubits"
-		messageTypeAux="Control"
-		messageIPorg=IPhostOrgOpNet
-		messageIPdest=IPhostDestOpNet
-		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-		self.QSLAagent.SendMessageAgent(messageAuxChar)
-		messagePayloadAux=str(NumRequestedQubits)
 		messageCommandAux="SimulateReceiveQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrgConNet
 		messageIPdest=IPhostDestConNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-		self.QSLAagent.SendMessageAgent(messageAuxChar)		
-	
-	def SimulateSendEntangledQubitsHost(self,IPhostDest1OpNet,IPhostOrg1OpNet,IPhostDest2OpNet,IPhostOrg2OpNet,IPnodeDestConNet,IPhostOrgConNet,NumSendQubits): # Request that the other nodes of the specified hosts get ready to receive entangled qubits from the dealer's node
-		messagePayloadAux=str(NumSendQubits)
+		self.QSLAagent.SendMessageAgent(messageAuxChar)
+		messagePayloadAux=str(NumRequestedQubits)
 		messageCommandAux="SimulateSendQubits"
 		messageTypeAux="Control"
-		messageIPorg=IPhostOrgConNet
-		messageIPdest=IPnodeDestConNet
+		messageIPorg=IPhostOrgOpNet
+		messageIPdest=IPhostDestOpNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-		self.QSLAagent.SendMessageAgent(messageAuxChar)
+		self.QSLAagent.SendMessageAgent(messageAuxChar)	
+	
+	def SimulateSendEntangledQubitsHost(self,IPhostDest1OpNet,IPhostOrg1OpNet,IPhostDest2OpNet,IPhostOrg2OpNet,IPnodeDestConNet,IPhostOrgConNet,NumSendQubits): # Request that the other nodes of the specified hosts get ready to receive entangled qubits from the dealer's node		
 		messagePayloadAux=str(NumSendQubits)
 		messageCommandAux="SimulateReceiveQubits"
 		messageTypeAux="Control"
@@ -68,6 +61,13 @@ class QPLA:
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrg1OpNet
 		messageIPdest=IPhostDest1OpNet
+		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
+		self.QSLAagent.SendMessageAgent(messageAuxChar)
+		messagePayloadAux=str(NumSendQubits)
+		messageCommandAux="SimulateSendQubits"
+		messageTypeAux="Control"
+		messageIPorg=IPhostOrgConNet
+		messageIPdest=IPnodeDestConNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
 		

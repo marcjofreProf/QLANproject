@@ -759,84 +759,87 @@ int QTLAN::GetSimulateNumStoredQubitsNode() {
 //cout<< "Node before acquire" << endl;
 this->acquire();	  
 //cout<< "Node before this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
-if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking this info
-	//cout<< "Node after this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
-	this->GetSimulateNumStoredQubitsNodeFlag=true; 
-	this->release();
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Compute interesting analystics on the Timetaggs and deteciton so that not all data has to be transfered thorugh sockets
-	// Param 0: Num detections channel 1
-	// Param 1: Num detections channel 2
-	// Param 2: Num detections channel 3
-	// Param 3: Num detections channel 4
-	// Param 4: Multidetection events
-	// Param 5: Mean time difference between tags
-	// Param 6: std time difference between tags
-	// Param 7: time value first count tags
-	int NumTimetaggDetAnalytics=8;
-	float TimeTaggsDetAnalytics[NumTimetaggDetAnalytics]={0.0};
-	int SimulateNumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetSimulateNumStoredQubitsNode(TimeTaggsDetAnalytics);// to be developed for more than one link
-	//cout << "Node return SimulateNumStoredQubitsNode: " << SimulateNumStoredQubitsNode << endl;
-	  // Generate the message
-	//cout<< "this->IPorgAux: " << this->IPorgAux << endl;
-	//cout<< "this->IPdestAux: " << this->IPdestAux << endl;
-	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-	strcpy(ParamsCharArray,this->IPorgAux);
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,this->IPdestAux);
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"Operation");
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"SimulateNumStoredQubitsNode");
-	strcat(ParamsCharArray,",");
-	char charNum[NumBytesBufferICPMAX] = {0};
-	sprintf(charNum, "%d", SimulateNumStoredQubitsNode);//
-	strcat(ParamsCharArray,charNum);
-	// Include param analytics info
-	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[0]);
-	strcat(ParamsCharArray,charNum);
-	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[1]);
-	strcat(ParamsCharArray,charNum);
-	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[2]);
-	strcat(ParamsCharArray,charNum);
-	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[3]);
-	strcat(ParamsCharArray,charNum);
-	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[4]);
-	strcat(ParamsCharArray,charNum);
-	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[5]);
-	strcat(ParamsCharArray,charNum);
-	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[6]);
-	strcat(ParamsCharArray,charNum);
-	strcat(ParamsCharArray,":");// Separate different Payloads with :
-	sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[7]);
-	strcat(ParamsCharArray,charNum);
-	strcat(ParamsCharArray,":");// End Separate different Payloads with :
-	strcat(ParamsCharArray,",");// Very important to end the message
-	//cout << "ParamsCharArray: " << ParamsCharArray << endl;
-	  // reply immediately with a message to requester
-	//cout<< "Node before second acquire" << endl;
-	this->acquire();	
-	//cout<< "Node after second acquire" << endl;	
-	strcpy(this->SendBuffer,ParamsCharArray);
-	int socket_fd_conn;
-    	if (string(SOCKtype)=="SOCK_DGRAM"){// Client sends on the file descriptor
-    		socket_fd_conn=this->socket_fdArray[0];
-    	}
-    	else{// server sends on the socket connection
-    		//cout << "socket_fd_conn" << socket_fd_conn << endl;
-    		socket_fd_conn=this->new_socketArray[0];
-    	}      
-    	this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
-	this->GetSimulateNumStoredQubitsNodeFlag=false;
-	//cout<< "Node after send" << endl;
+while (this->GetSimulateNumStoredQubitsNodeFlag==true or this->QPLASimulateReceiveQuBitFlag==true){// Wait here// No other thread checking this info
+this->release();usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();
 }
+
+//cout<< "Node after this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
+this->GetSimulateNumStoredQubitsNodeFlag=true; 
+this->release();
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Compute interesting analystics on the Timetaggs and deteciton so that not all data has to be transfered thorugh sockets
+// Param 0: Num detections channel 1
+// Param 1: Num detections channel 2
+// Param 2: Num detections channel 3
+// Param 3: Num detections channel 4
+// Param 4: Multidetection events
+// Param 5: Mean time difference between tags
+// Param 6: std time difference between tags
+// Param 7: time value first count tags
+int NumTimetaggDetAnalytics=8;
+float TimeTaggsDetAnalytics[NumTimetaggDetAnalytics]={0.0};
+int SimulateNumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetSimulateNumStoredQubitsNode(TimeTaggsDetAnalytics);// to be developed for more than one link
+//cout << "Node return SimulateNumStoredQubitsNode: " << SimulateNumStoredQubitsNode << endl;
+  // Generate the message
+//cout<< "this->IPorgAux: " << this->IPorgAux << endl;
+//cout<< "this->IPdestAux: " << this->IPdestAux << endl;
+char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+strcpy(ParamsCharArray,this->IPorgAux);
+strcat(ParamsCharArray,",");
+strcat(ParamsCharArray,this->IPdestAux);
+strcat(ParamsCharArray,",");
+strcat(ParamsCharArray,"Operation");
+strcat(ParamsCharArray,",");
+strcat(ParamsCharArray,"SimulateNumStoredQubitsNode");
+strcat(ParamsCharArray,",");
+char charNum[NumBytesBufferICPMAX] = {0};
+sprintf(charNum, "%d", SimulateNumStoredQubitsNode);//
+strcat(ParamsCharArray,charNum);
+// Include param analytics info
+strcat(ParamsCharArray,":");// Separate different Payloads with :
+sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[0]);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,":");// Separate different Payloads with :
+sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[1]);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,":");// Separate different Payloads with :
+sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[2]);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,":");// Separate different Payloads with :
+sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[3]);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,":");// Separate different Payloads with :
+sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[4]);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,":");// Separate different Payloads with :
+sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[5]);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,":");// Separate different Payloads with :
+sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[6]);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,":");// Separate different Payloads with :
+sprintf(charNum, "%.5f", TimeTaggsDetAnalytics[7]);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,":");// End Separate different Payloads with :
+strcat(ParamsCharArray,",");// Very important to end the message
+//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+  // reply immediately with a message to requester
+//cout<< "Node before second acquire" << endl;
+this->acquire();	
+//cout<< "Node after second acquire" << endl;	
+strcpy(this->SendBuffer,ParamsCharArray);
+int socket_fd_conn;
+if (string(SOCKtype)=="SOCK_DGRAM"){// Client sends on the file descriptor
+	socket_fd_conn=this->socket_fdArray[0];
+}
+else{// server sends on the socket connection
+	//cout << "socket_fd_conn" << socket_fd_conn << endl;
+	socket_fd_conn=this->new_socketArray[0];
+}      
+this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
+this->GetSimulateNumStoredQubitsNodeFlag=false;
+//cout<< "Node after send" << endl;
+
 this->release();
 //cout << "We get here Node GetNumStoredQubitsNode" << endl;
 return 0;

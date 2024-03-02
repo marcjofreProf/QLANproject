@@ -859,12 +859,17 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 }
 
 int QTLAH::SimulateRetrieveNumStoredQubitsNode(char* IPhostReply,char* IPhostRequest, int* ParamsIntArray,int nIntarray,float* ParamsFloatArray,int nFloatarray){ // Send to the upper layer agent how many qubits are stored
-
+usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes
 this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
-
+while(this->SimulateRetrieveNumStoredQubitsNodeFlag=true){//Wait, only one asking
+this->release();
+usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
+this->acquire();
+}
+this->SimulateRetrieveNumStoredQubitsNodeFlag=true;
 int isValidWhileLoopCount = 10; // Number of tries
-
+this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 while(isValidWhileLoopCount>0){
 	if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
 	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
@@ -896,6 +901,7 @@ while(isValidWhileLoopCount>0){
 		ParamsFloatArray[5]=this->TimeTaggsDetAnalytics[5];
 		ParamsFloatArray[6]=this->TimeTaggsDetAnalytics[6];
 		ParamsFloatArray[7]=this->TimeTaggsDetAnalytics[7];
+		this->SimulateRetrieveNumStoredQubitsNodeFlag=false;
 		this->release();			
 		isValidWhileLoopCount=0;
 	}
@@ -907,11 +913,12 @@ while(isValidWhileLoopCount>0){
 		if (isValidWhileLoopCount<=0){
 			cout << "Host did not achieve to RetrieveNumStoredQubitsNode" << endl;
 			this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
+			this->SimulateRetrieveNumStoredQubitsNodeFlag=false;
 			this->release();
 		}
 	}
 }//while
-
+usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give time to clear lost replies that might confuse the read
 return 0; // All OK
 }
 
