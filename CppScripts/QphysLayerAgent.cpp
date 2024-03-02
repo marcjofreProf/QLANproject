@@ -349,11 +349,10 @@ return requestWhileWait;
 
 
 int QPLA::SimulateEmitQuBit(){
-struct timespec requestWhileWait=this->SetFutureTimePointOtherNode();
 this->acquire();
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
-std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this,requestWhileWait);
+std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
 threadSimulateEmitQuBitRefAux.join();//threadSimulateEmitQuBitRefAux.detach();
 }
 else{
@@ -364,9 +363,9 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::ThreadSimulateEmitQuBit(struct timespec requestWhileWait){
+int QPLA::ThreadSimulateEmitQuBit(){
 cout << "Simulate Emiting Qubits" << endl;
-
+struct timespec requestWhileWait=this->SetFutureTimePointOtherNode();
 this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 
@@ -409,11 +408,10 @@ cout << "End Emiting Qubits" << endl;
 }
 
 int QPLA::SimulateReceiveQuBit(){
-struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
 this->acquire();
 if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
-std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this,requestWhileWait);
+std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
 threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
 }
 else{
@@ -423,10 +421,13 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::ThreadSimulateReceiveQubit(struct timespec requestWhileWait){
+int QPLA::ThreadSimulateReceiveQubit(){
 cout << "Simulate Receiving Qubits" << endl;
 this->acquire();
 PRUGPIO->ClearStoredQuBits();
+this->release();
+struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
+this->acquire();
 TimeTaggs[NumQubitsMemoryBuffer]={0}; // Clear the array
 ChannelTags[NumQubitsMemoryBuffer]={0}; // Clear the array
 // So that there are no segmentation faults by grabbing the CLOCK REALTIME and also this has maximum priority

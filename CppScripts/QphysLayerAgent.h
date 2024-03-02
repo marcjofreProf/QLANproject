@@ -120,8 +120,8 @@ private: // Functions/Methods
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 	// Particular process threads
-	int ThreadSimulateEmitQuBit(struct timespec requestWhileWait);
-	int ThreadSimulateReceiveQubit(struct timespec requestWhileWait);
+	int ThreadSimulateEmitQuBit();
+	int ThreadSimulateReceiveQubit();
 	struct timespec SetFutureTimePointOtherNode();
 	struct timespec GetFutureTimePointOtherNode();
 	
