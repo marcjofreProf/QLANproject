@@ -121,7 +121,7 @@ int QTLAH::countQintupleComas(char* ParamsCharArray) {
       comasCount++;
     }
   }
-
+ //cout << "comasCount: " << comasCount << endl;
   return comasCount/5;
 }
 
@@ -661,8 +661,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
 	strcpy(ReadBufferAux,ReadBufferAuxOriginal); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 	for (int iIterDump=0;iIterDump<(5*iIterMessages);iIterDump++){
-	if (iIterDump==0){strtok(ReadBufferAux,",");}
-	else{strtok(NULL,",");}
+		if (iIterDump==0){strtok(ReadBufferAux,",");}
+		else{strtok(NULL,",");}
 	}
 	if (iIterMessages==0){strcpy(IPdest,strtok(ReadBufferAux,","));}
 	else{strcpy(IPdest,strtok(NULL,","));}
@@ -670,7 +670,9 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	strcpy(Type,strtok(NULL,","));
 	strcpy(Command,strtok(NULL,","));
 	strcpy(Payload,strtok(NULL,","));
-
+	
+	//cout << "NumQintupleComas: " << NumQintupleComas << endl;
+	//cout << "iIterMessages: " << iIterMessages << endl;
 	//cout << "IPdest: " << IPdest << endl;
 	//cout << "IPorg: " << IPorg << endl;
 	//cout << "Type: " << Type << endl;
@@ -682,23 +684,26 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
 		if(string(IPdest)==string(this->IPaddressesSockets[1]) or string(IPdest)==string(this->IPaddressesSockets[2])){// Information for this host
 			if (string(Command)==string("SimulateNumStoredQubitsNode")){// Reply message. Expected/awaiting message
-				cout << "We are here NumStoredQubitsNode" << endl;
-				cout << "Payload: " << Payload << endl;
+				//cout << "We are here NumStoredQubitsNode" << endl;
+				//cout << "Payload: " << Payload << endl;
 				int NumSubPayloads=this->countColons(Payload);
-				char SubPayload[NumBytesBufferICPMAX] = {0};				
+				//cout << "NumSubPayloads: " << NumSubPayloads << endl;
+				char SubPayload[NumBytesBufferICPMAX] = {0};						
 				for (int i=0;i<NumSubPayloads;i++){					
-					if (i==0){
+					if (i==0){						
 						strcpy(SubPayload,strtok(Payload,":"));
 						this->SimulateNumStoredQubitsNodeParamsIntArray[0]=atoi(SubPayload);
-						cout << "atoi(SubPayload): " << atoi(SubPayload) << endl;
+						//cout << "atoi(SubPayload): " << atoi(SubPayload) << endl;
 					}
 					else{
 						strcpy(SubPayload,strtok(NULL,":"));
 						this->TimeTaggsDetAnalytics[i-1]=stof(SubPayload);
-						cout << "stof(SubPayload): " << stof(SubPayload) << endl;
+						//cout << "stof(SubPayload): " << stof(SubPayload) << endl;
 					}
 				}
-				this->InfoSimulateNumStoredQubitsNodeFlag=true;				
+								
+				this->InfoSimulateNumStoredQubitsNodeFlag=true;
+				//cout << "SimulateNumStoredQubitsNode finished parsing values" << endl;		
 			}
 			else if (string(Command)==string("print")){
 				cout << "New Message: "<< Payload << endl;
@@ -816,7 +821,7 @@ int QTLAH::ICPdiscoverSend(char* ParamsCharArray){
     //cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
     // Understand which socket descriptor has to be used
     int socket_fd_conn;
-    for (int i=0; i<NumSockets; ++i){
+    for (int i=0; i<NumSockets; i++){
     	if (string(this->IPSocketsList[i])==string(IPaddressesSocketsAux)){
     	//cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
     	//cout << "this->IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
@@ -854,7 +859,7 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 }
 
 int QTLAH::SimulateRetrieveNumStoredQubitsNode(char* IPhostReply,char* IPhostRequest, int* ParamsIntArray,int nIntarray,float* ParamsFloatArray,int nFloatarray){ // Send to the upper layer agent how many qubits are stored
-try{
+
 this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 
@@ -880,7 +885,7 @@ while(isValidWhileLoopCount>0){
 	usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
 	this->acquire();
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
-		cout << "We received info for SimulateRetrieveNumStoredQubitsNode" << endl;
+		//cout << "We received info for SimulateRetrieveNumStoredQubitsNode" << endl;
 		this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 		ParamsIntArray[0]=this->SimulateNumStoredQubitsNodeParamsIntArray[0];
 		ParamsFloatArray[0]=this->TimeTaggsDetAnalytics[0];
@@ -907,15 +912,6 @@ while(isValidWhileLoopCount>0){
 	}
 }//while
 
-} // try
-  catch (...) { // Catches any exception
-  cout << "Exception caught" << endl;
-    }
-//cout << "Before release valueSemaphore: " << valueSemaphore << endl;
-//cout << "Before release valueSemaphoreExpected: " << valueSemaphoreExpected << endl;
-//this->release(); // Release the semaphore
-//cout << "After release valueSemaphore: " << valueSemaphore << endl;
-//cout << "After release valueSemaphoreExpected: " << valueSemaphoreExpected << endl;
 return 0; // All OK
 }
 

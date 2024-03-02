@@ -819,7 +819,7 @@ if (this->GetSimulateNumStoredQubitsNodeFlag==false){// No other thread checking
 	strcat(ParamsCharArray,charNum);
 	strcat(ParamsCharArray,":");// End Separate different Payloads with :
 	strcat(ParamsCharArray,",");// Very important to end the message
-	cout << "ParamsCharArray: " << ParamsCharArray << endl;
+	//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 	  // reply immediately with a message to requester
 	//cout<< "Node before second acquire" << endl;
 	this->acquire();	
