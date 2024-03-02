@@ -428,13 +428,14 @@ return 0; // return 0 is for no error
 
 int QPLA::ThreadSimulateReceiveQubit(){
 cout << "Simulate Receiving Qubits" << endl;
-
+this->acquire();
+PRUGPIO->ClearStoredQuBits();
+this->release();
 // Related to time synchronization
 struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
 
 this->acquire();
 this->RunThreadSimulateReceiveQuBitFlag=true;//enable again that this thread can again be call
-PRUGPIO->ClearStoredQuBits();
 TimeTaggs[NumQubitsMemoryBuffer]={0}; // Clear the array
 ChannelTags[NumQubitsMemoryBuffer]={0}; // Clear the array
 // So that there are no segmentation faults by grabbing the CLOCK REALTIME and also this has maximum priority
@@ -499,6 +500,7 @@ int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 // Check that we now exceed the QuBits buffer size
 if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
 
+if (SimulateNumStoredQubitsNodeAux>0){
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 //cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
 //cout << "ChannelTags[i]: "<< std::bitset<8>(ChannelTags[i]) << endl;
@@ -555,6 +557,17 @@ for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
 TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*pow((float)((TimeTaggs[i]-TimeTaggs[i-1])%8)-TimeTaggsDetAnalytics[5],2.0);
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
+}
+else{
+TimeTaggsDetAnalytics[0]=0.0;
+TimeTaggsDetAnalytics[1]=0.0;
+TimeTaggsDetAnalytics[2]=0.0;
+TimeTaggsDetAnalytics[3]=0.0;
+TimeTaggsDetAnalytics[4]=0.0;
+TimeTaggsDetAnalytics[5]=0.0;
+TimeTaggsDetAnalytics[6]=0.0;
+TimeTaggsDetAnalytics[7]=0.0;
+}
 ////////////////////////////////
 
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
