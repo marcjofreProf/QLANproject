@@ -354,7 +354,7 @@ this->acquire();
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this,requestWhileWait);
-threadSimulateEmitQuBitRefAux.detach();
+threadSimulateEmitQuBitRefAux.join();//threadSimulateEmitQuBitRefAux.detach();
 }
 else{
 cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
@@ -414,7 +414,7 @@ this->acquire();
 if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this,requestWhileWait);
-threadSimulateReceiveQuBitRefAux.detach();
+threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
 }
 else{
 cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
