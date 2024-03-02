@@ -29,7 +29,7 @@ sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo ./CppScripts/QtransportLayerAgentN server 192.168.9.2 192.168.9.1
 sudo timedatectl set-ntp true # Start NTP
-echo 'Stopped PTP as master'
+echo 'Stopped'
 #sudo /etc/init.d/rsyslog start # start logging
 # Kill all the launched processes with same group PID
 #kill -INT $$
