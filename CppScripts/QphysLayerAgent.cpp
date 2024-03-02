@@ -350,7 +350,7 @@ return requestWhileWait;
 
 int QPLA::SimulateEmitQuBit(){
 this->acquire();
-if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
+if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
 threadSimulateEmitQuBitRefAux.detach();
@@ -413,13 +413,9 @@ cout << "End Emiting Qubits" << endl;
 
 int QPLA::SimulateReceiveQuBit(){
 this->acquire();
-//cout << "this->RunThreadSimulateReceiveQuBitFlag: " << this->RunThreadSimulateReceiveQuBitFlag << endl;
-//cout << "this->RunThreadSimulateEmitQuBitFlag: " << this->RunThreadSimulateEmitQuBitFlag << endl;
-//cout << "this->RunThreadAcquireSimulateNumStoredQubitsNode: " << this->RunThreadAcquireSimulateNumStoredQubitsNode << endl;
 
 if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
-this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
 threadSimulateReceiveQuBitRefAux.detach();
 }
@@ -486,7 +482,8 @@ return 0; // return 0 is for no error
 
 int QPLA::GetSimulateNumStoredQubitsNode(float* TimeTaggsDetAnalytics){
 this->acquire();
-while(this->RunThreadSimulateReceiveQuBitFlag==false){this->release();usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
+while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
+this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Compute interesting analystics on the Timetaggs and deteciton so that not all data has to be transfered thorugh sockets
