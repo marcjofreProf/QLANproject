@@ -862,7 +862,7 @@ int QTLAH::SimulateRetrieveNumStoredQubitsNode(char* IPhostReply,char* IPhostReq
 usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes
 this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
-while(this->SimulateRetrieveNumStoredQubitsNodeFlag=true){//Wait, only one asking
+while(this->SimulateRetrieveNumStoredQubitsNodeFlag==true){//Wait, only one asking
 this->release();
 usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
 this->acquire();
@@ -883,7 +883,7 @@ while(isValidWhileLoopCount>0){
 	strcat(ParamsCharArray,",");
 	strcat(ParamsCharArray,"SimulateNumStoredQubitsNode");
 	strcat(ParamsCharArray,",");// Very important to end the message
-	//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+	//cout << "SimulateRetrieveNumStoredQubitsNode ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 	}
 	this->release();
@@ -891,7 +891,6 @@ while(isValidWhileLoopCount>0){
 	this->acquire();
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
 		//cout << "We received info for SimulateRetrieveNumStoredQubitsNode" << endl;
-		this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 		ParamsIntArray[0]=this->SimulateNumStoredQubitsNodeParamsIntArray[0];
 		ParamsFloatArray[0]=this->TimeTaggsDetAnalytics[0];
 		ParamsFloatArray[1]=this->TimeTaggsDetAnalytics[1];
@@ -902,6 +901,7 @@ while(isValidWhileLoopCount>0){
 		ParamsFloatArray[6]=this->TimeTaggsDetAnalytics[6];
 		ParamsFloatArray[7]=this->TimeTaggsDetAnalytics[7];
 		this->SimulateRetrieveNumStoredQubitsNodeFlag=false;
+		this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 		this->release();			
 		isValidWhileLoopCount=0;
 	}

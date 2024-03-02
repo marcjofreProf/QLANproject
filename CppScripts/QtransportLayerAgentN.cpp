@@ -839,7 +839,6 @@ else{// server sends on the socket connection
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
 this->GetSimulateNumStoredQubitsNodeFlag=false;
 //cout<< "Node after send" << endl;
-
 this->release();
 //cout << "We get here Node GetNumStoredQubitsNode" << endl;
 return 0;
