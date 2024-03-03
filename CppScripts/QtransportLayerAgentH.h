@@ -13,6 +13,7 @@ Header declaration file for Quantum transport Layer Agent Host
 // ICP connections
 #define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 #define IPcharArrayLengthMAX 15
+#include<signal.h>
 // Threading
 #include <thread>
 // Semaphore
@@ -92,7 +93,7 @@ public: // Functions
 private: //Functions//Methods
 	static void SignalINTHandler(int s); // Handler for socket SIGPIPE signal error
 	static void SignalPIPEHandler(int s); // Handler for socket SIGPIPE signal error
-	//static void SignalSegmentationFaultHandler(int s); // Handler for segmentation error
+	static void SignalSegmentationFaultHandler(int s); // Handler for segmentation error
 	// Sempahore
 	void acquire();
 	void release();

@@ -79,10 +79,10 @@ signalReceivedFlag.store(true);
 cout << "Caught SIGPIPE" << endl;
 }
 
-//static void SignalSegmentationFaultHandler(int s) {
-//signalReceivedFlag.store(true);
-//cout << "Caught SIGSEGV" << endl;
-//}
+static void SignalSegmentationFaultHandler(int s) {
+signalReceivedFlag.store(true);
+cout << "Caught SIGSEGV" << endl;
+}
 ///////////////////////////////////////////////////////
 int QTLAN::InitiateBelowAgentsObjects(){// Some objects of the below layers that have to be initialized
 strcpy(this->QNLAagent.SCmode[0],this->SCmode[1]);
@@ -914,7 +914,7 @@ int main(int argc, char const * argv[]){
  /// Errors handling
  signal(SIGINT, SignalINTHandler);// Interruption signal
  signal(SIGPIPE, SignalPIPEHandler);// Error trying to write/read to a socket
- //signal(SIGSEGV, SignalSegmentationFaultHandler);// Segmentation fault
+ signal(SIGSEGV, SignalSegmentationFaultHandler);// Segmentation fault
  /////
  QTLANagent.m_pause(); // Initiate in paused state.
  //cout << "Starting in pause state the QtransportLayerAgentN" << endl;
