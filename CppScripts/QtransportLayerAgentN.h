@@ -110,7 +110,7 @@ public: // Functions/Methods
 private: // Functions/Methods
 	static void SignalINTHandler(int s); // Handler for socket SIGPIPE signal error
 	static void SignalPIPEHandler(int s); // Handler for socket SIGPIPE signal error
-	static void SignalSegmentationFaultHandler(int s); // Handler for segmentation error
+	//static void SignalSegmentationFaultHandler(int s); // Handler for segmentation error
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 	void AgentProcessRequestsPetitions(); // Process thread that manages requests and petitions	

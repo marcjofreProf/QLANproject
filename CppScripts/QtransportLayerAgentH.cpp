@@ -42,7 +42,7 @@ QTLAH::QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAsce
 /// Errors handling
  signal(SIGINT, SignalINTHandler);// Interruption signal
  signal(SIGPIPE, SignalPIPEHandler);// Error trying to write/read to a socket
- signal(SIGSEGV, SignalSegmentationFaultHandler);// Segmentation fault
+ //signal(SIGSEGV, SignalSegmentationFaultHandler);// Segmentation fault
  
  this->numberSessions = numberSessions; // Number of sessions of different services
  
@@ -131,10 +131,10 @@ signalReceivedFlag.store(true);
 cout << "Caught SIGPIPE" << endl;
 }
 
-void SignalSegmentationFaultHandler(int s) {
-signalReceivedFlag.store(true);
-cout << "Caught SIGSEGV" << endl;
-}
+//void SignalSegmentationFaultHandler(int s) {
+//signalReceivedFlag.store(true);
+//cout << "Caught SIGSEGV" << endl;
+//}
 
 /////////////////////////////////////////////////////////
 int QTLAH::countQintupleComas(char* ParamsCharArray) {
