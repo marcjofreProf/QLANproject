@@ -133,7 +133,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 			perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScriptHist4Sig.bin");//perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
 		}
 	}
-	sleep(2);// Give some time to load programs in PRUs and initiate
+	sleep(5);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	  
 	  /*// Doing debbuging checks - Debugging 1	  
 	  std::thread threadReadTimeStampsAux=std::thread(&GPIO::ReadTimeStamps,this);
@@ -197,7 +197,7 @@ else{CheckTimeFlag=false;}
 		//prussdrv_pru_disable(PRU_Operation_NUM);// Disable the PRU
 		//prussdrv_pru_enable(PRU_Operation_NUM);// Enable the PRU from 0		
 		cout << "GPIO::ReadTimeStamps took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
-		//sleep(3);// Give some time to load programs in PRUs and initiate
+		//sleep(5);// Give some time to load programs in PRUs and initiate
 		fin=true;
 	}
 } while(!fin);
@@ -254,7 +254,7 @@ do // This is blocking
 		//prussdrv_pru_disable(PRU_Signal_NUM);// Disable the PRU
 		//prussdrv_pru_enable(PRU_Signal_NUM);// Enable the PRU from 0		
 		cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1 if necessary." << endl;
-		//sleep(3);// Give some time to load programs in PRUs and initiate
+		//sleep(5);// Give some time to load programs in PRUs and initiate
 		fin=true;
 		}
 } while(!fin);
