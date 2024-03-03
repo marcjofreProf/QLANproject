@@ -194,7 +194,12 @@ else{// TCP
 	}
 	if (RetValue==-1){this->m_exit();} // Exit application
 	
-	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[2],this->new_socketArray[2],this->IPaddressesSockets[4],this->IPaddressesSockets[2],this->IPSocketsList[2]); // Open port and listen as server
+	if (string(this->SCmode[1])==string("dealer")){
+		RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[2],this->new_socketArray[2],this->IPaddressesSockets[4],this->IPaddressesSockets[2],this->IPSocketsList[2]); // Open port and listen as server
+	}
+	else{
+		RetValue=this->ICPmanagementOpenClient(this->socket_fdArray[2],this->IPaddressesSockets[4],this->IPaddressesSockets[2],this->IPSocketsList[2]); // Connect as client to destination host
+	}
 }
 	if (RetValue==-1){this->m_exit();} // Exit application
 	this->numberSessions=1;
@@ -205,17 +210,31 @@ else{// TCP
 
 int QTLAH::StopICPconnections() {
 	// First stop client or server host connection
-	if (string(SOCKtype)=="SOCK_DGRAM"){ICPmanagementCloseClient(this->socket_SendUDPfdArray[0]);ICPmanagementCloseClient(this->socket_SendUDPfdArray[1]);ICPmanagementCloseServer(this->socket_fdArray[0],this->new_socketArray[0]);ICPmanagementCloseServer(this->socket_fdArray[1],this->new_socketArray[1]);}
-	else{
-	if (string(this->SCmode[1])==string("client")){ // client
-		ICPmanagementCloseClient(this->socket_fdArray[1]);
-	}
-	else{// server
+	if (string(SOCKtype)=="SOCK_DGRAM"){
+		ICPmanagementCloseClient(this->socket_SendUDPfdArray[0]);
+		ICPmanagementCloseClient(this->socket_SendUDPfdArray[1]);
+		ICPmanagementCloseClient(this->socket_SendUDPfdArray[2]);
+		ICPmanagementCloseServer(this->socket_fdArray[0],this->new_socketArray[0]);
 		ICPmanagementCloseServer(this->socket_fdArray[1],this->new_socketArray[1]);
+		ICPmanagementCloseServer(this->socket_fdArray[1],this->new_socketArray[2]);
 	}
+	else{
+		if (string(this->SCmode[1])==string("dealer")){
+			ICPmanagementCloseServer(this->socket_fdArray[2],this->new_socketArray[2]);
+		}
+		else{
+			ICPmanagementCloseClient(this->socket_fdArray[2]);
+		}
+		
+		if (string(this->SCmode[1])==string("client")){ // client
+			ICPmanagementCloseClient(this->socket_fdArray[1]);
+		}
+		else{// server
+			ICPmanagementCloseServer(this->socket_fdArray[1],this->new_socketArray[1]);
+		}
 
-	// then stop client connection to attached node
-	ICPmanagementCloseClient(this->socket_fdArray[0]);
+		// then stop client connection to attached node
+		ICPmanagementCloseClient(this->socket_fdArray[0]);
 	}
 	// Update indicators
 	this->numberSessions=0;
