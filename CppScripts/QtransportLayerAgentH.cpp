@@ -13,6 +13,7 @@ Agent script for Quantum transport Layer Host
 // InterCommunication Protocols - Sockets - Common to Server and Client
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
 #include <sys/socket.h>
 #include <fcntl.h>
 #define PORT 8010
@@ -38,6 +39,11 @@ namespace nsQtransportLayerAgentH {
 
 QTLAH::QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAscendingCharArray) { // Constructor
 
+/// Errors handling
+ signal(SIGINT, SignalINTHandler);// Interruption signal
+ signal(SIGPIPE, SignalPIPEHandler);// Error trying to write/read to a socket
+ signal(SIGSEGV, SignalSegmentationFaultHandler);// Segmentation fault
+ 
  this->numberSessions = numberSessions; // Number of sessions of different services
  
  //cout << "The value of the input is: "<< ParamsDescendingCharArray << endl;
@@ -112,6 +118,24 @@ bool CheckRelease = valueSemaphore.fetch_add(1, std::memory_order_acquire);
 this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stays at 1
 //this->valueSemaphore.fetch_add(1,std::memory_order_release);
 }
+
+/// Errors handling
+std::atomic<bool> signalReceivedFlag{false};
+void SignalINTHandler(int s) {
+signalReceivedFlag.store(true);
+cout << "Caught SIGINT" << endl;
+}
+
+void SignalPIPEHandler(int s) {
+signalReceivedFlag.store(true);
+cout << "Caught SIGPIPE" << endl;
+}
+
+void SignalSegmentationFaultHandler(int s) {
+signalReceivedFlag.store(true);
+cout << "Caught SIGSEGV" << endl;
+}
+
 /////////////////////////////////////////////////////////
 int QTLAH::countQintupleComas(char* ParamsCharArray) {
   int comasCount = 0;
@@ -627,7 +651,8 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
            }
 
         } // switch
-        this->release(); // Release the semaphore 
+        this->release(); // Release the semaphore
+        if (signalReceivedFlag.load()){this->~QTLAH();}// Destroy the instance
         //cout << "(int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)): " << (int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)) << endl;
         usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
     }

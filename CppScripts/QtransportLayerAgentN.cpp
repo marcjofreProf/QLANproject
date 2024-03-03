@@ -67,12 +67,20 @@ void QTLAN::release() {
 this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stays at 1
 //this->valueSemaphore.fetch_add(1,std::memory_order_release);
 }
+/// Errors handling
+std::atomic<bool> signalReceivedFlag{false};
+void SignalINTHandler(int s) {
+signalReceivedFlag.store(true);
+cout << "Caught SIGINT" << endl;
+}
 
-static void SignalPIPEHandler(int s) {
+void SignalPIPEHandler(int s) {
+signalReceivedFlag.store(true);
 cout << "Caught SIGPIPE" << endl;
 }
 
-static void SignalSegmentationFaultHandler(int s) {
+void SignalSegmentationFaultHandler(int s) {
+signalReceivedFlag.store(true);
 cout << "Caught SIGSEGV" << endl;
 }
 ///////////////////////////////////////////////////////
@@ -901,10 +909,13 @@ int main(int argc, char const * argv[]){
  //  printf( "  %d. %s\n", i, argv[i] );
  // }
  //}
- 
- signal(SIGPIPE, SignalPIPEHandler);
- //signal(SIGSEGV,SignalSegmentationFaultHandler);// Segmentation fault
  QTLAN QTLANagent(0); // Initiate the instance with 0 sessions connected. A session is composed of one server sockets descriptor active.
+ 
+ /// Errors handling
+ signal(SIGINT, SignalINTHandler);// Interruption signal
+ signal(SIGPIPE, SignalPIPEHandler);// Error trying to write/read to a socket
+ signal(SIGSEGV, SignalSegmentationFaultHandler);// Segmentation fault
+ /////
  QTLANagent.m_pause(); // Initiate in paused state.
  //cout << "Starting in pause state the QtransportLayerAgentN" << endl;
  // Save some given parameters to the instance of the object
@@ -956,6 +967,7 @@ int main(int argc, char const * argv[]){
 
         } // switch
         QTLANagent.release();
+	if (signalReceivedFlag.load()){QTLANagent.~QTLAN();}// Destroy the instance
         usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {

@@ -90,6 +90,9 @@ public: // Functions
 	~QTLAH();  //destructor
 
 private: //Functions//Methods
+	static void SignalINTHandler(int s); // Handler for socket SIGPIPE signal error
+	static void SignalPIPEHandler(int s); // Handler for socket SIGPIPE signal error
+	static void SignalSegmentationFaultHandler(int s); // Handler for segmentation error
 	// Sempahore
 	void acquire();
 	void release();
