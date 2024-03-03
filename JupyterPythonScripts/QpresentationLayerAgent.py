@@ -9,11 +9,22 @@
 # Script Quantum LAN presentation layer
 #####################################################
 
-import sys, os
+import sys, os, signal
 import time
 import numpy as np
 
 import QsessionLayerAgent
+
+def signal_handler(signal_received, frame):
+    # This function will be called when SIGINT or SIGPIPE is received
+    print(f'Signal {signal_received} received, exiting gracefully.')
+    # Perform any cleanup here
+    sys.exit(0)
+
+# Set up signal handlers
+signal.signal(signal.SIGINT, signal_handler)  # Handle Ctrl+C
+signal.signal(signal.SIGPIPE, signal_handler) # Handle broken pipe errors
+signal.signal(signal.SIGSEGV, signal_handler) # Handle broken pipe errors
 
 class QPLA:
 	def __init__(self,ParamsDescendingCharArray,ParamsAscendingCharArray): # Constructor of this class

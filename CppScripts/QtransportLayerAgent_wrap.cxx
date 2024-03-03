@@ -3133,7 +3133,6 @@ namespace swig {
 #include "QtransportLayerAgentH.h"
 #include <thread>
 #include <atomic>
-#include <signal.h>
 
 
 #ifndef SWIG_FILE_WITH_INIT

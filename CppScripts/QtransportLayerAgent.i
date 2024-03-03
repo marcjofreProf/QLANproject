@@ -7,7 +7,6 @@
 #include "QtransportLayerAgentH.h"
 #include <thread>
 #include <atomic>
-#include <signal.h>
 %}
 %include "numpy.i"
 %init %{

@@ -8,8 +8,8 @@ Created: 2024
 Agent script for Quantum transport Layer Host
 */
 #include "QtransportLayerAgentH.h"
-#include<iostream>
-#include<unistd.h> //for usleep
+#include <iostream>
+#include <unistd.h> //for usleep
 // InterCommunication Protocols - Sockets - Common to Server and Client
 #include <stdio.h>
 #include <string.h>
@@ -39,10 +39,10 @@ namespace nsQtransportLayerAgentH {
 
 QTLAH::QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAscendingCharArray) { // Constructor
 
-/// Errors handling
- signal(SIGINT, SignalINTHandler);// Interruption signal
- signal(SIGPIPE, SignalPIPEHandler);// Error trying to write/read to a socket
- signal(SIGSEGV, SignalSegmentationFaultHandler);// Segmentation fault
+/// Errors handling - Actually handled in Python
+// signal(SIGINT, SignalINTHandler);// Interruption signal
+// signal(SIGPIPE, SignalPIPEHandler);// Error trying to write/read to a socket
+// signal(SIGSEGV, SignalSegmentationFaultHandler);// Segmentation fault
  
  this->numberSessions = numberSessions; // Number of sessions of different services
  
@@ -118,7 +118,7 @@ bool CheckRelease = valueSemaphore.fetch_add(1, std::memory_order_acquire);
 this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stays at 1
 //this->valueSemaphore.fetch_add(1,std::memory_order_release);
 }
-
+/*
 /// Errors handling
 std::atomic<bool> signalReceivedFlag{false};
 static void SignalINTHandler(int s) {
@@ -135,7 +135,7 @@ static void SignalSegmentationFaultHandler(int s) {
 signalReceivedFlag.store(true);
 cout << "Caught SIGSEGV" << endl;
 }
-
+*/
 /////////////////////////////////////////////////////////
 int QTLAH::countQintupleComas(char* ParamsCharArray) {
   int comasCount = 0;
@@ -652,7 +652,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
 
         } // switch
         this->release(); // Release the semaphore
-        if (signalReceivedFlag.load()){this->~QTLAH();}// Destroy the instance
+        //if (signalReceivedFlag.load()){this->~QTLAH();}// Destroy the instance
         //cout << "(int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)): " << (int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)) << endl;
         usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
     }
