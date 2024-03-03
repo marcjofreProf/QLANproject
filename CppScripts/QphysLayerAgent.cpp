@@ -30,7 +30,7 @@ Agent script for Quantum Physical Layer
 // time points
 #define WaitTimeToFutureTimePoint 199000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
 //Qubits
-#define NumQubitsMemoryBuffer 2048
+#define NumQuBitsPerRun 2048
 // MAthemtical calculations
 #include <cmath>
 
@@ -426,6 +426,8 @@ cout << "Simulate Receiving Qubits" << endl;
 this->acquire();
 PRUGPIO->ClearStoredQuBits();
 this->release();
+int iIterRuns;
+int DetRunsCount = NumQubitsMemoryBuffer/NumQuBitsPerRun;
 struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
 this->acquire();
 TimeTaggs[NumQubitsMemoryBuffer]={0}; // Clear the array
@@ -440,7 +442,9 @@ cout << "Start Receiving Qubits" << endl;// This line should be commented to red
 // Start measuring
  //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
  
- PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of 2048 qubit timetags
+ for (iIterRuns=0;iIterRuns<DetRunsCount;iIterRuns++){
+	PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of 2048 qubit timetags
+ }
  // Basic Input 
  /* Very slow GPIO BBB not used anymore
  ////clock_nanosleep(CLOCK_REALTIME,0,&requestQuarterPeriod,NULL);

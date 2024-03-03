@@ -903,7 +903,7 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 }
 
 int QTLAH::SimulateRetrieveNumStoredQubitsNode(char* IPhostReply,char* IPhostRequest, int* ParamsIntArray,int nIntarray,float* ParamsFloatArray,int nFloatarray){ // Send to the upper layer agent how many qubits are stored
-usleep((int)(2000*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes
+usleep((int)(2000*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes. This can be improved by sending messages to the specific node, and this node replying that has received the detection command, then this could start
 this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 while(this->SimulateRetrieveNumStoredQubitsNodeFlag==true){//Wait, only one asking
@@ -912,10 +912,10 @@ usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)))
 this->acquire();
 }
 this->SimulateRetrieveNumStoredQubitsNodeFlag=true;
-int isValidWhileLoopCount = 10; // Number of tries If it needs more than one trial is because the sockets are not working correctly. It is best to reboot nodes
+int isValidWhileLoopCount = 10; // Number of tries If it needs more than one trial is because the sockets are not working correctly. It is best to check for open sockets and kill the processes taking hold of them
 this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 while(isValidWhileLoopCount>0){
-	if (isValidWhileLoopCount % 10 ==0){// Only try to resend the message once every 10 times
+	if (isValidWhileLoopCount % isValidWhileLoopCount ==0){// Only try to resend the message once every 10 times
 	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 	strcpy(ParamsCharArray,IPhostReply);
 	strcat(ParamsCharArray,",");
@@ -955,7 +955,7 @@ while(isValidWhileLoopCount>0){
 		//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 		ParamsIntArray[0]=-1;
 		isValidWhileLoopCount--;
-		if (isValidWhileLoopCount<=0){
+		if (isValidWhileLoopCount<=1){// Finish at 1, so that a query message is ot send again without handling the eventual answer
 			cout << "Host did not achieve to RetrieveNumStoredQubitsNode" << endl;
 			this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 			this->SimulateRetrieveNumStoredQubitsNodeFlag=false;
@@ -963,7 +963,7 @@ while(isValidWhileLoopCount>0){
 		}
 	}
 }//while
-usleep((int)(2000*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give time to clear lost replies that might confuse the read
+
 return 0; // All OK
 }
 
