@@ -35,4 +35,7 @@ class QSLA:
 	
 	def SimulateRetrieveNumStoredQubitsNode(self,IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray): # Supposing that node has received quBits, make use of them
 		self.QTLAagent.SimulateRetrieveNumStoredQubitsNode(IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray)
+	
+	def __del__(self): # Destructor of the class
+		del self.QTLAagent
 

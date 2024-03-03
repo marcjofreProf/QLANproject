@@ -9,27 +9,16 @@
 # Script Quantum LAN presentation layer
 #####################################################
 
-import sys, os, signal
+import sys, os
 import time
 import numpy as np
 
 import QsessionLayerAgent
-
-def signal_handler(signal_received, frame):
-    # This function will be called when SIGINT or SIGPIPE is received
-    print(f'Signal {signal_received} received, exiting gracefully.')
-    # Perform any cleanup here
-    sys.exit(0)
-
-# Set up signal handlers
-signal.signal(signal.SIGINT, signal_handler)  # Handle Ctrl+C
-signal.signal(signal.SIGPIPE, signal_handler) # Handle broken pipe errors
-signal.signal(signal.SIGSEGV, signal_handler) # Handle broken pipe errors
-
+   
 class QPLA:
 	def __init__(self,ParamsDescendingCharArray,ParamsAscendingCharArray): # Constructor of this class
-        	self.QSLAagent = QsessionLayerAgent.QSLA(ParamsDescendingCharArray,ParamsAscendingCharArray) # Create instance of the Agent below
-        
+            self.QSLAagent = QsessionLayerAgent.QSLA(ParamsDescendingCharArray,ParamsAscendingCharArray) # Create instance of the Agent below
+                
         ##############################################################
 	# Methods
 	def ListCharArrayParser(self,ListCharArrayAux):
@@ -84,3 +73,7 @@ class QPLA:
 		
 	def SimulateRetrieveNumStoredQubitsNode(self,IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray): # Supposing that node has received quBits, make use of them
 		self.QSLAagent.SimulateRetrieveNumStoredQubitsNode(IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray)
+	
+	def __del__(self): # Destructor of the class
+		del self.QSLAagent
+        	
