@@ -113,6 +113,9 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
         // Initialize DDM
 	LOCAL_DDMinit(); // DDR (Double Data Rate): A class of memory technology used in DRAM where data is transferred on both the rising and falling edges of the clock signal, effectively doubling the data rate without increasing the clock frequency.
+	// Here we can update memory space assigned address
+	valpHolder=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM];
+	valpAuxHolder=valpHolder+4+5*NumRecords;
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Timetagging
@@ -271,35 +274,13 @@ return 0;// all ok
 //PRU0 - Operation - getting iputs
 
 int GPIO::DDRdumpdata(){
-//unsigned short int *DDR_regaddr;
-//unsigned char* test;
-//int ln;
-int x;
-//unsigned char tv;
-
-unsigned char* valp; // 8 bits
-unsigned char* valpAux; // 8 bits
-unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquition run
-unsigned int valOverflowCycleCountPRU=0; // 32 bits
-//unsigned int valIEPtimerFinalCounts=0; // 32 bits
-unsigned long long int extendedCounterPRU=0; // 64 bits
-unsigned long long int extendedCounterPRUaux=0; // 64 bits
-//unsigned char val; // 8 bits
-unsigned char valBitsInterest=0; // 8 bits
-//unsigned char rgb24[4];
-//unsigned char v1, v2;
-//rgb24[3]=0;
-
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
-valp=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
+valp=valpHolder; // Coincides with SHARED in PRUassTaggDetScript.p
 //for each capture bursts, at the beggining is stored the overflow counter of 32 bits. From there, each capture consists of 32 bits of the DWT_CYCCNT register and 8 bits of the channels detected (40 bits per detection tag).
 // The shared memory space has 12KB=12×1024bytes=12×1024×8bits=98304bits.
 //Doing numbers, we can store up to 2456 captures. To be in the safe side, we can do 2048 captures
 
-unsigned int NumRecords=2048; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 
-
-valpAux=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM]; // Coincides with SHARED in PRUassTaggDetScript.p
-valpAux=valpAux+4+5*NumRecords;
+valpAux=valpAuxHolder; // Coincides with SHARED in PRUassTaggDetScript.p
 /*///////////////////////////////////////////////////////////////////////////////////////
 // Checking control - If discipling PRU cycle clocks
 unsigned int valDWT_CYCCNTFinalCounts=static_cast<unsigned int>(*valpAux);
@@ -326,7 +307,7 @@ cout << "valDWT_CYCCNTreupdate: " << valDWT_CYCCNTreupdate << endl;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // Checking control - Clock skew and threshold
-unsigned int valSkewCounts=static_cast<unsigned int>(*valpAux);
+valSkewCounts=static_cast<unsigned int>(*valpAux);
 valpAux++;// 1 times 8 bits
 valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<8;
 valpAux++;// 1 times 8 bits
@@ -335,7 +316,7 @@ valpAux++;// 1 times 8 bits
 valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<24;
 //cout << "valSkewCounts: " << valSkewCounts << endl;
 valSkewCounts=valSkewCounts+7; // The 7 here is an estimation of th einstruction sthat are not accounted for. SBC0 is 6 counts
-unsigned int valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
+valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
 valpAux++;// 1 times 8 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<8;
 valpAux++;// 1 times 8 bits
@@ -346,7 +327,7 @@ valpAux++;// 1 times 8 bits
 //cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
 //////////////////////////////////////////////////////////////////////////////*/
 
-unsigned long long int auxUnskewingFactorResetCycle=static_cast<unsigned long long int>(valSkewCounts); // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
+auxUnskewingFactorResetCycle=static_cast<unsigned long long int>(valSkewCounts); // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
 // First 32 bits is the overflow register for DWT_CYCCNT
 valOverflowCycleCountPRU=static_cast<unsigned int>(*valp);
 valp++;// 1 times 8 bits
@@ -361,7 +342,7 @@ valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts wit
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactorResetCycle) + static_cast<unsigned long long int>(this->valCarryOnCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 
 streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-for (x=0; x<NumRecords; x++){
+for (iIterDump=0; iIterDump<NumRecords; iIterDump++){
 	// First 32 bits is the DWT_CYCCNT of the PRU
 	valCycleCountPRU=static_cast<unsigned int>(*valp);
 	valp++;// 1 times 8 bits
@@ -371,16 +352,16 @@ for (x=0; x<NumRecords; x++){
 	valp++;// 1 times 8 bits
 	valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
 	valp++;// 1 times 8 bits
-	//if (x==0 or x== 512 or x==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
+	//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
 	// Mount the extended counter value
 	extendedCounterPRU=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
-	//if (x==0 or x== 512 or x==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
+	//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
 	// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
 	valBitsInterest=static_cast<unsigned char>(*valp);
 	valp++;// 1 times 8 bits
-	//if (x==0 or x== 512 or x==1023){cout << "val: " << std::bitset<8>(val) << endl;}
+	//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "val: " << std::bitset<8>(val) << endl;}
 	//valBitsInterest=this->packBits(val); // we're just interested in 4 bits
-	//if (x==0 or x== 512 or x==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}	
+	//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}	
 	//fprintf(outfile, "%d\n", val);
 	//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	streamDDRpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
@@ -390,7 +371,6 @@ for (x=0; x<NumRecords; x++){
 }
 
 // Store the last IEP counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
-unsigned int AfterCountsThreshold=0;
 // The twelve below is an estimation since there are instructions that are not accounted for
 if (this->FirstTimeDDRdumpdata){AfterCountsThreshold=6400+16;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
 else{AfterCountsThreshold=valThresholdResetCounts+16;};//0x00000000;//16;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust

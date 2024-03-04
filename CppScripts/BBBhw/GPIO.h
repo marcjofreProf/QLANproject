@@ -78,6 +78,24 @@ private:// Variables
 	unsigned long long int TimePointFuture_time_as_countPRU1;
 	bool CheckTimeFlagPRU1;
 	bool finPRU1;
+	// SHARED RAM to file dump
+	int iIterDump;
+	unsigned int NumRecords=2048; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 
+	unsigned char* valpHolder;
+	unsigned char* valpAuxHolder;
+	unsigned char* valp; // 8 bits
+	unsigned char* valpAux; // 8 bits
+	unsigned int valCycleCountPRU; // 32 bits // Made relative to each acquition run
+	unsigned int valOverflowCycleCountPRU; // 32 bits
+	//unsigned int valIEPtimerFinalCounts; // 32 bits
+	unsigned long long int extendedCounterPRU; // 64 bits
+	unsigned long long int extendedCounterPRUaux; // 64 bits
+	//unsigned char val; // 8 bits
+	unsigned char valBitsInterest; // 8 bits
+	unsigned int valSkewCounts;
+	unsigned int valThresholdResetCounts;
+	unsigned long long int auxUnskewingFactorResetCycle;
+	unsigned int AfterCountsThreshold;
 	//FILE* outfile;
 	fstream streamDDRpru;	
 	bool FirstTimeDDRdumpdata=true; // First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
