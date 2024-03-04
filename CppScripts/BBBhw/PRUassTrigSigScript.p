@@ -138,7 +138,7 @@ CMDLOOP:
 	SBCO 	r4.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM
 	/// Relative synch count down
 	LBCO	r6, CONST_PRUDRAM, 0, 4
-COUNTDOWN;
+COUNTDOWN:
 	SUB	r6, r6, 1
 	QBNE	COUNTDOWN, r6, 0
 	//LED_ON

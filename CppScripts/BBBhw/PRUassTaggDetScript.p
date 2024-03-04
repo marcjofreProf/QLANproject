@@ -165,7 +165,7 @@ CMDLOOP:
 	SBCO 	r7.b0, CONST_PRUDRAM, 4, 1 // Put contents of r7 into CONST_PRUDRAM
 	/// Relative synch count down
 	LBCO	r18, CONST_PRUDRAM, 0, 4
-COUNTDOWN;
+COUNTDOWN:
 	SUB	r18, r18, 1
 	QBNE	COUNTDOWN, r18, 0
 //	LED_ON // Indicate that we start acquisiton of timetagging
