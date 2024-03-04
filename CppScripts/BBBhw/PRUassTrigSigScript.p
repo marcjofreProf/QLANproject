@@ -65,6 +65,8 @@
 // We cannot use Constan table pointers since the base addresses are too far
 // r2 reserved for 0x22000 Control register
 // r3 reserved for 0x2200C DWT_CYCCNT
+// r4 reserved for zeroing registers
+// r5 reserved for putting a 1
 
 // r10 is arbitrary used for operations
 
@@ -96,6 +98,11 @@ INITIATIONS:
 	//MOV	r2, 0x22000
 	//MOV	r3, 0x2200C
 	
+	// Initializations
+	LDI	r30, 0 // All signal pins down
+	LDI	r4, 0
+	LDI	r5, 1
+	
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
@@ -122,13 +129,12 @@ INITIATIONS:
 
 // Without delays (fastest possible) and CMD controlled
 CMDLOOP:
-	LBCO	r0, CONST_PRUDRAM, 0, 4 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
-	QBEQ	CMDLOOP, r0, 0 // loop until we get an instruction. Code 0 means idle
-	QBEQ	CMDLOOP, r0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
+	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
+	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction. Code 0 means idle
+	QBEQ	CMDLOOP, r0.b0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
 	// ok, we have an instruction (code 2). Assume it means 'begin signals'
 	// We remove the command from the host (in case there is a reset from host, we are saved)
-	MOV 	r0, 0 
-	SBCO 	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
+	SBCO 	r4.b0, CONST_PRUDRAM, 0, 1 // Put contents of r0 into CONST_PRUDRAM
 	//LED_ON
 	MOV	r1, NUM_REPETITIONS// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
 PSEUDOSYNCH:
@@ -155,9 +161,8 @@ SIGNALOFF:
 //	SUB 	r0, r0, 1
 //	QBNE 	DELAYOFF, r0, 0
 FINISHLOOP:
-	// The following lines do not consume "signal speed"	
-	MOV	r0, 1 // code 1 means that we have finished.
-	SBCO	r0, CONST_PRUDRAM, 0, 4 // Put contents of r0 into CONST_PRUDRAM
+	// The following lines do not consume "signal speed"
+	SBCO	r5.b0, CONST_PRUDRAM, 0, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.
 	LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	LED_OFF
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
