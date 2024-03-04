@@ -373,7 +373,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch ba
 
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  
- cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
+ //cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
  PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of 2048
  
  /* Very slow GPIO BBB not used anymore
@@ -437,7 +437,7 @@ clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch b
 
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 
-cout << "Start Receiving Qubits" << endl;// This line should be commented to reduce the time jitter
+//cout << "Start Receiving Qubits" << endl;// This line should be commented to reduce the time jitter
 
 // Start measuring
  //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.

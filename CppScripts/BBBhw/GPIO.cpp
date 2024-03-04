@@ -116,7 +116,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Timetagging
-	pru0dataMem_int[0]=(unsigned int)0; // set to zero means no command. PRU0 idle
+	pru0dataMem_int[0]=(unsigned int)1; // Countdown counter
+	pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
 	if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
@@ -126,7 +127,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	
 	// Generate signals
-	pru1dataMem_int[0]=(unsigned int)0; // set to zero means no command. PRU1 idle
+	pru1dataMem_int[0]=(unsigned int)1; // Countdown counter
+	pru1dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU1 idle
 	// Load and execute the PRU program on the PRU1
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
 		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
@@ -151,6 +153,10 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
+// Important, the following line at the very beggining to reduce the command jitter
+pru0dataMem_int[0]=(unsigned int)1; // Countdown counter
+pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
+
 //unsigned int ret;
 //int i;
 //void *DDR_paramaddr;
@@ -173,7 +179,6 @@ auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 
 bool CheckTimeFlag=false;
-pru0dataMem_int[0]=(unsigned int)2; // set to 2 means perform capture
 
 bool fin=false;
 do // This is blocking
@@ -184,14 +189,14 @@ TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(du
 
 if (TimeNow_time_as_count>TimePointFuture_time_as_count){CheckTimeFlag=true;}
 else{CheckTimeFlag=false;}
-	if (pru0dataMem_int[0] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the acquisition
+	if (pru0dataMem_int[1] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the acquisition
 	{
 		this->DDRdumpdata(); // Store to file
-		pru0dataMem_int[0] = (unsigned int)0; // Here clears the value
+		pru0dataMem_int[1] = (unsigned int)0; // Here clears the value
 		fin=true;
 	}
 	else if (CheckTimeFlag==true){// too much time
-		pru0dataMem_int[0]=(unsigned int)0; // set to zero means no command.
+		pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command.
 		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
 		//prussdrv_pru_reset(PRU_Operation_NUM);
 		//prussdrv_pru_disable(PRU_Operation_NUM);// Disable the PRU
@@ -211,6 +216,10 @@ return 0;// all ok
 }
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+// Important, the following line at the very beggining to reduce the command jitter
+pru1dataMem_int[0]=(unsigned int)1; // Countdown counter
+pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals
+
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
 int WaitTimeToFutureTimePoint=1000;
@@ -228,7 +237,6 @@ unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cas
 //cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
 
 bool CheckTimeFlag=false;
-pru1dataMem_int[0]=(unsigned int)2; // set to 2 means perform signals
 
 // Here we should wait for the PRU1 to finish, we can check it with the value modified in command
 bool fin=false;
@@ -241,14 +249,14 @@ do // This is blocking
 	if (TimeNow_time_as_count>TimePointFuture_time_as_count){CheckTimeFlag=true;}
 	else{CheckTimeFlag=false;}
 	//cout << "CheckTimeFlag: " << CheckTimeFlag << endl;
-	if (pru1dataMem_int[0] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the sequence
+	if (pru1dataMem_int[1] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the sequence
 	{	
-		pru1dataMem_int[0] = (unsigned int)0; // Here clears the value
+		pru1dataMem_int[1] = (unsigned int)0; // Here clears the value
 		//cout << "GPIO::SendTriggerSignals finished" << endl;
 		fin=true;
 	}
 	else if (CheckTimeFlag==true){// too much time		
-		pru1dataMem_int[0]=(unsigned int)0; // set to zero means no command.	
+		pru1dataMem_int[1]=(unsigned int)0; // set to zero means no command.	
 		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
 		//prussdrv_pru_reset(PRU_Signal_NUM);
 		//prussdrv_pru_disable(PRU_Signal_NUM);// Disable the PRU
