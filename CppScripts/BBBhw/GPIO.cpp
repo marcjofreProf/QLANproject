@@ -30,13 +30,13 @@
 #include<fstream>
 #include<bitset>
 #include<string>
-#include <sstream> // For istringstream
+#include<sstream> // For istringstream
 #include<cstdlib>
 #include<cstdio>
 #include<fcntl.h>
 #include<unistd.h>
 #include<sys/epoll.h>
-#include <thread>
+#include<thread>
 #include<pthread.h>
 // Time/synchronization management
 #include <chrono>
@@ -165,37 +165,31 @@ pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 //char fname_new[255];     
 //DDR_paramaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 8;
 //DDR_ackaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 4;
-int WaitTimeToFutureTimePoint=1000; // The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s.
 
-TimePoint TimePointClockNow=Clock::now();
-auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
+FutureTimePointPRU0 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU0);
+auto duration_since_epochFutureTimePointPRU0=FutureTimePointPRU0.time_since_epoch();
+auto duration_since_epochTimeNowPRU0=FutureTimePointPRU0.time_since_epoch(); //just for initialization
 // Convert duration to desired time
-unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds)
-//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
+TimePointFuture_time_as_countPRU0 = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePointPRU0).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 
-TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);
-auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
-// Convert duration to desired time
-unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
+CheckTimeFlagPRU0=false;
 
-bool CheckTimeFlag=false;
-
-bool fin=false;
+finPRU0=false;
 do // This is blocking
 {
-TimePointClockNow=Clock::now();
-duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
-TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count();
+TimePointClockNowPRU0=Clock::now();
+duration_since_epochTimeNowPRU0=TimePointClockNowPRU0.time_since_epoch();
+TimeNow_time_as_countPRU0 = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNowPRU0).count();
 
-if (TimeNow_time_as_count>TimePointFuture_time_as_count){CheckTimeFlag=true;}
-else{CheckTimeFlag=false;}
-	if (pru0dataMem_int[1] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the acquisition
+if (TimeNow_time_as_countPRU0>TimePointFuture_time_as_countPRU0){CheckTimeFlagPRU0=true;}
+else{CheckTimeFlagPRU0=false;}
+	if (pru0dataMem_int[1] == (unsigned int)1 and CheckTimeFlagPRU0==false)// Seems that it checks if it has finished the acquisition
 	{
 		this->DDRdumpdata(); // Store to file
 		pru0dataMem_int[1] = (unsigned int)0; // Here clears the value
-		fin=true;
+		finPRU0=true;
 	}
-	else if (CheckTimeFlag==true){// too much time
+	else if (CheckTimeFlagPRU0==true){// too much time
 		pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command.
 		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
 		//prussdrv_pru_reset(PRU_Operation_NUM);
@@ -203,9 +197,9 @@ else{CheckTimeFlag=false;}
 		//prussdrv_pru_enable(PRU_Operation_NUM);// Enable the PRU from 0		
 		cout << "GPIO::ReadTimeStamps took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
 		//sleep(5);// Give some time to load programs in PRUs and initiate
-		fin=true;
+		finPRU0=true;
 	}
-} while(!fin);
+} while(!finPRU0);
 
 		
 // Never accomplished because this signals are in the EXIT part of the assembler that never arrive	
@@ -222,40 +216,34 @@ pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals
 
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
-int WaitTimeToFutureTimePoint=1000;
 
-TimePoint TimePointClockNow=Clock::now();
-auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
+FutureTimePointPRU1 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU1);
+auto duration_since_epochFutureTimePointPRU1=FutureTimePointPRU1.time_since_epoch();
+auto duration_since_epochTimeNowPRU1=FutureTimePointPRU1.time_since_epoch();// JUST FOR INITIALIZATION
 // Convert duration to desired time
-unsigned long long int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds)
-//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
-
-TimePoint FutureTimePoint = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePoint);
-auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
-// Convert duration to desired time
-unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePoint).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds)
+TimePointFuture_time_as_countPRU1 = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePointPRU1).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds)
 //cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
 
-bool CheckTimeFlag=false;
+CheckTimeFlagPRU1=false;
 
 // Here we should wait for the PRU1 to finish, we can check it with the value modified in command
-bool fin=false;
+finPRU1=false;
 do // This is blocking
 {
-	TimePointClockNow=Clock::now();
-	duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
-	TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNow).count();
+	TimePointClockNowPRU1=Clock::now();
+	duration_since_epochTimeNowPRU1=TimePointClockNowPRU1.time_since_epoch();
+	TimeNow_time_as_countPRU1 = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNowPRU1).count();
 	//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
-	if (TimeNow_time_as_count>TimePointFuture_time_as_count){CheckTimeFlag=true;}
-	else{CheckTimeFlag=false;}
+	if (TimeNow_time_as_countPRU1>TimePointFuture_time_as_countPRU1){CheckTimeFlagPRU1=true;}
+	else{CheckTimeFlagPRU1=false;}
 	//cout << "CheckTimeFlag: " << CheckTimeFlag << endl;
-	if (pru1dataMem_int[1] == (unsigned int)1 and CheckTimeFlag==false)// Seems that it checks if it has finished the sequence
+	if (pru1dataMem_int[1] == (unsigned int)1 and CheckTimeFlagPRU1==false)// Seems that it checks if it has finished the sequence
 	{	
 		pru1dataMem_int[1] = (unsigned int)0; // Here clears the value
 		//cout << "GPIO::SendTriggerSignals finished" << endl;
-		fin=true;
+		finPRU1=true;
 	}
-	else if (CheckTimeFlag==true){// too much time		
+	else if (CheckTimeFlagPRU1==true){// too much time		
 		pru1dataMem_int[1]=(unsigned int)0; // set to zero means no command.	
 		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
 		//prussdrv_pru_reset(PRU_Signal_NUM);
@@ -263,9 +251,9 @@ do // This is blocking
 		//prussdrv_pru_enable(PRU_Signal_NUM);// Enable the PRU from 0		
 		cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1 if necessary." << endl;
 		//sleep(5);// Give some time to load programs in PRUs and initiate
-		fin=true;
+		finPRU1=true;
 		}
-} while(!fin);
+} while(!finPRU1);
 
 
 // Never accomplished because this signals are in the EXIT part of the assembler that never arrive

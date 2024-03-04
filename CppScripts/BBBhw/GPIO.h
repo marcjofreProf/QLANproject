@@ -28,6 +28,9 @@
 #include<fstream>
 // Time/synchronization management
 #include <chrono>
+
+using namespace std;
+
 using std::string;
 using std::ofstream;
 using std::ifstream;
@@ -48,6 +51,10 @@ class GPIO {
 //public: //Variables
 
 private:// Variables
+	// Time/synchronization management
+	using Clock = std::chrono::system_clock;//system_clock;steady_clock;high_resolution_clock
+	using TimePoint = std::chrono::time_point<Clock>;
+	TimePoint OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
 	// PRU
 	static int mem_fd;
 	static void *ddrMem, *sharedMem, *pru0dataMem, *pru1dataMem;
@@ -55,12 +62,24 @@ private:// Variables
 	//static int chunk;
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
 	unsigned int valCarryOnCycleCountPRU=0; // 32 bits
+	// PRU timetagger
+	int WaitTimeToFutureTimePointPRU0=1000; // The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s.
+	TimePoint TimePointClockNowPRU0;
+	unsigned long long int TimeNow_time_as_countPRU0;	
+	TimePoint FutureTimePointPRU0;
+	unsigned long long int TimePointFuture_time_as_countPRU0;
+	bool CheckTimeFlagPRU0;
+	bool finPRU0;
+	// PRU Signal
+	int WaitTimeToFutureTimePointPRU1=1000; // The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s.
+	TimePoint TimePointClockNowPRU1;
+	unsigned long long int TimeNow_time_as_countPRU1;	
+	TimePoint FutureTimePointPRU1;
+	unsigned long long int TimePointFuture_time_as_countPRU1;
+	bool CheckTimeFlagPRU1;
+	bool finPRU1;
 	//FILE* outfile;
-	fstream streamDDRpru;
-	// Time/synchronization management
-	using Clock = std::chrono::system_clock;//system_clock;steady_clock;high_resolution_clock
-	using TimePoint = std::chrono::time_point<Clock>;
-	TimePoint OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
+	fstream streamDDRpru;	
 	bool FirstTimeDDRdumpdata=true; // First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
 	// Non PRU
 	int number, debounceTime;
