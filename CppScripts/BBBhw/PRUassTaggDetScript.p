@@ -42,7 +42,7 @@
 // r9 reserved for cycle count final skew
 // r10 reserved for cycle count initial threshold reset
 // r11 reserved for cycle count final threshold reset
-
+// r16 reserved for raising edge detection operation together with r6
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
 // r12 reserved for 0x22000 Control register
@@ -167,8 +167,12 @@ CMDLOOP:
 		
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register, say R0
-	MOV 	r6.b0, r31.b0
-	// Mask the relevant bits you're interested in
+	// Edge detection
+	MOV 	r16.b0, r31.b0 // This wants to be zeros for edge detection
+	MOV	r6.b0, r31.b0 // Consecutive red for edge detection
+	NOT	r16.b0, r16.b0 // 0s converted to 1s
+	AND	r6.b0, r6.b0, r16.b0 // Only does complying with a rising edge
+	// Mask the relevant bits you're interested in	
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
 	//AND 	r6.b0, r6.b0, MASKevents // Interested specifically to the bits with MASKevents. MAybe there are never counts in this first 8 bits if there is not explicitly a signal.
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
@@ -177,7 +181,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Proceed with the rest of the program
 
 TIMETAG:
-	// Faster Concatenated Time counter and Detectoin channels
+	// Faster Concatenated Time counter and Detection channels
 	LBCO	r5, CONST_IETREG, 0xC, 4 // r5 maps the value of DWT_CYCCNT. From here account for counts until reset to adjust the threshold in GPIO c++
 	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 5 // Put contents of r5 and r6.b0 of DWT_CYCCNT into the address offset at r1.
 	ADD 	r1, r1, 5 // increment address by 5 bytes	
