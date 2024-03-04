@@ -154,7 +154,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 // Important, the following line at the very beggining to reduce the command jitter
-pru0dataMem_int[0]=(unsigned int)1; // Countdown counter
+pru0dataMem_int[0]=(unsigned int)1; // Countdown counter. Can be used to adjust time of flight differences between nodes.
 pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
 //unsigned int ret;
@@ -217,7 +217,7 @@ return 0;// all ok
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 // Important, the following line at the very beggining to reduce the command jitter
-pru1dataMem_int[0]=(unsigned int)1; // Countdown counter
+pru1dataMem_int[0]=(unsigned int)1; // Countdown counter. Can be used to adjust time of flight differences between nodes.
 pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals
 
 // Here there should be the instruction command to tell PRU1 to start generating signals
