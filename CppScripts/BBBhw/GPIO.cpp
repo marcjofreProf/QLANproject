@@ -318,7 +318,7 @@ valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<16;
 valpAux++;// 1 times 8 bits
 valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<24;
 //cout << "valSkewCounts: " << valSkewCounts << endl;
-valSkewCounts=valSkewCounts+7; // The 7 here is an estimation of th einstruction sthat are not accounted for. SBC0 is 6 counts
+valSkewCounts=valSkewCounts+0;//7; // The 7 here is an estimation of the instruction sthat are not accounted for. SBC0 is 6 counts
 valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
 valpAux++;// 1 times 8 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<8;
