@@ -168,14 +168,13 @@ SIGNALOFF:
 //	QBNE 	DELAYOFF, r0, 0
 FINISHLOOP:
 	// The following lines do not consume "signal speed"
-	SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.
+	SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+17
 	LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	LED_OFF
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
 	MOV	r31.b0, PRU1_R31_VEC_VALID | PRU_EVTOUT_0
-	MOV	r31.b0, PRU1_ARM_INTERRUPT+16
 	HALT
 
 ERR:	// Signal error

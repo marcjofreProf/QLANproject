@@ -215,7 +215,7 @@ TIMETAG:
 	SBCO 	r15, CONST_PRUSHAREDRAM, r1, 4
 	ADD 	r1, r1, 4 // increment address by 4 bytes
 	// we're done. Signal to the application
-	SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.
+	SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF
 	//// Make sure that counters are enabled
@@ -228,10 +228,8 @@ TIMETAG:
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:
-	// Send notification to Host for program completion
-	MOV 	R31.b0, PRU0_R31_VEC_VALID | PRU_EVTOUT_0
-	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
-
+	// Send notification (interrupt) to Host for program completion
+	MOV 	r31.b0, PRU0_R31_VEC_VALID | PRU_EVTOUT_0
 	// Halt the processor
 	HALT
 

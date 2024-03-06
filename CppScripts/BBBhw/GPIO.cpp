@@ -94,10 +94,13 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	tpruss_intc_initdata pruss_intc_initdata = PRUSS_INTC_INITDATA;
 	// Allocate and initialize memory
 	prussdrv_init();
-	if (prussdrv_open(PRU_EVTOUT_0) == -1) {  
-	   perror("prussdrv_open() failed. Execute as root: sudo su or sudo. /boot/uEnv.txt has to be properly configured with iuo. Message: "); 
-	  } 
+	
+	if (prussdrv_open(PRU_EVTOUT_0) == -1) {//PRU_EVTOUT_0=32+3=35  // Event PRU-EVTOUT_0 - Exit - Common for both PRUs
+	   perror("prussdrv_open(PRU_EVTOUT_0) failed. Execute as root: sudo su or sudo. /boot/uEnv.txt has to be properly configured with iuo. Message: "); 
+	  }
+	
 	// Map PRU's interrupts
+	// prussdrv.pruintc_init(); // Init handling interrupts from PRUs
 	prussdrv_pruintc_init(&pruss_intc_initdata);
     	
     	// Open file where temporally are stored timetaggs
