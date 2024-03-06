@@ -229,7 +229,7 @@ TIMETAG:
 	
 EXIT:
 	// Send notification (interrupt) to Host for program completion
-	MOV 	r31.b0, PRU0_R31_VEC_VALID | PRU_EVTOUT_0
+	MOV 	r31.b0, PRU_R31_VEC_VALID | PRU_EVTOUT_0
 	// Halt the processor
 	HALT
 

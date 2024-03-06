@@ -31,7 +31,7 @@
 #define SHARED_RAM           0x100 // equivalent with 0x120. Attention since C28 or C29 constant registers used, only few bytes to write The global memory map is shown in Table 6 (page 20) and identifies 0x00010000 as being the start of the 12Kb of shared memory. Therefore, value of 0x00012000 is somewhere inside the shared memory (albeit not at the beginning).
 #define DDR_MEM		     0x80001000 // 0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
 
-#define PRU0_R31_VEC_VALID	32
+#define PRU_R31_VEC_VALID	32
 #define PRU_EVTOUT_0		3	// the event number that is sent back
 
 #define GPIO0_BANK 0x44E07000

@@ -23,7 +23,7 @@
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
 #define NUM_REPETITIONS		16777216	//4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used)
 #define DELAY 1//1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
-#define PRU1_R31_VEC_VALID	32
+#define PRU_R31_VEC_VALID	32
 #define PRU_EVTOUT_0		3	// the event number that is sent back
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -174,7 +174,7 @@ FINISHLOOP:
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
-	MOV	r31.b0, PRU1_R31_VEC_VALID | PRU_EVTOUT_0
+	MOV	r31.b0, PRU_R31_VEC_VALID | PRU_EVTOUT_0
 	HALT
 
 ERR:	// Signal error
