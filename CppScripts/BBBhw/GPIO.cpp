@@ -177,6 +177,7 @@ prussdrv_pru_clear_event(PRU_EVTOUT0, PRU0_ARM_INTERRUPT);
 pru0dataMem_int[0]=(unsigned int)1; // Countdown counter. Can be used to adjust time of flight differences between nodes.
 pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
+/*
 struct pollfd fds[1];
 int ret;
 
@@ -192,7 +193,8 @@ else if (ret==0){
 }
 else{
 	cout << "PRU0 interrupt poll error" << endl;
-}
+}*/
+int n= prussdrv_pru_wait_event(PRU_EVTOUT0);
 /*
 FutureTimePointPRU0 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU0);
 auto duration_since_epochFutureTimePointPRU0=FutureTimePointPRU0.time_since_epoch();
