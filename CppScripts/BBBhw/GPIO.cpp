@@ -94,15 +94,27 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	tpruss_intc_initdata pruss_intc_initdata = PRUSS_INTC_INITDATA;
 	// Allocate and initialize memory
 	prussdrv_init();
-	
-	if (prussdrv_open(PRU_EVTOUT_0) == -1) {//PRU_EVTOUT_0=32+3=35  // Event PRU-EVTOUT_0 - Exit - Common for both PRUs
+	// Interrupts
+	if (prussdrv_open(PRU_EVTOUT_0) == -1) {// Event PRU-EVTOUT_0 - Interrupt from PRU0
 	   perror("prussdrv_open(PRU_EVTOUT_0) failed. Execute as root: sudo su or sudo. /boot/uEnv.txt has to be properly configured with iuo. Message: "); 
+	  }
+	
+	if (prussdrv_open(PRU_EVTOUT_1) == -1) {// Event PRU-EVTOUT_1 - Interrupt from PRU1
+	   perror("prussdrv_open(PRU_EVTOUT_1) failed. Execute as root: sudo su or sudo. /boot/uEnv.txt has to be properly configured with iuo. Message: "); 
 	  }
 	
 	// Map PRU's interrupts
 	// prussdrv.pruintc_init(); // Init handling interrupts from PRUs
 	prussdrv_pruintc_init(&pruss_intc_initdata);
     	
+    	// file descriptors for interrupts
+    	// Obtain the event file descriptor
+	event_fdPRU0 = prussdrv_pru_event_fd(PRU_EVTOUT_0);
+	event_fdPRU1 = prussdrv_pru_event_fd(PRU_EVTOUT_1);
+	// Clear prior interrupt events
+	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
+	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
+	
     	// Open file where temporally are stored timetaggs
     	//outfile=fopen("data.csv", "w");
 	
@@ -206,12 +218,8 @@ else{CheckTimeFlagPRU0=false;}
 		finPRU0=true;
 	}
 } while(!finPRU0);
+prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
 
-		
-// Never accomplished because this signals are in the EXIT part of the assembler that never arrive	
-//prussdrv_pru_wait_event(PRU_EVTOUT_0);
-//prussdrv_pru_clear_event(PRU0_ARM_INTERRUPT); 	
-  
 return 0;// all ok
 }
 
@@ -261,10 +269,7 @@ do // This is blocking
 		}
 } while(!finPRU1);
 
-
-// Never accomplished because this signals are in the EXIT part of the assembler that never arrive
-//prussdrv_pru_wait_event(PRU_EVTOUT_0);
-//prussdrv_pru_clear_event(PRU1_ARM_INTERRUPT); 
+prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
 
 return 0;// all ok	
 }

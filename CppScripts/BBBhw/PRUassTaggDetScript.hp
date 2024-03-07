@@ -13,6 +13,8 @@
 #define ARM_PRU0_INTERRUPT      21
 #define ARM_PRU1_INTERRUPT      22
 
+#define PRU_R31_VEC_VALID	32
+
 // Local Address Space point of view (from each PRU)
 // In the context of the AM335x Programmable Real-time Units (PRUs), "CXX" generally refers to the Constant Table Pointer Registers, such as C24, C25, C26, C27, C28, C29, C30, and C31. These registers are a key feature of the PRU's architecture, designed to facilitate efficient access to various memory regions and peripherals within the device. Each PRU core in the AM335x processors has its own set of these constant table registers.
 // these are like registers but constants, no operations can be performed, so they are good for storing addresses of interest
@@ -30,9 +32,6 @@
 #define OTHER_RAM            0x00002000 // The other PRU data ram (2000*32bits=64000; 64000/8=8K
 #define SHARED_RAM           0x100 // equivalent with 0x120. Attention since C28 or C29 constant registers used, only few bytes to write The global memory map is shown in Table 6 (page 20) and identifies 0x00010000 as being the start of the 12Kb of shared memory. Therefore, value of 0x00012000 is somewhere inside the shared memory (albeit not at the beginning).
 #define DDR_MEM		     0x80001000 // 0x80000000 is where DDR starts, but we leave some offset (0x00001000) to avoid conflicts with other critical data present
-
-#define PRU_R31_VEC_VALID	32
-#define PRU_EVTOUT_0		3	// the event number that is sent back
 
 #define GPIO0_BANK 0x44E07000
 #define GPIO1_BANK 0x4804c000 // this is the address of the BBB GPIO1 Bank Register for PR0
