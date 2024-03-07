@@ -96,11 +96,11 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Allocate and initialize memory
 	prussdrv_init();
 	// Interrupts
-	if (prussdrv_open(PRU_EVTOUT_0) == -1) {// Event PRU-EVTOUT_0 - Interrupt from PRU0
+	if (prussdrv_open(PRU_EVTOUT0) == -1) {// Event PRU-EVTOUT0 - Interrupt from PRU0
 	   perror("prussdrv_open(PRU_EVTOUT_0) failed. Execute as root: sudo su or sudo. /boot/uEnv.txt has to be properly configured with iuo. Message: "); 
 	  }
 	
-	if (prussdrv_open(PRU_EVTOUT_1) == -1) {// Event PRU-EVTOUT_1 - Interrupt from PRU1
+	if (prussdrv_open(PRU_EVTOUT1) == -1) {// Event PRU-EVTOUT1 - Interrupt from PRU1
 	   perror("prussdrv_open(PRU_EVTOUT_1) failed. Execute as root: sudo su or sudo. /boot/uEnv.txt has to be properly configured with iuo. Message: "); 
 	  }
 	
@@ -110,11 +110,11 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
     	
     	// file descriptors for interrupts
     	// Obtain the event file descriptor
-	event_fdPRU0 = prussdrv_pru_event_fd(PRU_EVTOUT_0);
-	event_fdPRU1 = prussdrv_pru_event_fd(PRU_EVTOUT_1);
+	event_fdPRU0 = prussdrv_pru_event_fd(PRU_EVTOUT0);
+	event_fdPRU1 = prussdrv_pru_event_fd(PRU_EVTOUT1);
 	// Clear prior interrupt events
-	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
-	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
+	prussdrv_pru_clear_event(PRU_EVTOUT0, PRU0_ARM_INTERRUPT);
+	prussdrv_pru_clear_event(PRU_EVTOUT1, PRU1_ARM_INTERRUPT);
 	
     	// Open file where temporally are stored timetaggs
     	//outfile=fopen("data.csv", "w");
@@ -172,7 +172,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
-prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
+prussdrv_pru_clear_event(PRU_EVTOUT0, PRU0_ARM_INTERRUPT);
 // Important, the following line at the very beggining to reduce the command jitter
 pru0dataMem_int[0]=(unsigned int)1; // Countdown counter. Can be used to adjust time of flight differences between nodes.
 pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
@@ -230,13 +230,13 @@ else{CheckTimeFlagPRU0=false;}
 } while(!finPRU0);
 */
 
-prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
+prussdrv_pru_clear_event(PRU_EVTOUT0, PRU0_ARM_INTERRUPT);
 
 return 0;// all ok
 }
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
+prussdrv_pru_clear_event(PRU_EVTOUT1, PRU1_ARM_INTERRUPT);
 
 // Important, the following line at the very beggining to reduce the command jitter
 pru1dataMem_int[0]=(unsigned int)1; // Countdown counter. Can be used to adjust time of flight differences between nodes.
@@ -283,7 +283,7 @@ do // This is blocking
 		}
 } while(!finPRU1);
 
-prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
+prussdrv_pru_clear_event(PRU_EVTOUT1, PRU1_ARM_INTERRUPT);
 
 return 0;// all ok	
 }
