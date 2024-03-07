@@ -41,6 +41,7 @@
 // Time/synchronization management
 #include <chrono>
 // PRU programming
+#include<poll.h>
 #include <stdio.h>
 #include <sys/mman.h>
 #include <prussdrv.h>
@@ -175,15 +176,25 @@ int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 pru0dataMem_int[0]=(unsigned int)1; // Countdown counter. Can be used to adjust time of flight differences between nodes.
 pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
-//unsigned int ret;
-//int i;
-//void *DDR_paramaddr;
-//void *DDR_ackaddr;
-//bool fin;
-//char fname_new[255];     
-//DDR_paramaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 8;
-//DDR_ackaddr = (short unsigned int*)ddrMem + OFFSET_DDR - 4;
+prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
 
+struct pollfd fds[1];
+int ret;
+
+fds[0].fd = event_fdPRU0;  // a valid file descriptor
+fds[0].events = POLLIN;
+
+ret = poll(fds, 1, WaitTimeToFutureTimePointPRU0);
+if (ret>0){
+	this->DDRdumpdata(); // Store to file
+}
+else if (ret==0){
+	cout << "GPIO::ReadTimeStamps took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
+}
+else{
+	cout << "PRU0 interrupt poll error" << endl;
+}
+/*
 FutureTimePointPRU0 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU0);
 auto duration_since_epochFutureTimePointPRU0=FutureTimePointPRU0.time_since_epoch();
 auto duration_since_epochTimeNowPRU0=FutureTimePointPRU0.time_since_epoch(); //just for initialization
@@ -218,6 +229,8 @@ else{CheckTimeFlagPRU0=false;}
 		finPRU0=true;
 	}
 } while(!finPRU0);
+*/
+
 prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
 
 return 0;// all ok
@@ -227,6 +240,8 @@ int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physical
 // Important, the following line at the very beggining to reduce the command jitter
 pru1dataMem_int[0]=(unsigned int)1; // Countdown counter. Can be used to adjust time of flight differences between nodes.
 pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals
+
+prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
 
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
