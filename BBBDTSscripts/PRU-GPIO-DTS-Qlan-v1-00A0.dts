@@ -38,6 +38,14 @@
    //  
    // Beware: Many other PRU EGP pins are reserved by HDMI or onboard flash, which  
    // would need to be disabled first by editing uEnv.txt and rebooting.  
+   
+   pruss: pruss@4a300000 { // Interrupts
+	 compatible = "ti,pruss-v2";
+	 reg = <0x4a300000 0x080000>;
+	 status = "disabled";
+	 interrupts = <20 21 22 23 24 25 26 27>;
+	};
+
    exclusive-use = "P8.15","P8.16", "P8.11", "P8.12","P9.25", "P9.41", "P9.27", "P9.42", "P9.28", "P9.29", "P9.30", "P9.31", "P8.45", "P8.46", "P8.43", "P8.44", "P8.41", "P8.42", "P8.39", "P8.40", "P8.27", "P8.29", "P8.28", "P8.30", "pru0", "pru1";  
   
 //fragment@0{
