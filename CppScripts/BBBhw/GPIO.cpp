@@ -172,11 +172,10 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
+prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
 // Important, the following line at the very beggining to reduce the command jitter
 pru0dataMem_int[0]=(unsigned int)1; // Countdown counter. Can be used to adjust time of flight differences between nodes.
 pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
-
-prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
 
 struct pollfd fds[1];
 int ret;
@@ -237,11 +236,11 @@ return 0;// all ok
 }
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
+
 // Important, the following line at the very beggining to reduce the command jitter
 pru1dataMem_int[0]=(unsigned int)1; // Countdown counter. Can be used to adjust time of flight differences between nodes.
 pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals
-
-prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
 
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
