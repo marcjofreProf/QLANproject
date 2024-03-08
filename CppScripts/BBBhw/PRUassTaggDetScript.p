@@ -215,7 +215,7 @@ TIMETAG:
 	SBCO 	r15, CONST_PRUSHAREDRAM, r1, 4
 	ADD 	r1, r1, 4 // increment address by 4 bytes
 	// we're done. Signal to the application
-	MOV 	r31, PRU0_ARM_INTERRUPT+16//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31, PRU0_ARM_INTERRUPT+16
+	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF
 	//// Make sure that counters are enabled
@@ -229,7 +229,7 @@ TIMETAG:
 	
 EXIT:
 	// Send notification (interrupt) to Host for program completion
-	MOV 	r31, PRU0_ARM_INTERRUPT+16
+	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	// Halt the processor
 	HALT
 

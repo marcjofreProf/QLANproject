@@ -67,13 +67,13 @@ private:// Variables
 	unsigned int valCarryOnCycleCountPRU=0; // 32 bits
 	// PRU timetagger
 	int retInterruptsPRU0;
-	unsigned int WaitTimeToFutureTimePointPRU0=1000000;// In microseconds // The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s.
-	TimePoint TimePointClockNowPRU0;
-	unsigned long long int TimeNow_time_as_countPRU0;	
-	TimePoint FutureTimePointPRU0;
-	unsigned long long int TimePointFuture_time_as_countPRU0;
-	bool CheckTimeFlagPRU0;
-	bool finPRU0;
+	unsigned int WaitTimeToFutureTimePointPRU0=4000000;// In microseconds // The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s.
+	//TimePoint TimePointClockNowPRU0;
+	//unsigned long long int TimeNow_time_as_countPRU0;	
+	//TimePoint FutureTimePointPRU0;
+	//unsigned long long int TimePointFuture_time_as_countPRU0;
+	//bool CheckTimeFlagPRU0;
+	//bool finPRU0;
 	// PRU Signal
 	int WaitTimeToFutureTimePointPRU1=1000; // The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s.
 	TimePoint TimePointClockNowPRU1;
