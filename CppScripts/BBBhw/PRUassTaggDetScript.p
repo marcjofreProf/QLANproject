@@ -155,13 +155,14 @@ CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of l
 	LBCO	r5, CONST_IETREG, 0xC, 4 // LBBO	// from here, if a reset of count we will lose some counts.		
 	QBLE	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte <= r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
 CMDLOOP:
-	//LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
-	QBBC	CHECK_CYCLECNT,r31, 30	//QBEQ	CHECK_CYCLECNT, r0.b0, 0 // loop until we get an instructionQBEQ	NORMSTEPS, r0.b0, 0 // loop until we get an instruction
+	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
+	QBEQ	CHECK_CYCLECNT, r0.b0, 0 // loop until we get an instructionQBEQ	NORMSTEPS, r0.b0, 0 // loop until we get an instruction
+	//QBBC	CHECK_CYCLECNT, r31, 30	//
 	//QBEQ	CHECK_CYCLECNT, r0.b0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
 	// We remove the command from the host (in case there is a reset from host, we are saved)
-	//SBCO 	r7.b0, CONST_PRUDRAM, 4, 1 // Put contents of r7 into CONST_PRUDRAM
-	SBCO	r7.b0, C0, 0x24, 1 // Reset host interrupt
+	SBCO 	r7.b0, CONST_PRUDRAM, 4, 1 // Put contents of r7 into CONST_PRUDRAM
+	//SBCO	r7.b0, C0, 0x24, 1 // Reset host interrupt
 	/// Relative synch count down
 //	LED_ON // Indicate that we start acquisiton of timetagging
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM

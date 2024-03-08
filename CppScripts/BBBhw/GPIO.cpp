@@ -166,7 +166,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 // Important, the following line at the very beggining to reduce the command jitter
-prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
+pru0dataMem_int[1]=(unsigned int)2;//prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
