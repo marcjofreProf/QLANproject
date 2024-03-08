@@ -177,7 +177,7 @@ FINISHLOOP:
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
-	MOV	r31, PRU1_ARM_INTERRUPT.b0+16
+	MOV	r31.b0, PRU1_ARM_INTERRUPT+16
 	HALT
 
 ERR:	// Signal error
