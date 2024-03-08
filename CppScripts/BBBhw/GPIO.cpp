@@ -140,7 +140,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 			perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
 		}
 	}
-	prussdrv_pru_enable(PRU_Operation_NUM);
+	////prussdrv_pru_enable(PRU_Operation_NUM);
 	// Generate signals
 	pru1dataMem_int[0]=(unsigned int)0; // Countdown counter
 	pru1dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU1 idle
@@ -150,7 +150,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 			perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScriptHist4Sig.bin");//perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
 		}
 	}
-	prussdrv_pru_enable(PRU_Signal_NUM);
+	////prussdrv_pru_enable(PRU_Signal_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	  
 	  /*// Doing debbuging checks - Debugging 1	  
@@ -176,8 +176,8 @@ pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
 retInterruptsPRU0= prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
-prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 if (retInterruptsPRU0>0){
+	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	this->DDRdumpdata(); // Store to file
 }
 else if (retInterruptsPRU0==0){
@@ -238,7 +238,9 @@ pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals
 
 retInterruptsPRU1= prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
 cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
-prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+if (retInterruptsPRU1>1){
+	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+}
 if (retInterruptsPRU1==0){
 	cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1 if necessary." << endl;
 }

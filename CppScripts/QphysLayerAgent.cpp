@@ -428,6 +428,7 @@ PRUGPIO->ClearStoredQuBits();
 this->release();
 int iIterRuns;
 int DetRunsCount = NumQubitsMemoryBuffer/NumQuBitsPerRun;
+cout << "DetRunsCount: " << DetRunsCount << endl;
 struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
 this->acquire();
 TimeTaggs[NumQubitsMemoryBuffer]={0}; // Clear the array
