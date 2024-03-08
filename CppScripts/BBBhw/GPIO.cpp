@@ -231,7 +231,7 @@ prussdrv_pru_send_event(22);//pru1dataMem_int[1]=(unsigned int)2; // set to 2 me
 
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
 //cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
-if (retInterruptsPRU1>1){
+if (retInterruptsPRU1>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 }
 if (retInterruptsPRU1==0){
