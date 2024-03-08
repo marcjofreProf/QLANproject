@@ -112,9 +112,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	//prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
 	//prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
 	
-    	// Open file where temporally are stored timetaggs
-    	//outfile=fopen("data.csv", "w");
-	
+    	// Open file where temporally are stored timetaggs	
 	streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
 	if (!streamDDRpru.is_open()) {
 		streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
@@ -206,8 +204,8 @@ if (TimeNow_time_as_countPRU0>TimePointFuture_time_as_countPRU0){CheckTimeFlagPR
 else{CheckTimeFlagPRU0=false;}
 	if (pru0dataMem_int[1] == (unsigned int)1 and CheckTimeFlagPRU0==false)// Seems that it checks if it has finished the acquisition
 	{
-		this->DDRdumpdata(); // Store to file
 		pru0dataMem_int[1] = (unsigned int)0; // Here clears the value
+		this->DDRdumpdata(); // Store to file		
 		finPRU0=true;
 	}
 	else if (CheckTimeFlagPRU0==true){// too much time
