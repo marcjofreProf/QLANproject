@@ -174,6 +174,7 @@ pru0dataMem_int[0]=(unsigned int)0; // Countdown counter. Can be used to adjust 
 pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
 retInterruptsPRU0= prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeToFutureTimePointPRU0);
+prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 if (retInterruptsPRU0>0){
 	this->DDRdumpdata(); // Store to file
 }
@@ -219,8 +220,6 @@ else{CheckTimeFlagPRU0=false;}
 	}
 } while(!finPRU0);
 */
-
-prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
 
 return 0;// all ok
 }
