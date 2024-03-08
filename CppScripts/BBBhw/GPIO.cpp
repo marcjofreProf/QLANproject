@@ -167,9 +167,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
-//prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
 // Important, the following line at the very beggining to reduce the command jitter
-pru0dataMem_int[0]=(unsigned int)1; // Countdown counter. Must be at least 1!!! Can be used to adjust time of flight differences between nodes.
 pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
@@ -220,14 +218,15 @@ else{CheckTimeFlagPRU0=false;}
 	}
 } while(!finPRU0);
 */
+
+// Update if needed
+pru0dataMem_int[0]=(unsigned int)1; // Countdown counter. Must be at least 1!!! Can be used to adjust time of flight differences between nodes.
+
 return 0;// all ok
 }
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-//prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
-
 // Important, the following line at the very beggining to reduce the command jitter
-pru1dataMem_int[0]=(unsigned int)1; // Countdown counter. Must be at least 1!!! Can be used to adjust time of flight differences between nodes.
 pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals
 
 // Here there should be the instruction command to tell PRU1 to start generating signals
@@ -284,6 +283,9 @@ do // This is blocking
 		}
 } while(!finPRU1);
 */
+
+// Update if needed
+pru1dataMem_int[0]=(unsigned int)1; // Countdown counter. Must be at least 1!!! Can be used to adjust time of flight differences between nodes.
 
 return 0;// all ok	
 }
