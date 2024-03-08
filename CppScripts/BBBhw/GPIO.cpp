@@ -129,7 +129,6 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Timetagging
-	pru0dataMem_int[0]=(unsigned int)1; // Countdown counter. Must be at least 1!!!
 	pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
@@ -140,7 +139,6 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	////prussdrv_pru_enable(PRU_Operation_NUM);
 	// Generate signals
-	pru1dataMem_int[0]=(unsigned int)1; // Countdown counter. Must be at least 1!!!
 	pru1dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU1 idle
 	// Load and execute the PRU program on the PRU1
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
@@ -168,8 +166,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 // Important, the following line at the very beggining to reduce the command jitter
-pru0dataMem_int[0]=(unsigned int)1; // Countdown counter. Must be at least 1!!! Can be used to adjust time of flight differences between nodes.
-pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
+prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
@@ -227,8 +224,7 @@ return 0;// all ok
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 // Important, the following line at the very beggining to reduce the command jitter
-pru1dataMem_int[0]=(unsigned int)1; // Countdown counter. Must be at least 1!!! Can be used to adjust time of flight differences between nodes.
-pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals
+pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals//prussdrv_pru_send_event(22);
 
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals

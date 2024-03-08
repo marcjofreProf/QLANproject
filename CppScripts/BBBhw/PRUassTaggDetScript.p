@@ -43,8 +43,6 @@
 // r10 reserved for cycle count initial threshold reset
 // r11 reserved for cycle count final threshold reset
 // r16 reserved for raising edge detection operation together with r6
-// r17 reserved for puting a 1
-// r18 reserved for synch countdown
 
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
@@ -108,7 +106,7 @@ INITIATIONS:// This is only run once
 	LDI 	r5, 0 // Initialize for the first time r5
 	LDI	r6, 0 // Initialization
 	LDI	r16, 0 // Initialization
-	LDI	r17, 1
+	CLR	r31.t30
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
 	// Initializations for faster execution
 	LDI	r7, 0 //MOV	r6, 0 // Register for clearing other registers
@@ -157,17 +155,14 @@ CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of l
 	LBCO	r5, CONST_IETREG, 0xC, 4 // LBBO	// from here, if a reset of count we will lose some counts.		
 	QBLE	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte <= r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
 CMDLOOP:
-	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
-	QBEQ	CHECK_CYCLECNT, r0.b0, 0 // loop until we get an instructionQBEQ	NORMSTEPS, r0.b0, 0 // loop until we get an instruction
+	//LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
+	QBBC	CHECK_CYCLECNT,r31, 30	//QBEQ	CHECK_CYCLECNT, r0.b0, 0 // loop until we get an instructionQBEQ	NORMSTEPS, r0.b0, 0 // loop until we get an instruction
 	//QBEQ	CHECK_CYCLECNT, r0.b0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
 	// We remove the command from the host (in case there is a reset from host, we are saved)
-	SBCO 	r7.b0, CONST_PRUDRAM, 4, 1 // Put contents of r7 into CONST_PRUDRAM
+	//SBCO 	r7.b0, CONST_PRUDRAM, 4, 1 // Put contents of r7 into CONST_PRUDRAM
+	SBCO	r7.b0, C0, 0x24, 1 // Reset host interrupt
 	/// Relative synch count down
-	LBCO	r18, CONST_PRUDRAM, 0, 4
-COUNTDOWN:
-	SUB	r18, r18, 1
-	QBNE	COUNTDOWN, r18, 0
 //	LED_ON // Indicate that we start acquisiton of timetagging
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
