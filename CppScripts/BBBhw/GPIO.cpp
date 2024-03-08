@@ -109,8 +109,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	prussdrv_pruintc_init(&pruss_intc_initdata);
     	
 	// Clear prior interrupt events
-	//prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
-	//prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
+	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
+	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
 	
     	// Open file where temporally are stored timetaggs	
 	streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
@@ -172,8 +172,8 @@ int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 pru0dataMem_int[0]=(unsigned int)1; // Countdown counter. Must be at least 1!!! Can be used to adjust time of flight differences between nodes.
 pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
-retInterruptsPRU0= prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
-cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
+retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
+//cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
 if (retInterruptsPRU0>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	this->DDRdumpdata(); // Store to file
@@ -233,8 +233,8 @@ pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
 
-retInterruptsPRU1= prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
-cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
+retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
+//cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 if (retInterruptsPRU1>1){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 }
