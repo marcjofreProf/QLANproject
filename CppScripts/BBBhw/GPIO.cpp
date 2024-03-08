@@ -109,8 +109,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	prussdrv_pruintc_init(&pruss_intc_initdata);
     	
 	// Clear prior interrupt events
-	//prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
-	//prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
+	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
+	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
 	
     	// Open file where temporally are stored timetaggs
     	//outfile=fopen("data.csv", "w");
@@ -140,7 +140,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 			perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
 		}
 	}
-	
+	prussdrv_pru_enable(PRU_Operation_NUM);
 	// Generate signals
 	pru1dataMem_int[0]=(unsigned int)0; // Countdown counter
 	pru1dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU1 idle
@@ -150,6 +150,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 			perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScriptHist4Sig.bin");//perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
 		}
 	}
+	prussdrv_pru_enable(PRU_Signal_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	  
 	  /*// Doing debbuging checks - Debugging 1	  
@@ -174,7 +175,8 @@ pru0dataMem_int[0]=(unsigned int)0; // Countdown counter. Can be used to adjust 
 pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
 retInterruptsPRU0= prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
-//prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
+prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 if (retInterruptsPRU0>0){
 	this->DDRdumpdata(); // Store to file
 }
@@ -235,7 +237,8 @@ pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
 
 retInterruptsPRU1= prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
-//prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
+prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 if (retInterruptsPRU1==0){
 	cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1 if necessary." << endl;
 }
