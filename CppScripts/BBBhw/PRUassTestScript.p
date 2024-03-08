@@ -13,7 +13,7 @@
 #define PRU_EVTOUT_0		3	// the event number that is sent back
 
 EXIT:
-	mov r31.b0, PRU0_R31_VEC_VALID | PRU_EVTOUT_0
+	mov r31, PRU0_R31_VEC_VALID | PRU_EVTOUT_0
 	halt
 
 
