@@ -171,7 +171,7 @@ int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 // Important, the following line at the very beggining to reduce the command jitter
 pru0dataMem_int[0]=(unsigned int)1; // Countdown counter. Must be at least 1!!! Can be used to adjust time of flight differences between nodes.
 pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
-/*
+
 retInterruptsPRU0= prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
 if (retInterruptsPRU0>0){
@@ -183,8 +183,8 @@ else if (retInterruptsPRU0==0){
 }
 else{
 	cout << "PRU0 interrupt poll error" << endl;
-}*/
-
+}
+/*
 FutureTimePointPRU0 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU0);
 auto duration_since_epochFutureTimePointPRU0=FutureTimePointPRU0.time_since_epoch();
 auto duration_since_epochTimeNowPRU0=FutureTimePointPRU0.time_since_epoch(); //just for initialization
@@ -219,7 +219,7 @@ else{CheckTimeFlagPRU0=false;}
 		finPRU0=true;
 	}
 } while(!finPRU0);
-
+*/
 return 0;// all ok
 }
 
@@ -232,7 +232,7 @@ pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals
 
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
-/*
+
 retInterruptsPRU1= prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
 cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 if (retInterruptsPRU1>1){
@@ -244,8 +244,8 @@ if (retInterruptsPRU1==0){
 else{
 	cout << "PRU1 interrupt error" << endl;
 }
-*/
 
+/*
 FutureTimePointPRU1 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU1);
 auto duration_since_epochFutureTimePointPRU1=FutureTimePointPRU1.time_since_epoch();
 auto duration_since_epochTimeNowPRU1=FutureTimePointPRU1.time_since_epoch();// JUST FOR INITIALIZATION
@@ -283,6 +283,7 @@ do // This is blocking
 		finPRU1=true;
 		}
 } while(!finPRU1);
+*/
 
 return 0;// all ok	
 }
