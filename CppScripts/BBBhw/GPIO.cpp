@@ -173,7 +173,7 @@ int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 pru0dataMem_int[0]=(unsigned int)0; // Countdown counter. Can be used to adjust time of flight differences between nodes.
 pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
-retInterruptsPRU0= prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeToFutureTimePointPRU0);
+retInterruptsPRU0= prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 if (retInterruptsPRU0>0){
 	this->DDRdumpdata(); // Store to file
@@ -234,6 +234,16 @@ pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
 
+retInterruptsPRU1= prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
+prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+if (retInterruptsPRU1==0){
+	cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1 if necessary." << endl;
+}
+else{
+	cout << "PRU1 interrupt error" << endl;
+}
+
+/*
 FutureTimePointPRU1 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU1);
 auto duration_since_epochFutureTimePointPRU1=FutureTimePointPRU1.time_since_epoch();
 auto duration_since_epochTimeNowPRU1=FutureTimePointPRU1.time_since_epoch();// JUST FOR INITIALIZATION
@@ -271,8 +281,7 @@ do // This is blocking
 		finPRU1=true;
 		}
 } while(!finPRU1);
-
-prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
+*/
 
 return 0;// all ok	
 }
