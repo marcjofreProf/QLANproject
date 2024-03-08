@@ -106,7 +106,8 @@ INITIATIONS:// This is only run once
 	LDI 	r5, 0 // Initialize for the first time r5
 	LDI	r6, 0 // Initialization
 	LDI	r16, 0 // Initialization
-	CLR	r31.t30
+	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
+	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
 	// Initializations for faster execution
 	LDI	r7, 0 //MOV	r6, 0 // Register for clearing other registers
@@ -165,8 +166,6 @@ CMDLOOP:
 	//SBCO	r7.b0, C0, 0x24, 1 // Reset host interrupt
 	/// Relative synch count down
 //	LED_ON // Indicate that we start acquisiton of timetagging
-	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
-	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 //	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	// Here include once the overflow register
 	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address offset at r1
@@ -214,6 +213,8 @@ TIMETAG:
 	MOV	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF
+	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
+	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 	//// Make sure that counters are enabled
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
