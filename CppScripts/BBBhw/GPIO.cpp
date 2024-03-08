@@ -166,6 +166,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 // Important, the following line at the very beggining to reduce the command jitter
+pru0dataMem_int[0]=(unsigned int)1;
 pru0dataMem_int[1]=(unsigned int)2;//prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
@@ -224,6 +225,7 @@ return 0;// all ok
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 // Important, the following line at the very beggining to reduce the command jitter
+pru0dataMem_int[0]=(unsigned int)1;
 pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals//prussdrv_pru_send_event(22);
 
 // Here there should be the instruction command to tell PRU1 to start generating signals
