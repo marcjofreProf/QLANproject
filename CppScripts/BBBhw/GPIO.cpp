@@ -177,9 +177,11 @@ if (retInterruptsPRU0>0){
 	this->DDRdumpdata(); // Store to file
 }
 else if (retInterruptsPRU0==0){
+	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "GPIO::ReadTimeStamps took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
 }
 else{
+	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU0 interrupt poll error" << endl;
 }
 /*
@@ -238,9 +240,11 @@ if (retInterruptsPRU1>1){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 }
 if (retInterruptsPRU1==0){
+	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1 if necessary." << endl;
 }
 else{
+	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU1 interrupt error" << endl;
 }
 
