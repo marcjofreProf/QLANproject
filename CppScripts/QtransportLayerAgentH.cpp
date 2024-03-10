@@ -25,7 +25,7 @@ Agent script for Quantum transport Layer Host
 #include <netinet/in.h>
 #include <stdlib.h>
 #define SOCKtype "SOCK_DGRAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
-#define SOCKkeepaliveTime 600000 // WaitTimeAfterMainWhileLoop
+#define SOCKkeepaliveTime 60000 // WaitTimeAfterMainWhileLoop
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
@@ -850,6 +850,9 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
 		}  
 	}
+	else if(string(Type)==string("KeepAlive")){
+		//cout << "Message to Host HeartBeat: "<< Payload << endl;
+	}
 	else{// 
 		cout << "Message not handled by host: "<< Payload << endl;
 	}  
@@ -984,7 +987,7 @@ for (int i=0;i<NumSockets;i++){
 	strcat(ParamsCharArray,",");
 	strcat(ParamsCharArray,"none");
 	strcat(ParamsCharArray,",");// Very important to end the message
-	//cout << "SimulateRetrieveNumStoredQubitsNode ParamsCharArray: " << ParamsCharArray << endl;
+	//cout << "SendKeepAliveHeartBeatsSockets ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 }
 

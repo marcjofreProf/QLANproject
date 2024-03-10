@@ -25,7 +25,7 @@ Agent script for Quantum transport Layer Node
 #include <netinet/in.h>
 #include <stdlib.h>
 #define SOCKtype "SOCK_DGRAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
-#define SOCKkeepaliveTime 600000 // WaitTimeAfterMainWhileLoop
+#define SOCKkeepaliveTime 60000 // WaitTimeAfterMainWhileLoop
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
@@ -730,6 +730,9 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		else{//Default
 			cout << "Control message to node not handled: "<< Payload << endl;
 		}
+	}
+	else if(string(Type)==string("KeepAlive")){
+		//cout << "Message to Node HeartBeat: "<< Payload << endl;
 	}
 	else{//Default
 		// Do not do anything
