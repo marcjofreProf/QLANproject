@@ -73,6 +73,7 @@ private: // Variables/Objects
 public: // Functions
 	// Management
 	QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAscendingCharArray); //constructor
+	int SendKeepAliveHeartBeatsSockets();
 	ApplicationState getState() const { return m_state; }	
         bool m_start() { m_state = APPLICATION_RUNNING; return true; }
         bool m_pause() { m_state = APPLICATION_PAUSED; return true; } 

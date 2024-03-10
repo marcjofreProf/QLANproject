@@ -81,6 +81,7 @@ public: // Functions/Methods
 	// Sempahore
 	void acquire();
 	void release();
+	int SendKeepAliveHeartBeatsSockets();
 	int InitAgentProcess(); // Initializer of the thread. Not used
 	int InitiateBelowAgentsObjects();
 	QTLAN(int numberSessions); //constructor

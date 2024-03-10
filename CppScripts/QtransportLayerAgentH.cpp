@@ -25,10 +25,11 @@ Agent script for Quantum transport Layer Host
 #include <netinet/in.h>
 #include <stdlib.h>
 #define SOCKtype "SOCK_DGRAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
+#define SOCKkeepaliveTime 600000 // WaitTimeAfterMainWhileLoop
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
-#define WaitTimeAfterMainWhileLoop 1000
+#define WaitTimeAfterMainWhileLoop 1000 // microseconds
 #include <thread>
 // Semaphore
 #include <atomic>
@@ -618,6 +619,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  //
  this->m_pause(); // Initiate in paused state.
  cout << "Starting in pause state the QtransportLayerAgentH" << endl;
+ int sockKeepAlivecounter=0;// To send periodic heart beats through sockets to keep them alive
  bool isValidWhileLoop = true;
  //unsigned int CheckCounter=0;
  while(isValidWhileLoop){
@@ -651,6 +653,8 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
            }
 
         } // switch
+        if (sockKeepAlivecounter>=SOCKkeepaliveTime){sockKeepAlivecounter=0;this->SendKeepAliveHeartBeatsSockets();}
+        else{sockKeepAlivecounter++;}
         this->release(); // Release the semaphore
         //if (signalReceivedFlag.load()){this->~QTLAH();}// Destroy the instance
         //cout << "(int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)): " << (int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)) << endl;
@@ -915,7 +919,7 @@ this->SimulateRetrieveNumStoredQubitsNodeFlag=true;
 int isValidWhileLoopCount = 10; // Number of tries If it needs more than one trial is because the sockets are not working correctly. It is best to check for open sockets and kill the processes taking hold of them
 this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 while(isValidWhileLoopCount>0){
-	if (isValidWhileLoopCount % isValidWhileLoopCount ==0){// Only try to resend the message once every 10 times
+	if (isValidWhileLoopCount % isValidWhileLoopCount==0){// Only try to resend the message once every 10 times
 	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 	strcpy(ParamsCharArray,IPhostReply);
 	strcat(ParamsCharArray,",");
@@ -965,6 +969,26 @@ while(isValidWhileLoopCount>0){
 }//while
 
 return 0; // All OK
+}
+
+int QTLAH::SendKeepAliveHeartBeatsSockets(){
+for (int i=0;i<NumSockets;i++){
+	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+	strcpy(ParamsCharArray,this->IPSocketsList[i]);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,this->IPaddressesSockets[1]);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"KeepAlive");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"HeartBeat");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"none");
+	strcat(ParamsCharArray,",");// Very important to end the message
+	//cout << "SimulateRetrieveNumStoredQubitsNode ParamsCharArray: " << ParamsCharArray << endl;
+	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+}
+
+return 0; // all ok
 }
 
 ///////////////////////////////////////////////////////////////////

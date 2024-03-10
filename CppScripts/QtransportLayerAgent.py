@@ -118,6 +118,9 @@ class QTLAH(_object):
         except __builtin__.Exception:
             self.this = this
 
+    def SendKeepAliveHeartBeatsSockets(self):
+        return _QtransportLayerAgent.QTLAH_SendKeepAliveHeartBeatsSockets(self)
+
     def getState(self):
         return _QtransportLayerAgent.QTLAH_getState(self)
 

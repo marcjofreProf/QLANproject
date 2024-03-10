@@ -25,10 +25,11 @@ Agent script for Quantum transport Layer Node
 #include <netinet/in.h>
 #include <stdlib.h>
 #define SOCKtype "SOCK_DGRAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
+#define SOCKkeepaliveTime 600000 // WaitTimeAfterMainWhileLoop
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
-#define WaitTimeAfterMainWhileLoop 1000
+#define WaitTimeAfterMainWhileLoop 1000 //microseconds
 #include <thread>
 // Semaphore
 #include <atomic>
@@ -852,6 +853,26 @@ this->release();
 return 0;
 }
 
+int QTLAN::SendKeepAliveHeartBeatsSockets(){
+for (int i=0;i<NumSocketsMax;i++){
+	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+	strcpy(ParamsCharArray,this->IPSocketsList[i]);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,this->IPaddressesSockets[1]);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"KeepAlive");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"HeartBeat");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"none");
+	strcat(ParamsCharArray,",");// Very important to end the message
+	//cout << "SimulateRetrieveNumStoredQubitsNode ParamsCharArray: " << ParamsCharArray << endl;
+	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+}
+
+return 0; // all ok
+}
+
 QTLAN::~QTLAN() {
 // destructor
 	this->StopICPconnections(this->ParamArgc);
@@ -933,7 +954,8 @@ int main(int argc, char const * argv[]){
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with its host
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
   
- // Then await for next actions 
+ // Then await for next actions
+ int sockKeepAlivecounter=0;// To send periodic heart beats through sockets to keep them alive
  bool isValidWhileLoop;
  if (QTLANagent.getState()==QTLAN::APPLICATION_EXIT){isValidWhileLoop = false;}
  else{isValidWhileLoop = true;}
@@ -966,6 +988,8 @@ int main(int argc, char const * argv[]){
            }
 
         } // switch
+        if (sockKeepAlivecounter>=SOCKkeepaliveTime){sockKeepAlivecounter=0;QTLANagent.SendKeepAliveHeartBeatsSockets();}
+        else{sockKeepAlivecounter++;}
         QTLANagent.release();
 	if (signalReceivedFlag.load()){QTLANagent.~QTLAN();}// Destroy the instance
         usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter

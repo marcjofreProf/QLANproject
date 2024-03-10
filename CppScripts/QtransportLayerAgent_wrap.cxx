@@ -4011,6 +4011,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_QTLAH_SendKeepAliveHeartBeatsSockets(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:QTLAH_SendKeepAliveHeartBeatsSockets",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_SendKeepAliveHeartBeatsSockets" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
+  }
+  arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
+  result = (int)(arg1)->SendKeepAliveHeartBeatsSockets();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_QTLAH_getState(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
@@ -4314,6 +4336,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "QTLAH_numberSessions_set", _wrap_QTLAH_numberSessions_set, METH_VARARGS, NULL},
 	 { "QTLAH_numberSessions_get", _wrap_QTLAH_numberSessions_get, METH_VARARGS, NULL},
 	 { "new_QTLAH", _wrap_new_QTLAH, METH_VARARGS, NULL},
+	 { "QTLAH_SendKeepAliveHeartBeatsSockets", _wrap_QTLAH_SendKeepAliveHeartBeatsSockets, METH_VARARGS, NULL},
 	 { "QTLAH_getState", _wrap_QTLAH_getState, METH_VARARGS, NULL},
 	 { "QTLAH_m_start", _wrap_QTLAH_m_start, METH_VARARGS, NULL},
 	 { "QTLAH_m_pause", _wrap_QTLAH_m_pause, METH_VARARGS, NULL},
