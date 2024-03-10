@@ -772,7 +772,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,Payload);
 			strcat(ParamsCharArray,",");// Very important to end the message
-			cout << "Operation Message forward ParamsCharArray: " << ParamsCharArray << endl;	
+			//cout << "Operation Message forward ParamsCharArray: " << ParamsCharArray << endl;	
 			this->ICPdiscoverSend(ParamsCharArray);
 		}				
 		else{//Default
