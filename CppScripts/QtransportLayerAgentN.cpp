@@ -29,7 +29,7 @@ Agent script for Quantum transport Layer Node
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
-#define WaitTimeAfterMainWhileLoop 100000 //nanoseconds
+#define WaitTimeAfterMainWhileLoop 1000000 //nanoseconds
 #include <thread>
 // Semaphore
 #include <atomic>
@@ -913,7 +913,7 @@ int QTLAN::RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep){
 struct timespec ts;
 ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
 ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
-clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, NULL); //
+clock_nanosleep(CLOCK_TAI, 0, &ts, NULL); //
 
 return 0; // All ok
 }
