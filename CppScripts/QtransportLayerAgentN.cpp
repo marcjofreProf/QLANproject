@@ -521,11 +521,31 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   }    
 }
 
+bool QTLAN::isSocketWritable(int sock) {
+    fd_set write_fds;
+    FD_ZERO(&write_fds);
+    FD_SET(sock, &write_fds);
+
+    // Set timeout to zero for non-blocking check
+    timeval timeout;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 0;
+
+    // Check if the socket is writable
+    int select_res = select(sock + 1, nullptr, &write_fds, nullptr, &timeout);
+
+    // select_res > 0 means the socket is writable
+    return select_res > 0;
+}
+
 int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 //cout << "Node SendBuffer: " << this->SendBuffer << endl;
 //cout << "Node SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
-try{
-   try {
+	
+	if (!this->isSocketWritable(socket_fd_conn)){//Reconnect socket
+		cout << "Host socket ICPmanagementSend not writable!" << endl;
+	}
+	
     const char* SendBufferAux = this->SendBuffer;
     int BytesSent=0;
     if (string(SOCKtype)=="SOCK_DGRAM"){    
@@ -552,15 +572,6 @@ try{
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
-    }
-    }
-    catch (const std::exception& e) {
-	// Handle the exception
-    	cout << "ICPmanagementSend Exception: " << e.what() << endl;
-    }
-    } // upper try
-  catch (...) { // Catches any exception
-  	cout << "ICPmanagementSend Exception caught" << endl;
     }
     return 0; // All OK
 }

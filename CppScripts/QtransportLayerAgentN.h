@@ -128,6 +128,7 @@ private: // Functions/Methods
 	int ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec);
 	int ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets);
 	int ICPdiscoverSend(char* ParamsCharArray); // Discover the socket and send the message
+	bool isSocketWritable(int sock);
 	// REquests	
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the Agent to send message to specific host/node
 //	friend void* threadedPoll(void *value);
