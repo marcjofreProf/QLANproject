@@ -20,7 +20,7 @@ Agent script for Quantum Physical Layer
 #include "./BBBhw/GPIO.h"
 #include <stdlib.h>
 // Threading
-#define WaitTimeAfterMainWhileLoop 100000 // nanoseconds
+#define WaitTimeAfterMainWhileLoop 1000000 // nanoseconds
 // Payload messages
 #define NumBytesPayloadBuffer 1000
 #define NumParamMessagesMax 20
@@ -28,7 +28,7 @@ Agent script for Quantum Physical Layer
 // Semaphore
 #include <atomic>
 // time points
-#define WaitTimeToFutureTimePoint 499000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
+#define WaitTimeToFutureTimePoint 199000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
 //Qubits
 #define NumQuBitsPerRun 2048
 // MAthemtical calculations
@@ -298,7 +298,7 @@ requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 this->release();
-usleep((int)(100*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to be able to send the above message
+this->RelativeNanoSleepWait((unsigned int)(100*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to be able to send the above message
 //////////////////////////
 return requestWhileWait;
 }
