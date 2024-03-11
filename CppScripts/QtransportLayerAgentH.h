@@ -95,6 +95,7 @@ private: //Functions//Methods
 	//static void SignalINTHandler(int s); // Handler for socket SIGPIPE signal error
 	//static void SignalPIPEHandler(int s); // Handler for socket SIGPIPE signal error
 	//static void SignalSegmentationFaultHandler(int s); // Handler for segmentation error
+	int RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep);
 	// Sempahore
 	void acquire();
 	void release();

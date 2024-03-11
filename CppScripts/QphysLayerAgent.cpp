@@ -9,7 +9,7 @@ Agent script for Quantum Physical Layer
 */
 #include "QphysLayerAgent.h"
 #include<iostream>
-#include<unistd.h> //for usleep
+#include<unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include<bitset>
@@ -20,7 +20,7 @@ Agent script for Quantum Physical Layer
 #include "./BBBhw/GPIO.h"
 #include <stdlib.h>
 // Threading
-#define WaitTimeAfterMainWhileLoop 1000
+#define WaitTimeAfterMainWhileLoop 1000000 // nanoseconds
 // Payload messages
 #define NumBytesPayloadBuffer 1000
 #define NumParamMessagesMax 20
@@ -311,7 +311,7 @@ this->acquire();
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
 	this->release();
 	MaxWhileRound--;	
-	usleep((int)(0.1*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//Maybe some sleep to reduce CPU consumption	
+	this->RelativeNanoSleepWait((unsigned int)(0.1*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//Maybe some sleep to reduce CPU consumption	
 	this->acquire();
 	};
 if (MaxWhileRound<=0){
@@ -481,7 +481,7 @@ return 0; // return 0 is for no error
 
 int QPLA::GetSimulateNumStoredQubitsNode(float* TimeTaggsDetAnalytics){
 this->acquire();
-while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
+while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -579,6 +579,15 @@ this->release();
 return SimulateNumStoredQubitsNodeAux;
 }
 
+int QPLA::RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep){
+struct timespec ts;
+ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
+ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
+clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, NULL); //
+
+return 0; // All ok
+}
+
 QPLA::~QPLA() {
 // destructor
 /* Very slow GPIO BBB not used anymore
@@ -613,7 +622,7 @@ void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
    	this->acquire();// Wait semaphore until it can proceed
     	this->ReadParametersAgent(); // Reads messages from above layer
         this->release(); // Release the semaphore 
-        usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
+        this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception

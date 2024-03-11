@@ -29,7 +29,7 @@ Agent script for Quantum transport Layer Host
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
-#define WaitTimeAfterMainWhileLoop 1000 // microseconds
+#define WaitTimeAfterMainWhileLoop 1000000 // nanoseconds
 #include <thread>
 // Semaphore
 #include <atomic>
@@ -439,8 +439,7 @@ else {// There might be at least one new message
 		// Read the message from the socket
 		int valread=0;
 		if (this->ReadFlagWait){			
-			if (string(SOCKtype)=="SOCK_DGRAM"){	
-			//usleep(SockListenTimeusec);		
+			if (string(SOCKtype)=="SOCK_DGRAM"){
 				struct sockaddr_in orgaddr; 
 			    memset(&orgaddr, 0, sizeof(orgaddr));		       
 			    // Filling information 
@@ -472,7 +471,6 @@ else {// There might be at least one new message
 			}
 		else{			
 			if (string(SOCKtype)=="SOCK_DGRAM"){
-			//usleep(SockListenTimeusec);
 				struct sockaddr_in orgaddr; 
 			    memset(&orgaddr, 0, sizeof(orgaddr));		       
 			    // Filling information 
@@ -635,6 +633,15 @@ if (string(SOCKtype)=="SOCK_STREAM"){
     return 0; // All OK
 }
 
+int QTLAH::RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep){
+struct timespec ts;
+ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
+ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
+clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, NULL); //
+
+return 0; // All ok
+}
+
 void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  // One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
  this->InitiateICPconnections(); // Very important that they work. Otherwise the rest go wrong
@@ -691,7 +698,8 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
         this->release(); // Release the semaphore
         //if (signalReceivedFlag.load()){this->~QTLAH();}// Destroy the instance
         //cout << "(int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)): " << (int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)) << endl;
-        usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
+        //usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
+        this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few nanoseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception
@@ -943,12 +951,12 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 }
 
 int QTLAH::SimulateRetrieveNumStoredQubitsNode(char* IPhostReply,char* IPhostRequest, int* ParamsIntArray,int nIntarray,float* ParamsFloatArray,int nFloatarray){ // Send to the upper layer agent how many qubits are stored
-usleep((int)(5000*WaitTimeAfterMainWhileLoop));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes. This can be improved by sending messages to the specific node, and this node replying that has received the detection command, then this could start
+this->RelativeNanoSleepWait((unsigned int)((unsigned int)5000*(unsigned int)WaitTimeAfterMainWhileLoop));//usleep((int)(5000*WaitTimeAfterMainWhileLoop));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes. This can be improved by sending messages to the specific node, and this node replying that has received the detection command, then this could start
 this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 while(this->SimulateRetrieveNumStoredQubitsNodeFlag==true){//Wait, only one asking
 this->release();
-usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
+this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
 this->acquire();
 }
 this->SimulateRetrieveNumStoredQubitsNodeFlag=true;
@@ -971,7 +979,7 @@ while(isValidWhileLoopCount>0){
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 	}
 	this->release();
-	usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
+	this->RelativeNanoSleepWait((unsigned int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
 	this->acquire();
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
 		//cout << "We received info for SimulateRetrieveNumStoredQubitsNode" << endl;

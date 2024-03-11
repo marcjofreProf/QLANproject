@@ -59,6 +59,7 @@ public: // Functions/Methods
 	~QNLA();  //destructor
 
 private://Functions/Methods
+	int RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep);
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 	// Sempahore

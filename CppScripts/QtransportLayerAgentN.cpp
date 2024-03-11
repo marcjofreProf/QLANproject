@@ -9,7 +9,7 @@ Agent script for Quantum transport Layer Node
 */
 #include "QtransportLayerAgentN.h"
 #include<iostream>
-#include<unistd.h> //for usleep
+#include<unistd.h>
 #include "QnetworkLayerAgent.h"
 // InterCommunication Protocols - Sockets - Common to Server and Client
 #include <stdio.h>
@@ -29,7 +29,7 @@ Agent script for Quantum transport Layer Node
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
-#define WaitTimeAfterMainWhileLoop 1000 //microseconds
+#define WaitTimeAfterMainWhileLoop 1000000 //nanoseconds
 #include <thread>
 // Semaphore
 #include <atomic>
@@ -805,7 +805,7 @@ int QTLAN::GetSimulateNumStoredQubitsNode() {
 this->acquire();	  
 //cout<< "Node before this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
 while (this->GetSimulateNumStoredQubitsNodeFlag==true or this->QPLASimulateReceiveQuBitFlag==true){// Wait here// No other thread checking this info
-this->release();usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();
+this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();
 }
 
 //cout<< "Node after this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
@@ -909,6 +909,15 @@ for (int i=0;i<NumSocketsMax;i++){
 return 0; // all ok
 }
 
+int QTLAN::RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep){
+struct timespec ts;
+ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
+ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
+clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, NULL); //
+
+return 0; // All ok
+}
+
 QTLAN::~QTLAN() {
 // destructor
 	this->StopICPconnections(this->ParamArgc);
@@ -924,7 +933,7 @@ void QTLAN::AgentProcessRequestsPetitions(){// Check next thing to do
    	this->acquire();// Wait semaphore until it can proceed
     	
         this->release(); // Release the semaphore 
-        usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
+        this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception
@@ -1028,7 +1037,7 @@ int main(int argc, char const * argv[]){
         else{sockKeepAlivecounter++;}
         QTLANagent.release();
 	if (signalReceivedFlag.load()){QTLANagent.~QTLAN();}// Destroy the instance
-        usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
+        QTLANagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception

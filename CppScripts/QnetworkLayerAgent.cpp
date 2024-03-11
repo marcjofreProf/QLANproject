@@ -9,14 +9,14 @@ Agent script for Quantum network Layer
 */
 #include "QnetworkLayerAgent.h"
 #include<iostream>
-#include<unistd.h> //for usleep
+#include<unistd.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "QlinkLayerAgent.h"
 // Threading
 #include <thread>
-#define WaitTimeAfterMainWhileLoop 1000
+#define WaitTimeAfterMainWhileLoop 1000000 // nanoseconds
 // Payload messages
 #define NumBytesPayloadBuffer 1000
 #define NumParamMessagesMax 20
@@ -182,6 +182,15 @@ int QNLA::InitAgentProcess(){
 	return 0; //All OK
 }
 
+int QNLA::RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep){
+struct timespec ts;
+ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
+ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
+clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, NULL); //
+
+return 0; // All ok
+}
+
 QNLA::~QNLA() {
 // destructor
  this->threadRef.join();// Terminate the process thread
@@ -215,7 +224,7 @@ void QNLA::AgentProcessRequestsPetitions(){// Check next thing to do
    	this->acquire();// Wait semaphore until it can proceed
     	this->ReadParametersAgent();// Reads messages from above layer
         this->release(); // Release the semaphore 
-        usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
+        this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception

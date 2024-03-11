@@ -78,6 +78,7 @@ private: // Variables/Objects
 	char IPdestAux[IPcharArrayLengthMAX]={0};
 	
 public: // Functions/Methods
+	int RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep);
 	// Sempahore
 	void acquire();
 	void release();
@@ -110,7 +111,7 @@ public: // Functions/Methods
 
 private: // Functions/Methods
 	static void SignalINTHandler(int s); // Handler for socket SIGPIPE signal error
-	static void SignalPIPEHandler(int s); // Handler for socket SIGPIPE signal error
+	static void SignalPIPEHandler(int s); // Handler for socket SIGPIPE signal error	
 	//static void SignalSegmentationFaultHandler(int s); // Handler for segmentation error
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking

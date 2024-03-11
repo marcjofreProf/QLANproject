@@ -91,7 +91,8 @@ public: // Functions/Methods
 	int GetSimulateNumStoredQubitsNode(float* TimeTaggsDetAnalytics);
 	~QPLA();  //destructor
 
-private: // Functions/Methods	
+private: // Functions/Methods
+	int RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep);
 	// Sempahore
 	void acquire();
 	void release();
