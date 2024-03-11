@@ -29,7 +29,7 @@ Agent script for Quantum transport Layer Host
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
-#define WaitTimeAfterMainWhileLoop 1000000 // nanoseconds
+#define WaitTimeAfterMainWhileLoop 5000000 // nanoseconds
 #include <thread>
 // Semaphore
 #include <atomic>
@@ -979,7 +979,7 @@ while(isValidWhileLoopCount>0){
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 	}
 	this->release();
-	this->RelativeNanoSleepWait((unsigned int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
+	this->RelativeNanoSleepWait((unsigned int)(500*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));//usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
 	this->acquire();
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
 		//cout << "We received info for SimulateRetrieveNumStoredQubitsNode" << endl;

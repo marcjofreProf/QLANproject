@@ -20,7 +20,7 @@ Agent script for Quantum Physical Layer
 #include "./BBBhw/GPIO.h"
 #include <stdlib.h>
 // Threading
-#define WaitTimeAfterMainWhileLoop 1000000 // nanoseconds
+#define WaitTimeAfterMainWhileLoop 5000000 // nanoseconds
 // Payload messages
 #define NumBytesPayloadBuffer 1000
 #define NumParamMessagesMax 20
@@ -298,7 +298,7 @@ requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 this->release();
-this->RelativeNanoSleepWait((unsigned int)(100*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to be able to send the above message
+this->RelativeNanoSleepWait((unsigned int)(100*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));// Give some time to be able to send the above message
 //////////////////////////
 return requestWhileWait;
 }
