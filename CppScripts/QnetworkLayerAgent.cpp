@@ -16,7 +16,7 @@ Agent script for Quantum network Layer
 #include "QlinkLayerAgent.h"
 // Threading
 #include <thread>
-#define WaitTimeAfterMainWhileLoop 5000000 // nanoseconds
+#define WaitTimeAfterMainWhileLoop 10000000 // nanoseconds
 // Payload messages
 #define NumBytesPayloadBuffer 1000
 #define NumParamMessagesMax 20

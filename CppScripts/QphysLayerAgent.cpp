@@ -20,7 +20,7 @@ Agent script for Quantum Physical Layer
 #include "./BBBhw/GPIO.h"
 #include <stdlib.h>
 // Threading
-#define WaitTimeAfterMainWhileLoop 5000000 // nanoseconds
+#define WaitTimeAfterMainWhileLoop 10000000 // nanoseconds
 // Payload messages
 #define NumBytesPayloadBuffer 1000
 #define NumParamMessagesMax 20
