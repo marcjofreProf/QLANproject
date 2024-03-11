@@ -16,7 +16,7 @@ Agent script for Quantum Link Layer
 #include "QphysLayerAgent.h"
 // Threading
 #include <thread>
-#define WaitTimeAfterMainWhileLoop 1000000 // nanoseconds
+#define WaitTimeAfterMainWhileLoop 100000 // nanoseconds
 // Payload messages
 #define NumBytesPayloadBuffer 1000
 #define NumParamMessagesMax 20
@@ -182,7 +182,7 @@ int QLLA::RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep){
 struct timespec ts;
 ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
 ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
-clock_nanosleep(CLOCK_PROCESS_CPUTIME_ID, 0, &ts, NULL); //
+clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, NULL); //
 
 return 0; // All ok
 }
