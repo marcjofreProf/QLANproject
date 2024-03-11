@@ -361,33 +361,38 @@ valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts wit
 //cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactorResetCycle) + static_cast<unsigned long long int>(this->valCarryOnCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 
-streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-for (iIterDump=0; iIterDump<NumRecords; iIterDump++){
-	// First 32 bits is the DWT_CYCCNT of the PRU
-	valCycleCountPRU=static_cast<unsigned int>(*valp);
-	valp++;// 1 times 8 bits
-	valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<8;
-	valp++;// 1 times 8 bits
-	valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
-	valp++;// 1 times 8 bits
-	valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
-	valp++;// 1 times 8 bits
-	//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
-	// Mount the extended counter value
-	extendedCounterPRU=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
-	//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
-	// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
-	valBitsInterest=static_cast<unsigned char>(*valp);
-	valp++;// 1 times 8 bits
-	//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "val: " << std::bitset<8>(val) << endl;}
-	//valBitsInterest=this->packBits(val); // we're just interested in 4 bits
-	//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}	
-	//fprintf(outfile, "%d\n", val);
-	//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	streamDDRpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
-	//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	streamDDRpru.write(reinterpret_cast<const char*>(&valBitsInterest), sizeof(valBitsInterest));
-	//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
+if (streamDDRpru.is_open()){
+	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	for (iIterDump=0; iIterDump<NumRecords; iIterDump++){
+		// First 32 bits is the DWT_CYCCNT of the PRU
+		valCycleCountPRU=static_cast<unsigned int>(*valp);
+		valp++;// 1 times 8 bits
+		valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<8;
+		valp++;// 1 times 8 bits
+		valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
+		valp++;// 1 times 8 bits
+		valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
+		valp++;// 1 times 8 bits
+		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
+		// Mount the extended counter value
+		extendedCounterPRU=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
+		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
+		// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
+		valBitsInterest=static_cast<unsigned char>(*valp);
+		valp++;// 1 times 8 bits
+		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "val: " << std::bitset<8>(val) << endl;}
+		//valBitsInterest=this->packBits(val); // we're just interested in 4 bits
+		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}	
+		//fprintf(outfile, "%d\n", val);
+		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		streamDDRpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
+		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		streamDDRpru.write(reinterpret_cast<const char*>(&valBitsInterest), sizeof(valBitsInterest));
+		//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
+	}
+}
+else{
+	cout << "DDRdumpdata streamDDRpru is not open!" << endl;
 }
 
 // Store the last IEP counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
@@ -420,21 +425,23 @@ if (streamDDRpru.is_open()){
 	streamDDRpru.close();
 	
 	//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
-	if (!streamDDRpru.is_open()) {
-		streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
-		if (!streamDDRpru.is_open()) {
-	        	cout << "Failed to re-open the streamDDRpru file." << endl;
-	        	return -1;
-	        }
-        }
-        streamDDRpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
-	return 0; // all ok
+	
 }
 else{
 	cout << "ClearStoredQuBits: BBB streamDDRpru is not open!" << endl;
 	return -1;
 }
+streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
+if (!streamDDRpru.is_open()) {
+	streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
+	if (!streamDDRpru.is_open()) {
+        	cout << "Failed to re-open the streamDDRpru file." << endl;
+        	return -1;
+        }
+}
+streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+streamDDRpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
+return 0; // all ok
 }
 
 int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags){
@@ -450,7 +457,7 @@ if (streamDDRpru.is_open()){
     	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
     	    //cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
     	    lineCount++; // Increment line count for each line read
-    	    //streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
+    	    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
     	    }
         return lineCount;
 }
