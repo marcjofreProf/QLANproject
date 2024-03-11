@@ -25,7 +25,7 @@ Agent script for Quantum transport Layer Node
 #include <netinet/in.h>
 #include <stdlib.h>
 #define SOCKtype "SOCK_DGRAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
-#define SOCKkeepaliveTime 20000 // WaitTimeAfterMainWhileLoop
+#define SOCKkeepaliveTime 200000 // WaitTimeAfterMainWhileLoop
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
