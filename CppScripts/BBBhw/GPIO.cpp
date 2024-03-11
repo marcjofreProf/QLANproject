@@ -120,6 +120,11 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	        	cout << "Failed to open the streamDDRpru file." << endl;
 	        }
         }
+        
+        if (streamDDRpru.is_open()){
+		streamDDRpru.close();	
+		//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	}
 	
         // Initialize DDM
 	LOCAL_DDMinit(); // DDR (Double Data Rate): A class of memory technology used in DRAM where data is transferred on both the rising and falling edges of the clock signal, effectively doubling the data rate without increasing the clock frequency.
@@ -422,15 +427,10 @@ unsigned char GPIO::packBits(unsigned char value) {
 
 int GPIO::ClearStoredQuBits(){
 if (streamDDRpru.is_open()){
-	streamDDRpru.close();
-	
+	streamDDRpru.close();	
 	//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	
 }
-else{
-	cout << "ClearStoredQuBits: BBB streamDDRpru is not open!" << endl;
-	return -1;
-}
+
 streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
 if (!streamDDRpru.is_open()) {
 	streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
@@ -446,13 +446,30 @@ return 0; // all ok
 
 int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags){
 if (streamDDRpru.is_open()){
+	streamDDRpru.close();
+	
+	//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	
+}
+
+streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content	
+if (!streamDDRpru.is_open()) {
+	streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content
+	if (!streamDDRpru.is_open()) {
+        	cout << "Failed to re-open the streamDDRpru file." << endl;
+        	return -1;
+        }
+}
+streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+
+if (streamDDRpru.is_open()){
 	streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
 	int lineCount = 0;
 	unsigned long long int ValueReadTest;
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
         while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
-	        TimeTaggs[lineCount]=ValueReadTest; 
-	        streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	    TimeTaggs[lineCount]=ValueReadTest; 
+	    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
     	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
     	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
     	    //cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
@@ -462,7 +479,7 @@ if (streamDDRpru.is_open()){
         return lineCount;
 }
 else{
-cout << "RetrieveNumStoredQuBits: BBB streamDDRpru is not open!" << endl;
+	cout << "RetrieveNumStoredQuBits: BBB streamDDRpru is not open!" << endl;
 return -1;
 }
 }
