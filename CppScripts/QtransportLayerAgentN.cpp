@@ -553,9 +553,9 @@ int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 //cout << "Node SendBuffer: " << this->SendBuffer << endl;
 //cout << "Node SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
 	
-	if (!this->isSocketWritable(socket_fd_conn)){//Reconnect socket
-		cout << "Host socket ICPmanagementSend not writable!" << endl;
-	}
+	//if (!this->isSocketWritable(socket_fd_conn)){//Reconnect socket
+	//	cout << "Host socket ICPmanagementSend not writable!" << endl;
+	//}
 	
     const char* SendBufferAux = this->SendBuffer;
     int BytesSent=0;
@@ -1033,8 +1033,8 @@ int main(int argc, char const * argv[]){
            }
 
         } // switch
-        if (sockKeepAlivecounter>=SOCKkeepaliveTime){sockKeepAlivecounter=0;QTLANagent.SendKeepAliveHeartBeatsSockets();}
-        else{sockKeepAlivecounter++;}
+        //if (sockKeepAlivecounter>=SOCKkeepaliveTime){sockKeepAlivecounter=0;QTLANagent.SendKeepAliveHeartBeatsSockets();}
+        //else{sockKeepAlivecounter++;}
         QTLANagent.release();
 	if (signalReceivedFlag.load()){QTLANagent.~QTLAN();}// Destroy the instance
         QTLANagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter

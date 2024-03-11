@@ -567,9 +567,9 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 //cout << "Host SendBuffer: " << this->SendBuffer << endl;
 //cout << "Host SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
 	
-	if (!this->isSocketWritable(socket_fd_conn)){//Reconnect socket
-		cout << "Host socket ICPmanagementSend not writable!" << endl;
-	}
+	//if (!this->isSocketWritable(socket_fd_conn)){//Reconnect socket
+	//	cout << "Host socket ICPmanagementSend not writable!" << endl;
+	//}
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=0;
@@ -693,8 +693,8 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
            }
 
         } // switch
-        if (sockKeepAlivecounter>=SOCKkeepaliveTime){sockKeepAlivecounter=0;this->SendKeepAliveHeartBeatsSockets();}
-        else{sockKeepAlivecounter++;}
+        //if (sockKeepAlivecounter>=SOCKkeepaliveTime){sockKeepAlivecounter=0;this->SendKeepAliveHeartBeatsSockets();}
+        //else{sockKeepAlivecounter++;}
         this->release(); // Release the semaphore
         //if (signalReceivedFlag.load()){this->~QTLAH();}// Destroy the instance
         //cout << "(int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)): " << (int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)) << endl;
