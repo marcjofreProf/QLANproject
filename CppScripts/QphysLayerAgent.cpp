@@ -583,7 +583,7 @@ int QPLA::RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep){
 struct timespec ts;
 ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
 ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
-clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, NULL); //
+clock_nanosleep(CLOCK_PROCESS_CPUTIME_ID, 0, &ts, NULL); //
 
 return 0; // All ok
 }
