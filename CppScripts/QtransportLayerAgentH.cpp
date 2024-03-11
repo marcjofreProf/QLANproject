@@ -537,6 +537,18 @@ else {// There might be at least one new message
 }
 
 bool QTLAH::isSocketWritable(int sock) {
+if (string(SOCKtype)=="SOCK_DGRAM"){ 
+for (int i=0; i<(NumSockets); i++){
+    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
+    	if (sock==socket_fdArray[i]){
+    		//cout << "socket_fd_conn: " << socket_fd_conn << endl;
+    		//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
+    		//cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
+    		sock=socket_SendUDPfdArray[i];
+ 	}
+ }
+ }
+    
     fd_set write_fds;
     FD_ZERO(&write_fds);
     FD_SET(sock, &write_fds);
