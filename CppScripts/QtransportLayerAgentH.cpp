@@ -25,7 +25,7 @@ Agent script for Quantum transport Layer Host
 #include <netinet/in.h>
 #include <stdlib.h>
 #define SOCKtype "SOCK_DGRAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
-#define SOCKkeepaliveTime 10000 // WaitTimeAfterMainWhileLoop
+#define SOCKkeepaliveTime 20000 // WaitTimeAfterMainWhileLoop
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
@@ -539,6 +539,8 @@ else {// There might be at least one new message
 int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 //cout << "Host SendBuffer: " << this->SendBuffer << endl;
 //cout << "Host SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
+try{
+   try {
     const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
     int BytesSent=0;
@@ -580,7 +582,16 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	  printf("File descriptor is not read-only\n");
 	}
 	*/
-    
+
+}
+    catch (const std::exception& e) {
+	// Handle the exception
+    	cout << "ICPmanagementSend Exception: " << e.what() << endl;
+    }
+    } // upper try
+  catch (...) { // Catches any exception
+  	cout << "ICPmanagementSend Exception caught" << endl;
+    }
     return 0; // All OK
 }
 

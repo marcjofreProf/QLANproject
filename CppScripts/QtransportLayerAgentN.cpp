@@ -25,7 +25,7 @@ Agent script for Quantum transport Layer Node
 #include <netinet/in.h>
 #include <stdlib.h>
 #define SOCKtype "SOCK_DGRAM" //"SOCK_STREAM": tcp; "SOCK_DGRAM": udp
-#define SOCKkeepaliveTime 10000 // WaitTimeAfterMainWhileLoop
+#define SOCKkeepaliveTime 20000 // WaitTimeAfterMainWhileLoop
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
@@ -522,8 +522,10 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 }
 
 int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
-	//cout << "Node SendBuffer: " << this->SendBuffer << endl;
-	//cout << "Node SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
+//cout << "Node SendBuffer: " << this->SendBuffer << endl;
+//cout << "Node SendBuffer IPaddressesSockets: " << IPaddressesSockets << endl;
+try{
+   try {
     const char* SendBufferAux = this->SendBuffer;
     int BytesSent=0;
     if (string(SOCKtype)=="SOCK_DGRAM"){    
@@ -550,6 +552,15 @@ int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
     if (BytesSent<0){
     	perror("send");
     	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
+    }
+    }
+    catch (const std::exception& e) {
+	// Handle the exception
+    	cout << "ICPmanagementSend Exception: " << e.what() << endl;
+    }
+    } // upper try
+  catch (...) { // Catches any exception
+  	cout << "ICPmanagementSend Exception caught" << endl;
     }
     return 0; // All OK
 }
