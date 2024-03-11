@@ -29,7 +29,7 @@ Agent script for Quantum transport Layer Host
 // InterCommunicaton Protocols - Sockets - Client
 #include <arpa/inet.h>
 // Threading
-#define WaitTimeAfterMainWhileLoop 1000000 // nanoseconds
+#define WaitTimeAfterMainWhileLoop 100000 // nanoseconds
 #include <thread>
 // Semaphore
 #include <atomic>
