@@ -963,7 +963,7 @@ this->SimulateRetrieveNumStoredQubitsNodeFlag=true;
 int isValidWhileLoopCount = 10; // Number of tries If it needs more than one trial is because the sockets are not working correctly. It is best to check for open sockets and kill the processes taking hold of them
 this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 while(isValidWhileLoopCount>0){
-	if (isValidWhileLoopCount % isValidWhileLoopCount==0){// Only try to resend the message once every 10 times
+	if (isValidWhileLoopCount % 10==0){// Only try to resend the message once every 10 times
 	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 	strcpy(ParamsCharArray,IPhostReply);
 	strcat(ParamsCharArray,",");
@@ -979,7 +979,7 @@ while(isValidWhileLoopCount>0){
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 	}
 	this->release();
-	this->RelativeNanoSleepWait((unsigned int)(500*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));//usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
+	this->RelativeNanoSleepWait((unsigned int)(1000*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));//usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
 	this->acquire();
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
 		//cout << "We received info for SimulateRetrieveNumStoredQubitsNode" << endl;
