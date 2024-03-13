@@ -822,7 +822,7 @@ this->release();
 // Param 6: std time difference between tags
 // Param 7: time value first count tags
 int NumTimetaggDetAnalytics=8;
-float TimeTaggsDetAnalytics[NumTimetaggDetAnalytics]={0.0};
+double TimeTaggsDetAnalytics[NumTimetaggDetAnalytics]={0.0};
 int SimulateNumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetSimulateNumStoredQubitsNode(TimeTaggsDetAnalytics);// to be developed for more than one link
 //cout << "Node return SimulateNumStoredQubitsNode: " << SimulateNumStoredQubitsNode << endl;
   // Generate the message
@@ -842,28 +842,28 @@ sprintf(charNum, "%d", SimulateNumStoredQubitsNode);//
 strcat(ParamsCharArray,charNum);
 // Include param analytics info
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[0]);
+sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[0]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[1]);
+sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[1]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[2]);
+sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[2]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[3]);
+sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[3]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[4]);
+sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[4]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[5]);
+sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[5]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[6]);
+sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[6]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[7]);
+sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[7]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// End Separate different Payloads with :
 strcat(ParamsCharArray,",");// Very important to end the message

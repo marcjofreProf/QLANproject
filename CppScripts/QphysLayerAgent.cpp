@@ -479,13 +479,14 @@ cout << "End Receiving Qubits" << endl;
 return 0; // return 0 is for no error
 }
 
-int QPLA::GetSimulateNumStoredQubitsNode(float* TimeTaggsDetAnalytics){
+int QPLA::GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics){
 this->acquire();
 while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Compute interesting analystics on the Timetaggs and deteciton so that not all data has to be transfered thorugh sockets
+// Compute interesting analystics on the Timetaggs and deteciton so that not all data has to be transfered through sockets
+// It has to have double precision so that statistics are useful
 // Param 0: Num detections channel 1
 // Param 1: Num detections channel 2
 // Param 2: Num detections channel 3
@@ -507,11 +508,11 @@ if ((ChannelTags[i]>>1)&0x01==1){TimeTaggsDetAnalytics[1]++;}
 if ((ChannelTags[i]>>2)&0x01==1){TimeTaggsDetAnalytics[2]++;}
 if ((ChannelTags[i]>>3)&0x01==1){TimeTaggsDetAnalytics[3]++;}
 
-if (((float)(ChannelTags[i]&0x01)+(float)((ChannelTags[i]>>1)&0x01)+(float)((ChannelTags[i]>>2)&0x01)+(float)((ChannelTags[i]>>3)&0x01))>1.0){
-TimeTaggsDetAnalytics[4]=(float)TimeTaggsDetAnalytics[4]+1.0;
+if (((ChannelTags[i]&0x01)+((ChannelTags[i]>>1)&0x01)+((ChannelTags[i]>>2)&0x01)+((ChannelTags[i]>>3)&0x01))>1){
+TimeTaggsDetAnalytics[4]=(double)TimeTaggsDetAnalytics[4]+1.0;
 }
 if (i>1){//Compute the mean value
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*((float)(TimeTaggs[i]-TimeTaggs[i-1]));
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)(TimeTaggs[i]-TimeTaggs[i-1]));
 
 //// Debugging
 //if ((TimeTaggs[i]-TimeTaggs[i-1])>100){
@@ -523,7 +524,7 @@ TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((float)SimulateNumStored
 }
 
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-if (i>0){TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*pow((float)(TimeTaggs[i]-TimeTaggs[i-1])-TimeTaggsDetAnalytics[5],2.0);}
+if (i>0){TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow((double)(TimeTaggs[i]-TimeTaggs[i-1])-TimeTaggsDetAnalytics[5],2.0);}
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 TimeTaggsDetAnalytics[7]=TimeTaggs[0];
@@ -549,14 +550,14 @@ cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference
 TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*((float)((TimeTaggs[i]-TimeTaggs[i-1])%8));
-//TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*((float)(fmod(((double)TimeTaggs[i]/(double)TimeTaggs[i-1]),8.0)-1.0));
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)((TimeTaggs[i]-TimeTaggs[i-1])%8));
+//TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)(fmod(((double)TimeTaggs[i]/(double)TimeTaggs[i-1]),8.0)-1.0));
 
 }
 
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*pow((float)((TimeTaggs[i]-TimeTaggs[i-1])%8)-TimeTaggsDetAnalytics[5],2.0);
-//TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((float)SimulateNumStoredQubitsNodeAux-1.0))*pow((float)(fmod(((double)TimeTaggs[i]/(double)TimeTaggs[i-1]),8.0)-1.0)-TimeTaggsDetAnalytics[5],2.0);
+TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow((double)((TimeTaggs[i]-TimeTaggs[i-1])%8)-TimeTaggsDetAnalytics[5],2.0);
+//TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow((double)(fmod(((double)TimeTaggs[i]/(double)TimeTaggs[i-1]),8.0)-1.0)-TimeTaggsDetAnalytics[5],2.0);
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 

@@ -88,7 +88,7 @@ public: // Functions/Methods
         // General Input and Output functions
 	int SimulateEmitQuBit();
 	int SimulateReceiveQuBit();
-	int GetSimulateNumStoredQubitsNode(float* TimeTaggsDetAnalytics);
+	int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
 	~QPLA();  //destructor
 
 private: // Functions/Methods

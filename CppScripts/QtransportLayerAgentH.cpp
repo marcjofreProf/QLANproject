@@ -786,8 +786,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 					}
 					else{
 						strcpy(SubPayload,strtok(NULL,":"));
-						this->TimeTaggsDetAnalytics[i-1]=stof(SubPayload);
-						//cout << "stof(SubPayload): " << stof(SubPayload) << endl;
+						this->TimeTaggsDetAnalytics[i-1]=stod(SubPayload);
+						//cout << "stof(SubPayload): " << stod(SubPayload) << endl;
 					}
 				}
 								
@@ -950,7 +950,7 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
     return 0; //All OK
 }
 
-int QTLAH::SimulateRetrieveNumStoredQubitsNode(char* IPhostReply,char* IPhostRequest, int* ParamsIntArray,int nIntarray,float* ParamsFloatArray,int nFloatarray){ // Send to the upper layer agent how many qubits are stored
+int QTLAH::SimulateRetrieveNumStoredQubitsNode(char* IPhostReply,char* IPhostRequest, int* ParamsIntArray,int nIntarray,double* ParamsDoubleArray,int nDoublearray){ // Send to the upper layer agent how many qubits are stored
 this->RelativeNanoSleepWait((unsigned int)((unsigned int)10000*(unsigned int)WaitTimeAfterMainWhileLoop));//usleep((int)(5000*WaitTimeAfterMainWhileLoop));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes. This can be improved by sending messages to the specific node, and this node replying that has received the detection command, then this could start
 this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
@@ -984,14 +984,14 @@ while(isValidWhileLoopCount>0){
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
 		//cout << "We received info for SimulateRetrieveNumStoredQubitsNode" << endl;
 		ParamsIntArray[0]=this->SimulateNumStoredQubitsNodeParamsIntArray[0];
-		ParamsFloatArray[0]=this->TimeTaggsDetAnalytics[0];
-		ParamsFloatArray[1]=this->TimeTaggsDetAnalytics[1];
-		ParamsFloatArray[2]=this->TimeTaggsDetAnalytics[2];
-		ParamsFloatArray[3]=this->TimeTaggsDetAnalytics[3];
-		ParamsFloatArray[4]=this->TimeTaggsDetAnalytics[4];
-		ParamsFloatArray[5]=this->TimeTaggsDetAnalytics[5];
-		ParamsFloatArray[6]=this->TimeTaggsDetAnalytics[6];
-		ParamsFloatArray[7]=this->TimeTaggsDetAnalytics[7];
+		ParamsDoubleArray[0]=this->TimeTaggsDetAnalytics[0];
+		ParamsDoubleArray[1]=this->TimeTaggsDetAnalytics[1];
+		ParamsDoubleArray[2]=this->TimeTaggsDetAnalytics[2];
+		ParamsDoubleArray[3]=this->TimeTaggsDetAnalytics[3];
+		ParamsDoubleArray[4]=this->TimeTaggsDetAnalytics[4];
+		ParamsDoubleArray[5]=this->TimeTaggsDetAnalytics[5];
+		ParamsDoubleArray[6]=this->TimeTaggsDetAnalytics[6];
+		ParamsDoubleArray[7]=this->TimeTaggsDetAnalytics[7];
 		
 		this->SimulateRetrieveNumStoredQubitsNodeFlag=false;
 		this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag

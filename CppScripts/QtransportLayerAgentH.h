@@ -66,7 +66,7 @@ private: // Variables/Objects
 	// Status
 	bool InfoSimulateNumStoredQubitsNodeFlag=false;// Flag to account that there is informaiton on number Qubits in node
 	int SimulateNumStoredQubitsNodeParamsIntArray[1]={0};// Array storing the Number Qubits stored in the node
-	float TimeTaggsDetAnalytics[8]={0.0};// Array containing the timetaggs detections analytics (proceesses by the nodes)
+	double TimeTaggsDetAnalytics[8]={0.0};// Array containing the timetaggs detections analytics (proceesses by the nodes)
 	int NumSockets=0;
 	bool SimulateRetrieveNumStoredQubitsNodeFlag=false; // Flag to only allow one process for ask to retrieve QuBits info
 
@@ -88,7 +88,7 @@ public: // Functions
 	int InitAgentProcess(); // Initializer of the thread
 	// Requests. They have to be in semaphore structure to avoid collisions between main and thread
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the upper Agent to send message to specific host/node	
-	int SimulateRetrieveNumStoredQubitsNode(char* IPhostReplyOpNet,char* IPhostRequestOpNet, int* ParamsIntArray,int nIntarray,float* ParamsFloatArray,int nFloatarray); // Send to the upper layer agent how many qubits are stored, and some statistics of the detections
+	int SimulateRetrieveNumStoredQubitsNode(char* IPhostReplyOpNet,char* IPhostRequestOpNet, int* ParamsIntArray,int nIntarray,double* ParamsDoubleArray,int nDoublearray); // Send to the upper layer agent how many qubits are stored, and some statistics of the detections
 	~QTLAH();  //destructor
 
 private: //Functions//Methods

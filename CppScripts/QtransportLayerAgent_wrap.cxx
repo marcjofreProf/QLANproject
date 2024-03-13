@@ -4206,7 +4206,7 @@ SWIGINTERN PyObject *_wrap_QTLAH_SimulateRetrieveNumStoredQubitsNode(PyObject *S
   char *arg3 = (char *) 0 ;
   int *arg4 = (int *) 0 ;
   int arg5 ;
-  float *arg6 = (float *) 0 ;
+  double *arg6 = (double *) 0 ;
   int arg7 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -4260,11 +4260,11 @@ SWIGINTERN PyObject *_wrap_QTLAH_SimulateRetrieveNumStoredQubitsNode(PyObject *S
       -1 
     };
     array6 = obj_to_array_contiguous_allow_conversion(obj4,
-      NPY_FLOAT,
+      NPY_DOUBLE,
       &is_new_object6);
     if (!array6 || !require_dimensions(array6, 1) ||
       !require_size(array6, size, 1)) SWIG_fail;
-    arg6 = (float*) array_data(array6);
+    arg6 = (double*) array_data(array6);
     arg7 = (int) array_size(array6,0);
   }
   result = (int)(arg1)->SimulateRetrieveNumStoredQubitsNode(arg2,arg3,arg4,arg5,arg6,arg7);
