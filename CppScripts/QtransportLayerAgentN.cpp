@@ -842,32 +842,32 @@ sprintf(charNum, "%d", SimulateNumStoredQubitsNode);//
 strcat(ParamsCharArray,charNum);
 // Include param analytics info
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[0]);
+sprintf(charNum, "%.15f", TimeTaggsDetAnalytics[0]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[1]);
+sprintf(charNum, "%.15f", TimeTaggsDetAnalytics[1]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[2]);
+sprintf(charNum, "%.15f", TimeTaggsDetAnalytics[2]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[3]);
+sprintf(charNum, "%.15f", TimeTaggsDetAnalytics[3]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[4]);
+sprintf(charNum, "%.15f", TimeTaggsDetAnalytics[4]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[5]);
+sprintf(charNum, "%.15f", TimeTaggsDetAnalytics[5]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[6]);
+sprintf(charNum, "%.15f", TimeTaggsDetAnalytics[6]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.15lf", TimeTaggsDetAnalytics[7]);
+sprintf(charNum, "%.15f", TimeTaggsDetAnalytics[7]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// End Separate different Payloads with :
 strcat(ParamsCharArray,",");// Very important to end the message
-//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+cout << "ParamsCharArray: " << ParamsCharArray << endl;
   // reply immediately with a message to requester
 //cout<< "Node before second acquire" << endl;
 this->acquire();	
