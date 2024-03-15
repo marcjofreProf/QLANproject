@@ -38,10 +38,9 @@
 // r5 reserved for holding the DWT_CYCCNT count value
 // r6 reserved because detected channels are concatenated with r5 in the write to SHARED RAM
 // r7 reserved for 0 value (zeroing registers)
-// r8 reserved for cycle count initial skew
-// r9 reserved for cycle count final skew
-// r10 reserved for cycle count initial threshold reset
-// r11 reserved for cycle count final threshold reset
+// r8 reserved for cycle count final skew
+// r9 reserved for cycle count final threshold reset
+
 // r16 reserved for raising edge detection operation together with r6
 
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
@@ -52,9 +51,6 @@
 // We can use Constant table pointers C26
 // CONST_IETREG 0x0002E000
 // IET Count 0xC offset
-
-// r14 is arbitrary used for operations
-// r15 is arbitrary used for operations
 
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
@@ -111,10 +107,6 @@ INITIATIONS:// This is only run once
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
 	// Initializations for faster execution
 	LDI	r7, 0 //MOV	r6, 0 // Register for clearing other registers
-	LDI	r8, 0
-	MOV	r9, 0xFFFFFFFF // For the initial skew count monitor
-	LDI	r10, 0
-	MOV	r11, 0xFFFFFFFF // For the initial threshold reset count we need to start with a high number
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -141,12 +133,12 @@ INITIATIONS:// This is only run once
 //	QBA     CHECK_CYCLECNT
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	//SUB	r10, r9, r5 // Make the difference between counters
-	LBBO	r8, r13, 0, 4 // read DWT_CYCNT
+	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
+	//LBBO	r8, r13, 0, 4 // read DWT_CYCNT
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Reset IEP counter to account for difference with DWT_CYCCNT. Account that we lose 12 cycle counts
-	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset
-	LBBO	r9, r13, 0, 4 // read DWT_CYCNT	
-	SBBO	r7, r13, 0, 4 // Update DWT_CYCNT. Account that we lose 2 cycle counts				
+	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset				
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
+	LBBO	r8, r13, 0, 4 // read DWT_CYCNT	
 
 //START1:
 //	SET r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
@@ -193,22 +185,21 @@ TIMETAG:
 	ADD 	r1, r1, 5 // increment address by 5 bytes	
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
-	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished	
-	SUB	r15, r11, r10 // Threshold reset counts
-	LBBO	r10, r13, 0, 4 // read DWT_CYCNT
+	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
+	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT	
+	//SUB	r15, r11, r10 // Threshold reset counts
+	//LBBO	r10, r13, 0, 4 // read DWT_CYCNT
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 	//// For checking control, place as the last value the current estimated skew counts and threshold reset counts
 	// Faster Concatenated Checks writting
-	SUB	r14, r9, r8 // Skew counts
-	SBCO 	r14, CONST_PRUSHAREDRAM, r1, 8 // writes values of r14 and r15
+	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 8 // writes values of r8 and r9
 	// we're done. Signal to the application
 	MOV	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF	
-	LBBO	r11, r13, 0, 4 // read DWT_CYCNT
-	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
+	LBBO	r9, r13, 0, 4 // read DWT_CYCNT	
 	//// Make sure that counters are enabled
 	//LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	//SET	r2.t3

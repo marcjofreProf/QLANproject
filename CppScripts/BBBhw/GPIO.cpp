@@ -403,7 +403,7 @@ else{
 
 // Store the last IEP counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
 // The twelve below is an estimation since there are instructions that are not accounted for
-if (this->FirstTimeDDRdumpdata){AfterCountsThreshold=6400+0;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
+if (this->FirstTimeDDRdumpdata){AfterCountsThreshold=3584+0;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
 else{AfterCountsThreshold=valThresholdResetCounts+0;};//0x00000000;//16;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust
 this->FirstTimeDDRdumpdata=false;
 if (valCycleCountPRU >= (0x80000000-AfterCountsThreshold)){this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valCycleCountPRU & 0x7FFFFFFF);}
