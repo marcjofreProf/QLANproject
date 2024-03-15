@@ -92,17 +92,18 @@ private:// Variables
 	unsigned char* valpAuxHolder;
 	unsigned char* valp; // 8 bits
 	unsigned char* valpAux; // 8 bits
-	unsigned int valCycleCountPRU; // 32 bits // Made relative to each acquition run
-	unsigned int valOverflowCycleCountPRU; // 32 bits
+	unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquition run
+	unsigned int valOverflowCycleCountPRU=0; // 32 bits
+	unsigned int valOverflowCycleCountPRUold=0; // 32 bits
 	//unsigned int valIEPtimerFinalCounts; // 32 bits
-	unsigned long long int extendedCounterPRU; // 64 bits
-	unsigned long long int extendedCounterPRUaux; // 64 bits
+	unsigned long long int extendedCounterPRU=0; // 64 bits
+	unsigned long long int extendedCounterPRUaux=0; // 64 bits
 	//unsigned char val; // 8 bits
-	unsigned char valBitsInterest; // 8 bits
-	unsigned int valSkewCounts;
-	unsigned int valThresholdResetCounts;
-	unsigned long long int auxUnskewingFactorResetCycle;
-	unsigned int AfterCountsThreshold;
+	unsigned char valBitsInterest=0; // 8 bits
+	unsigned int valSkewCounts=0;
+	unsigned int valThresholdResetCounts=0;
+	unsigned long long int auxUnskewingFactorResetCycle=0;
+	unsigned int AfterCountsThreshold=0;
 	//FILE* outfile;
 	fstream streamDDRpru;	
 	bool FirstTimeDDRdumpdata=true; // First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
