@@ -364,7 +364,7 @@ valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*
 valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts with a 1 offset
 //cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
-extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactorResetCycle) + static_cast<unsigned long long int>(this->valCarryOnCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
+extendedCounterPRUaux=0;//((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactorResetCycle) + static_cast<unsigned long long int>(this->valCarryOnCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 
 if (streamDDRpru.is_open()){
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
