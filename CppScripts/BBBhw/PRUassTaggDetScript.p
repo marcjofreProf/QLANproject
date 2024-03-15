@@ -114,7 +114,7 @@ INITIATIONS:// This is only run once
 	LDI	r8, 0
 	MOV	r9, 0xFFFFFFFF // For the initial skew count monitor
 	LDI	r10, 0
-	MOV	r11, 0xFFFFFFFF // For the initial thresdhol reset count we need to start with a high number
+	MOV	r11, 0xFFFFFFFF // For the initial threshold reset count we need to start with a high number
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -137,8 +137,8 @@ INITIATIONS:// This is only run once
 	LBCO	r5, CONST_IETREG, 0xC, 4 // Read once IEP timer count
 	//LBBO	r9, r13, 0 , 4 // Read DWT_CYCCNT	
 
-NORMSTEPS: // So that always takes the same amount of counts for reset
-	QBA     CHECK_CYCLECNT
+//NORMSTEPS: // So that always takes the same amount of counts for reset
+//	QBA     CHECK_CYCLECNT
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	//SUB	r10, r9, r5 // Make the difference between counters
 	LBBO	r8, r13, 0, 4 // read DWT_CYCNT
@@ -215,13 +215,13 @@ TIMETAG:
 	//LED_OFF
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
+	LBBO	r11, r13, 0, 4 // read DWT_CYCNT
 	//// Make sure that counters are enabled
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
 	MOV	r0, 0x11 // Enable and Define increment value to 1
 	SBCO	r0, CONST_IETREG, 0, 1 // Enables IET count	
-	LBBO	r11, r13, 0, 4 // read DWT_CYCNT
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:
