@@ -17,7 +17,7 @@ Header declaration file for Quantum physical Layer Agent
 // Payload messages
 #define NumBytesPayloadBuffer 1000
 //Qubits
-#define NumQubitsMemoryBuffer 4096//8192 // In multiples of 2048
+#define NumQubitsMemoryBuffer 8192 // In multiples of 2048
 
 #include<string>
 #include<fstream>

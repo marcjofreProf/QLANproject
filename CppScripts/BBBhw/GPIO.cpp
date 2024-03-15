@@ -349,7 +349,7 @@ valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*va
 valpAux++;// 1 times 8 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<24;
 valpAux++;// 1 times 8 bits
-//cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
+cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
 //////////////////////////////////////////////////////////////////////////////*/
 
 auxUnskewingFactorResetCycle=static_cast<unsigned long long int>(valSkewCounts); // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
@@ -364,7 +364,7 @@ valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*
 valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts with a 1 offset
 //cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
-extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactorResetCycle) + static_cast<unsigned long long int>(this->valCarryOnCycleCountPRU);// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
+extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactorResetCycle) + this->valCarryOnCycleCountPRU;// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 
 if (streamDDRpru.is_open()){
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
@@ -402,12 +402,13 @@ else{
 
 // Store the last IEP counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
 // The twelve below is an estimation since there are instructions that are not accounted for
-if (this->FirstTimeDDRdumpdata){AfterCountsThreshold=6400+16;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
-else{AfterCountsThreshold=valThresholdResetCounts+16;};//0x00000000;//16;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust
+if (this->FirstTimeDDRdumpdata){AfterCountsThreshold=6400+0;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
+else{AfterCountsThreshold=valThresholdResetCounts+0;};//0x00000000;//16;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust
 this->FirstTimeDDRdumpdata=false;
-if (valCycleCountPRU >= (0x80000000-AfterCountsThreshold)){this->valCarryOnCycleCountPRU=valCycleCountPRU & 0x7FFFFFFF;}
-else{this->valCarryOnCycleCountPRU=0;}
+if (valCycleCountPRU >= (0x80000000-AfterCountsThreshold)){this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valCycleCountPRU & 0x7FFFFFFF);}
 
+cout << "valCarryOnCycleCountPRU: " << valCarryOnCycleCountPRU << endl;
+this->valCarryOnCycleCountPRU=0;// To be deleted
 //cout << "sharedMem_int: " << sharedMem_int << endl;
 
 return 0; // all ok
