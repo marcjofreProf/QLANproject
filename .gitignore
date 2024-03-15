@@ -1,1 +1,4 @@
 ./PRUdata/TimetaggingData
+./PRUdata/ClientRawStoredQubitsNode
+./PRUdata/ServerRawStoredQubitsNode
+./PRUdata/DealerRawStoredQubitsNode
