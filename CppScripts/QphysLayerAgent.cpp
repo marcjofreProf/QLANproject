@@ -550,14 +550,11 @@ cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference
 TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)((TimeTaggs[i]-TimeTaggs[i-1])%8));
-//TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)(fmod(((double)TimeTaggs[i]/(double)TimeTaggs[i-1]),8.0)-1.0));
-
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)((4+TimeTaggs[i]-TimeTaggs[i-1])%8-4));
 }
 
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow((double)((TimeTaggs[i]-TimeTaggs[i-1])%8)-TimeTaggsDetAnalytics[5],2.0);
-//TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow((double)(fmod(((double)TimeTaggs[i]/(double)TimeTaggs[i-1]),8.0)-1.0)-TimeTaggsDetAnalytics[5],2.0);
+TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow((double)((4+TimeTaggs[i]-TimeTaggs[i-1])%8-4)-TimeTaggsDetAnalytics[5],2.0);
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
