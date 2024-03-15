@@ -339,8 +339,8 @@ valpAux++;// 1 times 8 bits
 valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<16;
 valpAux++;// 1 times 8 bits
 valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<24;
-//cout << "valSkewCounts: " << valSkewCounts << endl;
-valSkewCounts=valSkewCounts+0;//7; // The 7 here is an estimation of the instruction sthat are not accounted for. SBC0 is 6 counts
+cout << "valSkewCounts: " << valSkewCounts << endl;
+valSkewCounts=0*valSkewCounts+0;//7; // The 7 here is an estimation of the instruction sthat are not accounted for. SBC0 is 6 counts
 valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
 valpAux++;// 1 times 8 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<8;
@@ -363,7 +363,7 @@ valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
 valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts with a 1 offset
-//cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
+cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + (static_cast<unsigned long long int>(valOverflowCycleCountPRU)*auxUnskewingFactorResetCycle) + this->valCarryOnCycleCountPRU;// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 
 if (streamDDRpru.is_open()){
@@ -408,7 +408,7 @@ this->FirstTimeDDRdumpdata=false;
 if (valCycleCountPRU >= (0x80000000-AfterCountsThreshold)){this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valCycleCountPRU & 0x7FFFFFFF);}
 
 cout << "valCarryOnCycleCountPRU: " << valCarryOnCycleCountPRU << endl;
-this->valCarryOnCycleCountPRU=0;// To be deleted
+
 //cout << "sharedMem_int: " << sharedMem_int << endl;
 
 return 0; // all ok
