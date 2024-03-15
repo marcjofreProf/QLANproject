@@ -1,6 +1,6 @@
 # It needs installed in the host computer: sudo apt install openssh-server
 # ./BashFilesTransferServerNodeToHost.sh arg1
 # arg1: to specify if NTP or PTP or others
-sudo scp /home/debian/Scripts/QLANproject/PRUdata/TimetaggingData marcjofre@10.0.0.1:/home/marcjofre/Scripts/QLANproject/PRUdata/ServerRawStoredQubitsNode+$1
+sudo scp /home/debian/Scripts/QLANproject/PRUdata/TimetaggingData marcjofre@10.0.0.1:/home/marcjofre/Scripts/QLANproject/PRUdata/ServerRawStoredQubitsNode$1
 echo 'Sent files from server node to host'
 

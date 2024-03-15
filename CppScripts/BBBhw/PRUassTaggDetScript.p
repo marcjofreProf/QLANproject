@@ -197,31 +197,24 @@ TIMETAG:
 	SUB	r15, r11, r10 // Threshold reset counts
 	LBBO	r10, r13, 0, 4 // read DWT_CYCNT
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-	//// For checking control, place as the last value the current counter of DWT_CYCCNT as well as the last IEP timer count - DWT_CYCCNT comparison
-	//LBBO	r9, r13, 0 , 4 // Read DWT_CYCCNT
-	//SBCO 	r9, CONST_PRUSHAREDRAM, r1, 4
-	//ADD 	r1, r1, 4 // increment address by 4 bytes
-	//SBCO 	r10, CONST_PRUSHAREDRAM, r1, 4
-	//ADD 	r1, r1, 4 // increment address by 4 bytes
+	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
+	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 	//// For checking control, place as the last value the current estimated skew counts and threshold reset counts
+	// Faster Concatenated Checks writting
 	SUB	r14, r9, r8 // Skew counts
-	SBCO 	r14, CONST_PRUSHAREDRAM, r1, 4
-	ADD 	r1, r1, 4 // increment address by 4 bytes	
-	SBCO 	r15, CONST_PRUSHAREDRAM, r1, 4
-	ADD 	r1, r1, 4 // increment address by 4 bytes
+	SBCO 	r14, CONST_PRUSHAREDRAM, r1, 8 // writes values of r14 and r15
 	// we're done. Signal to the application
 	MOV	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
-	//LED_OFF
-	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
-	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
+	//LED_OFF	
 	LBBO	r11, r13, 0, 4 // read DWT_CYCNT
+	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	//// Make sure that counters are enabled
-	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
-	SET	r2.t3
-	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
-	MOV	r0, 0x11 // Enable and Define increment value to 1
-	SBCO	r0, CONST_IETREG, 0, 1 // Enables IET count	
+	//LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+	//SET	r2.t3
+	//SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
+	//MOV	r0, 0x11 // Enable and Define increment value to 1
+	//SBCO	r0, CONST_IETREG, 0, 1 // Enables IET count	
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:
