@@ -187,6 +187,7 @@ TIMETAG:
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT	
+	LBBO	r9, r13, 0, 4 // To be removed!!!!!!
 	//SUB	r15, r11, r10 // Threshold reset counts
 	//LBBO	r10, r13, 0, 4 // read DWT_CYCNT
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
