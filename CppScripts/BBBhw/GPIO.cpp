@@ -352,8 +352,6 @@ valpAux++;// 1 times 8 bits
 //cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
 //////////////////////////////////////////////////////////////////////////////*/
 
-auxUnskewingFactorResetCycle=auxUnskewingFactorResetCycle+static_cast<unsigned long long int>(valOverflowCycleCountPRU-valOverflowCycleCountPRUold)*static_cast<unsigned long long int>(valSkewCounts); // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
-valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 // First 32 bits is the overflow register for DWT_CYCCNT
 valOverflowCycleCountPRU=static_cast<unsigned int>(*valp);
 valp++;// 1 times 8 bits
@@ -365,6 +363,8 @@ valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*
 valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts with a 1 offset
 //cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
+auxUnskewingFactorResetCycle=auxUnskewingFactorResetCycle+static_cast<unsigned long long int>(valOverflowCycleCountPRU-valOverflowCycleCountPRUold)*static_cast<unsigned long long int>(valSkewCounts); // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
+valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU;// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 
 if (streamDDRpru.is_open()){
@@ -406,7 +406,7 @@ else{
 if (this->FirstTimeDDRdumpdata){this->AfterCountsThreshold=3584+0;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
 else{this->AfterCountsThreshold=this->valThresholdResetCounts+0;};//0x00000000;//16;// Related to the number of instruciton counts after the last read of the IEP timer. It is a parameter to adjust
 this->FirstTimeDDRdumpdata=false;
-if (valCycleCountPRU >= (0x80000000-this->AfterCountsThreshold)){
+if (valCycleCountPRU >= (0x80000000-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
 this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0x7FFFFFFF);//static_cast<unsigned long long int>(valCycleCountPRU & 0x7FFFFFFF);
 }
 
