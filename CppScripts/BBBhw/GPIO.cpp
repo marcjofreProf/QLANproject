@@ -339,6 +339,7 @@ valpAux++;// 1 times 8 bits
 valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<16;
 valpAux++;// 1 times 8 bits
 valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<24;
+valpAux++;// 1 times 8 bits
 cout << "valSkewCounts: " << valSkewCounts << endl;
 
 valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
@@ -363,6 +364,7 @@ valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*
 valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts with a 1 offset
 cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
+
 auxUnskewingFactorResetCycle=auxUnskewingFactorResetCycle+static_cast<unsigned long long int>(valOverflowCycleCountPRU-valOverflowCycleCountPRUold)*static_cast<unsigned long long int>(valSkewCounts); // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
 valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU;// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)

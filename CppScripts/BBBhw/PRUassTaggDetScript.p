@@ -109,9 +109,9 @@ INITIATIONS:// This is only run once
 	LDI	r7, 0 //MOV	r6, 0 // Register for clearing other registers
 	
 	// Initial Re-initialization of DWT_CYCCNT
-	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
-	CLR	r2.t3
-	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
+	//LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+	//CLR	r2.t3
+	//SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
@@ -122,10 +122,10 @@ INITIATIONS:// This is only run once
 	SBCO	r0, CONST_IETREG, 0, 1 // Enables IET count
 	
 	// Keep close together the clearing of the counters (keep order)
-	SBCO	r7, CONST_IETREG, 0xC, 4 // Clear IEP timer count
-	SBBO	r7, r13, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts		
+	SBBO	r7, r13, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SBCO	r7, CONST_IETREG, 0xC, 4 // Clear IEP timer count			
 	
-	// REad once the counters (keep the reading order along the script)
+	// Read once the counters (keep the reading order along the script)
 	LBCO	r5, CONST_IETREG, 0xC, 4 // Read once IEP timer count
 	//LBBO	r9, r13, 0 , 4 // Read DWT_CYCCNT	
 
@@ -186,8 +186,7 @@ TIMETAG:
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
-	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT	
-	LBBO	r9, r13, 0, 4 // To be removed!!!!!!
+	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	//SUB	r15, r11, r10 // Threshold reset counts
 	//LBBO	r10, r13, 0, 4 // read DWT_CYCNT
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
