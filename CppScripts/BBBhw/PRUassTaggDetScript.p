@@ -109,9 +109,9 @@ INITIATIONS:// This is only run once
 	LDI	r7, 0 //MOV	r6, 0 // Register for clearing other registers
 	
 	// Initial Re-initialization of DWT_CYCCNT
-	//LBBO	r2, r12, 0, 1 // r2 maps b0 control register
-	//CLR	r2.t3
-	//SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
+	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+	CLR	r2.t3
+	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
