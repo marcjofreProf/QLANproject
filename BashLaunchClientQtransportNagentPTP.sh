@@ -4,7 +4,7 @@ sudo /etc/init.d/rsyslog stop # stop logging
 sudo systemctl start systemd-timesyncd # start system synch
 sudo timedatectl set-ntp false
 sudo ./linuxptp/ptp4l -i eth0 -f PTP4lConfigQLANprojectSlave.cfg &
-sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP2pcConfigQLANprojectSlave.cfg &
+sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w & #-f PTP2pcConfigQLANprojectSlave.cfg &
 echo 'Enabling BBB pins'
 sudo config-pin P9_28 pruin
 sudo config-pin P9_29 pruin
