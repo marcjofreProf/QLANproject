@@ -17,7 +17,7 @@ Header declaration file for Quantum physical Layer Agent
 // Payload messages
 #define NumBytesPayloadBuffer 1000
 //Qubits
-#define NumQubitsMemoryBuffer 4096//8192//4096 // In multiples of 2048
+#define NumQubitsMemoryBuffer 8192//4096 // In multiples of 2048. Equivalent to MTU (Maximum Transmission Unit) - should be in link layer - could be named Quantum MTU
 
 #include<string>
 #include<fstream>
