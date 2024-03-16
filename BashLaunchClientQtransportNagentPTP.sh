@@ -3,7 +3,7 @@ echo 'Running PTP'
 sudo /etc/init.d/rsyslog stop # stop logging
 sudo systemctl start systemd-timesyncd # start system synch
 sudo timedatectl set-ntp false
-sudo ./linuxptp/ptp4l -i eth0 -f PTPconfigQLANproject.cfg &
+sudo ./linuxptp/ptp4l -i eth0 -f PTPconfigQLANprojectSlave.cfg &
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w &
 echo 'Enabling BBB pins'
 sudo config-pin P9_28 pruin
