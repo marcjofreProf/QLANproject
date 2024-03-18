@@ -123,6 +123,9 @@ INITIATIONS:// This is only run once
 	//SET 	r0, 17
 	//SBCO 	r0, CONST_PRUCFG, 0x10, 4 
 	//LBCO	r2, CONST_IETREG, 0, 1 //
+	//SET ocp_clk instead of iep_clk
+	MOV	r0, 1
+	SBCO 	r0, CONST_PRUCFG, 0x30, 4
 	// IEP configuration
 	MOV	r0, 0x111 // Enable and Define increment value to 1
 	SBCO	r0, CONST_IETREG, 0, 4 // Enables IET count and sets configuration
