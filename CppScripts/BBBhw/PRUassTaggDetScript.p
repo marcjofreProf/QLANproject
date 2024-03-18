@@ -127,7 +127,7 @@ INITIATIONS:// This is only run once
 	MOV	r0, 0
 	SBCO 	r0, CONST_PRUCFG, 0x30, 4
 	// IEP configuration
-	MOV	r0, 0x111 // Enable and Define increment value to 1
+	MOV	r0, 0x551//0x111 // Enable and Define increment value to 1
 	SBCO	r0, CONST_IETREG, 0, 4 // Enables IET count and sets configuration
 	// Deactivate IEP compensation
 	SBCO 	r7, CONST_IETREG, 0x08, 4
