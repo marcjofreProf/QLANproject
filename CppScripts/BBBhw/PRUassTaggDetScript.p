@@ -40,6 +40,7 @@
 // r7 reserved for 0 value (zeroing registers)
 // r8 reserved for cycle count final skew
 // r9 reserved for cycle count final threshold reset
+// r10 reserved for 0xFFFFFFFF
 
 // r16 reserved for raising edge detection operation together with r6
 
@@ -68,10 +69,9 @@ INITIATIONS:// This is only run once
 	//MOV	r10, 0x22000+0x20// | C24add//CONST_PRUDRAM
 	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
-	// This will make C26 point to 0x0002E000 (IET).
-	MOV	r0, 0x0002E000// | OWN_RAMoffset // When using assembler, the PRU does not put data in the first addresses of OWN_RAM (when using c++ PRU direct programming the PRU  might use some initial addresses of OWN_RAM space
-	//MOV	r10, 0x22000+0x20// | C24add//CONST_PRUDRAM
-	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of PRU0 Data RAM into C24
+	// This will make C26 point to 0x0002E000 (IEP).
+	MOV	r0, 0x0002E000//
+	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of IEP
 
 	// Configure the programmable pointer register for PRU by setting c28_pointer[15:0] // related to shared RAM
 	// This will make C28 point to 0x00010000 (PRU shared RAM).
@@ -107,6 +107,7 @@ INITIATIONS:// This is only run once
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
 	// Initializations for faster execution
 	LDI	r7, 0 //MOV	r6, 0 // Register for clearing other registers
+	MOV	r10, 0xFFFFFFFF
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -117,16 +118,23 @@ INITIATIONS:// This is only run once
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
 		
 	// Initial Re-initialization for IET counter
+	// The Clock gating Register controls the state of Clock Management
+	//LBCO 	r0, CONST_PRUCFG, 0x10, 4                    
+	//SET 	r0, 17
+	//SBCO 	r0, CONST_PRUCFG, 0x10, 4 
 	//LBCO	r2, CONST_IETREG, 0, 1 //
-	MOV	r0, 0x11 // Enable and Define increment value to 1
-	SBCO	r0, CONST_IETREG, 0, 1 // Enables IET count
+	// IEP configuration
+	MOV	r0, 0x111 // Enable and Define increment value to 1
+	SBCO	r0, CONST_IETREG, 0, 4 // Enables IET count and sets configuration
+	// Deactivate IEP compensation
+	SBCO 	r7, CONST_IETREG, 0x08, 4
 	
 	// Keep close together the clearing of the counters (keep order)
 	SBBO	r7, r13, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
-	SBCO	r7, CONST_IETREG, 0xC, 4 // Clear IEP timer count			
+	SBCO	r10, CONST_IETREG, 0xC, 4 // Clear IEP timer count			
 	
 	// Read once the counters (keep the reading order along the script)
-	LBCO	r5, CONST_IETREG, 0xC, 4 // Read once IEP timer count
+	//LBCO	r5, CONST_IETREG, 0xC, 4 // Read once IEP timer count
 	//LBBO	r9, r13, 0 , 4 // Read DWT_CYCCNT	
 
 //NORMSTEPS: // So that always takes the same amount of counts for reset
@@ -135,7 +143,7 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 	//SUB	r10, r9, r5 // Make the difference between counters
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	//LBBO	r8, r13, 0, 4 // read DWT_CYCNT
-	SBCO	r7, CONST_IETREG, 0xC, 4 // Reset IEP counter to account for difference with DWT_CYCCNT. Account that we lose 12 cycle counts
+	SBCO	r10, CONST_IETREG, 0xC, 4 // Reset IEP counter to 0xFFFFFFFF. Account that we lose 12 cycle counts
 	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset				
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 	LBBO	r8, r13, 0, 4 // read DWT_CYCNT	
