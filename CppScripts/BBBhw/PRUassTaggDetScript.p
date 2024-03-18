@@ -120,7 +120,7 @@ INITIATIONS:// This is only run once
 	// Initial Re-initialization for IET counter
 	// The Clock gating Register controls the state of Clock Management
 	//LBCO 	r0, CONST_PRUCFG, 0x10, 4                    
-	SET 	r0, 0x24924
+	MOV 	r0, 0x24924
 	SBCO 	r0, CONST_PRUCFG, 0x10, 4 
 	//LBCO	r2, CONST_IETREG, 0, 1 //
 	//SET ocp_clk:1 or of iep_clk:0
