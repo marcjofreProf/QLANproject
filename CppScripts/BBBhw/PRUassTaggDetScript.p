@@ -179,8 +179,8 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Edge detection
 	MOV 	r16.b0, r31.b0 // This wants to be zeros for edge detection
 	MOV	r6.b0, r31.b0 // Consecutive red for edge detection
-	//NOT	r16.b0, r16.b0 // 0s converted to 1s
-	//AND	r6.b0, r6.b0, r16.b0 // Only does complying with a rising edge
+	NOT	r16.b0, r16.b0 // 0s converted to 1s
+	AND	r6.b0, r6.b0, r16.b0 // Only does complying with a rising edge
 	// Mask the relevant bits you're interested in	
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
 	//AND 	r6.b0, r6.b0, MASKevents // Interested specifically to the bits with MASKevents. MAybe there are never counts in this first 8 bits if there is not explicitly a signal.
