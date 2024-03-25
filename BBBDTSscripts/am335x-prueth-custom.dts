@@ -140,7 +140,7 @@
 	 
        >;  
       };
-      
+      /*
       pruss_mdio_default: pruss_mdio_default {
 		pinctrl-single,pins = <
 			0x88c 0x0D //AM33XX_IOPAD(0x88c, (PIN_OUTPUT | MUX_MODE5))		gpmc_clk.pr1_mdio_mdclk
@@ -187,7 +187,17 @@
 			0x8ec 0x2D //AM33XX_IOPAD(0x8ec, (PIN_INPUT  | MUX_MODE2))	lcd_ac_bias_en.pr1_mii1_crs
 			0x870 0x2D //AM33XX_IOPAD(0x870, (PIN_INPUT  | MUX_MODE5))	gpmc_wait0.pr1_mii1_col
 		>;
-	}; 
+	};
+	*/
+
+	cpsw_default_pins: pinmux_cpsw_default_pins {
+		pinctrl-single,pins = <
+		    AM33XX_IOPAD(0x918, PIN_INPUT_PULLUP | MUX_MODE0) /* mdio_data */
+		    AM33XX_IOPAD(0x91c, PIN_INPUT_PULLUP | MUX_MODE0) /* mdio_clk */
+		    AM33XX_IOPAD(0x908, PIN_INPUT_PULLUP | MUX_MODE2) /* mii1_txd3 */
+		    /* Additional pins for RXD, TXD, RX_ER, TX_EN as needed */
+		>;
+	    };
     };  
    }; 
      
@@ -199,7 +209,37 @@
       pinctrl-names = "default";  
       pinctrl-0 = <&example_pins>;  
     };  
-   }; 
+   };
+   
+   &cpsw_emac0 {
+	phy_id = <&davinci_mdio>, <0>;
+	phy-mode = "mii";
+};
+
+&cpsw_emac1 {
+	phy_id = <&davinci_mdio>, <1>;
+	phy-mode = "mii";
+};
+
+&mac {
+	pinctrl-names = "default";
+	pinctrl-0 = <&cpsw_default>;
+	status = "okay";
+};
+
+&davinci_mdio {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&davinci_mdio_default>;
+
+	ethphy0: ethernet-phy@0 {
+		reg = <0>;
+	};
+
+	ethphy1: ethernet-phy@1 {
+		reg = <1>;
+	};
+};
+   
    /*
    fragment@2 {
    target = <&ocp>;
