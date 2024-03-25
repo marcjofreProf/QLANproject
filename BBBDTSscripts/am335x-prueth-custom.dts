@@ -200,7 +200,7 @@
       pinctrl-0 = <&example_pins>;  
     };  
    }; 
-   
+   /*
    fragment@2 {
    target = <&ocp>;
         __overlay__ {
@@ -238,7 +238,7 @@
 	pruss_eth1_phy: ethernet-phy@3 {
 		 reg = <3>;
 	 };   
+   };   
    };
-   
-   };
+   */
 };  
