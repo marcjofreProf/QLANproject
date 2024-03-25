@@ -218,7 +218,7 @@
 		line-name = "MUX_MII_CTL1";
 	};
 };
-
+*/
 &pruss_mdio {
 	pinctrl-0 = <&pruss_mdio_default>;
 	pinctrl-names = "default";
@@ -234,4 +234,4 @@
 		 reg = <3>;
 	 };
 };
-*/
+
