@@ -137,22 +137,22 @@
          0x0A0 0x0D	 // Mode 5 output non-pull
 	 0x0A4 0x0D	 // Mode 5 output non-pull
 	 
-      // >;  
-      //};
-      //
-      //pruss_mdio_default: pruss_mdio_default {
-	//	pinctrl-single,pins = <
+       >;  
+      };
+      
+      pruss_mdio_default: pruss_mdio_default {
+		pinctrl-single,pins = <
 			0x88c 0x0D //AM33XX_IOPAD(0x88c, (PIN_OUTPUT | MUX_MODE5))		gpmc_clk.pr1_mdio_mdclk
 			0x888 0x2D //AM33XX_IOPAD(0x888, (PIN_INPUT  | MUX_MODE5))		gpmc_csn3.pr1_mdio_data
 			0x89c 0x37 //AM33XX_IOPAD(0x89c, (PIN_INPUT_PULLUP | MUX_MODE7))	gpmc_ben0_cle.gpio2_5
-			/* disable CPSW MDIO */
+			// disable CPSW MDIO
 			0x948 0x37 //AM33XX_IOPAD(0x948, (PIN_INPUT_PULLUP | MUX_MODE7))	mdio_data.gpio0_0
 			0x94c 0x37 //AM33XX_IOPAD(0x94c, (PIN_INPUT_PULLUP | MUX_MODE7))	mdio_clk.gpio0_1
-	//	>;
-	//};
+		>;
+	};
 
-	//pruss_eth_default: pruss_eth_default {
-	//	pinctrl-single,pins = <
+	pruss_eth_default: pruss_eth_default {
+		pinctrl-single,pins = <
 			0x8a0 0x2A //AM33XX_IOPAD(0x8a0, (PIN_INPUT  | MUX_MODE2))	dss_data0.pr1_mii_mt0_clk
 			0x8b4 0x0A //AM33XX_IOPAD(0x8b4, (PIN_OUTPUT | MUX_MODE2))	dss_data5.pr1_mii0_txd0
 			0x8b0 0x0A //AM33XX_IOPAD(0x8b0, (PIN_OUTPUT | MUX_MODE2))	dss_data4.pr1_mii0_txd1
@@ -200,7 +200,7 @@
     };  
    }; 
 };  
-
+/*
 &gpio3 {
 	p4 {
 		gpio-hog;
@@ -233,4 +233,4 @@
 		 reg = <3>;
 	 };
 };
-
+*/
