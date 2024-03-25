@@ -189,7 +189,7 @@
     };  
    }; 
      
-   // This enables the PRU and assigns the GPIO pins to it for use in EGP mode.  
+  /* // This enables the PRU and assigns the GPIO pins to it for use in EGP mode.  
    fragment@1 {  
     target = <&pruss>;  
     __overlay__ {  
@@ -197,7 +197,7 @@
       pinctrl-names = "default";  
       pinctrl-0 = <&example_pins>;  
     };  
-   }; 
+   }; */
 };  
 
 &gpio3 {
