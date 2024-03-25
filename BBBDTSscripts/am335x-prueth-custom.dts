@@ -200,10 +200,12 @@
       pinctrl-0 = <&example_pins>;  
     };  
    }; 
-};  
-/*
-&gpio3 {
-	p4 {
+   
+   fragment@2 {
+   target = <&ocp>;
+        __overlay__ {
+     
+     p4 {
 		gpio-hog;
 		gpios = <4 0>;
 		output-high;
@@ -217,10 +219,13 @@
 		output-low;
 		line-name = "MUX_MII_CTL1";
 	};
-};
-*/
-&pruss_mdio {
-	pinctrl-0 = <&pruss_mdio_default>;
+    };   
+   };
+   
+   fragment@3 {
+   target = <&pruss_mdio>;
+        __overlay__ {
+        pinctrl-0 = <&pruss_mdio_default>;
 	pinctrl-names = "default";
 	reset-gpios = <&gpio2 5 1>;
 	reset-delay-us = <2>; // PHY datasheet states 1uS min
@@ -232,6 +237,8 @@
 
 	pruss_eth1_phy: ethernet-phy@3 {
 		 reg = <3>;
-	 };
-};
-
+	 };   
+   };
+   
+   };
+};  
