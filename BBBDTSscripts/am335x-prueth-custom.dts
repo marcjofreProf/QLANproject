@@ -78,7 +78,7 @@
 		};
 	};
 	
-	/*am33xx_pinmux: pinmux@44e10800 {
+	am33xx_pinmux: pinmux@44e10800 {
 		compatible = "pinctrl-single";
 		reg = <0x44e10800 0x0238>;
 		#address-cells = <1>;
@@ -96,7 +96,7 @@
 			#interrupt-cells = <1>;
 			reg = <0x481ac000 0x1000>;
 			interrupts = <32>;
-		};*/
+		};
   
  fragment@0 {  
     target = <&am33xx_pinmux>;  
@@ -201,7 +201,7 @@
 		>;
 	};
 };
-/*
+
 &gpio3 {
 	p4 {
 		gpio-hog;
@@ -213,17 +213,17 @@
 	p10 {
 		gpio-hog;
 		gpios = <10 GPIO_ACTIVE_HIGH>;
-		/* ETH1 mux: Low for MII-PRU, high for RMII-CPSW */
+		// ETH1 mux: Low for MII-PRU, high for RMII-CPSW
 		output-low;
 		line-name = "MUX_MII_CTL1";
 	};
 };
-*/
+
 &pruss_mdio {
 	pinctrl-0 = <&pruss_mdio_default>;
 	pinctrl-names = "default";
 	reset-gpios = <&gpio2 5 GPIO_ACTIVE_LOW>;
-	reset-delay-us = <2>; /* PHY datasheet states 1uS min */
+	reset-delay-us = <2>; // PHY datasheet states 1uS min
 	status = "okay";
 
 	pruss_eth0_phy: ethernet-phy@1 {
