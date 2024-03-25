@@ -205,14 +205,14 @@
 &gpio3 {
 	p4 {
 		gpio-hog;
-		gpios = <4 GPIO_ACTIVE_HIGH>;
+		gpios = <4 1>;
 		output-high;
 		line-name = "PR1_MII_CTRL";
 	};
 
 	p10 {
 		gpio-hog;
-		gpios = <10 GPIO_ACTIVE_HIGH>;
+		gpios = <10 1>;
 		// ETH1 mux: Low for MII-PRU, high for RMII-CPSW
 		output-low;
 		line-name = "MUX_MII_CTL1";
