@@ -137,23 +137,9 @@
          0x0A0 0x0D	 // Mode 5 output non-pull
 	 0x0A4 0x0D	 // Mode 5 output non-pull
        >;  
-      };  
-    };  
-   }; 
-     
-   // This enables the PRU and assigns the GPIO pins to it for use in EGP mode.  
-   fragment@1 {  
-    target = <&pruss>;  
-    __overlay__ {  
-      status = "okay";  
-      pinctrl-names = "default";  
-      pinctrl-0 = <&example_pins>;  
-    };  
-   }; 
-};  
-
-&am33xx_pinmux {
-	pruss_mdio_default: pruss_mdio_default {
+      };
+      
+      pruss_mdio_default: pruss_mdio_default {
 		pinctrl-single,pins = <
 			0x88c 0x0D //AM33XX_IOPAD(0x88c, (PIN_OUTPUT | MUX_MODE5))		gpmc_clk.pr1_mdio_mdclk
 			0x888 0x2D //AM33XX_IOPAD(0x888, (PIN_INPUT  | MUX_MODE5))		/* gpmc_csn3.pr1_mdio_data */
@@ -199,8 +185,20 @@
 			0x8ec 0x2D //AM33XX_IOPAD(0x8ec, (PIN_INPUT  | MUX_MODE2))	/* lcd_ac_bias_en.pr1_mii1_crs */
 			0x870 0x2D //AM33XX_IOPAD(0x870, (PIN_INPUT  | MUX_MODE5))	/* gpmc_wait0.pr1_mii1_col */
 		>;
-	};
-};
+	}; 
+    };  
+   }; 
+     
+   // This enables the PRU and assigns the GPIO pins to it for use in EGP mode.  
+   fragment@1 {  
+    target = <&pruss>;  
+    __overlay__ {  
+      status = "okay";  
+      pinctrl-names = "default";  
+      pinctrl-0 = <&example_pins>;  
+    };  
+   }; 
+};  
 
 &gpio3 {
 	p4 {
