@@ -96,18 +96,7 @@
 			#interrupt-cells = <1>;
 			reg = <0x481ac000 0x1000>;
 			interrupts = <32>;
-		};
-
-	gpio4: gpio@481ae000 {
-		compatible = "ti,omap4-gpio";
-		ti,hwmods = "gpio4";
-		gpio-controller;
-		#gpio-cells = <2>;
-		interrupt-controller;
-		#interrupt-cells = <1>;
-		reg = <0x481ae000 0x1000>;
-		interrupts = <62>;
-	};*/
+		};*/
   
  fragment@0 {  
     target = <&am33xx_pinmux>;  
@@ -212,7 +201,7 @@
 		>;
 	};
 };
-
+/*
 &gpio3 {
 	p4 {
 		gpio-hog;
@@ -229,7 +218,7 @@
 		line-name = "MUX_MII_CTL1";
 	};
 };
-
+*/
 &pruss_mdio {
 	pinctrl-0 = <&pruss_mdio_default>;
 	pinctrl-names = "default";
