@@ -48,56 +48,47 @@
 		ethernet1 = &pruss_emac1;
 	};
 
-	/* Dual mac ethernet application node on icss */
+	// Dual mac ethernet application node on icss
 	pruss_eth {
-		//compatible = "ti,am3359-prueth";
-		prus = <&pru0>, <&pru1>;
-		firmware-name = "ti-pruss/am335x-pru0-prueth-fw.elf",
-				"ti-pruss/am335x-pru1-prueth-fw.elf";
-		sram = <&ocmcram>;
-		interrupt-parent = <&pruss_intc>;
-		pinctrl-0 = <&pruss_eth_default>;
-		pinctrl-names = "default";
+                compatible = "ti,am3359-prueth";
+                pruss = <&pruss>;
+                sram = <&ocmcram_nocache>;
+                interrupt-parent = <&pruss_intc>;
 
-		pruss_emac0: ethernet-mii0 {
-			phy-handle = <&pruss_eth0_phy>;
-			phy-mode = "mii";
-			interrupts = <20>, <22>;
-			interrupt-names = "rx", "tx";
-			// Filled in by bootloader
-			local-mac-address = [00 00 00 00 00 00];
-		};
+                pinctrl-0 = <&pruss_eth_default>;
+                pinctrl-names = "default";
 
-		pruss_emac1: ethernet-mii1 {
-			phy-handle = <&pruss_eth1_phy>;
-			phy-mode = "mii";
-			interrupts = <21>, <23>;
-			interrupt-names = "rx", "tx";
-			/// Filled in by bootloader
-			local-mac-address = [00 00 00 00 00 00];
-		};
-	};
-	/*
-	am33xx_pinmux: pinmux@44e10800 {
-		compatible = "pinctrl-single";
-		reg = <0x44e10800 0x0238>;
-		#address-cells = <1>;
-		#size-cells = <0>;
-		pinctrl-single,register-width = <32>;
-		pinctrl-single,function-mask = <0x7f>;
-	};
-	
-	gpio3: gpio@481ac000 {
-			compatible = "ti,omap4-gpio";
-			ti,hwmods = "gpio3";
-			gpio-controller;
-			#gpio-cells = <2>;
-			interrupt-controller;
-			#interrupt-cells = <1>;
-			reg = <0x481ac000 0x1000>;
-			interrupts = <32>;
-		};
-	*/
+                pruss_emac0: ethernet-mii0 {
+                        phy-handle = <&pruss_eth0_phy>;
+                        phy-mode = "mii";
+                        interrupts = <20>, <22>;
+                        interrupt-names = "rx", "tx";
+                        /* Filled in by bootloader */
+                        local-mac-address = [00 00 00 00 00 00];
+                };
+
+                pruss_emac1: ethernet-mii1 {
+                        phy-handle = <&pruss_eth1_phy>;
+                        phy-mode = "mii";
+                        interrupts = <21>, <23>;
+                        interrupt-names = "rx", "tx";
+                        /* Filled in by bootloader */
+                        local-mac-address = [00 00 00 00 00 00];
+                };
+        };
+        /*
+        gpio2 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&gpio2_pins>;
+        status = "okay";
+        ti,no-reset-on-init;
+
+        p12 {
+                gpios = <12 0>; // I had to define this here, see PHY-reset issue
+                output-high;
+                line-name = "RST_PRUPHY#";
+        };
+	};*/
   
  fragment@0 {  
     target = <&am33xx_pinmux>;  
@@ -140,7 +131,8 @@
 	 
        >;  
       };
-      /*
+      // https://groups.google.com/g/beagleboard/c/hsehbCc8AVk
+      
       pruss_mdio_default: pruss_mdio_default {
 		pinctrl-single,pins = <
 			0x88c 0x0D //AM33XX_IOPAD(0x88c, (PIN_OUTPUT | MUX_MODE5))		gpmc_clk.pr1_mdio_mdclk
@@ -188,7 +180,7 @@
 			0x870 0x2D //AM33XX_IOPAD(0x870, (PIN_INPUT  | MUX_MODE5))	gpmc_wait0.pr1_mii1_col
 		>;
 	};
-	*/
+	
 /*
 	cpsw_default_pins: pinmux_cpsw_default_pins {
 		pinctrl-single,pins = <
@@ -199,34 +191,45 @@
 		>;
 	    };
 */
-		cpsw_emac0 {
-			phy_id = <&davinci_mdio>, <0>;
-			phy-mode = "mii";
-		};
+	
+	pruss_mdio {
+        pinctrl-0 = <&pruss_mdio_default>;
+        pinctrl-names = "default";
+        //reset-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;    // I had to disable this here, see PHY-reset issue
+        //reset-delay-us = <2>; // PHY datasheet states 1uS min
+        status = "okay";
+	/*
+        pruss_eth0_phy: ethernet-phy@0 {
+                reg = <0>;
+         };
 
-		cpsw_emac1 {
-			phy_id = <&davinci_mdio>, <1>;
-			phy-mode = "mii";
-		};
+        pruss_eth1_phy: ethernet-phy@1 {
+                reg = <1>;
+         };*/
+	};
 
-		mac {
-			pinctrl-names = "default";
-			pinctrl-0 = <&cpsw_default>;
-			status = "okay";
-		};
+	cpsw_emac0 {
+		phy_id = <&davinci_mdio>, <0>;
+		phy-mode = "mii";
+	};
 
-		davinci_mdio {
-			pinctrl-names = "default";
-			pinctrl-0 = <&davinci_mdio_default>;
-			/*
-			ethphy0: ethernet-phy@0 {
-				reg = <0>;
-			};
+	cpsw_emac1 {
+		status = "disabled";
+	};
 
-			ethphy1: ethernet-phy@1 {
-				reg = <1>;
-			};*/
-		};
+	mac {
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&cpsw_default>;
+		pinctrl-1 = <&cpsw_sleep>;
+		status = "okay";
+	};
+
+	davinci_mdio {
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&davinci_mdio_default>;
+		pinctrl-1 = <&davinci_mdio_sleep>;
+		status = "okay";
+	};
     };  
    }; 
      
@@ -240,47 +243,4 @@
     };  
    };
    
-   
-   
-   /*
-   fragment@2 {
-   target = <&ocp>;
-        __overlay__ {
-     
-     p4 {
-		gpio-hog;
-		gpios = <4 0>;
-		output-high;
-		line-name = "PR1_MII_CTRL";
-	};
-
-	p10 {
-		gpio-hog;
-		gpios = <10 0>;
-		// ETH1 mux: Low for MII-PRU, high for RMII-CPSW
-		output-low;
-		line-name = "MUX_MII_CTL1";
-	};
-    };   
-   };
-   
-   fragment@3 {
-   target = <&pruss_mdio>;
-        __overlay__ {
-        pinctrl-0 = <&pruss_mdio_default>;
-	pinctrl-names = "default";
-	reset-gpios = <&gpio2 5 1>;
-	reset-delay-us = <2>; // PHY datasheet states 1uS min
-	status = "okay";
-
-	pruss_eth0_phy: ethernet-phy@1 {
-		 reg = <1>;
-	 };
-
-	pruss_eth1_phy: ethernet-phy@3 {
-		 reg = <3>;
-	 };   
-   };   
-   };
-   */
 };  
