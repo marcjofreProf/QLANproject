@@ -205,14 +205,14 @@
 &gpio3 {
 	p4 {
 		gpio-hog;
-		gpios = <4 1>;
+		gpios = <4 0>;
 		output-high;
 		line-name = "PR1_MII_CTRL";
 	};
 
 	p10 {
 		gpio-hog;
-		gpios = <10 1>;
+		gpios = <10 0>;
 		// ETH1 mux: Low for MII-PRU, high for RMII-CPSW
 		output-low;
 		line-name = "MUX_MII_CTL1";
@@ -222,7 +222,7 @@
 &pruss_mdio {
 	pinctrl-0 = <&pruss_mdio_default>;
 	pinctrl-names = "default";
-	reset-gpios = <&gpio2 5 GPIO_ACTIVE_LOW>;
+	reset-gpios = <&gpio2 5 1>;
 	reset-delay-us = <2>; // PHY datasheet states 1uS min
 	status = "okay";
 
