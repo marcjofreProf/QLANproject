@@ -50,7 +50,7 @@
 
 	/* Dual mac ethernet application node on icss */
 	pruss_eth {
-		compatible = "ti,am3359-prueth";
+		//compatible = "ti,am3359-prueth";
 		prus = <&pru0>, <&pru1>;
 		firmware-name = "ti-pruss/am335x-pru0-prueth-fw.elf",
 				"ti-pruss/am335x-pru1-prueth-fw.elf";
@@ -78,7 +78,7 @@
 		};
 	};
 	
-	am33xx_pinmux: pinmux@44e10800 {
+	/*am33xx_pinmux: pinmux@44e10800 {
 		compatible = "pinctrl-single";
 		reg = <0x44e10800 0x0238>;
 		#address-cells = <1>;
@@ -107,7 +107,7 @@
 		#interrupt-cells = <1>;
 		reg = <0x481ae000 0x1000>;
 		interrupts = <62>;
-	};
+	};*/
   
  fragment@0 {  
     target = <&am33xx_pinmux>;  
