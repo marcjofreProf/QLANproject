@@ -1,0 +1,246 @@
+
+// This DTS overlay sets up input and output pin for use by  
+ // PRU1 via its Enhanced GPIO mode, which will let us access those pins  
+ // by writing to R30 bits or reading from R31 bits.  
+   
+ // Save this file wherever you want (but I recommend /lib/firmware), as  
+ // "am335x-prueth-custom.dts".
+   
+ // Compile with:
+ // dtc -O dtb -I dts -o /lib/firmware/am335x-prueth-custom.dtbo -b 0 -@ am335x-prueth-custom.dts  
+  
+ 
+ /dts-v1/;  
+ /plugin/;  
+
+ 
+ / {  
+   // This determines which boards can use this DTS overlay  
+   compatible = "ti,beaglebone", "ti,beaglebone-green", "ti,beaglebone-black";  
+   
+   // I think part-number is supposed to correspond with the filename,  
+   // so we'd save this as "PRU-GPIO-DTS-Qlan-v1-00A0.dts".  
+   part-number = "am335x-prueth";  
+   
+   // This always seems to be 00A0, and all the .dtbo files in /lib/firmware  
+   // seem to be named foo-00A0.dtbo, but then are loaded without that suffix.  So
+   // for foo-00A0.dtbo we'd do 'echo foo > /sys/devices/bone_capemgr.?/slots'
+   version = "custom";
+   
+   
+   // List the pins and resources we'll be using. This table:  
+   // http://elinux.org/Ti_AM33XX_PRUSSv2#Beaglebone_PRU_connections_and_modes  
+   // shows which pins can be used with PRU0 and PRU1 for input and output via  
+   // registers R31 and R30.  
+   // Our output pin, P8_27, 28, 29, 30, 39, 40, 41, 42, 43, 44, 45, 46, corresponds to PRU 1
+   // Our input pin, P8_15, P8_16, P8_11, P8_12, P9_25, P9_41, P9_27, P9_42, P9_28, P9_29, P9_30 and P_31, corresponds to PRU 0
+   //  
+   // Beware: Many other PRU EGP pins are reserved by HDMI or onboard flash, which  
+   // would need to be disabled first by editing uEnv.txt and rebooting.  
+   
+   exclusive-use = "P8.15","P8.16", "P8.11", "P8.12","P9.25", "P9.41", "P9.27", "P9.42", "P9.28", "P9.29", "P9.30", "P9.31", "P8.45", "P8.46", "P8.43", "P8.44", "P8.41", "P8.42", "P8.39", "P8.40", "P8.27", "P8.29", "P8.28", "P8.30", "pru0", "pru1";
+   
+   //model = "TI AM3359 ICE-V2 - dual PRUETH";
+	//compatible = "ti,am3359-icev2", "ti,am33xx";
+
+	aliases {
+		ethernet0 = &pruss_emac0;
+		ethernet1 = &pruss_emac1;
+	};
+
+	// Dual mac ethernet application node on icss
+	pruss_eth {
+                compatible = "ti,am3359-prueth";
+                pruss = <&pruss>;
+                sram = <&ocmcram_nocache>;
+                interrupt-parent = <&pruss_intc>;
+
+                pinctrl-0 = <&pruss_eth_default>;
+                pinctrl-names = "default";
+
+                pruss_emac0: ethernet-mii0 {
+                        phy-handle = <&pruss_eth0_phy>;
+                        phy-mode = "mii";
+                        interrupts = <20>, <22>;
+                        interrupt-names = "rx", "tx";
+                        /* Filled in by bootloader */
+                        local-mac-address = [00 00 00 00 00 00];
+                };
+
+                pruss_emac1: ethernet-mii1 {
+                        phy-handle = <&pruss_eth1_phy>;
+                        phy-mode = "mii";
+                        interrupts = <21>, <23>;
+                        interrupt-names = "rx", "tx";
+                        /* Filled in by bootloader */
+                        local-mac-address = [00 00 00 00 00 00];
+                };
+        };
+        /*
+        gpio2 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&gpio2_pins>;
+        status = "okay";
+        ti,no-reset-on-init;
+
+        p12 {
+                gpios = <12 0>; // I had to define this here, see PHY-reset issue
+                output-high;
+                line-name = "RST_PRUPHY#";
+        };
+	};*/
+  
+ fragment@0 {  
+    target = <&am33xx_pinmux>;  
+    __overlay__ {  
+      example_pins: pinmux_pru_pru_pins {  
+       // https://elinux.org/Ti_AM33XX_PRUSSv2#Beaglebone_PRU_connections_and_modes
+       // The offset and mode for pins P8_11 and P8_16 also come from the table linked above.
+       // 	        Bits 0..2 are the multiplexer mode
+       //		Bit 3 enables (0) or disables (1) the internal pullup/pulldown resistor
+       //		Bit 4 is 0 for pulldown, 1 for pullup
+       //		Bit 5 is 0 to disable input, 1 to enable input.
+       //		Bit 6 is 1 if you want slow rise/fall times (for long i2c buses)
+        
+       pinctrl-single,pins = <          
+         0x19C 0x2E      // Mode 6 input non-pull
+         0x194 0x2E      // Mode 6 input non-pull
+         0x198 0x2E      // Mode 6 input non-pull
+         0x190 0x2E      // Mode 6 input non-pull
+         0x1A4 0x2E      // Mode 6 input non-pull
+         0x1AC 0x2E      // Mode 6 input non-pull
+         0x038 0x2E      // Mode 6 input non-pull
+         0x03C 0x2E      // Mode 6 input non-pull
+         0x1A0 0x2E      // Mode 6 input non-pull
+         0x1A8 0x2E      // Mode 6 input non-pull
+         0x034 0x2E      // Mode 6 input non-pull
+         0x030 0x2E      // Mode 6 input non-pull
+         
+         0x0E0 0x0D	 // Mode 5 output non-pull
+         0x0E4 0x0D	 // Mode 5 output non-pull
+         0x0E8 0x0D	 // Mode 5 output non-pull
+         0x0EC 0x0D	 // Mode 5 output non-pull
+         0x0B8 0x0D	 // Mode 5 output non-pull
+         0x0BC 0x0D	 // Mode 5 output non-pull
+         0x0B0 0x0D	 // Mode 5 output non-pull
+         0x0B4 0x0D	 // Mode 5 output non-pull
+         0x0A8 0x0D	 // Mode 5 output non-pull
+         0x0AC 0x0D	 // Mode 5 output non-pull
+         0x0A0 0x0D	 // Mode 5 output non-pull
+	 0x0A4 0x0D	 // Mode 5 output non-pull
+	 
+       >;  
+      };
+      // https://groups.google.com/g/beagleboard/c/hsehbCc8AVk
+      
+      pruss_mdio_default: pruss_mdio_default {
+		pinctrl-single,pins = <
+			0x88c 0x0D //AM33XX_IOPAD(0x88c, (PIN_OUTPUT | MUX_MODE5))		gpmc_clk.pr1_mdio_mdclk
+			0x888 0x2D //AM33XX_IOPAD(0x888, (PIN_INPUT  | MUX_MODE5))		gpmc_csn3.pr1_mdio_data
+			0x89c 0x37 //AM33XX_IOPAD(0x89c, (PIN_INPUT_PULLUP | MUX_MODE7))	gpmc_ben0_cle.gpio2_5
+			// disable CPSW MDIO
+			0x948 0x37 //AM33XX_IOPAD(0x948, (PIN_INPUT_PULLUP | MUX_MODE7))	mdio_data.gpio0_0
+			0x94c 0x37 //AM33XX_IOPAD(0x94c, (PIN_INPUT_PULLUP | MUX_MODE7))	mdio_clk.gpio0_1
+		>;
+	};
+
+	pruss_eth_default: pruss_eth_default {
+		pinctrl-single,pins = <
+			0x8a0 0x2A //AM33XX_IOPAD(0x8a0, (PIN_INPUT  | MUX_MODE2))	dss_data0.pr1_mii_mt0_clk
+			0x8b4 0x0A //AM33XX_IOPAD(0x8b4, (PIN_OUTPUT | MUX_MODE2))	dss_data5.pr1_mii0_txd0
+			0x8b0 0x0A //AM33XX_IOPAD(0x8b0, (PIN_OUTPUT | MUX_MODE2))	dss_data4.pr1_mii0_txd1
+			0x8ac 0x0A //AM33XX_IOPAD(0x8ac, (PIN_OUTPUT | MUX_MODE2))	dss_data3.pr1_mii0_txd2
+			0x8a8 0x0A //AM33XX_IOPAD(0x8a8, (PIN_OUTPUT | MUX_MODE2))	dss_data2.pr1_mii0_txd3
+			0x8cc 0x2D //AM33XX_IOPAD(0x8cc, (PIN_INPUT  | MUX_MODE5))	dss_data11.pr1_mii0_rxd0
+			0x8c8 0x2D //AM33XX_IOPAD(0x8c8, (PIN_INPUT  | MUX_MODE5))	dss_data10.pr1_mii0_rxd1
+			0x8c4 0x2D //AM33XX_IOPAD(0x8c4, (PIN_INPUT  | MUX_MODE5))	dss_data9.pr1_mii0_rxd2
+			0x8c0 0x2D //AM33XX_IOPAD(0x8c0, (PIN_INPUT  | MUX_MODE5))	dss_data8.pr1_mii0_rxd3
+			0x8a4 0x0A //AM33XX_IOPAD(0x8a4, (PIN_OUTPUT | MUX_MODE2))	dss_data1.pr1_mii0_txen
+			0x8d8 0x2D //AM33XX_IOPAD(0x8d8, (PIN_INPUT  | MUX_MODE5))	dss_data14.pr1_mii_mr0_clk
+			0x8dc 0x2D //AM33XX_IOPAD(0x8dc, (PIN_INPUT  | MUX_MODE5))	dss_data15.pr1_mii0_rxdv
+			0x8d4 0x2D //AM33XX_IOPAD(0x8d4, (PIN_INPUT  | MUX_MODE5))	dss_data13.pr1_mii0_rxer
+			0x8d0 0x2D //AM33XX_IOPAD(0x8d0, (PIN_INPUT  | MUX_MODE5))	dss_data12.pr1_mii0_rxlink
+			0x8e8 0x2D //AM33XX_IOPAD(0x8e8, (PIN_INPUT  | MUX_MODE2))	 dss_pclk.pr1_mii0_crs
+
+			0x840 0x2D //AM33XX_IOPAD(0x840, (PIN_INPUT  | MUX_MODE5))	gpmc_a0.pr1_mii_mt1_clk
+			0x850 0x0D //AM33XX_IOPAD(0x850, (PIN_OUTPUT | MUX_MODE5))	gpmc_a4.pr1_mii1_txd0
+			0x84c 0x0D //AM33XX_IOPAD(0x84c, (PIN_OUTPUT | MUX_MODE5))	gpmc_a3.pr1_mii1_txd1
+			0x848 0x0D //AM33XX_IOPAD(0x848, (PIN_OUTPUT | MUX_MODE5))	gpmc_a2.pr1_mii1_txd2
+			0x844 0x0D //AM33XX_IOPAD(0x844, (PIN_OUTPUT | MUX_MODE5))	gpmc_a1.pr1_mii1_txd3
+			0x860 0x2D //AM33XX_IOPAD(0x860, (PIN_INPUT  | MUX_MODE5))	gpmc_a8.pr1_mii1_rxd0
+			0x85c 0x2D //AM33XX_IOPAD(0x85c, (PIN_INPUT  | MUX_MODE5))	gpmc_a7.pr1_mii1_rxd1
+			0x858 0x2D //AM33XX_IOPAD(0x858, (PIN_INPUT  | MUX_MODE5))	gpmc_a6.pr1_mii1_rxd2
+			0x854 0x2D //AM33XX_IOPAD(0x854, (PIN_INPUT  | MUX_MODE5))	gpmc_a5.pr1_mii1_rxd3
+			0x874 0x0D //AM33XX_IOPAD(0x874, (PIN_OUTPUT | MUX_MODE5))	gpmc_wpn.pr1_mii1_txen
+			0x864 0x2D //AM33XX_IOPAD(0x864, (PIN_INPUT  | MUX_MODE5))	gpmc_a9.pr1_mii_mr1_clk
+			0x868 0x2D //AM33XX_IOPAD(0x868, (PIN_INPUT  | MUX_MODE5))	gpmc_a10.pr1_mii1_rxdv
+			0x86c 0x2D //AM33XX_IOPAD(0x86c, (PIN_INPUT  | MUX_MODE5))	gpmc_a11.pr1_mii1_rxer
+			0x878 0x2D //AM33XX_IOPAD(0x878, (PIN_INPUT  | MUX_MODE5))	gpmc_ben1.pr1_mii1_rxlink
+			0x8ec 0x2D //AM33XX_IOPAD(0x8ec, (PIN_INPUT  | MUX_MODE2))	lcd_ac_bias_en.pr1_mii1_crs
+			0x870 0x2D //AM33XX_IOPAD(0x870, (PIN_INPUT  | MUX_MODE5))	gpmc_wait0.pr1_mii1_col
+		>;
+	};
+	
+/*
+	cpsw_default_pins: pinmux_cpsw_default_pins {
+		pinctrl-single,pins = <
+		    AM33XX_IOPAD(0x918, PIN_INPUT_PULLUP | MUX_MODE0) // mdio_data
+		    AM33XX_IOPAD(0x91c, PIN_INPUT_PULLUP | MUX_MODE0) // mdio_clk
+		    AM33XX_IOPAD(0x908, PIN_INPUT_PULLUP | MUX_MODE2) // mii1_txd3
+		    // Additional pins for RXD, TXD, RX_ER, TX_EN as needed 
+		>;
+	    };
+*/
+	
+	pruss_mdio {
+        pinctrl-0 = <&pruss_mdio_default>;
+        pinctrl-names = "default";
+        //reset-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;    // I had to disable this here, see PHY-reset issue
+        //reset-delay-us = <2>; // PHY datasheet states 1uS min
+        status = "okay";
+	/*
+        pruss_eth0_phy: ethernet-phy@0 {
+                reg = <0>;
+         };
+
+        pruss_eth1_phy: ethernet-phy@1 {
+                reg = <1>;
+         };*/
+	};
+
+	cpsw_emac0 {
+		phy_id = <&davinci_mdio>, <0>;
+		phy-mode = "mii";
+	};
+
+	cpsw_emac1 {
+		status = "disabled";
+	};
+
+	mac {
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&cpsw_default>;
+		pinctrl-1 = <&cpsw_sleep>;
+		status = "okay";
+	};
+
+	davinci_mdio {
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&davinci_mdio_default>;
+		pinctrl-1 = <&davinci_mdio_sleep>;
+		status = "okay";
+	};
+    };  
+   }; 
+     
+   // This enables the PRU and assigns the GPIO pins to it for use in EGP mode.  
+   fragment@1 {  
+    target = <&pruss>;  
+    __overlay__ {  
+      status = "okay";  
+      pinctrl-names = "default";  
+      pinctrl-0 = <&example_pins>;  
+    };  
+   };
+   
+};  
