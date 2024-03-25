@@ -64,7 +64,7 @@
 			phy-mode = "mii";
 			interrupts = <20>, <22>;
 			interrupt-names = "rx", "tx";
-			/* Filled in by bootloader */
+			// Filled in by bootloader
 			local-mac-address = [00 00 00 00 00 00];
 		};
 
@@ -73,16 +73,16 @@
 			phy-mode = "mii";
 			interrupts = <21>, <23>;
 			interrupt-names = "rx", "tx";
-			/* Filled in by bootloader */
+			/// Filled in by bootloader
 			local-mac-address = [00 00 00 00 00 00];
 		};
 	};
 	
 	am33xx_pinmux: pinmux@44e10800 {
 		compatible = "pinctrl-single";
-		reg = <0x44e10800 0x0238>;
-		#address-cells = <1>;
-		#size-cells = <0>;
+		//reg = <0x44e10800 0x0238>;
+		//#address-cells = <1>;
+		//#size-cells = <0>;
 		pinctrl-single,register-width = <32>;
 		pinctrl-single,function-mask = <0x7f>;
 	};
@@ -91,10 +91,10 @@
 			compatible = "ti,omap4-gpio";
 			ti,hwmods = "gpio3";
 			gpio-controller;
-			#gpio-cells = <2>;
+			//#gpio-cells = <2>;
 			interrupt-controller;
-			#interrupt-cells = <1>;
-			reg = <0x481ac000 0x1000>;
+			//#interrupt-cells = <1>;
+			//reg = <0x481ac000 0x1000>;
 			interrupts = <32>;
 		};
   
