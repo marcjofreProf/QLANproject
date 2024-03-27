@@ -1,68 +1,37 @@
+/*
+ * Copyright (C) 2020 Deepak Khatri <deepaklorkhatri7@gmail.com>
+ *
+ * Virtual cape for /sys/devices/platform/bone_timer_pwm_2/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
 
-// This DTS overlay sets up input and output pin for use by  
- // PRU1 via its Enhanced GPIO mode, which will let us access those pins  
- // by writing to R30 bits or reading from R31 bits.  
-   
- // Save this file wherever you want (but I recommend /lib/firmware), as  
- // "am335x-prueth-custom.dts".
-   
- // Compile with:
- // dtc -O dtb -I dts -o /lib/firmware/am335x-prueth-custom.dtbo -b 0 -@ am335x-prueth-custom.dts  
-  
- 
- /dts-v1/;  
- /plugin/;  
+/dts-v1/;
+/plugin/;
 
- 
- / {  
-   // This determines which boards can use this DTS overlay  
-   compatible = "ti,beaglebone", "ti,beaglebone-green", "ti,beaglebone-black";  
-   
-   // I think part-number is supposed to correspond with the filename,
-   part-number = "am335x-prueth";  
-   
-   // This always seems to be 00A0, and all the .dtbo files in /lib/firmware  
-   // seem to be named foo-00A0.dtbo, but then are loaded without that suffix.  So
-   // for foo-00A0.dtbo we'd do 'echo foo > /sys/devices/bone_capemgr.?/slots'
-   version = "custom";   
-   
-   // List the pins and resources we'll be using. This table:  
-   // http://elinux.org/Ti_AM33XX_PRUSSv2#Beaglebone_PRU_connections_and_modes  
-   // shows which pins can be used with PRU0 and PRU1 for input and output via  
-   // registers R31 and R30.  
-   // Our output pin, P8_27, 28, 29, 30, 39, 40, 41, 42, 43, 44, 45, 46, corresponds to PRU 1
-   // Our input pin, P8_15, P8_16, P8_11, P8_12, P9_25, P9_41, P9_27, P9_42, P9_28, P9_29, P9_30 and P_31, corresponds to PRU 0
-   //  
-   // Beware: Many other PRU EGP pins are reserved by HDMI or onboard flash, which  
-   // would need to be disabled first by editing uEnv.txt and rebooting.  
-   
-   // https://github.com/beagleboard/bb.org-overlays/blob/master/src/arm/BB-PWM-TIMER-P8.08.dts
-   fragment@0 {
-		target = <&am33xx_pinmux>;
-		__overlay__ {
-			timer7_pin: pinmux_timer7_pin {
-				pinctrl-single,pins = <
-				0x0894 0x11A// AM33XX_IOPAD(0x0894, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE2)	// gpmc_oen_ren.timer7
-				>;
-			};
-		};
+/*
+ * Update the default pinmux of the pins.
+ * See these files for the phandles (&P9_* & &P8_*)
+ * https://github.com/lorforlinux/BeagleBoard-DeviceTrees/blob/compatibility/src/arm/am335x-bone-common-univ.dtsi
+ * https://github.com/lorforlinux/BeagleBoard-DeviceTrees/blob/compatibility/src/arm/am572x-bone-common-univ.dtsi
+ */
+&ocp {
+    P8_08_pinmux { pinctrl-0 = <&P8_08_timer_pin>; };    /* PWM A */
+};
+
+// See these files for the definition
+// https://github.com/lorforlinux/BeagleBoard-DeviceTrees/blob/compatibility/src/arm/bbai-bone-buses.dtsi
+// https://github.com/lorforlinux/BeagleBoard-DeviceTrees/blob/compatibility/src/arm/bbb-bone-buses.dtsi
+&{/} {
+	bone_timer_pwm_2 {
+		compatible = "ti,omap-dmtimer-pwm";
+		#pwm-cells = <3>;
+		ti,timers = <&bone_timer_2>;
+		//ti,prescaler = <0>;		/* 0 thru 7 */
+		ti,clock-source = <0x00>;	/* timer_sys_ck */
+		//ti,clock-source = <0x01>;	/* timer_32k_ck */
 	};
-
-	fragment@1 {
-		target-path="/";
-		__overlay__ {
-			dmtimer-pwm-7 {
-				pinctrl-names = "default";
-				pinctrl-0 = <&timer7_pin>;
-
-				compatible = "ti,omap-dmtimer-pwm";
-				#pwm-cells = <3>;
-				ti,timers = <&timer7>;
-				//ti,prescaler = <0>;		/* 0 thru 7 */
-				ti,clock-source = <0x00>;	/* timer_sys_ck */
-				//ti,clock-source = <0x01>;	/* timer_32k_ck */
-			};
-		};
-	};
-};   
+};  
   
