@@ -77,28 +77,28 @@ INITIATIONS:
 //	MOV r1, GPIO2_BANK | GPIO_SETDATAOUToffset  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
 //	MOV r2, GPIO2_BANK | GPIO_CLEARDATAOUToffset // load the address we wish to cleare to r2. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
 		
-	LBCO	r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
-	// OCP master port is the protocol to enable communication between the PRUs and the host processor
-	CLR	r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
-	SBCO	r0, CONST_PRUCFG, 4, 4
-
-	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
-	// This will make C24 point to 0x00000000 (PRU data RAM).
-	MOV	r0, OWN_RAM// | OWN_RAMoffset
-	//MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
-	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
-	
-	// This will make C26 point to 0x0002E000 (IEP).
-	MOV	r0, 0x0002E000//
-	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of IEP
-	
-	// Initializations
-	LDI	r30, 0 // All signal pins down
-	LDI	r4, 0
-	MOV	r1, NUM_CLOCKS_PERIOD// Initial initialization jus tin case
-	MOV	r5, 0xFFFFFFFF
-	MOV	r6, 0x22000
-	MOV	r7, 0x2200C
+//	LBCO	r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
+//	// OCP master port is the protocol to enable communication between the PRUs and the host processor
+//	CLR	r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
+//	SBCO	r0, CONST_PRUCFG, 4, 4
+//
+//	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
+//	// This will make C24 point to 0x00000000 (PRU data RAM).
+//	MOV	r0, OWN_RAM// | OWN_RAMoffset
+//	//MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
+//	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
+//	
+//	// This will make C26 point to 0x0002E000 (IEP).
+//	MOV	r0, 0x0002E000//
+//	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of IEP
+//	
+//	// Initializations
+//	LDI	r30, 0 // All signal pins down
+//	LDI	r4, 0
+//	MOV	r1, NUM_CLOCKS_PERIOD// Initial initialization jus tin case
+//	MOV	r5, 0xFFFFFFFF
+//	MOV	r6, 0x22000
+//	MOV	r7, 0x2200C
 	
 //	// This scripts initiates first the timers
 //	// Initial Re-initialization of DWT_CYCCNT
@@ -140,7 +140,7 @@ INITIATIONS:
 	// We remove the command from the host (in case there is a reset from host, we are saved)
 //	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 	//LED_ON
-PSEUDOSYNCH:
+//PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
 //	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO
 //	AND	r0, r0, 0x00000003 // Since the signals have a minimum period of 4 clock cycles
