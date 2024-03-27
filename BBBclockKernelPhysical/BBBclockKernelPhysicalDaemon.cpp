@@ -149,7 +149,7 @@ int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it r
 pru1dataMem_int[0]=(unsigned int)3125; // set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
-
+sleep(1);// Give some time
 return 0;// all ok
 }
 
@@ -343,6 +343,7 @@ int main(int argc, char const * argv[]){
  bool isValidWhileLoop=true;
  if (CKPDagent.getState()==CKPD::APPLICATION_EXIT){isValidWhileLoop = false;}
  else{isValidWhileLoop = true;}
+ 
  CKPDagent.GenerateSynchClockPRU();// Launch the generation of the clock
  while(isValidWhileLoop){ 
    try{
