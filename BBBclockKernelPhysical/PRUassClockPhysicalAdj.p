@@ -100,39 +100,39 @@ INITIATIONS:
 	MOV	r6, 0x22000
 	MOV	r7, 0x2200C
 	
-	// This scripts initiates first the timers
-	// Initial Re-initialization of DWT_CYCCNT
-	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
-	CLR	r2.t3
-	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
-	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
-	SET	r2.t3
-	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
-		
-	// Initial Re-initialization for IET counter
-	// The Clock gating Register controls the state of Clock Management
-	//LBCO 	r0, CONST_PRUCFG, 0x10, 4                    
-	MOV 	r0, 0x24924
-	SBCO 	r0, CONST_PRUCFG, 0x10, 4 
-	//LBCO	r2, CONST_IETREG, 0, 1 //
-	//SET ocp_clk:1 or of iep_clk:0
-	MOV	r0, 0
-	SBCO 	r0, CONST_PRUCFG, 0x30, 4
-	// IEP configuration
-	MOV	r0, 0x111 // Enable and Define increment value to 1
-	SBCO	r0, CONST_IETREG, 0, 4 // Enables IET count and sets configuration
-	// Deactivate IEP compensation
-	SBCO 	r4, CONST_IETREG, 0x08, 4
-	
-	// Keep close together the clearing of the counters (keep order)
-	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
-	SBCO	r5, CONST_IETREG, 0xC, 4 // Clear IEP timer count	
+//	// This scripts initiates first the timers
+//	// Initial Re-initialization of DWT_CYCCNT
+//	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+//	CLR	r2.t3
+//	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
+//	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+//	SET	r2.t3
+//	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
+//		
+//	// Initial Re-initialization for IET counter
+//	// The Clock gating Register controls the state of Clock Management
+//	//LBCO 	r0, CONST_PRUCFG, 0x10, 4                    
+//	MOV 	r0, 0x24924
+//	SBCO 	r0, CONST_PRUCFG, 0x10, 4 
+//	//LBCO	r2, CONST_IETREG, 0, 1 //
+//	//SET ocp_clk:1 or of iep_clk:0
+//	MOV	r0, 0
+//	SBCO 	r0, CONST_PRUCFG, 0x30, 4
+//	// IEP configuration
+//	MOV	r0, 0x111 // Enable and Define increment value to 1
+//	SBCO	r0, CONST_IETREG, 0, 4 // Enables IET count and sets configuration
+//	// Deactivate IEP compensation
+//	SBCO 	r4, CONST_IETREG, 0x08, 4
+//	
+//	// Keep close together the clearing of the counters (keep order)
+//	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+//	SBCO	r5, CONST_IETREG, 0xC, 4 // Clear IEP timer count	
 		
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
 // Without delays (fastest possible) and CMD controlled
-CMDLOOP:
+//CMDLOOP:
 //	QBBC	CMDLOOP, r31, 30	//Reception or not of the host interrupt
 	// ok, we have an instruction. Assume it means 'begin signals'
 	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
@@ -161,7 +161,7 @@ DELAYOFF:
 	SUB 	r0, r0, 1
 	QBNE 	DELAYOFF, r0, 0
 FINISHLOOP:
-	JMP	PSEUDOSYNCH // Might consume more than one clock (maybe 3) but always the same amount
+	JMP	SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
 EXIT:
 	// Send notification (interrupt) to Host for program completion
 	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
