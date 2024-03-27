@@ -171,7 +171,7 @@ EXIT:
 	HALT
 
 ERR:	// Signal error
-	LED_ON
+	//LED_ON
 	LED_OFF
 	JMP ERR
 
