@@ -41,7 +41,7 @@
 
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0xFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
-#define AllOutputInterestPinsLow 0x00// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
+#define AllOutputInterestPinsLow 0x00// For the defined output pins to set them low in block (and not the ones that are allocated by other processes)
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
@@ -85,16 +85,7 @@ INITIATIONS:
 	MOV	r0, OWN_RAM// | OWN_RAMoffset
 	//MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
 	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
-	
-	//// This will make C26 point to 0x0002E000 (IET). Done by the other PRU
-	//MOV	r0, 0x0002E000// | OWN_RAMoffset // When using assembler, the PRU does not put data in the first addresses of OWN_RAM (when using c++ PRU direct programming the PRU  might use some initial addresses of OWN_RAM space
-	////MOV	r10, 0x22000+0x20// | C24add//CONST_PRUDRAM
-	//SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of PRU0 Data RAM into C24
-	
-	// Using cycle counter
-	//MOV	r2, 0x22000
-	//MOV	r3, 0x2200C
-	
+		
 	// Initializations
 	LDI	r30, 0 // All signal pins down
 	LDI	r4, 0
@@ -102,27 +93,6 @@ INITIATIONS:
 	
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
-
-//// With delays to produce longer pulses
-//SIGNALON:	// for setting just one pin would be set r30, r30, #Bit number
-//	//SET r30, r30, 6	
-//	MOV r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
-//	MOV r0, DELAY
-//
-//DELAYON:
-//	SUB r0, r0, 1
-//	QBNE DELAYON, r0, 0
-//	
-//SIGNALOFF:      // for clearing just one pin would be clr r30, r30, #Bit number	
-//	//CLR r30, r30, 6
-//	MOV r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
-//	MOV r0, DELAY
-//
-//DELAYOFF:
-//	SUB r0, r0, 1
-//	QBNE DELAYOFF, r0, 0
-//	JMP SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
-
 
 // Without delays (fastest possible) and CMD controlled
 CMDLOOP:
@@ -145,21 +115,6 @@ PSEUDOSYNCH:
 	QBEQ	SIGNALON, r0.b0, 2 // Coincides with a 2
 	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
 	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
-SIGNALON:	
-	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents of r1 byte 0 to magic r30 output byte 0
-	//SUB	r1, r1, 1	// Substract 1 count cycle
-//	MOV	r0, DELAY
-//DELAYON:
-//	SUB 	r0, r0, 1
-//	QBNE	DELAYON, r0, 0
-SIGNALOFF:
-	MOV	r30.b0, AllOutputInterestPinsLow // write the contents of r2 byte 0 to magic r30 byte 0
-	SUB	r1, r1, 1	// Substract 1 count cycle
-	QBNE	PSEUDOSYNCH, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
-//	MOV	r0, DELAY
-//DELAYOFF:
-//	SUB 	r0, r0, 1
-//	QBNE 	DELAYOFF, r0, 0
 FINISHLOOP:
 	// The following lines do not consume "signal speed"
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16

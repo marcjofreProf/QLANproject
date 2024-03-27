@@ -161,7 +161,7 @@ CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of l
 CMDLOOP:
 	//LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
 	//QBEQ	CHECK_CYCLECNT, r0.b0, 0 // loop until we get an instructionQBEQ	NORMSTEPS, r0.b0, 0 // loop until we get an instruction
-	QBBC	CHECK_CYCLECNT, r31, 30	//
+	QBBC	CHECK_CYCLECNT, r31, 30	// Reception or not of the host interrupt
 	//QBEQ	CHECK_CYCLECNT, r0.b0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
 	// We remove the command from the host (in case there is a reset from host, we are saved)

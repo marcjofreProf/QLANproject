@@ -63,7 +63,9 @@ private:// Variables
 
 public:	// Functions/Methods
 	CKPD(); //constructor	
-	// PRU	
+	// PRU
+	int GenerateSynchClockPRU();//  PRU0
+	int HandleInterruptSynchPRU();// PRU1
 	// Managing status of this Agent
         ApplicationState getState() const { return m_state; }	
         bool m_start() { m_state = APPLICATION_RUNNING; return true; }
@@ -86,9 +88,7 @@ private: // Functions/Methods
 	//static void SignalSegmentationFaultHandler(int s); // Handler for segmentation error
 	// PRU
 	int LOCAL_DDMinit();
-	int DisablePRUs();
-	int GenerateSynchClockPRU();//  PRU0
-	int HandleInterruptSynchPRU();// PRU1
+	int DisablePRUs();	
 };
 
 

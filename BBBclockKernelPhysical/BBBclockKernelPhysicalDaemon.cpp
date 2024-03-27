@@ -125,40 +125,30 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	//pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
-	if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
-		if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
-			perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
+	    pru0dataMem_int[0]=(unsigned int)6250; // set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
+	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdj.bin") == -1){
+		if (prussdrv_exec_program(PRU_Operation_NUM, "./PRUassClockPhysicalAdj.bin") == -1){
+			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdj.bin");
 		}
 	}
 	////prussdrv_pru_enable(PRU_Operation_NUM);
-	// Generate signals
-	pru1dataMem_int[0]=this->NumberRepetitionsSignal; // set the number of repetitions
+	pru1dataMem_int[0]=(unsigned int)0; // set
 	// Load and execute the PRU program on the PRU1
-	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
-		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
-			perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScriptHist4Sig.bin");//perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
+	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdj.bin") == -1){
+		if (prussdrv_exec_program(PRU_Signal_NUM, "./PRUassClockHandlerAdj.bin") == -1){
+			perror("prussdrv_exec_program non successfull writing of PRUassClockHandlerAdj.bin");
 		}
 	}
 	////prussdrv_pru_enable(PRU_Signal_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
-	  
-	  /*// Doing debbuging checks - Debugging 1	  
-	  std::thread threadReadTimeStampsAux=std::thread(&GPIO::ReadTimeStamps,this);
-	  std::thread threadSendTriggerSignalsAux=std::thread(&GPIO::SendTriggerSignals,this);
-	  threadReadTimeStampsAux.join();	
-	  threadSendTriggerSignalsAux.join();
-	  
-	  //munmap(ddrMem, 0x0FFFFFFF); // remove any mappings for those entire pages containing any part of the address space of the process starting at addr and continuing for len bytes. 
-	  //close(mem_fd); // Device
-	  prussdrv_pru_disable(PRU_Signal_NUM);
-	  prussdrv_pru_disable(PRU_Operation_NUM);  
-	  prussdrv_exit();*/
 }
 
-int CKPD::GenerateSynchClockPRU(){// Read the detected timestaps in four channels
+int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
+pru0dataMem_int[0]=(unsigned int)6250; // set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
 // Important, the following line at the very beggining to reduce the command jitter
-prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
+prussdrv_pru_send_event(21);
 
+/*
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
 if (retInterruptsPRU0>0){
@@ -166,12 +156,13 @@ if (retInterruptsPRU0>0){
 }
 else if (retInterruptsPRU0==0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-	cout << "GPIO::ReadTimeStamps took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
+	cout << "GPIO::GenerateSynchClockPRU took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
 }
 else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU0 interrupt poll error" << endl;
 }
+*/
 /*
 FutureTimePointPRU0 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU0);
 auto duration_since_epochFutureTimePointPRU0=FutureTimePointPRU0.time_since_epoch();
@@ -214,8 +205,8 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 // Important, the following line at the very beggining to reduce the command jitter
-pru1dataMem_int[0]=this->NumberRepetitionsSignal; // set the number of repetiti
-prussdrv_pru_send_event(22);//pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals//prussdrv_pru_send_event(22);
+pru1dataMem_int[0]=(unsigned int)0; // set
+prussdrv_pru_send_event(22);
 
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
@@ -227,7 +218,7 @@ if (retInterruptsPRU1>0){
 }
 else if (retInterruptsPRU1==0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-	cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1 if necessary." << endl;
+	cout << "GPIO::HandleInterruptSynchPRU took to much time. Reset PRU1 if necessary." << endl;
 }
 else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -378,6 +369,7 @@ int main(int argc, char const * argv[]){
  // }
  //}
  CKPD CKPDagent; // Initiate the instance
+ CKPDagent.m_start(); // Initiate in start state.
  /// Errors handling
  signal(SIGINT, SignalINTHandler);// Interruption signal
  signal(SIGPIPE, SignalPIPEHandler);// Error trying to write/read to a socket
@@ -386,28 +378,24 @@ int main(int argc, char const * argv[]){
  bool isValidWhileLoop=true;
  if (CKPDagent.getState()==CKPD::APPLICATION_EXIT){isValidWhileLoop = false;}
  else{isValidWhileLoop = true;}
- /*
+ CKPDagent.GenerateSynchClockPRU();// Launch the generation of the clock
  while(isValidWhileLoop){ 
    try{
  	try {
     	// Code that might throw an exception 
  	// Check if there are need messages or actions to be done by the node
- 	QTLANagent.acquire();
- 	QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
- 	QTLANagent.SendParametersAgent(); // Send Parameters information stored
-       switch(QTLANagent.getState()) {
-           case QTLAN::APPLICATION_RUNNING: {               
+ 	//CKPDagent.acquire();
+       switch(CKPDagent.getState()) {
+           case CKPD::APPLICATION_RUNNING: {               
                // Do Some Work
-               QTLANagent.ProcessNewMessage();
-               //while(QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard)>0);// Make sure to remove all pending mesages in the socket
-               QTLANagent.m_pause(); // After procesing the request, pass to paused state
+               CKPDagent.HandleInterruptSynchPRU();
                break;
            }
-           case QTLAN::APPLICATION_PAUSED: {
+           case CKPD::APPLICATION_PAUSED: {
                // Maybe do some checks if necessary 
                break;
            }
-           case QTLAN::APPLICATION_EXIT: {                  
+           case CKPD::APPLICATION_EXIT: {                  
                isValidWhileLoop=false;//break;
            }
            default: {
@@ -415,11 +403,9 @@ int main(int argc, char const * argv[]){
            }
 
         } // switch
-        //if (sockKeepAlivecounter>=SOCKkeepaliveTime){sockKeepAlivecounter=0;QTLANagent.SendKeepAliveHeartBeatsSockets();}
-        //else{sockKeepAlivecounter++;}
-        QTLANagent.release();
-	if (signalReceivedFlag.load()){QTLANagent.~QTLAN();}// Destroy the instance
-        QTLANagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
+        //CKPDagent.release();
+	if (signalReceivedFlag.load()){CKPDagent.~CKPD();}// Destroy the instance
+        //CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception
@@ -431,7 +417,7 @@ int main(int argc, char const * argv[]){
     }
     } // while
   cout << "Exiting the BBBclockKernelPhysicalDaemon" << endl;
-  */
+  
   
  return 0; // Everything Ok
 }
