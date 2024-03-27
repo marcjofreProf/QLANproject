@@ -99,9 +99,8 @@ CMDLOOP:
 	//LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
 	//QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction. Code 0 means idle
 	//QBEQ	CMDLOOP, r0.b0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
-	QBBC	CMDLOOP, r31, 31	//
-	// ok, we have an instruction (code 2). Assume it means 'begin signals'
-	// Read the number of NUM_REPETITIONS from positon 0 of PRU1 DATA RAM and stored it
+	QBBC	CMDLOOP, r31, 30	//
+	// Read the number of NUM_REPETITIONS from positon 0 of PRU0 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
 	// We remove the command from the host (in case there is a reset from host, we are saved)
 	//SBCO 	r4.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM

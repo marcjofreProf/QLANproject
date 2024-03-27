@@ -133,7 +133,7 @@ INITIATIONS:
 
 // Without delays (fastest possible) and CMD controlled
 CMDLOOP:
-	QBBC	CMDLOOP, r31, 30	//Reception or not of the host interrupt
+	QBBC	CMDLOOP, r31, 31	//Reception or not of the host interrupt
 	// ok, we have an instruction. Assume it means 'begin signals'
 	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
