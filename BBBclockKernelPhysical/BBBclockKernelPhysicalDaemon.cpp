@@ -132,7 +132,8 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdj.bin");
 		}
 	}
-	////prussdrv_pru_enable(PRU_Operation_NUM);
+	////prussdrv_pru_enable(PRU_ClockPhys_NUM);
+	/*
 	pru1dataMem_int[0]=(unsigned int)0; // set
 	// Load and execute the PRU program on the PRU1
 	if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdj.bin") == -1){
@@ -140,7 +141,8 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 			perror("prussdrv_exec_program non successfull writing of PRUassClockHandlerAdj.bin");
 		}
 	}
-	////prussdrv_pru_enable(PRU_Signal_NUM);
+	////prussdrv_pru_enable(PRU_HandlerSynch_NUM);
+	*/
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 }
 
