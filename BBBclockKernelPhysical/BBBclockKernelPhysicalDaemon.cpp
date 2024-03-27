@@ -133,7 +133,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 		}
 	}
 	////prussdrv_pru_enable(PRU_ClockPhys_NUM);
-	/*
+	
 	pru1dataMem_int[0]=(unsigned int)0; // set
 	// Load and execute the PRU program on the PRU1
 	if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdj.bin") == -1){
@@ -142,17 +142,15 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 		}
 	}
 	////prussdrv_pru_enable(PRU_HandlerSynch_NUM);
-	*/
+	
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 }
 
 int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
-/*
 pru0dataMem_int[0]=(unsigned int)6250; // set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(21);
-*/
-/*
+
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
 if (retInterruptsPRU0>0){
@@ -166,7 +164,7 @@ else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU0 interrupt poll error" << endl;
 }
-*/
+
 
 return 0;// all ok
 }
