@@ -60,10 +60,12 @@
 // r1 is reserved with the number of NUM_CLOCKS_PERIOD - storing the PRU 0 DATA number of repetitions
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
-// r2 reserved for 0x22000 Control register
-// r3 reserved for 0x2200C DWT_CYCCNT
+// r2 reserved mapping control register
+
 // r4 reserved for zeroing registers
 // r5 reserved for 0xFFFFFFFF
+// r6 reserved for 0x22000 Control register
+// r7 reserved for 0x2200C DWT_CYCCNT
 
 // r10 is arbitrary used for operations
 
@@ -95,15 +97,17 @@ INITIATIONS:
 	LDI	r4, 0
 	MOV	r1, NUM_CLOCKS_PERIOD// Initial initialization jus tin case
 	MOV	r5, 0xFFFFFFFF
+	MOV	r6, 0x22000
+	MOV	r7, 0x2200C
 	
 	// This scripts initiates first the timers
 	// Initial Re-initialization of DWT_CYCCNT
-	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	CLR	r2.t3
-	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
-	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
+	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
-	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
+	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
 		
 	// Initial Re-initialization for IET counter
 	// The Clock gating Register controls the state of Clock Management
@@ -121,53 +125,24 @@ INITIATIONS:
 	SBCO 	r4, CONST_IETREG, 0x08, 4
 	
 	// Keep close together the clearing of the counters (keep order)
-	SBBO	r4, r3, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	SBCO	r5, CONST_IETREG, 0xC, 4 // Clear IEP timer count	
-	
-	// Using cycle counter
-	//MOV	r2, 0x22000
-	//MOV	r3, 0x2200C
-	
+		
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
-//// With delays to produce longer pulses
-//SIGNALON:	// for setting just one pin would be set r30, r30, #Bit number
-//	//SET r30, r30, 6	
-//	MOV r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
-//	MOV r0, DELAY
-//
-//DELAYON:
-//	SUB r0, r0, 1
-//	QBNE DELAYON, r0, 0
-//	
-//SIGNALOFF:      // for clearing just one pin would be clr r30, r30, #Bit number	
-//	//CLR r30, r30, 6
-//	MOV r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
-//	MOV r0, DELAY
-//
-//DELAYOFF:
-//	SUB r0, r0, 1
-//	QBNE DELAYOFF, r0, 0
-//	JMP SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
-
-
 // Without delays (fastest possible) and CMD controlled
 CMDLOOP:
-	//LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
-	//QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction. Code 0 means idle
-	//QBEQ	CMDLOOP, r0.b0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
 	QBBC	CMDLOOP, r31, 30	//Reception or not of the host interrupt
-	// ok, we have an instruction (code 2). Assume it means 'begin signals'
+	// ok, we have an instruction. Assume it means 'begin signals'
 	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
 	// We remove the command from the host (in case there is a reset from host, we are saved)
-	//SBCO 	r4.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 	//LED_ON
 PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
-//	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
+//	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO
 //	AND	r0, r0, 0x00000003 // Since the signals have a minimum period of 4 clock cycles
 //	QBEQ	SIGNALON, r0.b0, 3 // Coincides with a 3
 //	QBEQ	SIGNALON, r0.b0, 2 // Coincides with a 2
@@ -180,7 +155,7 @@ DELAYON:
 	SUB 	r0, r0, 1
 	QBNE	DELAYON, r0, 0
 SIGNALOFF:
-	MOV	r30.b0, AllOutputInterestPinsLow // write the contents of r2 byte 0 to magic r30 byte 0
+	MOV	r30.b0, AllOutputInterestPinsLow // write the contents of to magic r30 byte 0
 	MOV	r0, DELAY
 DELAYOFF:
 	SUB 	r0, r0, 1
