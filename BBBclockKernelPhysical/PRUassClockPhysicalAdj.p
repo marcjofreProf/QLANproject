@@ -20,7 +20,7 @@
 #define INS_PER_US		200		// 5ns per instruction for Beaglebone black
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
 #define NUM_CLOCKS_PERIOD	6250		// Not used (value given by host) set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
-#define DELAY 			4294967296//1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
+#define DELAY 			3125//1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -163,7 +163,7 @@ DELAYOFF:
 	SUB 	r0, r0, 1
 	QBNE 	DELAYOFF, r0, 0
 FINISHLOOP:
-	JMP	EXIT // Might consume more than one clock (maybe 3) but always the same amount
+	JMP	SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
 EXIT:
 	// Send notification (interrupt) to Host for program completion
 	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
