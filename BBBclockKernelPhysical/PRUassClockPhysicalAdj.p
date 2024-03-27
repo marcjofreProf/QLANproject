@@ -77,10 +77,10 @@ INITIATIONS:
 //	MOV r1, GPIO2_BANK | GPIO_SETDATAOUToffset  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
 //	MOV r2, GPIO2_BANK | GPIO_CLEARDATAOUToffset // load the address we wish to cleare to r2. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
 		
-	LBCO	r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
+//	LBCO	r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
 	// OCP master port is the protocol to enable communication between the PRUs and the host processor
-	CLR	r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
-	SBCO	r0, CONST_PRUCFG, 4, 4
+//	CLR	r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
+//	SBCO	r0, CONST_PRUCFG, 4, 4
 
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
@@ -149,13 +149,13 @@ CMDLOOP:
 //	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
 //	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
 SIGNALON:
-	MOV	r30, 0xFFFFFFFF // write the contents to magic r30 output byte 0
+	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
 	MOV	r0, r1
 DELAYON:
 	SUB 	r0, r0, 1
 	QBNE	DELAYON, r0, 0
 SIGNALOFF:
-	MOV	r30, 0x00000000 // write the contents to magic r30 byte 0
+	MOV	r30.b0, AllOutputInterestPinsLow // write the contents to magic r30 byte 0
 	MOV	r0, r1
 DELAYOFF:
 	SUB 	r0, r0, 1
