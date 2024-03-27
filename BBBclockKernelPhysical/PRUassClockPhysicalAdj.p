@@ -128,7 +128,7 @@ INITIATIONS:
 //	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 //	SBCO	r5, CONST_IETREG, 0xC, 4 // Clear IEP timer count	
 		
-//	LED_ON	// just for signaling initiations
+	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
 // Without delays (fastest possible) and CMD controlled
@@ -170,5 +170,6 @@ EXIT:
 
 ERR:	// Signal error
 	LED_ON
+	LED_OFF
 	JMP ERR
 
