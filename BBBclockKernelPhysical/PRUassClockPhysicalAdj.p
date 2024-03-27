@@ -2,7 +2,7 @@
  //  
  // Assemble in BBB with:  
  // pasm -b PRUassClockPhysicalAdj.p
- // To be run on PRU0
+ // To be run on PRU1
  
 .origin 0				// start of program in PRU memory
 .entrypoint INITIATIONS			// program entry point (for debbuger)
@@ -36,7 +36,7 @@
 
 #define OWN_RAM              0x00000000 // current PRU data RAM
 #define OWN_RAMoffset	     0x00000200 // Offset from Base OWN_RAM to avoid collision with some data tht PRU might store
-#define PRU0_CTRL            0x220
+#define PRU1_CTRL            0x240
 
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0xFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
@@ -46,13 +46,13 @@
 // *** Affects: r28, r29. Each PRU has its of 32 registers
 .macro LED_OFF
 	MOV	r28, 1<<21
-	MOV	r29, GPIO1_BANK | GPIO_CLEARDATAOUToffset
+	MOV	r29, GPIO2_BANK | GPIO_CLEARDATAOUToffset
 	SBBO	r28, r29, 0, 4
 .endm
 
 .macro LED_ON
 	MOV	r28, 1<<21
-	MOV	r29, GPIO1_BANK | GPIO_SETDATAOUToffset
+	MOV	r29, GPIO2_BANK | GPIO_SETDATAOUToffset
 	SBBO	r28, r29, 0, 4
 .endm
 
@@ -77,10 +77,10 @@ INITIATIONS:
 //	MOV r1, GPIO2_BANK | GPIO_SETDATAOUToffset  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
 //	MOV r2, GPIO2_BANK | GPIO_CLEARDATAOUToffset // load the address we wish to cleare to r2. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
 		
-//	LBCO	r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
+	LBCO	r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
 	// OCP master port is the protocol to enable communication between the PRUs and the host processor
-//	CLR	r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
-//	SBCO	r0, CONST_PRUCFG, 4, 4
+	CLR	r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
+	SBCO	r0, CONST_PRUCFG, 4, 4
 
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
@@ -166,7 +166,7 @@ FINISHLOOP:
 	JMP	SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
 EXIT:
 	// Send notification (interrupt) to Host for program completion
-	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
+	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
 	// Halt the processor
 	HALT
 

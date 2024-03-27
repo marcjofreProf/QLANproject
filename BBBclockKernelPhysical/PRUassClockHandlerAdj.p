@@ -3,7 +3,7 @@
  //  
  // Assemble in BBB with:  
  // pasm -b PRUassassClockHandlerAdj.p
- // To be run on PRU1
+ // To be run on PRU0
  
 .origin 0				// start of program in PRU memory
 .entrypoint INITIATIONS			// program entry point (for debbuger)
@@ -37,7 +37,7 @@
 
 #define OWN_RAM              0x00000000 // current PRU data RAM
 #define OWN_RAMoffset	     0x00000200 // Offset from Base OWN_RAM to avoid collision with some data tht PRU might store
-#define PRU1_CTRL            0x240
+#define PRU0_CTRL            0x220
 
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0xFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
@@ -47,13 +47,13 @@
 // *** Affects: r28, r29. Each PRU has its of 32 registers
 .macro LED_OFF
 	MOV	r28, 1<<21
-	MOV	r29, GPIO2_BANK | GPIO_CLEARDATAOUToffset
+	MOV	r29, GPIO1_BANK | GPIO_CLEARDATAOUToffset
 	SBBO	r28, r29, 0, 4
 .endm
 
 .macro LED_ON
 	MOV	r28, 1<<21
-	MOV	r29, GPIO2_BANK | GPIO_SETDATAOUToffset
+	MOV	r29, GPIO1_BANK | GPIO_SETDATAOUToffset
 	SBBO	r28, r29, 0, 4
 .endm
 
@@ -117,12 +117,12 @@ PSEUDOSYNCH:
 //	QBEQ	FINISHLOOP, r0.b0, 0 // Coincides with a 0
 FINISHLOOP:
 	// The following lines do not consume "signal speed"
-	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
+	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
 	//MOV	r1, r5// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
-	MOV	r31.b0, PRU1_ARM_INTERRUPT+16
+	MOV	r31.b0, PRU0_ARM_INTERRUPT+16
 	HALT
 
 ERR:	// Signal error

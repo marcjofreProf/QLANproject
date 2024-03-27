@@ -16,8 +16,8 @@
 #include <sys/mman.h>
 #include <prussdrv.h>
 #include <pruss_intc_mapping.h>
-#define PRU_ClockPhys_NUM 0 // PRU0
-#define PRU_HandlerSynch_NUM 1 // PRU1
+#define PRU_ClockPhys_NUM 1 // PRU1
+#define PRU_HandlerSynch_NUM 0 // PRU0
 /******************************************************************************
 * Local Macro Declarations - Global Space point of View                       *
 ******************************************************************************/
@@ -125,17 +125,8 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	// Timetagging
 	//pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
-	    // Load and execute the PRU program on the PRU0
-	    pru0dataMem_int[0]=(unsigned int)6250; // set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
-	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdj.bin") == -1){
-		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdj.bin") == -1){
-			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdj.bin");
-		}
-	}
-	//prussdrv_pru_enable(PRU_ClockPhys_NUM);
-	
-	pru1dataMem_int[0]=(unsigned int)0; // set
-	// Load and execute the PRU program on the PRU1
+	  pru0dataMem_int[0]=(unsigned int)0; // set
+	// Load and execute the PRU program on the PRU0
 	if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdj.bin") == -1){
 		if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./PRUassClockHandlerAdj.bin") == -1){
 			perror("prussdrv_exec_program non successfull writing of PRUassClockHandlerAdj.bin");
@@ -143,13 +134,34 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	//prussdrv_pru_enable(PRU_HandlerSynch_NUM);
 	
+	    // Load and execute the PRU program on the PRU1
+	    pru1dataMem_int[0]=(unsigned int)6250; // set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
+	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdj.bin") == -1){
+		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdj.bin") == -1){
+			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdj.bin");
+		}
+	}
+	//prussdrv_pru_enable(PRU_ClockPhys_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 }
 
 int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
-pru0dataMem_int[0]=(unsigned int)6250; // set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
+pru1dataMem_int[0]=(unsigned int)6250; // set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
 // Important, the following line at the very beggining to reduce the command jitter
+prussdrv_pru_send_event(22);
+
+return 0;// all ok
+}
+
+int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+/*
+// Important, the following line at the very beggining to reduce the command jitter
+pru0dataMem_int[0]=(unsigned int)0; // set
 prussdrv_pru_send_event(21);
+
+// Here there should be the instruction command to tell PRU1 to start generating signals
+// We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
+
 /*
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
@@ -166,32 +178,6 @@ else{
 }
 */
 
-return 0;// all ok
-}
-
-int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-/*
-// Important, the following line at the very beggining to reduce the command jitter
-pru1dataMem_int[0]=(unsigned int)0; // set
-prussdrv_pru_send_event(22);
-
-// Here there should be the instruction command to tell PRU1 to start generating signals
-// We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
-
-retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
-//cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
-if (retInterruptsPRU1>0){
-	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-}
-else if (retInterruptsPRU1==0){
-	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-	cout << "GPIO::HandleInterruptSynchPRU took to much time. Reset PRU1 if necessary." << endl;
-}
-else{
-	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-	cout << "PRU1 interrupt error" << endl;
-}
-*/
 /*
 FutureTimePointPRU1 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU1);
 auto duration_since_epochFutureTimePointPRU1=FutureTimePointPRU1.time_since_epoch();
