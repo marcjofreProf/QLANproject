@@ -148,14 +148,14 @@ CMDLOOP:
 //	QBEQ	SIGNALON, r0.b0, 2 // Coincides with a 2
 //	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
 //	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
-//SIGNALON:
-//	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents of r1 byte 0 to magic r30 output byte 0
+SIGNALON:
+	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents of r1 byte 0 to magic r30 output byte 0
 //	MOV	r0, r1
 //DELAYON:
 //	SUB 	r0, r0, 1
 //	QBNE	DELAYON, r0, 0
-//SIGNALOFF:
-//	MOV	r30.b0, AllOutputInterestPinsLow // write the contents to magic r30 byte 0
+SIGNALOFF:
+	MOV	r30.b0, AllOutputInterestPinsLow // write the contents to magic r30 byte 0
 //	MOV	r0, r1
 //DELAYOFF:
 //	SUB 	r0, r0, 1
@@ -163,7 +163,7 @@ CMDLOOP:
 TEST:
 	LED_ON
 FINISHLOOP:
-	JMP	TEST // Might consume more than one clock (maybe 3) but always the same amount
+	JMP	SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
 EXIT:
 	// Send notification (interrupt) to Host for program completion
 	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
