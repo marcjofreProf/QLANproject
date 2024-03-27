@@ -20,7 +20,7 @@
 #define INS_PER_US		200		// 5ns per instruction for Beaglebone black
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
 #define NUM_CLOCKS_PERIOD	6250		// Not used (value given by host) set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
-#define DELAY 3125//1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
+#define DELAY 			3125//1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17

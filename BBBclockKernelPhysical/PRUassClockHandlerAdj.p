@@ -109,12 +109,12 @@ CMDLOOP:
 	//LED_ON
 PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
-	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
-	AND	r0, r0, 0x00000003 // Since the signals have a minimum period of 4 clock cycles
-	QBEQ	FINISHLOOP, r0.b0, 3 // Coincides with a 3
-	QBEQ	FINISHLOOP, r0.b0, 2 // Coincides with a 2
-	QBEQ	FINISHLOOP, r0.b0, 1 // Coincides with a 1
-	QBEQ	FINISHLOOP, r0.b0, 0 // Coincides with a 0
+//	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
+//	AND	r0, r0, 0x00000003 // Since the signals have a minimum period of 4 clock cycles
+//	QBEQ	FINISHLOOP, r0.b0, 3 // Coincides with a 3
+//	QBEQ	FINISHLOOP, r0.b0, 2 // Coincides with a 2
+//	QBEQ	FINISHLOOP, r0.b0, 1 // Coincides with a 1
+//	QBEQ	FINISHLOOP, r0.b0, 0 // Coincides with a 0
 FINISHLOOP:
 	// The following lines do not consume "signal speed"
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
