@@ -16,8 +16,8 @@
 #include <sys/mman.h>
 #include <prussdrv.h>
 #include <pruss_intc_mapping.h>
-#define PRU_Operation_NUM 0 // PRU operation and handling with PRU0
-#define PRU_Signal_NUM 1 // Signals PINS with PRU1
+#define PRU_ClockPhys_NUM 0 // PRU0
+#define PRU_HandlerSynch_NUM 1 // PRU1
 /******************************************************************************
 * Local Macro Declarations - Global Space point of View                       *
 ******************************************************************************/
@@ -127,16 +127,16 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
 	    pru0dataMem_int[0]=(unsigned int)6250; // set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
-	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdj.bin") == -1){
-		if (prussdrv_exec_program(PRU_Operation_NUM, "./PRUassClockPhysicalAdj.bin") == -1){
+	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdj.bin") == -1){
+		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdj.bin") == -1){
 			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdj.bin");
 		}
 	}
 	////prussdrv_pru_enable(PRU_Operation_NUM);
 	pru1dataMem_int[0]=(unsigned int)0; // set
 	// Load and execute the PRU program on the PRU1
-	if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdj.bin") == -1){
-		if (prussdrv_exec_program(PRU_Signal_NUM, "./PRUassClockHandlerAdj.bin") == -1){
+	if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdj.bin") == -1){
+		if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./PRUassClockHandlerAdj.bin") == -1){
 			perror("prussdrv_exec_program non successfull writing of PRUassClockHandlerAdj.bin");
 		}
 	}
@@ -164,47 +164,12 @@ else{
 	cout << "PRU0 interrupt poll error" << endl;
 }
 */
-/*
-FutureTimePointPRU0 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU0);
-auto duration_since_epochFutureTimePointPRU0=FutureTimePointPRU0.time_since_epoch();
-auto duration_since_epochTimeNowPRU0=FutureTimePointPRU0.time_since_epoch(); //just for initialization
-// Convert duration to desired time
-TimePointFuture_time_as_countPRU0 = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePointPRU0).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
-
-CheckTimeFlagPRU0=false;
-
-finPRU0=false;
-do // This is blocking
-{
-TimePointClockNowPRU0=Clock::now();
-duration_since_epochTimeNowPRU0=TimePointClockNowPRU0.time_since_epoch();
-TimeNow_time_as_countPRU0 = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNowPRU0).count();
-
-if (TimeNow_time_as_countPRU0>TimePointFuture_time_as_countPRU0){CheckTimeFlagPRU0=true;}
-else{CheckTimeFlagPRU0=false;}
-	if (pru0dataMem_int[1] == (unsigned int)1 and CheckTimeFlagPRU0==false)// Seems that it checks if it has finished the acquisition
-	{
-		pru0dataMem_int[1] = (unsigned int)0; // Here clears the value
-		this->DDRdumpdata(); // Store to file		
-		finPRU0=true;
-	}
-	else if (CheckTimeFlagPRU0==true){// too much time
-		pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command.
-		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
-		//prussdrv_pru_reset(PRU_Operation_NUM);
-		//prussdrv_pru_disable(PRU_Operation_NUM);// Disable the PRU
-		//prussdrv_pru_enable(PRU_Operation_NUM);// Enable the PRU from 0		
-		cout << "GPIO::ReadTimeStamps took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
-		//sleep(10);// Give some time to load programs in PRUs and initiate
-		finPRU0=true;
-	}
-} while(!finPRU0);
-*/
 
 return 0;// all ok
 }
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+/*
 // Important, the following line at the very beggining to reduce the command jitter
 pru1dataMem_int[0]=(unsigned int)0; // set
 prussdrv_pru_send_event(22);
@@ -225,7 +190,7 @@ else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU1 interrupt error" << endl;
 }
-
+*/
 /*
 FutureTimePointPRU1 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU1);
 auto duration_since_epochFutureTimePointPRU1=FutureTimePointPRU1.time_since_epoch();
@@ -338,8 +303,8 @@ return 0; // All ok
 
 int CKPD::DisablePRUs(){
 // Disable PRU and close memory mappings
-prussdrv_pru_disable(PRU_Signal_NUM);
-prussdrv_pru_disable(PRU_Operation_NUM);
+prussdrv_pru_disable(PRU_ClockPhys_NUM);
+prussdrv_pru_disable(PRU_HandlerSynch_NUM);
 
 return 0;
 }

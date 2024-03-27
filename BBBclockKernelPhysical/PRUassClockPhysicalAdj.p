@@ -86,6 +86,10 @@ INITIATIONS:
 	//MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
 	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
+	// This will make C26 point to 0x0002E000 (IEP).
+	MOV	r0, 0x0002E000//
+	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of IEP
+	
 	// Initializations
 	LDI	r30, 0 // All signal pins down
 	LDI	r4, 0
@@ -163,12 +167,12 @@ CMDLOOP:
 	//LED_ON
 PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
-	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
-	AND	r0, r0, 0x00000003 // Since the signals have a minimum period of 4 clock cycles
-	QBEQ	SIGNALON, r0.b0, 3 // Coincides with a 3
-	QBEQ	SIGNALON, r0.b0, 2 // Coincides with a 2
-	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
-	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
+//	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
+//	AND	r0, r0, 0x00000003 // Since the signals have a minimum period of 4 clock cycles
+//	QBEQ	SIGNALON, r0.b0, 3 // Coincides with a 3
+//	QBEQ	SIGNALON, r0.b0, 2 // Coincides with a 2
+//	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
+//	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
 SIGNALON:	
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents of r1 byte 0 to magic r30 output byte 0
 	MOV	r0, DELAY
