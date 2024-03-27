@@ -1,0 +1,1 @@
+arm-linux-gnueabihf-g++ -static -I ../am335x_pru_package/pru_sw/app_loader/include BBBclockKernelPhysicalDaemon.cpp ../am335x_pru_package/pru_sw/app_loader/interface/release/prussdrv.o -o BBBclockKernelPhysicalDaemon
