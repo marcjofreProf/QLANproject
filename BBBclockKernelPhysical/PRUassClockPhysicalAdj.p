@@ -150,16 +150,16 @@ CMDLOOP:
 //	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
 SIGNALON:
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents of r1 byte 0 to magic r30 output byte 0
-//	MOV	r0, r1
-//DELAYON:
-//	SUB 	r0, r0, 1
-//	QBNE	DELAYON, r0, 0
+	MOV	r0, r1
+DELAYON:
+	SUB 	r0, r0, 1
+	QBNE	DELAYON, r0, 0
 SIGNALOFF:
 	MOV	r30.b0, AllOutputInterestPinsLow // write the contents to magic r30 byte 0
-//	MOV	r0, r1
-//DELAYOFF:
-//	SUB 	r0, r0, 1
-//	QBNE 	DELAYOFF, r0, 0
+	MOV	r0, r1
+DELAYOFF:
+	SUB 	r0, r0, 1
+	QBNE 	DELAYOFF, r0, 0
 TEST:
 	LED_ON
 FINISHLOOP:
