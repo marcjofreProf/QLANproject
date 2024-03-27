@@ -133,12 +133,12 @@ INITIATIONS:
 
 // Without delays (fastest possible) and CMD controlled
 CMDLOOP:
-	QBBC	CMDLOOP, r31, 30	//Reception or not of the host interrupt
+//	QBBC	CMDLOOP, r31, 30	//Reception or not of the host interrupt
 	// ok, we have an instruction. Assume it means 'begin signals'
 	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
-	LBCO 	r1, CONST_PRUDRAM, 0, 4
+//	LBCO 	r1, CONST_PRUDRAM, 0, 4
 	// We remove the command from the host (in case there is a reset from host, we are saved)
-	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
+//	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 	//LED_ON
 PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
