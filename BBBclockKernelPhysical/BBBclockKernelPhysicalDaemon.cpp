@@ -378,9 +378,10 @@ int main(int argc, char const * argv[]){
  //  printf( "  %d. %s\n", i, argv[i] );
  // }
  //}
+ cout << "CKPDagent started..." << endl;
  CKPD CKPDagent; // Initiate the instance
  CKPDagent.m_start(); // Initiate in start state.
- cout << "CKPDagent started..." << endl;
+ 
  /// Errors handling
  signal(SIGINT, SignalINTHandler);// Interruption signal
  signal(SIGPIPE, SignalPIPEHandler);// Error trying to write/read to a socket
