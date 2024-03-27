@@ -77,6 +77,7 @@ public:	// Functions/Methods
         // time for your timer or counter. 
         bool m_resume() { m_state = APPLICATION_RUNNING; return true; }      
         bool m_exit() { m_state = APPLICATION_EXIT;  return false; }
+        int RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep);
         // Sempahore
 	void acquire();
 	void release();

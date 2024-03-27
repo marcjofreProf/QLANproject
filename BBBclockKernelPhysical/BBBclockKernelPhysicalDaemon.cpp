@@ -7,6 +7,7 @@
 #include <iostream>
 #include <unistd.h> //for sleep
 #include <signal.h>
+#define WaitTimeAfterMainWhileLoop 10000 //nanoseconds
 // Time/synchronization management
 #include <chrono>
 // PRU programming
@@ -326,6 +327,15 @@ int CKPD::LOCAL_DDMinit(){
     return 0;
 }
 
+int CKPD::RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep){
+struct timespec ts;
+ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
+ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
+clock_nanosleep(CLOCK_TAI, 0, &ts, NULL); //
+
+return 0; // All ok
+}
+
 int CKPD::DisablePRUs(){
 // Disable PRU and close memory mappings
 prussdrv_pru_disable(PRU_Signal_NUM);
@@ -370,6 +380,7 @@ int main(int argc, char const * argv[]){
  //}
  CKPD CKPDagent; // Initiate the instance
  CKPDagent.m_start(); // Initiate in start state.
+ cout << "CKPDagent started..." << endl;
  /// Errors handling
  signal(SIGINT, SignalINTHandler);// Interruption signal
  signal(SIGPIPE, SignalPIPEHandler);// Error trying to write/read to a socket
@@ -405,7 +416,7 @@ int main(int argc, char const * argv[]){
         } // switch
         //CKPDagent.release();
 	if (signalReceivedFlag.load()){CKPDagent.~CKPD();}// Destroy the instance
-        //CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
+        CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception
