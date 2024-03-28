@@ -125,7 +125,8 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	// Timetagging
 	//pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
-	  pru0dataMem_int[0]=(unsigned int)0; // set
+	  pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
+	  pru0dataMem_int[1]=this->Power2NumClocksHalfPeriod; // set
 	// Load and execute the PRU program on the PRU0
 	if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdj.bin") == -1){
 		if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./PRUassClockHandlerAdj.bin") == -1){
@@ -135,8 +136,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	//prussdrv_pru_enable(PRU_HandlerSynch_NUM);
 	
 	    // Load and execute the PRU program on the PRU1
-	    pru1dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
-	    pru1dataMem_int[1]=this->NumClocksPeriodPRUclock; 
+	    pru1dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250 
 	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdj.bin") == -1){
 		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdj.bin") == -1){
 			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdj.bin");
@@ -151,7 +151,6 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 
 int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
 pru1dataMem_int[0]=this->NumClocksHalfPeriodPRUclock;
-pru1dataMem_int[1]=this->NumClocksPeriodPRUclock; 
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
 sleep(1);// Give some time
@@ -160,8 +159,8 @@ return 0;// all ok
 }
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-pru0dataMem_int[0]=(unsigned int)0; // set
-
+pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
+pru0dataMem_int[1]=this->Power2NumClocksHalfPeriod; // set
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment

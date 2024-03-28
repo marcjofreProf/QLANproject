@@ -29,14 +29,18 @@
 #define CONST_PRUCFG         C4
 #define CONST_PRUDRAM        C24 // allow the PRU to map portions of the system's memory into its own address space. In particular we will map its own data RAM
 #define CONST_IETREG	     C26
+#define CONST_PRUSHAREDRAM   C28 // mapping shared memory
 
 #define OWN_RAM              0x00000000 // current PRU data RAM
 #define OWN_RAMoffset	     0x00000200 // Offset from Base OWN_RAM to avoid collision with some data tht PRU might store
 #define PRU0_CTRL            0x220
+#define SHARED_RAM           0x100
 
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0xFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
 #define AllOutputInterestPinsLow 0x00// For the defined output pins to set them low in block (and not the ones that are allocated by other processes)
+#define Power2NumClocksHalfPeriod 8 // Initial value in exponential of power 2 + 1 more to get half the period (also provided by host)
+#define NUM_CLOCKS_HALF_PERIOD	3125		// Not used (value given by host) set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
@@ -56,11 +60,13 @@
 // r1 reserved to read from PRU DATA RAM
 // If using the cycle counter in the PRU // We cannot use Constan table pointers since the base addresses are too far
 // r2 reserved mapping control register
-
+// r3 reserved for DWT_CYCCNT actual value
 // r4 reserved for zeroing registers
-
+// r5 reserved for number of clock periods betwene updates
 // r6 reserved for 0x22000 Control register
 // r7 reserved for 0x2200C DWT_CYCCNT
+
+// r10 reserved for operations
 
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
@@ -80,9 +86,18 @@ INITIATIONS:
 	MOV	r0, OWN_RAM// | OWN_RAMoffset
 	//MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
 	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
-		
+	
+	// Configure the programmable pointer register for PRU by setting c28_pointer[15:0] // related to shared RAM
+	// This will make C28 point to 0x00010000 (PRU shared RAM).
+	// http://www.embedded-things.com/bbb/understanding-bbb-pru-shared-memory-access/	
+	MOV	r0, SHARED_RAM // 0x100                  // Set C28 to point to shared RAM
+	MOV	r10, 0x22000+0x28//PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
+	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
+	
 	// Initializations
-	LDI	r4, 0
+	MOV	r1, NUM_CLOCKS_HALF_PERIOD// Initial initialization just in case
+	LDI	r4, 0 // For zeroing
+	MOV	r5, Power2NumClocksHalfPeriod// Initial initialization just in case
 	MOV	r6, 0x22000
 	MOV	r7, 0x2200C
 	
@@ -93,11 +108,12 @@ CMDLOOP:
 	QBBC	CMDLOOP, r31, 30	//
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
-	// We remove the command from the host (in case there is a reset from host, we are saved)
-	//SBCO 	r4.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM
+	LBCO 	r5, CONST_PRUDRAM, 4, 4
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 	//LED_ON
-CLOCKHANDLER:
+READCOUNTER:
+	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT
+CLEARCOUNTER:	// Clear the value of DWT_CYCCNT
 	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	CLR	r2.t3
 	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
@@ -106,6 +122,15 @@ CLOCKHANDLER:
 	//LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
+CALCHALFPERIOD:	// Divide the DWT_CYCCNT value by the number of theoretical clock cycles + one more time to get half the period
+	LSR	r3, r3, r5
+AVERAGEHALFPERIOD:	// Average with previous values
+	ADD	r3, r3, r1
+	LSR	r3, r3, 1
+SAVEVALUE:	// Save the value in SHARED RAM
+	SBCO 	r3, CONST_PRUSHAREDRAM, 0, 4 // Put contents into the address offset 0 SHARED RAM
+SENDINTPRU:	// Send interruption
+	MOV 	r31.b0, PRU0_PRU1_INTERRUPT+16
 FINISHLOOP:
 	// The following lines do not consume "signal speed"
 	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16

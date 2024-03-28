@@ -7,6 +7,7 @@
 #ifndef BBBclockKernelPhysicalDaemon_H_
 #define BBBclockKernelPhysicalDaemon_H_
 #include<string>
+#include<cmath>
 // Semaphore
 #include <atomic>
 // Time/synchronization management
@@ -17,7 +18,7 @@
 // Clock adjustment
 #define ClockPeriodNanoseconds			31250// 32Khz
 #define PRUclockStepPeriodNanoseconds		5 // PRU clock cycle time in nanoseconds
-#define ClockCyclePeriodAdjustment		100 // Multiply this value to the ClockPeriodNanoseconds, the value has to be larger than the WaitTimeAfterMainWhileLoop
+#define ClockCyclePeriodAdjustment		128 // It has to be power of 2 and adjusted in assembler code for faster operations. Multiply this value to the ClockPeriodNanoseconds, the value has to be larger than the WaitTimeAfterMainWhileLoop
 
 namespace exploringBBBCKPD {
 
@@ -48,7 +49,7 @@ private:// Variables
 	TimePoint TimePointClockCurrentInitial=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
 	// PRU clock handling
 	unsigned int NumClocksHalfPeriodPRUclock=(unsigned int)(0.5*((double)(ClockPeriodNanoseconds))/((double)(PRUclockStepPeriodNanoseconds)));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
-	unsigned int NumClocksPeriodPRUclock=(unsigned int)(2*NumClocksHalfPeriodPRUclock);
+	unsigned int Power2NumClocksHalfPeriod=(unsigned int)(log2(2*ClockCyclePeriodAdjustment));
 	int retInterruptsPRU0;
 	int WaitTimeInterruptPRU0=(int)(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds/1000); // In microseconds
 	// PRU clock generation

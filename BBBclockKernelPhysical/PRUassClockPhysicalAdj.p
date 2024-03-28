@@ -20,6 +20,7 @@
 #define NUM_CLOCKS_HALF_PERIOD	3125		// Not used (value given by host) set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
 #define LOSTCLOCKCOUNTS1	4 // estimation of clocks counts evolved
 #define LOSTCLOCKCOUNTS2	9 // estimation of clocks counts evolved
+#define LOSTCLOCKCOUNTS3	2 // estimation of clocks counts evolved
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -32,10 +33,12 @@
 #define CONST_PRUCFG         C4
 #define CONST_PRUDRAM        C24 // allow the PRU to map portions of the system's memory into its own address space. In particular we will map its own data RAM
 #define CONST_IETREG	     C26
+#define CONST_PRUSHAREDRAM   C28 // mapping shared memory
 
 #define OWN_RAM              0x00000000 // current PRU data RAM
 #define OWN_RAMoffset	     0x00000200 // Offset from Base OWN_RAM to avoid collision with some data tht PRU might store
 #define PRU1_CTRL            0x240
+#define SHARED_RAM           0x100
 
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0xFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
@@ -60,12 +63,10 @@
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
 // r2 reserved mapping control register
-// r3 reserved for adjusting CLOCK ON TIME
 // r4 reserved for zeroing registers
 // r5 reserved for 0xFFFFFFFF
 // r6 reserved for 0x22000 Control register
 // r7 reserved for 0x2200C DWT_CYCCNT
-// r8 reserved with the computed number of clock cycles of the total period
 
 // r10 is arbitrary used for operations
 
@@ -87,6 +88,13 @@ INITIATIONS:
 	MOV	r0, OWN_RAM// | OWN_RAMoffset
 	//MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
 	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
+	
+	// Configure the programmable pointer register for PRU by setting c28_pointer[15:0] // related to shared RAM
+	// This will make C28 point to 0x00010000 (PRU shared RAM).
+	// http://www.embedded-things.com/bbb/understanding-bbb-pru-shared-memory-access/	
+	MOV	r0, SHARED_RAM // 0x100                  // Set C28 to point to shared RAM
+	MOV	r10, 0x22000+0x28//PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
+	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
 	
 //	// This will make C26 point to 0x0002E000 (IEP).
 //	MOV	r0, 0x0002E000//
@@ -145,19 +153,11 @@ CMDLOOP:
 //	// ok, we have an instruction. Assume it means 'begin signals'
 //	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
-	LBCO 	r8, CONST_PRUDRAM, 4, 4
 //	// We remove the command from the host (in case there is a reset from host, we are saved)
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
-	// Calculate the total Clock period in counts
-PSEUDOSYNCH:
-	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
-	LBBO	r0, r7, 0, 4// Read DWT_CYCNT
-	
-	MOV	r3, r1
 SIGNALON:
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
-	MOV	r0, r3
-	MOV	r3, r1 // Update r3 to the actual value after adjustment
+	MOV	r0, r1
 DELAYON:
 	SUB 	r0, r0, 1
 	QBNE	DELAYON, r0, LOSTCLOCKCOUNTS1
@@ -167,8 +167,18 @@ SIGNALOFF:
 DELAYOFF:
 	SUB 	r0, r0, 1
 	QBNE 	DELAYOFF, r0, LOSTCLOCKCOUNTS2
-FINISHLOOP:
-	JMP	PSEUDOSYNCH // Might consume more than one clock (maybe 3) but always the same amount
+FINISHLOOP:// Check if interruption and updates r1 accordingly
+	QBBC	FINISHDELAYNOINT, r31, 29	//Reception or not of the PRU0 interrupt
+	// Handle interruption
+	LBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Read contents from the address offset 0 SHARED RAM
+	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt
+	JMP	SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
+FINISHDELAYNOINT: // Some delay because it does not have to handle interruption
+	MOV	r0, LOSTCLOCKCOUNTS3
+FINISHDELAYNOINTEXTRA:
+	SUB	r0, r0, 1
+	QBNE 	FINISHDELAYNOINTEXTRA, r0, 0
+	JMP	SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
 EXIT:
 	// Send notification (interrupt) to Host for program completion
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
