@@ -156,7 +156,6 @@ CMDLOOP:
 //	// We remove the command from the host (in case there is a reset from host, we are saved)
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 SIGNALON:
-	MOV	r1, 31250// Check
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
 	MOV	r0, r1
 DELAYON:
@@ -172,6 +171,7 @@ FINISHLOOP:// Check if interruption and updates r1 accordingly
 	QBBC	FINISHDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
 	// Handle interruption
 	LBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Read contents from the address offset 0 SHARED RAM
+	MOV	r1, 31250// Check
 	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt
 	JMP	SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
 FINISHDELAYNOINT: // Some delay because it does not have to handle interruption
