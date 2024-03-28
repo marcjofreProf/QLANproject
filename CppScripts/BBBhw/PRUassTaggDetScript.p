@@ -107,7 +107,7 @@ INITIATIONS:// This is only run once
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
 	// Initializations for faster execution
 	LDI	r7, 0 // Register for clearing other registers
-	MOV	r10, 0xFFFFFFFF
+	LDI	r10, 0//MOV	r10, 0xFFFFFFFF
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -146,9 +146,6 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 	SBCO	r10, CONST_IETREG, 0xC, 4 // Reset IEP counter to 0xFFFFFFFF. Account that we lose 12 cycle counts
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	// Initial Re-initialization of DWT_CYCCNT
-	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
-	CLR	r2.t3
-	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT

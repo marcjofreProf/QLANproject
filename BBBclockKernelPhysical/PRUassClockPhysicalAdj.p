@@ -96,7 +96,7 @@ INITIATIONS:
 	LDI	r30, 0 // All signal pins down
 	LDI	r4, 0
 	MOV	r1, NUM_CLOCKS_HALF_PERIOD// Initial initialization just in case
-	MOV	r5, 0xFFFFFFFF
+	LDI	r5, 0//MOV	r5, 0xFFFFFFFF
 	MOV	r6, 0x22000
 	MOV	r7, 0x2200C
 	
