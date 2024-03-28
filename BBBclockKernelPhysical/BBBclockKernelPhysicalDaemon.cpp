@@ -193,7 +193,7 @@ return 0;// all ok
 
 struct timespec CKPD::SetFutureTimePoint(){
 struct timespec requestWhileWaitAux;
-TimePoint TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(10*this->TimeAdjPeriod);
+TimePoint TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);
 this->TimePointClockCurrentInitial=TimePointClockCurrentFinal; //Update value
 auto duration_since_epochFutureTimePoint=TimePointClockCurrentFinal.time_since_epoch();
 // Convert duration to desired time
