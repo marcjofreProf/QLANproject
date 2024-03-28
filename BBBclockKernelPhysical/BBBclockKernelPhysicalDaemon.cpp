@@ -150,6 +150,7 @@ pru1dataMem_int[0]=(unsigned int)3125; // set the number of clocks that defines 
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
 sleep(1);// Give some time
+cout << "Generating clock output" << endl;
 return 0;// all ok
 }
 
@@ -345,6 +346,7 @@ int main(int argc, char const * argv[]){
  else{isValidWhileLoop = true;}
  
  CKPDagent.GenerateSynchClockPRU();// Launch the generation of the clock
+ cout << "Starting to actively adjust clock output" << endl;
  while(isValidWhileLoop){ 
    try{
  	try {
