@@ -155,6 +155,12 @@ CMDLOOP:
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
 //	// We remove the command from the host (in case there is a reset from host, we are saved)
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
+PSEUDOSYNCH:
+	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
+	LBBO	r0.b0, r7, 0, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
+	AND	r0, r0, 0x00000001 // Start at 0 in binary
+	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
+	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
 SIGNALON:
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
 	MOV	r0, r1
@@ -167,12 +173,6 @@ SIGNALOFF:
 DELAYOFF:
 	SUB 	r0, r0, 1
 	QBNE 	DELAYOFF, r0, LOSTCLOCKCOUNTS2
-PSEUDOSYNCH:
-	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
-	LBBO	r0.b0, r7, 0, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
-	AND	r0, r0, 0x00000001 // Start at 0 in binary
-	QBEQ	FINISHLOOP, r0.b0, 1 // Coincides with a 1
-	QBEQ	FINISHLOOP, r0.b0, 0 // Coincides with a 0
 FINISHLOOP:// Check if interruption and updates r1 accordingly
 	QBBC	FINISHDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
 	// Handle interruption
