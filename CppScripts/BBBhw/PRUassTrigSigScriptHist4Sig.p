@@ -83,8 +83,8 @@ INITIATIONS:
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
 	MOV	r0, OWN_RAM// | OWN_RAMoffset
-	//MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
-	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
+	MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
+	SBBO	r0, r10, 0, 4//SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
 	//// This will make C26 point to 0x0002E000 (IET). Done by the other PRU
 	//MOV	r0, 0x0002E000// | OWN_RAMoffset // When using assembler, the PRU does not put data in the first addresses of OWN_RAM (when using c++ PRU direct programming the PRU  might use some initial addresses of OWN_RAM space

@@ -49,7 +49,7 @@ private:// Variables
 	TimePoint TimePointClockCurrentInitial=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
 	// PRU clock handling
 	unsigned int NumClocksHalfPeriodPRUclock=(unsigned int)(0.5*((double)(ClockPeriodNanoseconds))/((double)(PRUclockStepPeriodNanoseconds)));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
-	float RatioFreqAdjustment=0.2;
+	float RatioFreqAdjustment=0.4;
 	unsigned int MinNumClocksHalfPeriodPRUclock=(unsigned int)((1.0-RatioFreqAdjustment)*(float)(NumClocksHalfPeriodPRUclock));
 	unsigned int MaxNumClocksHalfPeriodPRUclock=(unsigned int)((1.0+RatioFreqAdjustment)*(float)(NumClocksHalfPeriodPRUclock));
 	int retInterruptsPRU0;
