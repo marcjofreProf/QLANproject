@@ -126,7 +126,6 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	//pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
 	  pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
-	  pru0dataMem_int[1]=this->Power2NumClocksHalfPeriod; // set
 	// Load and execute the PRU program on the PRU0
 	if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdj.bin") == -1){
 		if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./PRUassClockHandlerAdj.bin") == -1){
@@ -160,7 +159,6 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
-pru0dataMem_int[1]=this->Power2NumClocksHalfPeriod; // set
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment
@@ -181,7 +179,7 @@ else{
 	cout << "PRU0 interrupt poll error" << endl;
 }
 // Update pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
-this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((float)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*((float)(pru0dataMem_int[0])));
+this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((float)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*((float)(pru0dataMem_int[0])/(float)(ClockCyclePeriodAdjustment)));
 
 return 0;// all ok	
 }

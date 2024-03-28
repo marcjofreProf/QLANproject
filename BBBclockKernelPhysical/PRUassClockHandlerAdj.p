@@ -39,7 +39,6 @@
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0xFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
 #define AllOutputInterestPinsLow 0x00// For the defined output pins to set them low in block (and not the ones that are allocated by other processes)
-#define Power2NumClocksHalfPeriod 8 // Initial value in exponential of power 2 + 1 more to get half the period (also provided by host)
 #define NUM_CLOCKS_HALF_PERIOD	3125		// Not used (value given by host) set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
@@ -62,7 +61,7 @@
 // r2 reserved mapping control register
 // r3 reserved for DWT_CYCCNT actual value
 // r4 reserved for zeroing registers
-// r5 reserved for number of clock periods betwene updates
+
 // r6 reserved for 0x22000 Control register
 // r7 reserved for 0x2200C DWT_CYCCNT
 
@@ -97,7 +96,6 @@ INITIATIONS:
 	// Initializations
 	MOV	r1, NUM_CLOCKS_HALF_PERIOD// Initial initialization just in case
 	LDI	r4, 0 // For zeroing
-	MOV	r5, Power2NumClocksHalfPeriod// Initial initialization just in case
 	MOV	r6, 0x22000
 	MOV	r7, 0x2200C
 	
@@ -111,7 +109,6 @@ READCOUNTER:
 READINFO:
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
-	LBCO 	r5, CONST_PRUDRAM, 4, 4
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 	//LED_ON
 
@@ -124,12 +121,10 @@ CLEARCOUNTER:	// Clear the value of DWT_CYCCNT
 	//LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
-CALCHALFPERIOD:	// Divide the DWT_CYCCNT value by the number of theoretical clock cycles + one more time to get half the period
-	LSR	r3, r3, r5
-AVERAGEHALFPERIOD:	// Average with previous values. Add is limited to add 255 only, so we have to do it in the host
+AVERAGEHALFPERIOD:	// Division ofr half period and average with previous values. Add is limited to add 255 only, so we have to do it in the host
 	SBCO 	r3, CONST_PRUDRAM, 0, 4// Stores in position 0 de new value so the host handles it
 SAVEVALUE:	// Save the value in SHARED RAM
-	SBCO 	r3, CONST_PRUSHAREDRAM, 0, 4 // Put contents into the address offset 0 SHARED RAM
+	SBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Put contents into the address offset 0 SHARED RAM for the other PRU; it is from the past calculation
 SENDINTPRU:	// Send interruption
 	MOV 	r31.b0, PRU0_PRU1_INTERRUPT+16
 FINISHLOOP:
