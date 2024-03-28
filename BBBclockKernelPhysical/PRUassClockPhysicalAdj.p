@@ -105,6 +105,7 @@ INITIATIONS:
 	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	CLR	r2.t3
 	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
+	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
@@ -131,12 +132,12 @@ INITIATIONS:
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
-CMDLOOP:
-	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT so that it does not overflow. Account that we lose 2 cycle counts
+CMDLOOP:	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	CLR	r2.t3
 	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
+	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT so that it does not overflow. Account that we lose 2 cycle counts
 	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT

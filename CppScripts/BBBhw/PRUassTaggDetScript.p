@@ -113,6 +113,7 @@ INITIATIONS:// This is only run once
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	CLR	r2.t3
 	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
+	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
@@ -144,22 +145,23 @@ INITIATIONS:// This is only run once
 //	QBA     CHECK_CYCLECNT
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	SBCO	r10, CONST_IETREG, 0xC, 4 // Reset IEP counter to 0xFFFFFFFF. Account that we lose 12 cycle counts
+	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+	CLR	r2.t3
+	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
-	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
-	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT	
+	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
+	LBCO	r8, CONST_IETREG, 0xC, 4//LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT		
 	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset				
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
-	LBCO	r8, CONST_IETREG, 0xC, 4//LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT	
-
 //START1:
 //	SET r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew	
-	LBBO	r5, r13, 0, 4//LBBO	r5, r13, 0, 4 // Read DWT_CYCCNT counter // LBCO	r5, CONST_IETREG, 0xC, 4 // Read IEP counter	// from here, if a reset of count we will lose some counts.		
-	QBLE	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte <= r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
+	LBBO	r5.b0, r13, 3, 1//LBBO	r5.b0, r13, 3, 1 // Read DWT_CYCCNT counter // LBCO	r5.b0, CONST_IETREG, 0xF, 1 // Read IEP counter	// from here, if a reset of count we will lose some counts.		
+	QBLE	RESET_CYCLECNT, r5.b0, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte <= r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
 CMDLOOP:
 	//LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
 	//QBEQ	CHECK_CYCLECNT, r0.b0, 0 // loop until we get an instructionQBEQ	NORMSTEPS, r0.b0, 0 // loop until we get an instruction
@@ -209,12 +211,6 @@ TIMETAG:
 	MOV	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF	
-	//// Make sure that counters are enabled
-	//LBBO	r2, r12, 0, 1 // r2 maps b0 control register
-	//SET	r2.t3
-	//SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
-	//MOV	r0, 0x11 // Enable and Define increment value to 1
-	//SBCO	r0, CONST_IETREG, 0, 1 // Enables IET count	
 	LBCO	r9, CONST_IETREG, 0xC, 4//LBCO	r9, CONST_IETREG, 0xC, 4 // read IEP	 // LBBO	r9, r13, 0, 4 // read DWT_CYCNT	
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	

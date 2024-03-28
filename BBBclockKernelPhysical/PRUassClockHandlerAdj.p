@@ -98,6 +98,9 @@ CMDLOOP:
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 	//LED_ON
 CLOCKHANDLER:
+	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+	CLR	r2.t3
+	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
 	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
