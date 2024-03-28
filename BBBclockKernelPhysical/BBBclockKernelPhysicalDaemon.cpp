@@ -180,7 +180,7 @@ else{
 }
 // Update pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
 this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((float)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*((float)(pru0dataMem_int[0])/(float)(ClockCyclePeriodAdjustment)));
-
+cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
 return 0;// all ok	
 }
 
