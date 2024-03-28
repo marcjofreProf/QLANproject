@@ -99,6 +99,13 @@ CMDLOOP:
 	//LED_ON
 CLOCKHANDLER:
 	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	// Initial Re-initialization of DWT_CYCCNT
+	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+	CLR	r2.t3
+	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
+	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+	SET	r2.t3
+	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
 FINISHLOOP:
 	// The following lines do not consume "signal speed"
 	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16

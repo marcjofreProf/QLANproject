@@ -145,6 +145,13 @@ INITIATIONS:// This is only run once
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew	
 	SBCO	r10, CONST_IETREG, 0xC, 4 // Reset IEP counter to 0xFFFFFFFF. Account that we lose 12 cycle counts
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
+	// Initial Re-initialization of DWT_CYCCNT
+	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+	CLR	r2.t3
+	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
+	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+	SET	r2.t3
+	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
 	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset				
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 	LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT	

@@ -133,6 +133,13 @@ INITIATIONS:
 
 CMDLOOP:
 	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT so that it does not overflow. Account that we lose 2 cycle counts
+	// Initial Re-initialization of DWT_CYCCNT
+	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+	CLR	r2.t3
+	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
+	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+	SET	r2.t3
+	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
 	QBBC	CMDLOOP, r31, 31	//Reception or not of the host interrupt
 //	// ok, we have an instruction. Assume it means 'begin signals'
 //	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
