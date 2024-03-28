@@ -17,7 +17,7 @@
 #define PRUdataPATH2 "../PRUdata/"
 // Clock adjustment
 #define ClockPeriodNanoseconds			31250// 32Khz
-#define PRUclockStepPeriodNanoseconds		1//5 // PRU clock cycle time in nanoseconds
+#define PRUclockStepPeriodNanoseconds		4 // PRU clock cycle time in nanoseconds
 #define ClockCyclePeriodAdjustment		128 // It has to be power of 2 and adjusted in assembler code for faster operations. Multiply this value to the ClockPeriodNanoseconds, the value has to be larger than the WaitTimeAfterMainWhileLoop
 
 namespace exploringBBBCKPD {
