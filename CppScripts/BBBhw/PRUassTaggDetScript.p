@@ -136,13 +136,9 @@ INITIATIONS:// This is only run once
 	SBBO	r7, r13, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts	
 	SBCO	r10, CONST_IETREG, 0xC, 4 // Clear IEP timer count				
 	
-	// Read once the counters// If using DWT_CYCCNT for computing skew and offset
-//	LBBO	r8, r13, 0 , 4 // Read DWT_CYCCNT
-//	LBBO	r9, r13, 0 , 4 // Read DWT_CYCCNT
-	
-	// Read once the counters// If using IEP counter for computing skew and offset
-	LBBO	r8, CONST_IETREG, 0xC , 4 // Read DWT_CYCCNT
-	LBBO	r9, CONST_IETREG, 0xC , 4 // Read DWT_CYCCNT	
+	// Initiate to zero for counters of skew and offset
+	LDI	r8, 0
+	LDI	r9, 0	
 
 //NORMSTEPS: // So that always takes the same amount of counts for reset
 //	QBA     CHECK_CYCLECNT
