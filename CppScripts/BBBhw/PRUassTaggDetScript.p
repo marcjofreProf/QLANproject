@@ -41,13 +41,16 @@
 // r8 reserved for cycle count final skew
 // r9 reserved for cycle count final threshold reset
 // r10 reserved for 0xFFFFFFFF
-
-// r16 reserved for raising edge detection operation together with r6
-
+// r11 reserved for initial count offset value
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
 // r12 reserved for 0x22000 Control register
 // r13 reserved for 0x2200C DWT_CYCCNT
+// r14 reserved for storing the substraction of offset value
+
+// r16 reserved for raising edge detection operation together with r6
+
+
 //// If using IET timer (potentially adjusted to synchronization protocols)
 // We can use Constant table pointers C26
 // CONST_IETREG 0x0002E000
@@ -120,31 +123,33 @@ INITIATIONS:// This is only run once
 		
 	// Initial Re-initialization for IET counter
 	// The Clock gating Register controls the state of Clock Management
-	//LBCO 	r0, CONST_PRUCFG, 0x10, 4                    
-	MOV 	r0, 0x24924
-	SBCO 	r0, CONST_PRUCFG, 0x10, 4 
-	//LBCO	r2, CONST_IETREG, 0, 1 //
-	//SET ocp_clk:1 or of iep_clk:0
-	MOV	r0, 0
-	SBCO 	r0, CONST_PRUCFG, 0x30, 4
-	// IEP configuration
-	MOV	r0, 0x111 // Enable and Define increment value to 1
-	SBCO	r0, CONST_IETREG, 0, 4 // Enables IET count and sets configuration
-	// Deactivate IEP compensation
-	SBCO 	r7, CONST_IETREG, 0x08, 4
+//	//LBCO 	r0, CONST_PRUCFG, 0x10, 4                    
+//	MOV 	r0, 0x24924
+//	SBCO 	r0, CONST_PRUCFG, 0x10, 4 
+//	//LBCO	r2, CONST_IETREG, 0, 1 //
+//	//SET ocp_clk:1 or of iep_clk:0
+//	MOV	r0, 0
+//	SBCO 	r0, CONST_PRUCFG, 0x30, 4
+//	// IEP configuration
+//	MOV	r0, 0x111 // Enable and Define increment value to 1
+//	SBCO	r0, CONST_IETREG, 0, 4 // Enables IET count and sets configuration
+//	// Deactivate IEP compensation
+//	SBCO 	r7, CONST_IETREG, 0x08, 4
 	
 	// Keep close together the clearing of the counters (keep order)
 	SBBO	r7, r13, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts	
-	SBCO	r10, CONST_IETREG, 0xC, 4 // Clear IEP timer count				
+//	SBCO	r10, CONST_IETREG, 0xC, 4 // Clear IEP timer count				
 	
 	// Initiate to zero for counters of skew and offset
 	LDI	r8, 0
-	LDI	r9, 0	
+	LDI	r9, 0
+	LDI	r11, 0
+	MOV	r14, 0xFFFFFFFF
 
 //NORMSTEPS: // So that always takes the same amount of counts for reset
 //	QBA     CHECK_CYCLECNT
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	SBCO	r10, CONST_IETREG, 0xC, 4 // Reset IEP counter to 0xFFFFFFFF. Account that we lose 12 cycle counts
+	//SBCO	r10, CONST_IETREG, 0xC, 4 // Reset IEP counter to 0xFFFFFFFF. Account that we lose 12 cycle counts
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	CLR	r2.t3
 	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
@@ -152,7 +157,7 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 	//LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
-	LBCO	r8, CONST_IETREG, 0xC, 4//LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT		
+	LBBO	r8, r13, 0, 4//LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT		
 	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset				
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 //START1:
@@ -201,7 +206,9 @@ TIMETAG:
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
 	// Faster Concatenated Checks writting	
-	SBCO	r10, CONST_IETREG, 0xC, 4//SBCO	r10, CONST_IETREG, 0xC, 4 // reset IEP // SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
+	//SBCO	r10, CONST_IETREG, 0xC, 4//SBCO	r10, CONST_IETREG, 0xC, 4 // reset IEP // SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
+	LBBO	r11, r13, 0, 4// Read DWT_CYCNT
+	SUB	r9, r14, r11
 	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 8 // writes values of r8 and r9
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
@@ -211,7 +218,7 @@ TIMETAG:
 	MOV	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF	
-	LBCO	r9, CONST_IETREG, 0xC, 4//LBCO	r9, CONST_IETREG, 0xC, 4 // read IEP	 // LBBO	r9, r13, 0, 4 // read DWT_CYCNT	
+	LBBO	r14, r13, 0, 4//LBCO	r9, CONST_IETREG, 0xC, 4 // read IEP	 // LBBO	r9, r13, 0, 4 // read DWT_CYCNT	
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:

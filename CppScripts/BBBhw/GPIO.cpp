@@ -341,7 +341,7 @@ valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<16;
 valpAux++;// 1 times 8 bits
 valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<24;
 valpAux++;// 1 times 8 bits
-//cout << "valSkewCounts: " << valSkewCounts << endl;
+cout << "valSkewCounts: " << valSkewCounts << endl;
 
 valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
 valpAux++;// 1 times 8 bits
@@ -351,7 +351,7 @@ valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*va
 valpAux++;// 1 times 8 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<24;
 valpAux++;// 1 times 8 bits
-//cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
+cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
 //////////////////////////////////////////////////////////////////////////////*/
 
 // First 32 bits is the overflow register for DWT_CYCCNT
