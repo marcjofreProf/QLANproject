@@ -135,7 +135,7 @@ INITIATIONS:
 	
 	// Keep close together the clearing of the counters (keep order)	
 //	SBCO	r5, CONST_IETREG, 0xC, 4 // Clear IEP timer count
-	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts	
+//	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts	
 		
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
@@ -159,8 +159,8 @@ PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
 	LBBO	r0.b0, r7, 0, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
 	AND	r0, r0, 0x00000001 // Start at 0 in binary
-	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
 	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
+	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
 SIGNALON:
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
 	MOV	r0, r1
