@@ -105,7 +105,7 @@ INITIATIONS:
 //	LED_OFF	// just for signaling initiations
 
 CMDLOOP:
-	QBBC	CMDLOOP, r31, 30	//
+	QBBC	CMDLOOP, r31, 30	// Interrupfrom the host signaling to start
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
 	LBCO 	r5, CONST_PRUDRAM, 4, 4
