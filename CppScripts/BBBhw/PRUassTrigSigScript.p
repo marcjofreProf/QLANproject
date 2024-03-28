@@ -140,7 +140,7 @@ CMDLOOP:
 	//LED_ON
 PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
-	LBBO	r0.b0, r3, 0, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
+	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
 	AND	r0, r0, 0x00000003 // Since the signals have a minimum period of 4 clock cycles
 	QBEQ	SIGNALON, r0.b0, 3 // Coincides with a 3
 	QBEQ	SIGNALON, r0.b0, 2 // Coincides with a 2

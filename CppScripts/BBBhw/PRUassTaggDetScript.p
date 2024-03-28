@@ -107,7 +107,7 @@ INITIATIONS:// This is only run once
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
 	// Initializations for faster execution
 	LDI	r7, 0 // Register for clearing other registers
-	LDI	r10, 0//MOV	r10, 0xFFFFFFFF
+	MOV	r10, 0xFFFFFFFF
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -132,9 +132,9 @@ INITIATIONS:// This is only run once
 	// Deactivate IEP compensation
 	SBCO 	r7, CONST_IETREG, 0x08, 4
 	
-	// Keep close together the clearing of the counters (keep order)	
-	SBCO	r10, CONST_IETREG, 0xC, 4 // Clear IEP timer count
-	SBBO	r7, r13, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts			
+	// Keep close together the clearing of the counters (keep order)
+	SBBO	r7, r13, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts	
+	SBCO	r10, CONST_IETREG, 0xC, 4 // Clear IEP timer count				
 	
 	// Read once the counters (keep the reading order along the script)
 	//LBCO	r5, CONST_IETREG, 0xC, 4 // Read once IEP timer count
@@ -143,22 +143,22 @@ INITIATIONS:// This is only run once
 //NORMSTEPS: // So that always takes the same amount of counts for reset
 //	QBA     CHECK_CYCLECNT
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew	
-	SBCO	r10, CONST_IETREG, 0xC, 4 // Reset IEP counter to 0xFFFFFFFF. Account that we lose 12 cycle counts
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
+	SBCO	r10, CONST_IETREG, 0xC, 4 // Reset IEP counter to 0xFFFFFFFF. Account that we lose 12 cycle counts
 	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset				
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
-	LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT	
+	LBBO	r8, r13, 0, 4//LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT	
 
 //START1:
 //	SET r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew	
-	LBBO	r5, r13, 0, 4 // Read DWT_CYCCNT counter // LBCO	r5, CONST_IETREG, 0xC, 4 // Read IEP counter	// from here, if a reset of count we will lose some counts.		
+	LBCO	r5, CONST_IETREG, 0xC, 4//LBBO	r5, r13, 0, 4 // Read DWT_CYCCNT counter // LBCO	r5, CONST_IETREG, 0xC, 4 // Read IEP counter	// from here, if a reset of count we will lose some counts.		
 	QBLE	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte <= r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
 CMDLOOP:
 	//LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
@@ -192,13 +192,13 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 
 TIMETAG:
 	// Faster Concatenated Time counter and Detection channels
-	LBBO	r5, r13, 0, 4 // r5 maps the value of DWT_CYCCNT//LBCO	r5, CONST_IETREG, 0xC, 4 // r5 maps the value of IEP counter. From here account for counts until reset to adjust the threshold in GPIO c++
+	LBCO	r5, CONST_IETREG, 0xC, 4//LBBO	r5, r13, 0, 4 // r5 maps the value of DWT_CYCCNT//LBCO	r5, CONST_IETREG, 0xC, 4 // r5 maps the value of IEP counter. From here account for counts until reset to adjust the threshold in GPIO c++
 	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 5 // Put contents of r5 and r6.b0 of DWT_CYCCNT into the address offset at r1.
 	ADD 	r1, r1, 5 // increment address by 5 bytes	
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
-	SBCO	r10, CONST_IETREG, 0xC, 4 // reset IEP // SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
+	SBBO	r7, r13, 0, 4//SBCO	r10, CONST_IETREG, 0xC, 4 // reset IEP // SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
@@ -209,7 +209,7 @@ TIMETAG:
 	MOV	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF	
-	LBCO	r9, CONST_IETREG, 0xC, 4 // read IEP	 // LBBO	r9, r13, 0, 4 // read DWT_CYCNT	
+	LBBO	r9, r13, 0, 4//LBCO	r9, CONST_IETREG, 0xC, 4 // read IEP	 // LBBO	r9, r13, 0, 4 // read DWT_CYCNT	
 	//// Make sure that counters are enabled
 	//LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	//SET	r2.t3
