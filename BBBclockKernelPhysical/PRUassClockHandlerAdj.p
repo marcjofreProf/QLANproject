@@ -110,8 +110,6 @@ READINFO:
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
-	//LED_ON
-
 CLEARCOUNTER:	// Clear the value of DWT_CYCCNT
 	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	CLR	r2.t3
