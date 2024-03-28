@@ -128,7 +128,6 @@ AVERAGEHALFPERIOD:	// Average with previous values
 	ADD	r3, r3, r1
 	LSR	r3, r3, 1
 SAVEVALUE:	// Save the value in SHARED RAM
-	MOV	r3, 31250// Check
 	SBCO 	r3, CONST_PRUSHAREDRAM, 0, 4 // Put contents into the address offset 0 SHARED RAM
 SENDINTPRU:	// Send interruption
 	MOV 	r31.b0, PRU0_PRU1_INTERRUPT+16
