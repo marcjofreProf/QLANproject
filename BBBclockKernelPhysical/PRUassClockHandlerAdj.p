@@ -68,6 +68,10 @@
 
 // r10 reserved for operations
 
+// r11 reserved for previous values
+// r12 reserved for previous values
+// r13 reserved for previous values
+
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
 // r30 is reserved for output pins
@@ -100,6 +104,7 @@ INITIATIONS:
 	MOV	r5, Power2NumClocksHalfPeriod// Initial initialization just in case
 	MOV	r6, 0x22000
 	MOV	r7, 0x2200C
+	MOV	r11, NUM_CLOCKS_HALF_PERIOD
 	
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
@@ -125,8 +130,15 @@ CLEARCOUNTER:	// Clear the value of DWT_CYCCNT
 CALCHALFPERIOD:	// Divide the DWT_CYCCNT value by the number of theoretical clock cycles + one more time to get half the period
 	LSR	r3, r3, r5
 AVERAGEHALFPERIOD:	// Average with previous values
-	ADD	r3, r3, r1
+	ADD	r3, r3, r11
 	LSR	r3, r3, 1
+	ADD	r3, r3, r12
+	LSR	r3, r3, 1
+	ADD	r3, r3, r13
+	LSR	r3, r3, 1
+	MOV	r13, r12 // Update old value
+	MOV	r12, r11 // Update old value
+	MOV	r11, r3 // Update old value	
 SAVEVALUE:	// Save the value in SHARED RAM
 	SBCO 	r3, CONST_PRUSHAREDRAM, 0, 4 // Put contents into the address offset 0 SHARED RAM
 SENDINTPRU:	// Send interruption
