@@ -98,9 +98,17 @@ INITIATIONS:
 	LDI	r4, 0 // For zeroing
 	MOV	r6, 0x22000
 	MOV	r7, 0x2200C
-	
-//	LED_ON	// just for signaling initiations
-//	LED_OFF	// just for signaling initiations
+
+	// Initial Re-initialization of DWT_CYCCNT
+	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+	CLR	r2.t3
+	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
+	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT so that it does not overflow. Account that we lose 2 cycle counts
+	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+	SET	r2.t3
+	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT	
+	LED_ON	// just for signaling initiations
+	LED_OFF	// just for signaling initiations
 
 CMDLOOP:
 	QBBC	CMDLOOP, r31, 30	// Interrupfrom the host signaling to start
@@ -111,14 +119,14 @@ READINFO:
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CLEARCOUNTER:	// Clear the value of DWT_CYCCNT
-	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
-	CLR	r2.t3
-	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
+//	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+//	CLR	r2.t3
+//	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
 	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	// Initial Re-initialization of DWT_CYCCNT
-	//LBBO	r2, r6, 0, 1 // r2 maps b0 control register
-	SET	r2.t3
-	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
+//	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+//	SET	r2.t3
+//	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
 AVERAGEHALFPERIOD:	// Division ofr half period and average with previous values. Add is limited to add 255 only, so we have to do it in the host
 	SBCO 	r3, CONST_PRUDRAM, 4, 4// Stores in position 0 de new value so the host handles it
 SAVEVALUE:	// Save the value in SHARED RAM
