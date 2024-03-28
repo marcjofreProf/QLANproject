@@ -168,8 +168,8 @@ DELAYOFF:
 	SUB 	r0, r0, 1
 	QBNE 	DELAYOFF, r0, LOSTCLOCKCOUNTS2
 FINISHLOOP:// Check if interruption and updates r1 accordingly
-//	QBBC	FINISHDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
-	LED_ON // Check
+	QBBC	FINISHDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
+	JMP EXIT // Check
 	// Handle interruption
 	LBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Read contents from the address offset 0 SHARED RAM
 	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt
