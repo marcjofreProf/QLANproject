@@ -132,8 +132,8 @@ CLEARCOUNTER:	// Clear the value of DWT_CYCCNT
 CALCHALFPERIOD:	// Divide the DWT_CYCCNT value by the number of theoretical clock cycles + one more time to get half the period
 	LSR	r3, r3, r5
 //AVERAGEHALFPERIOD:	// Average with previous values
-//	ADD	r3, r3, r1
-//	LSR	r3, r3, 1
+	ADD	r3, r3, r1
+	LSR	r3, r3, 1
 //	ADD	r3, r3, r11
 //	LSR	r3, r3, 1
 //	ADD	r3, r3, r12
