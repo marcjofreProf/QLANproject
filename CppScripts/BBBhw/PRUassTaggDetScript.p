@@ -72,9 +72,9 @@ INITIATIONS:// This is only run once
 	//MOV	r10, 0x22000+0x20// | C24add//CONST_PRUDRAM
 	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
-	// This will make C26 point to 0x0002E000 (IEP).
-	MOV	r0, 0x0002E000//
-	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of IEP
+//	// This will make C26 point to 0x0002E000 (IEP).
+//	MOV	r0, 0x0002E000//
+//	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of IEP
 
 	// Configure the programmable pointer register for PRU by setting c28_pointer[15:0] // related to shared RAM
 	// This will make C28 point to 0x00010000 (PRU shared RAM).
@@ -207,8 +207,7 @@ TIMETAG:
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
 	// Faster Concatenated Checks writting	
 	//SBCO	r10, CONST_IETREG, 0xC, 4//SBCO	r10, CONST_IETREG, 0xC, 4 // reset IEP // SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
-	LBBO	r11, r13, 0, 4// Read DWT_CYCNT
-	SUB	r9, r14, r11
+	LBBO	r11, r13, 0, 4// Read DWT_CYCNT	
 	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 8 // writes values of r8 and r9
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
@@ -218,7 +217,8 @@ TIMETAG:
 	MOV	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF	
-	LBBO	r14, r13, 0, 4//LBCO	r9, CONST_IETREG, 0xC, 4 // read IEP	 // LBBO	r9, r13, 0, 4 // read DWT_CYCNT	
+	LBBO	r14, r13, 0, 4//LBCO	r9, CONST_IETREG, 0xC, 4 // read IEP	 // LBBO	r9, r13, 0, 4 // read DWT_CYCNT
+	SUB	r9, r14, r11	
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
 	
 EXIT:
