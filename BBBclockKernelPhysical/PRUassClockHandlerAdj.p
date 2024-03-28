@@ -120,7 +120,7 @@ CLEARCOUNTER:	// Clear the value of DWT_CYCCNT
 	SET	r2.t3
 	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
 AVERAGEHALFPERIOD:	// Division ofr half period and average with previous values. Add is limited to add 255 only, so we have to do it in the host
-	SBCO 	r3, CONST_PRUDRAM, 0, 4// Stores in position 0 de new value so the host handles it
+	SBCO 	r3, CONST_PRUDRAM, 4, 4// Stores in position 0 de new value so the host handles it
 SAVEVALUE:	// Save the value in SHARED RAM
 	SBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Put contents into the address offset 0 SHARED RAM for the other PRU; it is from the past calculation
 SENDINTPRU:	// Send interruption
