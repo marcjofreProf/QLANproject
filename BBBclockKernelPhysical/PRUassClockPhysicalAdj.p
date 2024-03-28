@@ -156,6 +156,7 @@ CMDLOOP:
 //	// We remove the command from the host (in case there is a reset from host, we are saved)
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 SIGNALON:
+	MOV	r1, 31250// Check
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
 	MOV	r0, r1
 DELAYON:
