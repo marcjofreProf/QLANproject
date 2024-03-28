@@ -14,6 +14,10 @@
 
 #define PRUdataPATH1 "./PRUdata/"
 #define PRUdataPATH2 "../PRUdata/"
+// Clock adjustment
+#define ClockPeriodNanoseconds			31250// 32Khz
+#define PRUclockStepPeriodNanoseconds		5 // PRU clock cycle time in nanoseconds
+#define ClockCyclePeriodAdjustment		100 // Multiply this value to the ClockPeriodNanoseconds, the value has to be larger than the WaitTimeAfterMainWhileLoop
 
 namespace exploringBBBCKPD {
 
@@ -30,18 +34,22 @@ private:// Variables
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	// Time/synchronization management
-	using Clock = std::chrono::steady_clock;// Not needing the system_clock (to mucnh accurate and already in use by the PRUs) //system_clock;steady_clock;high_resolution_clock
+	using Clock = std::chrono::system_clock;// system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
-	TimePoint OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
+	struct timespec requestWhileWait;
 	// PRU
 	static int mem_fd;
 	static void *ddrMem, *sharedMem, *pru0dataMem, *pru1dataMem;
 	static void *pru_int;       // Points to start of PRU memory.
 	//static int chunk;
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
-	// PRU timetagger
+	// Time keeping
+	unsigned long long int TimeAdjPeriod=(unsigned long long int)(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted
+	TimePoint TimePointClockCurrentInitial=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
+	// PRU clock handling
+	unsigned int NumClocksHalfPeriodPRUclock=(unsigned int)(0.5*((double)(ClockPeriodNanoseconds))/((double)(PRUclockStepPeriodNanoseconds)));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
 	int retInterruptsPRU0;
-	int WaitTimeInterruptPRU0=2000000; // In microseconds
+	int WaitTimeInterruptPRU0=(int)(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds/1000); // In microseconds
 	//int WaitTimeToFutureTimePointPRU0=1000; // The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s.
 	//TimePoint TimePointClockNowPRU0;
 	//unsigned long long int TimeNow_time_as_countPRU0;	
@@ -49,7 +57,7 @@ private:// Variables
 	//unsigned long long int TimePointFuture_time_as_countPRU0;
 	//bool CheckTimeFlagPRU0;
 	//bool finPRU0;
-	// PRU Signal
+	// PRU clock generation
 	unsigned int NumberRepetitionsSignal=4194304;// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=2000000; // In microseconds
@@ -87,6 +95,8 @@ private: // Functions/Methods
 	static void SignalINTHandler(int s); // Handler for socket SIGPIPE signal error
 	static void SignalPIPEHandler(int s); // Handler for socket SIGPIPE signal error	
 	//static void SignalSegmentationFaultHandler(int s); // Handler for segmentation error
+	// Clock synch
+	struct timespec SetFutureTimePoint();
 	// PRU
 	int LOCAL_DDMinit();
 	int DisablePRUs();	

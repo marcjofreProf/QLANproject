@@ -135,7 +135,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	//prussdrv_pru_enable(PRU_HandlerSynch_NUM);
 	
 	    // Load and execute the PRU program on the PRU1
-	    pru1dataMem_int[0]=(unsigned int)3125; // set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
+	    pru1dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
 	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdj.bin") == -1){
 		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdj.bin") == -1){
 			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdj.bin");
@@ -143,27 +143,29 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	//prussdrv_pru_enable(PRU_ClockPhys_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
+	// first time to get TimePoints for clock adjustment
+	this->TimePointClockCurrentInitial=Clock::now();
+	this->requestWhileWait = this->SetFutureTimePoint();
 }
 
 int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
-pru1dataMem_int[0]=(unsigned int)3125; // set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
+pru1dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; 
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
 sleep(1);// Give some time
-cout << "Generating clock output" << endl;
+cout << "Generating clock output..." << endl;
 return 0;// all ok
 }
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-/*
-// Important, the following line at the very beggining to reduce the command jitter
 pru0dataMem_int[0]=(unsigned int)0; // set
-prussdrv_pru_send_event(21);
 
-// Here there should be the instruction command to tell PRU1 to start generating signals
-// We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
+// The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
+clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
+prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment
 
-/*
+this->requestWhileWait = this->SetFutureTimePoint();
+
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
 if (retInterruptsPRU0>0){
@@ -171,13 +173,12 @@ if (retInterruptsPRU0>0){
 }
 else if (retInterruptsPRU0==0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-	cout << "GPIO::GenerateSynchClockPRU took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
+	cout << "CKPD::HandleInterruptSynchPRU took to much time for the ClockHAndler. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
 }
 else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU0 interrupt poll error" << endl;
 }
-*/
 
 /*
 FutureTimePointPRU1 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU1);
@@ -222,6 +223,19 @@ do // This is blocking
 return 0;// all ok	
 }
 
+struct timespec CKPD::SetFutureTimePoint(){
+struct timespec requestWhileWaitAux;
+TimePoint TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(TimeAdjPeriod);
+this->TimePointClockCurrentInitial=TimePointClockCurrentFinal; //Update value
+auto duration_since_epochFutureTimePoint=TimePointClockCurrentFinal.time_since_epoch();
+// Convert duration to desired time
+unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Convert 
+//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
+
+requestWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
+requestWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
+return requestWhileWaitAux;
+}
 
 /*****************************************************************************
 * Local Function Definitions                                                 *
@@ -346,7 +360,7 @@ int main(int argc, char const * argv[]){
  else{isValidWhileLoop = true;}
  
  CKPDagent.GenerateSynchClockPRU();// Launch the generation of the clock
- cout << "Starting to actively adjust clock output" << endl;
+ cout << "Starting to actively adjust clock output..." << endl;
  while(isValidWhileLoop){ 
    try{
  	try {

@@ -55,9 +55,8 @@ class GPIO {
 
 private:// Variables
 	// Time/synchronization management
-	using Clock = std::chrono::steady_clock;// Not needing the system_clock (to mucnh accurate and already in use by the PRUs) //system_clock;steady_clock;high_resolution_clock
-	using TimePoint = std::chrono::time_point<Clock>;
-	TimePoint OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
+	//using Clock = std::chrono::steady_clock;// Not needing the system_clock (to mucnh accurate) //system_clock;steady_clock;high_resolution_clock
+	//using TimePoint = std::chrono::time_point<Clock>;
 	// PRU
 	static int mem_fd;
 	static void *ddrMem, *sharedMem, *pru0dataMem, *pru1dataMem;
