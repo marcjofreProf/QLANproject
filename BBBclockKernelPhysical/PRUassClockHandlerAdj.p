@@ -105,6 +105,8 @@ INITIATIONS:
 	MOV	r6, 0x22000
 	MOV	r7, 0x2200C
 	MOV	r11, NUM_CLOCKS_HALF_PERIOD
+	MOV	r12, NUM_CLOCKS_HALF_PERIOD
+	MOV	r13, NUM_CLOCKS_HALF_PERIOD
 	
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
