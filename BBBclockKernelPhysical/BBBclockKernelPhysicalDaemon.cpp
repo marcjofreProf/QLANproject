@@ -186,6 +186,7 @@ cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclo
 if (this->NumClocksHalfPeriodPRUclock<this->MinNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MinNumClocksHalfPeriodPRUclock;}
 else if (this->NumClocksHalfPeriodPRUclock>this->MaxNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MaxNumClocksHalfPeriodPRUclock;}
 
+this->NumClocksHalfPeriodPRUclock=3125;
 
 return 0;// all ok	
 }
