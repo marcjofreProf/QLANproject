@@ -93,7 +93,7 @@ INITIATIONS:
 	// This will make C28 point to 0x00010000 (PRU shared RAM).
 	// http://www.embedded-things.com/bbb/understanding-bbb-pru-shared-memory-access/	
 	MOV	r0, SHARED_RAM // 0x100                  // Set C28 to point to shared RAM
-	MOV	r10, 0x22000+0x28//PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
+	MOV	r10, 0x24000+0x28//PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
 	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
 	
 //	// This will make C26 point to 0x0002E000 (IEP).
@@ -171,7 +171,6 @@ FINISHLOOP:// Check if interruption and updates r1 accordingly
 	QBBC	FINISHDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
 	// Handle interruption
 	LBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Read contents from the address offset 0 SHARED RAM
-	MOV	r1, 31250// Check
 	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt
 	JMP	SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
 FINISHDELAYNOINT: // Some delay because it does not have to handle interruption
