@@ -134,15 +134,15 @@ CALCHALFPERIOD:	// Divide the DWT_CYCCNT value by the number of theoretical cloc
 //AVERAGEHALFPERIOD:	// Average with previous values
 //	ADD	r3, r3, r1
 //	LSR	r3, r3, 1
-	ADD	r3, r3, r11
-	LSR	r3, r3, 1
-	ADD	r3, r3, r12
-	LSR	r3, r3, 1
-	ADD	r3, r3, r13
-	LSR	r3, r3, 1
-	MOV	r13, r12 // Update old value
-	MOV	r12, r11 // Update old value
-	MOV	r11, r3 // Update old value	
+//	ADD	r3, r3, r11
+//	LSR	r3, r3, 1
+//	ADD	r3, r3, r12
+//	LSR	r3, r3, 1
+//	ADD	r3, r3, r13
+//	LSR	r3, r3, 1
+//	MOV	r13, r12 // Update old value
+//	MOV	r12, r11 // Update old value
+//	MOV	r11, r3 // Update old value	
 SAVEVALUE:	// Save the value in SHARED RAM
 	SBCO 	r3, CONST_PRUSHAREDRAM, 0, 4 // Put contents into the address offset 0 SHARED RAM
 SENDINTPRU:	// Send interruption
