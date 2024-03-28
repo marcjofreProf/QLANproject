@@ -180,7 +180,7 @@ else{
 }
 // Update pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
 cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
-this->NumClocksHalfPeriodPRUclock=pru0dataMem_int[1];//(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((float)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*0.5*((float)(pru0dataMem_int[1])/(float)(ClockCyclePeriodAdjustment)));
+//this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((float)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*0.5*((float)(pru0dataMem_int[1])/(float)(ClockCyclePeriodAdjustment)));
 cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
 // Set limits of adjustment
 if (this->NumClocksHalfPeriodPRUclock<this->MinNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MinNumClocksHalfPeriodPRUclock;}
