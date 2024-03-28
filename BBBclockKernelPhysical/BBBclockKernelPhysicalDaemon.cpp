@@ -136,6 +136,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	    // Load and execute the PRU program on the PRU1
 	    pru1dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
+	    pru1dataMem_int[1]=this->NumClocksPeriodPRUclock; 
 	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdj.bin") == -1){
 		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdj.bin") == -1){
 			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdj.bin");
@@ -149,7 +150,8 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 }
 
 int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
-pru1dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; 
+pru1dataMem_int[0]=this->NumClocksHalfPeriodPRUclock;
+pru1dataMem_int[1]=this->NumClocksPeriodPRUclock; 
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
 sleep(1);// Give some time
@@ -179,46 +181,6 @@ else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU0 interrupt poll error" << endl;
 }
-
-/*
-FutureTimePointPRU1 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU1);
-auto duration_since_epochFutureTimePointPRU1=FutureTimePointPRU1.time_since_epoch();
-auto duration_since_epochTimeNowPRU1=FutureTimePointPRU1.time_since_epoch();// JUST FOR INITIALIZATION
-// Convert duration to desired time
-TimePointFuture_time_as_countPRU1 = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePointPRU1).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds)
-//cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
-
-CheckTimeFlagPRU1=false;
-
-// Here we should wait for the PRU1 to finish, we can check it with the value modified in command
-finPRU1=false;
-do // This is blocking
-{
-	TimePointClockNowPRU1=Clock::now();
-	duration_since_epochTimeNowPRU1=TimePointClockNowPRU1.time_since_epoch();
-	TimeNow_time_as_countPRU1 = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNowPRU1).count();
-	//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
-	if (TimeNow_time_as_countPRU1>TimePointFuture_time_as_countPRU1){CheckTimeFlagPRU1=true;}
-	else{CheckTimeFlagPRU1=false;}
-	//cout << "CheckTimeFlag: " << CheckTimeFlag << endl;
-	if (pru1dataMem_int[1] == (unsigned int)1 and CheckTimeFlagPRU1==false)// Seems that it checks if it has finished the sequence
-	{	
-		pru1dataMem_int[1] = (unsigned int)0; // Here clears the value
-		//cout << "GPIO::SendTriggerSignals finished" << endl;
-		finPRU1=true;
-	}
-	else if (CheckTimeFlagPRU1==true){// too much time		
-		pru1dataMem_int[1]=(unsigned int)0; // set to zero means no command.	
-		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
-		//prussdrv_pru_reset(PRU_Signal_NUM);
-		//prussdrv_pru_disable(PRU_Signal_NUM);// Disable the PRU
-		//prussdrv_pru_enable(PRU_Signal_NUM);// Enable the PRU from 0		
-		cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1 if necessary." << endl;
-		//sleep(10);// Give some time to load programs in PRUs and initiate
-		finPRU1=true;
-		}
-} while(!finPRU1);
-*/
 
 return 0;// all ok	
 }

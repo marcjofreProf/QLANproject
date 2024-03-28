@@ -17,10 +17,9 @@
 #define GPIO_CLEARDATAOUToffset 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
 // GPIO goes low. If a bit is 0 it is ignored.
 
-#define INS_PER_US		200		// 5ns per instruction for Beaglebone black
-#define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
 #define NUM_CLOCKS_HALF_PERIOD	3125		// Not used (value given by host) set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
-#define DELAY 			3125//1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
+#define LOSTCLOCKCOUNTS1	4 // estimation of clocks counts evolved
+#define LOSTCLOCKCOUNTS2	9 // estimation of clocks counts evolved
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -57,15 +56,16 @@
 .endm
 
 // r0 is arbitrary used for operations
-// r1 is reserved with the number of NUM_CLOCKS_PERIOD - storing the PRU 0 DATA number of repetitions
+// r1 is reserved with the number of NUM_CLOCKS_HALF_PERIOD - storing the PRU 0 DATA number of repetitions
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
 // r2 reserved mapping control register
-
+// r3 reserved for adjusting CLOCK ON TIME
 // r4 reserved for zeroing registers
 // r5 reserved for 0xFFFFFFFF
 // r6 reserved for 0x22000 Control register
 // r7 reserved for 0x2200C DWT_CYCCNT
+// r8 reserved with the computed number of clock cycles of the total period
 
 // r10 is arbitrary used for operations
 
@@ -131,34 +131,34 @@ INITIATIONS:
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
-// Without delays (fastest possible) and CMD controlled
 CMDLOOP:
+	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT so that it does not overflow. Account that we lose 2 cycle counts
 	QBBC	CMDLOOP, r31, 31	//Reception or not of the host interrupt
 //	// ok, we have an instruction. Assume it means 'begin signals'
 //	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
+	LBCO 	r8, CONST_PRUDRAM, 4, 4
 //	// We remove the command from the host (in case there is a reset from host, we are saved)
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
+	// Calculate the total Clock period in counts
 PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
-	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO
-	AND	r0, r0, 0x00000003 // Since the signals have a minimum period of 4 clock cycles
-	QBEQ	SIGNALON, r0.b0, 3 // Coincides with a 3
-	QBEQ	SIGNALON, r0.b0, 2 // Coincides with a 2
-	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
-	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
+	LBBO	r0, r7, 0, 4// Read DWT_CYCNT
+	
+	SUB	r3, r1, r10
 SIGNALON:
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
-	MOV	r0, r1
+	MOV	r0, r3
+	MOV	r3, r1 // Update r3 to the actual value after adjustment
 DELAYON:
 	SUB 	r0, r0, 1
-	QBNE	DELAYON, r0, 0
+	QBNE	DELAYON, r0, LOSTCLOCKCOUNTS1
 SIGNALOFF:
 	MOV	r30.b0, AllOutputInterestPinsLow // write the contents to magic r30 byte 0
 	MOV	r0, r1
 DELAYOFF:
 	SUB 	r0, r0, 1
-	QBNE 	DELAYOFF, r0, 0
+	QBNE 	DELAYOFF, r0, LOSTCLOCKCOUNTS2
 FINISHLOOP:
 	JMP	PSEUDOSYNCH // Might consume more than one clock (maybe 3) but always the same amount
 EXIT:

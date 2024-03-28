@@ -18,11 +18,6 @@
 #define GPIO_CLEARDATAOUToffset 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
 // GPIO goes low. If a bit is 0 it is ignored.
 
-#define INS_PER_US		200		// 5ns per instruction for Beaglebone black
-#define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
-#define NUM_REPETITIONS		4194304	//Not used. 4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used). This defines the Maximum Transmission Unit - coul dbe named Quantum MTU (defined together with the clock)
-#define DELAY 1//1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
-
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
 #define PRU1_PRU0_INTERRUPT     18
@@ -58,14 +53,14 @@
 .endm
 
 // r0 is arbitrary used for operations
-// r1 is reserved with the number of NUM_REPETITIONS - storing the PRU 1 DATA number of repetitions
-//// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
-// We cannot use Constan table pointers since the base addresses are too far
-// r2 reserved for 0x22000 Control register
-// r3 reserved for 0x2200C DWT_CYCCNT
+// r1 reserved to read from PRU DATA RAM
+// If using the cycle counter in the PRU // We cannot use Constan table pointers since the base addresses are too far
+// r2 reserved mapping control register
+
 // r4 reserved for zeroing registers
 
-// r10 is arbitrary used for operations
+// r6 reserved for 0x22000 Control register
+// r7 reserved for 0x2200C DWT_CYCCNT
 
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
@@ -87,37 +82,26 @@ INITIATIONS:
 	SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 		
 	// Initializations
-	LDI	r30, 0 // All signal pins down
 	LDI	r4, 0
-	MOV	r1, NUM_REPETITIONS// Initial initialization jus tin case// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
+	MOV	r6, 0x22000
+	MOV	r7, 0x2200C
 	
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
-// Without delays (fastest possible) and CMD controlled
 CMDLOOP:
-	//LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
-	//QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction. Code 0 means idle
-	//QBEQ	CMDLOOP, r0.b0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
 	QBBC	CMDLOOP, r31, 30	//
-	// Read the number of NUM_REPETITIONS from positon 0 of PRU0 DATA RAM and stored it
+	// Read the from positon 0 of PRU0 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
 	// We remove the command from the host (in case there is a reset from host, we are saved)
 	//SBCO 	r4.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 	//LED_ON
-PSEUDOSYNCH:
-	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
-//	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
-//	AND	r0, r0, 0x00000003 // Since the signals have a minimum period of 4 clock cycles
-//	QBEQ	FINISHLOOP, r0.b0, 3 // Coincides with a 3
-//	QBEQ	FINISHLOOP, r0.b0, 2 // Coincides with a 2
-//	QBEQ	FINISHLOOP, r0.b0, 1 // Coincides with a 1
-//	QBEQ	FINISHLOOP, r0.b0, 0 // Coincides with a 0
+CLOCKHANDLER:
+	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 FINISHLOOP:
 	// The following lines do not consume "signal speed"
 	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
-	//MOV	r1, r5// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
