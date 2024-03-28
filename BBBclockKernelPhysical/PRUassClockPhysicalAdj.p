@@ -124,9 +124,9 @@ INITIATIONS:
 	// Deactivate IEP compensation
 	SBCO 	r4, CONST_IETREG, 0x08, 4
 	
-	// Keep close together the clearing of the counters (keep order)
-	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
-	SBCO	r5, CONST_IETREG, 0xC, 4 // Clear IEP timer count	
+	// Keep close together the clearing of the counters (keep order)	
+	SBCO	r5, CONST_IETREG, 0xC, 4 // Clear IEP timer count
+	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts	
 		
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations

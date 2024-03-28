@@ -93,8 +93,8 @@ INITIATIONS:
 	//SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
 	// Using cycle counter
-	//MOV	r2, 0x22000
-	//MOV	r3, 0x2200C
+	MOV	r2, 0x22000
+	MOV	r3, 0x2200C
 	
 	// Initializations
 	LDI	r30, 0 // All signal pins down
@@ -139,8 +139,8 @@ CMDLOOP:
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 	//LED_ON
 PSEUDOSYNCH:
-	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
-	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
+	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
+	LBBO	r0.b0, r3, 0, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
 	AND	r0, r0, 0x00000003 // Since the signals have a minimum period of 4 clock cycles
 	QBEQ	SIGNALON, r0.b0, 3 // Coincides with a 3
 	QBEQ	SIGNALON, r0.b0, 2 // Coincides with a 2
