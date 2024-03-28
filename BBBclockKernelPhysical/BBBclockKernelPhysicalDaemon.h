@@ -53,7 +53,7 @@ private:// Variables
 	int retInterruptsPRU0;
 	int WaitTimeInterruptPRU0=(int)(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds/1000); // In microseconds
 	// PRU clock generation
-	unsigned int NumberRepetitionsSignal=4194304;// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU
+	float RatioAverageFactorClockHalfPeriod=0.9;
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=2000000; // In microseconds
 

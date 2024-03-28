@@ -180,6 +180,8 @@ else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU0 interrupt poll error" << endl;
 }
+// Update pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
+this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((float)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*((float)(pru0dataMem_int[0])));
 
 return 0;// all ok	
 }
