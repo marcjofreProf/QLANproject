@@ -113,13 +113,15 @@ INITIATIONS:
 
 CMDLOOP:
 	QBBC	CMDLOOP, r31, 30	// Interrupfrom the host signaling to start
+READCOUNTER:
+	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT
+READINFO:
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
 	LBCO 	r5, CONST_PRUDRAM, 4, 4
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 	//LED_ON
-READCOUNTER:
-	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT
+
 CLEARCOUNTER:	// Clear the value of DWT_CYCCNT
 	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	CLR	r2.t3

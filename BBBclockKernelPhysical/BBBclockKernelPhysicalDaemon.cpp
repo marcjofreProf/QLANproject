@@ -147,6 +147,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=Clock::now();
 	this->requestWhileWait = this->SetFutureTimePoint();
+	cout << "Power2NumClocksHalfPeriod" << Power2NumClocksHalfPeriod << endl;
 }
 
 int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
