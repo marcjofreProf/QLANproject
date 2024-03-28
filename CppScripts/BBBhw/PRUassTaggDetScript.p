@@ -149,7 +149,7 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 	CLR	r2.t3
 	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
-	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+	//LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
 	LBCO	r8, CONST_IETREG, 0xC, 4//LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT		
