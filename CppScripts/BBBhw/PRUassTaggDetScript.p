@@ -136,9 +136,10 @@ INITIATIONS:// This is only run once
 	SBBO	r7, r13, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts	
 	SBCO	r10, CONST_IETREG, 0xC, 4 // Clear IEP timer count				
 	
-	// Read once the counters (keep the reading order along the script)
-	//LBCO	r5, CONST_IETREG, 0xC, 4 // Read once IEP timer count
-	//LBBO	r9, r13, 0 , 4 // Read DWT_CYCCNT	
+	// Read once the counters (keep the reading order along the script)// If using DWT_CYCCNT for computing skew and offset
+	LBCO	r5, CONST_IETREG, 0xC, 4 // Read once IEP timer count
+	LBBO	r8, r13, 0 , 4 // Read DWT_CYCCNT
+	LBBO	r9, r13, 0 , 4 // Read DWT_CYCCNT	
 
 //NORMSTEPS: // So that always takes the same amount of counts for reset
 //	QBA     CHECK_CYCLECNT
@@ -198,13 +199,13 @@ TIMETAG:
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
+	// Faster Concatenated Checks writting
+	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 8 // writes values of r8 and r9
 	SBBO	r7, r13, 0, 4//SBCO	r10, CONST_IETREG, 0xC, 4 // reset IEP // SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
-	//// For checking control, place as the last value the current estimated skew counts and threshold reset counts
-	// Faster Concatenated Checks writting
-	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 8 // writes values of r8 and r9
+	//// For checking control, place as the last value the current estimated skew counts and threshold reset counts	
 	// we're done. Signal to the application
 	MOV	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
