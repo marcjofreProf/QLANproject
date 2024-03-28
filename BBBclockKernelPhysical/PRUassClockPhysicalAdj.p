@@ -145,7 +145,7 @@ PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
 	LBBO	r0, r7, 0, 4// Read DWT_CYCNT
 	
-	SUB	r3, r1, r10
+	MOV	r3, r1
 SIGNALON:
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
 	MOV	r0, r3
