@@ -162,8 +162,8 @@ CMDLOOP2:// Double verification of host sending start command
 PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined by the other PRU)
 	LBBO	r0.b0, r7, 0, 1//LBBO	r0.b0, r7, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
-	AND	r0, r0, 0x01 // Start at 0 in binary
-	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
+	AND	r0.b0, r0.b0, 0x40 // Start at 0 in binary
+	QBEQ	SIGNALOFF, r0.b0, 64 // Coincides with a 64
 	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
 SIGNALON:
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
