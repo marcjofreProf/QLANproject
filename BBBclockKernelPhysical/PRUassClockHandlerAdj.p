@@ -112,7 +112,7 @@ INITIATIONS:
 	LED_OFF	// just for signaling initiations
 
 CMDLOOP:
-	QBBC	CMDLOOP, r31, 30	// Interrupfrom the host signaling to start
+	QBBC	CMDLOOP, r31, 30	// Interrupt from the host signaling to start
 READCOUNTER:
 	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT
 READINFO:
@@ -123,7 +123,7 @@ CLEARCOUNTER:	// Clear the value of DWT_CYCCNT
 	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	CLR	r2.t3
 	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
-//	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	// Initial Re-initialization of DWT_CYCCNT
 	//LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
