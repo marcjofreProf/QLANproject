@@ -160,10 +160,9 @@ return 0;// all ok
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
+requestWhileWait = this->SetFutureTimePoint();
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment
-
-this->requestWhileWait = this->SetFutureTimePoint();
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
