@@ -18,9 +18,9 @@
 // GPIO goes low. If a bit is 0 it is ignored.
 
 #define NUM_CLOCKS_HALF_PERIOD	3125		// Not used (value given by host) set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
-#define LOSTCLOCKCOUNTS1	4 // estimation of clocks counts evolved
+#define LOSTCLOCKCOUNTS1	1 // estimation of clocks counts evolved
 #define LOSTCLOCKCOUNTS2	9 // estimation of clocks counts evolved
-#define LOSTCLOCKCOUNTS3	2 // estimation of clocks counts evolved
+#define LOSTCLOCKCOUNTS3	3 // estimation of clocks counts evolved
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
