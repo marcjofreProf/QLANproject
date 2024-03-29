@@ -182,14 +182,15 @@ else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU0 interrupt poll error" << endl;
 }
-// Update pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
-//cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
-this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((float)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*0.5*((float)(pru0dataMem_int[1])/(float)(ClockCyclePeriodAdjustment)));
-//cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
+// Update pru0dataMem_int[0]
+// Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
+cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
+//this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((float)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*0.5*((float)(pru0dataMem_int[1])/(float)(ClockCyclePeriodAdjustment)));
+cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
 // Set limits of adjustment
 if (this->NumClocksHalfPeriodPRUclock<this->MinNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MinNumClocksHalfPeriodPRUclock;}
 else if (this->NumClocksHalfPeriodPRUclock>this->MaxNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MaxNumClocksHalfPeriodPRUclock;}
-//cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
+cout << "Limited this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
 
 return 0;// all ok	
 }
