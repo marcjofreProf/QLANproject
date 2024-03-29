@@ -96,9 +96,9 @@ INITIATIONS:
 	MOV	r10, 0x24000+0x28//PRU1_CTRL | C28add //CONST_PRUSHAREDRAM
 	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
 	
-//	// This will make C26 point to 0x0002E000 (IEP).
-//	MOV	r0, 0x0002E000//
-//	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of IEP
+	// This will make C26 point to 0x0002E000 (IEP).
+	MOV	r0, 0x0002E000//
+	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of IEP
 	
 	// Initializations
 	LDI	r30, 0 // All signal pins down
@@ -118,20 +118,20 @@ INITIATIONS:
 //	SET	r2.t3
 //	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
 		
-//	// Initial Re-initialization for IET counter
-//	// The Clock gating Register controls the state of Clock Management
-//	//LBCO 	r0, CONST_PRUCFG, 0x10, 4                    
-//	MOV 	r0, 0x24924
-//	SBCO 	r0, CONST_PRUCFG, 0x10, 4 
-//	//LBCO	r2, CONST_IETREG, 0, 1 //
-//	//SET ocp_clk:1 or of iep_clk:0
-//	MOV	r0, 0
-//	SBCO 	r0, CONST_PRUCFG, 0x30, 4
-//	// IEP configuration
-//	MOV	r0, 0x111 // Enable and Define increment value to 1
-//	SBCO	r0, CONST_IETREG, 0, 4 // Enables IET count and sets configuration
-//	// Deactivate IEP compensation
-//	SBCO 	r4, CONST_IETREG, 0x08, 4
+	// Initial Re-initialization for IET counter
+	// The Clock gating Register controls the state of Clock Management
+	//LBCO 	r0, CONST_PRUCFG, 0x10, 4                    
+	MOV 	r0, 0x24924
+	SBCO 	r0, CONST_PRUCFG, 0x10, 4 
+	//LBCO	r2, CONST_IETREG, 0, 1 //
+	//SET ocp_clk:1 or of iep_clk:0
+	MOV	r0, 0
+	SBCO 	r0, CONST_PRUCFG, 0x30, 4
+	// IEP configuration
+	MOV	r0, 0x111 // Enable and Define increment value to 1
+	SBCO	r0, CONST_IETREG, 0, 4 // Enables IET count and sets configuration
+	// Deactivate IEP compensation
+	SBCO 	r4, CONST_IETREG, 0x08, 4
 	
 	// Keep close together the clearing of the counters (keep order)	
 //	SBCO	r5, CONST_IETREG, 0xC, 4 // Clear IEP timer count
@@ -157,7 +157,7 @@ CMDLOOP:
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined by the other PRU)
-	LBBO	r0.b0, r7, 0, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
+	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO	r0.b0, r7, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
 	AND	r0, r0, 0x01 // Start at 0 in binary
 	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
 	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
