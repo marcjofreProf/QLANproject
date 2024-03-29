@@ -184,7 +184,7 @@ else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU0 interrupt poll error" << endl;
 }
-// Update pru0dataMem_int[0]
+// Update sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
 // Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
 
 if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000000000000000){cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;}
