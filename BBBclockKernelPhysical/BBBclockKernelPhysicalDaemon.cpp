@@ -162,7 +162,7 @@ int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems phy
 pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
-//pru0dataMem_int[2]=(unsigned int)1;
+pru0dataMem_int[2]=(unsigned int)1;
 prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment
 
 this->requestWhileWait = this->SetFutureTimePoint();
