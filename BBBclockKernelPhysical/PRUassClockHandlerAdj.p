@@ -93,9 +93,9 @@ INITIATIONS:
 	MOV	r10, 0x22000+0x28//PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
 	SBBO 	r0, r10, 0, 4//SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
 	
-	// This will make C26 point to 0x0002E000 (IEP).
-	MOV	r0, 0x0002E000//
-	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of IEP
+//	// This will make C26 point to 0x0002E000 (IEP).
+//	MOV	r0, 0x0002E000//
+//	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of IEP
 	
 	// Initializations
 	MOV	r1, NUM_CLOCKS_HALF_PERIOD// Initial initialization just in case
@@ -114,26 +114,29 @@ INITIATIONS:
 	SET	r2.t3
 	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
 	
-	// Initial Re-initialization for IET counter
-	// The Clock gating Register controls the state of Clock Management
-	//LBCO 	r0, CONST_PRUCFG, 0x10, 4                    
-	MOV 	r0, 0x24924
-	SBCO 	r0, CONST_PRUCFG, 0x10, 4 
-	//LBCO	r2, CONST_IETREG, 0, 1 //
-	//SET ocp_clk:1 or of iep_clk:0
-	MOV	r0, 0
-	SBCO 	r0, CONST_PRUCFG, 0x30, 4
-	// IEP configuration
-	MOV	r0, 0x111 // Enable and Define increment value to 1
-	SBCO	r0, CONST_IETREG, 0, 4 // Enables IET count and sets configuration
-	// Deactivate IEP compensation
-	SBCO 	r4, CONST_IETREG, 0x08, 4
+//	// Initial Re-initialization for IET counter
+//	// The Clock gating Register controls the state of Clock Management
+//	//LBCO 	r0, CONST_PRUCFG, 0x10, 4                    
+//	MOV 	r0, 0x24924
+//	SBCO 	r0, CONST_PRUCFG, 0x10, 4 
+//	//LBCO	r2, CONST_IETREG, 0, 1 //
+//	//SET ocp_clk:1 or of iep_clk:0
+//	MOV	r0, 0
+//	SBCO 	r0, CONST_PRUCFG, 0x30, 4
+//	// IEP configuration
+//	MOV	r0, 0x111 // Enable and Define increment value to 1
+//	SBCO	r0, CONST_IETREG, 0, 4 // Enables IET count and sets configuration
+//	// Deactivate IEP compensation
+//	SBCO 	r4, CONST_IETREG, 0x08, 4
 
 CMDLOOP:
-	QBBC	CMDLOOP, r31, 30	// Interrupt from the host signaling to start
+//	QBBC	CMDLOOP, r31, 30	// Interrupt from the host signaling to start
+	LBCO	r0.b0, CONST_PRUDRAM, 8, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
+	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
+	SBCO	r4.b0, CONST_PRUDRAM, 8, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
 READCOUNTER:
 	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT
-	LBCO	r3, CONST_IETREG, 0xC, 4// Read actual value of IEP
+//	LBCO	r3, CONST_IETREG, 0xC, 4// Read actual value of IEP
 READINFO:
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
@@ -147,7 +150,7 @@ CLEARCOUNTER:	// Clear the value of DWT_CYCCNT
 	//LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
-	SBCO	r5, CONST_IETREG, 0xC, 4// Clear actual value of IEP
+//	SBCO	r5, CONST_IETREG, 0xC, 4// Clear actual value of IEP
 AVERAGEHALFPERIOD:	// Division ofr half period and average with previous values. Add is limited to add 255 only, so we have to do it in the host
 	SBCO 	r3, CONST_PRUDRAM, 4, 4// Stores in position 4 de new value so the host handles it
 SAVEVALUE:	// Save the value in SHARED RAM
