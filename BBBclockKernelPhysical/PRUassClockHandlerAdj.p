@@ -133,7 +133,7 @@ CMDLOOP:// There is some issues confusing interrupts from host if the time betwe
 	QBBC	CMDLOOP, r31, 30	// Interrupt from the host signaling to start
 READINFO:
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
-	LBCO 	r1, CONST_PRUDRAM, 0, 4
+//	LBCO 	r1, CONST_PRUDRAM, 0, 4 Not needed done by the host
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 8, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
@@ -154,8 +154,8 @@ CLEARCOUNTER:	// Clear the value of DWT_CYCCNT
 //	SBCO	r5, CONST_IETREG, 0xC, 4// Clear actual value of IEP
 AVERAGEHALFPERIOD:	// Division ofr half period and average with previous values. Add is limited to add 255 only, so we have to do it in the host
 	SBCO 	r3, CONST_PRUDRAM, 4, 4// Stores in position 4 de new value so the host handles it
-SAVEVALUE:	// Save the value in SHARED RAM
-	SBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Put contents into the address offset 0 SHARED RAM for the other PRU; it is from the past calculation
+//SAVEVALUE:	// Save the value in SHARED RAM. Done by the host
+//	SBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Put contents into the address offset 0 SHARED RAM for the other PRU; it is from the past calculation
 SENDINTPRU:	// Send interruption
 	MOV 	r31.b0, PRU0_PRU1_INTERRUPT+16
 FINISHLOOP:
