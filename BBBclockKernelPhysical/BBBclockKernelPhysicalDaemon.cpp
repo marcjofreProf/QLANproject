@@ -7,7 +7,7 @@
 #include <iostream>
 #include <unistd.h> //for sleep
 #include <signal.h>
-#define WaitTimeAfterMainWhileLoop 10000000 //nanoseconds
+#define WaitTimeAfterMainWhileLoop 1000000 //nanoseconds
 // Time/synchronization management
 #include <chrono>
 // PRU programming
@@ -162,7 +162,7 @@ int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems phy
 pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
-pru0dataMem_int[2]=(unsigned int)1;
+//pru0dataMem_int[2]=(unsigned int)1;
 prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment
 
 this->requestWhileWait = this->SetFutureTimePoint();
@@ -181,13 +181,13 @@ else{
 	cout << "PRU0 interrupt poll error" << endl;
 }
 // Update pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
-//cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
+cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
 this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((float)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*0.5*((float)(pru0dataMem_int[1])/(float)(ClockCyclePeriodAdjustment)));
-//cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
+cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
 // Set limits of adjustment
 if (this->NumClocksHalfPeriodPRUclock<this->MinNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MinNumClocksHalfPeriodPRUclock;}
 else if (this->NumClocksHalfPeriodPRUclock>this->MaxNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MaxNumClocksHalfPeriodPRUclock;}
-//cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
+cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
 
 return 0;// all ok	
 }
