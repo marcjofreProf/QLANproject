@@ -159,12 +159,6 @@ CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
-PSEUDOSYNCH:
-	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined by the other PRU)
-	LBBO	r0.b0, r7, 1, 1//LBBO	r0.b0, r7, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
-	AND	r0, r0, 0x04 // Start at 0 in binary
-	QBEQ	SIGNALOFF, r0.b0, 4 // Coincides with half the period
-	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
 SIGNALON:
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
 	MOV	r0, r1
@@ -182,13 +176,13 @@ FINISHLOOP:// Check if interruption and updates r1 accordingly
 	// Handle interruption
 	LBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Read contents from the address offset 0 SHARED RAM
 	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt
-	JMP	PSEUDOSYNCH // Might consume more than one clock (maybe 3) but always the same amount
+	JMP	SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
 FINISHDELAYNOINT: // Some delay because it does not have to handle interruption
 	MOV	r0, LOSTCLOCKCOUNTS3
 FINISHDELAYNOINTEXTRA:
 	SUB	r0, r0, 1
 	QBNE 	FINISHDELAYNOINTEXTRA, r0, 0
-	JMP	PSEUDOSYNCH // Might consume more than one clock (maybe 3) but always the same amount
+	JMP	SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
 EXIT:
 	// Send notification (interrupt) to Host for program completion
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
