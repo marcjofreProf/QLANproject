@@ -97,8 +97,8 @@ INITIATIONS:
 	MOV	r1, NUM_CLOCKS_HALF_PERIOD// Initial initialization just in case
 	LDI	r3, 0 // Initialization
 	LDI	r4, 0 // For zeroing
-	MOV	r6, 0x24000
-	MOV	r7, 0x2400C
+	MOV	r6, 0x22000
+	MOV	r7, 0x2200C
 
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
@@ -114,6 +114,8 @@ INITIATIONS:
 CMDLOOP:
 	QBBC	CMDLOOP, r31, 30	// Interrupfrom the host signaling to start
 READCOUNTER:
+	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT
+	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT
 	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT
 READINFO:
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
