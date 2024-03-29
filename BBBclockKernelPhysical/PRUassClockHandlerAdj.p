@@ -63,7 +63,7 @@
 // r4 reserved for zeroing registers
 
 // r6 reserved for 0x22000 Control register
-// r7 reserved for 0x2200C DWT_CYCCNT
+// r7 reserved for 0x2400C DWT_CYCCNT
 
 // r10 reserved for operations
 
@@ -114,7 +114,7 @@ INITIATIONS:
 CMDLOOP:
 	QBBC	CMDLOOP, r31, 30	// Interrupfrom the host signaling to start
 READCOUNTER:
-//	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT
+	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT
 READINFO:
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
