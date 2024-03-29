@@ -48,11 +48,11 @@ private:// Variables
 	unsigned long long int TimeAdjPeriod=(unsigned long long int)(0.5*ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted
 	TimePoint TimePointClockCurrentInitial=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
 	// PRU clock handling
-	bool PlotPIDHAndlerInfo=true;
+	bool PlotPIDHAndlerInfo=false;
 	unsigned long long int iIterPlotPIDHAndlerInfo=0;
 	unsigned int NumClocksHalfPeriodPRUclock=(unsigned int)(0.5*((double)(ClockPeriodNanoseconds))/((double)(PRUclockStepPeriodNanoseconds)));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
-	double RatioFreqAdjustment=0.05;// Maximum and minimum frequency variation allowed
-	double RatioAverageFactorClockHalfPeriod=0.99; // The lower the more aggresive taking the new computed values
+	double RatioFreqAdjustment=0.025;// Maximum and minimum frequency variation allowed
+	double RatioAverageFactorClockHalfPeriod=0.999; // The lower the more aggresive taking the new computed values
 	unsigned int MinNumClocksHalfPeriodPRUclock=(unsigned int)((1.0-RatioFreqAdjustment)*(double)(NumClocksHalfPeriodPRUclock));
 	unsigned int MaxNumClocksHalfPeriodPRUclock=(unsigned int)((1.0+RatioFreqAdjustment)*(double)(NumClocksHalfPeriodPRUclock));
 	int retInterruptsPRU0;
