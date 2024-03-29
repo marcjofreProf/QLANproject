@@ -50,7 +50,7 @@ private:// Variables
 	// PRU clock handling
 	unsigned int NumClocksHalfPeriodPRUclock=(unsigned int)(0.5*((double)(ClockPeriodNanoseconds))/((double)(PRUclockStepPeriodNanoseconds)));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
 	float RatioFreqAdjustment=0.4;// Maximum and minimum frequency variation allowed
-	float RatioAverageFactorClockHalfPeriod=0.1; // The lower the more aggresive taking the new computed values
+	float RatioAverageFactorClockHalfPeriod=0.9999; // The lower the more aggresive taking the new computed values
 	unsigned int MinNumClocksHalfPeriodPRUclock=(unsigned int)((1.0-RatioFreqAdjustment)*(float)(NumClocksHalfPeriodPRUclock));
 	unsigned int MaxNumClocksHalfPeriodPRUclock=(unsigned int)((1.0+RatioFreqAdjustment)*(float)(NumClocksHalfPeriodPRUclock));
 	int retInterruptsPRU0;
