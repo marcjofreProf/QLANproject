@@ -62,8 +62,8 @@
 // r3 reserved for DWT_CYCCNT actual value
 // r4 reserved for zeroing registers
 
-// r6 reserved for 0x24000 Control register
-// r7 reserved for 0x2400C DWT_CYCCNT
+// r6 reserved for 0x22000 Control register
+// r7 reserved for 0x2200C DWT_CYCCNT
 
 // r10 reserved for operations
 
@@ -97,8 +97,8 @@ INITIATIONS:
 	MOV	r1, NUM_CLOCKS_HALF_PERIOD// Initial initialization just in case
 	LDI	r3, 0 // Initialization
 	LDI	r4, 0 // For zeroing
-	MOV	r6, 0x22000
-	MOV	r7, 0x2200C
+	MOV	r6, 0x24000
+	MOV	r7, 0x2400C
 
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
