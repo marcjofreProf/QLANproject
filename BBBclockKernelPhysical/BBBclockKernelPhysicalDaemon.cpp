@@ -163,7 +163,7 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 //pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
-//sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
+sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 pru0dataMem_int[2]=(unsigned int)1;
