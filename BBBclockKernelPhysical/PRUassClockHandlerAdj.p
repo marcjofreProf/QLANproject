@@ -130,7 +130,7 @@ INITIATIONS:
 //	SBCO 	r4, CONST_IETREG, 0x08, 4
 
 CMDLOOP:
-//	QBBC	CMDLOOP, r31, 30	// Interrupt from the host signaling to start
+	QBBC	CMDLOOP, r31, 30	// Interrupt from the host signaling to start
 READINFO:
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
