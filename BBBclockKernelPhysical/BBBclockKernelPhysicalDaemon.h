@@ -51,10 +51,10 @@ private:// Variables
 	bool PlotPIDHAndlerInfo=true;
 	unsigned long long int iIterPlotPIDHAndlerInfo=0;
 	unsigned int NumClocksHalfPeriodPRUclock=(unsigned int)(0.5*((double)(ClockPeriodNanoseconds))/((double)(PRUclockStepPeriodNanoseconds)));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
-	double RatioFreqAdjustment=0.1;// Maximum and minimum frequency variation allowed
-	double RatioAverageFactorClockHalfPeriod=0.999999999999; // The lower the more aggresive taking the new computed values
-	unsigned int MinNumClocksHalfPeriodPRUclock=(unsigned int)((1.0-RatioFreqAdjustment)*(float)(NumClocksHalfPeriodPRUclock));
-	unsigned int MaxNumClocksHalfPeriodPRUclock=(unsigned int)((1.0+RatioFreqAdjustment)*(float)(NumClocksHalfPeriodPRUclock));
+	double RatioFreqAdjustment=0.01;// Maximum and minimum frequency variation allowed
+	double RatioAverageFactorClockHalfPeriod=0.99; // The lower the more aggresive taking the new computed values
+	unsigned int MinNumClocksHalfPeriodPRUclock=(unsigned int)((1.0-RatioFreqAdjustment)*(double)(NumClocksHalfPeriodPRUclock));
+	unsigned int MaxNumClocksHalfPeriodPRUclock=(unsigned int)((1.0+RatioFreqAdjustment)*(double)(NumClocksHalfPeriodPRUclock));
 	int retInterruptsPRU0;
 	int WaitTimeInterruptPRU0=(int)(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds/2000); // In microseconds
 	// PRU clock generation	
