@@ -159,6 +159,12 @@ CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
+//PSEUDOSYNCH:
+//	// To give some sense of synchronization
+//	LBBO	r0.b0, r7, 0, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
+//	AND	r0, r0, 0x01 // Since the signals have a minimum period of 4 clock cycles
+//	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
+//	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
 SIGNALON:
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
 	MOV	r0, r1
