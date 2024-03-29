@@ -18,7 +18,7 @@
 // Clock adjustment
 #define ClockPeriodNanoseconds			31250// 32Khz
 #define PRUclockStepPeriodNanoseconds		5 // PRU clock cycle time in nanoseconds
-#define ClockCyclePeriodAdjustment		128 // It has to be power of 2 and adjusted in assembler code for faster operations. Multiply this value to the ClockPeriodNanoseconds, the value has to be larger than the WaitTimeAfterMainWhileLoop
+#define ClockCyclePeriodAdjustment		512 //  Multiply this value to the ClockPeriodNanoseconds, the value has to be larger than the WaitTimeAfterMainWhileLoop
 
 namespace exploringBBBCKPD {
 
@@ -55,7 +55,7 @@ private:// Variables
 	int retInterruptsPRU0;
 	int WaitTimeInterruptPRU0=(int)(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds/1000); // In microseconds
 	// PRU clock generation
-	float RatioAverageFactorClockHalfPeriod=0.4; // The lower the more aggresive taking the new computed values
+	float RatioAverageFactorClockHalfPeriod=0.6; // The lower the more aggresive taking the new computed values
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=2000000; // In microseconds
 
