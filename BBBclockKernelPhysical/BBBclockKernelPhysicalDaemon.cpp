@@ -185,13 +185,13 @@ else{
 // Update pru0dataMem_int[0]
 // Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
 
-if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000){cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;}
+if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000000){cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;}
 this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((float)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*0.5*((float)(pru0dataMem_int[1])/(float)(ClockCyclePeriodAdjustment)));
-if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000){cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;}
+if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000000){cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;}
 // Set limits of adjustment
 if (this->NumClocksHalfPeriodPRUclock<this->MinNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MinNumClocksHalfPeriodPRUclock;}
 else if (this->NumClocksHalfPeriodPRUclock>this->MaxNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MaxNumClocksHalfPeriodPRUclock;}
-if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000){cout << "Limited this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;}
+if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000000){cout << "Limited this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;}
 iIterPlotPIDHAndlerInfo++;
 return 0;// all ok	
 }
