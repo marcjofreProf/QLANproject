@@ -135,10 +135,10 @@ READINFO:
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
-//CMDLOOP2:// Double verification of host sending start command
-//	LBCO	r0.b0, CONST_PRUDRAM, 8, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
-//	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
-//	SBCO	r4.b0, CONST_PRUDRAM, 8, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
+CMDLOOP2:// Double verification of host sending start command
+	LBCO	r0.b0, CONST_PRUDRAM, 8, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
+	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
+	SBCO	r4.b0, CONST_PRUDRAM, 8, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
 READCOUNTER:
 	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT
 //	LBCO	r3, CONST_IETREG, 0xC, 4// Read actual value of IEP
