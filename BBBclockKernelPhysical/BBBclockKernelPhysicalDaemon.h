@@ -55,7 +55,7 @@ private:// Variables
 	int retInterruptsPRU0;
 	int WaitTimeInterruptPRU0=(int)(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds/1000); // In microseconds
 	// PRU clock generation
-	float RatioAverageFactorClockHalfPeriod=0.999;
+	float RatioAverageFactorClockHalfPeriod=0.1;
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=2000000; // In microseconds
 
