@@ -17,7 +17,7 @@
 #define GPIO_CLEARDATAOUToffset 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
 // GPIO goes low. If a bit is 0 it is ignored.
 
-#define NUM_CLOCKS_HALF_PERIOD	3125		// Not used (value given by host) set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
+#define NUM_CLOCKS_HALF_PERIOD	1562		// Not used (value given by host) set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 10ns (10ns seems more real, rather than 5ns as specs) is 3125
 #define LOSTCLOCKCOUNTS1	1 // estimation of clocks counts evolved
 #define LOSTCLOCKCOUNTS2	9 // estimation of clocks counts evolved
 #define LOSTCLOCKCOUNTS3	3 // estimation of clocks counts evolved
