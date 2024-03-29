@@ -62,7 +62,7 @@
 // r3 reserved for DWT_CYCCNT actual value
 // r4 reserved for zeroing registers
 
-// r6 reserved for 0x22000 Control register
+// r6 reserved for 0x24000 Control register
 // r7 reserved for 0x2400C DWT_CYCCNT
 
 // r10 reserved for operations
