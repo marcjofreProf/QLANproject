@@ -129,11 +129,12 @@ INITIATIONS:
 //	// Deactivate IEP compensation
 //	SBCO 	r4, CONST_IETREG, 0x08, 4
 
-CMDLOOP:
+CMDLOOP:// There is some issues confusing interrupts from host
 	QBBC	CMDLOOP, r31, 30	// Interrupt from the host signaling to start
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
+CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 8, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
-	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
+	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 8, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
 READINFO:
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
