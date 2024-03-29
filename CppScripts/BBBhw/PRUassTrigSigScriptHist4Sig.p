@@ -96,7 +96,7 @@ INITIATIONS:
 	
 	// Initializations
 	LDI	r30, 0 // All signal pins down
-	LDI	r4, 0
+	LDI	r4, 0 // zeroing
 	MOV	r1, NUM_REPETITIONS// Initial initialization jus tin case// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
 	
 //	LED_ON	// just for signaling initiations
@@ -135,7 +135,10 @@ CMDLOOP:
 	// We remove the command from the host (in case there is a reset from host, we are saved)
 	//SBCO 	r4.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
-	//LED_ON
+CMDLOOP2:// Double verification of host sending start command
+	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
+	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
+	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
 PSEUDOSYNCH:
 	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
 	LBBO	r0.b0, r3, 0, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
