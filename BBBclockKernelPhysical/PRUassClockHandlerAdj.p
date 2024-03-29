@@ -119,6 +119,15 @@ READINFO:
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 0, 4
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
+CLEARCOUNTER:	// Clear the value of DWT_CYCCNT
+	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+	CLR	r2.t3
+	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
+//	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
+	// Initial Re-initialization of DWT_CYCCNT
+	//LBBO	r2, r6, 0, 1 // r2 maps b0 control register
+	SET	r2.t3
+	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
 AVERAGEHALFPERIOD:	// Division ofr half period and average with previous values. Add is limited to add 255 only, so we have to do it in the host
 	SBCO 	r3, CONST_PRUDRAM, 4, 4// Stores in position 4 de new value so the host handles it
 SAVEVALUE:	// Save the value in SHARED RAM
@@ -128,15 +137,6 @@ SENDINTPRU:	// Send interruption
 FINISHLOOP:
 	// The following lines do not consume "signal speed"
 	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
-CLEARCOUNTER:	// Clear the value of DWT_CYCCNT
-	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
-	CLR	r2.t3
-	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
-	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
-	// Initial Re-initialization of DWT_CYCCNT
-	//LBBO	r2, r6, 0, 1 // r2 maps b0 control register
-	SET	r2.t3
-	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
