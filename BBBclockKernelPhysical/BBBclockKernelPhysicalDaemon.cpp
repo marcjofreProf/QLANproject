@@ -137,6 +137,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	    // Load and execute the PRU program on the PRU1
 	    pru1dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250 
+	    pru1dataMem_int[1]=(unsigned int)0;
 	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdj.bin") == -1){
 		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdj.bin") == -1){
 			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdj.bin");
@@ -151,6 +152,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 
 int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
 pru1dataMem_int[0]=this->NumClocksHalfPeriodPRUclock;
+pru1dataMem_int[1]=(unsigned int)1;// Double start command
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
 sleep(1);// Give some time
