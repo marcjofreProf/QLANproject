@@ -18,7 +18,7 @@
 // Clock adjustment
 #define ClockPeriodNanoseconds			31250// 32Khz
 #define PRUclockStepPeriodNanoseconds		5 // PRU clock cycle time in nanoseconds
-#define ClockCyclePeriodAdjustment		2048 // It has to be power of 2 and adjusted in assembler code for faster operations. Multiply this value to the ClockPeriodNanoseconds, the value has to be larger than the WaitTimeAfterMainWhileLoop
+#define ClockCyclePeriodAdjustment		128 // It has to be power of 2 and adjusted in assembler code for faster operations. Multiply this value to the ClockPeriodNanoseconds, the value has to be larger than the WaitTimeAfterMainWhileLoop
 
 namespace exploringBBBCKPD {
 
@@ -45,7 +45,7 @@ private:// Variables
 	//static int chunk;
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
 	// Time keeping
-	unsigned long long int TimeAdjPeriod=(unsigned long long int)(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted
+	int TimeAdjPeriod=(int)(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted
 	TimePoint TimePointClockCurrentInitial=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
 	// PRU clock handling
 	unsigned int NumClocksHalfPeriodPRUclock=(unsigned int)(0.5*((double)(ClockPeriodNanoseconds))/((double)(PRUclockStepPeriodNanoseconds)));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
