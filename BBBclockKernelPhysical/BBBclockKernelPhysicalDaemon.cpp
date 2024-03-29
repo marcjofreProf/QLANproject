@@ -192,7 +192,7 @@ if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000000000000000){cout << "th
 if (this->NumClocksHalfPeriodPRUclock<this->MinNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MinNumClocksHalfPeriodPRUclock;}
 else if (this->NumClocksHalfPeriodPRUclock>this->MaxNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MaxNumClocksHalfPeriodPRUclock;}
 if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000000000000000){cout << "Limited this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;}
-iIterPlotPIDHAndlerInfo++;
+if (PlotPIDHAndlerInfo){iIterPlotPIDHAndlerInfo++;}
 return 0;// all ok	
 }
 
