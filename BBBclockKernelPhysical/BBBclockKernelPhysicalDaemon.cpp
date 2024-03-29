@@ -122,10 +122,11 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	LOCAL_DDMinit(); // DDR (Double Data Rate): A class of memory technology used in DRAM where data is transferred on both the rising and falling edges of the clock signal, effectively doubling the data rate without increasing the clock frequency.
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
-	// Timetagging
+	// Handler
 	//pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
 	  pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
+	  pru0dataMem_int[2]=(unsigned int)0;
 	// Load and execute the PRU program on the PRU0
 	if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdj.bin") == -1){
 		if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./PRUassClockHandlerAdj.bin") == -1){
@@ -181,7 +182,7 @@ else{
 }
 // Update pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
 cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
-//this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((float)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*0.5*((float)(pru0dataMem_int[1])/(float)(ClockCyclePeriodAdjustment)));
+this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((float)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*0.5*((float)(pru0dataMem_int[1])/(float)(ClockCyclePeriodAdjustment)));
 cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
 // Set limits of adjustment
 if (this->NumClocksHalfPeriodPRUclock<this->MinNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MinNumClocksHalfPeriodPRUclock;}
