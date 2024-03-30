@@ -1,5 +1,5 @@
 # Parameters to pass
-# arg1: Daemon PID proportional factor. For example: 0.9999
+# arg1: Daemon PID proportional factor. For example: 0.999999
 # arg2: Daemon PID Frequency variation ratio sanity. For example: 0.1
 # arg3: Daemon print PID values: true or false
 trap "kill 0" EXIT

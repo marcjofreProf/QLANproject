@@ -18,7 +18,7 @@
 // Clock adjustment
 #define ClockPeriodNanoseconds			31250// 32Khz
 #define PRUclockStepPeriodNanoseconds		10 // PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is 10ns
-#define ClockCyclePeriodAdjustment		128 // Very important parameter. the lower the better, as long as the system supports so many fast interrupts. Multiply this value to the ClockPeriodNanoseconds, the value has to be larger than the WaitTimeAfterMainWhileLoop
+#define ClockCyclePeriodAdjustment		256 // Very important parameter. the lower the better, as long as the system supports so many fast interrupts. Multiply this value to the ClockPeriodNanoseconds, the value has to be larger than the WaitTimeAfterMainWhileLoop
 
 namespace exploringBBBCKPD {
 
@@ -39,7 +39,7 @@ private:// Variables
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	// Time/synchronization management
-	using Clock = std::chrono::system_clock;// system_clock;steady_clock;high_resolution_clock
+	using Clock = std::chrono::steady_clock;// system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
 	struct timespec requestWhileWait;
 	// PRU
