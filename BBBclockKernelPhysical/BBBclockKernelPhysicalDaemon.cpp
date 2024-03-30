@@ -164,7 +164,7 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 //pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
-sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock-AdjCountsFreq;//Information grabbed by PRU1
+sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock+AdjCountsFreq;//Information grabbed by PRU1
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 pru0dataMem_int[2]=(unsigned int)1;
@@ -189,7 +189,7 @@ else{
 // Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
 
 if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000000000000000){cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;}
-this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((double)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*0.5*((double)(pru0dataMem_int[1]+AdjCountsFreq)/(double)(ClockCyclePeriodAdjustment)));
+this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((double)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*0.5*((double)(pru0dataMem_int[1]-AdjCountsFreq)/(double)(ClockCyclePeriodAdjustment)));
 if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000000000000000){cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;}
 // Set limits of adjustment
 if (this->NumClocksHalfPeriodPRUclock<this->MinNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MinNumClocksHalfPeriodPRUclock;}
