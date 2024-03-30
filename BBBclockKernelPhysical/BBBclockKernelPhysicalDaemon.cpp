@@ -338,10 +338,13 @@ int main(int argc, char const * argv[]){
 	 CKPDagent.RatioAverageFactorClockHalfPeriod=stod(argv[2]);
 	 CKPDagent.RatioFreqAdjustment=stod(argv[3]);
 	 CKPDagent.PlotPIDHAndlerInfo=(strcmp(argv[4], "true") == 0);
-	 cout << "CKPDagent.AdjCountsFreq: " << CKPDagent.AdjCountsFreq << endl;
-	 cout << "CKPDagent.RatioAverageFactorClockHalfPeriod: " << CKPDagent.RatioAverageFactorClockHalfPeriod << endl;
-	 cout << "CKPDagent.RatioFreqAdjustment: " << CKPDagent.RatioFreqAdjustment << endl;
-	 cout << "CKPDagent.PlotPIDHAndlerInfo: " << CKPDagent.PlotPIDHAndlerInfo << endl;
+	 // Recompute some values:
+	 CKPDagent.MinNumClocksHalfPeriodPRUclock=(unsigned int)((1.0-CKPDagent.RatioFreqAdjustment)*(double)(CKPDagent.NumClocksHalfPeriodPRUclock));
+	 CKPDagent.MaxNumClocksHalfPeriodPRUclock=(unsigned int)((1.0+CKPDagent.RatioFreqAdjustment)*(double)(CKPDagent.NumClocksHalfPeriodPRUclock));
+	 //cout << "CKPDagent.AdjCountsFreq: " << CKPDagent.AdjCountsFreq << endl;
+	 //cout << "CKPDagent.RatioAverageFactorClockHalfPeriod: " << CKPDagent.RatioAverageFactorClockHalfPeriod << endl;
+	 //cout << "CKPDagent.RatioFreqAdjustment: " << CKPDagent.RatioFreqAdjustment << endl;
+	 //cout << "CKPDagent.PlotPIDHAndlerInfo: " << CKPDagent.PlotPIDHAndlerInfo << endl;
 	 } catch(const std::invalid_argument& e) {
             cout << "Invalid argument: Could not convert to double." << endl;
         } catch(const std::out_of_range& e) {
