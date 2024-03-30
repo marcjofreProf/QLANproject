@@ -31,7 +31,7 @@ public: //Variables
 	    };
 	// Variables adjusted by passing values to the main function
 	unsigned int AdjCountsFreq=100; // Number of clock ticks to adjust to the required frequency (e.g., 32 KHz) to account for having some idle time when resetting DWT_CNT in PRU
-	double RatioAverageFactorClockHalfPeriod=0.99999; // The lower the more aggresive taking the new computed values
+	double RatioAverageFactorClockHalfPeriod=0.999999999; // The lower the more aggresive taking the new computed values
 	double RatioFreqAdjustment=0.25;// Maximum and minimum frequency variation allowed
 	bool PlotPIDHAndlerInfo=false;
 	unsigned int NumClocksHalfPeriodPRUclock=(unsigned int)(0.15*((double)(ClockPeriodNanoseconds))/((double)(PRUclockStepPeriodNanoseconds)));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
