@@ -16,7 +16,7 @@
 #define PRUdataPATH1 "./PRUdata/"
 #define PRUdataPATH2 "../PRUdata/"
 // Clock adjustment
-#define ClockPeriodNanoseconds			31175//31250// 32Khz. Maybe slightly lower to account for having some idle time when resetting DWT_CNT in PRU
+#define ClockPeriodNanoseconds			31150//31250// 32Khz. Maybe slightly lower to account for having some idle time when resetting DWT_CNT in PRU
 #define PRUclockStepPeriodNanoseconds		10 // PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is 10ns
 #define ClockCyclePeriodAdjustment		256 // Very important parameter. the lower the better, as long as the system supports so many fast interrupts. Multiply this value to the ClockPeriodNanoseconds, the value has to be larger than the WaitTimeAfterMainWhileLoop
 
@@ -39,7 +39,7 @@ private:// Variables
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	// Time/synchronization management
-	using Clock = std::chrono::high_resolution_clock;// system_clock;steady_clock;high_resolution_clock
+	using Clock = std::chrono::steady_clock;// system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
 	struct timespec requestWhileWait;
 	// PRU
