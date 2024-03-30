@@ -7,6 +7,7 @@
 #include <iostream>
 #include <unistd.h> //for sleep
 #include <signal.h>
+#include <cstring>
 #define WaitTimeAfterMainWhileLoop 1000000 //nanoseconds
 // Time/synchronization management
 #include <chrono>
@@ -320,9 +321,23 @@ int main(int argc, char const * argv[]){
  //  printf( "  %d. %s\n", i, argv[i] );
  // }
  //}
+ 
  cout << "CKPDagent started..." << endl;
  
  CKPD CKPDagent; // Initiate the instance
+ 
+ if (argc>1){// Arguments passed
+ 	try{
+	 CKPDagent.RatioAverageFactorClockHalfPeriod=std::stod(argv[1]);
+	 CKPDagent.RatioFreqAdjustment=stod(argv[2]);
+	 CKPDagent.PlotPIDHAndlerInfo=(strcmp(argv[3], "true") == 0);
+	 } catch(const std::invalid_argument& e) {
+            cout << "Invalid argument: Could not convert to double." << endl;
+        } catch(const std::out_of_range& e) {
+            cout << "Out of range: The argument is too large or too small." << endl;
+        }
+ }
+ 
  CKPDagent.m_start(); // Initiate in start state.
  
  /// Errors handling
