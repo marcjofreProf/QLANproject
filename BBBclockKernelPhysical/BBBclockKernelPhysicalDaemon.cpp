@@ -164,7 +164,7 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 //pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
-sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
+sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock-AdjCountsFreq;//Information grabbed by PRU1
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 pru0dataMem_int[2]=(unsigned int)1;
@@ -179,7 +179,7 @@ if (retInterruptsPRU0>0){
 }
 else if (retInterruptsPRU0==0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-	cout << "CKPD::HandleInterruptSynchPRU took to much time for the ClockHAndler. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
+	cout << "CKPD::HandleInterruptSynchPRU took to much time for the ClockHandler. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
 }
 else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -189,12 +189,18 @@ else{
 // Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
 
 if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000000000000000){cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;}
-this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((double)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*0.5*((double)(pru0dataMem_int[1])/(double)(ClockCyclePeriodAdjustment)));
+this->NumClocksHalfPeriodPRUclock=(unsigned int)(this->RatioAverageFactorClockHalfPeriod*((double)(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*0.5*((double)(pru0dataMem_int[1]+AdjCountsFreq)/(double)(ClockCyclePeriodAdjustment)));
 if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000000000000000){cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;}
 // Set limits of adjustment
 if (this->NumClocksHalfPeriodPRUclock<this->MinNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MinNumClocksHalfPeriodPRUclock;}
 else if (this->NumClocksHalfPeriodPRUclock>this->MaxNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MaxNumClocksHalfPeriodPRUclock;}
-if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000000000000000){cout << "Limited this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;}
+
+if (PlotPIDHAndlerInfo and iIterPlotPIDHAndlerInfo%1000000000000000){
+cout << "Max Limit this->MaxNumClocksHalfPeriodPRUclock: " << this->MaxNumClocksHalfPeriodPRUclock << endl;
+cout << "Limited this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
+cout << "Min Limit this->MinNumClocksHalfPeriodPRUclock: " << this->MinNumClocksHalfPeriodPRUclock << endl;
+}
+
 if (PlotPIDHAndlerInfo){iIterPlotPIDHAndlerInfo++;}
 return 0;// all ok	
 }
@@ -328,9 +334,10 @@ int main(int argc, char const * argv[]){
  
  if (argc>1){// Arguments passed
  	try{
-	 CKPDagent.RatioAverageFactorClockHalfPeriod=std::stod(argv[1]);
-	 CKPDagent.RatioFreqAdjustment=stod(argv[2]);
-	 CKPDagent.PlotPIDHAndlerInfo=(strcmp(argv[3], "true") == 0);
+ 	 CKPDagent.AdjCountsFreq=stoul(argv[1]);
+	 CKPDagent.RatioAverageFactorClockHalfPeriod=stod(argv[2]);
+	 CKPDagent.RatioFreqAdjustment=stod(argv[3]);
+	 CKPDagent.PlotPIDHAndlerInfo=(strcmp(argv[4], "true") == 0);
 	 } catch(const std::invalid_argument& e) {
             cout << "Invalid argument: Could not convert to double." << endl;
         } catch(const std::out_of_range& e) {

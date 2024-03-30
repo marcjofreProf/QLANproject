@@ -16,9 +16,9 @@
 #define PRUdataPATH1 "./PRUdata/"
 #define PRUdataPATH2 "../PRUdata/"
 // Clock adjustment
-#define ClockPeriodNanoseconds			31150//31250// 32Khz. Maybe slightly lower to account for having some idle time when resetting DWT_CNT in PRU
+#define ClockPeriodNanoseconds			31250// 32Khz.
 #define PRUclockStepPeriodNanoseconds		10 // PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is 10ns
-#define ClockCyclePeriodAdjustment		256 // Very important parameter. the lower the better, as long as the system supports so many fast interrupts. Multiply this value to the ClockPeriodNanoseconds, the value has to be larger than the WaitTimeAfterMainWhileLoop
+#define ClockCyclePeriodAdjustment		128 // Very important parameter. the lower the better, as long as the system supports so many fast interrupts. Multiply this value to the ClockPeriodNanoseconds, the value has to be larger than the WaitTimeAfterMainWhileLoop
 
 namespace exploringBBBCKPD {
 
@@ -30,6 +30,7 @@ public: //Variables
 		APPLICATION_EXIT = -1,
 	    };
 	// Variables adjusted by passing values to the main function
+	unsigned int AdjCountsFreq=50; // Number of clock ticks to adjust to the required frequency (e.g., 32 KHz) Maybe slightly lower to account for having some idle time when resetting DWT_CNT in PRU
 	double RatioAverageFactorClockHalfPeriod=0.99999; // The lower the more aggresive taking the new computed values
 	double RatioFreqAdjustment=0.25;// Maximum and minimum frequency variation allowed
 	bool PlotPIDHAndlerInfo=false;
