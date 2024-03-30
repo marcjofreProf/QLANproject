@@ -345,6 +345,7 @@ int main(int argc, char const * argv[]){
 	 //cout << "CKPDagent.RatioAverageFactorClockHalfPeriod: " << CKPDagent.RatioAverageFactorClockHalfPeriod << endl;
 	 //cout << "CKPDagent.RatioFreqAdjustment: " << CKPDagent.RatioFreqAdjustment << endl;
 	 //cout << "CKPDagent.PlotPIDHAndlerInfo: " << CKPDagent.PlotPIDHAndlerInfo << endl;
+	 cout << "Attention, when outputing PID values, the synch performance decreases because of the uncontrolled/large time offset between periodic timer computing." << endl;
 	 } catch(const std::invalid_argument& e) {
             cout << "Invalid argument: Could not convert to double." << endl;
         } catch(const std::out_of_range& e) {
