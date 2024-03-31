@@ -8,7 +8,7 @@
 #include <unistd.h> //for sleep
 #include <signal.h>
 #include <cstring>
-#define WaitTimeAfterMainWhileLoop 1750000000 //nanoseconds
+#define WaitTimeAfterMainWhileLoop 1900000000 //nanoseconds
 // Time/synchronization management
 #include <chrono>
 // PRU programming
