@@ -34,9 +34,10 @@ public: //Variables
 	double RatioAverageFactorClockHalfPeriod=0.999; // The lower the more aggresive taking the new computed values
 	double RatioFreqAdjustment=0.99;// Maximum and minimum frequency variation allowed
 	bool PlotPIDHAndlerInfo=false;
-	unsigned int NumClocksHalfPeriodPRUclock=(unsigned int)(0.5*((double)(ClockPeriodNanoseconds))/((double)(PRUclockStepPeriodNanoseconds)));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
-	unsigned int MinNumClocksHalfPeriodPRUclock=(unsigned int)((1.0-RatioFreqAdjustment)*(double)(NumClocksHalfPeriodPRUclock));
-	unsigned int MaxNumClocksHalfPeriodPRUclock=(unsigned int)((1.0+RatioFreqAdjustment)*(double)(NumClocksHalfPeriodPRUclock));
+	double FactorTimerAdj=0.5; 
+	unsigned int NumClocksHalfPeriodPRUclock=static_cast<unsigned int>(FactorTimerAdj*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds)));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
+	unsigned int MinNumClocksHalfPeriodPRUclock=static_cast<unsigned int>((1.0-RatioFreqAdjustment)*static_cast<double>(NumClocksHalfPeriodPRUclock));
+	unsigned int MaxNumClocksHalfPeriodPRUclock=static_cast<unsigned int>((1.0+RatioFreqAdjustment)*static_cast<double>(NumClocksHalfPeriodPRUclock));
 
 private:// Variables
 	ApplicationState m_state;
@@ -53,12 +54,12 @@ private:// Variables
 	//static int chunk;
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
 	// Time keeping
-	unsigned long long int TimeAdjPeriod=(unsigned long long int)(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted. VEry important parameter
+	unsigned long long int TimeAdjPeriod=static_cast<unsigned long long int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted. VEry important parameter
 	TimePoint TimePointClockCurrentInitial=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
 	// PRU clock handling	
 	unsigned long long int iIterPlotPIDHAndlerInfo=0;		
 	int retInterruptsPRU0;
-	int WaitTimeInterruptPRU0=(int)(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds/2000); // In microseconds
+	int WaitTimeInterruptPRU0=static_cast<int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds/2000); // In microseconds
 	// PRU clock generation	
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=2000000; // In microseconds
