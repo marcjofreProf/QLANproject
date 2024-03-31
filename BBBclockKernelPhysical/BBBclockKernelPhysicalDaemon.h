@@ -53,7 +53,7 @@ private:// Variables
 	//static int chunk;
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
 	// Time keeping
-	unsigned long long int TimeAdjPeriod=(unsigned long long int)(0.75*ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted. VEry important parameter
+	unsigned long long int TimeAdjPeriod=(unsigned long long int)(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted. VEry important parameter
 	TimePoint TimePointClockCurrentInitial=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
 	// PRU clock handling	
 	unsigned long long int iIterPlotPIDHAndlerInfo=0;		
