@@ -18,7 +18,7 @@
 // Clock adjustment
 #define ClockPeriodNanoseconds			31250// 32Khz.
 #define PRUclockStepPeriodNanoseconds		10 // PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is 
-#define ClockCyclePeriodAdjustment		2048 // Very important parameter. The lower so that it does not continuously increse the generated output clock frequency
+#define ClockCyclePeriodAdjustment		4096 // Very important parameter. The lower so that it does not continuously increse the generated output clock frequency
 
 namespace exploringBBBCKPD {
 
