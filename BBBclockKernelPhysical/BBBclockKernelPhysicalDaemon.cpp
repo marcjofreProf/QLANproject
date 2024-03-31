@@ -394,7 +394,7 @@ int main(int argc, char const * argv[]){
         } // switch
         //CKPDagent.release();
 	if (signalReceivedFlag.load()){CKPDagent.~CKPD();}// Destroy the instance
-        CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few microseconds for other processes to enter
+        // Main barrier is in HandleInterruptSynchPRU function. No need for this CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few microseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception
