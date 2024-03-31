@@ -44,7 +44,7 @@ private:// Variables
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	// Time/synchronization management
-	using Clock = std::chrono::system_clock;// system_clock;steady_clock;high_resolution_clock
+	using Clock = std::chrono::high_resolution_clock;// system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
 	struct timespec requestWhileWait;
 	// PRU
