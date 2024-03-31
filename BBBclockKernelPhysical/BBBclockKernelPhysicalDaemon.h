@@ -35,7 +35,7 @@ public: //Variables
 	double RatioFreqAdjustment=0.99;// Maximum and minimum frequency variation allowed
 	bool PlotPIDHAndlerInfo=false;
 	double FactorTimerAdj=0.5; 
-	unsigned int NumClocksHalfPeriodPRUclock=static_cast<unsigned int>(FactorTimerAdj*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds)));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
+	unsigned int NumClocksHalfPeriodPRUclock=static_cast<unsigned int>(0.5*FactorTimerAdj*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds)));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
 	unsigned int MinNumClocksHalfPeriodPRUclock=static_cast<unsigned int>((1.0-RatioFreqAdjustment)*static_cast<double>(NumClocksHalfPeriodPRUclock));
 	unsigned int MaxNumClocksHalfPeriodPRUclock=static_cast<unsigned int>((1.0+RatioFreqAdjustment)*static_cast<double>(NumClocksHalfPeriodPRUclock));
 
