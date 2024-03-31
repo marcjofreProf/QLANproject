@@ -149,8 +149,8 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=Clock::now();
-	this->SetFutureTimePoint();// Used with busy-wait
-	//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
+	//this->SetFutureTimePoint();// Used with busy-wait
+	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 }
 
 int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
@@ -167,12 +167,12 @@ int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems phy
 //pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
 sharedMem_int[0]=static_cast<unsigned int>(static_cast<int>(this->NumClocksHalfPeriodPRUclock)+this->AdjCountsFreq);//Information grabbed by PRU1
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
-while (Clock::now() < this->TimePointClockCurrentFinal);// Busy wait
-//clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
+//while (Clock::now() < this->TimePointClockCurrentFinal);// Busy wait
+clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 pru0dataMem_int[2]=static_cast<unsigned int>(1);
 prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment
-this->SetFutureTimePoint();// Used with busy-wait
-//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
+//this->SetFutureTimePoint();// Used with busy-wait
+this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
@@ -408,7 +408,7 @@ int main(int argc, char const * argv[]){
         //CKPDagent.release();
 	if (signalReceivedFlag.load()){CKPDagent.~CKPD();}// Destroy the instance
         // Main barrier is in HandleInterruptSynchPRU function. No need for this CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));
-        CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Used in busy-wait
+        //CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Used in busy-wait
     //}
     //catch (const std::exception& e) {
     //	// Handle the exception
