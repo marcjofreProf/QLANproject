@@ -8,7 +8,7 @@
 #include <unistd.h> //for sleep
 #include <signal.h>
 #include <cstring>
-#define WaitTimeAfterMainWhileLoop 1000000 //nanoseconds
+#define WaitTimeAfterMainWhileLoop 2000000 //nanoseconds
 // Time/synchronization management
 #include <chrono>
 // PRU programming
@@ -127,7 +127,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	//pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
 	  //pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
-	  sharedMem_int[0]=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock-this->AdjCountsFreq);//Information grabbed by PRU1
+	  sharedMem_int[0]=static_cast<unsigned int>(static_cast<int>(this->NumClocksHalfPeriodPRUclock)+this->AdjCountsFreq);//Information grabbed by PRU1
 	  pru0dataMem_int[2]=static_cast<unsigned int>(0);
 	// Load and execute the PRU program on the PRU0
 	if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdj.bin") == -1){
