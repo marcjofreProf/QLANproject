@@ -188,7 +188,7 @@ else{
 // Update sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
 // Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
 
-this->NumClocksHalfPeriodPRUclock=static_cast<unsigned int>(this->RatioAverageFactorClockHalfPeriod*(static_cast<double>(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*(0.5*(static_cast<double>(pru0dataMem_int[1])/static_cast<double>(ClockCyclePeriodAdjustment)))+this->AdjCountsFreq);
+//this->NumClocksHalfPeriodPRUclock=static_cast<unsigned int>(this->RatioAverageFactorClockHalfPeriod*(static_cast<double>(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*(0.5*(static_cast<double>(pru0dataMem_int[1])/static_cast<double>(ClockCyclePeriodAdjustment)))+this->AdjCountsFreq);
 
 // Set limits of adjustment
 if (this->NumClocksHalfPeriodPRUclock<this->MinNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MinNumClocksHalfPeriodPRUclock;}
