@@ -193,8 +193,8 @@ else{
 this->NumClocksHalfPeriodPRUclock=static_cast<unsigned int>(this->RatioAverageFactorClockHalfPeriod*(static_cast<double>(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*static_cast<double>(static_cast<int>(this->FactorTimerAdj*0.5*static_cast<double>(pru0dataMem_int[1])/static_cast<double>(ClockCyclePeriodAdjustment))-this->AdjCountsFreq));
 
 // Set limits of adjustment
-if (this->NumClocksHalfPeriodPRUclock<this->MinNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MinNumClocksHalfPeriodPRUclock;}
-else if (this->NumClocksHalfPeriodPRUclock>this->MaxNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MaxNumClocksHalfPeriodPRUclock;}
+//if (this->NumClocksHalfPeriodPRUclock<this->MinNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MinNumClocksHalfPeriodPRUclock;}
+//else if (this->NumClocksHalfPeriodPRUclock>this->MaxNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MaxNumClocksHalfPeriodPRUclock;}
 
 if (PlotPIDHAndlerInfo){
 	if (iIterPlotPIDHAndlerInfo%1000000000000000){
