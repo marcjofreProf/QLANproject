@@ -1,5 +1,5 @@
 # Parameters to pass
-# arg1: Daemon ticks to adust ot required Frequency: For example, 450. Positively defined. 0<= arg1 <=65535
+# arg1: Daemon ticks to fine adust to required Frequency: For example, 0. Defined as int. -2147483647<= arg1 <=2147483647
 # arg2: Daemon PID proportional factor. For example: 0.99999
 # arg3: Daemon PID Frequency variation ratio sanity. For example: 0.99
 # arg4: Daemon print PID values: true or false

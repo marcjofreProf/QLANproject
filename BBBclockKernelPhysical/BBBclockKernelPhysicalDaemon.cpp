@@ -138,7 +138,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	//prussdrv_pru_enable(PRU_HandlerSynch_NUM);
 	
 	    // Load and execute the PRU program on the PRU1
-	    pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock-this->AdjCountsFreq); // set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250 
+	    pru1dataMem_int[0]=static_cast<unsigned int>(static_cast<int>(this->NumClocksHalfPeriodPRUclock)-this->AdjCountsFreq); // set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250 
 	    pru1dataMem_int[1]=static_cast<unsigned int>(0);
 	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdj.bin") == -1){
 		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdj.bin") == -1){
@@ -153,7 +153,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 }
 
 int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
-pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock-this->AdjCountsFreq);
+pru1dataMem_int[0]=static_cast<unsigned int>(static_cast<int>(this->NumClocksHalfPeriodPRUclock)-this->AdjCountsFreq);
 pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
@@ -164,7 +164,7 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 //pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
-sharedMem_int[0]=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock-this->AdjCountsFreq);//Information grabbed by PRU1
+sharedMem_int[0]=static_cast<unsigned int>(static_cast<int>(this->NumClocksHalfPeriodPRUclock)-this->AdjCountsFreq);//Information grabbed by PRU1
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 pru0dataMem_int[2]=static_cast<unsigned int>(1);
@@ -188,7 +188,7 @@ else{
 // Update sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
 // Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
 
-//this->NumClocksHalfPeriodPRUclock=static_cast<unsigned int>(this->RatioAverageFactorClockHalfPeriod*(static_cast<double>(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*(0.5*(static_cast<double>(pru0dataMem_int[1])/static_cast<double>(ClockCyclePeriodAdjustment)))+this->AdjCountsFreq);
+this->NumClocksHalfPeriodPRUclock=static_cast<unsigned int>(this->RatioAverageFactorClockHalfPeriod*(static_cast<double>(this->NumClocksHalfPeriodPRUclock))+(1.0-RatioAverageFactorClockHalfPeriod)*static_cast<double>(static_cast<int>(0.25*static_cast<double>(pru0dataMem_int[1])/static_cast<double>(ClockCyclePeriodAdjustment))+this->AdjCountsFreq));
 
 // Set limits of adjustment
 if (this->NumClocksHalfPeriodPRUclock<this->MinNumClocksHalfPeriodPRUclock){this->NumClocksHalfPeriodPRUclock=this->MinNumClocksHalfPeriodPRUclock;}
@@ -337,7 +337,7 @@ int main(int argc, char const * argv[]){
  
  if (argc>1){// Arguments passed
  	try{
- 	 CKPDagent.AdjCountsFreq=stoul(argv[1]);
+ 	 CKPDagent.AdjCountsFreq=stoi(argv[1]);
 	 CKPDagent.RatioAverageFactorClockHalfPeriod=stod(argv[2]);
 	 CKPDagent.RatioFreqAdjustment=stod(argv[3]);
 	 CKPDagent.PlotPIDHAndlerInfo=(strcmp(argv[4], "true") == 0);

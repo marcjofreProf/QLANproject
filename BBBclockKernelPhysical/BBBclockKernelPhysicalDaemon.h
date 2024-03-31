@@ -30,7 +30,7 @@ public: //Variables
 		APPLICATION_EXIT = -1,
 	    };
 	// Variables adjusted by passing values to the main function
-	unsigned int AdjCountsFreq=50; // Number of clock ticks to adjust to the required frequency (e.g., 32 KHz) to account for having some idle time when resetting DWT_CNT in PRU
+	int AdjCountsFreq=0; // Number of clock ticks to adjust to the required frequency (e.g., 32 KHz) to account for having some idle time when resetting DWT_CNT in PRU
 	double RatioAverageFactorClockHalfPeriod=0.999; // The lower the more aggresive taking the new computed values
 	double RatioFreqAdjustment=0.99;// Maximum and minimum frequency variation allowed
 	bool PlotPIDHAndlerInfo=false;
