@@ -8,7 +8,7 @@
 #include <unistd.h> //for sleep
 #include <signal.h>
 #include <cstring>
-#define WaitTimeAfterMainWhileLoop 100000 //nanoseconds
+#define WaitTimeAfterMainWhileLoop 1000000 //nanoseconds
 // Time/synchronization management
 #include <chrono>
 // PRU programming
@@ -149,7 +149,8 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=Clock::now();
-	this->requestWhileWait = this->SetFutureTimePoint();
+	this->SetFutureTimePoint();// Used with busy-wait
+	//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 }
 
 int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
@@ -166,11 +167,12 @@ int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems phy
 //pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
 sharedMem_int[0]=static_cast<unsigned int>(static_cast<int>(this->NumClocksHalfPeriodPRUclock)+this->AdjCountsFreq);//Information grabbed by PRU1
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
-clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
+while (Clock::now() < this->TimePointClockCurrentFinal);// Busy wait
+//clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 pru0dataMem_int[2]=static_cast<unsigned int>(1);
 prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment
-
-this->requestWhileWait = this->SetFutureTimePoint();
+this->SetFutureTimePoint();// Used with busy-wait
+//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
@@ -208,10 +210,10 @@ if (PlotPIDHAndlerInfo){
 return 0;// all ok	
 }
 
-struct timespec CKPD::SetFutureTimePoint(){
+struct timespec CKPD::SetWhileWait(){
 struct timespec requestWhileWaitAux;
-TimePoint TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);
-this->TimePointClockCurrentInitial=TimePointClockCurrentFinal; //Update value
+this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);
+this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal; //Update value
 auto duration_since_epochFutureTimePoint=TimePointClockCurrentFinal.time_since_epoch();
 // Convert duration to desired time
 unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Convert 
@@ -220,6 +222,12 @@ unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::d
 requestWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
 requestWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
 return requestWhileWaitAux;
+}
+
+int CKPD::SetFutureTimePoint(){
+this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);
+this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal; //Update value
+return 0; // All Ok
 }
 
 /*****************************************************************************
@@ -372,6 +380,7 @@ int main(int argc, char const * argv[]){
  
  CKPDagent.GenerateSynchClockPRU();// Launch the generation of the clock
  cout << "Starting to actively adjust clock output..." << endl;
+ 
  while(isValidWhileLoop){ 
    //try{
  	//try {
@@ -398,7 +407,8 @@ int main(int argc, char const * argv[]){
         } // switch
         //CKPDagent.release();
 	if (signalReceivedFlag.load()){CKPDagent.~CKPD();}// Destroy the instance
-        // Main barrier is in HandleInterruptSynchPRU function. No need for this CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few microseconds for other processes to enter
+        // Main barrier is in HandleInterruptSynchPRU function. No need for this CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));
+        CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Used in busy-wait
     //}
     //catch (const std::exception& e) {
     //	// Handle the exception

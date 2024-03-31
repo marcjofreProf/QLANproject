@@ -56,6 +56,7 @@ private:// Variables
 	// Time keeping
 	unsigned long long int TimeAdjPeriod=static_cast<unsigned long long int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted. VEry important parameter
 	TimePoint TimePointClockCurrentInitial=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
+	TimePoint TimePointClockCurrentFinal=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
 	// PRU clock handling	
 	unsigned long long int iIterPlotPIDHAndlerInfo=0;		
 	int retInterruptsPRU0;
@@ -91,7 +92,8 @@ private: // Functions/Methods
 	static void SignalPIPEHandler(int s); // Handler for socket SIGPIPE signal error	
 	//static void SignalSegmentationFaultHandler(int s); // Handler for segmentation error
 	// Clock synch
-	struct timespec SetFutureTimePoint();
+	int SetFutureTimePoint();
+	struct timespec SetWhileWait();
 	// PRU
 	int LOCAL_DDMinit();
 	int DisablePRUs();	
