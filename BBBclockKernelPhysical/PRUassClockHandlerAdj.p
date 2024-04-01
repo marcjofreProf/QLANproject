@@ -39,7 +39,7 @@
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0xFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
 #define AllOutputInterestPinsLow 0x00// For the defined output pins to set them low in block (and not the ones that are allocated by other processes)
-#define NUM_CLOCKS_HALF_PERIOD	4685		// Not used (value given by host) set the number of clocks that defines the period of the clock. For 32Khz, with a PRU clock of 10ns (10ns seems more real, rather than 5ns as specs) is 3125
+#define NUM_CLOCKS_HALF_PERIOD	50000000		// Not used (value given by host) set the number of clocks that defines the half period of the clock. For 1pps is around 50000000 For 32Khz, with a PRU clock of 10ns (10ns seems more real, rather than 5ns as specs) is 3125
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers

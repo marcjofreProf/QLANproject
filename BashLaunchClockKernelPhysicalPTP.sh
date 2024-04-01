@@ -1,5 +1,5 @@
 # Parameters to pass
-# arg1: Daemon ticks to fine adust to required Frequency: For example, 400. Defined as int. -2147483647<= arg1 <=2147483647, but it has to be small in order to not produce negative half periods (defined as unsigned int)
+# arg1: Daemon ticks to fine adust to required Frequency: For example, 0.0 Defined duble, but it has to be small in order to not produce negative half periods (defined as unsigned int)
 # arg2: Daemon PID proportional factor. For example: 0.05
 # arg3: Daemon print PID values: true or false
 trap "kill 0" EXIT
