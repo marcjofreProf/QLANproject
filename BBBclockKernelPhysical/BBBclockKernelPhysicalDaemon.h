@@ -30,14 +30,12 @@ public: //Variables
 		APPLICATION_EXIT = -1,
 	    };
 	// Variables adjusted by passing values to the main function
-	int AdjCountsFreq=400; // Number of clock ticks to adjust to the required frequency (e.g., 32 KHz) to account for having some idle time when resetting DWT_CNT in PRU
+	double AdjCountsFreq=400.0; // Number of clock ticks to adjust to the required frequency (e.g., 32 KHz) to account for having some idle time when resetting DWT_CNT in PRU
 	double RatioAverageFactorClockHalfPeriod=0.05; // The lower the more aggresive taking the new computed values
 	double RatioFreqAdjustment=0.99;// Maximum and minimum frequency variation allowed
 	bool PlotPIDHAndlerInfo=false;
 	double FactorTimerAdj=0.5; 
-	unsigned int NumClocksHalfPeriodPRUclock=static_cast<unsigned int>(FactorTimerAdj*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds)));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
-	unsigned int MinNumClocksHalfPeriodPRUclock=static_cast<unsigned int>((1.0-RatioFreqAdjustment)*static_cast<double>(NumClocksHalfPeriodPRUclock));
-	unsigned int MaxNumClocksHalfPeriodPRUclock=static_cast<unsigned int>((1.0+RatioFreqAdjustment)*static_cast<double>(NumClocksHalfPeriodPRUclock));
+	double NumClocksHalfPeriodPRUclock=FactorTimerAdj*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
 
 private:// Variables
 	ApplicationState m_state;

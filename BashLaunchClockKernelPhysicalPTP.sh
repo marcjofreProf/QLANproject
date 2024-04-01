@@ -1,8 +1,7 @@
 # Parameters to pass
 # arg1: Daemon ticks to fine adust to required Frequency: For example, 400. Defined as int. -2147483647<= arg1 <=2147483647, but it has to be small in order to not produce negative half periods (defined as unsigned int)
 # arg2: Daemon PID proportional factor. For example: 0.05
-# arg3: Daemon PID Frequency variation ratio sanity. For example: 0.99
-# arg4: Daemon print PID values: true or false
+# arg3: Daemon print PID values: true or false
 trap "kill 0" EXIT
 echo 'Running PTP'
 sudo /etc/init.d/rsyslog stop # stop logging
@@ -34,7 +33,7 @@ sudo config-pin P8_43 pruout
 sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
-sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 $4
+sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3
 sudo timedatectl set-ntp true # Start NTP
 echo 'Stopped PTP'
 #sudo /etc/init.d/rsyslog start # start logging
