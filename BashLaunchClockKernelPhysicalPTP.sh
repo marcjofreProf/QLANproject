@@ -1,6 +1,6 @@
 # Parameters to pass
 # arg1: Daemon ticks to fine adust to required Frequency: For example, 0.0 Defined duble, but it has to be small in order to not produce negative half periods (defined as unsigned int)
-# arg2: Daemon PID proportional factor. For example: 0.05
+# arg2: Daemon PID proportional factor. For example: 0.0. 0<= arg2 <= 1.0. Probably, only larger than 0.0, if there is too much jitter.
 # arg3: Daemon print PID values: true or false
 trap "kill 0" EXIT
 echo 'Running PTP'
