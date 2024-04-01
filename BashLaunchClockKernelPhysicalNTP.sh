@@ -7,6 +7,11 @@ echo 'Running NTP'
 sudo /etc/init.d/rsyslog stop # stop logging
 sudo systemctl start systemd-timesyncd # start system synch
 sudo timedatectl set-ntp true
+echo 'Enabling PWM for 24 MHz ref clock'
+sudo config-pin P8.19 pwm
+sudo sudo sh -c "echo '80' >> /sys/class/pwm/pwmchip7/pwm-7\:0/period"
+sudo sudo sh -c "echo '40' >> /sys/class/pwm/pwmchip7/pwm-7\:0/duty_cycle"
+sudo sudo sh -c "echo '1' >> /sys/class/pwm/pwmchip7/pwm-7\:0/enable"
 echo 'Enabling BBB pins'
 sudo config-pin P9_28 pruin
 sudo config-pin P9_29 pruin
