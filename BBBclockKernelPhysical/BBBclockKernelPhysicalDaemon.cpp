@@ -149,6 +149,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=Clock::now();
+	this->TimePointClockCurrentInitialAdj=Clock::now();
 	this->SetFutureTimePoint();// Used with busy-wait
 	//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 }
@@ -171,6 +172,7 @@ while (Clock::now() < this->TimePointClockCurrentFinal);// Busy wait
 //clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 pru0dataMem_int[2]=static_cast<unsigned int>(1);
 prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment
+this->TimePointClockCurrentFinalAdj=Clock::now();
 this->SetFutureTimePoint();// Used with busy-wait
 //this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 
@@ -187,15 +189,23 @@ else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU0 interrupt poll error" << endl;
 }
+
+
+// Compute clocks adjustment
+auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epoch()-this->TimePointClockCurrentInitialAdj.time_since_epoch();
+// Convert duration to desired time
+this->TimePointClockCurrentFinalInitialAdj_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
+this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;// Update value
+
 // Update sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
 // Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
-
-this->NumClocksHalfPeriodPRUclock=this->RatioAverageFactorClockHalfPeriod*this->NumClocksHalfPeriodPRUclock+(1.0-RatioAverageFactorClockHalfPeriod)*(this->FactorTimerAdj*0.5*static_cast<double>(pru0dataMem_int[1])/static_cast<double>(ClockCyclePeriodAdjustment)-this->AdjCountsFreq);
+this->NumClocksHalfPeriodPRUclock=this->RatioAverageFactorClockHalfPeriod*this->NumClocksHalfPeriodPRUclock+(1.0-RatioAverageFactorClockHalfPeriod)*(this->FactorTimerAdj*0.5*static_cast<double>(pru0dataMem_int[1])/static_cast<double>(ClockCyclePeriodAdjustment)*(static_cast<double>(this->TimeAdjPeriod)/static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count))-this->AdjCountsFreq);
 
 if (PlotPIDHAndlerInfo){
 	if (iIterPlotPIDHAndlerInfo%1000000000000000){
 	cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
 	cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
+	cout << "this->TimePointClockCurrentFinalInitialAdj_time_as_count: " << this->TimePointClockCurrentFinalInitialAdj_time_as_count << endl;
 	}
 	iIterPlotPIDHAndlerInfo++;
 }
@@ -207,7 +217,7 @@ struct timespec CKPD::SetWhileWait(){
 struct timespec requestWhileWaitAux;
 this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);
 this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal; //Update value
-auto duration_since_epochFutureTimePoint=TimePointClockCurrentFinal.time_since_epoch();
+auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentFinal.time_since_epoch();
 // Convert duration to desired time
 unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Convert 
 //cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;

@@ -44,6 +44,7 @@ private:// Variables
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;// system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
+	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_count;
 	struct timespec requestWhileWait;
 	// PRU
 	static int mem_fd;
@@ -55,6 +56,8 @@ private:// Variables
 	unsigned long long int TimeAdjPeriod=static_cast<unsigned long long int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted. VEry important parameter
 	TimePoint TimePointClockCurrentInitial=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
 	TimePoint TimePointClockCurrentFinal=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
+	TimePoint TimePointClockCurrentInitialAdj=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
+	TimePoint TimePointClockCurrentFinalAdj=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
 	// PRU clock handling	
 	unsigned long long int iIterPlotPIDHAndlerInfo=0;		
 	int retInterruptsPRU0;
