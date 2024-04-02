@@ -42,7 +42,7 @@ private:// Variables
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	// Time/synchronization management
-	using Clock = std::chrono::steady_clock;// system_clock;steady_clock;high_resolution_clock
+	using Clock = std::chrono::steady_clock;// system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer), steady_clock is much better than system_clock aimed at measuring absolute time (like a watch)
 	using TimePoint = std::chrono::time_point<Clock>;
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_count;
 	struct timespec requestWhileWait;
