@@ -53,6 +53,7 @@
 // r18 reserved pointing to PRU RAM
 // r19 reserved number of synch pulses detected
 // r20 reserved for raising edge detection synch pulses together with r17
+// r21 reserved for checking if too many synch pulses stored
 
 //// If using IET timer (potentially adjusted to synchronization protocols)
 // We can use Constant table pointers C26
@@ -215,8 +216,9 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// If the program reaches this point, at least one of the bits is high
 	// Proceed with the rest of the program
 	JMP	TIMETAG
-SYNCHPULSES:	
-	QBGT    SYNCHPULSESREG, r19, 255// Protection instruction to not go beyond the capacity os PRU RAM
+SYNCHPULSES:
+	MOV	r21.b0, r19.b1
+	QBGE    SYNCHPULSESREG, r21.b0, 3// Protection instruction to not go beyond the capacity of PRU RAM
 	JMP	WAIT_FOR_EVENT
 SYNCHPULSESREG:
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT	
