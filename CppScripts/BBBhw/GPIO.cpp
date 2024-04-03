@@ -517,15 +517,17 @@ if (streamSynchpru.is_open()){
 	int lineCount = 0;
 	unsigned int ValueReadNumSynchPulses;
 	streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	streamSynchpru.read(reinterpret_cast<char*>(ValueReadNumSynchPulses), sizeof(ValueReadNumSynchPulses));
-	cout << "GPIO::ValueReadNumSynchPulses: " << ValueReadNumSynchPulses << endl;
-	streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	unsigned long long int SynchPulsesTags[ValueReadNumSynchPulses];
-	for (unsigned int iIter=0;iIter<ValueReadNumSynchPulses;iIter++){
-    	    streamSynchpru.read(reinterpret_cast<char*>(&SynchPulsesTags[lineCount]), sizeof(SynchPulsesTags[lineCount]));
-    	    lineCount++; // Increment line count for each line read
-    	    streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
-    	    }
+	streamSynchpru.read(reinterpret_cast<char*>(&ValueReadNumSynchPulses), sizeof(ValueReadNumSynchPulses));
+	if (streamSynchpru){
+		cout << "GPIO::ValueReadNumSynchPulses: " << ValueReadNumSynchPulses << endl;
+		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		unsigned long long int SynchPulsesTags[ValueReadNumSynchPulses];
+		for (unsigned int iIter=0;iIter<ValueReadNumSynchPulses;iIter++){
+	    	    streamSynchpru.read(reinterpret_cast<char*>(&SynchPulsesTags[lineCount]), sizeof(SynchPulsesTags[lineCount]));
+	    	    lineCount++; // Increment line count for each line read
+	    	    streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
+	    	    }
+    	}
 }
 else{
 	cout << "RetrieveNumStoredQuBits: BBB streamSynchpru is not open!" << endl;
