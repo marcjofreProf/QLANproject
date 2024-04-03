@@ -379,13 +379,13 @@ cout << "GPIO::NumSynchPulses: " << NumSynchPulses << endl;
 if (NumSynchPulses>0){// There are synch pulses
 	if (streamSynchpru.is_open()){
 		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		streamSynchpru.write(reinterpret_cast<const char*>(NumSynchPulses), sizeof(NumSynchPulses));
+		streamSynchpru.write(reinterpret_cast<const char*>(&NumSynchPulses), sizeof(NumSynchPulses));
 		for (unsigned int iIterSynch=0;iIterSynch<NumSynchPulses;iIterSynch++){
-		// Here code to compute the compensation in time using Synch pulses
-		extendedCounterPRU=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
-		synchp++;// 1 times 32 bits
-		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		streamSynchpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
+			valCycleCountPRU=static_cast<unsigned int>(*synchp);
+			synchp++;// 1 times 32 bits
+			extendedCounterPRU=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);			
+			streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+			streamSynchpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
 		}
 	}
 	else{
