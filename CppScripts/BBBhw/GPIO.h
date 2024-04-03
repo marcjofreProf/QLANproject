@@ -108,7 +108,8 @@ private:// Variables
 	unsigned long long int auxUnskewingFactorResetCycle=0;
 	unsigned int AfterCountsThreshold=0;
 	//FILE* outfile;
-	fstream streamDDRpru;	
+	fstream streamDDRpru;
+	fstream streamSynchpru;
 	bool FirstTimeDDRdumpdata=true; // First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
 	// Non PRU
 	int number, debounceTime;

@@ -126,6 +126,20 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 		//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	}
 	
+	// Open file where temporally are stored synch	
+	streamSynchpru.open(string(PRUdataPATH1) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
+	if (!streamSynchpru.is_open()) {
+		streamSynchpru.open(string(PRUdataPATH2) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
+		if (!streamSynchpru.is_open()) {
+	        	cout << "Failed to open the streamSynchpru file." << endl;
+	        }
+        }
+        
+        if (streamSynchpru.is_open()){
+		streamSynchpru.close();	
+		//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	}
+	
         // Initialize DDM
 	LOCAL_DDMinit(); // DDR (Double Data Rate): A class of memory technology used in DRAM where data is transferred on both the rising and falling edges of the clock signal, effectively doubling the data rate without increasing the clock frequency.
 	// Here we can update memory space assigned address
@@ -362,19 +376,23 @@ extendedCounterPRUaux=auxUnskewingFactorResetCycle + this->valCarryOnCycleCountP
 NumSynchPulses=static_cast<unsigned int>(*synchp);
 synchp++;
 if (NumSynchPulses>0){// There are synch pulses
-	for (unsigned int iIterSynch=0;iIterSynch<NumSynchPulses;iIterSynch++){
-	// Here code to compute the compensation in time using Synch pulses
-	extendedCounterPRU=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
-	synchp++;
-	// Do something to adjust timing
-	}	
+	if (streamSynchpru.is_open()){
+		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		streamSynchpru.write(reinterpret_cast<const char*>(NumSynchPulses), sizeof(NumSynchPulses));
+		for (unsigned int iIterSynch=0;iIterSynch<NumSynchPulses;iIterSynch++){
+		// Here code to compute the compensation in time using Synch pulses
+		extendedCounterPRU=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
+		synchp++;// 1 times 32 bits
+		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		streamSynchpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
+		}
+	}
+	else{
+		cout << "DDRdumpdata streamSynchpru is not open!" << endl;
+	}
 }
-else{// No synch pulses
-	// Do not adjust timing
-}
+
 // Reading TimeTaggs
-
-
 if (streamDDRpru.is_open()){
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	for (iIterDump=0; iIterDump<NumRecords; iIterDump++){
@@ -438,6 +456,7 @@ unsigned char GPIO::packBits(unsigned char value) {
 }
 
 int GPIO::ClearStoredQuBits(){
+// Timetagging data
 if (streamDDRpru.is_open()){
 	streamDDRpru.close();	
 	//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
@@ -453,15 +472,70 @@ if (!streamDDRpru.is_open()) {
 }
 streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 streamDDRpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
+
+// Synch data
+if (streamSynchpru.is_open()){
+	streamSynchpru.close();	
+	//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+}
+
+streamSynchpru.open(string(PRUdataPATH1) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
+if (!streamSynchpru.is_open()) {
+	streamSynchpru.open(string(PRUdataPATH2) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
+	if (!streamSynchpru.is_open()) {
+        	cout << "Failed to re-open the streamSynchpru file." << endl;
+        	return -1;
+        }
+}
+streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+streamSynchpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
 return 0; // all ok
 }
 
 int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags){
+// Synch taggs
+if (streamSynchpru.is_open()){
+	streamSynchpru.close();
+	
+	//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+}
+
+streamSynchpru.open(string(PRUdataPATH1) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content	
+if (!streamSynchpru.is_open()) {
+	streamSynchpru.open(string(PRUdataPATH2) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content
+	if (!streamSynchpru.is_open()) {
+        	cout << "Failed to re-open the streamSynchpru file." << endl;
+        	return -1;
+        }
+}
+streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+
+if (streamSynchpru.is_open()){
+	streamSynchpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
+	int lineCount = 0;
+	unsigned int ValueReadNumSynchPulses;
+	streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	streamSynchpru.read(reinterpret_cast<char*>(ValueReadNumSynchPulses), sizeof(ValueReadNumSynchPulses));
+	cout << "GPIO::ValueReadNumSynchPulses: " << ValueReadNumSynchPulses << endl;
+	streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	unsigned long long int SynchPulsesTags[ValueReadNumSynchPulses];
+	for (unsigned int iIter=0;iIter<ValueReadNumSynchPulses;iIter++){
+    	    streamSynchpru.read(reinterpret_cast<char*>(&SynchPulsesTags[lineCount]), sizeof(SynchPulsesTags[lineCount]));
+    	    lineCount++; // Increment line count for each line read
+    	    streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
+    	    }
+        return lineCount;
+}
+else{
+	cout << "RetrieveNumStoredQuBits: BBB streamSynchpru is not open!" << endl;
+return -1;
+}
+
+// Detection tags
 if (streamDDRpru.is_open()){
 	streamDDRpru.close();
 	
 	//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	
 }
 
 streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content	
@@ -494,6 +568,9 @@ else{
 	cout << "RetrieveNumStoredQuBits: BBB streamDDRpru is not open!" << endl;
 return -1;
 }
+
+return 0; // All Ok
+
 }
 
 /*****************************************************************************
@@ -843,6 +920,7 @@ GPIO::~GPIO() {
 	//	cout << "GPIO destructor: munmap failed" << endl;
 	//}
 	streamDDRpru.close();
+	streamSynchpru.close();
 }
 
 } /* namespace exploringBB */

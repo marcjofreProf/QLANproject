@@ -202,7 +202,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
 	//AND 	r6.b0, r6.b0, MASKevents // Interested specifically to the bits with MASKevents. MAybe there are never counts in this first 8 bits if there is not explicitly a signal.
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
-	MOV	r17.b0, r16.b1 //Synch pulse is in the second byte, in bit 14 actually
+	MOV	r17.b0, r6.b1 //Synch pulse is in the second byte, in bit 14 actually
 	AND	r17.b0, r17.b0, 0x40 // Mask to only look at bit 7 (bit 14 when considering the two bytes)
 	QBNE	SYNCHPULSES, r17.b0, 0
 	// If not a synch pulse, a detector timetag
@@ -211,7 +211,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Proceed with the rest of the program
 	JMP	TIMETAG
 SYNCHPULSES:	
-	QBLT    SYNCHPULSESREG, r19, 255// Protection instruction to not go beyond the capacity
+	QBLT    SYNCHPULSESREG, r19, 255// Protection instruction to not go beyond the capacity os PRU RAM
 	JMP	WAIT_FOR_EVENT
 SYNCHPULSESREG:
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT	
