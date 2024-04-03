@@ -212,7 +212,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Proceed with the rest of the program
 	JMP	TIMETAG
 SYNCHPULSES:	
-	QBLT    SYNCHPULSESREG, r19, 255// Protection instruction to not go beyond the capacity os PRU RAM
+	QBGT    SYNCHPULSESREG, r19, 255// Protection instruction to not go beyond the capacity os PRU RAM
 	JMP	WAIT_FOR_EVENT
 SYNCHPULSESREG:
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT	
