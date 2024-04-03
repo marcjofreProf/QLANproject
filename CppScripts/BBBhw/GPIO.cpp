@@ -381,7 +381,7 @@ if (NumSynchPulses>0){// There are synch pulses
 		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 		unsigned int ValueReadNumSynchPulses=0;
 		streamSynchpru.read(reinterpret_cast<char*>(&ValueReadNumSynchPulses), sizeof(ValueReadNumSynchPulses));
-		if (streamSynchpru){//There was a value
+		if (!streamSynchpru){//There was a value
 			NumSynchPulses=NumSynchPulses+ValueReadNumSynchPulses;
 		}		
 		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
