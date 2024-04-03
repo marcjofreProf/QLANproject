@@ -366,7 +366,7 @@ return 0; // return 0 is for no error
 int QPLA::ThreadSimulateEmitQuBit(){
 cout << "Simulate Emiting Qubits" << endl;
 struct timespec requestWhileWait=this->SetFutureTimePointOtherNode();
-this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum
+this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum priority
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
