@@ -49,9 +49,10 @@
 // r14 reserved for storing the substraction of offset value
 
 // r16 reserved for raising edge detection operation together with r6
-
+// r17 reserved for checking presence of synch pulses
 // r18 reserved pointing to PRU RAM
 // r19 reserved number of synch pulses detected
+// r20 reserved for raising edge detection synch pulses together with r17
 
 //// If using IET timer (potentially adjusted to synchronization protocols)
 // We can use Constant table pointers C26
@@ -198,13 +199,15 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	MOV	r6.w0, r31.w0 // Consecutive red for edge detection
 	NOT	r16.w0, r16.w0 // 0s converted to 1s
 	AND	r6.b0, r6.b0, r16.b0 // Only does complying with a rising edge
-	AND	r6.b1, r6.b1, r16.b1 // Only does complying with a rising edge
+	//Synch pulse is in the second byte, in bit 14 actually
+	MOV 	r17.b0, r6.b1
+	MOV 	r20.b0, r16.b1
+	AND	r17.b0, r17.b0, r20.b0 // Only does complying with a rising edge
 	// Mask the relevant bits you're interested in	
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
 	//AND 	r6.b0, r6.b0, MASKevents // Interested specifically to the bits with MASKevents. MAybe there are never counts in this first 8 bits if there is not explicitly a signal.
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
 	//Synch pulse is in the second byte, in bit 14 actually
-	MOV 	r17.b0, r6.b1
 	AND	r17.b0, r17.b0, 0x40 // Mask to only look at bit 7 (bit 14 when considering the two bytes)
 	QBNE	SYNCHPULSES, r17.b0, 0
 	// If not a synch pulse, a detector timetag
