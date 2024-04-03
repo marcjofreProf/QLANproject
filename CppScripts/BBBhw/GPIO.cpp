@@ -379,6 +379,12 @@ cout << "GPIO::NumSynchPulses: " << NumSynchPulses << endl;
 if (NumSynchPulses>0){// There are synch pulses
 	if (streamSynchpru.is_open()){
 		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		unsigned int ValueReadNumSynchPulses=0;
+		streamSynchpru.read(reinterpret_cast<char*>(&ValueReadNumSynchPulses), sizeof(ValueReadNumSynchPulses));
+		if (streamSynchpru){//There was a value
+			NumSynchPulses=NumSynchPulses+ValueReadNumSynchPulses;
+		}		
+		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 		streamSynchpru.write(reinterpret_cast<const char*>(&NumSynchPulses), sizeof(NumSynchPulses));
 		for (unsigned int iIterSynch=0;iIterSynch<NumSynchPulses;iIterSynch++){
 			valCycleCountPRU=static_cast<unsigned int>(*synchp);
