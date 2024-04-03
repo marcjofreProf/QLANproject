@@ -49,7 +49,9 @@
 // r14 reserved for storing the substraction of offset value
 
 // r16 reserved for raising edge detection operation together with r6
-
+// r17 reserved to check if a raising edge synch pulse
+// r18 reserved pointing to PRU RAM
+// r19 reserved number of synch pulses detected
 
 //// If using IET timer (potentially adjusted to synchronization protocols)
 // We can use Constant table pointers C26
@@ -108,6 +110,8 @@ INITIATIONS:// This is only run once
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
+	LDI	r18, 8 // Initialize 8 bytes above for PRU RAM
+	LDI	r19, 0 // Reset number of synch pulses register
 	// Initializations for faster execution
 	LDI	r7, 0 // Register for clearing other registers
 	MOV	r10, 0xFFFFFFFF
@@ -183,25 +187,38 @@ CMDLOOP2:// Double verification of host sending start command
 	/// Relative synch count down
 //	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 REGISTERCNT:
+	SBCO 	r7, CONST_PRUDRAM, 4, 4 // writes values of r19. to clear the number of synch pulses communicate din PRU RAM
 	// Here include once the overflow register
 	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address offset at r1
 	ADD 	r1, r1, 4 // increment address by 4 bytes
-		
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register, say R0
 	// Edge detection
-	MOV 	r16.b0, r31.b0 // This wants to be zeros for edge detection
-	MOV	r6.b0, r31.b0 // Consecutive red for edge detection
-	NOT	r16.b0, r16.b0 // 0s converted to 1s
-	AND	r6.b0, r6.b0, r16.b0 // Only does complying with a rising edge
+	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection
+	MOV	r6.w0, r31.w0 // Consecutive red for edge detection
+	NOT	r16.w0, r16.w0 // 0s converted to 1s
+	AND	r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge
 	// Mask the relevant bits you're interested in	
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
 	//AND 	r6.b0, r6.b0, MASKevents // Interested specifically to the bits with MASKevents. MAybe there are never counts in this first 8 bits if there is not explicitly a signal.
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
+	MOV	r17.b0, r16.b1 //Synch pulse is in the second byte, in bit 14 actually
+	AND	r17.b0, r17.b0, 0x40 // Mask to only look at bit 7 (bit 14 when considering the two bytes)
+	QBNE	SYNCHPULSES, r17.b0, 0
+	// If not a synch pulse, a detector timetag
 	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0
 	// If the program reaches this point, at least one of the bits is high
 	// Proceed with the rest of the program
-
+	JMP	TIMETAG
+SYNCHPULSES:	
+	QBLT    SYNCHPULSESREG, r19, 255// Protection instruction to not go beyond the capacity
+	JMP	WAIT_FOR_EVENT
+SYNCHPULSESREG:
+	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT	
+	SBCO	r5, CONST_PRUDRAM, r18, 4 // Write the value of DWT_CYCNT to PRU RAM
+	ADD	r18, r18, 4 // Increment PRU RAM data address
+	ADD	r19, r19, 1 // Increment number of detected synch pulses
+	JMP	WAIT_FOR_EVENT
 TIMETAG:
 	// Faster Concatenated Time counter and Detection channels
 	LBBO	r5, r13, 0, 4//LBBO	r5, r13, 0, 4 // r5 maps the value of DWT_CYCCNT//LBCO	r5, CONST_IETREG, 0xC, 4 // r5 maps the value of IEP counter. From here account for counts until reset to adjust the threshold in GPIO c++
@@ -210,13 +227,17 @@ TIMETAG:
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
+FINISH:
 	// Faster Concatenated Checks writting	
 	//SBCO	r10, CONST_IETREG, 0xC, 4//SBCO	r10, CONST_IETREG, 0xC, 4 // reset IEP // SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	LBBO	r11, r13, 0, 4// Read DWT_CYCNT	
 	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 8 // writes values of r8 and r9
+	SBCO 	r19, CONST_PRUDRAM, 4, 4 // writes values of r19
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
+	LDI	r18, 8 // Initialize 8 bytes above for PRU RAM
+	LDI	r19, 0 // Reset number of synch pulses register
 	//// For checking control, place as the last value the current estimated skew counts and threshold reset counts	
 	// we're done. Signal to the application
 	MOV	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
@@ -225,7 +246,6 @@ TIMETAG:
 	LBBO	r14, r13, 0, 4//LBCO	r9, CONST_IETREG, 0xC, 4 // read IEP	 // LBBO	r9, r13, 0, 4 // read DWT_CYCNT
 	SUB	r9, r14, r11	
 	JMP 	CHECK_CYCLECNT // finished, wait for next command. So it continuosly loops	
-	
 EXIT:
 	// Send notification (interrupt) to Host for program completion
 	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16

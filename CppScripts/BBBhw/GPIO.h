@@ -87,11 +87,14 @@ private:// Variables
 	//bool finPRU1;
 	// SHARED RAM to file dump
 	int iIterDump;
-	unsigned int NumRecords=2048; //Number of records per run. It is also defined in PRUassTaggDetScript.p. 
+	unsigned int NumRecords=2048; //Number of records per run. It is also defined in PRUassTaggDetScript.p.
+	unsigned int NumSynchPulses=0;
 	unsigned char* valpHolder;
 	unsigned char* valpAuxHolder;
+	unsigned int* synchpHolder; // 32 bits
 	unsigned char* valp; // 8 bits
 	unsigned char* valpAux; // 8 bits
+	unsigned int* synchp; // 32 bits
 	unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquition run
 	unsigned int valOverflowCycleCountPRU=0; // 32 bits
 	unsigned int valOverflowCycleCountPRUold=0; // 32 bits

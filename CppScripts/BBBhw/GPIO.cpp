@@ -52,8 +52,8 @@
 * Local Macro Declarations - Global Space point of View                       *
 ******************************************************************************/
 #define AM33XX_PRUSS_IRAM_SIZE 8192 // Instructions RAM (where .p assembler instructions are loaded)
-#define AM33XX_PRUSS_DRAM_SIZE 8192 // Data RAM
-#define AM33XX_PRUSS_SHAREDRAM_SIZE 12000 // Data RAM
+#define AM33XX_PRUSS_DRAM_SIZE 8192 // PRU's Data RAM
+#define AM33XX_PRUSS_SHAREDRAM_SIZE 12000 // Shared Data RAM
 
 #define PRU_ADDR        0x4A300000      // Start of PRU memory Page 184 am335x TRM
 #define PRU_LEN         0x80000         // Length of PRU memory
@@ -131,6 +131,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Here we can update memory space assigned address
 	valpHolder=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM];
 	valpAuxHolder=valpHolder+4+5*NumRecords;
+	synchpHolder=(unsigned int*)&pru0dataMem_int[1];
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Timetagging
@@ -304,13 +305,16 @@ return 0;// all ok
 //PRU0 - Operation - getting iputs
 
 int GPIO::DDRdumpdata(){
+
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=valpHolder; // Coincides with SHARED in PRUassTaggDetScript.p
+valpAux=valpAuxHolder;
+synchp=synchpHolder;
 //for each capture bursts, at the beggining is stored the overflow counter of 32 bits. From there, each capture consists of 32 bits of the DWT_CYCCNT register and 8 bits of the channels detected (40 bits per detection tag).
 // The shared memory space has 12KB=12×1024bytes=12×1024×8bits=98304bits.
 //Doing numbers, we can store up to 2456 captures. To be in the safe side, we can do 2048 captures
 
-valpAux=valpAuxHolder; // Coincides with SHARED in PRUassTaggDetScript.p
+
 /*///////////////////////////////////////////////////////////////////////////////////////
 // Checking control - If discipling PRU cycle clocks
 unsigned int valDWT_CYCCNTFinalCounts=static_cast<unsigned int>(*valpAux);
@@ -378,6 +382,21 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 else{
 extendedCounterPRUaux=auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU;// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 }
+
+// Reading or not Synch pulses
+NumSynchPulses=static_cast<unsigned int>(*synchp);
+synchp++;
+if (NumSynchPulses>0){// There are synch pulses
+	for (unsigned int iIterSynch=0;iIterSynch<NumSynchPulses;iIterSynch++){
+	// Here code to compute the compensation in time using Synch pulses
+	extendedCounterPRU=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
+	synchp++;
+	}	
+}
+else{// No synch pulses
+}
+// Reading TimeTaggs
+
 
 if (streamDDRpru.is_open()){
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
