@@ -529,7 +529,7 @@ if (streamSynchpru.is_open()){
 	streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	streamSynchpru.read(reinterpret_cast<char*>(&ValueReadNumSynchPulses), sizeof(ValueReadNumSynchPulses));
 	if (streamSynchpru){
-		cout << "GPIO::ValueReadNumSynchPulses: " << ValueReadNumSynchPulses << endl;
+		//cout << "GPIO::ValueReadNumSynchPulses: " << ValueReadNumSynchPulses << endl;
 		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 		unsigned long long int SynchPulsesTags[ValueReadNumSynchPulses];
 		for (unsigned int iIter=0;iIter<ValueReadNumSynchPulses;iIter++){
@@ -537,6 +537,9 @@ if (streamSynchpru.is_open()){
 	    	    lineCount++; // Increment line count for each line read
 	    	    streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
 	    	    }
+    	}
+    	else{
+    		cout << "RetrieveNumStoredQuBits: No Synch pulses present!" << endl;
     	}
 }
 else{
