@@ -371,7 +371,7 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 else{
 extendedCounterPRUaux=auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU;// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
 }
-
+/*
 // Reading or not Synch pulses
 NumSynchPulses=static_cast<unsigned int>(*synchp);
 synchp++;
@@ -392,7 +392,7 @@ if (NumSynchPulses>0){// There are synch pulses
 		cout << "DDRdumpdata streamSynchpru is not open!" << endl;
 	}
 }
-
+*/
 // Reading TimeTaggs
 if (streamDDRpru.is_open()){
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
@@ -495,6 +495,7 @@ return 0; // all ok
 
 int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags){
 // Synch taggs
+/*
 if (streamSynchpru.is_open()){
 	streamSynchpru.close();
 	
@@ -525,13 +526,12 @@ if (streamSynchpru.is_open()){
     	    lineCount++; // Increment line count for each line read
     	    streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
     	    }
-        return lineCount;
 }
 else{
 	cout << "RetrieveNumStoredQuBits: BBB streamSynchpru is not open!" << endl;
 return -1;
 }
-
+*/
 // Detection tags
 if (streamDDRpru.is_open()){
 	streamDDRpru.close();
