@@ -375,6 +375,7 @@ extendedCounterPRUaux=auxUnskewingFactorResetCycle + this->valCarryOnCycleCountP
 // Reading or not Synch pulses
 NumSynchPulses=static_cast<unsigned int>(*synchp);
 synchp++;
+cout << "GPIO::NumSynchPulses: " << NumSynchPulses << endl;
 if (NumSynchPulses>0){// There are synch pulses
 	if (streamSynchpru.is_open()){
 		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
