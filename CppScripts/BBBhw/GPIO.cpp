@@ -314,31 +314,6 @@ synchp=synchpHolder;
 // The shared memory space has 12KB=12×1024bytes=12×1024×8bits=98304bits.
 //Doing numbers, we can store up to 2456 captures. To be in the safe side, we can do 2048 captures
 
-
-/*///////////////////////////////////////////////////////////////////////////////////////
-// Checking control - If discipling PRU cycle clocks
-unsigned int valDWT_CYCCNTFinalCounts=static_cast<unsigned int>(*valpAux);
-valpAux++;// 1 times 8 bits
-valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valpAux))<<8;
-valpAux++;// 1 times 8 bits
-valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valpAux))<<16;
-valpAux++;// 1 times 8 bits
-valDWT_CYCCNTFinalCounts=valDWT_CYCCNTFinalCounts | (static_cast<unsigned int>(*valpAux))<<24;
-cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
-cout << "valDWT_CYCCNTFinalCounts: " << valDWT_CYCCNTFinalCounts << endl;
-cout << "Diff PRU timers: " << static_cast<int>(valDWT_CYCCNTFinalCounts)-static_cast<int>(valCycleCountPRU) << endl;
-
-unsigned int valDWT_CYCCNTreupdate=static_cast<unsigned int>(*valpAux);
-valpAux++;// 1 times 8 bits
-valDWT_CYCCNTreupdate=valDWT_CYCCNTreupdate | (static_cast<unsigned int>(*valpAux))<<8;
-valpAux++;// 1 times 8 bits
-valDWT_CYCCNTreupdate=valDWT_CYCCNTreupdate | (static_cast<unsigned int>(*valpAux))<<16;
-valpAux++;// 1 times 8 bits
-valDWT_CYCCNTreupdate=valDWT_CYCCNTreupdate | (static_cast<unsigned int>(*valpAux))<<24;
-valpAux++;// 1 times 8 bits
-cout << "valDWT_CYCCNTreupdate: " << valDWT_CYCCNTreupdate << endl;
-//////////////////////////////////////////////////////////////////////////////*/
-
 ///////////////////////////////////////////////////////////////////////////////////////
 // Checking control - Clock skew and threshold
 valSkewCounts=static_cast<unsigned int>(*valpAux);
@@ -391,9 +366,11 @@ if (NumSynchPulses>0){// There are synch pulses
 	// Here code to compute the compensation in time using Synch pulses
 	extendedCounterPRU=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
 	synchp++;
+	// Do something to adjust timing
 	}	
 }
 else{// No synch pulses
+	// Do not adjust timing
 }
 // Reading TimeTaggs
 
