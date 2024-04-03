@@ -204,8 +204,9 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	//AND 	r6.b0, r6.b0, MASKevents // Interested specifically to the bits with MASKevents. MAybe there are never counts in this first 8 bits if there is not explicitly a signal.
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
 	//Synch pulse is in the second byte, in bit 14 actually
-	AND	r6.b1, r6.b1, 0x40 // Mask to only look at bit 7 (bit 14 when considering the two bytes)
-	QBNE	SYNCHPULSES, r6.b1, 0
+	MOV 	r17.b0, r6.b1
+	AND	r17.b0, r17.b0, 0x40 // Mask to only look at bit 7 (bit 14 when considering the two bytes)
+	QBNE	SYNCHPULSES, r17.b0, 0
 	// If not a synch pulse, a detector timetag
 	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0
 	// If the program reaches this point, at least one of the bits is high
