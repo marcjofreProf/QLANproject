@@ -495,7 +495,7 @@ return 0; // all ok
 
 int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags){
 // Synch taggs
-/*
+
 if (streamSynchpru.is_open()){
 	streamSynchpru.close();
 	
@@ -531,7 +531,7 @@ else{
 	cout << "RetrieveNumStoredQuBits: BBB streamSynchpru is not open!" << endl;
 return -1;
 }
-*/
+
 // Detection tags
 if (streamDDRpru.is_open()){
 	streamDDRpru.close();
