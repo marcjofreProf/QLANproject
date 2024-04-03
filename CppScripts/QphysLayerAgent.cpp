@@ -365,7 +365,8 @@ return 0; // return 0 is for no error
 
 int QPLA::ThreadSimulateEmitQuBit(){
 cout << "Simulate Emiting Qubits" << endl;
-struct timespec requestWhileWait=this->SetFutureTimePointOtherNode();
+//struct timespec requestWhileWait=this->SetFutureTimePointOtherNode();
+struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
 this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum priority
 //clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 while (Clock::now() < this->FutureTimePoint);// Busy wait
@@ -429,7 +430,8 @@ this->release();
 int iIterRuns;
 int DetRunsCount = NumQubitsMemoryBuffer/NumQuBitsPerRun;
 //cout << "DetRunsCount: " << DetRunsCount << endl;
-struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
+struct timespec requestWhileWait=this->SetFutureTimePointOtherNode();
+//struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
 this->acquire();
 TimeTaggs[NumQubitsMemoryBuffer]={0}; // Clear the array
 ChannelTags[NumQubitsMemoryBuffer]={0}; // Clear the array
