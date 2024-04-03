@@ -62,6 +62,7 @@ private: //Variables/Instances
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;//system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
+	TimePoint FutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
 	TimePoint OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
 	// Private threads
 	bool RunThreadSimulateEmitQuBitFlag=true;
