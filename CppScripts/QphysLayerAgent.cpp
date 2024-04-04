@@ -550,7 +550,7 @@ cout << "It has to have connected only ch1 timetagger" << endl;
 cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
 cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
 cout << "Attention a Periodic signal sent, so time synch between different acquisitions is corrected" << endl;
-unsigned long long int HistPeriodicityAux=8*4; // Periodicity in number of PRU counts
+unsigned long long int HistPeriodicityAux=8*8; // Periodicity in number of PRU counts
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures
 TimeTaggs[i]=TimeTaggs[i]-TimeTaggs[0]+OldLastTimeTagg+HistPeriodicityAux;
 }
