@@ -550,9 +550,9 @@ cout << "It has to have connected only ch1 timetagger" << endl;
 cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
 cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
 cout << "Attention a Periodic signal sent, so time synch between different acquisitions is corrected" << endl;
-
+unsigned long long int HistPeriodicityAux=8*4; // Periodicity in number of PRU counts
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures
-TimeTaggs[i]=TimeTaggs[i]-TimeTaggs[0]+OldLastTimeTagg+8;
+TimeTaggs[i]=TimeTaggs[i]-TimeTaggs[0]+OldLastTimeTagg+HistPeriodicityAux;
 }
 
 TimeTaggsDetAnalytics[7]=(double)(TimeTaggs[0]);
@@ -560,11 +560,11 @@ TimeTaggsDetAnalytics[7]=(double)(TimeTaggs[0]);
 TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)((4+TimeTaggs[i]-TimeTaggs[0])%8)-3.5);
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)((HistPeriodicityAux/2+TimeTaggs[i]-TimeTaggs[0])%HistPeriodicityAux)-(double)(HistPeriodicityAux/2)+0.5);
 }
 
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((4+TimeTaggs[i]-TimeTaggs[0])%8)-3.5)-TimeTaggsDetAnalytics[5],2.0);
+TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((HistPeriodicityAux/2+TimeTaggs[i]-TimeTaggs[0])%HistPeriodicityAux)-(double)(HistPeriodicityAux/2)+0.5)-TimeTaggsDetAnalytics[5],2.0);
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 

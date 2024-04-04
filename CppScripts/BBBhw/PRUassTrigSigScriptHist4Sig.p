@@ -153,13 +153,35 @@ CMDLOOP2:// Double verification of host sending start command
 //	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
 SIGNALON:	
 	MOV	r30.b0, 0x11 // Double channels 1. write to magic r30 output byte 0
+	LDI	r4, 0 // Intentional controlled delay
+	LDI	r4, 0 // Intentional controlled delay
+	LDI	r4, 0 // Intentional controlled delay
 	MOV	r30.b0, 0x00 // All off
+	LDI	r4, 0 // Intentional controlled delay
+	LDI	r4, 0 // Intentional controlled delay
+	LDI	r4, 0 // Intentional controlled delay
 	MOV	r30.b0, 0x22 // Double channels 2. write to magic r30 output byte 0
+	LDI	r4, 0 // Intentional controlled delay
+	LDI	r4, 0 // Intentional controlled delay
+	LDI	r4, 0 // Intentional controlled delay
 	MOV	r30.b0, 0x00 // All off
+	LDI	r4, 0 // Intentional controlled delay
+	LDI	r4, 0 // Intentional controlled delay
+	LDI	r4, 0 // Intentional controlled delay
 	MOV	r30.b0, 0x44 // Double channels 3. write to magic r30 output byte 0
+	LDI	r4, 0 // Intentional controlled delay
+	LDI	r4, 0 // Intentional controlled delay
+	LDI	r4, 0 // Intentional controlled delay
 	MOV	r30.b0, 0x00 // All off
+	LDI	r4, 0 // Intentional controlled delay
+	LDI	r4, 0 // Intentional controlled delay
+	LDI	r4, 0 // Intentional controlled delay
 	MOV	r30.b0, 0x88 // Double channels 4. write to magic r30 output byte 0
+	LDI	r4, 0 // Intentional controlled delay
+	LDI	r4, 0 // Intentional controlled delay
+	LDI	r4, 0 // Intentional controlled delay
 	MOV	r30.b0, 0x00 // All off
+	LDI	r4, 0 // Intentional controlled delay to adjust periodicity
 SIGNALOFF:
 	SUB	r1, r1, 1 // Decrement counter
 	QBNE	SIGNALON, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
