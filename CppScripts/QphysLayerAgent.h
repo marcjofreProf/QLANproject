@@ -68,8 +68,6 @@ private: //Variables/Instances
 	bool RunThreadSimulateEmitQuBitFlag=true;
 	bool RunThreadSimulateReceiveQuBitFlag=true;
 	bool RunThreadAcquireSimulateNumStoredQubitsNode=true;
-	// Periodic signal histogram analysis
-	unsigned long long int OldLastTimeTagg=0;
         
 public: // Variables/Instances
 	enum ApplicationState { // State of the agent sequences

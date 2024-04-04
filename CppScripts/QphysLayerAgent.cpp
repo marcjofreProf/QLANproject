@@ -368,8 +368,8 @@ cout << "Simulate Emiting Qubits" << endl;
 struct timespec requestWhileWait=this->SetFutureTimePointOtherNode();
 //struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
 this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum priority
-//clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
-while (Clock::now() < this->FutureTimePoint);// Busy wait
+clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
+//while (Clock::now() < this->FutureTimePoint);// Busy wait
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
@@ -436,8 +436,8 @@ this->acquire();
 TimeTaggs[NumQubitsMemoryBuffer]={0}; // Clear the array
 ChannelTags[NumQubitsMemoryBuffer]={0}; // Clear the array
 // So that there are no segmentation faults by grabbing the CLOCK REALTIME and also this has maximum priority
-//clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrier
-while (Clock::now() < this->OtherClientNodeFutureTimePoint);// Busy wait
+clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrier
+//while (Clock::now() < this->OtherClientNodeFutureTimePoint);// Busy wait
 
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 
@@ -530,7 +530,7 @@ for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
 if (i>0){TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow((double)(TimeTaggs[i]-TimeTaggs[i-1])-TimeTaggsDetAnalytics[5],2.0);}
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
-TimeTaggsDetAnalytics[7]=TimeTaggs[0];
+TimeTaggsDetAnalytics[7]=(double)(TimeTaggs[0]);// Timetag of the first capture
 
 //cout << "TimeTaggsDetAnalytics[0]: " << TimeTaggsDetAnalytics[0] << endl;
 //cout << "TimeTaggsDetAnalytics[1]: " << TimeTaggsDetAnalytics[1] << endl;
@@ -549,20 +549,21 @@ cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 cout << "It has to have connected only ch1 timetagger" << endl;
 cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
 cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
-cout << "Attention a Periodic signal sent, so time synch between different acquisitions is corrected with the last measured tagg: OldLastTimeTagg" << endl;
+cout << "Attention a Periodic signal sent, so time synch between different acquisitions is corrected" << endl;
+
+TimeTaggsDetAnalytics[7]=(double)((TimeTaggs[0]/8)*8);// To have synchronisms in between inter captures
 
 TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)((4+TimeTaggs[i]-TimeTaggs[0]-OldLastTimeTagg)%8)-3.5);
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)((4+TimeTaggs[i]-TimeTaggs[0])%8)-3.5);
 }
 
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((4+TimeTaggs[i]-TimeTaggs[0]-OldLastTimeTagg)%8)-3.5)-TimeTaggsDetAnalytics[5],2.0);
+TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((4+TimeTaggs[i]-TimeTaggs[0])%8)-3.5)-TimeTaggsDetAnalytics[5],2.0);
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
-OldLastTimeTagg=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];// Update value
 }
 else{
 TimeTaggsDetAnalytics[0]=0.0;
