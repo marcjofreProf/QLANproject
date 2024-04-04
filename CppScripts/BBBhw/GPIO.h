@@ -43,6 +43,10 @@ using std::fstream;
 #define PRUdataPATH1 "./PRUdata/"
 #define PRUdataPATH2 "../PRUdata/"
 
+#define MaxNumPulses	8192
+#define PRUclockStepPeriodNanoseconds		10 // PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is 
+#define PulseFreq	1000 // Hz
+
 namespace exploringBB {
 
 typedef int (*CallbackType)(int);
@@ -123,6 +127,11 @@ private:// Variables
 	int toggleNumber;  //default -1 (infinite)
 	// Testing with periodic histogram signal
 	unsigned long long int OldLastTimeTagg=0;
+	// Pulses compensation
+	int NumSynchPulsesRed=0;
+	unsigned long long int SynchPulsesTags[MaxNumPulses]={0};
+	double PeriodCountsPulseAdj=(((1.0/(double)(PulseFreq))*1e9)/((double)(PRUclockStepPeriodNanoseconds)));
+	double AdjPulseSynchCoeff=1.0;
 
 public:	// Functions/Methods
 	GPIO(int number); //constructor will export the pin	

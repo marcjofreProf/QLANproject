@@ -375,21 +375,11 @@ extendedCounterPRUaux=auxUnskewingFactorResetCycle + this->valCarryOnCycleCountP
 // Reading or not Synch pulses
 NumSynchPulses=static_cast<unsigned int>(*synchp);
 synchp++;
-//cout << "This slows down and unsynchronizes (comment) GPIO::NumSynchPulses: " << NumSynchPulses << endl;
+cout << "This slows down and unsynchronizes (comment) GPIO::NumSynchPulses: " << NumSynchPulses << endl;
 if (NumSynchPulses>0){// There are synch pulses
 	if (streamSynchpru.is_open()){
-		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		unsigned int ValueReadNumSynchPulses=0;
-		streamSynchpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
-		streamSynchpru.read(reinterpret_cast<char*>(&ValueReadNumSynchPulses), sizeof(ValueReadNumSynchPulses));
-		if (streamSynchpru){//There was a value
-			NumSynchPulses=NumSynchPulses+ValueReadNumSynchPulses;
-		}		
-		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		streamSynchpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
+		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations		
 		streamSynchpru.write(reinterpret_cast<const char*>(&NumSynchPulses), sizeof(NumSynchPulses));
-		streamSynchpru.seekg(0, std::ios::end); // the get (reading) pointer back to the end!
-		streamSynchpru.seekp(0, std::ios::end); // the put (writing) pointer back to the end!
 		for (unsigned int iIterSynch=0;iIterSynch<NumSynchPulses;iIterSynch++){
 			valCycleCountPRU=static_cast<unsigned int>(*synchp);
 			synchp++;// 1 times 32 bits
@@ -504,82 +494,89 @@ return 0; // all ok
 }
 
 int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags){
-// Synch taggs
-if (streamSynchpru.is_open()){
-	streamSynchpru.close();	
-	//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-}
+	// Synch taggs
+	if (streamSynchpru.is_open()){
+		streamSynchpru.close();	
+		//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	}
 
-streamSynchpru.open(string(PRUdataPATH1) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content	
-if (!streamSynchpru.is_open()) {
-	streamSynchpru.open(string(PRUdataPATH2) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content
+	streamSynchpru.open(string(PRUdataPATH1) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content	
 	if (!streamSynchpru.is_open()) {
-        	cout << "Failed to re-open the streamSynchpru file." << endl;
-        	return -1;
-        }
-}
-streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-
-if (streamSynchpru.is_open()){
-	streamSynchpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
-	int lineCount = 0;
-	unsigned int ValueReadNumSynchPulses;
+		streamSynchpru.open(string(PRUdataPATH2) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content
+		if (!streamSynchpru.is_open()) {
+			cout << "Failed to re-open the streamSynchpru file." << endl;
+			return -1;
+		}
+	}
 	streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	streamSynchpru.read(reinterpret_cast<char*>(&ValueReadNumSynchPulses), sizeof(ValueReadNumSynchPulses));
-	if (streamSynchpru){
-		//cout << "GPIO::ValueReadNumSynchPulses: " << ValueReadNumSynchPulses << endl;
+
+	if (streamSynchpru.is_open()){
+		streamSynchpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
+		int lineCount = 0;
+		unsigned int ValueReadNumSynchPulses;
 		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		unsigned long long int SynchPulsesTags[ValueReadNumSynchPulses];
-		for (unsigned int iIter=0;iIter<ValueReadNumSynchPulses;iIter++){
-	    	    streamSynchpru.read(reinterpret_cast<char*>(&SynchPulsesTags[lineCount]), sizeof(SynchPulsesTags[lineCount]));
-	    	    lineCount++; // Increment line count for each line read
-	    	    streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
-	    	    }
-    	}
-    	else{
-    		cout << "RetrieveNumStoredQuBits: No Synch pulses present!" << endl;
-    	}
-}
-else{
-	cout << "RetrieveNumStoredQuBits: BBB streamSynchpru is not open!" << endl;
-return -1;
-}
+		while (streamSynchpru.read(reinterpret_cast<char*>(&ValueReadNumSynchPulses), sizeof(ValueReadNumSynchPulses)) and lineCount<MaxNumPulses){		
+			for (int iIter=0;iIter<ValueReadNumSynchPulses;iIter++){
+				//cout << "GPIO::ValueReadNumSynchPulses: " << ValueReadNumSynchPulses << endl;
+				streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations				
+			    	streamSynchpru.read(reinterpret_cast<char*>(&SynchPulsesTags[lineCount]), sizeof(SynchPulsesTags[lineCount]));
+			    	lineCount++; // Increment line count for each line read			    	    
+		    	}
+		    	streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		}
+		NumSynchPulsesRed=lineCount;
+		if (NumSynchPulsesRed>1){//At least two points, we can generate a calibration curve
+			AdjPulseSynchCoeff=((double)((SynchPulsesTags[NumSynchPulsesRed-1]-SynchPulsesTags[0])/((unsigned long long int)(PeriodCountsPulseAdj))))/(((double)(SynchPulsesTags[NumSynchPulsesRed-1]-SynchPulsesTags[0]))/(PeriodCountsPulseAdj));
+		}
+		if (NumSynchPulsesRed>=MaxNumPulses){cout << "Too many pulses stored, increase buffer size or reduce number pulses" << endl;}
+	    	else if (NumSynchPulsesRed==0){cout << "RetrieveNumStoredQuBits: No Synch pulses present!" << endl;}
+	}
+	else{
+		cout << "RetrieveNumStoredQuBits: BBB streamSynchpru is not open!" << endl;
+	return -1;
+	}
 
-// Detection tags
-if (streamDDRpru.is_open()){
-	streamDDRpru.close();	
-	//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-}
+	// Detection tags
+	if (streamDDRpru.is_open()){
+		streamDDRpru.close();	
+		//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	}
 
-streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content	
-if (!streamDDRpru.is_open()) {
-	streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content
+	streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content	
 	if (!streamDDRpru.is_open()) {
-        	cout << "Failed to re-open the streamDDRpru file." << endl;
-        	return -1;
-        }
-}
-streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-
-if (streamDDRpru.is_open()){
-	streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
-	int lineCount = 0;
-	unsigned long long int ValueReadTest;
+		streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content
+		if (!streamDDRpru.is_open()) {
+			cout << "Failed to re-open the streamDDRpru file." << endl;
+			return -1;
+		}
+	}
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-        while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
-	    TimeTaggs[lineCount]=ValueReadTest; 
-	    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
-    	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
-    	    //cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
-    	    lineCount++; // Increment line count for each line read
-    	    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
-    	    }
-        return lineCount;
-}
-else{
-	cout << "RetrieveNumStoredQuBits: BBB streamDDRpru is not open!" << endl;
-return -1;
+
+	if (streamDDRpru.is_open()){
+		streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
+		int lineCount = 0;
+		unsigned long long int ValueReadTest;
+		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
+		    // Apply pulses time drift correction
+		    if (NumSynchPulsesRed>1){// There is a calibration curve
+		    	TimeTaggs[lineCount]=(unsigned long long int)(ValueReadTest*AdjPulseSynchCoeff);
+		    }
+		    else{// No pulse compensation
+		    	TimeTaggs[lineCount]=ValueReadTest; 
+		    }
+		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
+	    	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
+	    	    //cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
+	    	    lineCount++; // Increment line count for each line read
+	    	    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
+	    	    }
+		return lineCount;
+	}
+	else{
+		cout << "RetrieveNumStoredQuBits: BBB streamDDRpru is not open!" << endl;
+	return -1;
 }
 
 }
