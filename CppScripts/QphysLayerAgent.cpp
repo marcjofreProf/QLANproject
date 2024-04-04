@@ -549,18 +549,20 @@ cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 cout << "It has to have connected only ch1 timetagger" << endl;
 cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
 cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
+cout << "Attention a Periodic signal sent, so time synch between different acquisitions is corrected with the last measured tagg: OldLastTimeTagg" << endl;
 
 TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)((4+TimeTaggs[i]-TimeTaggs[0])%8)-3.5);
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)((4+TimeTaggs[i]-TimeTaggs[0]-OldLastTimeTagg)%8)-3.5);
 }
 
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((4+TimeTaggs[i]-TimeTaggs[0])%8)-3.5)-TimeTaggsDetAnalytics[5],2.0);
+TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((4+TimeTaggs[i]-TimeTaggs[0]-OldLastTimeTagg)%8)-3.5)-TimeTaggsDetAnalytics[5],2.0);
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
+OldLastTimeTagg=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];// Update value
 }
 else{
 TimeTaggsDetAnalytics[0]=0.0;
