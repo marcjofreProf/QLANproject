@@ -375,7 +375,7 @@ extendedCounterPRUaux=auxUnskewingFactorResetCycle + this->valCarryOnCycleCountP
 // Reading or not Synch pulses
 NumSynchPulses=static_cast<unsigned int>(*synchp);
 synchp++;
-cout << "This slows down and unsynchronizes (comment) GPIO::NumSynchPulses: " << NumSynchPulses << endl;
+//cout << "This slows down and unsynchronizes (comment) GPIO::NumSynchPulses: " << NumSynchPulses << endl;
 if (NumSynchPulses>0){// There are synch pulses
 	if (streamSynchpru.is_open()){
 		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations		
@@ -527,6 +527,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 		NumSynchPulsesRed=lineCount;
 		if (NumSynchPulsesRed>1){//At least two points, we can generate a calibration curve
 			AdjPulseSynchCoeff=((double)((SynchPulsesTags[NumSynchPulsesRed-1]-SynchPulsesTags[0])/((unsigned long long int)(PeriodCountsPulseAdj))))/(((double)(SynchPulsesTags[NumSynchPulsesRed-1]-SynchPulsesTags[0]))/(PeriodCountsPulseAdj));
+			cout << "AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
 		}
 		if (NumSynchPulsesRed>=MaxNumPulses){cout << "Too many pulses stored, increase buffer size or reduce number pulses" << endl;}
 	    	else if (NumSynchPulsesRed==0){cout << "RetrieveNumStoredQuBits: No Synch pulses present!" << endl;}
