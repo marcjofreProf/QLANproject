@@ -524,14 +524,17 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 		    	}
 		    	streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 		}
-		NumSynchPulsesRed=lineCount;
-		AdjPulseSynchCoeff=0.0;// Reset
+		NumSynchPulsesRed=lineCount;		
 		if (NumSynchPulsesRed>1){//At least two points, we can generate a calibration curve
+			AdjPulseSynchCoeff=0.0;// Reset
 			for (int iIter=0;iIter<(NumSynchPulsesRed-1);iIter++){
 				AdjPulseSynchCoeff=AdjPulseSynchCoeff+((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))))/(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
 			}
 			AdjPulseSynchCoeff=AdjPulseSynchCoeff/((double)(NumSynchPulsesRed-1));// Average
 			cout << "AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
+		}
+		else{
+			AdjPulseSynchCoeff=1.0;
 		}
 		if (NumSynchPulsesRed>=MaxNumPulses){cout << "Too many pulses stored, increase buffer size or reduce number pulses" << endl;}
 	    	else if (NumSynchPulsesRed==0){cout << "RetrieveNumStoredQuBits: No Synch pulses present!" << endl;}
