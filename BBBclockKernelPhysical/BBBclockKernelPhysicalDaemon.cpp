@@ -168,13 +168,13 @@ int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems phy
 //pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
 sharedMem_int[0]=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock+this->AdjCountsFreq);//Information grabbed by PRU1
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
-while (Clock::now() < this->TimePointClockCurrentFinal);// Busy wait
-//clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
+//while (Clock::now() < this->TimePointClockCurrentFinal);// Busy wait
+clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 pru0dataMem_int[2]=static_cast<unsigned int>(1);
 prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment
 this->TimePointClockCurrentFinalAdj=Clock::now();
-this->SetFutureTimePoint();// Used with busy-wait
-//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
+//this->SetFutureTimePoint();// Used with busy-wait
+this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
