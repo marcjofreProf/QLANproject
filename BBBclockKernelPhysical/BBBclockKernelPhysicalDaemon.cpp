@@ -150,8 +150,8 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=Clock::now();
 	this->TimePointClockCurrentInitialAdj=Clock::now();
-	this->SetFutureTimePoint();// Used with busy-wait
-	//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
+	//this->SetFutureTimePoint();// Used with busy-wait
+	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 }
 
 int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
