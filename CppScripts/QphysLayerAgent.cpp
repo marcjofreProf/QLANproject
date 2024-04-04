@@ -551,7 +551,7 @@ cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count differenc
 cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
 cout << "Attention a Periodic signal sent, so time synch between different acquisitions is corrected" << endl;
 
-TimeTaggsDetAnalytics[7]=(double)((TimeTaggs[0]/8)*8);// To have synchronisms in between inter captures
+TimeTaggsDetAnalytics[7]=(double)(TimeTaggs[0]-OldLastTimeTagg+8);// To have synchronisms in between inter captures
 
 TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
@@ -563,6 +563,8 @@ for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
 TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((4+TimeTaggs[i]-TimeTaggs[0])%8)-3.5)-TimeTaggsDetAnalytics[5],2.0);
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
+
+OldLastTimeTagg=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];
 
 }
 else{
