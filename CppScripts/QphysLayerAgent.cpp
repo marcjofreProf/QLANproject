@@ -554,11 +554,11 @@ cout << "Attention a Periodic signal sent, so time synch between different acqui
 TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)((4+TimeTaggs[i]-TimeTaggs[0]-OldLastTimeTagg)%8)-4.0);
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)((4+TimeTaggs[i]-TimeTaggs[0]-OldLastTimeTagg)%8)-3.0);
 }
 
 for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((4+TimeTaggs[i]-TimeTaggs[0]-OldLastTimeTagg)%8)-4.0)-TimeTaggsDetAnalytics[5],2.0);
+TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((4+TimeTaggs[i]-TimeTaggs[0]-OldLastTimeTagg)%8)-3.0)-TimeTaggsDetAnalytics[5],2.0);
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
