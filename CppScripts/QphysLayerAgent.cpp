@@ -564,7 +564,7 @@ TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStore
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
-OldLastTimeTagg=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];
+OldLastTimeTagg=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];// Update value
 
 }
 else{
