@@ -568,7 +568,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 		while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
 		    // Apply pulses time drift correction
 		    if (NumSynchPulsesRed>1){// There is a calibration curve
-		    	TimeTaggs[lineCount]=(unsigned long long int)(ValueReadTest/AdjPulseSynchCoeff);
+		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))*AdjPulseSynchCoeff);
 		    }
 		    else{// No pulse compensation
 		    	TimeTaggs[lineCount]=ValueReadTest; 
