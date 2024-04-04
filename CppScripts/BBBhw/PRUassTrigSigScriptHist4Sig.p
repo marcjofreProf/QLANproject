@@ -139,18 +139,18 @@ CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
-PSEUDOSYNCH:
-	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
-	LBBO	r0.b0, r3, 0, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
-	AND	r0, r0, 0x07 // Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) we can get a value between 0 and 7
-	QBEQ	SIGNALON, r0.b0, 7 // Coincides with a 7
-	QBEQ	SIGNALON, r0.b0, 6 // Coincides with a 6
-	QBEQ	SIGNALON, r0.b0, 5 // Coincides with a 5
-	QBEQ	SIGNALON, r0.b0, 4 // Coincides with a 4
-	QBEQ	SIGNALON, r0.b0, 3 // Coincides with a 3
-	QBEQ	SIGNALON, r0.b0, 2 // Coincides with a 2
-	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
-	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
+//PSEUDOSYNCH:
+//	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
+//	LBBO	r0.b0, r3, 0, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
+//	AND	r0, r0, 0x07 // Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) we can get a value between 0 and 7
+//	QBEQ	SIGNALON, r0.b0, 7 // Coincides with a 7
+//	QBEQ	SIGNALON, r0.b0, 6 // Coincides with a 6
+//	QBEQ	SIGNALON, r0.b0, 5 // Coincides with a 5
+//	QBEQ	SIGNALON, r0.b0, 4 // Coincides with a 4
+//	QBEQ	SIGNALON, r0.b0, 3 // Coincides with a 3
+//	QBEQ	SIGNALON, r0.b0, 2 // Coincides with a 2
+//	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
+//	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
 SIGNALON:	
 	MOV	r30.b0, 0x11 // Double channels 1. write to magic r30 output byte 0
 	MOV	r30.b0, 0x00 // All off
@@ -162,7 +162,7 @@ SIGNALON:
 	MOV	r30.b0, 0x00 // All off
 SIGNALOFF:
 	SUB	r1, r1, 1 // Decrement counter
-	QBNE	PSEUDOSYNCH, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
+	QBNE	SIGNALON, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
 	//QBA	SIGNALON//PSEUDOSYNCH// Debbuging - Infinite loop
 //	MOV	r0, DELAY
 //DELAYOFF:
