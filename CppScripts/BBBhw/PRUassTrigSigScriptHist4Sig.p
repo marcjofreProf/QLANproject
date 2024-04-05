@@ -23,7 +23,7 @@
 #define INS_PER_US		200		// 5ns per instruction for Beaglebone black
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
 #define NUM_REPETITIONS		4194304	//Not used 4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used). This defines the Maximum Transmission Unit - coul dbe named Quantum MTU (defined together with the clock)
-#define DELAY 2036//Substract 12 for the common cost commands. For instance 116=128-12 //1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
+#define DELAY 2036//Substract 12 for the common cost commands. For instance 116=128-12 // Assuming that QBNE add one extra when it goes through
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17

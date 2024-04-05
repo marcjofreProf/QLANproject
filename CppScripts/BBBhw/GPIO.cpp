@@ -527,9 +527,16 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 		NumSynchPulsesRed=lineCount;		
 		if (NumSynchPulsesRed>1){//At least two points, we can generate a calibration curve
 			AdjPulseSynchCoeff=0.0;// Reset
+			double CoeffSynchAdjAux1=0.0;
+			double CoeffSynchAdjAux2=0.0;
 			for (int iIter=0;iIter<(NumSynchPulsesRed-1);iIter++){
-				AdjPulseSynchCoeff=AdjPulseSynchCoeff+((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))))/(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
+				CoeffSynchAdjAux1=((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
+				CoeffSynchAdjAux2=(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
+				AdjPulseSynchCoeff=AdjPulseSynchCoeff+CoeffSynchAdjAux1/CoeffSynchAdjAux2;
 			}
+			cout << "PeriodCountsPulseAdj: " << PeriodCountsPulseAdj << endl;
+			cout << "Last CoeffSynchAdjAux1: " << CoeffSynchAdjAux1 << endl;
+			cout << "Last CoeffSynchAdjAux2: " << CoeffSynchAdjAux2 << endl;
 			AdjPulseSynchCoeff=AdjPulseSynchCoeff/((double)(NumSynchPulsesRed-1));// Average
 			cout << "AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
 		}
