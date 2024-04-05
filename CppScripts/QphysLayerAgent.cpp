@@ -564,7 +564,7 @@ TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
 for (int i=0;i<(SimulateNumStoredQubitsNodeAux-1);i++){
 if (i==0){cout << "TimeTaggs[1]-TimeTaggs[0]: " << TimeTaggs[1]-TimeTaggs[0] << endl;}
-else if(i==(SimulateNumStoredQubitsNodeAux-1)){cout << "TimeTaggs[i+1]-TimeTaggs[i]: " << TimeTaggs[i+1]-TimeTaggs[i] << endl;}
+else if(i==(SimulateNumStoredQubitsNodeAux-2)){cout << "TimeTaggs[i+1]-TimeTaggs[i]: " << TimeTaggs[i+1]-TimeTaggs[i] << endl;}
 
 TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((HistPeriodicityAux/2+TimeTaggs[i+1]-TimeTaggs[i])%HistPeriodicityAux))-(double)(HistPeriodicityAux/2));
 }
