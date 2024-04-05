@@ -562,20 +562,20 @@ TimeTaggsDetAnalytics[7]=(double)(TimeTaggs[0]);
 TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
 for (int i=0;i<(SimulateNumStoredQubitsNodeAux-1);i++){
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)((TimeTaggs[i+1]-TimeTaggs[i])%HistPeriodicityAux));
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)((HistPeriodicityAux/4+TimeTaggs[i+1]-TimeTaggs[i])%HistPeriodicityAux));
 }
 
 for (int i=0;i<(SimulateNumStoredQubitsNodeAux-1);i++){
-TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((TimeTaggs[i+1]-TimeTaggs[i])%HistPeriodicityAux))-TimeTaggsDetAnalytics[5],2.0);
+TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((HistPeriodicityAux/4+TimeTaggs[i+1]-TimeTaggs[i])%HistPeriodicityAux))-TimeTaggsDetAnalytics[5],2.0);
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
 OldLastTimeTagg=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];// Update value
 
-cout << "Offset corrected TimeTaggs[0]: " << TimeTaggs[0] << endl;
-cout << "Offset corrected TimeTaggs[1]: " << TimeTaggs[1] << endl;
-cout << "Offset corrected TimeTaggs[2]: " << TimeTaggs[2] << endl;
-cout << "Offset corrected TimeTaggs[3]: " << TimeTaggs[3] << endl;
+//cout << "Offset corrected TimeTaggs[0]: " << TimeTaggs[0] << endl;
+//cout << "Offset corrected TimeTaggs[1]: " << TimeTaggs[1] << endl;
+//cout << "Offset corrected TimeTaggs[2]: " << TimeTaggs[2] << endl;
+//cout << "Offset corrected TimeTaggs[3]: " << TimeTaggs[3] << endl;
 
 }
 else{
