@@ -20,9 +20,9 @@
 #define NUM_CLOCKS_HALF_PERIOD	50000000		// Not used (value given by host) set the number of clocks that defines the half period of the clock. For 1pps is around 50000000 For 32Khz, with a PRU clock of 10ns (10ns seems more real, rather than 5ns as specs) is 3125
 // adjust to longest path so that the period of the signal is exact. The longest path is when in the OFF state the system has to check for an interrupt
 #define LOSTCLOCKCOUNTS1	2 // Since r1 already has a 0.5 factor (it account for the SUb + QBNE), but we lose 2 counts for settings bits low and loading r0, so 2 counts.
-#define LOSTCLOCKCOUNTS2	12 // compensate for the finish loop which has probably 10 clocks. Furthermore, since r1 already has a 0.5 factor (it account for the SUb + QBNE), but we lose 2 counts for settings bits low and loading r0, so 2 more counts should be added. Equating to 12
-#define LOSTCLOCKCOUNTS3	4 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(10-2"Two instructions")/2"Subs + QB"=4
-//#define LOSTCLOCKSWREXT		4 // # clocks when reading or writing from a register outside PRU (so shared RAM or interrupt)
+#define LOSTCLOCKCOUNTS2	14 // compensate for the finish loop which has probably 12 clocks. Furthermore, since r1 already has a 0.5 factor (it account for the SUb + QBNE), but we lose 2 counts for settings bits low and loading r0, so 2 more counts should be added. Equating to 14
+#define LOSTCLOCKCOUNTS3	5 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(12-2"Two instructions")/2"Subs + QB"=5
+//#define LOSTCLOCKSWREXT		5 // # clocks when reading or writing from a register outside PRU (so shared RAM or interrupt)
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -179,7 +179,7 @@ SIGNALOFF:
 DELAYOFF:
 	SUB 	r0, r0, 1
 	QBNE 	DELAYOFF, r0, LOSTCLOCKCOUNTS2
-FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly 10 clock counts
+FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly 12 clock counts
 	QBBC	FINISHDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
 	// Handle interruption
 	LBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Read contents from the address offset 0 SHARED RAM //
