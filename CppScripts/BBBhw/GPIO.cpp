@@ -530,8 +530,8 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 			double CoeffSynchAdjAux1=0.0;
 			double CoeffSynchAdjAux2=0.0;
 			for (int iIter=0;iIter<(NumSynchPulsesRed-1);iIter++){
-				CoeffSynchAdjAux1=((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
-				CoeffSynchAdjAux2=(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
+				CoeffSynchAdjAux2=((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
+				CoeffSynchAdjAux1=(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
 				AdjPulseSynchCoeff=AdjPulseSynchCoeff+CoeffSynchAdjAux1/CoeffSynchAdjAux2;
 			}
 			//cout << "PeriodCountsPulseAdj: " << PeriodCountsPulseAdj << endl;
