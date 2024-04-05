@@ -553,23 +553,24 @@ cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected f
 cout << "Attention a Periodic signal sent, so time synch between different acquisitions is corrected" << endl;
 cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
 unsigned long long int HistPeriodicityAux=8*1024; // Periodicity in number of PRU counts
-//for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures
-//TimeTaggs[i]=TimeTaggs[i]-TimeTaggs[0]+OldLastTimeTagg+HistPeriodicityAux;
-//}
+unsigned long long int TimeTaggs0Aux=TimeTaggs[0];
+for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures
+TimeTaggs[i]=TimeTaggs[i]-TimeTaggs0Aux+OldLastTimeTagg+HistPeriodicityAux;
+}
 
 TimeTaggsDetAnalytics[7]=(double)(TimeTaggs[0]);
 
 TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
-for (int i=1;i<(SimulateNumStoredQubitsNodeAux-1);i++){
-if (i==1){cout << "TimeTaggs[1]-TimeTaggs[0]: " << TimeTaggs[1]-TimeTaggs[0] << endl;}
+for (int i=0;i<(SimulateNumStoredQubitsNodeAux-1);i++){
+if (i==0){cout << "TimeTaggs[1]-TimeTaggs[0]: " << TimeTaggs[1]-TimeTaggs[0] << endl;}
 else if(i==(SimulateNumStoredQubitsNodeAux-2)){cout << "TimeTaggs[i+1]-TimeTaggs[i]: " << TimeTaggs[i+1]-TimeTaggs[i] << endl;}
 
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-2.0))*(((double)((HistPeriodicityAux/2+TimeTaggs[i+1]-TimeTaggs[i])%HistPeriodicityAux))-(double)(HistPeriodicityAux/2));
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((HistPeriodicityAux/2+TimeTaggs[i+1]-TimeTaggs[i])%HistPeriodicityAux))-(double)(HistPeriodicityAux/2));
 }
 
-for (int i=1;i<(SimulateNumStoredQubitsNodeAux-1);i++){
-TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-2.0))*pow(((double)((HistPeriodicityAux/2+TimeTaggs[i+1]-TimeTaggs[i])%HistPeriodicityAux))-(double)(HistPeriodicityAux/2)-TimeTaggsDetAnalytics[5],2.0);
+for (int i=0;i<(SimulateNumStoredQubitsNodeAux-1);i++){
+TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((HistPeriodicityAux/2+TimeTaggs[i+1]-TimeTaggs[i])%HistPeriodicityAux))-(double)(HistPeriodicityAux/2)-TimeTaggsDetAnalytics[5],2.0);
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
