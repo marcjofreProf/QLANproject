@@ -552,7 +552,7 @@ cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference
 cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
 cout << "Attention a Periodic signal sent, so time synch between different acquisitions is corrected" << endl;
 cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
-unsigned long long int HistPeriodicityAux=8*128; // Periodicity in number of PRU counts
+unsigned long long int HistPeriodicityAux=8*1024; // Periodicity in number of PRU counts
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures
 TimeTaggs[i]=TimeTaggs[i]-TimeTaggs[0]+OldLastTimeTagg+HistPeriodicityAux;
 }
