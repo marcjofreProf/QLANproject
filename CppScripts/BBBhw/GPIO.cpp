@@ -530,8 +530,8 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 			double CoeffSynchAdjAux1=0.0;
 			double CoeffSynchAdjAux2=0.0;
 			for (int iIter=0;iIter<(NumSynchPulsesRed-1);iIter++){
-				CoeffSynchAdjAux1=(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
-				CoeffSynchAdjAux2=((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));				
+				CoeffSynchAdjAux1=((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
+				CoeffSynchAdjAux2=(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
 				AdjPulseSynchCoeff=AdjPulseSynchCoeff+CoeffSynchAdjAux1/CoeffSynchAdjAux2;
 			}
 			//cout << "PeriodCountsPulseAdj: " << PeriodCountsPulseAdj << endl;
@@ -576,7 +576,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 		    // Apply pulses time drift correction
 		    if (NumSynchPulsesRed>1){// There is a calibration curve
 		        // using doubles, to represent usigned long long int can hold, with the 5ns PRU count, up to 2 years with presition!!!
-		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))/(1.0+AdjPulseSynchCoeff));
+		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))*AdjPulseSynchCoeff);
 		    }
 		    else{// No pulse compensation
 		    	TimeTaggs[lineCount]=ValueReadTest; 
