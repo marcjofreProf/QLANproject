@@ -23,7 +23,7 @@
 #define INS_PER_US		200		// 5ns per instruction for Beaglebone black
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
 #define NUM_REPETITIONS		4194304	//Not used 4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used). This defines the Maximum Transmission Unit - coul dbe named Quantum MTU (defined together with the clock)
-#define DELAY 1//1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
+#define DELAY 122//Substract 6 for the common cost commands. For instance 124=128-6 //1 * (INS_PER_US / INS_PER_DELAY_LOOP) // in microseconds
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -64,6 +64,7 @@
 // r2 reserved for 0x22000 Control register
 // r3 reserved for 0x2200C DWT_CYCCNT
 // r4 reserved for zeroing registers
+// r5 reserved for delay count
 
 // r10 is arbitrary used for operations
 
@@ -151,265 +152,72 @@ CMDLOOP2:// Double verification of host sending start command
 //	QBEQ	SIGNALON, r0.b0, 2 // Coincides with a 2
 //	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
 //	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
-SIGNALON:	
+SIGNALON1:	
 	MOV	r30.b0, 0x11 // Double channels 1. write to magic r30 output byte 0
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
+	MOV	r5, DELAY
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+SIGNALON1DEL:
+	SUB	r5, r5, 1
+	QBNE	SIGNALON1DEL, r5, 0
+SIGNALON2:
 	MOV	r30.b0, 0x00 // All off
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
+	MOV	r5, DELAY
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+SIGNALON2DEL:
+	SUB	r5, r5, 1
+	QBNE	SIGNALON2DEL, r5, 0
+SIGNALON3:
 	MOV	r30.b0, 0x22 // Double channels 2. write to magic r30 output byte 0
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
+	MOV	r5, DELAY
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+SIGNALON3DEL:
+	SUB	r5, r5, 1
+	QBNE	SIGNALON3DEL, r5, 0
+SIGNALON4:
 	MOV	r30.b0, 0x00 // All off
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
+	MOV	r5, DELAY
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+SIGNALON4DEL:
+	SUB	r5, r5, 1
+	QBNE	SIGNALON4DEL, r5, 0
+SIGNALON5:
 	MOV	r30.b0, 0x44 // Double channels 3. write to magic r30 output byte 0
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
+	MOV	r5, DELAY
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+SIGNALON5DEL:
+	SUB	r5, r5, 1
+	QBNE	SIGNALON5DEL, r5, 0
+SIGNALON6:
 	MOV	r30.b0, 0x00 // All off
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
+	MOV	r5, DELAY
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+SIGNALON6DEL:
+	SUB	r5, r5, 1
+	QBNE	SIGNALON6DEL, r5, 0
+SIGNALON7:
 	MOV	r30.b0, 0x88 // Double channels 4. write to magic r30 output byte 0
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
+	MOV	r5, DELAY
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+SIGNALON7DEL:
+	SUB	r5, r5, 1
+	QBNE	SIGNALON7DEL, r5, 0
+SIGNALON8:
 	MOV	r30.b0, 0x00 // All off
-	LDI	r4, 0 // Intentional controlled delay to adjust periodicity (accounting as well as the ones in SIGNALOFF)
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-	LDI	r4, 0 // Intentional controlled delay
-SIGNALOFF:
+	MOV	r5, DELAY // No extra controlled delay since two instructions below as well in FINISH
+SIGNALON8DEL:
+	SUB	r5, r5, 1
+	QBNE	SIGNALON8DEL, r5, 0
+FINISH:
 	SUB	r1, r1, 1 // Decrement counter
-	QBNE	SIGNALON, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
-	//QBA	SIGNALON//PSEUDOSYNCH// Debbuging - Infinite loop
+	QBNE	SIGNALON1, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
+	//QBA	SIGNALON1//PSEUDOSYNCH// Debbuging - Infinite loop
 //	MOV	r0, DELAY
 //DELAYOFF:
 //	SUB 	r0, r0, 1
