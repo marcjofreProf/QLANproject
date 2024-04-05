@@ -205,7 +205,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	
 	//Synch pulse is in the second byte, in bit 14 actually
 	MOV 	r17.b0, r6.b1
-//	MOV 	r20.b0, r16.b1
+	MOV 	r20.b0, r16.b1
 //	AND	r17, r17, r20 // Only does complying with a rising edge.// AND has to be done with the whole register, not a byte of it!!!!
 	// Mask the relevant bits you're interested in	
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
