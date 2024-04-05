@@ -202,16 +202,16 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	//Synch pulse is in the second byte, in bit 14 actually
 	MOV 	r17.b0, r6.b1
 	MOV 	r20.b0, r16.b1
-//	AND	r17.b0, r17.b0, r20.b0 // Only does complying with a rising edge
+	AND	r17, r17, r20 // Only does complying with a rising edge.// AND has to be done with the whole register, not a byte of it!!!!
 	// Mask the relevant bits you're interested in	
 	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
 	//AND 	r6.b0, r6.b0, MASKevents // Interested specifically to the bits with MASKevents. MAybe there are never counts in this first 8 bits if there is not explicitly a signal.
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
 	//Synch pulse is in the second byte, in bit 14 actually
-	AND	r17.b0, r17.b0, 0x40 // Mask to only look at bit 7 (bit 14 when considering the two bytes)
+	AND	r17, r17, 0x40 // Mask to only look at bit 7 (bit 14 when considering the two bytes)// AND has to be done with the whole register, not a byte of it!!!!
 	QBNE	SYNCHPULSES, r17.b0, 0
 	// If not a synch pulse, a detector timetag
-	AND	r6, r6, r16 // Only does complying with a rising edge
+	AND	r6, r6, r16 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
 	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0
 	// If the program reaches this point, at least one of the bits is high
 	// Proceed with the rest of the program
