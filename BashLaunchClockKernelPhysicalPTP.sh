@@ -8,7 +8,7 @@ sudo /etc/init.d/rsyslog stop # stop logging
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
 sudo timedatectl set-ntp false
-sudo ./linuxptp/ptp4l -i eth0 -f PTP4lConfigQLANproject.cfg & #-m
+sudo ./linuxptp/ptp4l -i eth0 & #-f PTP4lConfigQLANproject.cfg & #-m
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w & #-f PTP2pcConfigQLANprojectSlave.cfg & -m
 echo 'Enabling PWM for 24 MHz ref clock'
 sudo config-pin P8.19 pwm
