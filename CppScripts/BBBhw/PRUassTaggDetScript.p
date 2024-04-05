@@ -54,6 +54,7 @@
 // r19 reserved number of synch pulses detected
 // r20 reserved for raising edge detection synch pulses together with r17
 // r21 reserved for checking if too many synch pulses stored
+// r22 reserved for the mask of synch pulses pin
 
 //// If using IET timer (potentially adjusted to synchronization protocols)
 // We can use Constant table pointers C26
@@ -117,6 +118,7 @@ INITIATIONS:// This is only run once
 	// Initializations for faster execution
 	LDI	r7, 0 // Register for clearing other registers
 	MOV	r10, 0xFFFFFFFF
+	MOV	r22, 0x00000040
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -208,7 +210,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	//AND 	r6.b0, r6.b0, MASKevents // Interested specifically to the bits with MASKevents. MAybe there are never counts in this first 8 bits if there is not explicitly a signal.
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
 	//Synch pulse is in the second byte, in bit 14 actually
-	AND	r17, r17, 0x40 // Mask to only look at bit 7 (bit 14 when considering the two bytes)// AND has to be done with the whole register, not a byte of it!!!!
+	AND	r17, r17, r22 // Mask to only look at bit 7 (bit 14 when considering the two bytes)// AND has to be done with the whole register, not a byte of it!!!!
 	QBNE	SYNCHPULSES, r17.b0, 0
 	// If not a synch pulse, a detector timetag
 	AND	r6, r6, r16 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
