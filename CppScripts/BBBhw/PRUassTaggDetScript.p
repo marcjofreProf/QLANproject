@@ -211,7 +211,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	AND	r17.b0, r17.b0, 0x40 // Mask to only look at bit 7 (bit 14 when considering the two bytes)
 	QBNE	SYNCHPULSES, r17.b0, 0
 	// If not a synch pulse, a detector timetag
-//	AND	r6.b0, r6.b0, r16.b0 // Only does complying with a rising edge
+	AND	r6, r6, r16 // Only does complying with a rising edge
 	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0
 	// If the program reaches this point, at least one of the bits is high
 	// Proceed with the rest of the program

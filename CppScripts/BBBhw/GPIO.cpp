@@ -529,15 +529,20 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 			AdjPulseSynchCoeff=0.0;// Reset
 			double CoeffSynchAdjAux1=0.0;
 			double CoeffSynchAdjAux2=0.0;
+			int NumAvgAux=0;
 			for (int iIter=0;iIter<(NumSynchPulsesRed-1);iIter++){
-				CoeffSynchAdjAux2=((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
-				CoeffSynchAdjAux1=(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
-				AdjPulseSynchCoeff=AdjPulseSynchCoeff+CoeffSynchAdjAux1/CoeffSynchAdjAux2;
+				CoeffSynchAdjAux1=((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
+				CoeffSynchAdjAux2=(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
+				if (CoeffSynchAdjAux1!=0.0 and CoeffSynchAdjAux2!=0.0){
+					AdjPulseSynchCoeff=AdjPulseSynchCoeff+CoeffSynchAdjAux1/CoeffSynchAdjAux2;
+					NumAvgAux++;
+				}
 			}
 			//cout << "PeriodCountsPulseAdj: " << PeriodCountsPulseAdj << endl;
 			//cout << "Last CoeffSynchAdjAux1: " << CoeffSynchAdjAux1 << endl;
 			//cout << "Last CoeffSynchAdjAux2: " << CoeffSynchAdjAux2 << endl;
-			AdjPulseSynchCoeff=AdjPulseSynchCoeff/((double)(NumSynchPulsesRed-1));// Average
+			if (NumAvgAux>0){AdjPulseSynchCoeff=AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
+			else{AdjPulseSynchCoeff=1.0;}// Reset
 			cout << "AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
 		}
 		else{
