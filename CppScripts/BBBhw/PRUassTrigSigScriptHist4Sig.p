@@ -158,79 +158,81 @@ SIGNALON1:
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 SIGNALON1DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON1DEL, r5, 0
+	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON2:
 	MOV	r30.b0, 0x00 // All off
 	MOV	r5, DELAY
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 SIGNALON2DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON2DEL, r5, 0
+	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON3:
 	MOV	r30.b0, 0x22 // Double channels 2. write to magic r30 output byte 0
 	MOV	r5, DELAY
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 SIGNALON3DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON3DEL, r5, 0
+	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON4:
 	MOV	r30.b0, 0x00 // All off
 	MOV	r5, DELAY
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 SIGNALON4DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON4DEL, r5, 0
+	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON5:
 	MOV	r30.b0, 0x44 // Double channels 3. write to magic r30 output byte 0
 	MOV	r5, DELAY
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 SIGNALON5DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON5DEL, r5, 0
+	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON6:
 	MOV	r30.b0, 0x00 // All off
 	MOV	r5, DELAY
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 SIGNALON6DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON6DEL, r5, 0
+	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON7:
 	MOV	r30.b0, 0x88 // Double channels 4. write to magic r30 output byte 0
 	MOV	r5, DELAY
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 SIGNALON7DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON7DEL, r5, 0
+	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON8:
 	MOV	r30.b0, 0x00 // All off
 	MOV	r5, DELAY // No extra controlled delay since two instructions below as well in FINISH
 SIGNALON8DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON8DEL, r5, 0
+	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 FINISH:
 	SUB	r1, r1, 1 // Decrement counter
 	QBNE	SIGNALON1, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
+	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 	//QBA	SIGNALON1//PSEUDOSYNCH// Debbuging - Infinite loop
 //	MOV	r0, DELAY
 //DELAYOFF:
