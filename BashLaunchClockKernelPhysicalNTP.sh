@@ -6,6 +6,7 @@ trap "kill 0" EXIT
 echo 'Running NTP'
 sudo /etc/init.d/rsyslog stop # stop logging
 sudo systemctl start systemd-timesyncd # start system synch
+sudo systemctl daemon-reload
 sudo timedatectl set-ntp true
 echo 'Enabling PWM for 24 MHz ref clock'
 sudo config-pin P8.19 pwm

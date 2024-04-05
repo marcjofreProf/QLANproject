@@ -1,9 +1,20 @@
+# Parameters to pass
+# arg1: Daemon ticks to fine adust to required Frequency: For example, 0.0 Defined duble, but it has to be small in order to not produce negative half periods (defined as unsigned int)
+# arg2: Daemon PID proportional factor. For example: 0.0. 0<= arg2 <= 1.0. Probably, only larger than 0.0, if there is too much jitter.
+# arg3: Daemon print PID values: true or false
 trap "kill 0" EXIT
-echo 'Running NTP'
+echo 'Running PTP'
 sudo /etc/init.d/rsyslog stop # stop logging
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
-sudo timedatectl set-ntp true # Start NTP
+sudo timedatectl set-ntp false
+sudo ./linuxptp/ptp4l -i eth0 -f PTP4lConfigQLANproject.cfg & #-m
+sudo ./linuxptp/phc2sys -c eth0 -s CLOCK_REALTIME -w & #-f PTP2pcConfigQLANprojectSlave.cfg & -m
+echo 'Enabling PWM for 24 MHz ref clock'
+sudo config-pin P8.19 pwm
+sudo sudo sh -c "echo '38' >> /sys/class/pwm/pwmchip7/pwm-7\:0/period"
+sudo sudo sh -c "echo '19' >> /sys/class/pwm/pwmchip7/pwm-7\:0/duty_cycle"
+sudo sudo sh -c "echo '1' >> /sys/class/pwm/pwmchip7/pwm-7\:0/enable"
 echo 'Enabling BBB pins'
 sudo config-pin P9_28 pruin
 sudo config-pin P9_29 pruin
@@ -28,9 +39,9 @@ sudo config-pin P8_43 pruout
 sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
-sudo ./CppScripts/QtransportLayerAgentN client 192.168.8.2 192.168.8.1
+sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3
 sudo timedatectl set-ntp true # Start NTP
-echo 'Stopped'
+echo 'Stopped PTP'
 #sudo /etc/init.d/rsyslog start # start logging
 # Kill all the launched processes with same group PID
 #kill -INT $$

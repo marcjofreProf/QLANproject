@@ -28,5 +28,6 @@ sudo config-pin P8_46 pruout
 sudo ./CppScripts/QtransportLayerAgentN dealer 192.168.10.2 192.168.10.1
 sudo timedatectl set-ntp true # Start NTP
 sudo systemctl start systemd-timesyncd # start system synch
+sudo systemctl daemon-reload
 #sudo /etc/init.d/rsyslog start # start logging
 
