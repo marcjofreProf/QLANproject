@@ -40,6 +40,8 @@
 #include<pthread.h>
 // Time/synchronization management
 #include <chrono>
+// Mathemtical calculations
+#include <cmath>
 // PRU programming
 #include<poll.h>
 #include <stdio.h>
@@ -545,11 +547,11 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 			double CoeffSynchAdjAux2=0.0;// PRU counting
 			int NumAvgAux=0;
 			for (int iIter=0;iIter<(NumSynchPulsesRed-1);iIter++){
-				//CoeffSynchAdjAux0=(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj)); // Distill how many pulse synch periods passes...1, 2, 3....
+				CoeffSynchAdjAux0=(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj)); // Distill how many pulse synch periods passes...1, 2, 3....
 				CoeffSynchAdjAux1=(double)(CoeffSynchAdjAux0*PeriodCountsPulseAdj);//((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
 				CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]);//(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
-				if (CoeffSynchAdjAux1!=0.0 and CoeffSynchAdjAux2!=0.0){
-					AdjPulseSynchCoeff=AdjPulseSynchCoeff+(CoeffSynchAdjAux1/CoeffSynchAdjAux2);
+				if (CoeffSynchAdjAux0!=0.0 and CoeffSynchAdjAux1!=0.0 and CoeffSynchAdjAux2!=0.0){
+					AdjPulseSynchCoeff=AdjPulseSynchCoeff+pow(CoeffSynchAdjAux1/CoeffSynchAdjAux2,1.0/((double)(CoeffSynchAdjAux0)));
 					NumAvgAux++;
 				}
 			}
