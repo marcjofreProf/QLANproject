@@ -173,7 +173,7 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew	
-	LBBO	r5.b0, r13, 3, 1//LBBO	r5.b0, r13, 3, 1 // Read DWT_CYCCNT counter // LBCO	r5.b0, CONST_IETREG, 0xF, 1 // Read IEP counter	// from here, if a reset of count we will lose some counts.		
+	LBBO	r5.b0, r13, 3, 1//LBBO	r5.b0, r13, 3, 1 // Read DWT_CYCCNT counter // LBCO	r5.b0, CONST_IETREG, 0xF, 1 // Read IEP counter	// from here, if a reset of count we will lose some counts. We read byte b3 of counter		
 	QBLE	RESET_CYCLECNT, r5.b0, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte <= r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
 CMDLOOP:
 	//LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes

@@ -554,6 +554,7 @@ cout << "Attention a Periodic signal sent, so time synch between different acqui
 cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
 unsigned long long int HistPeriodicityAux=8*1024; // Periodicity in number of PRU counts
 unsigned long long int TimeTaggs0Aux=TimeTaggs[0];
+unsigned long long int TimeTaggsLastAux=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures
 TimeTaggs[i]=TimeTaggs[i]-TimeTaggs0Aux+OldLastTimeTagg+HistPeriodicityAux;
 }
@@ -574,7 +575,7 @@ TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStore
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
-OldLastTimeTagg=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];// Update value
+OldLastTimeTagg=TimeTaggsLastAux;// Update value
 
 //cout << "Offset corrected TimeTaggs[0]: " << TimeTaggs[0] << endl;
 //cout << "Offset corrected TimeTaggs[1]: " << TimeTaggs[1] << endl;
