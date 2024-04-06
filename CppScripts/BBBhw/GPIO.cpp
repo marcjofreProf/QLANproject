@@ -196,6 +196,9 @@ prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 me
 this->TimePointClockCurrentPRU0meas=Clock::now();// To time stamp the current measurement, in contrast ot th eold last measurement
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
+
+this->TimePointClockCurrentPRU0measOld=Clock::now();// To time stamp the current measurement
+
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
 if (retInterruptsPRU0>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -331,8 +334,9 @@ else{
 	auto duration_since_lastMeasTime=this->TimePointClockCurrentPRU0meas.time_since_epoch()-this->TimePointClockCurrentPRU0measOld.time_since_epoch();
 // Convert duration to desired time
 	TimeElpasedNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_lastMeasTime).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds)
+	cout << "TimeElpasedNow_time_as_count: " << TimeElpasedNow_time_as_count << endl;
 }
-this->TimePointClockCurrentPRU0measOld=this->TimePointClockCurrentPRU0meas;// Update old meas timestamp
+//this->TimePointClockCurrentPRU0measOld=this->TimePointClockCurrentPRU0meas;// Update old meas timestamp
 
 // Reading data from PRU shared and own RAMs
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
@@ -551,7 +555,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 				CoeffSynchAdjAux1=(double)(CoeffSynchAdjAux0*PeriodCountsPulseAdj);//((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
 				CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]);//(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
 				if (CoeffSynchAdjAux0!=0.0 and CoeffSynchAdjAux1!=0.0 and CoeffSynchAdjAux2!=0.0){
-					AdjPulseSynchCoeff=AdjPulseSynchCoeff+pow(CoeffSynchAdjAux1/CoeffSynchAdjAux2,1.0/((double)(CoeffSynchAdjAux0)));
+					AdjPulseSynchCoeff=AdjPulseSynchCoeff+(CoeffSynchAdjAux1/CoeffSynchAdjAux2);
 					NumAvgAux++;
 				}
 			}

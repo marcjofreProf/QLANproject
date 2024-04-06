@@ -44,7 +44,7 @@ using std::fstream;
 #define PRUdataPATH2 "../PRUdata/"
 
 #define MaxNumPulses	8192
-#define PRUclockStepPeriodNanoseconds		10 // PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is 
+#define PRUclockStepPeriodNanoseconds		5 // PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is 
 #define PulseFreq	1000 // Hz
 
 namespace exploringBB {
