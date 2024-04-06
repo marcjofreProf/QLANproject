@@ -60,7 +60,7 @@ private: //Variables/Instances
 	//GPIO* inGPIO; // Slow (not used) Object for reading Qubits
 	//GPIO* outGPIO; // Slow (not used) Object for sending Qubits
 	// Time/synchronization management
-	using Clock = std::chrono::system_clock;//system_clock;steady_clock;high_resolution_clock
+	using Clock = std::chrono::system_clock;//system_clock;steady_clock;high_resolution_clock. We need a wathc to wall synchronize starting of signal and measurement, that is why we use system_clock (if we wanted a chrono we would use steady_clock)
 	using TimePoint = std::chrono::time_point<Clock>;
 	TimePoint FutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
 	TimePoint OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere

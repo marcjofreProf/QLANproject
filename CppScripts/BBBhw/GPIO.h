@@ -59,8 +59,11 @@ class GPIO {
 
 private:// Variables
 	// Time/synchronization management
-	//using Clock = std::chrono::steady_clock;// Not needing the system_clock (to mucnh accurate) //system_clock;steady_clock;high_resolution_clock
-	//using TimePoint = std::chrono::time_point<Clock>;
+	using Clock = std::chrono::steady_clock;// We do not use system clock because we do not need a wathc, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
+	using TimePoint = std::chrono::time_point<Clock>;
+	TimePoint TimePointClockCurrentPRU0meas=std::chrono::time_point<Clock>();
+	TimePoint TimePointClockCurrentPRU0measOld=std::chrono::time_point<Clock>();
+	unsigned long long int TimeElpasedNow_time_as_count=0;
 	// PRU
 	static int mem_fd;
 	static void *ddrMem, *sharedMem, *pru0dataMem, *pru1dataMem;

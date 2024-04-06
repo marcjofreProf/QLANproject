@@ -191,6 +191,8 @@ int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
+this->TimePointClockCurrentPRU0meas=Clock::now();// To time stamp the current measurement, in contrast ot th eold last measurement
+
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
 if (retInterruptsPRU0>0){
@@ -319,7 +321,18 @@ return 0;// all ok
 //PRU0 - Operation - getting iputs
 
 int GPIO::DDRdumpdata(){
+// Time elapsed between consecutive measurements
+if (this->TimePointClockCurrentPRU0measOld==std::chrono::time_point<Clock>()){// First measurement
+	this->TimeElpasedNow_time_as_count=0;
+}
+else{
+	auto duration_since_lastMeasTime=this->TimePointClockCurrentPRU0meas.time_since_epoch()-this->TimePointClockCurrentPRU0measOld.time_since_epoch();
+// Convert duration to desired time
+	TimeElpasedNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_lastMeasTime).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds)
+}
+this->TimePointClockCurrentPRU0measOld=this->TimePointClockCurrentPRU0meas;// Update old meas timestamp
 
+// Reading data from PRU shared and own RAMs
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=valpHolder; // Coincides with SHARED in PRUassTaggDetScript.p
 valpAux=valpAuxHolder;
