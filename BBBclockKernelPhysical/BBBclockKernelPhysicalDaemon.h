@@ -16,7 +16,7 @@
 #define PRUdataPATH1 "./PRUdata/"
 #define PRUdataPATH2 "../PRUdata/"
 // Clock adjustment
-#define ClockPeriodNanoseconds			1000000000// 1pps 31250// 32Khz.
+#define ClockPeriodNanoseconds			1000000// 1KHz//1000000000// 1pps 31250// 32Khz.
 #define PRUclockStepPeriodNanoseconds		10 // PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is 
 #define ClockCyclePeriodAdjustment		1// pps// 65536 32 KHz // Very important parameter. The larger the better, since the interrupts time jitter do not paly a role, as long as the PRU counter does not overexceed (the turn down is that ht eupdate time is larger)
 
