@@ -158,9 +158,9 @@ INITIATIONS:// This is only run once
 //	QBA     CHECK_CYCLECNT
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
 	//SBCO	r10, CONST_IETREG, 0xC, 4 // Reset IEP counter to 0xFFFFFFFF. Account that we lose 12 cycle counts
-	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
-	CLR	r2.t3
-	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
+//	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+//	CLR	r2.t3
+//	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	//LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
