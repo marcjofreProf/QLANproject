@@ -540,20 +540,23 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 		NumSynchPulsesRed=lineCount;		
 		if (NumSynchPulsesRed>1){//At least two points, we can generate a calibration curve
 			AdjPulseSynchCoeff=0.0;// Reset
-			double CoeffSynchAdjAux1=0.0;
-			double CoeffSynchAdjAux2=0.0;
+			unsigned long long int CoeffSynchAdjAux0=1;
+			double CoeffSynchAdjAux1=0.0;// Number theoretical counts given the number of cycles
+			double CoeffSynchAdjAux2=0.0;// PRU counting
 			int NumAvgAux=0;
 			for (int iIter=0;iIter<(NumSynchPulsesRed-1);iIter++){
-				CoeffSynchAdjAux1=((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
-				CoeffSynchAdjAux2=(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
+				CoeffSynchAdjAux0=(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj)); // Distill how many pulse synch periods passes...1, 2, 3....
+				CoeffSynchAdjAux1=(double)(CoeffSynchAdjAux0*PeriodCountsPulseAdj);//((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
+				CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]);//(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
 				if (CoeffSynchAdjAux1!=0.0 and CoeffSynchAdjAux2!=0.0){
 					AdjPulseSynchCoeff=AdjPulseSynchCoeff+CoeffSynchAdjAux1/CoeffSynchAdjAux2;
 					NumAvgAux++;
 				}
 			}
-			//cout << "PeriodCountsPulseAdj: " << PeriodCountsPulseAdj << endl;
-			//cout << "Last CoeffSynchAdjAux1: " << CoeffSynchAdjAux1 << endl;
-			//cout << "Last CoeffSynchAdjAux2: " << CoeffSynchAdjAux2 << endl;
+			cout << "PeriodCountsPulseAdj: " << PeriodCountsPulseAdj << endl;
+			cout << "Last CoeffSynchAdjAux0: " << CoeffSynchAdjAux0 << endl;
+			cout << "Last CoeffSynchAdjAux1: " << CoeffSynchAdjAux1 << endl;
+			cout << "Last CoeffSynchAdjAux2: " << CoeffSynchAdjAux2 << endl;
 			if (NumAvgAux>0){AdjPulseSynchCoeff=AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
 			else{AdjPulseSynchCoeff=1.0;}// Reset
 			cout << "AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
