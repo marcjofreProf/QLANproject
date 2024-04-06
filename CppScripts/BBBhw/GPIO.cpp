@@ -560,6 +560,8 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 			if (NumAvgAux>0){AdjPulseSynchCoeff=AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
 			else{AdjPulseSynchCoeff=1.0;}// Reset
 			cout << "AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
+			AdjPulseSynchCoeff=1.0;
+			cout << "AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
 		}
 		else{
 			AdjPulseSynchCoeff=1.0;
