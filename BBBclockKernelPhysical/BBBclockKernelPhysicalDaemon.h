@@ -37,6 +37,7 @@ public: //Variables
 	bool PlotPIDHAndlerInfo=false;
 	double FactorTimerAdj=0.5; 
 	double NumClocksHalfPeriodPRUclock=FactorTimerAdj*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250
+	double NumClocksHalfPeriodPRUclockUpdated=0.0;
 
 private:// Variables
 	ApplicationState m_state;
