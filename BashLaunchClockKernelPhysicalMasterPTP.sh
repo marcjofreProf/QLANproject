@@ -12,10 +12,20 @@ sudo ./linuxptp/ptp4l -i eth0 & #-f PTP4lConfigQLANproject.cfg & #-m
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w & #-f PTP2pcConfigQLANprojectSlave.cfg & -m
 echo 'Enabling PWM for 24 MHz ref clock'
 sudo config-pin P8.19 pwm
-sudo sudo sh -c "echo '38' >> /sys/class/pwm/pwmchip7/pwm-7\:0/period"
-sudo sudo sh -c "echo '19' >> /sys/class/pwm/pwmchip7/pwm-7\:0/duty_cycle"
-sudo sudo sh -c "echo '1' >> /sys/class/pwm/pwmchip7/pwm-7\:0/enable"
-echo 'Enabling BBB pins'
+sudo sh -c "echo '38' >> /sys/class/pwm/pwmchip7/pwm-7\:0/period"
+sudo sh -c "echo '19' >> /sys/class/pwm/pwmchip7/pwm-7\:0/duty_cycle"
+sudo sh -c "echo '1' >> /sys/class/pwm/pwmchip7/pwm-7\:0/enable"
+echo 'Enabling PWM for 1 KHz ref clock'
+sudo config-pin P9.14 pwm 
+sudo sh -c "echo '1000000' >> /sys/class/pwm/pwmchip4/pwm-4\:0/period" 
+sudo sh -c "echo '500000' >> /sys/class/pwm/pwmchip4/pwm-4\:0/duty_cycle" 
+sudo sh -c "echo '1' >> /sys/class/pwm/pwmchip4/pwm-4\:0/enable"
+echo 'Enabling PWM for 10 MHz ref clock'
+sudo config-pin P9.22 pwm 
+sudo sh -c "echo '100' >> /sys/class/pwm/pwmchip1/pwm-1\:0/period" 
+sudo sh -c "echo '50' >> /sys/class/pwm/pwmchip1/pwm-1\:0/duty_cycle" 
+sudo sh -c "echo '1' >> /sys/class/pwm/pwmchip1/pwm-1\:0/enable" 
+echo 'Enabling PRU pins'
 sudo config-pin P9_28 pruin
 sudo config-pin P9_29 pruin
 sudo config-pin P9_30 pruin
