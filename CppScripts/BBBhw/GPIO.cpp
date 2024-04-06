@@ -197,7 +197,7 @@ this->TimePointClockCurrentPRU0meas=Clock::now();// To time stamp the current me
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 
-this->TimePointClockCurrentPRU0measOld=Clock::now();// To time stamp the current measurement
+//this->TimePointClockCurrentPRU0measOld=Clock::now();// To time stamp the current measurement
 
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
 if (retInterruptsPRU0>0){
@@ -336,7 +336,7 @@ else{
 	TimeElpasedNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_lastMeasTime).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds)
 	cout << "TimeElpasedNow_time_as_count: " << TimeElpasedNow_time_as_count << endl;
 }
-//this->TimePointClockCurrentPRU0measOld=this->TimePointClockCurrentPRU0meas;// Update old meas timestamp
+this->TimePointClockCurrentPRU0measOld=this->TimePointClockCurrentPRU0meas;// Update old meas timestamp
 
 // Reading data from PRU shared and own RAMs
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
