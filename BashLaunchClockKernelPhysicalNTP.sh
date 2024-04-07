@@ -10,8 +10,8 @@ sudo systemctl daemon-reload
 sudo timedatectl set-ntp true
 echo 'Enabling PWM for 24 MHz ref clock'
 sudo config-pin P8.19 pwm
-sudo sh -c "echo '42' >> /sys/class/pwm/pwmchip7/pwm-7\:0/period"
-sudo sh -c "echo '21' >> /sys/class/pwm/pwmchip7/pwm-7\:0/duty_cycle"
+sudo sh -c "echo '38' >> /sys/class/pwm/pwmchip7/pwm-7\:0/period"
+sudo sh -c "echo '19' >> /sys/class/pwm/pwmchip7/pwm-7\:0/duty_cycle"
 sudo sh -c "echo '1' >> /sys/class/pwm/pwmchip7/pwm-7\:0/enable"
 echo 'Enabling PWM for 1 KHz ref clock'
 sudo config-pin P9.14 pwm 
