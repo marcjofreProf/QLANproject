@@ -225,7 +225,7 @@ this->NumClocksHalfPeriodPRUclock=(this->RatioAverageFactorClockHalfPeriod*this-
 // Median implementation
 
 // Average implementation
-this->AdjCountsFreq=this->AdjCountsFreq*(this->RatioAverageFactorClockHalfPeriod*1.0+(1.0-this->RatioAverageFactorClockHalfPeriod)*(this->NumClocksHalfPeriodPRUclockUpdated/this->NumClocksHalfPeriodPRUclockOld));// Update value according to the adjustment
+this->AdjCountsFreq=this->AdjCountsFreqHolder*(this->RatioAverageFactorClockHalfPeriod*1.0+(1.0-this->RatioAverageFactorClockHalfPeriod)*(this->NumClocksHalfPeriodPRUclockUpdated/this->NumClocksHalfPeriodPRUclock));// Update value according to the adjustment
 
 if (PlotPIDHAndlerInfo){
 	if (iIterPlotPIDHAndlerInfo%1000000000000000){
