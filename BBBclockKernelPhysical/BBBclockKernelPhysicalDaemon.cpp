@@ -198,15 +198,20 @@ if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not ap
 else{
 	this->RatioAverageFactorClockHalfPeriod=this->RatioAverageFactorClockHalfPeriodHolder;
 }
-this->CounterHandleInterruptSynchPRU++;
+
 
 // Compute clocks adjustment
 auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epoch()-this->TimePointClockCurrentInitialAdj.time_since_epoch();
 // Convert duration to desired time
-// Median implementation
-
-// Average implementation
+switch(FilterMode) {
+case 1:{// Median implementation
+this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
+this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMedianFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);
+}
+default:{// Average implementation
 this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned long long int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count()));
+}
+}
 this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;// Update value
 
 // Update sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
@@ -215,16 +220,19 @@ this->NumClocksHalfPeriodPRUclockUpdated=(this->FactorTimerAdj*0.5*static_cast<d
 
 
 // Important the order
-this->NumClocksHalfPeriodPRUclockOld=this->NumClocksHalfPeriodPRUclock;
-// Median implementation
-
+this->NumClocksHalfPeriodPRUclockOld=this->NumClocksHalfPeriodPRUclock;// Update value
+switch(FilterMode) {
+case 1:{// Median implementation// Median implementation
+this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;
+this->NumClocksHalfPeriodPRUclock=this->DoubleMedianFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);
+}
+default:{
 // Average implementation
 this->NumClocksHalfPeriodPRUclock=(this->RatioAverageFactorClockHalfPeriod*this->NumClocksHalfPeriodPRUclock+(1.0-RatioAverageFactorClockHalfPeriod)*this->NumClocksHalfPeriodPRUclockUpdated);
+}
+}
 
 // Important the order. The this->AdjCountsFreq is not an estimation but a parameter given by the user to adjust ot the desired low frequency, an hence in median/average implementation is has to be computed directly
-// Median implementation
-
-// Average implementation
 this->AdjCountsFreqHolder=this->AdjCountsFreqHolder*(this->NumClocksHalfPeriodPRUclock/this->NumClocksHalfPeriodPRUclockOld);
 if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
 	this->AdjCountsFreq=0.0;
@@ -241,6 +249,8 @@ if (PlotPIDHAndlerInfo){
 	}
 	iIterPlotPIDHAndlerInfo++;
 }
+
+this->CounterHandleInterruptSynchPRU++;// Update counter
 
 return 0;// all ok	
 }
@@ -339,6 +349,72 @@ prussdrv_pru_disable(PRU_HandlerSynch_NUM);
 return 0;
 }
 
+double CKPD::DoubleMedianFilterSubArray(double* ArrayHolderAux){
+if (this->MedianFilterFactor<=1){
+	return ArrayHolderAux[0];
+}
+else{
+	// Step 1: Copy the array to a temporary array
+    double temp[this->MedianFilterFactor]={0.0};
+    for(int i = 0; i < this->MedianFilterFactor; i++) {
+        temp[i] = ArrayHolderAux[i];
+    }
+    
+    // Step 2: Sort the temporary array
+    this->DoubleBubbleSort(temp);
+    // If odd, middle number
+      return temp[this->MedianFilterFactor/2];
+}
+}
+
+// Function to implement Bubble Sort
+int CKPD::DoubleBubbleSort(double* arr) {
+    for (int i = 0; i < this->MedianFilterFactor-1; i++) {
+        for (int j = 0; j < this->MedianFilterFactor-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                // Swap arr[j] and arr[j+1]
+                double temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+    return 0; // All ok
+}
+
+unsigned long long int CKPD::ULLIMedianFilterSubArray(unsigned long long int* ArrayHolderAux){
+if (this->MedianFilterFactor<=1){
+	return ArrayHolderAux[0];
+}
+else{
+	// Step 1: Copy the array to a temporary array
+    unsigned long long int temp[this->MedianFilterFactor]={0};
+    for(int i = 0; i < this->MedianFilterFactor; i++) {
+        temp[i] = ArrayHolderAux[i];
+    }
+    
+    // Step 2: Sort the temporary array
+    this->ULLIBubbleSort(temp);
+    // If odd, middle number
+      return temp[this->MedianFilterFactor/2];
+}
+}
+
+// Function to implement Bubble Sort
+int CKPD::ULLIBubbleSort(unsigned long long int* arr) {
+    for (int i = 0; i < this->MedianFilterFactor-1; i++) {
+        for (int j = 0; j < this->MedianFilterFactor-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                // Swap arr[j] and arr[j+1]
+                unsigned long long int temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+    return 0; // All ok
+}
+
 CKPD::~CKPD() {
 //	this->unexportGPIO();
 	this->DisablePRUs();
@@ -382,7 +458,19 @@ int main(int argc, char const * argv[]){
  	try{
  	 CKPDagent.AdjCountsFreq=stod(argv[1]);
  	 CKPDagent.AdjCountsFreqHolder=CKPDagent.AdjCountsFreq;// Update of the value for ever
-	 CKPDagent.RatioAverageFactorClockHalfPeriod=stod(argv[2]);
+	 //CKPDagent.RatioAverageFactorClockHalfPeriod=stod(argv[2]);
+	 CKPDagent.MedianFilterFactor=stoull(argv[2]);
+	 if (CKPDagent.MedianFilterFactor>MaxMedianFilterArraySize){
+	 	CKPDagent.MedianFilterFactor=MaxMedianFilterArraySize;
+	 	cout << "Attention, median filter size too large." << endl;
+	 }
+	 else if (CKPDagent.MedianFilterFactor<1){
+	 	CKPDagent.MedianFilterFactor=1;
+	 	cout << "Attention, median filter size too small." << endl;
+	 }
+	 else{// For fast median computing the length should be odd
+	 	CKPDagent.MedianFilterFactor=(CKPDagent.MedianFilterFactor/2)*2+1;
+	 }
 	 CKPDagent.PlotPIDHAndlerInfo=(strcmp(argv[3], "true") == 0);
 	 // Recompute some values:
 	 //cout << "CKPDagent.AdjCountsFreq: " << CKPDagent.AdjCountsFreq << endl;

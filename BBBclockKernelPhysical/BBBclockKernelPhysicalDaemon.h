@@ -21,6 +21,8 @@
 #define PRUclockStepPeriodNanoseconds		5 // PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is 
 #define ClockCyclePeriodAdjustment		1// pps// 65536 32 KHz // Very important parameter. The larger the better, since the interrupts time jitter do not paly a role, as long as the PRU counter does not overexceed (the turn down is that ht eupdate time is larger)
 #define WaitCyclesBeforeAveraging	20 // To go into steady state in the initialization
+#define MaxMedianFilterArraySize	50
+#define FilterMode 1 // 0: averaging; 1: median
 
 namespace exploringBBBCKPD {
 
@@ -35,8 +37,8 @@ public: //Variables
 	double AdjCountsFreq=0.0; // Number of clock ticks to adjust to the required frequency (e.g., 32 KHz) to account for having some idle time when resetting DWT_CNT in PRU
 	double AdjCountsFreqHolder=0.0;
 	double RatioAverageFactorClockHalfPeriodHolder=0.0; // The lower the more aggresive taking the new computed values
-	double RatioAverageFactorClockHalfPeriod=0.9999; // The lower the more aggresive taking the new computed values
-	double RatioFreqAdjustment=0.99;// Maximum and minimum frequency variation allowed. Not used
+	double RatioAverageFactorClockHalfPeriod=0.9999; // The lower the more aggresive taking the new computed values. Whe using mean filter
+	unsigned long long int MedianFilterFactor=1; // When using median filter
 	bool PlotPIDHAndlerInfo=false;
 	double FactorTimerAdj=0.5; 
 	double NumClocksHalfPeriodPRUclock=0.5*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the half period of the clock.
@@ -72,6 +74,9 @@ private:// Variables
 	// PRU clock generation	
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=2000000; // In microseconds
+	// Median filter implementation
+	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={0};
+	double NumClocksHalfPeriodPRUclockArray[MaxMedianFilterArraySize]={0.0};
 
 public:	// Functions/Methods
 	CKPD(); //constructor	
@@ -104,7 +109,12 @@ private: // Functions/Methods
 	struct timespec SetWhileWait();
 	// PRU
 	int LOCAL_DDMinit();
-	int DisablePRUs();	
+	int DisablePRUs();
+	// Median filter
+	double DoubleMedianFilterSubArray(double* ArrayHolderAux);
+	int DoubleBubbleSort(double* arr);
+	unsigned long long int ULLIMedianFilterSubArray(unsigned long long int* ArrayHolderAux);
+	int ULLIBubbleSort(unsigned long long int* arr);
 };
 
 
