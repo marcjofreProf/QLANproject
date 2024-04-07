@@ -206,11 +206,11 @@ this->AdjCountsFreq=this->AdjCountsFreq*(this->RatioAverageFactorClockHalfPeriod
 // Important the order
 if (this->FirstHandleInterruptSynchPRU or this->FirstSecondHandleInterruptSynchPRU){ //first and second iteration
 if (this->FirstHandleInterruptSynchPRU){
-this->NumClocksHalfPeriodPRUclock=this->NumClocksHalfPeriodPRUclockUpdated;
+//this->NumClocksHalfPeriodPRUclock=this->NumClocksHalfPeriodPRUclockUpdated;
 this->FirstHandleInterruptSynchPRU=false;
 }
 else{
-this->NumClocksHalfPeriodPRUclock=this->NumClocksHalfPeriodPRUclockUpdated;
+//this->NumClocksHalfPeriodPRUclock=this->NumClocksHalfPeriodPRUclockUpdated;
 this->FirstSecondHandleInterruptSynchPRU=false;
 }
 }
