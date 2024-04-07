@@ -1,6 +1,6 @@
 # Parameters to pass
 # arg1: Daemon ticks to fine adust to required Frequency: For example, 0.0 for 1pps, or -99900000 for 1 KHz. Defined double, but it has to be small in order to not produce negative half periods (defined as unsigned int)
-# arg2: Daemon PID proportional factor. For example: 0.9999. 0<= arg2 <= 1.0. Probably, only larger than 0.0, if there is too much jitter.
+# arg2: Daemon median filter. For example (odd number): 5. 1<= arg2 <= 50. Probably, only larger if there is too much jitter.
 # arg3: Daemon print PID values: true or false
 trap "kill 0" EXIT
 echo 'Running NTP'
