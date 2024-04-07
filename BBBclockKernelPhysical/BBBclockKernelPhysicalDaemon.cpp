@@ -189,14 +189,16 @@ else{
 	cout << "PRU0 interrupt poll error" << endl;
 }
 
-if (this->FirstHandleInterruptSynchPRU==true){
-this->RatioAverageFactorClockHalfPeriodHolder=this->RatioAverageFactorClockHalfPeriod;
-this->RatioAverageFactorClockHalfPeriod=0.0;
-this->FirstHandleInterruptSynchPRU=false;
+if (this->CounterHandleInterruptSynchPRU<5){
+	if (this->CounterHandleInterruptSynchPRU==0){//First
+		this->RatioAverageFactorClockHalfPeriodHolder=this->RatioAverageFactorClockHalfPeriod;
+		this->RatioAverageFactorClockHalfPeriod=0.0;
+	}
 }
 else{
-this->RatioAverageFactorClockHalfPeriod=this->RatioAverageFactorClockHalfPeriodHolder;
+	this->RatioAverageFactorClockHalfPeriod=this->RatioAverageFactorClockHalfPeriodHolder;
 }
+this->CounterHandleInterruptSynchPRU++;
 
 // Compute clocks adjustment
 auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epoch()-this->TimePointClockCurrentInitialAdj.time_since_epoch();
