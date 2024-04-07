@@ -189,7 +189,7 @@ else{
 	cout << "PRU0 interrupt poll error" << endl;
 }
 
-if (this->CounterHandleInterruptSynchPRU<10){// Do not apply the averaging in the first ones since everything is adjusting
+if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
 	if (this->CounterHandleInterruptSynchPRU==0){//First
 		this->RatioAverageFactorClockHalfPeriodHolder=this->RatioAverageFactorClockHalfPeriod;
 		this->RatioAverageFactorClockHalfPeriod=0.0;
@@ -225,7 +225,14 @@ this->NumClocksHalfPeriodPRUclock=(this->RatioAverageFactorClockHalfPeriod*this-
 // Median implementation
 
 // Average implementation
-this->AdjCountsFreq=this->AdjCountsFreqHolder*(this->NumClocksHalfPeriodPRUclockUpdated/this->NumClocksHalfPeriodPRUclockOld);// this->AdjCountsFreq*(this->RatioAverageFactorClockHalfPeriod*1.0+(1.0-this->RatioAverageFactorClockHalfPeriod)*(this->NumClocksHalfPeriodPRUclockUpdated/this->NumClocksHalfPeriodPRUclockOld));// Update value according to the adjustment
+this->AdjCountsFreqHolder=this->AdjCountsFreqHolder*(this->NumClocksHalfPeriodPRUclock/this->NumClocksHalfPeriodPRUclockOld);
+if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
+	this->AdjCountsFreq=0.0;
+}
+else{
+	this->AdjCountsFreq=this->AdjCountsFreqHolder;
+}
+// this->AdjCountsFreq*(this->RatioAverageFactorClockHalfPeriod*1.0+(1.0-this->RatioAverageFactorClockHalfPeriod)*(this->NumClocksHalfPeriodPRUclockUpdated/this->NumClocksHalfPeriodPRUclockOld));// Update value according to the adjustment
 
 if (PlotPIDHAndlerInfo){
 	if (iIterPlotPIDHAndlerInfo%1000000000000000){
