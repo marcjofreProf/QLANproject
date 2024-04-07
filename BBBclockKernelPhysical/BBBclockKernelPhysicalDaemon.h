@@ -75,8 +75,8 @@ private:// Variables
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=2000000; // In microseconds
 	// Median filter implementation
-	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={0};
-	double NumClocksHalfPeriodPRUclockArray[MaxMedianFilterArraySize]={0.0};
+	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={1000000000};
+	double NumClocksHalfPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksHalfPeriodPRUclock};
 
 public:	// Functions/Methods
 	CKPD(); //constructor	
