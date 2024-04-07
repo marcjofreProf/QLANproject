@@ -33,10 +33,10 @@ public: //Variables
 	// Variables adjusted by passing values to the main function
 	double AdjCountsFreq=0.0; // Number of clock ticks to adjust to the required frequency (e.g., 32 KHz) to account for having some idle time when resetting DWT_CNT in PRU
 	double RatioAverageFactorClockHalfPeriod=0.05; // The lower the more aggresive taking the new computed values
-	double RatioFreqAdjustment=0.99;// Maximum and minimum frequency variation allowed
+	double RatioFreqAdjustment=0.99;// Maximum and minimum frequency variation allowed. Not used
 	bool PlotPIDHAndlerInfo=false;
-	double FactorTimerAdj=0.5; 
-	double NumClocksHalfPeriodPRUclock=FactorTimerAdj*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the half period of the clock.
+	double FactorTimerAdj=1.0; 
+	double NumClocksHalfPeriodPRUclock=0.5*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the half period of the clock.
 	double NumClocksHalfPeriodPRUclockUpdated=0.0;
 
 private:// Variables
