@@ -193,7 +193,7 @@ else{
 // Compute clocks adjustment
 auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epoch()-this->TimePointClockCurrentInitialAdj.time_since_epoch();
 // Convert duration to desired time
-this->TimePointClockCurrentFinalInitialAdj_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
+this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned long long int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count()));
 this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;// Update value
 
 // Update sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
@@ -201,7 +201,7 @@ this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;// Upd
 this->NumClocksHalfPeriodPRUclockUpdated=(this->FactorTimerAdj*0.5*static_cast<double>(pru0dataMem_int[1])/static_cast<double>(ClockCyclePeriodAdjustment)*(static_cast<double>(this->TimeAdjPeriod)/static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)));
 
 // Important the order
-this->AdjCountsFreq=this->AdjCountsFreq*(this->RatioAverageFactorClockHalfPeriod*1.0+(1.0-RatioAverageFactorClockHalfPeriod)*(this->NumClocksHalfPeriodPRUclockUpdated/this->NumClocksHalfPeriodPRUclock));// Update value according to the adjustment
+this->AdjCountsFreq=this->AdjCountsFreq*(this->RatioAverageFactorClockHalfPeriod*1.0+(1.0-this->RatioAverageFactorClockHalfPeriod)*(this->NumClocksHalfPeriodPRUclockUpdated/this->NumClocksHalfPeriodPRUclock));// Update value according to the adjustment
 
 // Important the order
 this->NumClocksHalfPeriodPRUclock=(this->RatioAverageFactorClockHalfPeriod*this->NumClocksHalfPeriodPRUclock+(1.0-RatioAverageFactorClockHalfPeriod)*this->NumClocksHalfPeriodPRUclockUpdated)-0.0*this->AdjCountsFreq;
