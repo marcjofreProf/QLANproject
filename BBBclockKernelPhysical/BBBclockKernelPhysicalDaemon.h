@@ -35,7 +35,7 @@ public: //Variables
 	double RatioAverageFactorClockHalfPeriod=0.05; // The lower the more aggresive taking the new computed values
 	double RatioFreqAdjustment=0.99;// Maximum and minimum frequency variation allowed. Not used
 	bool PlotPIDHAndlerInfo=false;
-	double FactorTimerAdj=1.0; 
+	double FactorTimerAdj=0.5; 
 	double NumClocksHalfPeriodPRUclock=0.5*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the half period of the clock.
 	double NumClocksHalfPeriodPRUclockUpdated=0.0;
 
