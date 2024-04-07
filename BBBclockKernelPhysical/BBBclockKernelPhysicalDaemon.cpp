@@ -189,6 +189,14 @@ else{
 	cout << "PRU0 interrupt poll error" << endl;
 }
 
+if (this->FirstHandleInterruptSynchPRU==true){
+this->RatioAverageFactorClockHalfPeriodHolder=this->RatioAverageFactorClockHalfPeriod;
+this->RatioAverageFactorClockHalfPeriod=0.0;
+this->FirstHandleInterruptSynchPRU=false;
+}
+else{
+this->RatioAverageFactorClockHalfPeriod=this->RatioAverageFactorClockHalfPeriodHolder;
+}
 
 // Compute clocks adjustment
 auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epoch()-this->TimePointClockCurrentInitialAdj.time_since_epoch();
@@ -204,14 +212,6 @@ this->NumClocksHalfPeriodPRUclockUpdated=(this->FactorTimerAdj*0.5*static_cast<d
 this->AdjCountsFreq=this->AdjCountsFreq*(this->RatioAverageFactorClockHalfPeriod*1.0+(1.0-this->RatioAverageFactorClockHalfPeriod)*(this->NumClocksHalfPeriodPRUclockUpdated/this->NumClocksHalfPeriodPRUclock));// Update value according to the adjustment
 
 // Important the order
-//if (this->FirstHandleInterruptSynchPRU){ //first and second iteration
-//this->NumClocksHalfPeriodPRUclock=0.5*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));
-//this->FirstHandleInterruptSynchPRU=false;
-//}
-//else{// Non-first iteration
-//this->NumClocksHalfPeriodPRUclock=(this->RatioAverageFactorClockHalfPeriod*this->NumClocksHalfPeriodPRUclock+(1.0-RatioAverageFactorClockHalfPeriod)*this->NumClocksHalfPeriodPRUclockUpdated);
-//}
-
 this->NumClocksHalfPeriodPRUclock=(this->RatioAverageFactorClockHalfPeriod*this->NumClocksHalfPeriodPRUclock+(1.0-RatioAverageFactorClockHalfPeriod)*this->NumClocksHalfPeriodPRUclockUpdated);
 
 if (PlotPIDHAndlerInfo){
