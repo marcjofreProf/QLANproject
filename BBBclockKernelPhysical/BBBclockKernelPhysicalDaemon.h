@@ -20,7 +20,7 @@
 #define WaitTimeAfterMainWhileLoop 990000000 //nanoseconds. Maximum 999999999. Adjusted to have 10ms time slot to activate the busy wait
 #define PRUclockStepPeriodNanoseconds		5 // PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is 
 #define ClockCyclePeriodAdjustment		1// pps// 65536 32 KHz // Very important parameter. The larger the better, since the interrupts time jitter do not paly a role, as long as the PRU counter does not overexceed (the turn down is that ht eupdate time is larger)
-#define WaitCyclesBeforeAveraging	25 // To go into steady state in the initialization
+#define WaitCyclesBeforeAveraging	20 // To go into steady state in the initialization
 
 namespace exploringBBBCKPD {
 
