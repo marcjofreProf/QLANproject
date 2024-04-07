@@ -204,13 +204,15 @@ this->NumClocksHalfPeriodPRUclockUpdated=(this->FactorTimerAdj*0.5*static_cast<d
 this->AdjCountsFreq=this->AdjCountsFreq*(this->RatioAverageFactorClockHalfPeriod*1.0+(1.0-this->RatioAverageFactorClockHalfPeriod)*(this->NumClocksHalfPeriodPRUclockUpdated/this->NumClocksHalfPeriodPRUclock));// Update value according to the adjustment
 
 // Important the order
-if (this->FirstHandleInterruptSynchPRU){ //first and second iteration
-this->NumClocksHalfPeriodPRUclock=0.5*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));
-this->FirstHandleInterruptSynchPRU=false;
-}
-else{// Non-first iteration
+//if (this->FirstHandleInterruptSynchPRU){ //first and second iteration
+//this->NumClocksHalfPeriodPRUclock=0.5*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));
+//this->FirstHandleInterruptSynchPRU=false;
+//}
+//else{// Non-first iteration
+//this->NumClocksHalfPeriodPRUclock=(this->RatioAverageFactorClockHalfPeriod*this->NumClocksHalfPeriodPRUclock+(1.0-RatioAverageFactorClockHalfPeriod)*this->NumClocksHalfPeriodPRUclockUpdated);
+//}
+
 this->NumClocksHalfPeriodPRUclock=(this->RatioAverageFactorClockHalfPeriod*this->NumClocksHalfPeriodPRUclock+(1.0-RatioAverageFactorClockHalfPeriod)*this->NumClocksHalfPeriodPRUclockUpdated);
-}
 
 if (PlotPIDHAndlerInfo){
 	if (iIterPlotPIDHAndlerInfo%1000000000000000){
