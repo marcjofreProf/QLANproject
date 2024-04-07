@@ -189,7 +189,7 @@ else{
 	cout << "PRU0 interrupt poll error" << endl;
 }
 
-if (this->CounterHandleInterruptSynchPRU<5){
+if (this->CounterHandleInterruptSynchPRU<10){// Do not apply the averaging in the first ones since everything is adjusting
 	if (this->CounterHandleInterruptSynchPRU==0){//First
 		this->RatioAverageFactorClockHalfPeriodHolder=this->RatioAverageFactorClockHalfPeriod;
 		this->RatioAverageFactorClockHalfPeriod=0.0;
