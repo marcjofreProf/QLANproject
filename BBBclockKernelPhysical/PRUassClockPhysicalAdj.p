@@ -17,7 +17,6 @@
 #define GPIO_CLEARDATAOUToffset 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
 // GPIO goes low. If a bit is 0 it is ignored.
 
-#define NUM_CLOCKS_HALF_PERIOD	50000000		// Not used (value given by host) set the number of clocks that defines the half period of the clock. For 1pps is around 50000000 For 32Khz, with a PRU clock of 10ns (10ns seems more real, rather than 5ns as specs) is 3125
 // adjust to longest path so that the period of the signal is exact. The longest path is when in the OFF state the system has to check for an interrupt
 #define LOSTCLOCKCOUNTS1	2 // Since r1 already has a 0.5 factor (it account for the SUb + QBNE), but we lose 2 counts for settings bits low and loading r0, so 2 counts.
 #define LOSTCLOCKCOUNTS2	14 // compensate for the finish loop which has probably 12 clocks. Furthermore, since r1 already has a 0.5 factor (it account for the SUb + QBNE), but we lose 2 counts for settings bits low and loading r0, so 2 more counts should be added. Equating to 14
@@ -61,7 +60,7 @@
 .endm
 
 // r0 is arbitrary used for operations
-// r1 is reserved with the number of NUM_CLOCKS_HALF_PERIOD - storing the PRU 0 DATA number of repetitions
+
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
 // r2 reserved mapping control register
@@ -105,7 +104,6 @@ INITIATIONS:
 	// Initializations
 	LDI	r30, 0 // All signal pins down
 	LDI	r4, 0
-	MOV	r1, NUM_CLOCKS_HALF_PERIOD// Initial initialization just in case
 	MOV	r5, 0xFFFFFFFF
 	MOV	r6, 0x22000
 	MOV	r7, 0x2200C
