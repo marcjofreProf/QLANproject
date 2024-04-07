@@ -38,6 +38,7 @@ public: //Variables
 	bool PlotPIDHAndlerInfo=false;
 	double FactorTimerAdj=0.5; 
 	double NumClocksHalfPeriodPRUclock=0.5*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the half period of the clock.
+	double NumClocksHalfPeriodPRUclockOld=0.0;
 	double NumClocksHalfPeriodPRUclockUpdated=0.0;
 
 private:// Variables

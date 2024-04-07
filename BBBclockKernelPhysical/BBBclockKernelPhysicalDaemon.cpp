@@ -203,6 +203,9 @@ this->CounterHandleInterruptSynchPRU++;
 // Compute clocks adjustment
 auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epoch()-this->TimePointClockCurrentInitialAdj.time_since_epoch();
 // Convert duration to desired time
+// Median implementation
+
+// Average implementation
 this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned long long int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count()));
 this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;// Update value
 
@@ -210,11 +213,19 @@ this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;// Upd
 // Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
 this->NumClocksHalfPeriodPRUclockUpdated=(this->FactorTimerAdj*0.5*static_cast<double>(pru0dataMem_int[1])/static_cast<double>(ClockCyclePeriodAdjustment)*(static_cast<double>(this->TimeAdjPeriod)/static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)));
 
-// Important the order
-this->AdjCountsFreq=this->AdjCountsFreq*(this->RatioAverageFactorClockHalfPeriod*1.0+(1.0-this->RatioAverageFactorClockHalfPeriod)*(this->NumClocksHalfPeriodPRUclockUpdated/this->NumClocksHalfPeriodPRUclock));// Update value according to the adjustment
 
 // Important the order
+this->NumClocksHalfPeriodPRUclockOld=this->NumClocksHalfPeriodPRUclock;
+// Median implementation
+
+// Average implementation
 this->NumClocksHalfPeriodPRUclock=(this->RatioAverageFactorClockHalfPeriod*this->NumClocksHalfPeriodPRUclock+(1.0-RatioAverageFactorClockHalfPeriod)*this->NumClocksHalfPeriodPRUclockUpdated);
+
+// Important the order. The this->AdjCountsFreq is not an estimation but a parameter given by the user to adjust ot the desired low frequency, an hence in median implementation is has to be computed directly
+// Median implementation
+
+// Average implementation
+this->AdjCountsFreq=this->AdjCountsFreq*(this->RatioAverageFactorClockHalfPeriod*1.0+(1.0-this->RatioAverageFactorClockHalfPeriod)*(this->NumClocksHalfPeriodPRUclockUpdated/this->NumClocksHalfPeriodPRUclockOld));// Update value according to the adjustment
 
 if (PlotPIDHAndlerInfo){
 	if (iIterPlotPIDHAndlerInfo%1000000000000000){
