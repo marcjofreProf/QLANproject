@@ -32,6 +32,7 @@ public: //Variables
 	    };
 	// Variables adjusted by passing values to the main function
 	double AdjCountsFreq=0.0; // Number of clock ticks to adjust to the required frequency (e.g., 32 KHz) to account for having some idle time when resetting DWT_CNT in PRU
+	double AdjCountsFreqHolder=0.0;
 	double RatioAverageFactorClockHalfPeriodHolder=0.0; // The lower the more aggresive taking the new computed values
 	double RatioAverageFactorClockHalfPeriod=0.9999; // The lower the more aggresive taking the new computed values
 	double RatioFreqAdjustment=0.99;// Maximum and minimum frequency variation allowed. Not used

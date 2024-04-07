@@ -225,7 +225,7 @@ this->NumClocksHalfPeriodPRUclock=(this->RatioAverageFactorClockHalfPeriod*this-
 // Median implementation
 
 // Average implementation
-this->AdjCountsFreq=this->AdjCountsFreq*(this->RatioAverageFactorClockHalfPeriod*1.0+(1.0-this->RatioAverageFactorClockHalfPeriod)*(this->NumClocksHalfPeriodPRUclockUpdated/this->NumClocksHalfPeriodPRUclockOld));// Update value according to the adjustment
+this->AdjCountsFreq=this->AdjCountsFreqHolder*(this->RatioAverageFactorClockHalfPeriod*1.0+(1.0-this->RatioAverageFactorClockHalfPeriod)*(this->NumClocksHalfPeriodPRUclockUpdated/this->NumClocksHalfPeriodPRUclockOld));// Update value according to the adjustment
 
 if (PlotPIDHAndlerInfo){
 	if (iIterPlotPIDHAndlerInfo%1000000000000000){
@@ -375,6 +375,7 @@ int main(int argc, char const * argv[]){
  if (argc>1){// Arguments passed
  	try{
  	 CKPDagent.AdjCountsFreq=stod(argv[1]);
+ 	 CKPDagent.AdjCountsFreqHolder=CKPDagent.AdjCountsFreq;// Update of the value for ever
 	 CKPDagent.RatioAverageFactorClockHalfPeriod=stod(argv[2]);
 	 CKPDagent.PlotPIDHAndlerInfo=(strcmp(argv[3], "true") == 0);
 	 // Recompute some values:
