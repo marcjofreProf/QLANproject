@@ -94,7 +94,7 @@ private:// Variables
 	//bool finPRU1;
 	// SHARED RAM to file dump
 	int iIterDump;
-	unsigned int NumRecords=1024; //2048; //Number of records per run. It is also defined in PRUassTaggDetScript.p.
+	unsigned int NumRecords=1024; //2048; //Number of records per run. It is also defined in PRUassTaggDetScript.p and QphysLayerAgent.cpp
 	unsigned int NumSynchPulses=0;
 	unsigned char* valpHolder;
 	unsigned char* valpAuxHolder;

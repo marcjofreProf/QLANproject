@@ -30,7 +30,7 @@ Agent script for Quantum Physical Layer
 // time points
 #define WaitTimeToFutureTimePoint 399000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
 //Qubits
-#define NumQuBitsPerRun 2048
+#define NumQuBitsPerRun 1024
 // Mathemtical calculations
 #include <cmath>
 
