@@ -186,13 +186,13 @@ CMDLOOP:
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 1 bytes. It is the command to start
 	QBEQ	CHECK_CYCLECNT, r0.b0, 0 // loop until we get an instruction
-	LBCO	r4, CONST_PRUDRAM, 4, 4 // Load to r0 the content of CONST_PRUDRAM with offset 4, and 4 bytes. It is the number of RECORDS
+	LBCO	r4, CONST_PRUDRAM, 4, 4 // Load to r4 the content of CONST_PRUDRAM with offset 4, and 4 bytes. It is the number of RECORDS
 	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start 
 	SBCO	r7.b0, C0, 0x24, 1 // Reset host interrupt
 	/// Relative synch count down
 //	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 REGISTERCNT:
-	SBCO 	r7, CONST_PRUDRAM, 4, 4 // writes values of r19. to clear the number of synch pulses communicate din PRU RAM
+	SBCO 	r7, CONST_PRUDRAM, 8, 4 // writes values of r19. to clear the number of synch pulses communicate din PRU RAM
 	// Here include once the overflow register
 	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address offset at r1
 	ADD 	r1, r1, 4 // increment address by 4 bytes
