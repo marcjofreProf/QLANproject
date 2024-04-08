@@ -129,7 +129,7 @@ INITIATIONS:// This is only run once
 	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
 		
-	// Initial Re-initialization for IET counter
+	// Initial Re-initialization for IET counter. Used in the other PRU1
 	// The Clock gating Register controls the state of Clock Management
 //	//LBCO 	r0, CONST_PRUCFG, 0x10, 4                    
 //	MOV 	r0, 0x24924
