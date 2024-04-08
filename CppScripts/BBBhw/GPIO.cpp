@@ -569,7 +569,8 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 			cout << "AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
 		}
 		else{
-			AdjPulseSynchCoeff=1.0;
+			//AdjPulseSynchCoeff=1.0;
+			cout << "GPIO: Using previously computed AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
 		}
 		if (NumSynchPulsesRed>=MaxNumPulses){cout << "Too many pulses stored, increase buffer size or reduce number pulses: " << NumSynchPulsesRed << endl;}
 	    	else if (NumSynchPulsesRed==0){cout << "RetrieveNumStoredQuBits: No Synch pulses present!" << endl;}
