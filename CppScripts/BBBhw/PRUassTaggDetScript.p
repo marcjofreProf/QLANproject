@@ -113,7 +113,7 @@ INITIATIONS:// This is only run once
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
-	LDI	r18, 8 // Initialize 8 bytes above for PRU RAM
+	LDI	r18, 12 // Initialize 8 bytes above for PRU RAM
 	LDI	r19, 0 // Reset number of synch pulses register
 	// Initializations for faster execution
 	LDI	r7, 0 // Register for clearing other registers
@@ -244,11 +244,11 @@ FINISH:
 	//SBCO	r10, CONST_IETREG, 0xC, 4//SBCO	r10, CONST_IETREG, 0xC, 4 // reset IEP // SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	LBBO	r11, r13, 0, 4// Read DWT_CYCNT	
 	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 8 // writes values of r8 and r9
-	SBCO 	r19, CONST_PRUDRAM, 4, 4 // writes values of r19
+	SBCO 	r19, CONST_PRUDRAM, 8, 4 // writes values of r19
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 //	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
-	LDI	r18, 8 // Initialize 8 bytes above for PRU RAM
+	LDI	r18, 12 // Initialize 8 bytes above for PRU RAM
 	LDI	r19, 0 // Reset number of synch pulses register
 	//// For checking control, place as the last value the current estimated skew counts and threshold reset counts	
 	// we're done. Signal to the application
