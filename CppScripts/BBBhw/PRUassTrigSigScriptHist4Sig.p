@@ -24,7 +24,7 @@
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
 #define NUM_REPETITIONS		4194304	//Not used 4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used). This defines the Maximum Transmission Unit - coul dbe named Quantum MTU (defined together with the clock)
 #define DELAY 510//Example 510=(1024-4)/2. How to do it. Substract 4 and divide by 2 for the common cost commands. For instance 58=(128-4)/2 // Assuming that QBNE always consumes one clock (check experimentally). It has to be a power of 2 to be able to do module in assembler
-#define DELAYMODULE	7 // One less than the power of two required of the period of the histogrm which is 8.
+#define DELAYMODULE	0x07 // One less than the power of two required of the period of the histogrm which is 8.
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -101,7 +101,7 @@ INITIATIONS:
 	MOV	r0, 0x111 // Enable and Define increment value to 1
 	SBCO	r0, CONST_IETREG, 0, 4 // Enables IET count and sets configuration
 	// Deactivate IEP compensation
-	SBCO 	r7, CONST_IETREG, 0x08, 4
+	SBCO 	r4, CONST_IETREG, 0x08, 4
 
 	// Using cycle counter// Not really using it
 	MOV	r2, 0x22000
@@ -152,11 +152,10 @@ CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
-PSEUDOSYNCH:
+PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit t a specific bins for the histogram
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
-	AND	r0, r0, DELAYMODULE // Implement module of power of 2 on the histogram period
-	AND	r0, r0, 0x07 // Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) we can get a value between 0 and 7
+	AND	r0, r0, DELAYMODULE // Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) we can get a value between 0 and 7
 	QBEQ	SIGNALON1, r0.b0, 7 // Coincides with a 7
 	QBEQ	SIGNALON1, r0.b0, 6 // Coincides with a 6
 	QBEQ	SIGNALON1, r0.b0, 5 // Coincides with a 5
