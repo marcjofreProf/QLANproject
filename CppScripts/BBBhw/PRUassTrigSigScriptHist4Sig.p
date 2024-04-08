@@ -163,7 +163,7 @@ PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of star
 	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
 PSEUDOSYNCHLOOP:
 	SUB	r0, r0, 1
-	QBNE	SIGNALON1, r0.b0, 0 // Coincides with a 0
+	QBNE	PSEUDOSYNCHLOOP, r0.b0, 0 // Coincides with a 0
 //BASICPSEUDOSYNCH:
 //	QBEQ	SIGNALON1, r0.b0, 7 // Coincides with a 7
 //	QBEQ	SIGNALON1, r0.b0, 6 // Coincides with a 6
