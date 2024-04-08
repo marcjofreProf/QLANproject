@@ -10,7 +10,7 @@
 #define MASKevents 0x0F // P9_28-31, which corresponds to r31 bits 0,1,2,3
 
 // Length of acquisition:
-#define RECORDS 1024 //2048 // readings and it matches in the host c++ script
+#define RECORDS 2048 // readings and it matches in the host c++ script
 #define MAX_VALUE_BEFORE_RESETmostsigByte 0x80 // 128 in decimal
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
@@ -184,9 +184,10 @@ CMDLOOP:
 	// We remove the command from the host (in case there is a reset from host, we are saved)
 	//SBCO 	r7.b0, CONST_PRUDRAM, 4, 1 // Put contents of r7 into CONST_PRUDRAM	
 CMDLOOP2:// Double verification of host sending start command
-	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
+	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 1 bytes. It is the command to start
 	QBEQ	CHECK_CYCLECNT, r0.b0, 0 // loop until we get an instruction
-	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
+	LBCO	r4, CONST_PRUDRAM, 4, 4 // Load to r0 the content of CONST_PRUDRAM with offset 4, and 4 bytes. It is the number of RECORDS
+	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start 
 	SBCO	r7.b0, C0, 0x24, 1 // Reset host interrupt
 	/// Relative synch count down
 //	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
@@ -246,7 +247,7 @@ FINISH:
 	SBCO 	r19, CONST_PRUDRAM, 4, 4 // writes values of r19
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
-	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
+//	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 	LDI	r18, 8 // Initialize 8 bytes above for PRU RAM
 	LDI	r19, 0 // Reset number of synch pulses register
 	//// For checking control, place as the last value the current estimated skew counts and threshold reset counts	

@@ -556,9 +556,9 @@ cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating t
 unsigned long long int HistPeriodicityAux=8*2048; // Periodicity in number of PRU counts
 unsigned long long int TimeTaggs0Aux=TimeTaggs[0];
 unsigned long long int TimeTaggsLastAux=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];
-for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures. For long range synch testing with histogram, this could be commented
-TimeTaggs[i]=TimeTaggs[i]-TimeTaggs0Aux+OldLastTimeTagg+HistPeriodicityAux;
-}
+//for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures. For long range synch testing with histogram, this could be commented
+//TimeTaggs[i]=TimeTaggs[i]-TimeTaggs0Aux+OldLastTimeTagg+HistPeriodicityAux;
+//}
 
 TimeTaggsDetAnalytics[7]=(double)(TimeTaggs[0]);
 

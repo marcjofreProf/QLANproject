@@ -147,14 +147,14 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Here we can update memory space assigned address
 	valpHolder=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM];
 	valpAuxHolder=valpHolder+4+5*NumRecords;
-	synchpHolder=(unsigned int*)&pru0dataMem_int[1];
+	synchpHolder=(unsigned int*)&pru0dataMem_int[2];
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Timetagging
-	//pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
 	pru0dataMem_int[0]=static_cast<unsigned int>(0); // set no command
+	pru0dataMem_int[1]=this->NumRecords; // set number captures
 	if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
 		if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
 			perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
@@ -191,6 +191,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 // Important, the following line at the very beggining to reduce the command jitter
 pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
+pru0dataMem_int[1]=this->NumRecords; // set number captures
 prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
 this->TimePointClockCurrentPRU0meas=Clock::now();// To time stamp the current measurement, in contrast ot th eold last measurement
