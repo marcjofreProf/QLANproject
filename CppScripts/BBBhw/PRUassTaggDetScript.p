@@ -10,7 +10,7 @@
 #define MASKevents 0x0F // P9_28-31, which corresponds to r31 bits 0,1,2,3
 
 // Length of acquisition:
-#define RECORDS 2048 // readings and it matches in the host c++ script
+#define RECORDS 1024 //2048 // readings and it matches in the host c++ script
 #define MAX_VALUE_BEFORE_RESETmostsigByte 0x80 // 128 in decimal
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers

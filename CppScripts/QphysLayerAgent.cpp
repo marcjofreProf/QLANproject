@@ -545,6 +545,7 @@ TimeTaggsDetAnalytics[7]=(double)(TimeTaggs[0]);// Timetag of the first capture
 // Accordingly a complete sycle has 8 counts (2 counts for each step)
 // Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
 // Accordingly, the std wrapped count difference is stored in TimeTaggsDetAnalytics[6]
+cout << "When not using hist analys,it can be changed back to 2048 NUMRECORDS in PRUassTrigSigScriptHist4Sig and GPIO.cpp" << endl;
 cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 cout << "It has to have connected only ch1 timetagger" << endl;
 cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
