@@ -30,7 +30,7 @@ Agent script for Quantum Physical Layer
 // time points
 #define WaitTimeToFutureTimePoint 399000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
 //Qubits
-#define NumQuBitsPerRun 1024
+#define NumQuBitsPerRun 256 // REally defined in GPIO.h
 // Mathemtical calculations
 #include <cmath>
 
@@ -553,7 +553,7 @@ cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference
 cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
 cout << "Attention a Periodic signal sent, so time synch between different acquisitions is corrected" << endl;
 cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
-unsigned long long int HistPeriodicityAux=8*2048; // Periodicity in number of PRU counts
+unsigned long long int HistPeriodicityAux=8*8192; // Periodicity in number of PRU counts
 unsigned long long int TimeTaggs0Aux=TimeTaggs[0];
 unsigned long long int TimeTaggsLastAux=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];
 //for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures. For long range synch testing with histogram, this could be commented
