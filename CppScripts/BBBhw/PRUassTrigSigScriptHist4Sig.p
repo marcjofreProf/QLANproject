@@ -24,7 +24,7 @@
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
 #define NUM_REPETITIONS		4194304	//Not used 4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used). This defines the Maximum Transmission Unit - coul dbe named Quantum MTU (defined together with the clock)
 #define DELAY 510//Example 510=(1024-4)/2. How to do it. Substract 4 and divide by 2 for the common cost commands. For instance 58=(128-4)/2 // Assuming that QBNE always consumes one clock (check experimentally). It has to be a power of 2 to be able to do module in assembler
-#define DELAYMODULE	0x07 // One less than the power of two required of the period of the histogrm which is 8.
+#define DELAYMODULE	1023 // One less than the power of two required of the period of the histogrm which is 1023.
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -66,6 +66,7 @@
 // r3 reserved for 0x2200C DWT_CYCCNT
 // r4 reserved for zeroing registers
 // r5 reserved for delay count
+// r6 reserved for period of delay module
 
 // r10 is arbitrary used for operations
 
@@ -111,6 +112,7 @@ INITIATIONS:
 	LDI	r30, 0 // All signal pins down
 	LDI	r4, 0 // zeroing
 	MOV	r1, NUM_REPETITIONS// Initial initialization jus tin case// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
+	MOV	r6, DELAYMODULE
 	
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
@@ -155,15 +157,22 @@ CMDLOOP2:// Double verification of host sending start command
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit t a specific bins for the histogram
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	LBCO	r0.b0, CONST_IETREG, 0xC, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
-	AND	r0, r0, DELAYMODULE // Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) we can get a value between 0 and 7
-	QBEQ	SIGNALON1, r0.b0, 7 // Coincides with a 7
-	QBEQ	SIGNALON1, r0.b0, 6 // Coincides with a 6
-	QBEQ	SIGNALON1, r0.b0, 5 // Coincides with a 5
-	QBEQ	SIGNALON1, r0.b0, 4 // Coincides with a 4
-	QBEQ	SIGNALON1, r0.b0, 3 // Coincides with a 3
-	QBEQ	SIGNALON1, r0.b0, 2 // Coincides with a 2
-	QBEQ	SIGNALON1, r0.b0, 1 // Coincides with a 1
-	QBEQ	SIGNALON1, r0.b0, 0 // Coincides with a 0
+	AND	r0, r0, r6 // Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
+//	AND	r0, r0, 0x07 // Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) we can get a value between 0 and 7
+	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCH consumes double
+	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+PSEUDOSYNCHLOOP:
+	SUB	r0, r0, 1
+	QBNE	SIGNALON1, r0.b0, 0 // Coincides with a 0
+//BASICPSEUDOSYNCH:
+//	QBEQ	SIGNALON1, r0.b0, 7 // Coincides with a 7
+//	QBEQ	SIGNALON1, r0.b0, 6 // Coincides with a 6
+//	QBEQ	SIGNALON1, r0.b0, 5 // Coincides with a 5
+//	QBEQ	SIGNALON1, r0.b0, 4 // Coincides with a 4
+//	QBEQ	SIGNALON1, r0.b0, 3 // Coincides with a 3
+//	QBEQ	SIGNALON1, r0.b0, 2 // Coincides with a 2
+//	QBEQ	SIGNALON1, r0.b0, 1 // Coincides with a 1
+//	QBEQ	SIGNALON1, r0.b0, 0 // Coincides with a 0
 SIGNALON1:	
 	MOV	r30.b0, 0x11 // Double channels 1. write to magic r30 output byte 0
 	MOV	r5, DELAY
