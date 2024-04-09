@@ -80,6 +80,7 @@ private:// Variables
 	// Median filter implementation
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={1000000000};
 	double NumClocksHalfPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksHalfPeriodPRUclock};
+	int TimePointClockCurrentAdjErrorArray[MaxMedianFilterArraySize]={0};
 
 public:	// Functions/Methods
 	CKPD(); //constructor	
@@ -118,6 +119,8 @@ private: // Functions/Methods
 	int DoubleBubbleSort(double* arr);
 	unsigned long long int ULLIMedianFilterSubArray(unsigned long long int* ArrayHolderAux);
 	int ULLIBubbleSort(unsigned long long int* arr);
+	int IMedianFilterSubArray(int* ArrayHolderAux);
+	int IBubbleSort(int* arr);
 };
 
 

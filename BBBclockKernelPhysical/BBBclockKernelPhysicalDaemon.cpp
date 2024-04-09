@@ -213,7 +213,18 @@ this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned 
 }
 }
 
-this->TimePointClockCurrentAdjError=(int)(this->TimeAdjPeriod-this->TimePointClockCurrentFinalInitialAdj_time_as_count)-this->TimePointClockCurrentAdjError;// Error to be compensated for
+
+switch(FilterMode) {
+case 1:{// Median implementation
+this->TimePointClockCurrentAdjErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=(int)(this->TimeAdjPeriod-this->TimePointClockCurrentFinalInitialAdj_time_as_count)-this->TimePointClockCurrentAdjError;// Error to be compensated for
+this->TimePointClockCurrentAdjError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjErrorArray);
+}
+default:{// Average implementation
+this->TimePointClockCurrentAdjError = static_cast<int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentAdjError)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>((int)(this->TimeAdjPeriod-this->TimePointClockCurrentFinalInitialAdj_time_as_count)-this->TimePointClockCurrentAdjError));
+}
+}
+
+//////
 this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;// Update value
 
 // Update sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
@@ -409,6 +420,39 @@ int CKPD::ULLIBubbleSort(unsigned long long int* arr) {
             if (arr[j] > arr[j+1]) {
                 // Swap arr[j] and arr[j+1]
                 unsigned long long int temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+    return 0; // All ok
+}
+
+int CKPD::IMedianFilterSubArray(int* ArrayHolderAux){
+if (this->MedianFilterFactor<=1){
+	return ArrayHolderAux[0];
+}
+else{
+	// Step 1: Copy the array to a temporary array
+    int temp[this->MedianFilterFactor]={0};
+    for(int i = 0; i < this->MedianFilterFactor; i++) {
+        temp[i] = ArrayHolderAux[i];
+    }
+    
+    // Step 2: Sort the temporary array
+    this->IBubbleSort(temp);
+    // If odd, middle number
+      return temp[this->MedianFilterFactor/2];
+}
+}
+
+// Function to implement Bubble Sort
+int CKPD::IBubbleSort(int* arr) {
+    for (int i = 0; i < this->MedianFilterFactor-1; i++) {
+        for (int j = 0; j < this->MedianFilterFactor-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                // Swap arr[j] and arr[j+1]
+                int temp = arr[j];
                 arr[j] = arr[j+1];
                 arr[j+1] = temp;
             }
