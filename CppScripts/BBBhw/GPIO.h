@@ -145,6 +145,7 @@ public:	// Functions/Methods
 	virtual int DisablePRUs();
 	virtual int ReadTimeStamps();// Read the detected timestaps in four channels
 	virtual int SendTriggerSignals(); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+	virtual int SendTriggerSignalsSelfTest();//
 	virtual int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
 	virtual int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
 	virtual int ClearStoredQuBits(); // Send the writting pointer back to the beggining - effectively clearing stored QuBits
