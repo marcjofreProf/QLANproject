@@ -216,11 +216,11 @@ this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned 
 
 switch(FilterMode) {
 case 1:{// Median implementation
-this->TimePointClockCurrentAdjErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=(int)(this->TimeAdjPeriod-this->TimePointClockCurrentFinalInitialAdj_time_as_count)-this->TimePointClockCurrentAdjError;// Error to be compensated for
-this->TimePointClockCurrentAdjError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjErrorArray);
+this->TimePointClockCurrentAdjErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=(int)(this->TimeAdjPeriod-this->TimePointClockCurrentFinalInitialAdj_time_as_count);// Error to be compensated for
+this->TimePointClockCurrentAdjError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjErrorArray)-this->TimePointClockCurrentAdjError;
 }
 default:{// Average implementation
-this->TimePointClockCurrentAdjError = static_cast<int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentAdjError)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>((int)(this->TimeAdjPeriod-this->TimePointClockCurrentFinalInitialAdj_time_as_count)-this->TimePointClockCurrentAdjError));
+this->TimePointClockCurrentAdjError = static_cast<int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentAdjError)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>((int)(this->TimeAdjPeriod-this->TimePointClockCurrentFinalInitialAdj_time_as_count)))-this->TimePointClockCurrentAdjError;
 }
 }
 
