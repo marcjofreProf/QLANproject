@@ -165,12 +165,12 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 	pru1dataMem_int[1]=static_cast<unsigned int>(0); // set no command
 	// Load and execute the PRU program on the PRU1
-	/*
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
 		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
 			perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScriptHist4Sig.bin");//perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
 		}
-	}*/
+	}
+	/*
 	// Self Test Histogram
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4SigSelfTest.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
 		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4SigSelfTest.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
@@ -179,7 +179,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	this->SendTriggerSignalsSelfTest(); // Self test initialization
-	cout << "Attention doing SendTriggerSignalsSelfTest. To be removed" << endl;
+	cout << "Attention doing SendTriggerSignalsSelfTest. To be removed" << endl;	
+	*/
 	
 	////prussdrv_pru_enable(PRU_Signal_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
@@ -580,11 +581,11 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 			cout << "Last CoeffSynchAdjAux1: " << CoeffSynchAdjAux1 << endl;
 			cout << "Last CoeffSynchAdjAux2: " << CoeffSynchAdjAux2 << endl;
 			if (NumAvgAux>0){AdjPulseSynchCoeff=AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
-			else{AdjPulseSynchCoeff=1.0;}// Reset
+			else{AdjPulseSynchCoeff=0.0;}// Reset
 			cout << "GPIO: AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
 		}
 		else{
-			AdjPulseSynchCoeff=1.0;
+			AdjPulseSynchCoeff=0.0;
 			cout << "GPIO: AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
 		}
 		if (NumSynchPulsesRed>=MaxNumPulses){cout << "Too many pulses stored, increase buffer size or reduce number pulses: " << NumSynchPulsesRed << endl;}
