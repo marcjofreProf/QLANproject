@@ -213,7 +213,7 @@ this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned 
 }
 }
 
-this->TimePointClockCurrentAdjError=this->TimeAdjPeriod-this->TimePointClockCurrentFinalInitialAdj_time_as_count;// Error to be compensated for
+this->TimePointClockCurrentAdjError=-this->TimeAdjPeriod+this->TimePointClockCurrentFinalInitialAdj_time_as_count;// Error to be compensated for
 this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;// Update value
 
 // Update sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
