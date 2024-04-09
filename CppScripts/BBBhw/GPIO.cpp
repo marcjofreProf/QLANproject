@@ -606,7 +606,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 		    // Apply pulses time drift correction
 		    if (NumSynchPulsesRed>1){// There is a calibration curve
 		        // using doubles, to represent usigned long long int can hold, with the 5ns PRU count, up to 2 years with presition!!!
-		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))*AdjPulseSynchCoeff);
+		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))/AdjPulseSynchCoeff);
 		    }
 		    else{// No pulse compensation
 		    	TimeTaggs[lineCount]=ValueReadTest; 
