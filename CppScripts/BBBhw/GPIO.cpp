@@ -179,6 +179,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	this->SendTriggerSignalsSelfTest(); // Self test initialization
+	cout << "Attention doing SendTriggerSignalsSelfTest. To be removed" << endl;
 	
 	////prussdrv_pru_enable(PRU_Signal_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
