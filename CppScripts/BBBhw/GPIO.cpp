@@ -556,18 +556,18 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 		    	streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 		}
 		NumSynchPulsesRed=lineCount;		
-		if (NumSynchPulsesRed>1){//At least two points, we can generate a calibration curve
+		if (NumSynchPulsesRed>3){//At least four points (two cycles separated by one cycle in between), we can generate a calibration curve
 			AdjPulseSynchCoeff=0.0;// Reset
 			unsigned long long int CoeffSynchAdjAux0=1;
 			double CoeffSynchAdjAux1=0.0;// Number theoretical counts given the number of cycles
 			double CoeffSynchAdjAux2=0.0;// PRU counting
 			int NumAvgAux=0;
-			for (int iIter=0;iIter<(NumSynchPulsesRed-2);iIter++){
-				CoeffSynchAdjAux0=(unsigned long long int)(((double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj); // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
+			for (int iIter=0;iIter<(NumSynchPulsesRed-3);iIter++){
+				CoeffSynchAdjAux0=(unsigned long long int)(((double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj); // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
 				CoeffSynchAdjAux1=(double)(CoeffSynchAdjAux0*PeriodCountsPulseAdj);//((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
-				CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])-(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]);//(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
+				CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+3]-SynchPulsesTags[iIter+2])-(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]);//(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
 				if (CoeffSynchAdjAux0!=0.0 and CoeffSynchAdjAux1!=0.0 and CoeffSynchAdjAux2!=0.0){
-					AdjPulseSynchCoeff=AdjPulseSynchCoeff+(CoeffSynchAdjAux1/CoeffSynchAdjAux2);
+					AdjPulseSynchCoeff=AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);
 					NumAvgAux++;
 				}
 			}
@@ -616,7 +616,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 		while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
 		    // Apply pulses time drift correction
 		    // using doubles, to represent usigned long long int can hold, with the 5ns PRU count, up to 2 years with presition!!!
-		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))*AdjPulseSynchCoeff);		    
+		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))*(1.0-AdjPulseSynchCoeff));		    
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
 	    	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
