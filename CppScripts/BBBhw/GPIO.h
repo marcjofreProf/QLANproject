@@ -44,7 +44,7 @@ using std::fstream;
 #define PRUdataPATH2 "../PRUdata/"
 
 #define MaxNumPulses	8192
-#define PRUclockStepPeriodNanoseconds		4.99999999 // PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is multiplied by 8, so 192MHz, hence th period 5.2083...ns
+#define PRUclockStepPeriodNanoseconds		5 // PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is multiplied by 8, so 192MHz, hence th period 5.2083...ns
 #define PulseFreq	1000 // Hz
 
 namespace exploringBB {
@@ -59,7 +59,7 @@ class GPIO {
 
 private:// Variables
 	// Time/synchronization management
-	using Clock = std::chrono::steady_clock;// We do not use system clock because we do not need a wathc, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
+	using Clock = std::chrono::steady_clock;// We do not use system clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
 	TimePoint TimePointClockCurrentPRU0meas=std::chrono::time_point<Clock>();
 	TimePoint TimePointClockCurrentPRU0measOld=std::chrono::time_point<Clock>();
