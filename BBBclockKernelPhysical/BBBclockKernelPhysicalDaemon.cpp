@@ -147,8 +147,8 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	//prussdrv_pru_enable(PRU_ClockPhys_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	// first time to get TimePoints for clock adjustment
-	this->TimePointClockCurrentInitial=Clock::now();
-	this->TimePointClockCurrentInitialAdj=Clock::now();
+	this->TimePointClockCurrentInitial=ClockWatch::now();
+	this->TimePointClockCurrentInitialAdj=ClockChrono::now();
 	this->SetFutureTimePoint();// Used with busy-wait
 	//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 }
@@ -167,11 +167,11 @@ int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems phy
 //pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
 sharedMem_int[0]=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock+this->AdjCountsFreq);//Information grabbed by PRU1
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
-while (Clock::now() < this->TimePointClockCurrentFinal);// Busy wait
+while (ClockWatch::now() < this->TimePointClockCurrentFinal);// Busy wait
 //clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 pru0dataMem_int[2]=static_cast<unsigned int>(1);
 prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment
-this->TimePointClockCurrentFinalAdj=Clock::now();
+this->TimePointClockCurrentFinalAdj=ClockChrono::now();
 this->SetFutureTimePoint();// Used with busy-wait
 //this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 

@@ -51,8 +51,10 @@ private:// Variables
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	// Time/synchronization management
 	unsigned long long int CounterHandleInterruptSynchPRU=0;
-	using Clock = std::chrono::steady_clock;// system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer), steady_clock is much better than system_clock aimed at measuring absolute time (like a watch)
-	using TimePoint = std::chrono::time_point<Clock>;
+	using ClockChrono = std::chrono::steady_clock;// system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer), system_clock is much better than seady_clock aimed at measuring absolute time (like a watch)
+	using ClockWatch = std::chrono::system_clock;// system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer), system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
+	using TimePointChrono = std::chrono::time_point<ClockChrono>;
+	using TimePointWatch = std::chrono::time_point<ClockWatch>;
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_count=1000000000; // Initial value to 1 s
 	struct timespec requestWhileWait;
 	// PRU
@@ -63,10 +65,10 @@ private:// Variables
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
 	// Time keeping
 	unsigned long long int TimeAdjPeriod=static_cast<unsigned long long int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted. VEry important parameter
-	TimePoint TimePointClockCurrentInitial=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
-	TimePoint TimePointClockCurrentFinal=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
-	TimePoint TimePointClockCurrentInitialAdj=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
-	TimePoint TimePointClockCurrentFinalAdj=std::chrono::time_point<Clock>(); // Initial updated value of the clock (updated in each iteration)
+	TimePointWatch TimePointClockCurrentInitial=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
+	TimePointWatch TimePointClockCurrentFinal=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
+	TimePointChrono TimePointClockCurrentInitialAdj=std::chrono::time_point<ClockChrono>(); // Initial updated value of the clock (updated in each iteration)
+	TimePointChrono TimePointClockCurrentFinalAdj=std::chrono::time_point<ClockChrono>(); // Initial updated value of the clock (updated in each iteration)
 	// PRU clock handling	
 	unsigned long long int iIterPlotPIDHAndlerInfo=0;		
 	int retInterruptsPRU0;
