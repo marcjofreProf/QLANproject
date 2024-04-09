@@ -621,7 +621,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 		while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
 		    // Apply pulses time drift correction
 		    // using doubles, to represent usigned long long int can hold, with the 5ns PRU count, up to 2 years with presition!!!
-		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))*(1.0-AdjPulseSynchCoeff));		    
+		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))*(1.0+AdjPulseSynchCoeff));		    
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
 	    	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
