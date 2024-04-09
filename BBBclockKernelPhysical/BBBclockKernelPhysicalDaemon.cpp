@@ -171,7 +171,7 @@ while (ClockWatch::now() < this->TimePointClockCurrentFinal);// Busy wait
 //clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 pru0dataMem_int[2]=static_cast<unsigned int>(1);
 prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment
-this->TimePointClockCurrentFinalAdj=ClockChrono::now();
+this->TimePointClockCurrentFinalAdj=ClockChrono::now()-std::chrono::nanoseconds(this->TimePointClockCurrentAdjError);
 this->SetFutureTimePoint();// Used with busy-wait
 //this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 
@@ -212,6 +212,8 @@ default:{// Average implementation
 this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned long long int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count()));
 }
 }
+
+this->TimePointClockCurrentAdjError=this->TimeAdjPeriod-this->TimePointClockCurrentFinalInitialAdj_time_as_count;// Error to be compensated for
 this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;// Update value
 
 // Update sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
@@ -256,23 +258,23 @@ return 0;// all ok
 }
 
 struct timespec CKPD::SetWhileWait(){
-struct timespec requestWhileWaitAux;
-this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);
-this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal; //Update value
-auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentFinal.time_since_epoch();
-// Convert duration to desired time
-unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Convert 
-//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
+	struct timespec requestWhileWaitAux;
+	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod)+std::chrono::nanoseconds(this->TimePointClockCurrentAdjError);
+	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal-std::chrono::nanoseconds(this->TimePointClockCurrentAdjError); //Update value
+	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentFinal.time_since_epoch();
+	// Convert duration to desired time
+	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Convert 
+	//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
 
-requestWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
-requestWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
-return requestWhileWaitAux;
+	requestWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
+	requestWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
+	return requestWhileWaitAux;
 }
 
 int CKPD::SetFutureTimePoint(){
-this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);
-this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal; //Update value
-return 0; // All Ok
+	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod)+std::chrono::nanoseconds(this->TimePointClockCurrentAdjError);
+	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal-std::chrono::nanoseconds(this->TimePointClockCurrentAdjError); //Update value
+	return 0; // All Ok
 }
 
 /*****************************************************************************
