@@ -563,7 +563,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 			double CoeffSynchAdjAux2=0.0;// PRU counting
 			int NumAvgAux=0;
 			for (int iIter=0;iIter<(NumSynchPulsesRed-1);iIter++){
-				CoeffSynchAdjAux0=(unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj); // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
+				CoeffSynchAdjAux0=(unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]-1)+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj); // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
 				CoeffSynchAdjAux1=(double)(CoeffSynchAdjAux0*PeriodCountsPulseAdj);//((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
 				CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]-1);//(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
 				if (CoeffSynchAdjAux0!=0.0 and CoeffSynchAdjAux1!=0.0 and CoeffSynchAdjAux2!=0.0){
