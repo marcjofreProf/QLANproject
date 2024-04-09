@@ -256,7 +256,7 @@ SIGNALON8DEL:
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 FINISH:
 	SUB	r1, r1, 1 // Decrement counter
-	MOV	r1, NUM_REPETITIONS
+	MOV	r1, 1
 	JMP	SIGNALON1//QBNE	SIGNALON1, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 	//QBA	SIGNALON1//PSEUDOSYNCH// Debbuging - Infinite loop
