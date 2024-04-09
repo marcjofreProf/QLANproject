@@ -462,7 +462,7 @@ else{
 
 // Store the last IEP counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
 // The number below is an estimation since there are instructions that are not accounted for
-if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=14+0;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
+if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=13+0;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
 else{this->AfterCountsThreshold=this->valThresholdResetCounts+0;};//0x00000000;// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
 this->FirstTimeDDRdumpdata=false;
 if (valCycleCountPRU >= (0x80000000-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
@@ -572,7 +572,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 				CoeffSynchAdjAux4=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+3]-SynchPulsesTags[iIter+2])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
 				if (CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+3]-SynchPulsesTags[iIter+2])/CoeffSynchAdjAux4-(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/CoeffSynchAdjAux3;}//(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
 				if (CoeffSynchAdjAux1!=0.0 and CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){
-					AdjPulseSynchCoeff=AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);
+					AdjPulseSynchCoeff=AdjPulseSynchCoeff+(CoeffSynchAdjAux2/(CoeffSynchAdjAux1+CoeffSynchAdjAux3/2.0+CoeffSynchAdjAux4/2.0));
 					NumAvgAux++;
 				}
 			}
@@ -580,6 +580,8 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 			cout << "Last CoeffSynchAdjAux0: " << CoeffSynchAdjAux0 << endl;
 			cout << "Last CoeffSynchAdjAux1: " << CoeffSynchAdjAux1 << endl;
 			cout << "Last CoeffSynchAdjAux2: " << CoeffSynchAdjAux2 << endl;
+			cout << "Last CoeffSynchAdjAux3: " << CoeffSynchAdjAux3 << endl;
+			cout << "Last CoeffSynchAdjAux4: " << CoeffSynchAdjAux4 << endl;
 			if (NumAvgAux>0){AdjPulseSynchCoeff=AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
 			else{AdjPulseSynchCoeff=0.0;}// Reset
 			cout << "GPIO: AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
