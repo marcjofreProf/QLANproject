@@ -570,9 +570,9 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 				CoeffSynchAdjAux1=(double)(CoeffSynchAdjAux0)*PeriodCountsPulseAdj;//((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
 				CoeffSynchAdjAux3=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter+0])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
 				CoeffSynchAdjAux4=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+3]-SynchPulsesTags[iIter+2])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
-				if (CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+3]-SynchPulsesTags[iIter+2])/CoeffSynchAdjAux4-(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/CoeffSynchAdjAux3;}//(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
+				if (CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+3]-SynchPulsesTags[iIter+2])/CoeffSynchAdjAux4-(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter+0])/CoeffSynchAdjAux3;}//(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
 				if (CoeffSynchAdjAux1!=0.0 and CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){
-					AdjPulseSynchCoeff=AdjPulseSynchCoeff+(CoeffSynchAdjAux2/(CoeffSynchAdjAux1+CoeffSynchAdjAux3/2.0+CoeffSynchAdjAux4/2.0));
+					AdjPulseSynchCoeff=AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);
 					NumAvgAux++;
 				}
 			}
