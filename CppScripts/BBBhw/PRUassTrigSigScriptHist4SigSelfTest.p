@@ -22,7 +22,7 @@
 
 #define INS_PER_US		200		// 5ns per instruction for Beaglebone black
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
-#define NUM_REPETITIONS		4194304	//Not used 4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used). This defines the Maximum Transmission Unit - coul dbe named Quantum MTU (defined together with the clock)
+#define NUM_REPETITIONS		1024	//Not used 4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used). This defines the Maximum Transmission Unit - coul dbe named Quantum MTU (defined together with the clock)
 #define DELAY 4094//It has to be  related to an even power of 2!!! Example 1022=(2048-4)/2. How to do it. Substract 4 and divide by 2 for the common cost commands. For instance 58=(128-4)/2 // Assuming that QBNE always consumes one clock (check experimentally). It has to be a power of 2 to be able to do module in assembler
 #define DELAYMODULE	65536 // The whole histogram period
 #define DELAYHALFMODULE	32768 // One less than the power of two required of the period of the histogram which is 65536=2^16, hence 2^15=32768.
@@ -98,7 +98,7 @@ INITIATIONS:
 	SBCO 	r0, CONST_PRUCFG, 0x10, 4 
 	//LBCO	r2, CONST_IETREG, 0, 1 //
 	//SET ocp_clk:1 or of iep_clk:0// It is important ot select the clock source to be in synch with the PRU clock. I believe it should be ocp_clk
-	MOV	r0, 1
+	MOV	r0, 0
 	SBCO 	r0, CONST_PRUCFG, 0x30, 4
 	// IEP configuration
 	MOV	r0, 0x111 // Enable and Define increment value to 1
@@ -116,6 +116,7 @@ INITIATIONS:
 	MOV	r1, NUM_REPETITIONS// Initial initialization jus tin case// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
 	MOV	r6, DELAYHALFMODULE
 	MOV	r7, DELAYMODULE
+	LDI	r0, 0
 	
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
