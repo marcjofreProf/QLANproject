@@ -563,7 +563,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 			double CoeffSynchAdjAux2=0.0;// PRU counting
 			int NumAvgAux=0;
 			for (int iIter=0;iIter<(NumSynchPulsesRed-1);iIter++){
-				CoeffSynchAdjAux0=(unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]-1)+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj); // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
+				CoeffSynchAdjAux0=(unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj); // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
 				CoeffSynchAdjAux1=(double)(CoeffSynchAdjAux0*PeriodCountsPulseAdj);//((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
 				CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]-1);//(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
 				if (CoeffSynchAdjAux0!=0.0 and CoeffSynchAdjAux1!=0.0 and CoeffSynchAdjAux2!=0.0){
@@ -615,13 +615,8 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 		while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
 		    // Apply pulses time drift correction
-		    if (NumSynchPulsesRed>1){// There is a calibration curve
-		        // using doubles, to represent usigned long long int can hold, with the 5ns PRU count, up to 2 years with presition!!!
-		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))*AdjPulseSynchCoeff);
-		    }
-		    else{// No pulse compensation
-		    	TimeTaggs[lineCount]=ValueReadTest; 
-		    }
+		    // using doubles, to represent usigned long long int can hold, with the 5ns PRU count, up to 2 years with presition!!!
+		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))*AdjPulseSynchCoeff);		    
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
 	    	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;

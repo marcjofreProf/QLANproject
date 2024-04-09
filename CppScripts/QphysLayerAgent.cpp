@@ -568,11 +568,11 @@ for (int i=0;i<(SimulateNumStoredQubitsNodeAux-1);i++){
 if (i==0){cout << "TimeTaggs[1]-TimeTaggs[0]: " << TimeTaggs[1]-TimeTaggs[0] << endl;}
 else if(i==(SimulateNumStoredQubitsNodeAux-2)){cout << "TimeTaggs[i+1]-TimeTaggs[i]: " << TimeTaggs[i+1]-TimeTaggs[i] << endl;}
 
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((HistPeriodicityAux/2+TimeTaggs[i+1]-TimeTaggs[i])%HistPeriodicityAux)+1.0)-(double)(HistPeriodicityAux/2));
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((HistPeriodicityAux/2+TimeTaggs[i+1]-TimeTaggs[i])%HistPeriodicityAux))-(double)(HistPeriodicityAux/2));
 }
 
 for (int i=0;i<(SimulateNumStoredQubitsNodeAux-1);i++){
-TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((HistPeriodicityAux/2+TimeTaggs[i+1]-TimeTaggs[i])%HistPeriodicityAux)+1.0)-(double)(HistPeriodicityAux/2)-TimeTaggsDetAnalytics[5],2.0);
+TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((HistPeriodicityAux/2+TimeTaggs[i+1]-TimeTaggs[i])%HistPeriodicityAux))-(double)(HistPeriodicityAux/2)-TimeTaggsDetAnalytics[5],2.0);
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
