@@ -82,6 +82,8 @@ private:// Variables
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={1000000000};
 	double NumClocksHalfPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksHalfPeriodPRUclock};
 	int TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0};
+	// PID error correction
+	double PIDconstant=0.1;
 
 public:	// Functions/Methods
 	CKPD(); //constructor	
