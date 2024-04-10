@@ -212,7 +212,9 @@ auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epo
 //this->TimePointClockCurrentAdjError = static_cast<int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentAdjError)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>((int)(this->TimeAdjPeriod-this->TimePointClockCurrentFinalInitialAdj_time_as_count)))-this->TimePointClockCurrentAdjError;
 //}
 //}
+if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){
 this->TimePointClockCurrentAdjError=(int)(this->TimeAdjPeriod-std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count())-this->TimePointClockCurrentAdjError;// Error to be compensated for
+}
 
 // Convert duration to desired time
 switch(FilterMode) {
