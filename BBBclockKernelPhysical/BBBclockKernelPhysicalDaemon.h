@@ -66,6 +66,7 @@ private:// Variables
 	// Time keeping
 	unsigned long long int TimeAdjPeriod=static_cast<unsigned long long int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted. VEry important parameter
 	int TimePointClockCurrentAdjError=0;
+	int TimePointClockCurrentAdjFilError=0;
 	TimePointWatch TimePointClockCurrentInitial=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
 	TimePointWatch TimePointClockCurrentFinal=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
 	TimePointChrono TimePointClockCurrentInitialAdj=std::chrono::time_point<ClockChrono>(); // Initial updated value of the clock (updated in each iteration)
@@ -80,7 +81,7 @@ private:// Variables
 	// Median filter implementation
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={1000000000};
 	double NumClocksHalfPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksHalfPeriodPRUclock};
-	int TimePointClockCurrentAdjErrorArray[MaxMedianFilterArraySize]={0};
+	int TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0};
 
 public:	// Functions/Methods
 	CKPD(); //constructor	
