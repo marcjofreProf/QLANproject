@@ -39,7 +39,7 @@ public: //Variables
 	double RatioAverageFactorClockHalfPeriodHolder=0.0; // The lower the more aggresive taking the new computed values.
 	double RatioAverageFactorClockHalfPeriod=0.9999; // The lower the more aggresive taking the new computed values. Whe using mean filter.
 	unsigned long long int MedianFilterFactor=1; // When using median filter
-	unsigned long long int MeanFilterFactor=1; // When using median filter
+	unsigned long long int MeanFilterFactor=1; // When using mean filter
 	bool PlotPIDHAndlerInfo=false;
 	double FactorTimerAdj=0.5; 
 	double NumClocksHalfPeriodPRUclock=0.5*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the half period of the clock.

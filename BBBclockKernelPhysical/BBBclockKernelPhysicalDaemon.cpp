@@ -211,10 +211,12 @@ switch(FilterMode) {
 case 2:{// Mean implementation
 this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
 this->TimePointClockCurrentAdjFilError=this->IMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
+break;
 }
 case 1:{// Median implementation
 this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
 this->TimePointClockCurrentAdjFilError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
+break;
 }
 default:{// Average implementation
 this->TimePointClockCurrentAdjFilError = static_cast<int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentAdjFilError)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>((int)(this->TimeAdjPeriod-std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count())+this->TimePointClockCurrentAdjError));
@@ -226,10 +228,12 @@ switch(FilterMode) {
 case 2:{// Mean implementation
 this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
 this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMeanFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);
+break;
 }
 case 1:{// Median implementation
 this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
 this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMedianFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);
+break;
 }
 default:{// Average implementation
 this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned long long int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count()));
@@ -251,10 +255,12 @@ switch(FilterMode) {
 case 2:{// Mean implementation
 this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;
 this->NumClocksHalfPeriodPRUclock=this->DoubleMeanFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);
+break;
 }
 case 1:{// Median implementation
 this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;
 this->NumClocksHalfPeriodPRUclock=this->DoubleMedianFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);
+break;
 }
 default:{
 // Average implementation
@@ -586,6 +592,7 @@ int main(int argc, char const * argv[]){
 		 else{// For fast median computing the length should be odd
 		 	CKPDagent.MeanFilterFactor=(CKPDagent.MeanFilterFactor/2)*2+1;
 		 }
+		 break;
 	}
 	case 1:{// Median implementation
 		cout << "Using median filtering." << endl;
@@ -601,6 +608,7 @@ int main(int argc, char const * argv[]){
 		 else{// For fast median computing the length should be odd
 		 	CKPDagent.MedianFilterFactor=(CKPDagent.MedianFilterFactor/2)*2+1;// odd
 		 }
+		 break;
 	}
 	default:{// Average implementation
 		cout << "Using average filtering." << endl;
