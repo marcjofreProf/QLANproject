@@ -195,6 +195,10 @@ private: // Functions/Methods
 	//int unexportGPIO(); Not currently used - legacy
 	friend void* threadedPoll(void *value);
 	friend void* threadedToggle(void *value);
+	// Median filter
+	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
+	double DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor);
+	int DoubleBubbleSort(double* arr,int MedianFilterFactor);
 };
 
 void* threadedPoll(void *value);

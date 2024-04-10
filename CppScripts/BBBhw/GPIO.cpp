@@ -572,7 +572,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 				CoeffSynchAdjAux4=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+3]-SynchPulsesTags[iIter+2])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
 				if (CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+3]-SynchPulsesTags[iIter+2])/CoeffSynchAdjAux4-(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter+0])/CoeffSynchAdjAux3;}//(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter]))/(PeriodCountsPulseAdj));
 				if (CoeffSynchAdjAux1!=0.0 and CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){
-					AdjPulseSynchCoeff=AdjPulseSynchCoeff+CoeffSynchAdjAux2;//+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);
+					AdjPulseSynchCoeffArray[NumAvgAux]=CoeffSynchAdjAux2;//AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);
 					NumAvgAux++;
 				}
 			}
@@ -582,7 +582,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 			cout << "Last CoeffSynchAdjAux2: " << CoeffSynchAdjAux2 << endl;
 			cout << "Last CoeffSynchAdjAux3: " << CoeffSynchAdjAux3 << endl;
 			cout << "Last CoeffSynchAdjAux4: " << CoeffSynchAdjAux4 << endl;
-			if (NumAvgAux>0){AdjPulseSynchCoeff=AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
+			if (NumAvgAux>0){AdjPulseSynchCoeff=this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumAvgAux);}//Median AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
 			else{AdjPulseSynchCoeff=0.0;}// Reset
 			cout << "GPIO: AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
 		}
@@ -639,6 +639,39 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 	return -1;
 }
 
+}
+
+double GPIO::DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor){
+if (MedianFilterFactor<=1){
+	return ArrayHolderAux[0];
+}
+else{
+	// Step 1: Copy the array to a temporary array
+    double temp[MedianFilterFactor]={0.0};
+    for(int i = 0; i < MedianFilterFactor; i++) {
+        temp[i] = ArrayHolderAux[i];
+    }
+    
+    // Step 2: Sort the temporary array
+    this->DoubleBubbleSort(temp,MedianFilterFactor);
+    // If odd, middle number
+      return temp[MedianFilterFactor/2];
+}
+}
+
+// Function to implement Bubble Sort
+int GPIO::DoubleBubbleSort(double* arr,int MedianFilterFactor) {
+    for (int i = 0; i < MedianFilterFactor-1; i++) {
+        for (int j = 0; j < MedianFilterFactor-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                // Swap arr[j] and arr[j+1]
+                double temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+    return 0; // All ok
 }
 
 int GPIO::SendTriggerSignalsSelfTest(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
