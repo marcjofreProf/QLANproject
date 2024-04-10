@@ -202,6 +202,18 @@ else{
 
 // Compute clocks adjustment
 auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epoch()-this->TimePointClockCurrentInitialAdj.time_since_epoch();
+
+//switch(FilterMode) {// Error should not be filtered
+//case 1:{// Median implementation
+//this->TimePointClockCurrentAdjErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=(int)(this->TimeAdjPeriod-this->TimePointClockCurrentFinalInitialAdj_time_as_count);// Error to be compensated for
+//this->TimePointClockCurrentAdjError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjErrorArray)-this->TimePointClockCurrentAdjError;
+//}
+//default:{// Average implementation
+//this->TimePointClockCurrentAdjError = static_cast<int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentAdjError)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>((int)(this->TimeAdjPeriod-this->TimePointClockCurrentFinalInitialAdj_time_as_count)))-this->TimePointClockCurrentAdjError;
+//}
+//}
+this->TimePointClockCurrentAdjError=(int)(this->TimeAdjPeriod-std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count());// Error to be compensated for
+
 // Convert duration to desired time
 switch(FilterMode) {
 case 1:{// Median implementation
@@ -210,17 +222,6 @@ this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMedianFilterS
 }
 default:{// Average implementation
 this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned long long int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count()));
-}
-}
-
-
-switch(FilterMode) {
-case 1:{// Median implementation
-this->TimePointClockCurrentAdjErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=(int)(this->TimeAdjPeriod-this->TimePointClockCurrentFinalInitialAdj_time_as_count);// Error to be compensated for
-this->TimePointClockCurrentAdjError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjErrorArray)-this->TimePointClockCurrentAdjError;
-}
-default:{// Average implementation
-this->TimePointClockCurrentAdjError = static_cast<int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentAdjError)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>((int)(this->TimeAdjPeriod-this->TimePointClockCurrentFinalInitialAdj_time_as_count)))-this->TimePointClockCurrentAdjError;
 }
 }
 
@@ -255,10 +256,11 @@ else{
 }
 
 if (PlotPIDHAndlerInfo){
-	if (iIterPlotPIDHAndlerInfo%1000000000000000){
+	if (iIterPlotPIDHAndlerInfo%10000000000000000){
 	cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
 	cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
 	cout << "this->TimePointClockCurrentFinalInitialAdj_time_as_count: " << this->TimePointClockCurrentFinalInitialAdj_time_as_count << endl;
+	cout << "this->TimePointClockCurrentAdjError: " << this->TimePointClockCurrentAdjError << endl;
 	}
 	iIterPlotPIDHAndlerInfo++;
 }
