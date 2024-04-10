@@ -209,11 +209,11 @@ this->TimePointClockCurrentAdjError=(int)(this->TimeAdjPeriod-std::chrono::durat
 
 switch(FilterMode) {
 case 1:{// Median implementation
-this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=(int)(this->TimeAdjPeriod-std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count());// Error to be compensated for
+this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
 this->TimePointClockCurrentAdjFilError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
 }
 default:{// Average implementation
-this->TimePointClockCurrentAdjFilError = static_cast<int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentAdjFilError)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>((int)(this->TimeAdjPeriod-std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count())));
+this->TimePointClockCurrentAdjFilError = static_cast<int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentAdjFilError)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>((int)(this->TimeAdjPeriod-std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count())+this->TimePointClockCurrentAdjError));
 }
 }
 
@@ -275,8 +275,8 @@ return 0;// all ok
 
 struct timespec CKPD::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
-	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod)+std::chrono::nanoseconds(this->TimePointClockCurrentAdjFilError);
-	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal-std::chrono::nanoseconds(this->TimePointClockCurrentAdjFilError); //Update value
+	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial-std::chrono::nanoseconds(this->TimeAdjPeriod)+std::chrono::nanoseconds(this->TimePointClockCurrentAdjFilError);
+	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal+std::chrono::nanoseconds(this->TimePointClockCurrentAdjFilError); //Update value
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentFinal.time_since_epoch();
 	// Convert duration to desired time
 	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Convert 
@@ -288,8 +288,8 @@ struct timespec CKPD::SetWhileWait(){
 }
 
 int CKPD::SetFutureTimePoint(){
-	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod)+std::chrono::nanoseconds(this->TimePointClockCurrentAdjFilError);
-	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal-std::chrono::nanoseconds(this->TimePointClockCurrentAdjFilError); //Update value
+	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial-std::chrono::nanoseconds(this->TimeAdjPeriod)+std::chrono::nanoseconds(this->TimePointClockCurrentAdjFilError);
+	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal+std::chrono::nanoseconds(this->TimePointClockCurrentAdjFilError); //Update value
 	return 0; // All Ok
 }
 
