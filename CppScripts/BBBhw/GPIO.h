@@ -134,7 +134,8 @@ private:// Variables
 	int NumSynchPulsesRed=0;
 	unsigned long long int SynchPulsesTags[MaxNumPulses]={0};
 	double PeriodCountsPulseAdj=(((1.0/(double)(PulseFreq))*1e9)/((double)(PRUclockStepPeriodNanoseconds)));
-	double AdjPulseSynchCoeff=0.0;
+	double AdjPulseSynchCoeff=1.0;
+	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
 
 public:	// Functions/Methods
 	GPIO(int number); //constructor will export the pin	
@@ -196,7 +197,6 @@ private: // Functions/Methods
 	friend void* threadedPoll(void *value);
 	friend void* threadedToggle(void *value);
 	// Median filter
-	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
 	double DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor);
 	int DoubleBubbleSort(double* arr,int MedianFilterFactor);
 };

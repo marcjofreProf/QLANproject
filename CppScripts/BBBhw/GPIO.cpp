@@ -585,11 +585,11 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 			cout << "Last CoeffSynchAdjAux3: " << CoeffSynchAdjAux3 << endl;
 			cout << "Last CoeffSynchAdjAux4: " << CoeffSynchAdjAux4 << endl;
 			if (NumAvgAux>0){AdjPulseSynchCoeff=this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumAvgAux);}//Median AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
-			else{AdjPulseSynchCoeff=0.0;}// Reset
+			else{AdjPulseSynchCoeff=1.0;}// Reset
 			cout << "GPIO: AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
 		}
 		else{
-			AdjPulseSynchCoeff=0.0;
+			AdjPulseSynchCoeff=1.0;
 			cout << "GPIO: AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
 		}
 		if (NumSynchPulsesRed>=MaxNumPulses){cout << "Too many pulses stored, increase buffer size or reduce number pulses: " << NumSynchPulsesRed << endl;}
