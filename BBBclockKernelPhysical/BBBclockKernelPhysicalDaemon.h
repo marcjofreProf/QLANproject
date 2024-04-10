@@ -22,7 +22,7 @@
 #define ClockCyclePeriodAdjustment		1// pps// 65536 32 KHz // Very important parameter. The larger the better, since the interrupts time jitter do not paly a role, as long as the PRU counter does not overexceed (the turn down is that ht eupdate time is larger)
 #define WaitCyclesBeforeAveraging	25 // To go into steady state in the initialization
 #define MaxMedianFilterArraySize	50
-#define FilterMode 0 // 0: averaging; 1: median. The erro jumps between two values, then maybe it is better to use averaging
+#define FilterMode 2 // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mea window
 
 namespace exploringBBBCKPD {
 
@@ -36,9 +36,10 @@ public: //Variables
 	// Variables adjusted by passing values to the main function
 	double AdjCountsFreq=0.0; // Number of clock ticks to adjust to the required frequency (e.g., 32 KHz) to account for having some idle time when resetting DWT_CNT in PRU
 	double AdjCountsFreqHolder=0.0;
-	double RatioAverageFactorClockHalfPeriodHolder=0.0; // The lower the more aggresive taking the new computed values
-	double RatioAverageFactorClockHalfPeriod=0.9999; // The lower the more aggresive taking the new computed values. Whe using mean filter
+	double RatioAverageFactorClockHalfPeriodHolder=0.0; // The lower the more aggresive taking the new computed values.
+	double RatioAverageFactorClockHalfPeriod=0.9999; // The lower the more aggresive taking the new computed values. Whe using mean filter.
 	unsigned long long int MedianFilterFactor=1; // When using median filter
+	unsigned long long int MeanFilterFactor=1; // When using median filter
 	bool PlotPIDHAndlerInfo=false;
 	double FactorTimerAdj=0.5; 
 	double NumClocksHalfPeriodPRUclock=0.5*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the half period of the clock.
@@ -119,10 +120,13 @@ private: // Functions/Methods
 	int DisablePRUs();
 	// Median filter
 	double DoubleMedianFilterSubArray(double* ArrayHolderAux);
+	double DoubleMeanFilterSubArray(double* ArrayHolderAux);
 	int DoubleBubbleSort(double* arr);
 	unsigned long long int ULLIMedianFilterSubArray(unsigned long long int* ArrayHolderAux);
+	unsigned long long int ULLIMeanFilterSubArray(unsigned long long int* ArrayHolderAux);
 	int ULLIBubbleSort(unsigned long long int* arr);
 	int IMedianFilterSubArray(int* ArrayHolderAux);
+	int IMeanFilterSubArray(int* ArrayHolderAux);
 	int IBubbleSort(int* arr);
 };
 

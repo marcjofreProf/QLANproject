@@ -208,6 +208,10 @@ this->TimePointClockCurrentAdjError=(int)(this->TimeAdjPeriod-std::chrono::durat
 }
 
 switch(FilterMode) {
+case 2:{// Mean implementation
+this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
+this->TimePointClockCurrentAdjFilError=this->IMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
+}
 case 1:{// Median implementation
 this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
 this->TimePointClockCurrentAdjFilError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
@@ -219,6 +223,10 @@ this->TimePointClockCurrentAdjFilError = static_cast<int>(this->RatioAverageFact
 
 // Convert duration to desired time
 switch(FilterMode) {
+case 2:{// Mean implementation
+this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
+this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMeanFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);
+}
 case 1:{// Median implementation
 this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
 this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMedianFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);
@@ -238,8 +246,13 @@ this->NumClocksHalfPeriodPRUclockUpdated=(this->FactorTimerAdj*0.5*static_cast<d
 
 // Important the order
 this->NumClocksHalfPeriodPRUclockOld=this->NumClocksHalfPeriodPRUclock;// Update value
+
 switch(FilterMode) {
-case 1:{// Median implementation// Median implementation
+case 2:{// Mean implementation
+this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;
+this->NumClocksHalfPeriodPRUclock=this->DoubleMeanFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);
+}
+case 1:{// Median implementation
 this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;
 this->NumClocksHalfPeriodPRUclock=this->DoubleMedianFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);
 }
@@ -385,6 +398,22 @@ else{
 }
 }
 
+double CKPD::DoubleMeanFilterSubArray(double* ArrayHolderAux){
+if (this->MeanFilterFactor<=1){
+	return ArrayHolderAux[0];
+}
+else{
+	// Step 1: Copy the array to a temporary array
+    double temp=0.0;
+    for(int i = 0; i < this->MeanFilterFactor; i++) {
+        temp = temp + ArrayHolderAux[i];
+    }
+    
+    temp=temp/((double)(this->MeanFilterFactor));
+    return temp;
+}
+}
+
 // Function to implement Bubble Sort
 int CKPD::DoubleBubbleSort(double* arr) {
     for (int i = 0; i < this->MedianFilterFactor-1; i++) {
@@ -418,6 +447,22 @@ else{
 }
 }
 
+unsigned long long int CKPD::ULLIMeanFilterSubArray(unsigned long long int* ArrayHolderAux){
+if (this->MeanFilterFactor<=1){
+	return ArrayHolderAux[0];
+}
+else{
+	// Step 1: Copy the array to a temporary array
+    unsigned long long int temp=0.0;
+    for(int i = 0; i < this->MeanFilterFactor; i++) {
+        temp = temp + ArrayHolderAux[i];
+    }
+    
+    temp=(unsigned long long int)(((double)(temp))/((double)(this->MeanFilterFactor)));
+    return temp;
+}
+}
+
 // Function to implement Bubble Sort
 int CKPD::ULLIBubbleSort(unsigned long long int* arr) {
     for (int i = 0; i < this->MedianFilterFactor-1; i++) {
@@ -448,6 +493,22 @@ else{
     this->IBubbleSort(temp);
     // If odd, middle number
       return temp[this->MedianFilterFactor/2];
+}
+}
+
+int CKPD::IMeanFilterSubArray(int* ArrayHolderAux){
+if (this->MeanFilterFactor<=1){
+	return ArrayHolderAux[0];
+}
+else{
+	// Step 1: Copy the array to a temporary array
+    int temp=0.0;
+    for(int i = 0; i < this->MeanFilterFactor; i++) {
+        temp = temp + ArrayHolderAux[i];
+    }
+    
+    temp=(int)(((double)(temp))/((double)(this->MeanFilterFactor)));
+    return temp;
 }
 }
 
@@ -511,6 +572,21 @@ int main(int argc, char const * argv[]){
  	 CKPDagent.AdjCountsFreqHolder=CKPDagent.AdjCountsFreq;// Update of the value for ever	 
 	 
 	 switch(FilterMode) {
+	 case 2:{// Mean implementation
+		cout << "Using mean filtering." << endl;
+		CKPDagent.MeanFilterFactor=stoull(argv[2]);
+		 if (CKPDagent.MeanFilterFactor>MaxMedianFilterArraySize){
+		 	CKPDagent.MeanFilterFactor=MaxMedianFilterArraySize;
+		 	cout << "Attention, mean filter size too large." << endl;
+		 }
+		 else if (CKPDagent.MeanFilterFactor<1){
+		 	CKPDagent.MeanFilterFactor=1;
+		 	cout << "Attention, mean filter size too small." << endl;
+		 }
+		 else{// For fast median computing the length should be odd
+		 	CKPDagent.MeanFilterFactor=(CKPDagent.MeanFilterFactor/2)*2+1;
+		 }
+	}
 	case 1:{// Median implementation
 		cout << "Using median filtering." << endl;
 		CKPDagent.MedianFilterFactor=stoull(argv[2]);
