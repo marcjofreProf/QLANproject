@@ -206,7 +206,9 @@ auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epo
 if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
 this->TimePointClockCurrentAdjError=(int)(this->TimeAdjPeriod-std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count())+this->TimePointClockCurrentAdjError;// Error to be compensated for
 }
-this->TimePointClockCurrentAdjError=0;
+else{
+	this->TimePointClockCurrentAdjError=0;
+}
 
 switch(FilterMode) {
 case 2:{// Mean implementation
