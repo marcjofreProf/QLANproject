@@ -235,7 +235,7 @@ break;
 }
 case 1:{// Median implementation
 this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
-this->TimePointClockCurrentFinalInitialAdj_time_as_count=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();//this->ULLIMedianFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);
+this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMedianFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);// Not working
 break;
 }
 default:{// Average implementation
@@ -262,7 +262,7 @@ break;
 }
 case 1:{// Median implementation
 this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;
-this->NumClocksHalfPeriodPRUclock=this->DoubleMedianFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);
+this->NumClocksHalfPeriodPRUclock=this->DoubleMedianFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);// Not working
 break;
 }
 default:{
@@ -599,6 +599,7 @@ int main(int argc, char const * argv[]){
 	}
 	case 1:{// Median implementation
 		cout << "Using median filtering." << endl;
+		cout << "Attention filtering not working iwth median filter." << endl;
 		CKPDagent.MedianFilterFactor=stoull(argv[2]);
 		 if (CKPDagent.MedianFilterFactor>MaxMedianFilterArraySize){
 		 	CKPDagent.MedianFilterFactor=MaxMedianFilterArraySize;
