@@ -171,7 +171,7 @@ while (ClockWatch::now() < this->TimePointClockCurrentFinal);// Busy wait
 //clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 pru0dataMem_int[2]=static_cast<unsigned int>(1);
 prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment
-this->TimePointClockCurrentFinalAdj=ClockChrono::now()-std::chrono::nanoseconds(this->TimePointClockCurrentAdjError);
+this->TimePointClockCurrentFinalAdj=ClockChrono::now()+std::chrono::nanoseconds(this->TimePointClockCurrentAdjError);
 this->SetFutureTimePoint();// Used with busy-wait
 //this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 
@@ -209,7 +209,7 @@ this->TimePointClockCurrentAdjError=(int)(this->TimeAdjPeriod-std::chrono::durat
 
 switch(FilterMode) {
 case 2:{// Mean implementation
-this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
+this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
 this->TimePointClockCurrentAdjFilError=this->IMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
 }
 case 1:{// Median implementation
@@ -224,7 +224,7 @@ this->TimePointClockCurrentAdjFilError = static_cast<int>(this->RatioAverageFact
 // Convert duration to desired time
 switch(FilterMode) {
 case 2:{// Mean implementation
-this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
+this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
 this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMeanFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);
 }
 case 1:{// Median implementation
@@ -249,7 +249,7 @@ this->NumClocksHalfPeriodPRUclockOld=this->NumClocksHalfPeriodPRUclock;// Update
 
 switch(FilterMode) {
 case 2:{// Mean implementation
-this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;
+this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;
 this->NumClocksHalfPeriodPRUclock=this->DoubleMeanFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);
 }
 case 1:{// Median implementation
