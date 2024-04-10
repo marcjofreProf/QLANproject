@@ -508,20 +508,31 @@ int main(int argc, char const * argv[]){
  if (argc>1){// Arguments passed
  	try{
  	 CKPDagent.AdjCountsFreq=stod(argv[1]);
- 	 CKPDagent.AdjCountsFreqHolder=CKPDagent.AdjCountsFreq;// Update of the value for ever
-	 //CKPDagent.RatioAverageFactorClockHalfPeriod=stod(argv[2]);
-	 CKPDagent.MedianFilterFactor=stoull(argv[2]);
-	 if (CKPDagent.MedianFilterFactor>MaxMedianFilterArraySize){
-	 	CKPDagent.MedianFilterFactor=MaxMedianFilterArraySize;
-	 	cout << "Attention, median filter size too large." << endl;
-	 }
-	 else if (CKPDagent.MedianFilterFactor<1){
-	 	CKPDagent.MedianFilterFactor=1;
-	 	cout << "Attention, median filter size too small." << endl;
-	 }
-	 else{// For fast median computing the length should be odd
-	 	CKPDagent.MedianFilterFactor=(CKPDagent.MedianFilterFactor/2)*2+1;
-	 }
+ 	 CKPDagent.AdjCountsFreqHolder=CKPDagent.AdjCountsFreq;// Update of the value for ever	 
+	 
+	 switch(FilterMode) {
+	case 1:{// Median implementation
+		cout << "Using median filtering." << endl;
+		CKPDagent.MedianFilterFactor=stoull(argv[2]);
+		 if (CKPDagent.MedianFilterFactor>MaxMedianFilterArraySize){
+		 	CKPDagent.MedianFilterFactor=MaxMedianFilterArraySize;
+		 	cout << "Attention, median filter size too large." << endl;
+		 }
+		 else if (CKPDagent.MedianFilterFactor<1){
+		 	CKPDagent.MedianFilterFactor=1;
+		 	cout << "Attention, median filter size too small." << endl;
+		 }
+		 else{// For fast median computing the length should be odd
+		 	CKPDagent.MedianFilterFactor=(CKPDagent.MedianFilterFactor/2)*2+1;
+		 }
+	}
+	default:{// Average implementation
+		cout << "Using average filtering." << endl;
+		CKPDagent.RatioAverageFactorClockHalfPeriod=stod(argv[2]);
+	}
+	}
+
+
 	 CKPDagent.PlotPIDHAndlerInfo=(strcmp(argv[3], "true") == 0);
 	 // Recompute some values:
 	 //cout << "CKPDagent.AdjCountsFreq: " << CKPDagent.AdjCountsFreq << endl;
