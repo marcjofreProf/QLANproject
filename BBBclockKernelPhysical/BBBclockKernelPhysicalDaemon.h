@@ -83,7 +83,7 @@ private:// Variables
 	double NumClocksHalfPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksHalfPeriodPRUclock};
 	int TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0};
 	// PID error correction
-	double PIDconstant=1.1;
+	double PIDconstant=1.1; // should be larger than 1.0
 
 public:	// Functions/Methods
 	CKPD(); //constructor	
