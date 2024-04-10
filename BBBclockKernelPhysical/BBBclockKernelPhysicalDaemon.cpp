@@ -394,7 +394,7 @@ else{
     // Step 2: Sort the temporary array
     this->DoubleBubbleSort(temp);
     // If odd, middle number
-      return temp[this->MedianFilterFactor/2];
+      return (temp[this->MedianFilterFactor/2]+temp[this->MedianFilterFactor/2+1])/2.0;
 }
 }
 
@@ -443,7 +443,7 @@ else{
     // Step 2: Sort the temporary array
     this->ULLIBubbleSort(temp);
     // If odd, middle number
-      return temp[this->MedianFilterFactor/2];
+      return (temp[this->MedianFilterFactor/2]+temp[this->MedianFilterFactor/2+1])/2;
 }
 }
 
@@ -492,7 +492,7 @@ else{
     // Step 2: Sort the temporary array
     this->IBubbleSort(temp);
     // If odd, middle number
-      return temp[this->MedianFilterFactor/2];
+      return (temp[this->MedianFilterFactor/2]+temp[this->MedianFilterFactor/2+1])/2;
 }
 }
 
@@ -599,7 +599,7 @@ int main(int argc, char const * argv[]){
 		 	cout << "Attention, median filter size too small." << endl;
 		 }
 		 else{// For fast median computing the length should be odd
-		 	CKPDagent.MedianFilterFactor=(CKPDagent.MedianFilterFactor/2)*2+1;
+		 	CKPDagent.MedianFilterFactor=(CKPDagent.MedianFilterFactor/2)*2;// even
 		 }
 	}
 	default:{// Average implementation
