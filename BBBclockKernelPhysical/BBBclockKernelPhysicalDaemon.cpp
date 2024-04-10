@@ -218,7 +218,7 @@ break;
 }
 case 1:{// Median implementation
 this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
-this->TimePointClockCurrentAdjFilError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
+this->TimePointClockCurrentAdjFilError=this->TimePointClockCurrentAdjError;//this->IMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
 break;
 }
 default:{// Average implementation
@@ -235,7 +235,7 @@ break;
 }
 case 1:{// Median implementation
 this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
-this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMedianFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);
+this->TimePointClockCurrentFinalInitialAdj_time_as_count=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();//this->ULLIMedianFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);
 break;
 }
 default:{// Average implementation
@@ -262,7 +262,7 @@ break;
 }
 case 1:{// Median implementation
 this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;
-this->NumClocksHalfPeriodPRUclock=this->DoubleMedianFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);
+this->NumClocksHalfPeriodPRUclock=this->NumClocksHalfPeriodPRUclockUpdated;//this->DoubleMedianFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);
 break;
 }
 default:{
