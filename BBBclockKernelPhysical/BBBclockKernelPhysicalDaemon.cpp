@@ -270,7 +270,7 @@ return 0;// all ok
 
 struct timespec CKPD::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
-	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod)+std::chrono::nanoseconds(this->TimePointClockCurrentAdjError);
+	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);//+std::chrono::nanoseconds(this->TimePointClockCurrentAdjError);
 	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal; //Update value
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentFinal.time_since_epoch();
 	// Convert duration to desired time
@@ -283,7 +283,7 @@ struct timespec CKPD::SetWhileWait(){
 }
 
 int CKPD::SetFutureTimePoint(){
-	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod)+std::chrono::nanoseconds(this->TimePointClockCurrentAdjError);
+	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);//+std::chrono::nanoseconds(this->TimePointClockCurrentAdjError);
 	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal; //Update value
 	return 0; // All Ok
 }
