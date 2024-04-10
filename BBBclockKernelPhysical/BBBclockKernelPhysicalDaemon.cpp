@@ -262,7 +262,7 @@ break;
 }
 case 1:{// Median implementation
 this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;
-this->NumClocksHalfPeriodPRUclock=this->NumClocksHalfPeriodPRUclockUpdated;//this->DoubleMedianFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);
+this->NumClocksHalfPeriodPRUclock=this->DoubleMedianFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);
 break;
 }
 default:{
