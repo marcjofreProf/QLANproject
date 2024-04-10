@@ -235,7 +235,7 @@ break;
 }
 case 1:{// Median implementation
 this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
-this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMedianFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);
+this->TimePointClockCurrentFinalInitialAdj_time_as_count=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();//this->ULLIMedianFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);
 break;
 }
 default:{// Average implementation
