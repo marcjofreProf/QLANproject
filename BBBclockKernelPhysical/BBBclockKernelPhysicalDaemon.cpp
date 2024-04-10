@@ -213,7 +213,7 @@ auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epo
 //}
 //}
 if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){
-this->TimePointClockCurrentAdjError=(int)(this->TimeAdjPeriod-std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count())-this->TimePointClockCurrentAdjError;// Error to be compensated for
+this->TimePointClockCurrentAdjError=(int)(this->TimeAdjPeriod-std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count());//-this->TimePointClockCurrentAdjError;// Error to be compensated for
 }
 
 // Convert duration to desired time
