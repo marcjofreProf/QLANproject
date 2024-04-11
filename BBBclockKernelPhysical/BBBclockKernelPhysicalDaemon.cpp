@@ -290,6 +290,9 @@ if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not ap
 else{
 	this->AdjCountsFreq=this->AdjCountsFreqHolder;
 }
+this->MinAdjCountsFreq=-this->NumClocksHalfPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
+if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}
+else if(this->AdjCountsFreq<this->MinAdjCountsFreq){this->AdjCountsFreq=this->MinAdjCountsFreq;}
 
 if (PlotPIDHAndlerInfo){
 	if (iIterPlotPIDHAndlerInfo%10000000000000000){
