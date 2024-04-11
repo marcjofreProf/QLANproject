@@ -22,7 +22,7 @@
 #define ClockCyclePeriodAdjustment		1// pps// 65536 32 KHz // Very important parameter. The larger the better, since the interrupts time jitter do not paly a role, as long as the PRU counter does not overexceed (the turn down is that ht eupdate time is larger)
 #define WaitCyclesBeforeAveraging	10 // To go into steady state in the initialization
 #define MaxMedianFilterArraySize	10000
-#define FilterMode 2 // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mea window
+#define FilterMode 1 // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mea window
 
 namespace exploringBBBCKPD {
 
@@ -79,6 +79,8 @@ private:// Variables
 	// PRU clock generation	
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=2000000; // In microseconds
+	unsigned int MinNumPeriodColcksPRUnoHalt=100;// Protecion agains very low numbers
+	unsigned int MaxNumPeriodColcksPRUnoHalt=1000000000;// Protecion agains very large numbers
 	// Median filter implementation
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={1000000000};
 	double NumClocksHalfPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksHalfPeriodPRUclock};

@@ -165,6 +165,10 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 //pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
+unsigned int PRU1HalfClocksAux=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock+this->AdjCountsFreq)
+if (PRU1HalfClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1HalfClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
+else if (PRU1HalfClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1HalfClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
+
 sharedMem_int[0]=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock+this->AdjCountsFreq);//Information grabbed by PRU1
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
 while (ClockWatch::now() < this->TimePointClockCurrentFinal);// Busy wait
@@ -611,6 +615,7 @@ int main(int argc, char const * argv[]){
 		CKPDagent.MedianFilterFactor=stoull(argv[2]);
 		 if (CKPDagent.MedianFilterFactor>MaxMedianFilterArraySize){
 		 	CKPDagent.MedianFilterFactor=MaxMedianFilterArraySize;
+		 	CKPDagent.MedianFilterFactor=(CKPDagent.MedianFilterFactor/2)*2+1;// odd
 		 	cout << "Attention, median filter size too large." << endl;
 		 }
 		 else if (CKPDagent.MedianFilterFactor<1){
