@@ -22,7 +22,7 @@
 #define ClockCyclePeriodAdjustment		1// pps// 65536 32 KHz // Very important parameter. The larger the better, since the interrupts time jitter do not paly a role, as long as the PRU counter does not overexceed (the turn down is that ht eupdate time is larger)
 #define WaitCyclesBeforeAveraging	10 // To go into steady state in the initialization
 #define MaxMedianFilterArraySize	10000
-#define FilterMode 1 // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mea window
+#define FilterMode 2 // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mea window
 
 namespace exploringBBBCKPD {
 
@@ -53,7 +53,7 @@ private:// Variables
 	// Time/synchronization management
 	unsigned long long int CounterHandleInterruptSynchPRU=0;
 	using ClockChrono = std::chrono::system_clock;// steady_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than seady_clock aimed at measuring absolute time (like a watch)
-	using ClockWatch = std::chrono::system_clock; //Maybe we also need a stop watch.//system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
+	using ClockWatch = std::chrono::steady_clock; //Maybe we also need a stop watch.//system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
 	using TimePointChrono = std::chrono::time_point<ClockChrono>;
 	using TimePointWatch = std::chrono::time_point<ClockWatch>;
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds; // Initial value to 1 s
