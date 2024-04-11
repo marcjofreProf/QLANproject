@@ -257,7 +257,7 @@ this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;// Upd
 
 // Update sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
 // Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
-this->NumClocksHalfPeriodPRUclockUpdated=(this->FactorTimerAdj*0.5*static_cast<double>(pru0dataMem_int[1])/static_cast<double>(ClockCyclePeriodAdjustment)*(static_cast<double>(this->TimeAdjPeriod)/static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)));
+this->NumClocksHalfPeriodPRUclockUpdated=(this->FactorTimerAdj*0.5*static_cast<double>(pru0dataMem_int[1])/static_cast<double>(ClockCyclePeriodAdjustment)*(static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)/static_cast<double>(this->TimeAdjPeriod)));
 
 
 // Important the order
@@ -283,7 +283,7 @@ this->NumClocksHalfPeriodPRUclock=(this->RatioAverageFactorClockHalfPeriod*this-
 }
 
 // Important the order. The this->AdjCountsFreq is not an estimation but a parameter given by the user to adjust ot the desired low frequency, an hence in median/average implementation is has to be computed directly
-this->AdjCountsFreqHolder=this->AdjCountsFreqHolder*(this->NumClocksHalfPeriodPRUclockOld/this->NumClocksHalfPeriodPRUclock);
+this->AdjCountsFreqHolder=this->AdjCountsFreqHolder*(this->NumClocksHalfPeriodPRUclock/this->NumClocksHalfPeriodPRUclockOld);
 if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
 	this->AdjCountsFreq=0.0;
 }
