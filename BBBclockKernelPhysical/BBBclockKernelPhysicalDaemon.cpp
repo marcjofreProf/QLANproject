@@ -417,7 +417,7 @@ else{
     }
     
     // Step 2: Sort the temporary array
-    this->DoubleBubbleSort(temp);
+    //this->DoubleBubbleSort(temp);
     // If odd, middle number
       return temp[this->MedianFilterFactor/2];
 }
@@ -466,7 +466,7 @@ else{
     }
     
     // Step 2: Sort the temporary array
-    this->ULLIBubbleSort(temp);
+    //this->ULLIBubbleSort(temp);
     // If odd, middle number
     return temp[this->MedianFilterFactor/2];
 }
@@ -515,7 +515,7 @@ else{
     }
     
     // Step 2: Sort the temporary array
-    this->IBubbleSort(temp);
+    //this->IBubbleSort(temp);
     // If odd, middle number
       return temp[this->MedianFilterFactor/2];
 }
