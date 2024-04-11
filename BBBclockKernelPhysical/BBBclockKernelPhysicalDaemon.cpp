@@ -169,7 +169,7 @@ unsigned int PRU1HalfClocksAux=static_cast<unsigned int>(this->NumClocksHalfPeri
 if (PRU1HalfClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1HalfClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU1HalfClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1HalfClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
-sharedMem_int[0]=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock+this->AdjCountsFreq);//Information grabbed by PRU1
+sharedMem_int[0]=PRU1HalfClocksAux;//Information grabbed by PRU1
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
 while (ClockWatch::now() <= this->TimePointClockCurrentFinal);// Busy wait
 //clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
@@ -253,7 +253,7 @@ this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned 
 
 // Update sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
 // Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
-this->NumClocksHalfPeriodPRUclockUpdated=(this->FactorTimerAdj*0.5*static_cast<double>(pru0dataMem_int[1]))/static_cast<double>(ClockCyclePeriodAdjustment)*(static_cast<double>(this->TimeAdjPeriod)/static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count));
+this->NumClocksHalfPeriodPRUclockUpdated=(this->FactorTimerAdj*0.5*static_cast<double>(pru0dataMem_int[1]))/static_cast<double>(ClockCyclePeriodAdjustment)*(static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)/static_cast<double>(this->TimeAdjPeriod));
 
 
 // Important the order
