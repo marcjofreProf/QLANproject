@@ -202,14 +202,17 @@ else{
 
 // Compute clocks adjustment
 auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epoch()-this->TimePointClockCurrentInitialAdj.time_since_epoch();
+unsigned long long int duration_FinalInitialAdjCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
 
 if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
-this->TimePointClockCurrentAdjError=(int)(this->TimeAdjPeriod-std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count())+this->TimePointClockCurrentAdjError;// Error to be compensated for
+this->TimePointClockCurrentAdjError=(int)(this->TimeAdjPeriod-duration_FinalInitialAdjCountAux)+this->TimePointClockCurrentAdjError;// Error to be compensated for
 }
 else{
 	this->TimePointClockCurrentAdjError=0;
 }
 
+if (this->TimePointClockCurrentAdjError>this->MaxTimePointClockCurrentAdjError){this->TimePointClockCurrentAdjError=this->MaxTimePointClockCurrentAdjError;}
+else if (this->TimePointClockCurrentAdjError<this->MinTimePointClockCurrentAdjError){this->TimePointClockCurrentAdjError=this->MinTimePointClockCurrentAdjError;}
 switch(FilterMode) {
 case 2:{// Mean implementation
 this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
@@ -227,19 +230,21 @@ this->TimePointClockCurrentAdjFilError = static_cast<int>(this->RatioAverageFact
 }
 
 // Convert duration to desired time
+if (duration_FinalInitialAdjCountAux>this->MaxTimePointClockCurrentFinalInitialAdj_time_as_count){duration_FinalInitialAdjCountAux=this->MaxTimePointClockCurrentFinalInitialAdj_time_as_count;}
+else if (duration_FinalInitialAdjCountAux<this->MinTimePointClockCurrentFinalInitialAdj_time_as_count){duration_FinalInitialAdjCountAux=this->MinTimePointClockCurrentFinalInitialAdj_time_as_count;}
 switch(FilterMode) {
 case 2:{// Mean implementation
-this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
+this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=duration_FinalInitialAdjCountAux;
 this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMeanFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);
 break;
 }
 case 1:{// Median implementation
-this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
+this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=duration_FinalInitialAdjCountAux;
 this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMedianFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);// Not working
 break;
 }
 default:{// Average implementation
-this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned long long int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count()));
+this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned long long int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>(duration_FinalInitialAdjCountAux));
 }
 }
 
@@ -254,6 +259,8 @@ this->NumClocksHalfPeriodPRUclockUpdated=(this->FactorTimerAdj*0.5*static_cast<d
 // Important the order
 this->NumClocksHalfPeriodPRUclockOld=this->NumClocksHalfPeriodPRUclock;// Update value
 
+if (this->NumClocksHalfPeriodPRUclockUpdated>this->MaxNumClocksHalfPeriodPRUclockUpdated){this->NumClocksHalfPeriodPRUclockUpdated=this->MaxNumClocksHalfPeriodPRUclockUpdated;}
+else if (this->NumClocksHalfPeriodPRUclockUpdated<this->MinNumClocksHalfPeriodPRUclockUpdated){this->NumClocksHalfPeriodPRUclockUpdated=this->MinNumClocksHalfPeriodPRUclockUpdated;}
 switch(FilterMode) {
 case 2:{// Mean implementation
 this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;

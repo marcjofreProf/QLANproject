@@ -56,7 +56,7 @@ private:// Variables
 	using ClockWatch = std::chrono::steady_clock;//system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
 	using TimePointChrono = std::chrono::time_point<ClockChrono>;
 	using TimePointWatch = std::chrono::time_point<ClockWatch>;
-	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_count=1000000000; // Initial value to 1 s
+	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds; // Initial value to 1 s
 	struct timespec requestWhileWait;
 	// PRU
 	static int mem_fd;
@@ -85,6 +85,13 @@ private:// Variables
 	int TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0};
 	// PID error correction
 	double PIDconstant=1.0; // The more larger than 1 the more aggressive to correct (although it can become unstable). Below 1.0 is not aggressively enough to correct fully, eventhought it will try
+	// Maximum values
+	double MaxNumClocksHalfPeriodPRUclockUpdated=100.0*NumClocksHalfPeriodPRUclock;
+	double MinNumClocksHalfPeriodPRUclockUpdated=0.01*NumClocksHalfPeriodPRUclock;
+	unsigned long long int MaxTimePointClockCurrentFinalInitialAdj_time_as_count=2*ClockPeriodNanoseconds;
+	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/10;
+	int MaxTimePointClockCurrentAdjError=NumClocksHalfPeriodPRUclock/100;
+	int MinTimePointClockCurrentAdjError=0;
 
 public:	// Functions/Methods
 	CKPD(); //constructor	
