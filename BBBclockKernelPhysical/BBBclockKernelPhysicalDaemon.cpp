@@ -611,6 +611,7 @@ int main(int argc, char const * argv[]){
 	}
 	case 1:{// Median implementation
 		cout << "Using median filtering." << endl;
+		cout << "Median filtering not working." << endl;
 		CKPDagent.MedianFilterFactor=stoull(argv[2]);
 		 if (CKPDagent.MedianFilterFactor>MaxMedianFilterArraySize){
 		 	CKPDagent.MedianFilterFactor=MaxMedianFilterArraySize;
