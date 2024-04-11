@@ -79,7 +79,7 @@ private:// Variables
 	// PRU clock generation	
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=2000000; // In microseconds
-	unsigned int MinNumPeriodColcksPRUnoHalt=100;// Protecion agains very low numbers
+	unsigned int MinNumPeriodColcksPRUnoHalt=1000;// Protecion agains very low numbers
 	unsigned int MaxNumPeriodColcksPRUnoHalt=1000000000;// Protecion agains very large numbers
 	// Median filter implementation
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={1000000000};
