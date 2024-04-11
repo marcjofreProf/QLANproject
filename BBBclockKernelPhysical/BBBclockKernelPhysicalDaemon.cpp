@@ -208,7 +208,7 @@ unsigned long long int duration_FinalInitialAdjCountAux=std::chrono::duration_ca
 this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;//;-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));// Update value
 
 if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
-this->TimePointClockCurrentAdjError=this->TimePointClockCurrentAdjError+(int)(this->TimeAdjPeriod-duration_FinalInitialAdjCountAux);// Error to be compensated for
+this->TimePointClockCurrentAdjError=0*this->TimePointClockCurrentAdjError+(int)(this->TimeAdjPeriod-duration_FinalInitialAdjCountAux);// Error to be compensated for
 }
 else{
 	this->TimePointClockCurrentAdjError=0;
