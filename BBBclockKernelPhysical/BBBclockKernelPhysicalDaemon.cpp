@@ -226,7 +226,7 @@ break;
 }
 case 1:{// Median implementation
 this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
-this->TimePointClockCurrentAdjFilError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
+this->TimePointClockCurrentAdjFilError=this->IMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
 break;
 }
 default:{// Average implementation
@@ -245,7 +245,7 @@ break;
 }
 case 1:{// Median implementation
 this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=duration_FinalInitialAdjCountAux;
-this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMedianFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);// Not working
+this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMeanFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);// Not working
 break;
 }
 default:{// Average implementation
@@ -271,7 +271,7 @@ break;
 }
 case 1:{// Median implementation
 this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;
-this->NumClocksHalfPeriodPRUclock=this->DoubleMedianFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);// Not working
+this->NumClocksHalfPeriodPRUclock=this->DoubleMeanFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);// Not working
 break;
 }
 default:{
@@ -419,7 +419,7 @@ else{
     // Step 2: Sort the temporary array
     this->DoubleBubbleSort(temp);
     // If odd, middle number
-      return temp[0];//this->MedianFilterFactor/2];
+      return temp[this->MedianFilterFactor/2];
 }
 }
 
@@ -468,7 +468,7 @@ else{
     // Step 2: Sort the temporary array
     this->ULLIBubbleSort(temp);
     // If odd, middle number
-    return ArrayHolderAux[0];//return temp[this->MedianFilterFactor/2];
+    return temp[this->MedianFilterFactor/2];
 }
 }
 
@@ -517,7 +517,7 @@ else{
     // Step 2: Sort the temporary array
     this->IBubbleSort(temp);
     // If odd, middle number
-      return ArrayHolderAux[0];//return temp[this->MedianFilterFactor/2];
+      return temp[this->MedianFilterFactor/2];
 }
 }
 
