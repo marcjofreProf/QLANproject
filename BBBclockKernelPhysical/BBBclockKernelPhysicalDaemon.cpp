@@ -165,7 +165,7 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 //pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
-unsigned int PRU1HalfClocksAux=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock+this->AdjCountsFreq)
+unsigned int PRU1HalfClocksAux=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock+this->AdjCountsFreq);
 if (PRU1HalfClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1HalfClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU1HalfClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1HalfClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
