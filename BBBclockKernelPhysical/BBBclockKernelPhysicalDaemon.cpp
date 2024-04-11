@@ -205,7 +205,7 @@ else{
 // Compute clocks adjustment
 auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epoch()-this->TimePointClockCurrentInitialAdj.time_since_epoch();
 unsigned long long int duration_FinalInitialAdjCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
-this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));// Update value
+this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));// Update value
 
 if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
 this->TimePointClockCurrentAdjError=this->TimePointClockCurrentAdjError+(int)(this->TimeAdjPeriod-duration_FinalInitialAdjCountAux);// Error to be compensated for
