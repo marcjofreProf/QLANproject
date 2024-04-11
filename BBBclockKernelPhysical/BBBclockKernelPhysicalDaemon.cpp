@@ -253,7 +253,7 @@ this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned 
 
 // Update sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
 // Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
-this->NumClocksHalfPeriodPRUclockUpdated=(this->FactorTimerAdj*0.5*static_cast<double>(ClockCyclePeriodAdjustment)/static_cast<double>(pru0dataMem_int[1]));//*(static_cast<double>(this->TimeAdjPeriod)/static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)));
+this->NumClocksHalfPeriodPRUclockUpdated=static_cast<double>(ClockCyclePeriodAdjustment)/(this->FactorTimerAdj*0.5*static_cast<double>(pru0dataMem_int[1]));//*(static_cast<double>(this->TimeAdjPeriod)/static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)));
 
 
 // Important the order
@@ -284,7 +284,7 @@ if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not ap
 	this->AdjCountsFreq=0.0;
 }
 else{
-	this->AdjCountsFreq=this->AdjCountsFreqHolder+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/2.0;
+	this->AdjCountsFreq=this->AdjCountsFreqHolder-this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/2.0;
 }
 this->MinAdjCountsFreq=-this->NumClocksHalfPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
 if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}
