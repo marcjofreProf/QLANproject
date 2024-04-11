@@ -22,7 +22,7 @@
 #define ClockCyclePeriodAdjustment		1// pps// 65536 32 KHz // Very important parameter. The larger the better, since the interrupts time jitter do not paly a role, as long as the PRU counter does not overexceed (the turn down is that ht eupdate time is larger)
 #define WaitCyclesBeforeAveraging	20 // To go into steady state in the initialization
 #define MaxMedianFilterArraySize	10000
-#define FilterMode 2 // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mea window
+#define FilterMode 1 // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mea window
 
 namespace exploringBBBCKPD {
 
@@ -84,12 +84,12 @@ private:// Variables
 	double NumClocksHalfPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksHalfPeriodPRUclock};
 	int TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0};
 	// PID error correction
-	double PIDconstant=1.0; // The more larger than 1 the more aggressive to correct (although it can become unstable). Below 1.0 is not aggressively enough to correct fully, eventhought it will try
+	double PIDconstant=1.5; // The more larger than 1 the more aggressive to correct (although it can become unstable). Below 1.0 is not aggressively enough to correct fully, eventhought it will try
 	// Maximum values
 	double MaxNumClocksHalfPeriodPRUclockUpdated=100.0*NumClocksHalfPeriodPRUclock;
 	double MinNumClocksHalfPeriodPRUclockUpdated=0.01*NumClocksHalfPeriodPRUclock;
 	unsigned long long int MaxTimePointClockCurrentFinalInitialAdj_time_as_count=2*ClockPeriodNanoseconds;
-	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/10;
+	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/1000;
 	int MaxTimePointClockCurrentAdjError=NumClocksHalfPeriodPRUclock/100;
 	int MinTimePointClockCurrentAdjError=0;
 
