@@ -201,7 +201,9 @@ else{
 	this->RatioAverageFactorClockHalfPeriod=this->RatioAverageFactorClockHalfPeriodHolder;
 }
 
-
+// Seems that there are two errors to compensate for:
+// - Error on time between launching the updates to PRU
+// - Error of the estimation of thime of the PRU
 // Compute clocks adjustment
 auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epoch()-this->TimePointClockCurrentInitialAdj.time_since_epoch();
 unsigned long long int duration_FinalInitialAdjCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
@@ -284,7 +286,7 @@ if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not ap
 	this->AdjCountsFreq=0.0;
 }
 else{
-	this->AdjCountsFreq=this->AdjCountsFreqHolder-this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/2.0;
+	this->AdjCountsFreq=this->AdjCountsFreqHolder+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/2.0;
 }
 this->MinAdjCountsFreq=-this->NumClocksHalfPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
 if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}
