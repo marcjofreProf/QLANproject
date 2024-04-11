@@ -281,7 +281,7 @@ this->NumClocksHalfPeriodPRUclock=(this->RatioAverageFactorClockHalfPeriod*this-
 }
 
 // Important the order. The this->AdjCountsFreq is not an estimation but a parameter given by the user to adjust ot the desired low frequency, an hence in median/average implementation is has to be computed directly
-this->AdjCountsFreqHolder=this->AdjCountsFreqHolder*(this->NumClocksHalfPeriodPRUclock/this->NumClocksHalfPeriodPRUclockOld);
+//this->AdjCountsFreqHolder=this->AdjCountsFreqHolder*(this->NumClocksHalfPeriodPRUclock/this->NumClocksHalfPeriodPRUclockOld);
 if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
 	this->AdjCountsFreq=0.0;
 }
