@@ -171,7 +171,7 @@ while (ClockWatch::now() < this->TimePointClockCurrentFinal);// Busy wait
 //clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 pru0dataMem_int[2]=static_cast<unsigned int>(1);
 prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment
-this->TimePointClockCurrentFinalAdj=ClockChrono::now()+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
+this->TimePointClockCurrentFinalAdj=ClockChrono::now();//+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
 this->SetFutureTimePoint();// Used with busy-wait
 //this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 
@@ -205,7 +205,7 @@ auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epo
 unsigned long long int duration_FinalInitialAdjCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
 
 if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
-this->TimePointClockCurrentAdjError=(int)(this->TimeAdjPeriod-duration_FinalInitialAdjCountAux)+this->TimePointClockCurrentAdjError;// Error to be compensated for
+this->TimePointClockCurrentAdjError=this->TimePointClockCurrentAdjError+(int)(this->TimeAdjPeriod-duration_FinalInitialAdjCountAux);// Error to be compensated for
 }
 else{
 	this->TimePointClockCurrentAdjError=0;
