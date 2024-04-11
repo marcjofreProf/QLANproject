@@ -84,14 +84,14 @@ private:// Variables
 	double NumClocksHalfPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksHalfPeriodPRUclock};
 	int TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0};
 	// PID error correction
-	double PIDconstant=100.0; // The more larger than 1 the more aggressive to correct (although it can become unstable). Below 1.0 is not aggressively enough to correct fully, eventhought it will try. This value times the maxium value set in MaxTimePointClockCurrentAdjError, has not ot exceed the period wanted
+	double PIDconstant=100.0; // The more larger than 1 the more aggressive to correct (although it can become unstable). Below 1.0 is not aggressively enough to correct fully, eventhought it will try. This value times the maxium value set in MaxTimePointClockCurrentAdjError, has not ot exceed the period wanted. It has to be larger than the jitter of the hardware clocks
 	// Maximum values
 	double MaxNumClocksHalfPeriodPRUclockUpdated=100.0*NumClocksHalfPeriodPRUclock;
 	double MinNumClocksHalfPeriodPRUclockUpdated=0.01*NumClocksHalfPeriodPRUclock;
 	unsigned long long int MaxTimePointClockCurrentFinalInitialAdj_time_as_count=2*ClockPeriodNanoseconds;
 	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/1000;
 	int MaxTimePointClockCurrentAdjError=NumClocksHalfPeriodPRUclock/1000;
-	int MinTimePointClockCurrentAdjError=0;
+	int MinTimePointClockCurrentAdjError=-NumClocksHalfPeriodPRUclock/1000;
 
 public:	// Functions/Methods
 	CKPD(); //constructor	
