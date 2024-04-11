@@ -419,7 +419,7 @@ else{
     // Step 2: Sort the temporary array
     this->DoubleBubbleSort(temp);
     // If odd, middle number
-      return ArrayHolderAux[0];//return temp[this->MedianFilterFactor/2];
+      return temp[0];//this->MedianFilterFactor/2];
 }
 }
 
