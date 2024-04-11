@@ -84,7 +84,7 @@ private:// Variables
 	double NumClocksHalfPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksHalfPeriodPRUclock};
 	int TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0};
 	// PID error correction
-	double PIDconstant=0.9; // The more larger than 1 the more aggressive to correct (although it can become unstable). Below 1.0 is not aggressively enough to correct fully, eventhought it will try
+	double PIDconstant=1.5; // The more larger than 1 the more aggressive to correct (although it can become unstable). Below 1.0 is not aggressively enough to correct fully, eventhought it will try
 	// Maximum values
 	double MaxNumClocksHalfPeriodPRUclockUpdated=100.0*NumClocksHalfPeriodPRUclock;
 	double MinNumClocksHalfPeriodPRUclockUpdated=0.01*NumClocksHalfPeriodPRUclock;
