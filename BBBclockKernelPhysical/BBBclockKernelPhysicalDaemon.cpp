@@ -460,7 +460,7 @@ else{
     // Step 2: Sort the temporary array
     this->ULLIBubbleSort(temp);
     // If odd, middle number
-      return temp[this->MedianFilterFactor/2];
+    return temp[this->MedianFilterFactor/2];
 }
 }
 
