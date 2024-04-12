@@ -52,8 +52,8 @@ private:// Variables
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	// Time/synchronization management
 	unsigned long long int CounterHandleInterruptSynchPRU=0;
-	using ClockChrono = std::chrono::system_clock;// system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than seady_clock aimed at measuring absolute time (like a watch)
-	using ClockWatch = std::chrono::steady_clock; //Maybe we also need a stop watch.//system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
+	using ClockWatch = std::chrono::system_clock; //system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
+	using ClockChrono = std::chrono::system_clock;//Probably is also better to also measure with system_clock. system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than seady_clock aimed at measuring absolute time (like a watch)	
 	using TimePointChrono = std::chrono::time_point<ClockChrono>;
 	using TimePointWatch = std::chrono::time_point<ClockWatch>;
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds; // Initial value to 1 s
