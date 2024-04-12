@@ -93,8 +93,8 @@ private:// Variables
 	double MinNumClocksHalfPeriodPRUclockUpdated=0.01*NumClocksHalfPeriodPRUclock;
 	unsigned long long int MaxTimePointClockCurrentFinalInitialAdj_time_as_count=2*ClockPeriodNanoseconds;
 	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/100;
-	int MaxTimePointClockCurrentAdjError=NumClocksHalfPeriodPRUclock/1000;
-	int MinTimePointClockCurrentAdjError=-NumClocksHalfPeriodPRUclock/1000;
+	int MaxTimePointClockCurrentAdjError=NumClocksHalfPeriodPRUclock/100;
+	int MinTimePointClockCurrentAdjError=-NumClocksHalfPeriodPRUclock/100;
 
 public:	// Functions/Methods
 	CKPD(); //constructor	
