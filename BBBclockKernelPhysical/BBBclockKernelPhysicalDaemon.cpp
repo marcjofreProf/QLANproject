@@ -171,10 +171,10 @@ else if (PRU1HalfClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1HalfClocksAux=
 
 sharedMem_int[0]=PRU1HalfClocksAux;//Information grabbed by PRU1
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
-while (ClockWatch::now() <= this->TimePointClockCurrentFinal);// Busy wait
+while (ClockWatch::now() < this->TimePointClockCurrentFinal);// Busy wait
 //clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 pru0dataMem_int[2]=static_cast<unsigned int>(1);
-prussdrv_pru_send_event(21); // Send interrupt to tell PR0 to handle the clock adjustment
+prussdrv_pru_send_event(21); // Send interrupt to tell PRU0 to handle the clock adjustment
 this->TimePointClockCurrentFinalAdj=ClockChrono::now();//+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
@@ -286,7 +286,7 @@ if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not ap
 	this->AdjCountsFreq=0.0;
 }
 else{
-	this->AdjCountsFreq=this->AdjCountsFreqHolder-this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/2.0;
+	this->AdjCountsFreq=this->AdjCountsFreqHolder-static_cast<double>(static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))/2.0;// Exactly put the error correction injection, divided by 2 because it is for half period for the PRU1.
 }
 this->MinAdjCountsFreq=-this->NumClocksHalfPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
 if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}

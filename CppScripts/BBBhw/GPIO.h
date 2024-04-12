@@ -198,6 +198,7 @@ private: // Functions/Methods
 	friend void* threadedToggle(void *value);
 	// Median filter
 	double DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor);
+	double DoubleMeanFilterSubArray(double* ArrayHolderAux,int MeanFilterFactor);
 	int DoubleBubbleSort(double* arr,int MedianFilterFactor);
 };
 

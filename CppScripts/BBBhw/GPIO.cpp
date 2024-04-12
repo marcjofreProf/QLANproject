@@ -584,7 +584,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 			cout << "Last CoeffSynchAdjAux2: " << CoeffSynchAdjAux2 << endl;
 			cout << "Last CoeffSynchAdjAux3: " << CoeffSynchAdjAux3 << endl;
 			cout << "Last CoeffSynchAdjAux4: " << CoeffSynchAdjAux4 << endl;
-			if (NumAvgAux>0){AdjPulseSynchCoeff=this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumAvgAux);}//Median AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
+			if (NumAvgAux>0){AdjPulseSynchCoeff=this->DoubleMeanFilterSubArray(AdjPulseSynchCoeffArray,NumAvgAux);}// Mean average//this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumAvgAux);//Median AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
 			else{AdjPulseSynchCoeff=1.0;}// Reset
 			cout << "GPIO: AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
 		}
@@ -674,6 +674,22 @@ int GPIO::DoubleBubbleSort(double* arr,int MedianFilterFactor) {
         }
     }
     return 0; // All ok
+}
+
+double GPIO::DoubleMeanFilterSubArray(double* ArrayHolderAux,int MeanFilterFactor){
+if (MeanFilterFactor<=1){
+	return ArrayHolderAux[0];
+}
+else{
+	// Step 1: Copy the array to a temporary array
+    double temp=0.0;
+    for(int i = 0; i < MeanFilterFactor; i++) {
+        temp = temp + ArrayHolderAux[i];
+    }
+    
+    temp=temp/((double)(MeanFilterFactor));
+    return temp;
+}
 }
 
 int GPIO::SendTriggerSignalsSelfTest(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
