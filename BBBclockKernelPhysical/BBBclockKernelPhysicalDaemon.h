@@ -22,7 +22,7 @@
 #define ClockCyclePeriodAdjustment		1// pps// 65536 32 KHz // Very important parameter. The larger the better, since the interrupts time jitter do not paly a role, as long as the PRU counter does not overexceed (the turn down is that ht eupdate time is larger)
 #define WaitCyclesBeforeAveraging	10 // To go into steady state in the initialization
 #define MaxMedianFilterArraySize	10000
-#define FilterMode 1 // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mea window
+#define FilterMode 2 // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mean window
 
 namespace exploringBBBCKPD {
 
