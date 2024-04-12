@@ -193,11 +193,14 @@ else{
 
 if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
 	if (this->CounterHandleInterruptSynchPRU==0){//First
+		this->FilterModeHolder=this->FilterMode;
+		this->FilterMode=1;
 		this->RatioAverageFactorClockHalfPeriodHolder=this->RatioAverageFactorClockHalfPeriod;
 		this->RatioAverageFactorClockHalfPeriod=0.0;
 	}
 }
 else{
+	this->FilterMode=this->FilterModeHolder;
 	this->RatioAverageFactorClockHalfPeriod=this->RatioAverageFactorClockHalfPeriodHolder;
 }
 
@@ -226,7 +229,7 @@ break;
 }
 case 1:{// Median implementation
 this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
-this->TimePointClockCurrentAdjFilError=this->IMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
+this->TimePointClockCurrentAdjFilError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
 break;
 }
 default:{// Average implementation
@@ -245,7 +248,7 @@ break;
 }
 case 1:{// Median implementation
 this->TimePointClockCurrentFinalInitialAdj_time_as_countArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=duration_FinalInitialAdjCountAux;
-this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMeanFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);// Not working
+this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMedianFilterSubArray(this->TimePointClockCurrentFinalInitialAdj_time_as_countArray);// Not working
 break;
 }
 default:{// Average implementation
@@ -271,7 +274,7 @@ break;
 }
 case 1:{// Median implementation
 this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;
-this->NumClocksHalfPeriodPRUclock=this->DoubleMeanFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);// Not working
+this->NumClocksHalfPeriodPRUclock=this->DoubleMedianFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);// Not working
 break;
 }
 default:{
@@ -596,7 +599,7 @@ int main(int argc, char const * argv[]){
  	 CKPDagent.AdjCountsFreq=stod(argv[1]);
  	 CKPDagent.AdjCountsFreqHolder=CKPDagent.AdjCountsFreq;// Update of the value for ever	 
 	 
-	 switch(FilterMode) {
+	 switch(CKPDagent.FilterMode) {
 	 case 2:{// Mean implementation
 		cout << "Using mean filtering." << endl;
 		CKPDagent.MeanFilterFactor=stoull(argv[2]);
