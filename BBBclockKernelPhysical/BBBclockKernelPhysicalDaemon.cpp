@@ -286,7 +286,7 @@ if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not ap
 	this->AdjCountsFreq=0.0;
 }
 else{
-	this->AdjCountsFreq=this->AdjCountsFreqHolder-static_cast<double>(static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))/2.0;// Exactly put the error correction injection, divided by 2 because it is for half period for the PRU1.
+	this->AdjCountsFreq=this->AdjCountsFreqHolder+static_cast<double>(static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))/2.0;// Exactly put the error correction injection, divided by 2 because it is for half period for the PRU1.
 }
 this->MinAdjCountsFreq=-this->NumClocksHalfPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
 if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}
