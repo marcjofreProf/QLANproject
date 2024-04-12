@@ -255,7 +255,7 @@ SIGNALON8:
 SIGNALON8DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON8DEL, r5, 0
-	LDI	r4, 0 // Controlled intentional delay to adjust
+//	LDI	r4, 0 // Controlled intentional delay to adjust
 FINISH:
 	SUB	r1, r1, 1 // Decrement counter
 	QBNE	SIGNALON1, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
