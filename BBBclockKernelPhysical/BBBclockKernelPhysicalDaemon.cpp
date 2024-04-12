@@ -149,6 +149,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=ClockWatch::now();
 	this->TimePointClockCurrentInitialAdj=ClockChrono::now();
+	this->TimePointClockCurrentFinalAux=ClockWatch::now();
 	this->SetFutureTimePoint();// Used with busy-wait
 	//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 }
@@ -171,7 +172,7 @@ else if (PRU1HalfClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1HalfClocksAux=
 
 sharedMem_int[0]=PRU1HalfClocksAux;//Information grabbed by PRU1
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
-while (this->TimePointClockCurrentFinalAux < this->TimePointClockCurrentFinal){
+while (this->TimePointClockCurrentFinal < this->TimePointClockCurrentFinal){
 this->TimePointClockCurrentFinalAux=ClockWatch::now();// Busy wait
 }
 //clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
