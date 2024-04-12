@@ -22,6 +22,7 @@
 #define ClockCyclePeriodAdjustment		1// pps// 65536 32 KHz // Very important parameter. The larger the better, since the interrupts time jitter do not paly a role, as long as the PRU counter does not overexceed (the turn down is that ht eupdate time is larger)
 #define WaitCyclesBeforeAveraging	10 // To go into steady state in the initialization
 #define MaxMedianFilterArraySize	10000
+#define FilterMode 1 // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mea window
 
 namespace exploringBBBCKPD {
 
@@ -44,7 +45,6 @@ public: //Variables
 	double NumClocksHalfPeriodPRUclock=0.5*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the half period of the clock.
 	double NumClocksHalfPeriodPRUclockOld=0.0;
 	double NumClocksHalfPeriodPRUclockUpdated=0.0;
-	int FilterMode=1; // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mea window
 
 private:// Variables
 	ApplicationState m_state;
@@ -96,7 +96,6 @@ private:// Variables
 	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/100;
 	int MaxTimePointClockCurrentAdjError=NumClocksHalfPeriodPRUclock/10;
 	int MinTimePointClockCurrentAdjError=-NumClocksHalfPeriodPRUclock/10;
-	int FilterModeHolder=2;
 
 public:	// Functions/Methods
 	CKPD(); //constructor	
