@@ -78,7 +78,7 @@ private:// Variables
 	unsigned int PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock);
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=1500000; // In microseconds
-	unsigned int MinNumPeriodColcksPRUnoHalt=1000;// Protection agains very low numbers
+	unsigned int MinNumPeriodColcksPRUnoHalt=1000;// Protection againts very low numbers
 	unsigned int MaxNumPeriodColcksPRUnoHalt=1000000000;// Protecion agains very large numbers
 	// Median filter implementation
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={1000000000};
