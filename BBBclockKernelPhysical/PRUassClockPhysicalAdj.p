@@ -16,7 +16,7 @@
 
 #define GPIO_CLEARDATAOUToffset 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
 // GPIO goes low. If a bit is 0 it is ignored.
-#define CYCLESRESYNCH		1
+#define CYCLESRESYNCH		120
 // adjust to longest path so that the period of the signal is exact. The longest path is when in the OFF state the system has to check for an interrupt
 #define LOSTCLOCKCOUNTS1	8 // give room for the interrupt which accounts for 10 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be substracted. Equating to 10
 #define LOSTCLOCKCOUNTS2	4 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(9-1"One instructions")/2"Subs + QB"=4
@@ -159,8 +159,8 @@ CMDLOOP2:// Double verification of host sending start command
 PSEUDOSYNCH:// Only needed at the beggining to remove the slow drift	
 	LBBO	r0, r7, 0, 4// read the DWT_CYCCNT
 	MOV	r8, CYCLESRESYNCH
-//	LSL	r10, r9, 2 // Multiply by 4 to have the total period
-//	SUB	r0, r10, r0 // Substract to find how long to wait	
+	LSL	r10, r9, 2 // Multiply by 4 to have the total period
+	SUB	r0, r10, r0 // Substract to find how long to wait	
 	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCH consumes double
 	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
 PSEUDOSYNCHLOOP:
