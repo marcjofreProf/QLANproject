@@ -183,6 +183,7 @@ else{
 }
 
 // Compute error
+int TimePointClockCurrentAdjErrorOld=this->TimePointClockCurrentAdjError;
 if (retInterruptsPRU1>0){
 	// Compute clocks adjustment
 	auto duration_FinalInitial=this->TimePointClockCurrentFinal-this->TimePointClockCurrentInitial;
@@ -250,6 +251,7 @@ if (PlotPIDHAndlerInfo){
 	cout << "this->TimePointClockCurrentAdjFilError: " << this->TimePointClockCurrentAdjFilError << endl;
 	cout << "Applied: this->PIDconstant*this->TimePointClockCurrentAdjFilError: " << this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError) << endl;
 	cout << "this->ParityAdjFilError: " << this->ParityAdjFilError << endl;
+	cout << "abs(this->TimePointClockCurrentAdjError-TimePointClockCurrentAdjErrorOld): " << abs(this->TimePointClockCurrentAdjError-TimePointClockCurrentAdjErrorOld) << endl;
 	}
 }
 
