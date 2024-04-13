@@ -18,9 +18,9 @@
 // GPIO goes low. If a bit is 0 it is ignored.
 #define CYCLESRESYNCH		120
 // adjust to longest path so that the period of the signal is exact. The longest path is when in the OFF state the system has to check for an interrupt
-#define LOSTCLOCKCOUNTS1	8 // give room for the interrupt which accounts for 10 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be substracted. Equating to 10
+#define LOSTCLOCKCOUNTS1	6//8 // give room for the interrupt which accounts for 10 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be substracted. Equating to 10
 #define LOSTCLOCKCOUNTS2	4 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(9-1"One instructions")/2"Subs + QB"=4
-#define LOSTCLOCKCOUNTS3	10 // give room for the interrupt which accounts for 12 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be substracted. Equating to 10
+#define LOSTCLOCKCOUNTS3	6//10 // give room for the interrupt which accounts for 8-12 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be substracted. Equating to 10
 #define LOSTCLOCKCOUNTS4	4 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(9-1"One instructions")/2"Subs + QB"=4
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
@@ -156,16 +156,16 @@ CMDLOOP2:// Double verification of host sending start command
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
 
-PSEUDOSYNCH:// Only needed at the beggining to remove the slow drift	
-	LBBO	r0, r7, 0, 4// read the DWT_CYCCNT
-	MOV	r8, CYCLESRESYNCH
-	LSL	r10, r9, 2 // Multiply by 4 to have the total period
-	SUB	r0, r10, r0 // Substract to find how long to wait	
-	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCH consumes double
-	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
-PSEUDOSYNCHLOOP:
-	SUB	r0, r0, 1
-	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
+//PSEUDOSYNCH:// Only needed at the beggining to remove the slow drift	
+//	LBBO	r0, r7, 0, 4// read the DWT_CYCCNT
+//	MOV	r8, CYCLESRESYNCH
+//	LSL	r10, r9, 2 // Multiply by 4 to have the total period
+//	SUB	r0, r10, r0 // Substract to find how long to wait	
+//	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCH consumes double
+//	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+//PSEUDOSYNCHLOOP:
+//	SUB	r0, r0, 1
+//	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
 
 SIGNALON:
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
@@ -195,22 +195,22 @@ DELAYOFF:
 	SUB 	r0, r0, 1
 	QBNE 	DELAYOFF, r0, LOSTCLOCKCOUNTS3
 
-FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly, after QBBC to common part of no interrupt, 9 clock counts difference
+FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly, after QBBC to common part of no interrupt, 8 clock counts difference
 	QBBC	FINISHDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
 	// Handle interruption
 	LBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Read contents from the address offset 0 SHARED RAM //
 	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt
-	MOV	r9, r1// Store new value of quarter period
-	SUB	r8, r8, 1
-	QBEQ	PSEUDOSYNCH, r8, 0 // Re-synch again
+//	MOV	r9, r1// Store new value of quarter period
+//	SUB	r8, r8, 1
+//	QBEQ	PSEUDOSYNCH, r8, 0 // Re-synch again
 	JMP	SIGNALON // Might consume one clock
 FINISHDELAYNOINT: // Some delay because it does not have to handle interruption
 	MOV	r0, LOSTCLOCKCOUNTS4 // extra step in no interrupt
 FINISHDELAYNOINTEXTRA:
 	SUB	r0, r0, 1
 	QBNE 	FINISHDELAYNOINTEXTRA, r0, 0
-	SUB	r8, r8, 1
-	QBEQ	PSEUDOSYNCH, r8, 0 // Re-synch again
+//	SUB	r8, r8, 1
+//	QBEQ	PSEUDOSYNCH, r8, 0 // Re-synch again
 	JMP	SIGNALON // Might consume one clock
 EXIT:
 	// Send notification (interrupt) to Host for program completion
