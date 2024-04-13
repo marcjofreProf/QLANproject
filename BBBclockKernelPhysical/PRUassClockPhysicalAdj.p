@@ -156,9 +156,9 @@ CMDLOOP2:// Double verification of host sending start command
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
 
-PSEUDOSYNCH:// Only needed at the beggining to remove the slow drift
-	MOV	r8, CYCLESRESYNCH
+PSEUDOSYNCH:// Only needed at the beggining to remove the slow drift	
 	LBBO	r0, r7, 0, 4// read the DWT_CYCCNT
+	MOV	r8, CYCLESRESYNCH
 	LSL	r10, r9, 2 // Multiply by 4 to have the total period
 	SUB	r0, r10, r0 // Substract to find how long to wait	
 	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCH consumes double
