@@ -220,8 +220,6 @@ else{
 	this->TimePointClockCurrentAdjError=0;
 }
 
-if (this->TimePointClockCurrentAdjError>this->MaxTimePointClockCurrentAdjError){this->TimePointClockCurrentAdjError=this->MaxTimePointClockCurrentAdjError;}
-else if (this->TimePointClockCurrentAdjError<this->MinTimePointClockCurrentAdjError){this->TimePointClockCurrentAdjError=this->MinTimePointClockCurrentAdjError;}
 switch(FilterMode) {
 case 2:{// Mean implementation
 this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
@@ -237,6 +235,8 @@ default:{// Average implementation
 this->TimePointClockCurrentAdjFilError = static_cast<int>(this->RatioAverageFactorClockQuarterPeriod*static_cast<double>(this->TimePointClockCurrentAdjFilError)+(1.0-this->RatioAverageFactorClockQuarterPeriod)*static_cast<double>((int)(this->TimeAdjPeriod-duration_FinalInitialAdjCountAux)+this->TimePointClockCurrentAdjError));
 }
 }
+if (this->TimePointClockCurrentAdjFilError>this->MaxTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MaxTimePointClockCurrentAdjFilError;}
+else if (this->TimePointClockCurrentAdjFilError<this->MinTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MinTimePointClockCurrentAdjFilError;}
 
 if (this->TimePointClockCurrentAdjFilError>0){// If there is a continuous slow drift, this could help. Has to be activated down here.
 this->ParityAdjFilError++;
