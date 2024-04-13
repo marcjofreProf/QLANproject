@@ -235,7 +235,7 @@ if (retInterruptsPRU1>0){
 }
 // Update values
 
-PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/4.0);
+PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq-this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/4.0);
 if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
