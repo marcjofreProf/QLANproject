@@ -175,8 +175,7 @@ if (retInterruptsPRU1>0){
 }
 else if (retInterruptsPRU1==0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-	cout << "CKPD::HandleInterruptSynchPRU took to much time for the ClockHandler. Reset PRU1 if necessary." << endl;
-	
+	cout << "CKPD::HandleInterruptSynchPRU took to much time for the ClockHandler. Reset PRU1 if necessary." << endl;	
 }
 else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -184,54 +183,55 @@ else{
 }
 
 // Compute error
-// Compute clocks adjustment
-auto duration_FinalInitial=this->TimePointClockCurrentFinal.time_since_epoch()-this->TimePointClockCurrentInitial.time_since_epoch();
-unsigned long long int duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
+if (retInterruptsPRU1>0){
+	// Compute clocks adjustment
+	auto duration_FinalInitial=this->TimePointClockCurrentFinal.time_since_epoch()-this->TimePointClockCurrentInitial.time_since_epoch();
+	unsigned long long int duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
 
-// Compute absolute error
-if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
-this->TimePointClockCurrentAdjError=(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
-}
-else{
-	this->TimePointClockCurrentAdjError=0;
-}
+	// Compute absolute error
+	if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
+	this->TimePointClockCurrentAdjError=(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
+	}
+	else{
+		this->TimePointClockCurrentAdjError=0;
+	}
 
-// Error filtering
-switch(FilterMode) {
-case 2:{// Mean implementation
-this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
-this->TimePointClockCurrentAdjFilError=this->IMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
-break;
-}
-case 1:{// Median implementation
-this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
-this->TimePointClockCurrentAdjFilError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
-break;
-}
-default:{// Average implementation
-this->TimePointClockCurrentAdjFilError = static_cast<int>(this->RatioAverageFactorClockQuarterPeriod*static_cast<double>(this->TimePointClockCurrentAdjFilError)+(1.0-this->RatioAverageFactorClockQuarterPeriod)*static_cast<double>(this->TimePointClockCurrentAdjError));
-}
-}
-if (this->TimePointClockCurrentAdjFilError>this->MaxTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MaxTimePointClockCurrentAdjFilError;}
-else if (this->TimePointClockCurrentAdjFilError<this->MinTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MinTimePointClockCurrentAdjFilError;}
+	// Error filtering
+	switch(FilterMode) {
+	case 2:{// Mean implementation
+	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
+	this->TimePointClockCurrentAdjFilError=this->IMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
+	break;
+	}
+	case 1:{// Median implementation
+	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
+	this->TimePointClockCurrentAdjFilError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
+	break;
+	}
+	default:{// Average implementation
+	this->TimePointClockCurrentAdjFilError = static_cast<int>(this->RatioAverageFactorClockQuarterPeriod*static_cast<double>(this->TimePointClockCurrentAdjFilError)+(1.0-this->RatioAverageFactorClockQuarterPeriod)*static_cast<double>(this->TimePointClockCurrentAdjError));
+	}
+	}
+	if (this->TimePointClockCurrentAdjFilError>this->MaxTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MaxTimePointClockCurrentAdjFilError;}
+	else if (this->TimePointClockCurrentAdjFilError<this->MinTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MinTimePointClockCurrentAdjFilError;}
 
-if (this->TimePointClockCurrentAdjFilError>0){// I believe it indicates the tendency of the clock to advance or delay from the protocol clock.
-this->ParityAdjFilError++;
-}
-else if(this->TimePointClockCurrentAdjFilError<0){
-this->ParityAdjFilError--;
-}
+	if (this->TimePointClockCurrentAdjFilError>0){// I believe it indicates the tendency of the clock to advance or delay from the protocol clock.
+	this->ParityAdjFilError++;
+	}
+	else if(this->TimePointClockCurrentAdjFilError<0){
+	this->ParityAdjFilError--;
+	}
 
-if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
-	this->AdjCountsFreq=0.0;
+	if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
+		this->AdjCountsFreq=0.0;
+	}
+	else{
+		this->AdjCountsFreq=this->AdjCountsFreqHolder/4.0;// divided by 4 because it is for Quarter period for the PRU1.
+	}
+	this->MinAdjCountsFreq=-this->NumClocksQuarterPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
+	if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}
+	else if(this->AdjCountsFreq<this->MinAdjCountsFreq){this->AdjCountsFreq=this->MinAdjCountsFreq;}
 }
-else{
-	this->AdjCountsFreq=this->AdjCountsFreqHolder/4.0;// divided by 4 because it is for Quarter period for the PRU1.
-}
-this->MinAdjCountsFreq=-this->NumClocksQuarterPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
-if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}
-else if(this->AdjCountsFreq<this->MinAdjCountsFreq){this->AdjCountsFreq=this->MinAdjCountsFreq;}
-
 // Update values
 
 PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/4.0);
