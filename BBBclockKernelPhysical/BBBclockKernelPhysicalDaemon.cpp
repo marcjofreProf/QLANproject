@@ -165,7 +165,7 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 //pru0dataMem_int[0]=this->NumClocksQuarterPeriodPRUclock; // set
-unsigned int PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/4.0);
+unsigned int PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq-this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/4.0);
 if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
@@ -211,7 +211,7 @@ else{
 auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epoch()-this->TimePointClockCurrentInitialAdj.time_since_epoch();
 unsigned long long int duration_FinalInitialAdjCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
 this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;//;-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));// Update value
-
+// Compute absolute error
 if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
 this->TimePointClockCurrentAdjError=this->TimePointClockCurrentAdjError+static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+static_cast<int>(this->TimeAdjPeriod-duration_FinalInitialAdjCountAux);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
 }
