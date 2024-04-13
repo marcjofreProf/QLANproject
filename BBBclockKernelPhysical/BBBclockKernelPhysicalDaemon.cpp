@@ -219,6 +219,7 @@ else{
 	this->TimePointClockCurrentAdjError=0;
 }
 
+// Error filtering
 switch(FilterMode) {
 case 2:{// Mean implementation
 this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
@@ -244,6 +245,7 @@ else if(this->TimePointClockCurrentAdjFilError<0){
 this->ParityAdjFilError--;
 }
 
+/* Not used
 // Convert duration to desired time
 if (duration_FinalInitialAdjCountAux>this->MaxTimePointClockCurrentFinalInitialAdj_time_as_count){duration_FinalInitialAdjCountAux=this->MaxTimePointClockCurrentFinalInitialAdj_time_as_count;}
 else if (duration_FinalInitialAdjCountAux<this->MinTimePointClockCurrentFinalInitialAdj_time_as_count){duration_FinalInitialAdjCountAux=this->MinTimePointClockCurrentFinalInitialAdj_time_as_count;}
@@ -262,6 +264,7 @@ default:{// Average implementation
 this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned long long int>(this->RatioAverageFactorClockQuarterPeriod*static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)+(1.0-this->RatioAverageFactorClockQuarterPeriod)*static_cast<double>(duration_FinalInitialAdjCountAux));
 }
 }
+*/
 
 // Update sharedMem_int[0]=this->NumClocksQuarterPeriodPRUclock;//Information grabbed by PRU1
 // Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
@@ -306,7 +309,7 @@ if (PlotPIDHAndlerInfo){
 	if (this->CounterHandleInterruptSynchPRU%1==0){
 	cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
 	cout << "this->NumClocksQuarterPeriodPRUclock: " << this->NumClocksQuarterPeriodPRUclock << endl;
-	cout << "this->TimePointClockCurrentFinalInitialAdj_time_as_count: " << this->TimePointClockCurrentFinalInitialAdj_time_as_count << endl;
+	// Not used cout << "this->TimePointClockCurrentFinalInitialAdj_time_as_count: " << this->TimePointClockCurrentFinalInitialAdj_time_as_count << endl;
 	cout << "this->TimePointClockCurrentAdjError: " << this->TimePointClockCurrentAdjError << endl;
 	cout << "this->TimePointClockCurrentAdjFilError: " << this->TimePointClockCurrentAdjFilError << endl;
 	cout << "this->ParityAdjFilError: " << this->ParityAdjFilError << endl;
