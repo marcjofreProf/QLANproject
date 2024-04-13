@@ -85,7 +85,7 @@ private:// Variables
 	double NumClocksQuarterPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksQuarterPeriodPRUclock};
 	int TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0};
 	// PID error correction
-	double PIDconstant=0.95; // The larger than 1 the more aggressive correction. Below 1.0 is not aggressively enough to correct fully, eventhought it will try. This value times the maxium value set in MaxTimePointClockCurrentAdjError, has not ot exceed the period wanted. It has to be larger than the jitter of the hardware clocks
+	double PIDconstant=0.9; // The larger than 1 the more aggressive correction. Below 1.0 is not aggressively enough to correct fully, eventhought it will try. This value times the maxium value set in MaxTimePointClockCurrentAdjError, has not ot exceed the period wanted. It has to be larger than the jitter of the hardware clocks
 	// Maximum values
 	double MaxAdjCountsFreq=1000000000;
 	double MinAdjCountsFreq=-1000000000+MinNumPeriodColcksPRUnoHalt;
@@ -93,8 +93,8 @@ private:// Variables
 	double MinNumClocksQuarterPeriodPRUclockUpdated=0.01*NumClocksQuarterPeriodPRUclock;
 	unsigned long long int MaxTimePointClockCurrentFinalInitialAdj_time_as_count=2*ClockPeriodNanoseconds;
 	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/100;
-	int MaxTimePointClockCurrentAdjFilError=4*5*NumClocksQuarterPeriodPRUclock/10;
-	int MinTimePointClockCurrentAdjFilError=-4*5*NumClocksQuarterPeriodPRUclock/10;
+	int MaxTimePointClockCurrentAdjFilError=4*5*NumClocksQuarterPeriodPRUclock/100;
+	int MinTimePointClockCurrentAdjFilError=-4*5*NumClocksQuarterPeriodPRUclock/100;
 	long long int ParityAdjFilError=0;
 
 public:	// Functions/Methods
