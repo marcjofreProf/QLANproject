@@ -121,6 +121,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
         // Initialize DDM
 	LOCAL_DDMinit(); // DDR (Double Data Rate): A class of memory technology used in DRAM where data is transferred on both the rising and falling edges of the clock signal, effectively doubling the data rate without increasing the clock frequency.
 	
+	/* PRU0 not used
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Handler
 	//pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU0 idle
@@ -135,7 +136,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 		}
 	}
 	//prussdrv_pru_enable(PRU_HandlerSynch_NUM);
-	
+	*/
 	    // Load and execute the PRU program on the PRU1
 	    pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq); // set the number of clocks that defines the Quarter period of the clock. 
 	    pru1dataMem_int[1]=static_cast<unsigned int>(0);
@@ -148,8 +149,8 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=ClockWatch::now();
-	this->TimePointClockCurrentInitialAdj=ClockChrono::now();
-	this->SetFutureTimePoint();// Used with busy-wait
+	//this->TimePointClockCurrentInitialAdj=ClockChrono::now();
+	//this->SetFutureTimePoint();// Used with busy-wait
 	//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait	
 }
 
@@ -163,6 +164,87 @@ cout << "Generating clock output..." << endl;
 return 0;// all ok
 }
 
+int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// After the interrupt update rapidly the new quarter value
+this->TimePointClockCurrentFinal=ClockWatch::now();
+
+sharedMem_int[0]=PRU1QuarterClocksAux;//Information grabbed by PRU1
+
+// Compute error
+// Compute clocks adjustment
+auto duration_FinalInitial=this->TimePointClockCurrentFinal.time_since_epoch()-this->TimePointClockCurrentInitial.time_since_epoch();
+unsigned long long int duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
+
+// Compute absolute error
+if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
+this->TimePointClockCurrentAdjError=(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
+}
+else{
+	this->TimePointClockCurrentAdjError=0;
+}
+
+// Error filtering
+switch(FilterMode) {
+case 2:{// Mean implementation
+this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
+this->TimePointClockCurrentAdjFilError=this->IMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
+break;
+}
+case 1:{// Median implementation
+this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
+this->TimePointClockCurrentAdjFilError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
+break;
+}
+default:{// Average implementation
+this->TimePointClockCurrentAdjFilError = static_cast<int>(this->RatioAverageFactorClockQuarterPeriod*static_cast<double>(this->TimePointClockCurrentAdjFilError)+(1.0-this->RatioAverageFactorClockQuarterPeriod)*static_cast<double>(this->TimePointClockCurrentAdjError));
+}
+}
+if (this->TimePointClockCurrentAdjFilError>this->MaxTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MaxTimePointClockCurrentAdjFilError;}
+else if (this->TimePointClockCurrentAdjFilError<this->MinTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MinTimePointClockCurrentAdjFilError;}
+
+if (this->TimePointClockCurrentAdjFilError>0){// I believe it indicates the tendency of the clock to advance or delay from the protocol clock.
+this->ParityAdjFilError++;
+}
+else if(this->TimePointClockCurrentAdjFilError<0){
+this->ParityAdjFilError--;
+}
+
+if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
+	this->AdjCountsFreq=0.0;
+}
+else{
+	this->AdjCountsFreq=this->AdjCountsFreqHolder/4.0;// divided by 4 because it is for Quarter period for the PRU1.
+}
+this->MinAdjCountsFreq=-this->NumClocksQuarterPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
+if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}
+else if(this->AdjCountsFreq<this->MinAdjCountsFreq){this->AdjCountsFreq=this->MinAdjCountsFreq;}
+
+if (PlotPIDHAndlerInfo){
+	if (this->CounterHandleInterruptSynchPRU%1==0){
+	cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
+	cout << "this->NumClocksQuarterPeriodPRUclock: " << this->NumClocksQuarterPeriodPRUclock << endl;
+	// Not used cout << "this->TimePointClockCurrentFinalInitialAdj_time_as_count: " << this->TimePointClockCurrentFinalInitialAdj_time_as_count << endl;
+	cout << "this->TimePointClockCurrentAdjError: " << this->TimePointClockCurrentAdjError << endl;
+	cout << "this->TimePointClockCurrentAdjFilError: " << this->TimePointClockCurrentAdjFilError << endl;
+	cout << "Applied: this->PIDconstant*this->TimePointClockCurrentAdjFilError: " << this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError) << endl;
+	cout << "this->ParityAdjFilError: " << this->ParityAdjFilError << endl;
+	}
+}
+
+
+// Update values
+
+PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/4.0);
+if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
+else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
+
+this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;
+this->CounterHandleInterruptSynchPRU++;// Update counter
+
+return 0;// All ok
+}
+
+/* Old - affected by the clocks drifts
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 //pru0dataMem_int[0]=this->NumClocksQuarterPeriodPRUclock; // set
 unsigned int PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/4.0);
@@ -294,7 +376,7 @@ default:{
 this->NumClocksQuarterPeriodPRUclock=(this->RatioAverageFactorClockQuarterPeriod*this->NumClocksQuarterPeriodPRUclock+(1.0-RatioAverageFactorClockQuarterPeriod)*this->NumClocksQuarterPeriodPRUclockUpdated);
 }
 }
-*/
+
 // Important the order. The this->AdjCountsFreq is not an estimation but a parameter given by the user to adjust ot the desired low frequency, an hence in median/average implementation is has to be computed directly
 //this->AdjCountsFreqHolder=this->AdjCountsFreqHolder*(this->NumClocksQuarterPeriodPRUclock/this->NumClocksQuarterPeriodPRUclockOld);
 if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
@@ -326,6 +408,7 @@ this->CounterHandleInterruptSynchPRU++;// Update counter
 
 return 0;// all ok	
 }
+*/
 
 struct timespec CKPD::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
