@@ -20,6 +20,8 @@
 // adjust to longest path so that the period of the signal is exact. The longest path is when in the OFF state the system has to check for an interrupt
 #define LOSTCLOCKCOUNTS1	10 // give room for the interrupt which accounts for 12 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be substracted. Equating to 10
 #define LOSTCLOCKCOUNTS2	5 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(12-2"Two instructions")/2"Subs + QB"=5
+#define LOSTCLOCKCOUNTS3	10 // give room for the interrupt which accounts for 16 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be substracted. Equating to 10
+#define LOSTCLOCKCOUNTS4	5 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(12-2"Two instructions")/2"Subs + QB"=5
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -157,7 +159,7 @@ CMDLOOP2:// Double verification of host sending start command
 PSEUDOSYNCH:// Only needed at the beggining to remove the slow drift
 	MOV	r8, CYCLESRESYNCH
 	LBBO	r0, r7, 0, 4// read the DWT_CYCCNT
-	LSL	r10, r9, 2 // Multiply by 4 to have to total period
+	LSL	r10, r9, 2 // Multiply by 4 to have the total period
 	SUB	r0, r10, r0 // Substract to find how long to wait	
 	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCH consumes double
 	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
@@ -191,7 +193,7 @@ SIGNALOFF:
 	MOV	r0, r1
 DELAYOFF:
 	SUB 	r0, r0, 1
-	QBNE 	DELAYOFF, r0, LOSTCLOCKCOUNTS1
+	QBNE 	DELAYOFF, r0, LOSTCLOCKCOUNTS3
 
 FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly 12 clock counts
 	QBBC	FINISHDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
@@ -203,7 +205,7 @@ FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly 12 cl
 	QBEQ	PSEUDOSYNCH, r8, 0 // Re-synch again
 	JMP	SIGNALON // Might consume one clock
 FINISHDELAYNOINT: // Some delay because it does not have to handle interruption
-	MOV	r0, LOSTCLOCKCOUNTS2
+	MOV	r0, LOSTCLOCKCOUNTS4
 FINISHDELAYNOINTEXTRA:
 	SUB	r0, r0, 1
 	QBNE 	FINISHDELAYNOINTEXTRA, r0, 0
