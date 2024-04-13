@@ -159,8 +159,8 @@ CMDLOOP2:// Double verification of host sending start command
 PSEUDOSYNCH:// Only needed at the beggining to remove the slow drift	
 	LBBO	r0, r7, 0, 4// read the DWT_CYCCNT
 	MOV	r8, CYCLESRESYNCH
-	LSL	r10, r9, 2 // Multiply by 4 to have the total period
-	SUB	r0, r10, r0 // Substract to find how long to wait	
+//	LSL	r10, r9, 2 // Multiply by 4 to have the total period
+//	SUB	r0, r10, r0 // Substract to find how long to wait	
 	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCH consumes double
 	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
 PSEUDOSYNCHLOOP:
