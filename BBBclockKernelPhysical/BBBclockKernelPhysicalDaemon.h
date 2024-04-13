@@ -70,7 +70,6 @@ private:// Variables
 	int TimePointClockCurrentAdjFilError=0;
 	TimePointWatch TimePointClockCurrentInitial=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
 	TimePointWatch TimePointClockCurrentFinal=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
-	TimePointWatch TimePointClockCurrentFinalAux=std::chrono::time_point<ClockWatch>();
 	TimePointChrono TimePointClockCurrentInitialAdj=std::chrono::time_point<ClockChrono>(); // Initial updated value of the clock (updated in each iteration)
 	TimePointChrono TimePointClockCurrentFinalAdj=std::chrono::time_point<ClockChrono>(); // Initial updated value of the clock (updated in each iteration)
 	// PRU clock handling			
@@ -96,6 +95,7 @@ private:// Variables
 	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/100;
 	int MaxTimePointClockCurrentAdjError=NumClocksHalfPeriodPRUclock/100;
 	int MinTimePointClockCurrentAdjError=-NumClocksHalfPeriodPRUclock/100;
+	long long int ParityAdjFilError=0;
 
 public:	// Functions/Methods
 	CKPD(); //constructor	
