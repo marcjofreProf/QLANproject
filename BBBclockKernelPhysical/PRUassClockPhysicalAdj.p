@@ -16,7 +16,7 @@
 
 #define GPIO_CLEARDATAOUToffset 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
 // GPIO goes low. If a bit is 0 it is ignored.
-
+#define PRU1QuarterClocks	50000000
 // adjust to longest path so that the period of the signal is exact. The longest path is when in the OFF state the system has to check for an interrupt
 #define LOSTCLOCKCOUNTS1	2 // estimation of clocks lost
 #define LOSTCLOCKCOUNTS2	8 // estimation of clocks need 
@@ -105,6 +105,7 @@ INITIATIONS:
 	MOV	r5, 0xFFFFFFFF
 	MOV	r6, 0x22000
 	MOV	r7, 0x2200C
+	MOV	r1, PRU1QuarterClocks
 	
 	// This scripts initiates first the timers
 	// Initial Re-initialization of DWT_CYCCNT
@@ -142,7 +143,7 @@ CMDLOOP:
 	QBBC	CMDLOOP, r31, 31	//Reception or not of the host interrupt
 //	// ok, we have an instruction. Assume it means 'begin signals'
 //	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
-	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period
+//	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period
 //	// We remove the command from the host (in case there is a reset from host, we are saved)
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
@@ -179,7 +180,7 @@ FINISHLOOP:
 	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period updated
 	// Send notification (interrupt) to Host for program completion
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16	
-	JMP	SIGNALON
+	JMP	CMDLOOP
 
 EXIT:
 	// Send notification (interrupt) to Host for program completion

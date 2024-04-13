@@ -167,6 +167,9 @@ return 0;// all ok
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// After the interrupt update rapidly the new quarter value
 this->TimePointClockCurrentFinal=ClockWatch::now();
+pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
+// Important, the following line at the very beggining to reduce the command jitter
+prussdrv_pru_send_event(22);
 
 sharedMem_int[0]=PRU1QuarterClocksAux;//Information grabbed by PRU1
 
