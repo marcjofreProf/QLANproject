@@ -16,12 +16,12 @@
 
 #define GPIO_CLEARDATAOUToffset 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
 // GPIO goes low. If a bit is 0 it is ignored.
-#define CYCLESRESYNCH		60
+#define CYCLESRESYNCH		1
 // adjust to longest path so that the period of the signal is exact. The longest path is when in the OFF state the system has to check for an interrupt
-#define LOSTCLOCKCOUNTS1	10 // give room for the interrupt which accounts for 12 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be substracted. Equating to 10
-#define LOSTCLOCKCOUNTS2	5 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(12-2"Two instructions")/2"Subs + QB"=5
-#define LOSTCLOCKCOUNTS3	10 // give room for the interrupt which accounts for 16 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be substracted. Equating to 10
-#define LOSTCLOCKCOUNTS4	5 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(12-2"Two instructions")/2"Subs + QB"=5
+#define LOSTCLOCKCOUNTS1	8 // give room for the interrupt which accounts for 10 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be substracted. Equating to 10
+#define LOSTCLOCKCOUNTS2	4 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(9-1"One instructions")/2"Subs + QB"=4
+#define LOSTCLOCKCOUNTS3	10 // give room for the interrupt which accounts for 12 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be substracted. Equating to 10
+#define LOSTCLOCKCOUNTS4	4 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(9-1"One instructions")/2"Subs + QB"=4
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -195,7 +195,7 @@ DELAYOFF:
 	SUB 	r0, r0, 1
 	QBNE 	DELAYOFF, r0, LOSTCLOCKCOUNTS3
 
-FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly 12 clock counts
+FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly, after QBBC to common part of no interrupt, 9 clock counts difference
 	QBBC	FINISHDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
 	// Handle interruption
 	LBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Read contents from the address offset 0 SHARED RAM //
@@ -205,7 +205,7 @@ FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly 12 cl
 	QBEQ	PSEUDOSYNCH, r8, 0 // Re-synch again
 	JMP	SIGNALON // Might consume one clock
 FINISHDELAYNOINT: // Some delay because it does not have to handle interruption
-	MOV	r0, LOSTCLOCKCOUNTS4
+	MOV	r0, LOSTCLOCKCOUNTS4 // extra step in no interrupt
 FINISHDELAYNOINTEXTRA:
 	SUB	r0, r0, 1
 	QBNE 	FINISHDELAYNOINTEXTRA, r0, 0
