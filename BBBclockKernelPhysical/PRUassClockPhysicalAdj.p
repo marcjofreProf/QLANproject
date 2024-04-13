@@ -18,12 +18,8 @@
 // GPIO goes low. If a bit is 0 it is ignored.
 
 // adjust to longest path so that the period of the signal is exact. The longest path is when in the OFF state the system has to check for an interrupt
-#define LOSTCLOCKCOUNTS1	5 // compensate for the finish loop which has probably 12 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be added. Equating to 10/2"Subs + QB"=5
+#define LOSTCLOCKCOUNTS1	10 // give room for the interrupt which accounts for 12 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be substracted. Equating to 10
 #define LOSTCLOCKCOUNTS2	5 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(12-2"Two instructions")/2"Subs + QB"=5
-//#define LOSTCLOCKSWREXT		5 // # clocks when reading or writing from a register outside PRU (so shared RAM or interrupt)
-#define LOSTCLOCKCOUNTS3	5 // compensate for the finish loop which has probably 12 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be added. Equating to 10/2"Subs + QB"=5
-#define LOSTCLOCKCOUNTS4	5 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(12-2"Two instructions")/2"Subs + QB"=5
-//#define LOSTCLOCKSWREXT		5 // # clocks when reading or writing from a register outside PRU (so shared RAM or interrupt)
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -192,7 +188,7 @@ SIGNALOFF:
 	MOV	r0, r1
 DELAYOFF:
 	SUB 	r0, r0, 1
-	QBNE 	DELAYOFF, r0, LOSTCLOCKCOUNTS3
+	QBNE 	DELAYOFF, r0, LOSTCLOCKCOUNTS1
 
 FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly 12 clock counts
 	QBBC	FINISHDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
@@ -201,7 +197,7 @@ FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly 12 cl
 	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt
 	JMP	SIGNALON // Might consume one clock
 FINISHDELAYNOINT: // Some delay because it does not have to handle interruption
-	MOV	r0, LOSTCLOCKCOUNTS4
+	MOV	r0, LOSTCLOCKCOUNTS2
 FINISHDELAYNOINTEXTRA:
 	SUB	r0, r0, 1
 	QBNE 	FINISHDELAYNOINTEXTRA, r0, 0
