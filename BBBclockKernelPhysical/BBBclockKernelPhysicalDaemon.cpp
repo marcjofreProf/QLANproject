@@ -173,10 +173,12 @@ sharedMem_int[0]=PRU1QuarterClocksAux;//Information grabbed by PRU1
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
 while (ClockWatch::now() < this->TimePointClockCurrentFinal);// Busy wait
 //clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
-this->TimePointClockCurrentFinalAdj=ClockChrono::now();//+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
+
 // The interrupt time is not and error from the synchronization network portocol (so do not count it in the error). Instead, the variation in time of interrupts is relatively (not in absolute error terms) accounted for in AdjCountsFreq
+this->TimePointClockCurrentInitialAdj=ClockChrono::now();
 pru0dataMem_int[2]=static_cast<unsigned int>(1);
 prussdrv_pru_send_event(21); // Send interrupt to tell PRU0 to handle the clock adjustment
+this->TimePointClockCurrentFinalAdj=ClockChrono::now();//+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 
@@ -209,11 +211,11 @@ else{
 // Compute clocks adjustment
 auto duration_FinalInitialAdj=this->TimePointClockCurrentFinalAdj.time_since_epoch()-this->TimePointClockCurrentInitialAdj.time_since_epoch();
 unsigned long long int duration_FinalInitialAdjCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialAdj).count();
-this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;//;-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));// Update value
+//this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;//;-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));// Update value
 
 // Compute absolute error
 if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
-this->TimePointClockCurrentAdjError=(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+static_cast<int>(pru0dataMem_int[1])*5-static_cast<int>(this->TimeAdjPeriod);//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
+this->TimePointClockCurrentAdjError=(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+static_cast<int>(this->TimeAdjPeriod)-(static_cast<int>(pru0dataMem_int[1])*5-static_cast<int>(duration_FinalInitialAdjCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
 }
 else{
 	this->TimePointClockCurrentAdjError=0;
