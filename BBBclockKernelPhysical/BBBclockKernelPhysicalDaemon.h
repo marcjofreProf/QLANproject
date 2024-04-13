@@ -92,8 +92,8 @@ private:// Variables
 	double MinNumClocksQuarterPeriodPRUclockUpdated=0.01*NumClocksQuarterPeriodPRUclock;
 	unsigned long long int MaxTimePointClockCurrentFinalInitialAdj_time_as_count=2*ClockPeriodNanoseconds;
 	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/100;
-	int MaxTimePointClockCurrentAdjFilError=NumClocksQuarterPeriodPRUclock/100;
-	int MinTimePointClockCurrentAdjFilError=-NumClocksQuarterPeriodPRUclock/100;
+	int MaxTimePointClockCurrentAdjFilError=NumClocksQuarterPeriodPRUclock/10;
+	int MinTimePointClockCurrentAdjFilError=-NumClocksQuarterPeriodPRUclock/10;
 	long long int ParityAdjFilError=0;
 
 public:	// Functions/Methods
