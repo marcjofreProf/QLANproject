@@ -195,13 +195,13 @@ FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly 12 cl
 	// Handle interruption
 	LBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Read contents from the address offset 0 SHARED RAM //
 	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt
-	JMP	SIGNALON // Might consume one clock
+	JMP	CMDLOOP//SIGNALON // Might consume one clock
 FINISHDELAYNOINT: // Some delay because it does not have to handle interruption
 	MOV	r0, LOSTCLOCKCOUNTS2
 FINISHDELAYNOINTEXTRA:
 	SUB	r0, r0, 1
 	QBNE 	FINISHDELAYNOINTEXTRA, r0, 0
-	JMP	SIGNALON // Might consume one clock
+	JMP	CMDLOOP//SIGNALON // Might consume one clock
 EXIT:
 	// Send notification (interrupt) to Host for program completion
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16

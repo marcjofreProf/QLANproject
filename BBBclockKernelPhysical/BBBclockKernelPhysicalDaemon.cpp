@@ -150,16 +150,16 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	this->TimePointClockCurrentInitial=ClockWatch::now();
 	this->TimePointClockCurrentInitialAdj=ClockChrono::now();
 	this->SetFutureTimePoint();// Used with busy-wait
-	//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
+	//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait	
 }
 
 int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
-pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq);
+//pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq);
 pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
-sleep(1);// Give some time
 cout << "Generating clock output..." << endl;
+
 return 0;// all ok
 }
 
@@ -213,7 +213,7 @@ unsigned long long int duration_FinalInitialAdjCountAux=std::chrono::duration_ca
 this->TimePointClockCurrentInitialAdj=this->TimePointClockCurrentFinalAdj;//;-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));// Update value
 // Compute absolute error
 if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
-this->TimePointClockCurrentAdjError=this->TimePointClockCurrentAdjError+static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+static_cast<int>(this->TimeAdjPeriod-duration_FinalInitialAdjCountAux);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
+this->TimePointClockCurrentAdjError=(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
 }
 else{
 	this->TimePointClockCurrentAdjError=0;
@@ -327,7 +327,7 @@ return 0;// all ok
 
 struct timespec CKPD::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
-	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod)-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
+	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
 	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;//+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError))); //Update value
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentFinal.time_since_epoch();
 	// Convert duration to desired time
@@ -340,7 +340,7 @@ struct timespec CKPD::SetWhileWait(){
 }
 
 int CKPD::SetFutureTimePoint(){
-	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod)-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
+	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
 	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;//+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError))); //Update value
 	return 0; // All Ok
 }
