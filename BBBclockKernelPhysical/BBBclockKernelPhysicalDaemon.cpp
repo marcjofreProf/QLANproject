@@ -793,7 +793,7 @@ int main(int argc, char const * argv[]){
         //CKPDagent.release();
 	if (signalReceivedFlag.load()){CKPDagent.~CKPD();}// Destroy the instance
         // Main barrier is in HandleInterruptSynchPRU function. No need for this CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));
-        CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Used in busy-wait
+        //CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Used in busy-wait
     //}
     //catch (const std::exception& e) {
     //	// Handle the exception
