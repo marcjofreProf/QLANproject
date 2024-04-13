@@ -143,7 +143,7 @@ CMDLOOP:
 	QBBC	CMDLOOP, r31, 31	//Reception or not of the host interrupt
 //	// ok, we have an instruction. Assume it means 'begin signals'
 //	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
-//	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period
+	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period
 //	// We remove the command from the host (in case there is a reset from host, we are saved)
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
@@ -180,7 +180,7 @@ FINISHLOOP:
 	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period updated
 	// Send notification (interrupt) to Host for program completion
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16	
-	JMP	CMDLOOP
+	JMP	SIGNALON
 
 EXIT:
 	// Send notification (interrupt) to Host for program completion
