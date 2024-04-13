@@ -16,7 +16,7 @@
 
 #define GPIO_CLEARDATAOUToffset 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
 // GPIO goes low. If a bit is 0 it is ignored.
-
+#define CYCLESRESYNCH		60
 // adjust to longest path so that the period of the signal is exact. The longest path is when in the OFF state the system has to check for an interrupt
 #define LOSTCLOCKCOUNTS1	10 // give room for the interrupt which accounts for 12 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be substracted. Equating to 10
 #define LOSTCLOCKCOUNTS2	5 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(12-2"Two instructions")/2"Subs + QB"=5
@@ -66,6 +66,8 @@
 // r5 reserved for 0xFFFFFFFF
 // r6 reserved for 0x22000 Control register
 // r7 reserved for 0x2200C DWT_CYCCNT
+// r8 reserved for counting cycles after re-synch
+// r9 reserved for long storage value of quarted period
 
 // r10 is arbitrary used for operations
 
@@ -105,6 +107,7 @@ INITIATIONS:
 	MOV	r5, 0xFFFFFFFF
 	MOV	r6, 0x22000
 	MOV	r7, 0x2200C
+	MOV	r8, CYCLESRESYNCH
 	
 	// This scripts initiates first the timers
 	// Initial Re-initialization of DWT_CYCCNT
@@ -138,31 +141,30 @@ INITIATIONS:
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
-CMDLOOP:	
-	// Initial Re-initialization of DWT_CYCCNT
-//	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
-//	CLR	r2.t3
-//	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
-//	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT so that it does not overflow. Account that we lose 2 cycle counts
-//	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
-//	SET	r2.t3
-//	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
+CMDLOOP:
 	QBBC	CMDLOOP, r31, 31	//Reception or not of the host interrupt
 //	// ok, we have an instruction. Assume it means 'begin signals'
 //	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
-	LBCO 	r1, CONST_PRUDRAM, 0, 4
+	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period
+	MOV	r9, r1// Store new value of quarter period
 //	// We remove the command from the host (in case there is a reset from host, we are saved)
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
-//PSEUDOSYNCH:
-//	// To give some sense of synchronization
-//	LBBO	r0.b0, r7, 0, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
-//	AND	r0, r0, 0x01 // Since the signals have a minimum period of 4 clock cycles
-//	QBEQ	SIGNALON, r0.b0, 1 // Coincides with a 1
-//	QBEQ	SIGNALON, r0.b0, 0 // Coincides with a 0
+
+PSEUDOSYNCH:// Only needed at the beggining to remove the slow drift
+	MOV	r8, CYCLESRESYNCH
+	LBBO	r0, r7, 0, 4// read the DWT_CYCCNT
+	LSL	r10, r9, 2 // Multiply by 4 to have to total period
+	SUB	r0, r10, r0 // Substract to find how long to wait	
+	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCH consumes double
+	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+PSEUDOSYNCHLOOP:
+	SUB	r0, r0, 1
+	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
+
 SIGNALON:
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
 	MOV	r0, r1
@@ -175,6 +177,7 @@ STARTLOOP:// Check if interruption and updates r1 accordingly. Supposedly 12 clo
 	// Handle interruption
 	LBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Read contents from the address offset 0 SHARED RAM //
 	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt
+	MOV	r9, r1// Store new value of quarter period	
 	JMP	SIGNALOFF
 STARTDELAYNOINT: // Some delay because it does not have to handle interruption
 	MOV	r0, LOSTCLOCKCOUNTS2
@@ -195,13 +198,18 @@ FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly 12 cl
 	// Handle interruption
 	LBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Read contents from the address offset 0 SHARED RAM //
 	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt
-	JMP	CMDLOOP//SIGNALON // Might consume one clock
+	MOV	r9, r1// Store new value of quarter period
+	SUB	r8, r8, 1
+	QBEQ	PSEUDOSYNCH, r8, 0 // Re-synch again
+	JMP	SIGNALON // Might consume one clock
 FINISHDELAYNOINT: // Some delay because it does not have to handle interruption
 	MOV	r0, LOSTCLOCKCOUNTS2
 FINISHDELAYNOINTEXTRA:
 	SUB	r0, r0, 1
 	QBNE 	FINISHDELAYNOINTEXTRA, r0, 0
-	JMP	CMDLOOP//SIGNALON // Might consume one clock
+	SUB	r8, r8, 1
+	QBEQ	PSEUDOSYNCH, r8, 0 // Re-synch again
+	JMP	SIGNALON // Might consume one clock
 EXIT:
 	// Send notification (interrupt) to Host for program completion
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
