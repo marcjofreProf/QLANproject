@@ -125,8 +125,8 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	// Handler
 	//pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
-	  //pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
-	  sharedMem_int[0]=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock+this->AdjCountsFreq);//Information grabbed by PRU1
+	  //pru0dataMem_int[0]=this->NumClocksQuarterPeriodPRUclock; // set
+	  sharedMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq);//Information grabbed by PRU1
 	  pru0dataMem_int[2]=static_cast<unsigned int>(0);
 	// Load and execute the PRU program on the PRU0
 	if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdj.bin") == -1){
@@ -137,7 +137,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	//prussdrv_pru_enable(PRU_HandlerSynch_NUM);
 	
 	    // Load and execute the PRU program on the PRU1
-	    pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock+this->AdjCountsFreq); // set the number of clocks that defines the half period of the clock. For 32Khz, with a PRU clock of 5ns is 6250 
+	    pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq); // set the number of clocks that defines the Quarter period of the clock. 
 	    pru1dataMem_int[1]=static_cast<unsigned int>(0);
 	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdj.bin") == -1){
 		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdj.bin") == -1){
@@ -154,7 +154,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 }
 
 int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
-pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock+this->AdjCountsFreq);
+pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq);
 pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
@@ -164,12 +164,12 @@ return 0;// all ok
 }
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-//pru0dataMem_int[0]=this->NumClocksHalfPeriodPRUclock; // set
-unsigned int PRU1HalfClocksAux=static_cast<unsigned int>(this->NumClocksHalfPeriodPRUclock+this->AdjCountsFreq);
-if (PRU1HalfClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1HalfClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
-else if (PRU1HalfClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1HalfClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
+//pru0dataMem_int[0]=this->NumClocksQuarterPeriodPRUclock; // set
+unsigned int PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq);
+if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
+else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
-sharedMem_int[0]=PRU1HalfClocksAux;//Information grabbed by PRU1
+sharedMem_int[0]=PRU1QuarterClocksAux;//Information grabbed by PRU1
 // The following two lines set the maximum synchronizity possible (so do not add lines in between)(critical part)
 while (ClockWatch::now() < this->TimePointClockCurrentFinal);// Busy wait
 
@@ -197,12 +197,12 @@ else{
 
 if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
 	if (this->CounterHandleInterruptSynchPRU==0){//First
-		this->RatioAverageFactorClockHalfPeriodHolder=this->RatioAverageFactorClockHalfPeriod;
-		this->RatioAverageFactorClockHalfPeriod=0.0;
+		this->RatioAverageFactorClockQuarterPeriodHolder=this->RatioAverageFactorClockQuarterPeriod;
+		this->RatioAverageFactorClockQuarterPeriod=0.0;
 	}
 }
 else{
-	this->RatioAverageFactorClockHalfPeriod=this->RatioAverageFactorClockHalfPeriodHolder;
+	this->RatioAverageFactorClockQuarterPeriod=this->RatioAverageFactorClockQuarterPeriodHolder;
 }
 
 // Seems that there are two errors to compensate for:
@@ -234,11 +234,11 @@ this->TimePointClockCurrentAdjFilError=this->IMedianFilterSubArray(this->TimePoi
 break;
 }
 default:{// Average implementation
-this->TimePointClockCurrentAdjFilError = static_cast<int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentAdjFilError)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>((int)(this->TimeAdjPeriod-duration_FinalInitialAdjCountAux)+this->TimePointClockCurrentAdjError));
+this->TimePointClockCurrentAdjFilError = static_cast<int>(this->RatioAverageFactorClockQuarterPeriod*static_cast<double>(this->TimePointClockCurrentAdjFilError)+(1.0-this->RatioAverageFactorClockQuarterPeriod)*static_cast<double>((int)(this->TimeAdjPeriod-duration_FinalInitialAdjCountAux)+this->TimePointClockCurrentAdjError));
 }
 }
 
-if (this->TimePointClockCurrentAdjFilError>0){
+if (this->TimePointClockCurrentAdjFilError>0){// If there is a continuous slow drift, this could help. Has to be activated down here.
 this->ParityAdjFilError++;
 }
 else if(this->TimePointClockCurrentAdjFilError<0){
@@ -260,53 +260,53 @@ this->TimePointClockCurrentFinalInitialAdj_time_as_count=this->ULLIMeanFilterSub
 break;
 }
 default:{// Average implementation
-this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned long long int>(this->RatioAverageFactorClockHalfPeriod*static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)+(1.0-this->RatioAverageFactorClockHalfPeriod)*static_cast<double>(duration_FinalInitialAdjCountAux));
+this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned long long int>(this->RatioAverageFactorClockQuarterPeriod*static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count)+(1.0-this->RatioAverageFactorClockQuarterPeriod)*static_cast<double>(duration_FinalInitialAdjCountAux));
 }
 }
 
-// Update sharedMem_int[0]=this->NumClocksHalfPeriodPRUclock;//Information grabbed by PRU1
+// Update sharedMem_int[0]=this->NumClocksQuarterPeriodPRUclock;//Information grabbed by PRU1
 // Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
-this->NumClocksHalfPeriodPRUclockUpdated=(this->FactorTimerAdj*0.5*static_cast<double>(pru0dataMem_int[1]))/static_cast<double>(ClockCyclePeriodAdjustment);//*(static_cast<double>(this->TimeAdjPeriod)/static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count));
+this->NumClocksQuarterPeriodPRUclockUpdated=(0.25*static_cast<double>(pru0dataMem_int[1]))/static_cast<double>(ClockCyclePeriodAdjustment);//*(static_cast<double>(this->TimeAdjPeriod)/static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count));
 
 
 // Important the order
-this->NumClocksHalfPeriodPRUclockOld=this->NumClocksHalfPeriodPRUclock;// Update value
+this->NumClocksQuarterPeriodPRUclockOld=this->NumClocksQuarterPeriodPRUclock;// Update value
 
-if (this->NumClocksHalfPeriodPRUclockUpdated>this->MaxNumClocksHalfPeriodPRUclockUpdated){this->NumClocksHalfPeriodPRUclockUpdated=this->MaxNumClocksHalfPeriodPRUclockUpdated;}
-else if (this->NumClocksHalfPeriodPRUclockUpdated<this->MinNumClocksHalfPeriodPRUclockUpdated){this->NumClocksHalfPeriodPRUclockUpdated=this->MinNumClocksHalfPeriodPRUclockUpdated;}
+if (this->NumClocksQuarterPeriodPRUclockUpdated>this->MaxNumClocksQuarterPeriodPRUclockUpdated){this->NumClocksQuarterPeriodPRUclockUpdated=this->MaxNumClocksQuarterPeriodPRUclockUpdated;}
+else if (this->NumClocksQuarterPeriodPRUclockUpdated<this->MinNumClocksQuarterPeriodPRUclockUpdated){this->NumClocksQuarterPeriodPRUclockUpdated=this->MinNumClocksQuarterPeriodPRUclockUpdated;}
 switch(FilterMode) {
 case 2:{// Mean implementation
-this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;
-this->NumClocksHalfPeriodPRUclock=this->DoubleMeanFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);
+this->NumClocksQuarterPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->NumClocksQuarterPeriodPRUclockUpdated;
+this->NumClocksQuarterPeriodPRUclock=this->DoubleMeanFilterSubArray(this->NumClocksQuarterPeriodPRUclockArray);
 break;
 }
 case 1:{// Median implementation
-this->NumClocksHalfPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->NumClocksHalfPeriodPRUclockUpdated;
-this->NumClocksHalfPeriodPRUclock=this->DoubleMeanFilterSubArray(this->NumClocksHalfPeriodPRUclockArray);// Not working. Hence using mean
+this->NumClocksQuarterPeriodPRUclockArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->NumClocksQuarterPeriodPRUclockUpdated;
+this->NumClocksQuarterPeriodPRUclock=this->DoubleMeanFilterSubArray(this->NumClocksQuarterPeriodPRUclockArray);// Not working. Hence using mean
 break;
 }
 default:{
 // Average implementation
-this->NumClocksHalfPeriodPRUclock=(this->RatioAverageFactorClockHalfPeriod*this->NumClocksHalfPeriodPRUclock+(1.0-RatioAverageFactorClockHalfPeriod)*this->NumClocksHalfPeriodPRUclockUpdated);
+this->NumClocksQuarterPeriodPRUclock=(this->RatioAverageFactorClockQuarterPeriod*this->NumClocksQuarterPeriodPRUclock+(1.0-RatioAverageFactorClockQuarterPeriod)*this->NumClocksQuarterPeriodPRUclockUpdated);
 }
 }
 
 // Important the order. The this->AdjCountsFreq is not an estimation but a parameter given by the user to adjust ot the desired low frequency, an hence in median/average implementation is has to be computed directly
-this->AdjCountsFreqHolder=this->AdjCountsFreqHolder*(this->NumClocksHalfPeriodPRUclock/this->NumClocksHalfPeriodPRUclockOld);
+this->AdjCountsFreqHolder=this->AdjCountsFreqHolder*(this->NumClocksQuarterPeriodPRUclock/this->NumClocksQuarterPeriodPRUclockOld);
 if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
 	this->AdjCountsFreq=0.0;
 }
 else{
-	this->AdjCountsFreq=this->AdjCountsFreqHolder+static_cast<double>(static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))/2.0+static_cast<int>(this->ParityAdjFilError);// Exactly put the error correction injection, divided by 2 because it is for half period for the PRU1.
+	this->AdjCountsFreq=this->AdjCountsFreqHolder+static_cast<double>(static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))/4.0;//+static_cast<double>(this->ParityAdjFilError)/4.0;// Exactly put the error correction injection, divided by 2 because it is for Quarter period for the PRU1.
 }
-this->MinAdjCountsFreq=-this->NumClocksHalfPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
+this->MinAdjCountsFreq=-this->NumClocksQuarterPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
 if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}
 else if(this->AdjCountsFreq<this->MinAdjCountsFreq){this->AdjCountsFreq=this->MinAdjCountsFreq;}
 
 if (PlotPIDHAndlerInfo){
 	if (this->CounterHandleInterruptSynchPRU%1==0){
 	cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
-	cout << "this->NumClocksHalfPeriodPRUclock: " << this->NumClocksHalfPeriodPRUclock << endl;
+	cout << "this->NumClocksQuarterPeriodPRUclock: " << this->NumClocksQuarterPeriodPRUclock << endl;
 	cout << "this->TimePointClockCurrentFinalInitialAdj_time_as_count: " << this->TimePointClockCurrentFinalInitialAdj_time_as_count << endl;
 	cout << "this->TimePointClockCurrentAdjError: " << this->TimePointClockCurrentAdjError << endl;
 	cout << "this->TimePointClockCurrentAdjFilError: " << this->TimePointClockCurrentAdjFilError << endl;
@@ -644,7 +644,7 @@ int main(int argc, char const * argv[]){
 	}
 	default:{// Average implementation
 		cout << "Using average filtering." << endl;
-		CKPDagent.RatioAverageFactorClockHalfPeriod=stod(argv[2]);
+		CKPDagent.RatioAverageFactorClockQuarterPeriod=stod(argv[2]);
 	}
 	}
 
@@ -652,7 +652,7 @@ int main(int argc, char const * argv[]){
 	 CKPDagent.PlotPIDHAndlerInfo=(strcmp(argv[3], "true") == 0);
 	 // Recompute some values:
 	 //cout << "CKPDagent.AdjCountsFreq: " << CKPDagent.AdjCountsFreq << endl;
-	 //cout << "CKPDagent.RatioAverageFactorClockHalfPeriod: " << CKPDagent.RatioAverageFactorClockHalfPeriod << endl;
+	 //cout << "CKPDagent.RatioAverageFactorClockQuarterPeriod: " << CKPDagent.RatioAverageFactorClockQuarterPeriod << endl;
 	 //cout << "CKPDagent.PlotPIDHAndlerInfo: " << CKPDagent.PlotPIDHAndlerInfo << endl;
 	 if (CKPDagent.PlotPIDHAndlerInfo==true){
 	 	cout << "Attention, when outputing PID values, the synch performance decreases because of the uncontrolled/large time offset between periodic timer computing." << endl;

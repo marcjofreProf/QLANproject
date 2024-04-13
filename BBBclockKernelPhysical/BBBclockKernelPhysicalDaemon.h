@@ -36,15 +36,14 @@ public: //Variables
 	// Variables adjusted by passing values to the main function
 	double AdjCountsFreq=0.0; // Number of clock ticks to adjust to the required frequency (e.g., 32 KHz) to account for having some idle time when resetting DWT_CNT in PRU
 	double AdjCountsFreqHolder=0.0;
-	double RatioAverageFactorClockHalfPeriodHolder=0.0; // The lower the more aggresive taking the new computed values.
-	double RatioAverageFactorClockHalfPeriod=0.9999; // The lower the more aggresive taking the new computed values. Whe using mean filter.
+	double RatioAverageFactorClockQuarterPeriodHolder=0.0; // The lower the more aggresive taking the new computed values.
+	double RatioAverageFactorClockQuarterPeriod=0.9999; // The lower the more aggresive taking the new computed values. Whe using mean filter.
 	unsigned long long int MedianFilterFactor=1; // When using median filter
 	unsigned long long int MeanFilterFactor=1; // When using mean filter
 	bool PlotPIDHAndlerInfo=false;
-	double FactorTimerAdj=0.5; 
-	double NumClocksHalfPeriodPRUclock=0.5*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the half period of the clock.
-	double NumClocksHalfPeriodPRUclockOld=0.0;
-	double NumClocksHalfPeriodPRUclockUpdated=0.0;
+	double NumClocksQuarterPeriodPRUclock=0.25*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the Quarter period of the clock.
+	double NumClocksQuarterPeriodPRUclockOld=0.0;
+	double NumClocksQuarterPeriodPRUclockUpdated=0.0;
 
 private:// Variables
 	ApplicationState m_state;
@@ -82,19 +81,19 @@ private:// Variables
 	unsigned int MaxNumPeriodColcksPRUnoHalt=1000000000;// Protecion agains very large numbers
 	// Median filter implementation
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={1000000000};
-	double NumClocksHalfPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksHalfPeriodPRUclock};
+	double NumClocksQuarterPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksQuarterPeriodPRUclock};
 	int TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0};
 	// PID error correction
 	double PIDconstant=0.9; // The larger than 1 the more aggressive correction (and more unstable). Below 1.0 is not aggressively enough to correct fully, eventhought it will try. This value times the maxium value set in MaxTimePointClockCurrentAdjError, has not ot exceed the period wanted. It has to be larger than the jitter of the hardware clocks
 	// Maximum values
 	double MaxAdjCountsFreq=1000000000;
 	double MinAdjCountsFreq=-1000000000+MinNumPeriodColcksPRUnoHalt;
-	double MaxNumClocksHalfPeriodPRUclockUpdated=100.0*NumClocksHalfPeriodPRUclock;
-	double MinNumClocksHalfPeriodPRUclockUpdated=0.01*NumClocksHalfPeriodPRUclock;
+	double MaxNumClocksQuarterPeriodPRUclockUpdated=100.0*NumClocksQuarterPeriodPRUclock;
+	double MinNumClocksQuarterPeriodPRUclockUpdated=0.01*NumClocksQuarterPeriodPRUclock;
 	unsigned long long int MaxTimePointClockCurrentFinalInitialAdj_time_as_count=2*ClockPeriodNanoseconds;
 	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/100;
-	int MaxTimePointClockCurrentAdjError=NumClocksHalfPeriodPRUclock/100;
-	int MinTimePointClockCurrentAdjError=-NumClocksHalfPeriodPRUclock/100;
+	int MaxTimePointClockCurrentAdjError=NumClocksQuarterPeriodPRUclock/100;
+	int MinTimePointClockCurrentAdjError=-NumClocksQuarterPeriodPRUclock/100;
 	long long int ParityAdjFilError=0;
 
 public:	// Functions/Methods
