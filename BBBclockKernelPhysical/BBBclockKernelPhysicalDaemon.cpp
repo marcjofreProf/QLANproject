@@ -170,6 +170,19 @@ this->TimePointClockCurrentFinal=ClockWatch::now();
 
 sharedMem_int[0]=PRU1QuarterClocksAux;//Information grabbed by PRU1
 
+if (retInterruptsPRU1>0){
+	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+}
+else if (retInterruptsPRU1==0){
+	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+	cout << "CKPD::HandleInterruptSynchPRU took to much time for the ClockHandler. Reset PRU1 if necessary." << endl;
+	
+}
+else{
+	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+	cout << "PRU1 interrupt poll error" << endl;
+}
+
 // Compute error
 // Compute clocks adjustment
 auto duration_FinalInitial=this->TimePointClockCurrentFinal.time_since_epoch()-this->TimePointClockCurrentInitial.time_since_epoch();
@@ -219,6 +232,15 @@ this->MinAdjCountsFreq=-this->NumClocksQuarterPeriodPRUclock+static_cast<double>
 if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}
 else if(this->AdjCountsFreq<this->MinAdjCountsFreq){this->AdjCountsFreq=this->MinAdjCountsFreq;}
 
+// Update values
+
+PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/4.0);
+if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
+else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
+
+this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;
+this->CounterHandleInterruptSynchPRU++;// Update counter
+
 if (PlotPIDHAndlerInfo){
 	if (this->CounterHandleInterruptSynchPRU%1==0){
 	cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
@@ -230,16 +252,6 @@ if (PlotPIDHAndlerInfo){
 	cout << "this->ParityAdjFilError: " << this->ParityAdjFilError << endl;
 	}
 }
-
-
-// Update values
-
-PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/4.0);
-if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
-else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
-
-this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;
-this->CounterHandleInterruptSynchPRU++;// Update counter
 
 return 0;// All ok
 }
