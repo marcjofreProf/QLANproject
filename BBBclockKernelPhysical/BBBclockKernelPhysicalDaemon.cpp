@@ -268,11 +268,11 @@ this->TimePointClockCurrentFinalInitialAdj_time_as_count = static_cast<unsigned 
 
 // Update sharedMem_int[0]=this->NumClocksQuarterPeriodPRUclock;//Information grabbed by PRU1
 // Also it can be played with the time between updates, both in terms of nanosleep time and number of cycles for updating
-this->NumClocksQuarterPeriodPRUclockUpdated=this->NumClocksQuarterPeriodPRUclock-(0.25*static_cast<double>(pru0dataMem_int[1]))-static_cast<double>(ClockCyclePeriodAdjustment);//*(static_cast<double>(this->TimeAdjPeriod)/static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count));
+this->NumClocksQuarterPeriodPRUclockUpdated=(0.25*static_cast<double>(pru0dataMem_int[1]))/static_cast<double>(ClockCyclePeriodAdjustment);//*(static_cast<double>(this->TimeAdjPeriod)/static_cast<double>(this->TimePointClockCurrentFinalInitialAdj_time_as_count));
 
 
 // Important the order
-//this->NumClocksQuarterPeriodPRUclockOld=this->NumClocksQuarterPeriodPRUclock;// Update value
+this->NumClocksQuarterPeriodPRUclockOld=this->NumClocksQuarterPeriodPRUclock;// Update value
 
 if (this->NumClocksQuarterPeriodPRUclockUpdated>this->MaxNumClocksQuarterPeriodPRUclockUpdated){this->NumClocksQuarterPeriodPRUclockUpdated=this->MaxNumClocksQuarterPeriodPRUclockUpdated;}
 else if (this->NumClocksQuarterPeriodPRUclockUpdated<this->MinNumClocksQuarterPeriodPRUclockUpdated){this->NumClocksQuarterPeriodPRUclockUpdated=this->MinNumClocksQuarterPeriodPRUclockUpdated;}
@@ -294,7 +294,7 @@ this->NumClocksQuarterPeriodPRUclock=(this->RatioAverageFactorClockQuarterPeriod
 }
 
 // Important the order. The this->AdjCountsFreq is not an estimation but a parameter given by the user to adjust ot the desired low frequency, an hence in median/average implementation is has to be computed directly
-//this->AdjCountsFreqHolder=this->AdjCountsFreqHolder*(this->NumClocksQuarterPeriodPRUclock/this->NumClocksQuarterPeriodPRUclockOld);
+this->AdjCountsFreqHolder=this->AdjCountsFreqHolder*(this->NumClocksQuarterPeriodPRUclock/this->NumClocksQuarterPeriodPRUclockOld);
 if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
 	this->AdjCountsFreq=0.0;
 }
