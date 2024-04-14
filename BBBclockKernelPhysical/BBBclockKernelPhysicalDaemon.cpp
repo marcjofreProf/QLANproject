@@ -246,8 +246,8 @@ if (PlotPIDHAndlerInfo){
 	// Not used cout << "this->TimePointClockCurrentFinalInitialAdj_time_as_count: " << this->TimePointClockCurrentFinalInitialAdj_time_as_count << endl;
 	cout << "this->TimePointClockCurrentAdjError: " << this->TimePointClockCurrentAdjError << endl;
 	cout << "this->TimePointClockCurrentAdjFilError: " << this->TimePointClockCurrentAdjFilError << endl;
-	cout << "Applied: this->PIDconstant*this->TimePointClockCurrentAdjFilError: " << this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError) << endl;
-	cout << "PRU1QuarterClocksAux: " << PRU1QuarterClocksAux << endl;
+	cout << "this->TimePointClockCurrentAdjFilErrorApplied: " << this->TimePointClockCurrentAdjFilErrorApplied << endl;
+	//cout << "PRU1QuarterClocksAux: " << PRU1QuarterClocksAux << endl;
 	}
 }
 
