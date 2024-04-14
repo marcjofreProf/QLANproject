@@ -23,6 +23,7 @@
 #define WaitCyclesBeforeAveraging	10 // To go into steady state in the initialization
 #define MaxMedianFilterArraySize	100
 #define FilterMode 1 // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mean window
+#define	CyclesSkipErrorApplied	60
 
 namespace exploringBBBCKPD {
 
@@ -52,8 +53,9 @@ private:// Variables
 	// Time/synchronization management
 	unsigned long long int CounterHandleInterruptSynchPRU=0;
 	unsigned long long int CounterHandleInterruptSynchPRUlast=0;
-	using ClockWatch = std::chrono::high_resolution_clock;//system_clock; //system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
-	//using ClockChrono = std::chrono::steady_clock;//Probably is also better to also measure with system_clock. system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than seady_clock aimed at measuring absolute time (like a watch)		
+	using ClockWatch = std::chrono::steady_clock;//system_clock; //system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
+	//using ClockChrono = std::chrono::steady_clock;//Probably is also better to also measure with system_clock. system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than seady_clock aimed at measuring absolute time (like a watch)	
+		
 	using TimePointWatch = std::chrono::time_point<ClockWatch>;
 	//using TimePointChrono = std::chrono::time_point<ClockChrono>;
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds; // Initial value to 1 s
@@ -153,3 +155,40 @@ private: // Functions/Methods
 } /* namespace exploringBBBCKPD */
 
 #endif /* BBBclockKernelPhysicalDaemon_H_ */
+
+/*We're using std::chrono::steady_clock for most of our internal queues and relative timings. However, we're on a POSIX platform and steady_clock is implemented by using clock_gettime(CLOCK_MONOTONIC, ....
+
+The CLOCK_MONOTONIC clock is not affected by discontinuous jumps in the system time (e.g., if the system administrator manually changes the clock), but is affected by the incremental adjustments performed by adjtime(3) and NTP. This clock does not count time that the system is suspended. All CLOCK_MONOTONIC variants guarantee that the time returned by consecutive calls will not go backwards, but successive calls may—depending on the architecture—return identical (not-increased) time values.
+
+Since steady_clock is affected by certain clock adjustments, in some parts of our codebase clock_gettime(CLOCK_MONOTONIC_RAW, ... is therefore used directly instead, which is ...
+
+Similar to CLOCK_MONOTONIC, but provides access to a raw hardware-based time that is not subject to NTP adjustments or the incremental adjustments performed by adjtime(3). This clock does not count time that the system is suspended.
+
+pragma once       // or a classic portable header guard
+
+#include <chrono>
+#include <ctime>
+
+namespace foo {
+
+struct monotonic_raw_clock {
+    using duration = std::chrono::nanoseconds;
+    using rep = duration::rep;
+    using period = duration::period;
+    using time_point = std::chrono::time_point<monotonic_raw_clock, duration>;
+
+    static constexpr bool is_steady = true;
+
+    static inline time_point now() noexcept {
+        std::timespec tp;
+        // The return value from clock_gettime is ignored in the gcc steady_clock
+        // implementation too:
+        static_cast<void>(clock_gettime(CLOCK_MONOTONIC_RAW, &tp));
+
+        return time_point(duration(std::chrono::seconds(tp.tv_sec) +
+                                   std::chrono::nanoseconds(tp.tv_nsec)));
+    }
+};
+
+}  // namespace foo
+*/

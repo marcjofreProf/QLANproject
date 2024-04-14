@@ -168,7 +168,12 @@ int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems phy
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// After the interrupt update rapidly the new quarter value
 this->TimePointClockCurrentFinal=ClockWatch::now();
 
+if (this->CounterHandleInterruptSynchPRU%CyclesSkipErrorApplied==0){// Apply correction
 pru1dataMem_int[0]=PRU1QuarterClocksAux;//Information grabbed by PRU1
+}
+else{// Do not apply correction
+pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock);
+}
 
 if (retInterruptsPRU1>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
