@@ -190,7 +190,7 @@ if (retInterruptsPRU1>0){
 
 	// Compute absolute error
 	if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
-	this->TimePointClockCurrentAdjError=0*this->TimePointClockCurrentAdjError+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
+	this->TimePointClockCurrentAdjError=(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
 	}
 	else{
 		this->TimePointClockCurrentAdjError=0;
@@ -199,22 +199,26 @@ if (retInterruptsPRU1>0){
 	// Error filtering
 	switch(FilterMode) {
 	case 2:{// Mean implementation
-	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
-	this->TimePointClockCurrentAdjFilError=this->IMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
+	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=static_cast<double>(this->TimePointClockCurrentAdjError);// Error to be compensated for
+	this->TimePointClockCurrentAdjFilError=this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
 	break;
 	}
 	case 1:{// Median implementation
-	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
-	this->TimePointClockCurrentAdjFilError=this->IMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
+	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=static_cast<double>(this->TimePointClockCurrentAdjError);// Error to be compensated for
+	this->TimePointClockCurrentAdjFilError=this->DoubleMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
 	break;
 	}
 	default:{// Average implementation
-	this->TimePointClockCurrentAdjFilError = static_cast<int>(this->RatioAverageFactorClockQuarterPeriod*static_cast<double>(this->TimePointClockCurrentAdjFilError)+(1.0-this->RatioAverageFactorClockQuarterPeriod)*static_cast<double>(this->TimePointClockCurrentAdjError));
+	this->TimePointClockCurrentAdjFilError = this->RatioAverageFactorClockQuarterPeriod*this->TimePointClockCurrentAdjFilError+(1.0-this->RatioAverageFactorClockQuarterPeriod)*static_cast<double>(this->TimePointClockCurrentAdjError);
 	}
 	}
 	// Limit applied error correction
 	if (this->TimePointClockCurrentAdjFilError>this->MaxTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MaxTimePointClockCurrentAdjFilError;}
 	else if (this->TimePointClockCurrentAdjFilError<this->MinTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MinTimePointClockCurrentAdjFilError;}
+	
+	// PID implementation
+	this->PIDcontrolerTime();
+	
 	// Apply period scaling selected by the user
 	if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
 		this->AdjCountsFreq=0.0;
@@ -228,7 +232,7 @@ if (retInterruptsPRU1>0){
 }
 // Update values
 
-PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/5.0/4.0);
+PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->TimePointClockCurrentAdjFilErrorApplied/5.0/4.0);
 if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
@@ -248,6 +252,15 @@ if (PlotPIDHAndlerInfo){
 }
 
 return 0;// All ok
+}
+
+int CKPD::PIDcontrolerTime(){
+TimePointClockCurrentAdjFilErrorDerivative=(TimePointClockCurrentAdjFilError-TimePointClockCurrentAdjFilErrorLast)/static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast);
+TimePointClockCurrentAdjFilErrorIntegral=TimePointClockCurrentAdjFilErrorIntegral+TimePointClockCurrentAdjFilError*static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast);
+this->TimePointClockCurrentAdjFilErrorApplied=PIDconstant*TimePointClockCurrentAdjFilError+PIDintegral*TimePointClockCurrentAdjFilErrorIntegral+PIDderiv*TimePointClockCurrentAdjFilErrorDerivative;
+TimePointClockCurrentAdjFilErrorLast=TimePointClockCurrentAdjFilError;// Update
+CounterHandleInterruptSynchPRUlast=CounterHandleInterruptSynchPRU;// Update
+return 0; // All ok
 }
 
 /* Old - affected by the clocks drifts

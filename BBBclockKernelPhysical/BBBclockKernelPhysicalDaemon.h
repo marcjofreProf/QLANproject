@@ -51,6 +51,7 @@ private:// Variables
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	// Time/synchronization management
 	unsigned long long int CounterHandleInterruptSynchPRU=0;
+	unsigned long long int CounterHandleInterruptSynchPRUlast=0;
 	using ClockWatch = std::chrono::high_resolution_clock;//system_clock; //system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
 	//using ClockChrono = std::chrono::steady_clock;//Probably is also better to also measure with system_clock. system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than seady_clock aimed at measuring absolute time (like a watch)		
 	using TimePointWatch = std::chrono::time_point<ClockWatch>;
@@ -66,7 +67,11 @@ private:// Variables
 	// Time keeping
 	unsigned long long int TimeAdjPeriod=static_cast<unsigned long long int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted. VEry important parameter
 	int TimePointClockCurrentAdjError=0;
-	int TimePointClockCurrentAdjFilError=0;
+	double TimePointClockCurrentAdjFilError=0;
+	double TimePointClockCurrentAdjFilErrorIntegral=0;
+	double TimePointClockCurrentAdjFilErrorDerivative=0;
+	double TimePointClockCurrentAdjFilErrorLast=0;
+	double TimePointClockCurrentAdjFilErrorApplied=0;
 	TimePointWatch TimePointClockCurrentInitial=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
 	TimePointWatch TimePointClockCurrentFinal=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
 	//TimePointChrono TimePointClockCurrentInitialAdj=std::chrono::time_point<ClockChrono>(); // Initial updated value of the clock (updated in each iteration)
@@ -83,11 +88,11 @@ private:// Variables
 	// Median filter implementation
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={1000000000};
 	double NumClocksQuarterPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksQuarterPeriodPRUclock};
-	int TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0};
+	double TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0};
 	// PID error correction
-	double PIDconstant=0.1; // The larger than 1 the more aggressive correction. Below 1.0 is not aggressively enough to correct fully, eventhought it will try. This value times the maxium value set in MaxTimePointClockCurrentAdjError, has not ot exceed the period wanted. It has to be larger than the jitter of the hardware clocks
-	double PIDderiv=0.0;
-	double PIDintegral=0.0;
+	double PIDconstant=0.75; // The larger than 1 the more aggressive correction. Below 1.0 is not aggressively enough to correct fully, eventhought it will try. This value times the maxium value set in MaxTimePointClockCurrentAdjError, has not ot exceed the period wanted. It has to be larger than the jitter of the hardware clocks
+	double PIDintegral=0.25;
+	double PIDderiv=0.1;	
 	// Maximum values
 	double MaxAdjCountsFreq=1000000000;
 	double MinAdjCountsFreq=-1000000000+MinNumPeriodColcksPRUnoHalt;
@@ -95,8 +100,8 @@ private:// Variables
 	double MinNumClocksQuarterPeriodPRUclockUpdated=0.01*NumClocksQuarterPeriodPRUclock;
 	unsigned long long int MaxTimePointClockCurrentFinalInitialAdj_time_as_count=2*ClockPeriodNanoseconds;
 	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/100;
-	int MaxTimePointClockCurrentAdjFilError=4*5*NumClocksQuarterPeriodPRUclock/100;
-	int MinTimePointClockCurrentAdjFilError=-4*5*NumClocksQuarterPeriodPRUclock/100;
+	double MaxTimePointClockCurrentAdjFilError=4.0*5.0*static_cast<double>(NumClocksQuarterPeriodPRUclock)/100.0;
+	double MinTimePointClockCurrentAdjFilError=-4.0*5.0*static_cast<double>(NumClocksQuarterPeriodPRUclock)/100.0;
 
 public:	// Functions/Methods
 	CKPD(); //constructor	
@@ -140,6 +145,8 @@ private: // Functions/Methods
 	int IMedianFilterSubArray(int* ArrayHolderAux);
 	int IMeanFilterSubArray(int* ArrayHolderAux);
 	int IBubbleSort(int* arr);
+	// PID controller
+	int PIDcontrolerTime();
 };
 
 
