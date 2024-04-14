@@ -220,7 +220,7 @@ if (retInterruptsPRU1>0){
 		this->AdjCountsFreq=0.0;
 	}
 	else{
-		this->AdjCountsFreq=this->AdjCountsFreqHolder/4.0;// divided by 4 because it is for Quarter period for the PRU1.
+		this->AdjCountsFreq=this->AdjCountsFreqHolder/5.0/4.0;// divided by 4 because it is for Quarter period for the PRU1.
 	}
 	this->MinAdjCountsFreq=-this->NumClocksQuarterPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
 	if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}
@@ -228,7 +228,7 @@ if (retInterruptsPRU1>0){
 }
 // Update values
 
-PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq-this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/5.0/4.0);
+PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/5.0/4.0);
 if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
