@@ -23,7 +23,7 @@
 #define WaitCyclesBeforeAveraging	10 // To go into steady state in the initialization
 #define MaxMedianFilterArraySize	100
 #define FilterMode 1 // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mean window
-#define	CyclesSkipErrorApplied	3
+#define	CyclesAvgErrorApplied	1
 
 namespace exploringBBBCKPD {
 
@@ -41,7 +41,7 @@ public: //Variables
 	double RatioAverageFactorClockQuarterPeriod=0.9999; // The lower the more aggresive taking the new computed values. Whe using mean filter.
 	unsigned long long int MedianFilterFactor=1; // When using median filter
 	unsigned long long int MeanFilterFactor=1; // When using mean filter
-	unsigned long long int AppliedMeanFilterFactor=CyclesSkipErrorApplied; // When using mean filter
+	unsigned long long int AppliedMeanFilterFactor=CyclesAvgErrorApplied; // When using mean filter
 	bool PlotPIDHAndlerInfo=false;
 	double NumClocksQuarterPeriodPRUclock=0.25*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the Quarter period of the clock.
 	double NumClocksQuarterPeriodPRUclockOld=0.0;
