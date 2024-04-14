@@ -92,7 +92,7 @@ private:// Variables
 	// PID error correction
 	double PIDconstant=0.75; // The larger than 1 the more aggressive correction. Below 1.0 is not aggressively enough to correct fully, eventhought it will try. This value times the maxium value set in MaxTimePointClockCurrentAdjError, has not ot exceed the period wanted. It has to be larger than the jitter of the hardware clocks
 	double PIDintegral=0.20;
-	double PIDderiv=1.0-PIDconstant-PIDintegral;	
+	double PIDderiv=0.05;	
 	// Maximum values
 	double MaxAdjCountsFreq=1000000000;
 	double MinAdjCountsFreq=-1000000000+MinNumPeriodColcksPRUnoHalt;
