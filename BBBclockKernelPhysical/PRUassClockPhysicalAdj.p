@@ -19,7 +19,7 @@
 #define PRU1QuarterClocks	50000000
 // adjust to longest path so that the period of the signal is exact. The longest path is when in the OFF state the system has to check for an interrupt
 #define LOSTCLOCKCOUNTS1	2 // estimation of clocks lost
-#define LOSTCLOCKCOUNTS2	8 // estimation of clocks need 
+#define LOSTCLOCKCOUNTS2	6 // estimation of clocks need 
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17

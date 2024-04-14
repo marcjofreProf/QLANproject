@@ -183,7 +183,6 @@ else{
 }
 
 // Compute error
-int TimePointClockCurrentAdjErrorOld=this->TimePointClockCurrentAdjError;
 if (retInterruptsPRU1>0){
 	// Compute clocks adjustment
 	auto duration_FinalInitial=this->TimePointClockCurrentFinal-this->TimePointClockCurrentInitial;
@@ -213,16 +212,10 @@ if (retInterruptsPRU1>0){
 	this->TimePointClockCurrentAdjFilError = static_cast<int>(this->RatioAverageFactorClockQuarterPeriod*static_cast<double>(this->TimePointClockCurrentAdjFilError)+(1.0-this->RatioAverageFactorClockQuarterPeriod)*static_cast<double>(this->TimePointClockCurrentAdjError));
 	}
 	}
+	// Limit applied error correction
 	if (this->TimePointClockCurrentAdjFilError>this->MaxTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MaxTimePointClockCurrentAdjFilError;}
 	else if (this->TimePointClockCurrentAdjFilError<this->MinTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MinTimePointClockCurrentAdjFilError;}
-
-	if (this->TimePointClockCurrentAdjFilError>0){// I believe it indicates the tendency of the clock to advance or delay from the protocol clock.
-	this->ParityAdjFilError++;
-	}
-	else if(this->TimePointClockCurrentAdjFilError<0){
-	this->ParityAdjFilError--;
-	}
-
+	// Apply period scaling selected by the user
 	if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
 		this->AdjCountsFreq=0.0;
 	}
@@ -243,15 +236,13 @@ this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;
 this->CounterHandleInterruptSynchPRU++;// Update counter
 
 if (PlotPIDHAndlerInfo){
-	if (this->CounterHandleInterruptSynchPRU%1==0){
+	if (this->CounterHandleInterruptSynchPRU%3==0){
 	//cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
 	cout << "this->NumClocksQuarterPeriodPRUclock: " << this->NumClocksQuarterPeriodPRUclock << endl;
 	// Not used cout << "this->TimePointClockCurrentFinalInitialAdj_time_as_count: " << this->TimePointClockCurrentFinalInitialAdj_time_as_count << endl;
 	cout << "this->TimePointClockCurrentAdjError: " << this->TimePointClockCurrentAdjError << endl;
 	cout << "this->TimePointClockCurrentAdjFilError: " << this->TimePointClockCurrentAdjFilError << endl;
 	cout << "Applied: this->PIDconstant*this->TimePointClockCurrentAdjFilError: " << this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError) << endl;
-	cout << "this->ParityAdjFilError: " << this->ParityAdjFilError << endl;
-	cout << "abs(this->TimePointClockCurrentAdjError-TimePointClockCurrentAdjErrorOld): " << abs(this->TimePointClockCurrentAdjError-TimePointClockCurrentAdjErrorOld) << endl;
 	cout << "PRU1QuarterClocksAux: " << PRU1QuarterClocksAux << endl;
 	}
 }
@@ -262,7 +253,7 @@ return 0;// All ok
 /* Old - affected by the clocks drifts
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 //pru0dataMem_int[0]=this->NumClocksQuarterPeriodPRUclock; // set
-unsigned int PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/4.0);
+unsigned int PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/5.0/4.0);
 if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
