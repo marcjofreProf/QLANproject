@@ -23,7 +23,7 @@
 #define WaitCyclesBeforeAveraging	10 // To go into steady state in the initialization
 #define MaxMedianFilterArraySize	100
 #define FilterMode 1 // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mean window
-#define	CyclesSkipErrorApplied	60
+#define	CyclesSkipErrorApplied	3
 
 namespace exploringBBBCKPD {
 
