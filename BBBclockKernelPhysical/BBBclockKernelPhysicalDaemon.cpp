@@ -168,12 +168,7 @@ int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems phy
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// After the interrupt update rapidly the new quarter value
 this->TimePointClockCurrentFinal=ClockWatch::now();
 
-if (this->CounterHandleInterruptSynchPRU%CyclesSkipErrorApplied==0){// Apply correction
-pru1dataMem_int[0]=PRU1QuarterClocksAux;//Information grabbed by PRU1
-}
-else{// Do not apply correction
-pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock);
-}
+pru1dataMem_int[0]=PRU1QuarterClocksAux;//Information sent to and grabbed by PRU1
 
 if (retInterruptsPRU1>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -205,7 +200,7 @@ if (retInterruptsPRU1>0){
 	switch(FilterMode) {
 	case 2:{// Mean implementation
 	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=static_cast<double>(this->TimePointClockCurrentAdjError);// Error to be compensated for
-	this->TimePointClockCurrentAdjFilError=this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
+	this->TimePointClockCurrentAdjFilError=this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray,this->MeanFilterFactor);
 	break;
 	}
 	case 1:{// Median implementation
@@ -237,7 +232,7 @@ if (retInterruptsPRU1>0){
 }
 // Update values
 
-PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->TimePointClockCurrentAdjFilErrorApplied/5.0/4.0);
+PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorAppliedArray,this->AppliedMeanFilterFactor)/5.0/4.0);
 if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
@@ -546,18 +541,18 @@ else{
 }
 }
 
-double CKPD::DoubleMeanFilterSubArray(double* ArrayHolderAux){
-if (this->MeanFilterFactor<=1){
+double CKPD::DoubleMeanFilterSubArray(double* ArrayHolderAux,unsigned long long int FilterFactor){
+if (FilterFactor<=1){
 	return ArrayHolderAux[0];
 }
 else{
 	// Step 1: Copy the array to a temporary array
     double temp=0.0;
-    for(int i = 0; i < this->MeanFilterFactor; i++) {
+    for(int i = 0; i < FilterFactor; i++) {
         temp = temp + ArrayHolderAux[i];
     }
     
-    temp=temp/((double)(this->MeanFilterFactor));
+    temp=temp/((double)(FilterFactor));
     return temp;
 }
 }

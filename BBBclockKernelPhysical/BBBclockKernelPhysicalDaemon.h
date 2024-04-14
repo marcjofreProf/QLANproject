@@ -41,6 +41,7 @@ public: //Variables
 	double RatioAverageFactorClockQuarterPeriod=0.9999; // The lower the more aggresive taking the new computed values. Whe using mean filter.
 	unsigned long long int MedianFilterFactor=1; // When using median filter
 	unsigned long long int MeanFilterFactor=1; // When using mean filter
+	unsigned long long int AppliedMeanFilterFactor=CyclesSkipErrorApplied; // When using mean filter
 	bool PlotPIDHAndlerInfo=false;
 	double NumClocksQuarterPeriodPRUclock=0.25*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the Quarter period of the clock.
 	double NumClocksQuarterPeriodPRUclockOld=0.0;
@@ -90,7 +91,8 @@ private:// Variables
 	// Median filter implementation
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={1000000000};
 	double NumClocksQuarterPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksQuarterPeriodPRUclock};
-	double TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0};
+	double TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0.0};
+	double TimePointClockCurrentAdjFilErrorAppliedArray[MaxMedianFilterArraySize]={0.0};
 	// PID error correction
 	double PIDconstant=0.75; // The larger than 1 the more aggressive correction. Below 1.0 is not aggressively enough to correct fully, eventhought it will try. This value times the maxium value set in MaxTimePointClockCurrentAdjError, has not ot exceed the period wanted. It has to be larger than the jitter of the hardware clocks
 	double PIDintegral=0.20;
@@ -139,7 +141,7 @@ private: // Functions/Methods
 	int DisablePRUs();
 	// Median filter
 	double DoubleMedianFilterSubArray(double* ArrayHolderAux);
-	double DoubleMeanFilterSubArray(double* ArrayHolderAux);
+	double DoubleMeanFilterSubArray(double* ArrayHolderAux,unsigned long long int FilterFactor);
 	int DoubleBubbleSort(double* arr);
 	unsigned long long int ULLIMedianFilterSubArray(unsigned long long int* ArrayHolderAux);
 	unsigned long long int ULLIMeanFilterSubArray(unsigned long long int* ArrayHolderAux);
