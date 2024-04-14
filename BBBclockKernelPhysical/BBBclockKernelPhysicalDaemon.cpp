@@ -231,7 +231,7 @@ if (retInterruptsPRU1>0){
 	else if(this->AdjCountsFreq<this->MinAdjCountsFreq){this->AdjCountsFreq=this->MinAdjCountsFreq;}
 }
 // Update values
-
+this->TimePointClockCurrentAdjFilErrorAppliedArray[this->CounterHandleInterruptSynchPRU%this->AppliedMeanFilterFactor]=this->TimePointClockCurrentAdjFilErrorApplied;
 PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorAppliedArray,this->AppliedMeanFilterFactor)/5.0/4.0);
 if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
