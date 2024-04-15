@@ -3,13 +3,11 @@
 # arg2: Daemon average filter, median filter or mean window. For example (odd number): 5. 1<= arg2 <= 50. Probably, only larger if there is too much jitter.
 # arg3: Daemon print PID values: true or false
 trap "kill 0" EXIT
-echo 'Running PTP'
+echo 'Running NTP'
 sudo /etc/init.d/rsyslog stop # stop logging
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
-sudo timedatectl set-ntp false
-sudo ./linuxptp/ptp4l -i eth0 & #-f PTP4lConfigQLANproject.cfg & #-m
-sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w & #-f PTP2pcConfigQLANprojectSlave.cfg & -m
+sudo timedatectl set-ntp true
 echo 'Enabling PWM for 24 MHz ref clock'
 sudo config-pin P8.19 pwm
 sudo sh -c "echo '38' >> /sys/class/pwm/pwmchip7/pwm-7\:0/period"
@@ -49,9 +47,8 @@ sudo config-pin P8_43 pruout
 sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
-sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3
+sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemonSigCorrection $1 $2 $3
 sudo timedatectl set-ntp true # Start NTP
-echo 'Stopped PTP'
 #sudo /etc/init.d/rsyslog start # start logging
 # Kill all the launched processes with same group PID
 #kill -INT $$
