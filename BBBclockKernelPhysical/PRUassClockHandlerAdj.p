@@ -39,19 +39,19 @@
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0xFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
 #define AllOutputInterestPinsLow 0x00// For the defined output pins to set them low in block (and not the ones that are allocated by other processes)
-#define NUM_CLOCKS_HALF_PERIOD	100000000		// Not really used since it is updated by the host
+#define PRU0QuarterClocks	50000000		// Not really used since it is updated by the host
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
 .macro LED_OFF
 	MOV	r28, 1<<21
-	MOV	r29, GPIO1_BANK | GPIO_CLEARDATAOUToffset
+	MOV	r29, GPIO0_BANK | GPIO_CLEARDATAOUToffset
 	SBBO	r28, r29, 0, 4
 .endm
 
 .macro LED_ON
 	MOV	r28, 1<<21
-	MOV	r29, GPIO1_BANK | GPIO_SETDATAOUToffset
+	MOV	r29, GPIO0_BANK | GPIO_SETDATAOUToffset
 	SBBO	r28, r29, 0, 4
 .endm
 
@@ -98,7 +98,7 @@ INITIATIONS:
 //	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of IEP
 	
 	// Initializations
-	MOV	r1, NUM_CLOCKS_HALF_PERIOD// Initial initialization just in case
+	MOV	r1, PRU0QuarterClocks// Initial initialization just in case
 	LDI	r3, 0 // Initialization
 	LDI	r4, 0 // For zeroing
 	MOv	r5, 0xFFFFFFFF

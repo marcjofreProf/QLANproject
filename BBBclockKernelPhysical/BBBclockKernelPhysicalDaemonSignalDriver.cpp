@@ -121,28 +121,27 @@ CKPDSD::CKPDSD(){// Redeclaration of constructor GPIO when no argument is specif
         // Initialize DDM
 	LOCAL_DDMinit(); // DDR (Double Data Rate): A class of memory technology used in DRAM where data is transferred on both the rising and falling edges of the clock signal, effectively doubling the data rate without increasing the clock frequency.
 	
-	/* PRU0 not used
-	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
-	// Handler
+	// Launch the PRU0 (24 MHz counter) and PR1 (generating correction signal) codes but put them in idle mode, waiting for command
+	// Counter
 	//pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
-	  //pru0dataMem_int[0]=this->NumClocksQuarterPeriodPRUclock; // set
+	  pru0dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq); // set the number of clocks that defines the Quarter period of the clock. 
 	  sharedMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq);//Information grabbed by PRU1
-	  pru0dataMem_int[2]=static_cast<unsigned int>(0);
+	  pru0dataMem_int[1]=static_cast<unsigned int>(0);
 	// Load and execute the PRU program on the PRU0
-	if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdj.bin") == -1){
-		if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./PRUassClockHandlerAdj.bin") == -1){
-			perror("prussdrv_exec_program non successfull writing of PRUassClockHandlerAdj.bin");
+	if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdjSigCorrection.bin") == -1){
+		if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./PRUassClockHandlerAdjSigCorrection.bin") == -1){
+			perror("prussdrv_exec_program non successfull writing of PRUassClockHandlerAdjSigCorrection.bin");
 		}
 	}
 	//prussdrv_pru_enable(PRU_HandlerSynch_NUM);
-	*/
+	
 	    // Load and execute the PRU program on the PRU1
 	    pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq); // set the number of clocks that defines the Quarter period of the clock. 
 	    pru1dataMem_int[1]=static_cast<unsigned int>(0);
-	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdjTrig.bin") == -1){
-		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdjTrig.bin") == -1){
-			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdjTrig.bin");
+	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdjTrigSigCorrection.bin") == -1){
+		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdjTrigSigCorrection.bin") == -1){
+			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdjTrigSigCorrection.bin");
 		}
 	}
 	//prussdrv_pru_enable(PRU_ClockPhys_NUM);
@@ -154,42 +153,52 @@ CKPDSD::CKPDSD(){// Redeclaration of constructor GPIO when no argument is specif
 	//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait	
 }
 
-int CKPDSD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
+int CKPDSD::InitiateClockCorrectionPRU(){// PRU1 Only used once at the begging, because it runs continuosly
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq);
 pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
+cout << "Generating clock correction output..." << endl;
+
+return 0;// all ok
+}
+
+int CKPDSD::InitiatePPSCounterPRU(){// PRU0 Only used once at the begging, because it runs continuosly
+pru0dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq);
+pru0dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
+// Important, the following line at the very beggining to reduce the command jitter
+prussdrv_pru_send_event(21);
 cout << "Generating clock output..." << endl;
 
 return 0;// all ok
 }
 
-int CKPDSD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// After the interrupt update rapidly the new quarter value
+int CKPDSD::HandleInterruptSynchPRU(){ // Uses output pins to count 24 MHz counts sunch with software 1pps
+retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);// After the interrupt update rapidly the new quarter value
 this->TimePointClockCurrentFinal=ClockWatch::now();
 
-pru1dataMem_int[0]=PRU1QuarterClocksAux;//Information sent to and grabbed by PRU1
+pru0dataMem_int[0]=PRU0QuarterClocksAux;//Information sent to and grabbed by PRU1
 
 //Triggered part
-pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
+pru0dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
 // Important, the following line at the very beggining to reduce the command jitter
-prussdrv_pru_send_event(22);
+prussdrv_pru_send_event(21);
 //
 
-if (retInterruptsPRU1>0){
-	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+if (retInterruptsPRU0>0){
+	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 }
 else if (retInterruptsPRU1==0){
-	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-	cout << "CKPD::HandleInterruptSynchPRU took to much time for the ClockHandler. Reset PRU1 if necessary." << endl;	
+	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+	cout << "CKPD::HandleInterruptSynchPRU took to much time for the ClockHandler. Reset PRU0 if necessary." << endl;	
 }
 else{
-	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-	cout << "PRU1 interrupt poll error" << endl;
+	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+	cout << "PRU0 interrupt poll error" << endl;
 }
 
 // Compute error
-if (retInterruptsPRU1>0){
+if (retInterruptsPRU0>0){
 	// Compute clocks adjustment
 	auto duration_FinalInitial=this->TimePointClockCurrentFinal-this->TimePointClockCurrentInitial;
 	unsigned long long int duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
@@ -238,9 +247,9 @@ if (retInterruptsPRU1>0){
 }
 // Update values
 this->TimePointClockCurrentAdjFilErrorAppliedArray[this->CounterHandleInterruptSynchPRU%this->AppliedMeanFilterFactor]=this->TimePointClockCurrentAdjFilErrorApplied;
-PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorAppliedArray,this->AppliedMeanFilterFactor)/5.0/4.0);
-if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
-else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
+PRU0QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorAppliedArray,this->AppliedMeanFilterFactor)/5.0/4.0);
+if (PRU0QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU0QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
+else if (PRU0QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU0QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
 this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;
 this->CounterHandleInterruptSynchPRU++;// Update counter
@@ -260,7 +269,7 @@ if (PlotPIDHAndlerInfo){
 return 0;// All ok
 }
 
-int CKPD::PIDcontrolerTime(){
+int CKPDSD::PIDcontrolerTime(){
 TimePointClockCurrentAdjFilErrorDerivative=(TimePointClockCurrentAdjFilError-TimePointClockCurrentAdjFilErrorLast)/static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast);
 TimePointClockCurrentAdjFilErrorIntegral=TimePointClockCurrentAdjFilErrorIntegral+TimePointClockCurrentAdjFilError*static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast);
 this->TimePointClockCurrentAdjFilErrorApplied=PIDconstant*TimePointClockCurrentAdjFilError+PIDintegral*TimePointClockCurrentAdjFilErrorIntegral+PIDderiv*TimePointClockCurrentAdjFilErrorDerivative;
@@ -545,63 +554,63 @@ int main(int argc, char const * argv[]){
  // }
  //}
  
- cout << "CKPDagent started..." << endl;
+ cout << "CKPDSDagent started..." << endl;
  
- CKPD CKPDagent; // Initiate the instance
+ CKPDSD CKPDSDagent; // Initiate the instance
  
  if (argc>1){// Arguments passed
  	try{
- 	 CKPDagent.AdjCountsFreq=stod(argv[1]);
- 	 CKPDagent.AdjCountsFreqHolder=CKPDagent.AdjCountsFreq;// Update of the value for ever	 
+ 	 CKPDSDagent.AdjCountsFreq=stod(argv[1]);
+ 	 CKPDSDagent.AdjCountsFreqHolder=CKPDSDagent.AdjCountsFreq;// Update of the value for ever	 
 	 
 	 switch(FilterMode) {
 	 case 2:{// Mean implementation
 		cout << "Using mean filtering." << endl;
-		CKPDagent.MeanFilterFactor=stoull(argv[2]);
-		 if (CKPDagent.MeanFilterFactor>MaxMedianFilterArraySize){
-		 	CKPDagent.MeanFilterFactor=MaxMedianFilterArraySize;
+		CKPDSDagent.MeanFilterFactor=stoull(argv[2]);
+		 if (CKPDSDagent.MeanFilterFactor>MaxMedianFilterArraySize){
+		 	CKPDSDagent.MeanFilterFactor=MaxMedianFilterArraySize;
 		 	cout << "Attention, mean filter size too large." << endl;
 		 }
-		 else if (CKPDagent.MeanFilterFactor<1){
-		 	CKPDagent.MeanFilterFactor=1;
+		 else if (CKPDSDagent.MeanFilterFactor<1){
+		 	CKPDSDagent.MeanFilterFactor=1;
 		 	cout << "Attention, mean filter size too small." << endl;
 		 }
 		 else{// For fast median computing the length should be odd
-		 	CKPDagent.MeanFilterFactor=(CKPDagent.MeanFilterFactor/2)*2+1;
+		 	CKPDSDagent.MeanFilterFactor=(CKPDSDagent.MeanFilterFactor/2)*2+1;
 		 }
 		 break;
 	}
 	case 1:{// Median implementation
 		cout << "Using median filtering." << endl;
 		cout << "Median filtering not working." << endl;
-		CKPDagent.MedianFilterFactor=stoull(argv[2]);
-		 if (CKPDagent.MedianFilterFactor>MaxMedianFilterArraySize){
-		 	CKPDagent.MedianFilterFactor=MaxMedianFilterArraySize;
-		 	CKPDagent.MedianFilterFactor=(CKPDagent.MedianFilterFactor/2)*2+1;// odd
+		CKPDSDagent.MedianFilterFactor=stoull(argv[2]);
+		 if (CKPDSDagent.MedianFilterFactor>MaxMedianFilterArraySize){
+		 	CKPDSDagent.MedianFilterFactor=MaxMedianFilterArraySize;
+		 	CKPDSDagent.MedianFilterFactor=(CKPDSDagent.MedianFilterFactor/2)*2+1;// odd
 		 	cout << "Attention, median filter size too large." << endl;
 		 }
-		 else if (CKPDagent.MedianFilterFactor<1){
-		 	CKPDagent.MedianFilterFactor=1;
+		 else if (CKPDSDagent.MedianFilterFactor<1){
+		 	CKPDSDagent.MedianFilterFactor=1;
 		 	cout << "Attention, median filter size too small." << endl;
 		 }
 		 else{// For fast median computing the length should be odd
-		 	CKPDagent.MedianFilterFactor=(CKPDagent.MedianFilterFactor/2)*2+1;// odd
+		 	CKPDSDagent.MedianFilterFactor=(CKPDSDagent.MedianFilterFactor/2)*2+1;// odd
 		 }
 		 break;
 	}
 	default:{// Average implementation
 		cout << "Using average filtering." << endl;
-		CKPDagent.RatioAverageFactorClockQuarterPeriod=stod(argv[2]);
+		CKPDSDagent.RatioAverageFactorClockQuarterPeriod=stod(argv[2]);
 	}
 	}
 
 
-	 CKPDagent.PlotPIDHAndlerInfo=(strcmp(argv[3], "true") == 0);
+	 CKPDSDagent.PlotPIDHAndlerInfo=(strcmp(argv[3], "true") == 0);
 	 // Recompute some values:
 	 //cout << "CKPDagent.AdjCountsFreq: " << CKPDagent.AdjCountsFreq << endl;
 	 //cout << "CKPDagent.RatioAverageFactorClockQuarterPeriod: " << CKPDagent.RatioAverageFactorClockQuarterPeriod << endl;
 	 //cout << "CKPDagent.PlotPIDHAndlerInfo: " << CKPDagent.PlotPIDHAndlerInfo << endl;
-	 if (CKPDagent.PlotPIDHAndlerInfo==true){
+	 if (CKPDSDagent.PlotPIDHAndlerInfo==true){
 	 	cout << "Attention, when outputing PID values, the synch performance decreases because of the uncontrolled/large time offset between periodic timer computing." << endl;
 	 }
 	 } catch(const std::invalid_argument& e) {
@@ -611,7 +620,7 @@ int main(int argc, char const * argv[]){
         }
  }
  
- CKPDagent.m_start(); // Initiate in start state.
+ CKPDSDagent.m_start(); // Initiate in start state.
  
  /// Errors handling
  signal(SIGINT, SignalINTHandler);// Interruption signal
@@ -619,11 +628,12 @@ int main(int argc, char const * argv[]){
  //signal(SIGSEGV, SignalSegmentationFaultHandler);// Segmentation fault
  
  bool isValidWhileLoop=true;
- if (CKPDagent.getState()==CKPD::APPLICATION_EXIT){isValidWhileLoop = false;}
+ if (CKPDSDagent.getState()==CKPDSD::APPLICATION_EXIT){isValidWhileLoop = false;}
  else{isValidWhileLoop = true;}
  
- CKPDagent.GenerateSynchClockPRU();// Launch the generation of the clock
- cout << "Starting to actively adjust clock output..." << endl;
+ CKPDSDagent.InitiateClockCorrectionPRU();// Launch the generation of the clock correction
+ CKPDSDagent.InitiatePPSCounterPRU();// Launch counting of 24 MHz reference clock
+ cout << "Starting to actively adjust clock correction output..." << endl;
  
  while(isValidWhileLoop){ 
    //try{
@@ -631,17 +641,17 @@ int main(int argc, char const * argv[]){
     	// Code that might throw an exception 
  	// Check if there are need messages or actions to be done by the node
  	//CKPDagent.acquire();
-       switch(CKPDagent.getState()) {
-           case CKPD::APPLICATION_RUNNING: {               
+       switch(CKPDSDagent.getState()) {
+           case CKPDSD::APPLICATION_RUNNING: {               
                // Do Some Work
-               CKPDagent.HandleInterruptSynchPRU();
+               CKPDSDagent.HandleInterruptSynchPRU();
                break;
            }
-           case CKPD::APPLICATION_PAUSED: {
+           case CKPDSD::APPLICATION_PAUSED: {
                // Maybe do some checks if necessary 
                break;
            }
-           case CKPD::APPLICATION_EXIT: {                  
+           case CKPDSD::APPLICATION_EXIT: {                  
                isValidWhileLoop=false;//break;
            }
            default: {
@@ -650,7 +660,7 @@ int main(int argc, char const * argv[]){
 
         } // switch
         //CKPDagent.release();
-	if (signalReceivedFlag.load()){CKPDagent.~CKPD();}// Destroy the instance
+	if (signalReceivedFlag.load()){CKPDSDagent.~CKPDSD();}// Destroy the instance
         // Main barrier is in HandleInterruptSynchPRU function. No need for this CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));
         //CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Used in busy-wait
     //}
@@ -663,7 +673,7 @@ int main(int argc, char const * argv[]){
   //cout << "Exception caught" << endl;
   //  }
     } // while
-  cout << "Exiting the BBBclockKernelPhysicalDaemon" << endl;
+  cout << "Exiting the BBBclockKernelPhysicalDaemonSignalDriver" << endl;
   
   
  return 0; // Everything Ok

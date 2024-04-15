@@ -1,4 +1,4 @@
-// PRU-ICSS program to count the 24 MHz clock signal
+// PRU-ICSS program to count the 24 MHz clock signal - PRU0 allows to read pins
 
  //  
  // Assemble in BBB with:  
@@ -39,24 +39,24 @@
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0xFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
 #define AllOutputInterestPinsLow 0x00// For the defined output pins to set them low in block (and not the ones that are allocated by other processes)
-#define NUM_CLOCKS_HALF_PERIOD	100000000		// Not really used since it is updated by the host
+#define PRU0QuarterClocks	50000000
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
 .macro LED_OFF
 	MOV	r28, 1<<21
-	MOV	r29, GPIO1_BANK | GPIO_CLEARDATAOUToffset
+	MOV	r29, GPIO0_BANK | GPIO_CLEARDATAOUToffset
 	SBBO	r28, r29, 0, 4
 .endm
 
 .macro LED_ON
 	MOV	r28, 1<<21
-	MOV	r29, GPIO1_BANK | GPIO_SETDATAOUToffset
+	MOV	r29, GPIO0_BANK | GPIO_SETDATAOUToffset
 	SBBO	r28, r29, 0, 4
 .endm
 
 // r0 is arbitrary used for operations
-// r1 reserved to read from PRU DATA RAM
+// r1 reserved for storing the actual Quarter period value
 // If using the cycle counter in the PRU // We cannot use Constan table pointers since the base addresses are too far
 // r2 reserved mapping control register
 // r3 reserved for DWT_CYCCNT actual value
@@ -98,7 +98,7 @@ INITIATIONS:
 //	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of IEP
 	
 	// Initializations
-	MOV	r1, NUM_CLOCKS_HALF_PERIOD// Initial initialization just in case
+	MOV	r1, PRU0QuarterClocks// Initial initialization just in case
 	LDI	r3, 0 // Initialization
 	LDI	r4, 0 // For zeroing
 	MOv	r5, 0xFFFFFFFF
@@ -133,12 +133,12 @@ CMDLOOP:// There is some issues confusing interrupts from host if the time betwe
 	QBBC	CMDLOOP, r31, 30	// Interrupt from the host signaling to start
 READINFO:
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
-//	LBCO 	r1, CONST_PRUDRAM, 0, 4 Not needed done by the host
+	LBCO 	r1, CONST_PRUDRAM, 0, 4
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
-	LBCO	r0.b0, CONST_PRUDRAM, 8, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
+	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
-	SBCO	r4.b0, CONST_PRUDRAM, 8, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
+	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
 READCOUNTER:
 	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT
 //	LBCO	r3, CONST_IETREG, 0xC, 4// Read actual value of IEP
@@ -156,7 +156,7 @@ AVERAGEHALFPERIOD:	// Division ofr half period and average with previous values.
 	SBCO 	r3, CONST_PRUDRAM, 4, 4// Stores in position 4 de new value so the host handles it
 //SAVEVALUE:	// Save the value in SHARED RAM. Done by the host
 //	SBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Put contents into the address offset 0 SHARED RAM for the other PRU; it is from the past calculation
-SENDINTPRU:	// Send interruption
+SENDINTPRU:	// Send interruption to PRU1
 	MOV 	r31.b0, PRU0_PRU1_INTERRUPT+16
 FINISHLOOP:
 	// The following lines do not consume "signal speed"

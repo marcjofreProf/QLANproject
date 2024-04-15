@@ -25,9 +25,9 @@
 #define FilterMode 1 // 0: averaging; 1: median; 2: mean window. The erro jumps between two values, then maybe it is better to use mean window
 #define	CyclesAvgErrorApplied	1
 
-namespace exploringBBBCKPDSG {
+namespace exploringBBBCKPDSD {
 
-class CKPDSG {
+class CKPDSD {
 public: //Variables
 	enum ApplicationState { // State of the agent sequences
 		APPLICATION_RUNNING = 0,
@@ -80,12 +80,12 @@ private:// Variables
 	//TimePointChrono TimePointClockCurrentInitialAdj=std::chrono::time_point<ClockChrono>(); // Initial updated value of the clock (updated in each iteration)
 	//TimePointChrono TimePointClockCurrentFinalAdj=std::chrono::time_point<ClockChrono>(); // Initial updated value of the clock (updated in each iteration)
 	// PRU clock handling			
-	int retInterruptsPRU0;
-	int WaitTimeInterruptPRU0=static_cast<int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds/2000); // In microseconds
-	// PRU clock generation
-	unsigned int PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock);
 	int retInterruptsPRU1;
-	int WaitTimeInterruptPRU1=1500000; // In microseconds
+	int WaitTimeInterruptPRU1=static_cast<int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds/2000); // In microseconds
+	// PRU clock generation
+	unsigned int PRU0QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock);
+	int retInterruptsPRU0;
+	int WaitTimeInterruptPRU0=1500000; // In microseconds
 	unsigned int MinNumPeriodColcksPRUnoHalt=1000;// Protection againts very low numbers
 	unsigned int MaxNumPeriodColcksPRUnoHalt=1000000000;// Protecion agains very large numbers
 	// Median filter implementation
@@ -110,7 +110,8 @@ private:// Variables
 public:	// Functions/Methods
 	CKPDSD(); //constructor	
 	// PRU
-	int GenerateSynchClockPRU();//  PRU0
+	int InitiateClockCorrectionPRU();
+	int InitiatePPSCounterPRU();//  PRU1
 	int HandleInterruptSynchPRU();// PRU1
 	// Managing status of this Agent
         ApplicationState getState() const { return m_state; }	

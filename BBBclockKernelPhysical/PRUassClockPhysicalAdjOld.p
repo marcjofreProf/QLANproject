@@ -60,7 +60,7 @@
 .endm
 
 // r0 is arbitrary used for operations
-
+// r1 reserved for storing the actual Quarter period value
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
 // r2 reserved mapping control register
