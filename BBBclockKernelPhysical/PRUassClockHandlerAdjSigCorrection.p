@@ -39,7 +39,11 @@
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0xFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
 #define AllOutputInterestPinsLow 0x00// For the defined output pins to set them low in block (and not the ones that are allocated by other processes)
-#define PRU0QuarterClocks	50000000
+#define PRU0PeriodClocks	200000000 // Updated by host every second
+
+#define CLKSDUTYONTHR		13000000// Threshold for determining OFF DUTY
+#define CLKSDUTYOFFTHR		10000000// Threshold for determining OFF DUTY
+#define LOSTCLOCKCOUNTS1	6//Time to match to the period specified by the host
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
@@ -64,8 +68,16 @@
 // r5 reserved for clearing IEP counter
 // r6 reserved for 0x22000 Control register
 // r7 reserved for 0x2200C DWT_CYCCNT
+// r8 reserved for second measurement of signal
+// r9 reserved for first measurement of signal
 
 // r10 reserved for operations
+
+// r11 reserved for clocks counter
+// r12 reserved for ON clocks
+// r13 reserved for OFF clocks
+// r14 reserved for ON threshold calculation
+// r15 reserved for OFF threshold calculation
 
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
@@ -98,12 +110,15 @@ INITIATIONS:
 //	SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of IEP
 	
 	// Initializations
-	MOV	r1, PRU0QuarterClocks// Initial initialization just in case
+	MOV	r1, PRU0PeriodClocks// Initial initialization just in case
 	LDI	r3, 0 // Initialization
 	LDI	r4, 0 // For zeroing
 	MOv	r5, 0xFFFFFFFF
 	MOV	r6, 0x22000
 	MOV	r7, 0x2200C
+	LDI	r11, 0
+	MOV	r14, CLKSDUTYONTHR
+	MOV	r15, CLKSDUTYOFFTHR
 
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
@@ -133,33 +148,51 @@ CMDLOOP:// There is some issues confusing interrupts from host if the time betwe
 	QBBC	CMDLOOP, r31, 30	// Interrupt from the host signaling to start
 READINFO:
 	// Read the from positon 0 of PRU0 DATA RAM and stored it
-	LBCO 	r1, CONST_PRUDRAM, 0, 4
+	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Time in clocks of full period
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
-READCOUNTER:
-	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT
-//	LBCO	r3, CONST_IETREG, 0xC, 4// Read actual value of IEP
-CLEARCOUNTER:	// Clear the value of DWT_CYCCNT
+
+CLEAR:	// Clear the value of DWT_CYCCNT
+	LDI	r11, 0 // Clear the number of clocks counted
 //	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
 //	CLR	r2.t3
 //	SBBO	r2, r6, 0, 1 // stops DWT_CYCCNT
 	SBBO	r4, r7, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts
 	// Initial Re-initialization of DWT_CYCCNT
 	//LBBO	r2, r6, 0, 1 // r2 maps b0 control register
-	SET	r2.t3
-	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT
+//	SET	r2.t3 // done the first time
+	SBBO	r2, r6, 0, 1 // Enables DWT_CYCCNT just for robustness
 //	SBCO	r5, CONST_IETREG, 0xC, 4// Clear actual value of IEP
-AVERAGEHALFPERIOD:	// Division ofr half period and average with previous values. Add is limited to add 255 only, so we have to do it in the host
-	SBCO 	r3, CONST_PRUDRAM, 4, 4// Stores in position 4 de new value so the host handles it
-//SAVEVALUE:	// Save the value in SHARED RAM. Done by the host
-//	SBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Put contents into the address offset 0 SHARED RAM for the other PRU; it is from the past calculation
+	JMP	DETECTEDGE
+
+INCCOUNTER: // Increase counter if detection
+	ADD	r11, r11, 1
+	JMP	READCLOCK
+
+DETECTEDGE: // We should have at least 7 counts. Maybe since we are just counting, we do not care about edge. 24 MHz equals to 8 clocks more or less, hence the half time on accounts for 4 clocks (so basic instructions should last longer to not count several times, actually it should last more than 5 counts to account for the minimum time on of 20 MHz). Registering and checking should account for less
+//	MOV 	r9.b0, r31.b0 // This wants to be zeros for edge detection
+	MOV 	r8.b0, r31.b0 // This wants to be ones for edge detection
+//	NOT	r9.b0, r9.b0 // 0s converted to 1s
+//	AND	r8, r8, r9 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
+	QBNE	INCCOUNTER, r8.b0, 0
+	
+READCLOCK:
+	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT. Probably 2 counts.
+	QBNE	DETECTEDGE, r3, r1 // Add the concept of lost coutnts (maybe in the host) LOSTCLOCKCOUNTS1 // To be improved
+
+PROCESSINFO:// Process the basic info to send to the other PRU (clocks ON and clocks OFF)
+	SUB	r12, r14, r11
+	SUB	r13, r11, r15
+		
+INFOOTHERPRU:	// Division ofr half period and average with previous values. Add is limited to add 255 only, so we have to do it in the host
+	SBCO 	r12, CONST_PRUSHAREDRAM, 0, 8 // Put contents of r12 and r13 into the address offset 0 SHARED RAM for the other PRU;
 SENDINTPRU:	// Send interruption to PRU1
 	MOV 	r31.b0, PRU0_PRU1_INTERRUPT+16
 FINISHLOOP:
-	// The following lines do not consume "signal speed"
+	// Notify host finished cycle
 	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 

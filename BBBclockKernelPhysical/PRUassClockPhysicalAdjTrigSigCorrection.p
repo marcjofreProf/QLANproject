@@ -23,6 +23,9 @@
 #define LOSTCLOCKCOUNTS3	6//10 // give room for the interrupt which accounts for 8-12 clocks, but we lose 2 counts for settings bits low and loading r0, so 2 les counts should be substracted. Equating to 10
 #define LOSTCLOCKCOUNTS4	4 // estimation of clocks need to compensate shorter route when no interrupt (the interrupt part considered to have 10 clocks, hence this delay should be(9-1"One instructions")/2"Subs + QB"=4
 
+#define PRU0ONClocks	100000000
+#define PRU0OFFClocks	100000000
+
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
 #define PRU1_PRU0_INTERRUPT     18
@@ -37,7 +40,7 @@
 #define CONST_PRUSHAREDRAM   C28 // mapping shared memory
 
 #define OWN_RAM              0x00000000 // current PRU data RAM
-#define OWN_RAMoffset	     0x00000200 // Offset from Base OWN_RAM to avoid collision with some data tht PRU might store
+#define OWN_RAMoffset	     0x00000200 // Offset from Base OWN_RAM to avoid collision with some data that PRU might store
 #define PRU1_CTRL            0x240
 #define SHARED_RAM           0x100
 
@@ -60,7 +63,7 @@
 .endm
 
 // r0 is arbitrary used for operations
-// r1 reserved for storing the actual Quarter period value
+
 //// If using the cycle counter in the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
 // r2 reserved mapping control register
@@ -70,6 +73,9 @@
 // r7 reserved for 0x2200C DWT_CYCCNT
 
 // r10 is arbitrary used for operations
+
+// r11 reserved for clocks on
+// r12 reserved for clocks off
 
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
@@ -107,7 +113,6 @@ INITIATIONS:
 	MOV	r5, 0xFFFFFFFF
 	MOV	r6, 0x22000
 	MOV	r7, 0x2200C
-	MOV	r8, CYCLESRESYNCH
 	
 	// This scripts initiates first the timers
 	// Initial Re-initialization of DWT_CYCCNT
@@ -145,39 +150,26 @@ CMDLOOP:
 	QBBC	CMDLOOP, r31, 31	//Reception or not of the host interrupt
 //	// ok, we have an instruction. Assume it means 'begin signals'
 //	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
-	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period
-	MOV	r9, r1// Store new value of quarter period
+//	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Not used
 //	// We remove the command from the host (in case there is a reset from host, we are saved)
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
-	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
+	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
-	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
-
-//PSEUDOSYNCH:// Only needed at the beggining to remove the slow drift	
-//	LBBO	r0, r7, 0, 4// read the DWT_CYCCNT
-//	MOV	r8, CYCLESRESYNCH
-//	LSL	r10, r9, 2 // Multiply by 4 to have the total period
-//	SUB	r0, r10, r0 // Substract to find how long to wait	
-//	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCH consumes double
-//	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
-//PSEUDOSYNCHLOOP:
-//	SUB	r0, r0, 1
-//	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
+	SBCO	r4.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
 
 SIGNALON:
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
-	MOV	r0, r1
+	MOV	r0, r11
 DELAYON:
 	SUB 	r0, r0, 1
 	QBNE	DELAYON, r0, LOSTCLOCKCOUNTS1
 
-STARTLOOP:// Check if interruption and updates r1 accordingly. Supposedly 12 clock counts
+STARTLOOP:// Check if interruption and updates r11 and r12 accordingly. Supposedly 12 clock counts
 	QBBC	STARTDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
 	// Handle interruption
-	LBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Read contents from the address offset 0 SHARED RAM //
-	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt
-	MOV	r9, r1// Store new value of quarter period	
+	LBCO 	r11, CONST_PRUSHAREDRAM, 0, 8 // Read contents from the address offset 0 SHARED RAM 8 bytes and stores it in r11 and 12
+	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt	
 	JMP	SIGNALOFF
 STARTDELAYNOINT: // Some delay because it does not have to handle interruption
 	MOV	r0, LOSTCLOCKCOUNTS2
@@ -188,7 +180,7 @@ STARTDELAYNOINTEXTRA:
 
 SIGNALOFF:
 	MOV	r30.b0, AllOutputInterestPinsLow // write the contents to magic r30 byte 0
-	MOV	r0, r1
+	MOV	r0, r12
 DELAYOFF:
 	SUB 	r0, r0, 1
 	QBNE 	DELAYOFF, r0, LOSTCLOCKCOUNTS3
@@ -196,19 +188,14 @@ DELAYOFF:
 FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly, after QBBC to common part of no interrupt, 8 clock counts difference
 	QBBC	FINISHDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
 	// Handle interruption
-	LBCO 	r1, CONST_PRUSHAREDRAM, 0, 4 // Read contents from the address offset 0 SHARED RAM //
+	LBCO 	r11, CONST_PRUSHAREDRAM, 0, 8 // Read contents from the address offset 0 SHARED RAM 8 bytes and stores it in r11 and 12
 	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt
-//	MOV	r9, r1// Store new value of quarter period
-//	SUB	r8, r8, 1
-//	QBEQ	PSEUDOSYNCH, r8, 0 // Re-synch again
 	JMP	SIGNALON // Might consume one clock
 FINISHDELAYNOINT: // Some delay because it does not have to handle interruption
 	MOV	r0, LOSTCLOCKCOUNTS4 // extra step in no interrupt
 FINISHDELAYNOINTEXTRA:
 	SUB	r0, r0, 1
 	QBNE 	FINISHDELAYNOINTEXTRA, r0, 0
-//	SUB	r8, r8, 1
-//	QBEQ	PSEUDOSYNCH, r8, 0 // Re-synch again
 	JMP	SIGNALON // Might consume one clock
 EXIT:
 	// Send notification (interrupt) to Host for program completion

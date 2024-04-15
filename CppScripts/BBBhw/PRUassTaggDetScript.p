@@ -163,8 +163,8 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 //	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	//LBBO	r2, r12, 0, 1 // r2 maps b0 control register
-	SET	r2.t3
-	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
+	SET	r2.t3 // done the first time and r2 is not touched. Hence it can be commented to increas speed.
+	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT. Just to make it robust
 	LBBO	r8, r13, 0, 4//LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT		
 	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset				
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count

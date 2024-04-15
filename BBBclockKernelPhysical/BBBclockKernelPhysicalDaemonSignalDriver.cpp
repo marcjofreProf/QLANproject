@@ -125,8 +125,8 @@ CKPDSD::CKPDSD(){// Redeclaration of constructor GPIO when no argument is specif
 	// Counter
 	//pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
-	  pru0dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq); // set the number of clocks that defines the Quarter period of the clock. 
-	  sharedMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq);//Information grabbed by PRU1
+	  pru0dataMem_int[0]=static_cast<unsigned int>(this->NumClocksFullPeriodPRUclock+this->AdjCountsFreq); // set the number of clocks that defines the period of the 1pps in the PRU. 
+	  sharedMem_int[0]=static_cast<unsigned int>(this->NumClocksFullPeriodPRUclock+this->AdjCountsFreq);//Information grabbed by PRU1
 	  pru0dataMem_int[1]=static_cast<unsigned int>(0);
 	// Load and execute the PRU program on the PRU0
 	if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdjSigCorrection.bin") == -1){
@@ -137,8 +137,7 @@ CKPDSD::CKPDSD(){// Redeclaration of constructor GPIO when no argument is specif
 	//prussdrv_pru_enable(PRU_HandlerSynch_NUM);
 	
 	    // Load and execute the PRU program on the PRU1
-	    pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq); // set the number of clocks that defines the Quarter period of the clock. 
-	    pru1dataMem_int[1]=static_cast<unsigned int>(0);
+	    pru1dataMem_int[0]=static_cast<unsigned int>(0); // Non-start command
 	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdjTrigSigCorrection.bin") == -1){
 		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdjTrigSigCorrection.bin") == -1){
 			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdjTrigSigCorrection.bin");
@@ -154,8 +153,7 @@ CKPDSD::CKPDSD(){// Redeclaration of constructor GPIO when no argument is specif
 }
 
 int CKPDSD::InitiateClockCorrectionPRU(){// PRU1 Only used once at the begging, because it runs continuosly
-pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq);
-pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
+pru1dataMem_int[0]=static_cast<unsigned int>(1);// Double start command
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
 cout << "Generating clock correction output..." << endl;
@@ -164,7 +162,7 @@ return 0;// all ok
 }
 
 int CKPDSD::InitiatePPSCounterPRU(){// PRU0 Only used once at the begging, because it runs continuosly
-pru0dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq);
+pru0dataMem_int[0]=static_cast<unsigned int>(this->NumClocksFullPeriodPRUclock+this->AdjCountsFreq);
 pru0dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(21);
@@ -177,7 +175,7 @@ int CKPDSD::HandleInterruptSynchPRU(){ // Uses output pins to count 24 MHz count
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);// After the interrupt update rapidly the new quarter value
 this->TimePointClockCurrentFinal=ClockWatch::now();
 
-pru0dataMem_int[0]=PRU0QuarterClocksAux;//Information sent to and grabbed by PRU1
+pru0dataMem_int[0]=PRU0PeriodClocksAux;//Information sent to and grabbed by PRU1
 
 //Triggered part
 pru0dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
@@ -188,7 +186,7 @@ prussdrv_pru_send_event(21);
 if (retInterruptsPRU0>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 }
-else if (retInterruptsPRU1==0){
+else if (retInterruptsPRU0==0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "CKPD::HandleInterruptSynchPRU took to much time for the ClockHandler. Reset PRU0 if necessary." << endl;	
 }
@@ -224,7 +222,7 @@ if (retInterruptsPRU0>0){
 	break;
 	}
 	default:{// Average implementation
-	this->TimePointClockCurrentAdjFilError = this->RatioAverageFactorClockQuarterPeriod*this->TimePointClockCurrentAdjFilError+(1.0-this->RatioAverageFactorClockQuarterPeriod)*static_cast<double>(this->TimePointClockCurrentAdjError);
+	this->TimePointClockCurrentAdjFilError = this->RatioAverageFactorClockFullPeriod*this->TimePointClockCurrentAdjFilError+(1.0-this->RatioAverageFactorClockFullPeriod)*static_cast<double>(this->TimePointClockCurrentAdjError);
 	}
 	}
 	// Limit applied error correction
@@ -239,17 +237,17 @@ if (retInterruptsPRU0>0){
 		this->AdjCountsFreq=0.0;
 	}
 	else{
-		this->AdjCountsFreq=this->AdjCountsFreqHolder/5.0/4.0;// divided by 4 because it is for Quarter period for the PRU1.
+		this->AdjCountsFreq=this->AdjCountsFreqHolder/5.0;// divided by 5 because is the time per clock of PRU in nanoseconds.
 	}
-	this->MinAdjCountsFreq=-this->NumClocksQuarterPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
+	this->MinAdjCountsFreq=-this->NumClocksFullPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
 	if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}
 	else if(this->AdjCountsFreq<this->MinAdjCountsFreq){this->AdjCountsFreq=this->MinAdjCountsFreq;}
 }
 // Update values
 this->TimePointClockCurrentAdjFilErrorAppliedArray[this->CounterHandleInterruptSynchPRU%this->AppliedMeanFilterFactor]=this->TimePointClockCurrentAdjFilErrorApplied;
-PRU0QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorAppliedArray,this->AppliedMeanFilterFactor)/5.0/4.0);
-if (PRU0QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU0QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
-else if (PRU0QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU0QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
+PRU0PeriodClocksAux=static_cast<unsigned int>(this->NumClocksFullPeriodPRUclock+this->AdjCountsFreq+this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorAppliedArray,this->AppliedMeanFilterFactor)/5.0);
+if (PRU0PeriodClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU0PeriodClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
+else if (PRU0PeriodClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU0PeriodClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
 this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;
 this->CounterHandleInterruptSynchPRU++;// Update counter
@@ -257,7 +255,7 @@ this->CounterHandleInterruptSynchPRU++;// Update counter
 if (PlotPIDHAndlerInfo){
 	if (this->CounterHandleInterruptSynchPRU%3==0){
 	//cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
-	//cout << "this->NumClocksQuarterPeriodPRUclock: " << this->NumClocksQuarterPeriodPRUclock << endl;
+	//cout << "this->NumClocksFullPeriodPRUclock: " << this->NumClocksFullPeriodPRUclock << endl;
 	// Not used cout << "this->TimePointClockCurrentFinalInitialAdj_time_as_count: " << this->TimePointClockCurrentFinalInitialAdj_time_as_count << endl;
 	cout << "this->TimePointClockCurrentAdjError: " << this->TimePointClockCurrentAdjError << endl;
 	cout << "this->TimePointClockCurrentAdjFilError: " << this->TimePointClockCurrentAdjFilError << endl;
@@ -600,7 +598,7 @@ int main(int argc, char const * argv[]){
 	}
 	default:{// Average implementation
 		cout << "Using average filtering." << endl;
-		CKPDSDagent.RatioAverageFactorClockQuarterPeriod=stod(argv[2]);
+		CKPDSDagent.RatioAverageFactorClockFullPeriod=stod(argv[2]);
 	}
 	}
 
@@ -608,7 +606,7 @@ int main(int argc, char const * argv[]){
 	 CKPDSDagent.PlotPIDHAndlerInfo=(strcmp(argv[3], "true") == 0);
 	 // Recompute some values:
 	 //cout << "CKPDagent.AdjCountsFreq: " << CKPDagent.AdjCountsFreq << endl;
-	 //cout << "CKPDagent.RatioAverageFactorClockQuarterPeriod: " << CKPDagent.RatioAverageFactorClockQuarterPeriod << endl;
+	 //cout << "CKPDagent.RatioAverageFactorClockFullPeriod: " << CKPDagent.RatioAverageFactorClockFullPeriod << endl;
 	 //cout << "CKPDagent.PlotPIDHAndlerInfo: " << CKPDagent.PlotPIDHAndlerInfo << endl;
 	 if (CKPDSDagent.PlotPIDHAndlerInfo==true){
 	 	cout << "Attention, when outputing PID values, the synch performance decreases because of the uncontrolled/large time offset between periodic timer computing." << endl;

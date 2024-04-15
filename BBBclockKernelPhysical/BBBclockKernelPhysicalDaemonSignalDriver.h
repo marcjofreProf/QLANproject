@@ -37,15 +37,15 @@ public: //Variables
 	// Variables adjusted by passing values to the main function
 	double AdjCountsFreq=0.0; // Number of clock ticks to adjust to the required frequency (e.g., 32 KHz) to account for having some idle time when resetting DWT_CNT in PRU
 	double AdjCountsFreqHolder=0.0;
-	double RatioAverageFactorClockQuarterPeriodHolder=0.0; // The lower the more aggresive taking the new computed values.
-	double RatioAverageFactorClockQuarterPeriod=0.9999; // The lower the more aggresive taking the new computed values. Whe using mean filter.
+	double RatioAverageFactorClockFullPeriodHolder=0.0; // The lower the more aggresive taking the new computed values.
+	double RatioAverageFactorClockFullPeriod=0.9999; // The lower the more aggresive taking the new computed values. Whe using mean filter.
 	unsigned long long int MedianFilterFactor=1; // When using median filter
 	unsigned long long int MeanFilterFactor=1; // When using mean filter
 	unsigned long long int AppliedMeanFilterFactor=CyclesAvgErrorApplied; // When using mean filter
 	bool PlotPIDHAndlerInfo=false;
-	double NumClocksQuarterPeriodPRUclock=0.25*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the Quarter period of the clock.
-	double NumClocksQuarterPeriodPRUclockOld=0.0;
-	double NumClocksQuarterPeriodPRUclockUpdated=0.0;
+	double NumClocksFullPeriodPRUclock=(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the period of the 1pps.
+	double NumClocksFullPeriodPRUclockOld=0.0;
+	double NumClocksFullPeriodPRUclockUpdated=0.0;
 
 private:// Variables
 	ApplicationState m_state;
@@ -83,14 +83,14 @@ private:// Variables
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=static_cast<int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds/2000); // In microseconds
 	// PRU clock generation
-	unsigned int PRU0QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock);
+	unsigned int PRU0PeriodClocksAux=static_cast<unsigned int>(this->NumClocksFullPeriodPRUclock);
 	int retInterruptsPRU0;
 	int WaitTimeInterruptPRU0=1500000; // In microseconds
 	unsigned int MinNumPeriodColcksPRUnoHalt=1000;// Protection againts very low numbers
 	unsigned int MaxNumPeriodColcksPRUnoHalt=1000000000;// Protecion agains very large numbers
 	// Median filter implementation
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={1000000000};
-	double NumClocksQuarterPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksQuarterPeriodPRUclock};
+	double NumClocksFullPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksFullPeriodPRUclock};
 	double TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0.0};
 	double TimePointClockCurrentAdjFilErrorAppliedArray[MaxMedianFilterArraySize]={0.0};
 	// PID error correction
@@ -100,12 +100,12 @@ private:// Variables
 	// Maximum values
 	double MaxAdjCountsFreq=1000000000;
 	double MinAdjCountsFreq=-1000000000+MinNumPeriodColcksPRUnoHalt;
-	double MaxNumClocksQuarterPeriodPRUclockUpdated=100.0*NumClocksQuarterPeriodPRUclock;
-	double MinNumClocksQuarterPeriodPRUclockUpdated=0.01*NumClocksQuarterPeriodPRUclock;
+	double MaxNumClocksFullPeriodPRUclockUpdated=100.0*NumClocksFullPeriodPRUclock;
+	double MinNumClocksFullPeriodPRUclockUpdated=0.01*NumClocksFullPeriodPRUclock;
 	unsigned long long int MaxTimePointClockCurrentFinalInitialAdj_time_as_count=2*ClockPeriodNanoseconds;
 	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/100;
-	double MaxTimePointClockCurrentAdjFilError=4.0*5.0*static_cast<double>(NumClocksQuarterPeriodPRUclock)/100.0;
-	double MinTimePointClockCurrentAdjFilError=-4.0*5.0*static_cast<double>(NumClocksQuarterPeriodPRUclock)/100.0;
+	double MaxTimePointClockCurrentAdjFilError=5.0*static_cast<double>(NumClocksFullPeriodPRUclock)/100.0;
+	double MinTimePointClockCurrentAdjFilError=-5.0*static_cast<double>(NumClocksFullPeriodPRUclock)/100.0;
 
 public:	// Functions/Methods
 	CKPDSD(); //constructor	
