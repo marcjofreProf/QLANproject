@@ -140,9 +140,9 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	    // Load and execute the PRU program on the PRU1
 	    pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq); // set the number of clocks that defines the Quarter period of the clock. 
 	    pru1dataMem_int[1]=static_cast<unsigned int>(0);
-	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdj.bin") == -1){
-		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdj.bin") == -1){
-			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdj.bin");
+	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdjTrig.bin") == -1){
+		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdjTrig.bin") == -1){
+			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdjTrig.bin");
 		}
 	}
 	//prussdrv_pru_enable(PRU_ClockPhys_NUM);
@@ -169,6 +169,12 @@ retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterrupt
 this->TimePointClockCurrentFinal=ClockWatch::now();
 
 pru1dataMem_int[0]=PRU1QuarterClocksAux;//Information sent to and grabbed by PRU1
+
+//Triggered part
+pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
+// Important, the following line at the very beggining to reduce the command jitter
+prussdrv_pru_send_event(22);
+//
 
 if (retInterruptsPRU1>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
