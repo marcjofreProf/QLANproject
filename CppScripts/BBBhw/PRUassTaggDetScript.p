@@ -11,7 +11,9 @@
 
 // Length of acquisition:
 #define RECORDS 2048 // readings and it matches in the host c++ script
-#define MAX_VALUE_BEFORE_RESETmostsigByte 0x80 // 128 in decimal
+#define MAX_VALUE_BEFORE_RESETmostsigByte 0x7B//127 //0x80 // 128 in decimal
+#define	CompLostCounts	0x7EFFFFFF
+
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
 .macro LED_OFF
@@ -47,7 +49,7 @@
 // r12 reserved for 0x22000 Control register
 // r13 reserved for 0x2200C DWT_CYCCNT
 // r14 reserved for storing the substraction of offset value
-
+// r15 reserved for storing comparison of lost counts
 // r16 reserved for raising edge detection operation together with r6
 // r17 reserved for checking presence of synch pulses
 // r18 reserved pointing to PRU RAM
@@ -119,6 +121,7 @@ INITIATIONS:// This is only run once
 	LDI	r7, 0 // Register for clearing other registers
 	MOV	r10, 0xFFFFFFFF
 	MOV	r22, 0x00000040
+	MOV	r15, CompLostCounts
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -157,15 +160,18 @@ INITIATIONS:// This is only run once
 //NORMSTEPS: // So that always takes the same amount of counts for reset
 //	QBA     CHECK_CYCLECNT
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
+	LBBO	r0, r13, 0, 4//read DWT_CYCNT // LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT
 	//SBCO	r10, CONST_IETREG, 0xC, 4 // Reset IEP counter to 0xFFFFFFFF. Account that we lose 12 cycle counts
 //	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 //	CLR	r2.t3
 //	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	//LBBO	r2, r12, 0, 1 // r2 maps b0 control register
-	SET	r2.t3 // done the first time and r2 is not touched. Hence it can be commented to increas speed.
+//	SET	r2.t3 // done the first time and r2 is not touched. Hence it can be commented to increas speed.
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT. Just to make it robust
-	LBBO	r8, r13, 0, 4//LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT		
+//	LBBO	r8, r13, 0, 4//read DWT_CYCNT // LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT	
+	SUB	r0, r0, r15 // Account lost counts
+	ADD	r8, r8, r0
 	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset				
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 //START1:
@@ -173,8 +179,8 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 	
 // Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
 CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew	
-	LBBO	r5.b0, r13, 3, 1//LBBO	r5.b0, r13, 3, 1 // Read DWT_CYCCNT counter // LBCO	r5.b0, CONST_IETREG, 0xF, 1 // Read IEP counter	// from here, if a reset of count we will lose some counts. We read byte b3 of counter		
-	QBLE	RESET_CYCLECNT, r5.b0, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte <= r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
+	LBBO	r5, r13, 0, 4//LBBO	r5.b0, r13, 3, 1//LBBO	r5.b0, r13, 3, 1 // Read DWT_CYCCNT counter // LBCO	r5.b0, CONST_IETREG, 0xF, 1 // Read IEP counter	// from here, if a reset of count we will lose some counts. We read byte b3 of counter		
+	QBLE	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte//QBLE	RESET_CYCLECNT, r5.b0, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte <= r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
 CMDLOOP:
 	//LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
 	//QBEQ	CHECK_CYCLECNT, r0.b0, 0 // loop until we get an instructionQBEQ	NORMSTEPS, r0.b0, 0 // loop until we get an instruction
@@ -244,6 +250,7 @@ FINISH:
 	//SBCO	r10, CONST_IETREG, 0xC, 4//SBCO	r10, CONST_IETREG, 0xC, 4 // reset IEP // SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	LBBO	r11, r13, 0, 4// Read DWT_CYCNT	
 	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 8 // writes values of r8 and r9
+	LDI	r8, 0 // Reset the count of skews
 	SBCO 	r19, CONST_PRUDRAM, 8, 4 // writes values of r19
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
