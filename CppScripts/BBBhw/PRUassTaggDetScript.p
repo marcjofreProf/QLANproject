@@ -12,7 +12,6 @@
 // Length of acquisition:
 #define RECORDS 2048 // readings and it matches in the host c++ script
 #define MAX_VALUE_BEFORE_RESETmostsigByte 0x80 // 128 in decimal
-#define	CompLostCounts	0x7EFFFFFF
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
