@@ -205,7 +205,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Edge detection
 	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection
 	MOV	r6.w0, r31.w0 // Consecutive red for edge detection
-	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0 // Do not lose time with the below if there are no detections
+	QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 // Do not lose time with the below if there are no detections
 	NOT	r16, r16 // 0s converted to 1s	
 	AND	r6, r6, r16 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
 // Do not touch this part below. Somehow it works to have fast edge detections of both synch pulses and detections!!!
