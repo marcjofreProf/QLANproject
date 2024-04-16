@@ -133,8 +133,10 @@ private:// Variables
 	// Pulses compensation
 	int NumSynchPulsesRed=0;
 	unsigned long long int SynchPulsesTags[MaxNumPulses]={0};
+	unsigned long long int SynchPulsesTagsUsed[MaxNumPulses]={0};
 	double PeriodCountsPulseAdj=(((1.0/(double)(PulseFreq))*1e9)/((double)(PRUclockStepPeriodNanoseconds)));
 	double AdjPulseSynchCoeff=1.0;
+	double AdjPulseSynchCoeffAverage=1.0;
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
 
 public:	// Functions/Methods

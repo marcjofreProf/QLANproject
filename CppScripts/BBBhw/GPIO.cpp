@@ -526,6 +526,8 @@ return 0; // all ok
 }
 
 int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags){
+unsigned int ValueReadNumSynchPulses;
+int NumSynchPulseAvgAux=0;
 	// Synch taggs
 	if (streamSynchpru.is_open()){
 		streamSynchpru.close();	
@@ -544,8 +546,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 
 	if (streamSynchpru.is_open()){
 		streamSynchpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
-		int lineCount = 0;
-		unsigned int ValueReadNumSynchPulses;
+		int lineCount = 0;		
 		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 		while (streamSynchpru.read(reinterpret_cast<char*>(&ValueReadNumSynchPulses), sizeof(ValueReadNumSynchPulses)) and lineCount<MaxNumPulses){		
 			for (int iIter=0;iIter<ValueReadNumSynchPulses;iIter++){
@@ -557,14 +558,12 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 		    	streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 		}
 		NumSynchPulsesRed=lineCount;		
-		if (NumSynchPulsesRed>3){//At least four points (two cycles separated by one cycle in between), we can generate a calibration curve
-			AdjPulseSynchCoeff=0.0;// Reset
-			unsigned long long int CoeffSynchAdjAux0=1;
-			double CoeffSynchAdjAux1=0.0;// Number theoretical counts given the number of cycles
+		if (NumSynchPulsesRed>1){//At least two points (two cycles separated by one cycle in between), we can generate a calibration curve
+			//unsigned long long int CoeffSynchAdjAux0=1;
+			//double CoeffSynchAdjAux1=0.0;// Number theoretical counts given the number of cycles
 			double CoeffSynchAdjAux2=0.0;// PRU counting
 			double CoeffSynchAdjAux3=0.0;// Number theoretical counts given the number of cycles
-			double CoeffSynchAdjAux4=0.0;// Number theoretical counts given the number of cycles
-			int NumAvgAux=0;
+			//double CoeffSynchAdjAux4=0.0;// Number theoretical counts given the number of cycles
 			for (int iIter=0;iIter<(NumSynchPulsesRed-1);iIter++){
 				//CoeffSynchAdjAux0=(unsigned long long int)(((double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj); // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
 				//CoeffSynchAdjAux1=(double)(CoeffSynchAdjAux0)*PeriodCountsPulseAdj;//((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
@@ -573,24 +572,28 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 				//if (CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])/CoeffSynchAdjAux4-(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter+0])/CoeffSynchAdjAux3;}
 				if (CoeffSynchAdjAux3!=0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter+0])/CoeffSynchAdjAux3;}
 				if (CoeffSynchAdjAux3!=0.0){// and CoeffSynchAdjAux4!=0.0){
-					AdjPulseSynchCoeffArray[NumAvgAux]=CoeffSynchAdjAux2;//sqrt(CoeffSynchAdjAux2);//AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);					
+					AdjPulseSynchCoeffArray[NumSynchPulseAvgAux]=CoeffSynchAdjAux2;//sqrt(CoeffSynchAdjAux2);//AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);					
 					//cout << "AdjPulseSynchCoeffArray[NumAvgAux]: " << AdjPulseSynchCoeffArray[NumAvgAux] << endl;
-					NumAvgAux++;
+					SynchPulsesTagsUsed[NumSynchPulseAvgAux]=SynchPulsesTags[iIter+1];
+					NumSynchPulseAvgAux++;
 				}
 			}
-			cout << "PeriodCountsPulseAdj: " << PeriodCountsPulseAdj << endl;
-			cout << "Last CoeffSynchAdjAux0: " << CoeffSynchAdjAux0 << endl;
-			cout << "Last CoeffSynchAdjAux1: " << CoeffSynchAdjAux1 << endl;
+			//cout << "PeriodCountsPulseAdj: " << PeriodCountsPulseAdj << endl;
+			//cout << "Last CoeffSynchAdjAux0: " << CoeffSynchAdjAux0 << endl;
+			//cout << "Last CoeffSynchAdjAux1: " << CoeffSynchAdjAux1 << endl;
 			cout << "Last CoeffSynchAdjAux2: " << CoeffSynchAdjAux2 << endl;
 			cout << "Last CoeffSynchAdjAux3: " << CoeffSynchAdjAux3 << endl;
-			cout << "Last CoeffSynchAdjAux4: " << CoeffSynchAdjAux4 << endl;
-			if (NumAvgAux>0){AdjPulseSynchCoeff=this->DoubleMeanFilterSubArray(AdjPulseSynchCoeffArray,NumAvgAux);}// Mean average//this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumAvgAux);//Median AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
-			else{AdjPulseSynchCoeff=1.0;}// Reset
-			cout << "GPIO: AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
+			//cout << "Last CoeffSynchAdjAux4: " << CoeffSynchAdjAux4 << endl;
+			if (NumSynchPulseAvgAux>0){
+				AdjPulseSynchCoeffAverage=this->DoubleMeanFilterSubArray(AdjPulseSynchCoeffArray,NumSynchPulseAvgAux);
+				cout << "AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
+			}// Mean average//this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumAvgAux);//Median AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
+			else{AdjPulseSynchCoeffAverage=1.0;}// Reset
+			cout << "GPIO: AdjPulseSynchCoeff: " << AdjPulseSynchCoeffAverage << endl;
 		}
 		else{
-			AdjPulseSynchCoeff=1.0;
-			cout << "GPIO: AdjPulseSynchCoeff: " << AdjPulseSynchCoeff << endl;
+			AdjPulseSynchCoeffAverage=1.0;
+			cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
 		}
 		if (NumSynchPulsesRed>=MaxNumPulses){cout << "Too many pulses stored, increase buffer size or reduce number pulses: " << NumSynchPulsesRed << endl;}
 	    	else if (NumSynchPulsesRed==0){cout << "RetrieveNumStoredQuBits: No Synch pulses present!" << endl;}
@@ -622,10 +625,33 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned ch
 		int lineCount = 0;
 		unsigned long long int ValueReadTest;
 		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		int iIterMovAdjPulseSynchCoeff=0;
 		while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
 		    // Apply pulses time drift correction
 		    // using doubles, to represent usigned long long int can hold, with the 5ns PRU count, up to 2 years with presition!!!
-		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))/AdjPulseSynchCoeff);		    
+		    // Aimply apply the average value for adjusting synch pulses
+		    // AdjPulseSynchCoeff=AdjPulseSynchCoeffAverage;
+		    //TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))/AdjPulseSynchCoeff); // Simply apply the average value of Synch pulses
+		    // Advanced application of the AdjPulseSynchCoeff per ranges
+		    if (NumSynchPulsesRed>1){
+			    if (ValueReadTest<=SynchPulsesTagsUsed[iIterMovAdjPulseSynchCoeff]){
+			    	AdjPulseSynchCoeff=AdjPulseSynchCoeffArray[iIterMovAdjPulseSynchCoeff];}// Use the value of adjust synch
+			    else{// Increase
+			    	if (iIterMovAdjPulseSynchCoeff<(NumSynchPulseAvgAux-1)){
+			    	OldLastTimeTagg=ValueReadTest;
+			    	iIterMovAdjPulseSynchCoeff++;
+			    	}
+			    	AdjPulseSynchCoeff=AdjPulseSynchCoeffArray[iIterMovAdjPulseSynchCoeff];
+			    }
+		    }
+		    
+		    if (lineCount==0){
+		    	TimeTaggs[0]=(unsigned long long int)(((double)(ValueReadTest))/AdjPulseSynchCoeff);
+		    	OldLastTimeTagg=ValueReadTest;
+		    	} // Simply apply the average value of Synch pulses
+		    else{// Not the first tagg
+		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))/AdjPulseSynchCoeff)+TimeTaggs[lineCount-1];
+		    }
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
 	    	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
