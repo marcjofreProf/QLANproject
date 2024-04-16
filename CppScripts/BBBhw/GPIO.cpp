@@ -638,7 +638,6 @@ int NumSynchPulseAvgAux=0;
 			    	AdjPulseSynchCoeff=AdjPulseSynchCoeffArray[iIterMovAdjPulseSynchCoeff];}// Use the value of adjust synch
 			    else{// Increase
 			    	if (iIterMovAdjPulseSynchCoeff<(NumSynchPulseAvgAux-1)){
-			    	OldLastTimeTagg=ValueReadTest;
 			    	iIterMovAdjPulseSynchCoeff++;
 			    	}
 			    	AdjPulseSynchCoeff=AdjPulseSynchCoeffArray[iIterMovAdjPulseSynchCoeff];
@@ -647,11 +646,13 @@ int NumSynchPulseAvgAux=0;
 		    
 		    if (lineCount==0){
 		    	TimeTaggs[0]=(unsigned long long int)(((double)(ValueReadTest))/AdjPulseSynchCoeff);
-		    	OldLastTimeTagg=ValueReadTest;
+		    	
 		    	} // Simply apply the average value of Synch pulses
 		    else{// Not the first tagg
 		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))/AdjPulseSynchCoeff)+TimeTaggs[lineCount-1];
 		    }
+		    OldLastTimeTagg=ValueReadTest;
+		    
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
 	    	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
