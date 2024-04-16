@@ -727,6 +727,7 @@ int main(int argc, char const * argv[]){
 		 if (CKPDagent.MeanFilterFactor>MaxMedianFilterArraySize){
 		 	CKPDagent.MeanFilterFactor=MaxMedianFilterArraySize;
 		 	cout << "Attention, mean filter size too large." << endl;
+		 	cout << "Using averaging, reduces jitter, but produces a skew over time!!!!" << endl;
 		 }
 		 else if (CKPDagent.MeanFilterFactor<1){
 		 	CKPDagent.MeanFilterFactor=1;
@@ -734,6 +735,7 @@ int main(int argc, char const * argv[]){
 		 }
 		 else{// For fast median computing the length should be odd
 		 	CKPDagent.MeanFilterFactor=(CKPDagent.MeanFilterFactor/2)*2+1;
+		 	cout << "Using averaging, reduces jitter, but produces a skew over time!!!!" << endl;
 		 }
 		 break;
 	}
@@ -745,6 +747,7 @@ int main(int argc, char const * argv[]){
 		 	CKPDagent.MedianFilterFactor=MaxMedianFilterArraySize;
 		 	CKPDagent.MedianFilterFactor=(CKPDagent.MedianFilterFactor/2)*2+1;// odd
 		 	cout << "Attention, median filter size too large." << endl;
+		 	cout << "Using averaging, reduces jitter, but produces a skew over time!!!!" << endl;
 		 }
 		 else if (CKPDagent.MedianFilterFactor<1){
 		 	CKPDagent.MedianFilterFactor=1;
@@ -752,12 +755,14 @@ int main(int argc, char const * argv[]){
 		 }
 		 else{// For fast median computing the length should be odd
 		 	CKPDagent.MedianFilterFactor=(CKPDagent.MedianFilterFactor/2)*2+1;// odd
+		 	cout << "Using averaging, reduces jitter, but produces a skew over time!!!!" << endl;
 		 }
 		 break;
 	}
 	default:{// Average implementation
 		cout << "Using average filtering." << endl;
 		CKPDagent.RatioAverageFactorClockQuarterPeriod=stod(argv[2]);
+		cout << "Using averaging, reduces jitter, but produces a skew over time!!!!" << endl;
 	}
 	}
 
