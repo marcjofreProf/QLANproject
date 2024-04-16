@@ -347,7 +347,7 @@ else{
 	auto duration_since_lastMeasTime=this->TimePointClockCurrentPRU0meas.time_since_epoch()-this->TimePointClockCurrentPRU0measOld.time_since_epoch();
 // Convert duration to desired time
 	TimeElpasedNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_lastMeasTime).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds)
-	cout << "TimeElpasedNow_time_as_count: " << TimeElpasedNow_time_as_count << endl;
+	//cout << "TimeElpasedNow_time_as_count: " << TimeElpasedNow_time_as_count << endl;
 }
 this->TimePointClockCurrentPRU0measOld=this->TimePointClockCurrentPRU0meas;// Update old meas timestamp
 
@@ -395,7 +395,7 @@ valp++;// 1 times 8 bits
 valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts with a 1 offset
 //cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
 
-auxUnskewingFactorResetCycle=auxUnskewingFactorResetCycle+static_cast<unsigned long long int>(valSkewCounts)+4;//static_cast<unsigned long long int>(valOverflowCycleCountPRU-valOverflowCycleCountPRUold)*static_cast<unsigned long long int>(valSkewCounts); // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
+auxUnskewingFactorResetCycle=auxUnskewingFactorResetCycle+static_cast<unsigned long long int>(valSkewCounts)+static_cast<unsigned long long int>(valOverflowCycleCountPRU-valOverflowCycleCountPRUold)*4;//static_cast<unsigned long long int>(valOverflowCycleCountPRU-valOverflowCycleCountPRUold)*static_cast<unsigned long long int>(valSkewCounts); // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
 valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 if (valOverflowCycleCountPRU>0){
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU;// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
