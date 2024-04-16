@@ -652,9 +652,10 @@ int NumSynchPulseAvgAux=0;
 		    	
 		    	} // Simply apply the average value of Synch pulses
 		    else{// Not the first tagg
-		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))/AdjPulseSynchCoeff)+OldLastTimeTagg;
+		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))/AdjPulseSynchCoeff)+(unsigned long long int)((double)(OldLastTimeTagg)/OldLastAdjPulseSynchCoeff);
 		    }
 		    OldLastTimeTagg=ValueReadTest;
+		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
 		    
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
