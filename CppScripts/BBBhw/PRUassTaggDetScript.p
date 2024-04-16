@@ -205,7 +205,8 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Edge detection
 	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection
 	MOV	r6.w0, r31.w0 // Consecutive red for edge detection
-	NOT	r16.w0, r16.w0 // 0s converted to 1s	
+	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0 // Do not lose time with the below if there are no detections
+	NOT	r16, r16 // 0s converted to 1s	
 	AND	r6, r6, r16 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
 // Do not touch this part below. Somehow it works to have fast edge detections of both synch pulses and detections!!!
 	//Synch pulse is in the second byte, in bit 14 actually
@@ -218,6 +219,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
 	//Synch pulse is in the second byte, in bit 14 actually
 	AND	r17, r17, r22 // Mask to only look at bit 7 (bit 14 when considering the two bytes)// AND has to be done with the whole register, not a byte of it!!!!
+	///////////////////////////////////
 	QBNE	SYNCHPULSES, r17.b0, 0
 	// If not a synch pulse, a detector timetag
 // Do not touch this part above. Somehow it works to have fast edge detections of both synch pulses and detections!!!
