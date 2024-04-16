@@ -158,7 +158,7 @@ INITIATIONS:// This is only run once
 //NORMSTEPS: // So that always takes the same amount of counts for reset
 //	QBA     CHECK_CYCLECNT
 RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	LBBO	r0.b0, r13, 0, 1//read DWT_CYCNT // LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT
+	LBBO	r0, r13, 0, 4//read DWT_CYCNT // LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT
 	//SBCO	r10, CONST_IETREG, 0xC, 4 // Reset IEP counter to 0xFFFFFFFF. Account that we lose 12 cycle counts
 //	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 //	CLR	r2.t3
@@ -168,8 +168,8 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 //	SET	r2.t3 // done the first time and r2 is not touched. Hence it can be commented to increas speed.
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT. Just to make it robust
 //	LBBO	r8, r13, 0, 4//read DWT_CYCNT // LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT	
-	SUB	r0.b0, r0.b0, r5.b0
-	ADD	r8, r8, r0.b0 // Will read 3 (in the cpp we have to add 2) to not lost counts
+	SUB	r0, r0, r5
+	ADD	r8, r8, r0 // Will read 3 (in the cpp we have to add 2) to not lost counts
 	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset				
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 //START1:
