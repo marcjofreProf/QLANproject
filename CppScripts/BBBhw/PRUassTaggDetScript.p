@@ -169,7 +169,7 @@ RESET_CYCLECNT:// This instruction block has to contain the minimum number of li
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT. Just to make it robust
 //	LBBO	r8, r13, 0, 4//read DWT_CYCNT // LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT	
 	SUB	r0, r0, r5
-	ADD	r8, r8, r0 // Will read 3 (in the cpp we have to add 2) to not lost counts
+	ADD	r8, r8, r0 // Will read 5, 10 or 12 typically (in the cpp we have to add 4 for the reset instruction) to not lost counts
 	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset				
 	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
 //START1:
