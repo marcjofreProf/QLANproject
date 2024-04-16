@@ -220,7 +220,8 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	AND	r17, r17, r22 // Mask to only look at bit 7 (bit 14 when considering the two bytes)// AND has to be done with the whole register, not a byte of it!!!!
 	QBNE	SYNCHPULSES, r17.b0, 0
 	// If not a synch pulse, a detector timetag
-// Do not touch this part above. Somehow it works to have fast edge detections of both synch pulses and detections!!!		
+// Do not touch this part above. Somehow it works to have fast edge detections of both synch pulses and detections!!!
+CHECKDET:		
 	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0
 	// If the program reaches this point, at least one of the bits is high
 	// Proceed with the rest of the program
@@ -228,7 +229,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 SYNCHPULSES:
 	MOV	r21.b0, r19.b1
 	QBGE    SYNCHPULSESREG, r21.b0, 3// Protection instruction to not go beyond the capacity of PRU RAM
-	JMP	WAIT_FOR_EVENT
+	JMP	CHECKDET//WAIT_FOR_EVENT
 SYNCHPULSESREG:
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT	
 	SBCO	r5, CONST_PRUDRAM, r18, 4 // Write the value of DWT_CYCNT to PRU RAM

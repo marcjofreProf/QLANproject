@@ -18,7 +18,7 @@ sudo sh -c "echo '1' >> /sys/class/pwm/pwmchip7/pwm-7\:0/enable"
 echo 'Enabling PWM for 1 KHz ref clock'
 sudo config-pin P9.14 pwm 
 sudo sh -c "echo '1000000' >> /sys/class/pwm/pwmchip4/pwm-4\:0/period" 
-sudo sh -c "echo '500000' >> /sys/class/pwm/pwmchip4/pwm-4\:0/duty_cycle" 
+sudo sh -c "echo '2' >> /sys/class/pwm/pwmchip4/pwm-4\:0/duty_cycle" 
 sudo sh -c "echo '1' >> /sys/class/pwm/pwmchip4/pwm-4\:0/enable"
 echo 'Enabling PWM for 10 MHz ref clock'
 sudo config-pin P9.22 pwm 
