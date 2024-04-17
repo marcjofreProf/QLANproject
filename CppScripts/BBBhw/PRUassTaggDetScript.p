@@ -201,13 +201,14 @@ REGISTERCNT:
 	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address offset at r1
 	ADD 	r1, r1, 4 // increment address by 4 bytes
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
-	// Load the value of R31 into a working register, say R0
-	// Edge detection
+	// Load the value of R31 into a working register
+	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance
 	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection
+	NOT	r16, r16 // 0s converted to 1s. This step can be placed here to increase chances of detection. Limits the pulse rate to 50 MHz.
 	MOV	r6.w0, r31.w0 // Consecutive red for edge detection
 	QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 // Do not lose time with the below if there are no detections
-	NOT	r16, r16 // 0s converted to 1s	
 	AND	r6, r6, r16 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
+	//////////////////////////////////////
 // Do not touch this part below. Somehow it works to have fast edge detections of both synch pulses and detections!!!
 //	//Synch pulse is in the second byte, in bit 14 actually
 //	MOV 	r17.b0, r6.b1
@@ -238,7 +239,7 @@ SYNCHPULSESREG:
 	SBCO	r5, CONST_PRUDRAM, r18, 4 // Write the value of DWT_CYCNT to PRU RAM
 	ADD	r18, r18, 4 // Increment PRU RAM data address
 	ADD	r19, r19, 1 // Increment number of detected synch pulses
-	JMP	WAIT_FOR_EVENT
+	JMP	CHECKDET//WAIT_FOR_EVENT
 TIMETAG:
 	// Faster Concatenated Time counter and Detection channels
 	LBBO	r5, r13, 0, 4//LBBO	r5, r13, 0, 4 // r5 maps the value of DWT_CYCCNT//LBCO	r5, CONST_IETREG, 0xC, 4 // r5 maps the value of IEP counter. From here account for counts until reset to adjust the threshold in GPIO c++
