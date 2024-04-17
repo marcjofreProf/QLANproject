@@ -87,7 +87,7 @@ private:// Variables
 	int retInterruptsPRU0;
 	int WaitTimeInterruptPRU0=1500000; // In microseconds
 	unsigned int MinNumPeriodColcksPRUnoHalt=1000;// Protection againts very low numbers
-	unsigned int MaxNumPeriodColcksPRUnoHalt=1000000000;// Protecion agains very large numbers
+	unsigned int MaxNumPeriodColcksPRUnoHalt=2000000000;// Protecion agains very large numbers
 	// Median filter implementation
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={1000000000};
 	double NumClocksFullPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksFullPeriodPRUclock};
@@ -100,10 +100,10 @@ private:// Variables
 	// Maximum values
 	double MaxAdjCountsFreq=1000000000;
 	double MinAdjCountsFreq=-1000000000+MinNumPeriodColcksPRUnoHalt;
-	double MaxNumClocksFullPeriodPRUclockUpdated=100.0*NumClocksFullPeriodPRUclock;
+	double MaxNumClocksFullPeriodPRUclockUpdated=2.0*NumClocksFullPeriodPRUclock;
 	double MinNumClocksFullPeriodPRUclockUpdated=0.01*NumClocksFullPeriodPRUclock;
-	unsigned long long int MaxTimePointClockCurrentFinalInitialAdj_time_as_count=2*ClockPeriodNanoseconds;
-	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/100;
+	unsigned long long int MaxTimePointClockCurrentFinalInitialAdj_time_as_count=2*ClockPeriodNanoseconds; // Not used
+	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/100; // Not used
 	double MaxTimePointClockCurrentAdjFilError=5.0*static_cast<double>(NumClocksFullPeriodPRUclock)/100.0;
 	double MinTimePointClockCurrentAdjFilError=-5.0*static_cast<double>(NumClocksFullPeriodPRUclock)/100.0;
 
