@@ -87,7 +87,7 @@ private:// Variables
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=1500000; // In microseconds
 	unsigned int MinNumPeriodColcksPRUnoHalt=1000;// Protection againts very low numbers
-	unsigned int MaxNumPeriodColcksPRUnoHalt=2000000000;// Protecion agains very large numbers
+	unsigned int MaxNumPeriodColcksPRUnoHalt=200000000;// Protecion agains very large numbers
 	// Median filter implementation
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={1000000000};
 	double NumClocksQuarterPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksQuarterPeriodPRUclock};
