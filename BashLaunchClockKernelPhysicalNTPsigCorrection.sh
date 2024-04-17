@@ -47,7 +47,7 @@ sudo config-pin P8_43 pruout
 sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
-sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemonSigCorrection $1 $2 $3
+sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemonSignalDriver $1 $2 $3
 sudo timedatectl set-ntp true # Start NTP
 #sudo /etc/init.d/rsyslog start # start logging
 # Kill all the launched processes with same group PID
