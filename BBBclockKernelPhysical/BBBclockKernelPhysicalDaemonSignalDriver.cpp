@@ -189,6 +189,7 @@ prussdrv_pru_send_event(21);
 
 // Send info to PRU1
 NumRefSigCounts=pru0dataMem_int[3]; // Information of how many counts
+
 pru1dataMem_int[1]=static_cast<unsigned int>(NumOnSigCounts);// Correcton ON counts
 pru1dataMem_int[2]=static_cast<unsigned int>(NumOffSigCounts);// Correction OFF counts
 prussdrv_pru_send_event(22); // Send interrupt to PRU1

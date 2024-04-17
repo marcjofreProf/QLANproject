@@ -632,11 +632,11 @@ int NumSynchPulseAvgAux=0;
 		    // Apply pulses time drift correction
 		    // using doubles, to represent usigned long long int can hold, with the 5ns PRU count, up to 2 years with presition!!!
 		    /////////////////////////////////////////////////////////////////////////////////
-		    /*
+		    
 		    // Simply apply the average value for adjusting synch pulses
 		    AdjPulseSynchCoeff=AdjPulseSynchCoeffAverage;
 		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))/AdjPulseSynchCoeff); // Simply apply the average value of Synch pulses
-		    */
+		    /*
 		    // Advanced application of the AdjPulseSynchCoeff per ranges - need improved short acurracy		    
 		    if (NumSynchPulsesRed>1){
 			    if (ValueReadTest<=SynchPulsesTagsUsed[iIterMovAdjPulseSynchCoeff]){
@@ -657,7 +657,7 @@ int NumSynchPulseAvgAux=0;
 		    }
 		    OldLastTimeTagg=ValueReadTest;
 		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
-		    
+		    */
 		    ////////////////////////////////////////////////////////////////////////////////
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
