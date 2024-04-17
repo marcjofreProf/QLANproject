@@ -152,7 +152,7 @@ CMDLOOP:
 	QBBC	CMDLOOP, r31, 31	//Reception or not of the host interrupt
 //	// ok, we have an instruction. Assume it means 'begin signals'
 //	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
-//	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Not used
+	LBCO 	r11, CONST_PRUDRAM, 4, 8 // Load information from host into r11 and r12
 //	// We remove the command from the host (in case there is a reset from host, we are saved)
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
@@ -168,10 +168,10 @@ DELAYON:
 	QBNE	DELAYON, r0, LOSTCLOCKCOUNTS1
 
 STARTLOOP:// Check if interruption and updates r11 and r12 accordingly. Supposedly 12 clock counts
-	QBBC	STARTDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
+	QBBC	CMDLOOP, r31, 31	//Reception or not of the host interrupt
 	// Handle interruption
-//	LBCO 	r11, CONST_PRUSHAREDRAM, 0, 8 // Read contents from the address offset 0 SHARED RAM 8 bytes and stores it in r11 and 12
-	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt	
+	LBCO 	r11, CONST_PRUDRAM, 4, 8 // Read contents from the address offset 4 PRU RAM 8 bytes and stores it in r11 and 12
+	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt	
 	JMP	SIGNALOFF
 STARTDELAYNOINT: // Some delay because it does not have to handle interruption
 	MOV	r0, LOSTCLOCKCOUNTS2
@@ -188,10 +188,10 @@ DELAYOFF:
 	QBNE 	DELAYOFF, r0, LOSTCLOCKCOUNTS3
 
 FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly, after QBBC to common part of no interrupt, 8 clock counts difference
-	QBBC	FINISHDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
+	QBBC	CMDLOOP, r31, 31	//Reception or not of the host interrupt
 	// Handle interruption
-//	LBCO 	r11, CONST_PRUSHAREDRAM, 0, 8 // Read contents from the address offset 0 SHARED RAM 8 bytes and stores it in r11 and 12
-	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt
+	LBCO 	r11, CONST_PRUDRAM, 4, 8 // Read contents from the address offset 4 PRU RAM 8 bytes and stores it in r11 and 12
+	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 	JMP	SIGNALON // Might consume one clock
 FINISHDELAYNOINT: // Some delay because it does not have to handle interruption
 	MOV	r0, LOSTCLOCKCOUNTS4 // extra step in no interrupt

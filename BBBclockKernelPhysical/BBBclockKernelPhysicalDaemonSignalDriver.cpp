@@ -138,6 +138,8 @@ CKPDSD::CKPDSD(){// Redeclaration of constructor GPIO when no argument is specif
 	
 	    // Load and execute the PRU program on the PRU1
 	    pru1dataMem_int[0]=static_cast<unsigned int>(0); // Non-start command
+	    pru1dataMem_int[1]=static_cast<unsigned int>(NumOnSigCounts);// Correcton ON counts
+	    pru1dataMem_int[2]=static_cast<unsigned int>(NumOffSigCounts);// Correction OFF counts
 	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdjTrigSigCorrection.bin") == -1){
 		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdjTrigSigCorrection.bin") == -1){
 			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdjTrigSigCorrection.bin");
@@ -154,6 +156,8 @@ CKPDSD::CKPDSD(){// Redeclaration of constructor GPIO when no argument is specif
 
 int CKPDSD::InitiateClockCorrectionPRU(){// PRU1 Only used once at the begging, because it runs continuosly
 pru1dataMem_int[0]=static_cast<unsigned int>(1);// Double start command
+pru1dataMem_int[1]=static_cast<unsigned int>(NumOnSigCounts);// Correcton ON counts
+pru1dataMem_int[2]=static_cast<unsigned int>(NumOffSigCounts);// Correction OFF counts
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
 cout << "Generating clock correction output..." << endl;
@@ -182,6 +186,12 @@ pru0dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(21);
 //
+
+// Send info to PRU1
+NumRefSigCounts=pru0dataMem_int[3]; // Information of how many counts
+pru1dataMem_int[1]=static_cast<unsigned int>(NumOnSigCounts);// Correcton ON counts
+pru1dataMem_int[2]=static_cast<unsigned int>(NumOffSigCounts);// Correction OFF counts
+prussdrv_pru_send_event(22); // Send interrupt to PRU1
 
 if (retInterruptsPRU0>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations

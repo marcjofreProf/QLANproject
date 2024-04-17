@@ -106,6 +106,10 @@ private:// Variables
 	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/100; // Not used
 	double MaxTimePointClockCurrentAdjFilError=5.0*static_cast<double>(NumClocksFullPeriodPRUclock)/100.0;
 	double MinTimePointClockCurrentAdjFilError=-5.0*static_cast<double>(NumClocksFullPeriodPRUclock)/100.0;
+	// 24 MHz counts
+	unsigned int NumRefSigCounts=24000000;
+	unsigned int NumOnSigCounts=100000000;
+	unsigned int NumOffSigCounts=100000000;
 
 public:	// Functions/Methods
 	CKPDSD(); //constructor	

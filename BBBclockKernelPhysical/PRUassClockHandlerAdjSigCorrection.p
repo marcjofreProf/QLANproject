@@ -41,8 +41,6 @@
 #define AllOutputInterestPinsLow 0x00// For the defined output pins to set them low in block (and not the ones that are allocated by other processes)
 #define PRU0PeriodClocks	200000000 // Updated by host every second
 
-#define CLKSDUTYONTHR		25000000// Threshold for determining OFF DUTY
-#define CLKSDUTYOFFTHR		23000000// Threshold for determining OFF DUTY
 #define LOSTCLOCKCOUNTS1	6//Time to match to the period specified by the host
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
@@ -74,10 +72,6 @@
 // r10 reserved for operations
 
 // r11 reserved for clocks counter
-// r12 reserved for ON clocks
-// r13 reserved for OFF clocks
-// r14 reserved for ON threshold calculation
-// r15 reserved for OFF threshold calculation
 
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
@@ -117,8 +111,6 @@ INITIATIONS:
 	MOV	r6, 0x22000
 	MOV	r7, 0x2200C
 	LDI	r11, 0
-	MOV	r14, CLKSDUTYONTHR
-	MOV	r15, CLKSDUTYOFFTHR
 
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r6, 0, 1 // r2 maps b0 control register
@@ -182,15 +174,11 @@ DETECTEDGE: // We should have at least 7 counts. Maybe since we are just countin
 READCLOCK:
 	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT. Probably 2 counts.
 	QBGE	DETECTEDGE, r3, r1 // Add the concept of lost coutnts (maybe in the host) LOSTCLOCKCOUNTS1 // To be improved
-
-PROCESSINFO:// Process the basic info to send to the other PRU (clocks ON and clocks OFF)
-	SUB	r12, r14, r11
-	SUB	r13, r11, r15
 		
 INFOOTHERPRU:	// Division ofr half period and average with previous values. Add is limited to add 255 only, so we have to do it in the host
-	SBCO 	r12, CONST_PRUSHAREDRAM, 0, 8 // Put contents of r12 and r13 into the address offset 0 SHARED RAM for the other PRU;
-SENDINTPRU:	// Send interruption to PRU1
-	MOV 	r31.b0, PRU0_PRU1_INTERRUPT+16
+	SBCO 	r11, CONST_PRUDRAM, 12, 4 // Put contents of r11 in address 3 of PRU RAM
+//SENDINTPRU:	// Send interruption to PRU1. Interrupt sent to PRU1 by host
+//	MOV 	r31.b0, PRU0_PRU1_INTERRUPT+16
 FINISHLOOP:
 	// Notify host finished cycle
 	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
