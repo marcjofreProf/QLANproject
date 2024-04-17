@@ -126,7 +126,7 @@ CKPDSD::CKPDSD(){// Redeclaration of constructor GPIO when no argument is specif
 	//pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command. PRU0 idle
 	    // Execute program
 	  pru0dataMem_int[0]=static_cast<unsigned int>(this->NumClocksFullPeriodPRUclock+this->AdjCountsFreq); // set the number of clocks that defines the period of the 1pps in the PRU. 
-	  sharedMem_int[0]=static_cast<unsigned int>(this->NumClocksFullPeriodPRUclock+this->AdjCountsFreq);//Information grabbed by PRU1
+	  //sharedMem_int[0]=static_cast<unsigned int>(this->NumClocksFullPeriodPRUclock+this->AdjCountsFreq);//Information grabbed by PRU1
 	  pru0dataMem_int[1]=static_cast<unsigned int>(0);
 	// Load and execute the PRU program on the PRU0
 	if (prussdrv_exec_program(PRU_HandlerSynch_NUM, "./BBBclockKernelPhysical/PRUassClockHandlerAdjSigCorrection.bin") == -1){

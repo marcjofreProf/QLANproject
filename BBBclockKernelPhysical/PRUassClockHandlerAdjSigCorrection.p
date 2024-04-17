@@ -181,7 +181,7 @@ DETECTEDGE: // We should have at least 7 counts. Maybe since we are just countin
 	
 READCLOCK:
 	LBBO	r3, r7, 0, 4 // Read actual value of DWT_CYCCNT. Probably 2 counts.
-	QBNE	DETECTEDGE, r3, r1 // Add the concept of lost coutnts (maybe in the host) LOSTCLOCKCOUNTS1 // To be improved
+	QBGE	DETECTEDGE, r3, r1 // Add the concept of lost coutnts (maybe in the host) LOSTCLOCKCOUNTS1 // To be improved
 
 PROCESSINFO:// Process the basic info to send to the other PRU (clocks ON and clocks OFF)
 	SUB	r12, r14, r11
