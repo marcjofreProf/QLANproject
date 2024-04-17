@@ -170,7 +170,7 @@ DELAYON:
 STARTLOOP:// Check if interruption and updates r11 and r12 accordingly. Supposedly 12 clock counts
 	QBBC	STARTDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
 	// Handle interruption
-	LBCO 	r11, CONST_PRUSHAREDRAM, 0, 8 // Read contents from the address offset 0 SHARED RAM 8 bytes and stores it in r11 and 12
+//	LBCO 	r11, CONST_PRUSHAREDRAM, 0, 8 // Read contents from the address offset 0 SHARED RAM 8 bytes and stores it in r11 and 12
 	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt	
 	JMP	SIGNALOFF
 STARTDELAYNOINT: // Some delay because it does not have to handle interruption
@@ -190,7 +190,7 @@ DELAYOFF:
 FINISHLOOP:// Check if interruption and updates r1 accordingly. Supposedly, after QBBC to common part of no interrupt, 8 clock counts difference
 	QBBC	FINISHDELAYNOINT, r31, 31	//Reception or not of the PRU0 interrupt
 	// Handle interruption
-	LBCO 	r11, CONST_PRUSHAREDRAM, 0, 8 // Read contents from the address offset 0 SHARED RAM 8 bytes and stores it in r11 and 12
+//	LBCO 	r11, CONST_PRUSHAREDRAM, 0, 8 // Read contents from the address offset 0 SHARED RAM 8 bytes and stores it in r11 and 12
 	SBCO	r4.b0, C0, 0x24, 1 // Reset PRU interrupt
 	JMP	SIGNALON // Might consume one clock
 FINISHDELAYNOINT: // Some delay because it does not have to handle interruption
