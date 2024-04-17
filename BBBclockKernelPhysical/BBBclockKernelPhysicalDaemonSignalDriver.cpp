@@ -271,6 +271,7 @@ if (PlotPIDHAndlerInfo){
 	cout << "this->TimePointClockCurrentAdjFilError: " << this->TimePointClockCurrentAdjFilError << endl;
 	cout << "this->TimePointClockCurrentAdjFilErrorApplied: " << this->TimePointClockCurrentAdjFilErrorApplied << endl;
 	//cout << "PRU1QuarterClocksAux: " << PRU1QuarterClocksAux << endl;
+	cout << "this->NumRefSigCounts: " << this->NumRefSigCounts << endl;
 	}
 }
 
