@@ -41,8 +41,8 @@
 #define AllOutputInterestPinsLow 0x00// For the defined output pins to set them low in block (and not the ones that are allocated by other processes)
 #define PRU0PeriodClocks	200000000 // Updated by host every second
 
-#define CLKSDUTYONTHR		13000000// Threshold for determining OFF DUTY
-#define CLKSDUTYOFFTHR		10000000// Threshold for determining OFF DUTY
+#define CLKSDUTYONTHR		25000000// Threshold for determining OFF DUTY
+#define CLKSDUTYOFFTHR		23000000// Threshold for determining OFF DUTY
 #define LOSTCLOCKCOUNTS1	6//Time to match to the period specified by the host
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging

@@ -113,6 +113,8 @@ INITIATIONS:
 	MOV	r5, 0xFFFFFFFF
 	MOV	r6, 0x22000
 	MOV	r7, 0x2200C
+	MOV	r11, PRU0ONClocks
+	MOV	r12, PRU0OFFClocks
 	
 	// This scripts initiates first the timers
 	// Initial Re-initialization of DWT_CYCCNT
