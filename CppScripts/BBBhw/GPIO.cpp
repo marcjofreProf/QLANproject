@@ -569,10 +569,10 @@ int NumSynchPulseAvgAux=0;
 				//CoeffSynchAdjAux0=(unsigned long long int)(((double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj); // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
 				//CoeffSynchAdjAux1=(double)(CoeffSynchAdjAux0)*PeriodCountsPulseAdj;//((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
 				// It makes a lot of difference to compute the pulse synchs fixed from the first pulse tagg rather than against the last one!!!!!
-				CoeffSynchAdjAux3=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
+				CoeffSynchAdjAux3=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[0*iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
 				//CoeffSynchAdjAux4=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
 				//if (CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])/CoeffSynchAdjAux4-(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter+0])/CoeffSynchAdjAux3;}
-				if (CoeffSynchAdjAux3>0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])/CoeffSynchAdjAux3;}
+				if (CoeffSynchAdjAux3>0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[0*iIter])/CoeffSynchAdjAux3;}
 				if (CoeffSynchAdjAux3>0.0 and CoeffSynchAdjAux2>0.99 and CoeffSynchAdjAux2<1.11){// and CoeffSynchAdjAux4!=0.0){
 					AdjPulseSynchCoeffArray[NumSynchPulseAvgAux]=CoeffSynchAdjAux2;//sqrt(CoeffSynchAdjAux2);//AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);					
 					//cout << "AdjPulseSynchCoeffArray[NumAvgAux]: " << AdjPulseSynchCoeffArray[NumAvgAux] << endl;
@@ -632,11 +632,11 @@ int NumSynchPulseAvgAux=0;
 		    // Apply pulses time drift correction
 		    // using doubles, to represent usigned long long int can hold, with the 5ns PRU count, up to 2 years with presition!!!
 		    /////////////////////////////////////////////////////////////////////////////////
-		    
+		    /*
 		    // Simply apply the average value for adjusting synch pulses
 		    AdjPulseSynchCoeff=AdjPulseSynchCoeffAverage;
 		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))/AdjPulseSynchCoeff); // Simply apply the average value of Synch pulses
-		    /*
+		    */
 		    // Advanced application of the AdjPulseSynchCoeff per ranges - need improved short acurracy		    
 		    if (NumSynchPulsesRed>1){
 			    if (ValueReadTest<=SynchPulsesTagsUsed[iIterMovAdjPulseSynchCoeff]){
@@ -657,7 +657,7 @@ int NumSynchPulseAvgAux=0;
 		    }
 		    OldLastTimeTagg=ValueReadTest;
 		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
-		    */
+		    
 		    ////////////////////////////////////////////////////////////////////////////////
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
