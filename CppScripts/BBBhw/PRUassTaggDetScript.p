@@ -41,7 +41,7 @@
 // r7 reserved for 0 value (zeroing registers)
 // r8 reserved for cycle count final skew
 // r9 reserved for cycle count final threshold reset
-// r10 reserved for 0xFFFFFFFF
+
 // r11 reserved for initial count offset value
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
@@ -50,12 +50,9 @@
 // r14 reserved for storing the substraction of offset value
 
 // r16 reserved for raising edge detection operation together with r6
-// r17 reserved for checking presence of synch pulses
+
 // r18 reserved pointing to PRU RAM
 // r19 reserved number of synch pulses detected
-// r20 reserved for raising edge detection synch pulses together with r17
-// r21 reserved for checking if too many synch pulses stored
-// r22 reserved for the mask of synch pulses pin
 
 //// If using IET timer (potentially adjusted to synchronization protocols)
 // We can use Constant table pointers C26
@@ -118,8 +115,11 @@ INITIATIONS:// This is only run once
 	LDI	r19, 0 // Reset number of synch pulses register
 	// Initializations for faster execution
 	LDI	r7, 0 // Register for clearing other registers
-	MOV	r10, 0xFFFFFFFF
-	MOV	r22, 0x00000040
+	// Initiate to zero for counters of skew and offset
+	LDI	r8, 0
+	LDI	r9, 0
+	LDI	r11, 0
+	MOV	r14, 0xFFFFFFFF
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -147,13 +147,7 @@ INITIATIONS:// This is only run once
 	
 	// Keep close together the clearing of the counters (keep order)
 	SBBO	r7, r13, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts	
-//	SBCO	r10, CONST_IETREG, 0xC, 4 // Clear IEP timer count				
-	
-	// Initiate to zero for counters of skew and offset
-	LDI	r8, 0
-	LDI	r9, 0
-	LDI	r11, 0
-	MOV	r14, 0xFFFFFFFF
+//	SBCO	r10, CONST_IETREG, 0xC, 4 // Clear IEP timer count	
 
 //NORMSTEPS: // So that always takes the same amount of counts for reset
 //	QBA     CHECK_CYCLECNT
@@ -207,6 +201,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	NOT	r16, r16 // 0s converted to 1s. This step can be placed here to increase chances of detection. Limits the pulse rate to 50 MHz.
 	MOV	r6.w0, r31.w0 // Consecutive red for edge detection
 	QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 // Do not lose time with the below if there are no detections
+	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
 	AND	r6, r6, r16 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
 	//////////////////////////////////////
 // Do not touch this part below. Somehow it works to have fast edge detections of both synch pulses and detections!!!
@@ -219,7 +214,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 //	//AND 	r6.b0, r6.b0, MASKevents // Interested specifically to the bits with MASKevents. MAybe there are never counts in this first 8 bits if there is not explicitly a signal.
 //	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
 //	//Synch pulse is in the second byte, in bit 14 actually
-//	AND	r17, r17, r22 // Mask to only look at bit 7 (bit 14 when considering the two bytes)// AND has to be done with the whole register, not a byte of it!!!!	
+//	AND	r17, r17, r22 // Mask to only look at bit 7 (bit 14 when considering the two bytes)// AND has to be done with the whole register, not a byte of it!!!!	Nto needed because not visible to pru the other bits
 //	QBNE	SYNCHPULSES, r17.b0, 0
 	///////////////////////////////////
 	QBNE	SYNCHPULSES, r6.b1, 0
@@ -231,27 +226,23 @@ CHECKDET:
 	// Proceed with the rest of the program
 	JMP	TIMETAG
 SYNCHPULSES:
-	MOV	r21.b0, r19.b1
-	QBGE    SYNCHPULSESREG, r21.b0, 3// Protection instruction to not go beyond the capacity of PRU RAM
+	QBGE    SYNCHPULSESREG, r19.b1, 3// Protection instruction to not go beyond the capacity of PRU RAM
 	JMP	CHECKDET//WAIT_FOR_EVENT
-SYNCHPULSESREG:
-	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT	
+SYNCHPULSESREG:	
 	SBCO	r5, CONST_PRUDRAM, r18, 4 // Write the value of DWT_CYCNT to PRU RAM
 	ADD	r18, r18, 4 // Increment PRU RAM data address
 	ADD	r19, r19, 1 // Increment number of detected synch pulses
 	JMP	CHECKDET//WAIT_FOR_EVENT
 TIMETAG:
 	// Faster Concatenated Time counter and Detection channels
-	LBBO	r5, r13, 0, 4//LBBO	r5, r13, 0, 4 // r5 maps the value of DWT_CYCCNT//LBCO	r5, CONST_IETREG, 0xC, 4 // r5 maps the value of IEP counter. From here account for counts until reset to adjust the threshold in GPIO c++
 	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 5 // Put contents of r5 and r6.b0 of DWT_CYCCNT into the address offset at r1.
 	ADD 	r1, r1, 5 // increment address by 5 bytes	
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
 FINISH:
-	// Faster Concatenated Checks writting	
-	//SBCO	r10, CONST_IETREG, 0xC, 4//SBCO	r10, CONST_IETREG, 0xC, 4 // reset IEP // SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
-	LBBO	r11, r13, 0, 4// Read DWT_CYCNT	
+	// Faster Concatenated Checks writting
+	MOV	r11, r5 //LBBO	r11, r13, 0, 4// Read the last value of DWT_CYCNT	
 	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 8 // writes values of r8 and r9
 	LDI	r8, 0 // Reset the count of skews
 	SBCO 	r19, CONST_PRUDRAM, 8, 4 // writes values of r19
