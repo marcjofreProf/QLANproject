@@ -196,7 +196,7 @@ REGISTERCNT:
 	ADD 	r1, r1, 4 // increment address by 4 bytes
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register
-	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance
+	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
 	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection
 	NOT	r16, r16 // 0s converted to 1s. This step can be placed here to increase chances of detection. Limits the pulse rate to 50 MHz.
 	MOV	r6.w0, r31.w0 // Consecutive red for edge detection
