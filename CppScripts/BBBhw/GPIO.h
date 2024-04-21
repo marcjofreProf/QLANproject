@@ -66,7 +66,7 @@ private:// Variables
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 	// Time/synchronization management
-	using Clock = std::chrono::system_clock;//steady_clock;// We do not use system clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
+	using Clock = std::chrono::steady_clock;//steady_clock;// We do not use system clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
 	TimePoint TimePointClockCurrentPRU0meas=std::chrono::time_point<Clock>();
 	TimePoint TimePointClockCurrentPRU0measOld=std::chrono::time_point<Clock>();
