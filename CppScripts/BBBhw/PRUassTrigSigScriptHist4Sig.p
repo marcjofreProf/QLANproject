@@ -133,16 +133,14 @@ CMDLOOP:
 	//SBCO 	r4.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
-	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
+	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 4, and 1 bytes
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
-	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
+	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 4, and 1 bytes.
 	QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
 PERIODICTIMESYNCH: // with command coded 2 means synch by reseting the IEP timer
 	SBCO	r4, CONST_IETREG, 0xC, 4 // Clear IEP timer count. It could also be cleared with 0xFFFFFFFF
-//	LED_ON	// just for signaling initiations
-//	LED_OFF	// just for signaling initiations
 //	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
-//	JMP	CMDLOOP
+	JMP	CMDLOOP
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit t a specific bins for the histogram
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
