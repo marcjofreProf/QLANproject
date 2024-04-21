@@ -206,7 +206,7 @@ pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 pru0dataMem_int[1]=this->NumRecords; // set number captures
 prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
-this->TimePointClockCurrentPRU0meas=Clock::now();// To time stamp the current measurement, in contrast ot th eold last measurement
+this->TimePointClockCurrentPRU0meas=Clock::now();// To time stamp the current measurement, in contrast ot the old last measurement
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 
@@ -344,7 +344,7 @@ if (this->TimePointClockCurrentPRU0measOld==std::chrono::time_point<Clock>()){//
 	this->TimeElpasedNow_time_as_count=0;
 }
 else{
-	auto duration_since_lastMeasTime=this->TimePointClockCurrentPRU0meas.time_since_epoch()-this->TimePointClockCurrentPRU0measOld.time_since_epoch();
+	auto duration_since_lastMeasTime=this->TimePointClockCurrentPRU0meas-this->TimePointClockCurrentPRU0measOld;
 // Convert duration to desired time
 	TimeElpasedNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_lastMeasTime).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds)
 	//cout << "TimeElpasedNow_time_as_count: " << TimeElpasedNow_time_as_count << endl;
@@ -573,7 +573,7 @@ int NumSynchPulseAvgAux=0;
 				//CoeffSynchAdjAux4=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
 				//if (CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])/CoeffSynchAdjAux4-(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter+0])/CoeffSynchAdjAux3;}
 				if (CoeffSynchAdjAux3>0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])/CoeffSynchAdjAux3;}
-				if (CoeffSynchAdjAux3>0.0 and CoeffSynchAdjAux2>0.99 and CoeffSynchAdjAux2<1.11){// and CoeffSynchAdjAux4!=0.0){
+				if (CoeffSynchAdjAux3>0.0 and CoeffSynchAdjAux2>0.0){// and CoeffSynchAdjAux4!=0.0){
 					AdjPulseSynchCoeffArray[NumSynchPulseAvgAux]=CoeffSynchAdjAux2;//sqrt(CoeffSynchAdjAux2);//AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);					
 					//cout << "AdjPulseSynchCoeffArray[NumAvgAux]: " << AdjPulseSynchCoeffArray[NumAvgAux] << endl;
 					SynchPulsesTagsUsed[NumSynchPulseAvgAux]=SynchPulsesTags[iIter+1];
@@ -632,11 +632,11 @@ int NumSynchPulseAvgAux=0;
 		    // Apply pulses time drift correction
 		    // using doubles, to represent usigned long long int can hold, with the 5ns PRU count, up to 2 years with presition!!!
 		    /////////////////////////////////////////////////////////////////////////////////
-		    
+		    /*
 		    // Simply apply the average value for adjusting synch pulses
 		    AdjPulseSynchCoeff=AdjPulseSynchCoeffAverage;
 		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))/AdjPulseSynchCoeff); // Simply apply the average value of Synch pulses
-		    /*
+		    */
 		    // Advanced application of the AdjPulseSynchCoeff per ranges - need improved short acurracy		    
 		    if (NumSynchPulsesRed>1){
 			    if (ValueReadTest<=SynchPulsesTagsUsed[iIterMovAdjPulseSynchCoeff]){
@@ -650,14 +650,14 @@ int NumSynchPulseAvgAux=0;
 		    }
 		    
 		    if (lineCount==0){
-		    	TimeTaggs[0]=(unsigned long long int)(((double)(ValueReadTest))/AdjPulseSynchCoeffAverage);		    	
+		    	TimeTaggs[0]=(unsigned long long int)(ValueReadTest);		    	
 		    	} // Simply apply the average value of Synch pulses
 		    else{// Not the first tagg
-		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))/AdjPulseSynchCoeff+(double)(OldLastTimeTagg)/AdjPulseSynchCoeffAverage);
+		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))/AdjPulseSynchCoeff+TimeTaggs[lineCount-1]);
 		    }
 		    OldLastTimeTagg=ValueReadTest;
 		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
-		    */
+		    
 		    ////////////////////////////////////////////////////////////////////////////////
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
