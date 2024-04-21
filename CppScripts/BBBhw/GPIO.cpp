@@ -201,7 +201,6 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  ///////////////////////////////////////////////////////
 	  // Launch periodic synchronization of the IEP timer - like slotted time synchronization protocol
 	  this->threadRef=std::thread(&GPIO::PRUsignalTimerSynch,this);
-	  this->threadRef.detach();
 }
 
 ////////////////////////////////////////////////////////
@@ -251,7 +250,7 @@ int GPIO::PRUsignalTimerSynch(){
 		pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
 		pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions
 		prussdrv_pru_send_event(22);
-		
+		this->release();
 		retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
 		//cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 		if (retInterruptsPRU1>0){
@@ -265,7 +264,6 @@ int GPIO::PRUsignalTimerSynch(){
 			prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 			cout << "PRU1 interrupt error" << endl;
 		}		
-		this->release();
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	}
 
@@ -347,6 +345,8 @@ prussdrv_pru_send_event(22);//pru1dataMem_int[1]=(unsigned int)2; // set to 2 me
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
 
+this->release();
+
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
 //cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 if (retInterruptsPRU1>0){
@@ -400,7 +400,6 @@ do // This is blocking
 		}
 } while(!finPRU1);
 */
-this->release();
 return 0;// all ok	
 }
 
