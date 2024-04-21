@@ -244,27 +244,30 @@ int GPIO::PRUsignalTimerSynch(){
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	while(true){	
 		clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
-		this->acquire();
-		
-		// Important, the following line at the very beggining to reduce the command jitter
-		pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
-		pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions
-		prussdrv_pru_send_event(22);
-		/*
-		retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
-		//cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
-		if (retInterruptsPRU1>0){
-			prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+		if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriodMargin))){// It was possible to execute when needed
+			cout << "Resetting PRUs timer!" << endl;
+			this->acquire();
+			
+			// Important, the following line at the very beggining to reduce the command jitter
+			pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
+			pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions
+			prussdrv_pru_send_event(22);
+			
+			retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
+			//cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
+			if (retInterruptsPRU1>0){
+				prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+			}
+			else if (retInterruptsPRU1==0){
+				prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+				cout << "GPIO::PRUsignalTimerSynch took to much time. Reset PRU1 if necessary." << endl;
+			}
+			else{
+				prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+				cout << "PRU1 interrupt error" << endl;
+			}		
+			this->release();
 		}
-		else if (retInterruptsPRU1==0){
-			prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-			cout << "GPIO::PRUsignalTimerSynch took to much time. Reset PRU1 if necessary." << endl;
-		}
-		else{
-			prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-			cout << "PRU1 interrupt error" << endl;
-		}	*/	
-		this->release();
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	}
 
