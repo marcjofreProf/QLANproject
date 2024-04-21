@@ -66,12 +66,12 @@ private:// Variables
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 	// Time/synchronization management
-	using Clock = std::chrono::steady_clock;// We do not use system clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
+	using Clock = std::chrono::system_clock;//steady_clock;// We do not use system clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
 	TimePoint TimePointClockCurrentPRU0meas=std::chrono::time_point<Clock>();
 	TimePoint TimePointClockCurrentPRU0measOld=std::chrono::time_point<Clock>();
 	unsigned long long int TimePRU1synchPeriod=671088640;//2684354560;//21474836480; // 2 second in nanoseconds, since captures due to tthe clock resolution for timetaggs cannot last than 2 or 2.5 seconds
-	unsigned long long int TimePRU1synchPeriodMargin=10000;// Margin to enter an correct for PRU timer reset
+	unsigned long long int TimePRU1synchPeriodMargin=10000;// Margin to enter and correct for PRU timer reset
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	unsigned long long int TimeElpasedNow_time_as_count=0;
