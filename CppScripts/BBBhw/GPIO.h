@@ -65,7 +65,6 @@ private:// Variables
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
-	std::thread threadRefSig; // Process thread that executes requests/petitions without blocking
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;//steady_clock;// We do not use system clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
@@ -161,7 +160,6 @@ public:	// Functions/Methods
 	virtual int DisablePRUs();
 	virtual int ReadTimeStamps();// Read the detected timestaps in four channels
 	virtual int SendTriggerSignals(); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-	int TriggerSignals();
 	virtual int SendTriggerSignalsSelfTest();//
 	virtual int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
 	virtual int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
