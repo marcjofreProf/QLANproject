@@ -201,6 +201,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  ///////////////////////////////////////////////////////
 	  // Launch periodic synchronization of the IEP timer - like slotted time synchronization protocol
 	  this->threadRef=std::thread(&GPIO::PRUsignalTimerSynch,this);
+	  this->threadRef.detach();
 }
 
 ////////////////////////////////////////////////////////
