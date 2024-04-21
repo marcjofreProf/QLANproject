@@ -139,7 +139,7 @@ CMDLOOP2:// Double verification of host sending start command
 	QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
 PERIODICTIMESYNCH: // with command coded 2 means synch by reseting the IEP timer
 	SBCO	r4, CONST_IETREG, 0xC, 4 // Clear IEP timer count. It could also be cleared with 0xFFFFFFFF
-//	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
+	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP	CMDLOOP
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit t a specific bins for the histogram
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)

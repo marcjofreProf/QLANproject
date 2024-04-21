@@ -250,7 +250,7 @@ int GPIO::PRUsignalTimerSynch(){
 		pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
 		pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions
 		prussdrv_pru_send_event(22);
-		/*
+		
 		retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
 		//cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 		if (retInterruptsPRU1>0){
@@ -263,7 +263,7 @@ int GPIO::PRUsignalTimerSynch(){
 		else{
 			prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 			cout << "PRU1 interrupt error" << endl;
-		}*/		
+		}		
 		this->release();
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	}
@@ -727,12 +727,12 @@ int NumSynchPulseAvgAux=0;
 		    }
 		    
 		    if (lineCount==0){
-		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest)/AdjPulseSynchCoeffAverage);		    	
+		    	TimeTaggs[0]=(unsigned long long int)(ValueReadTest);//(unsigned long long int)((double)(ValueReadTest)/AdjPulseSynchCoeffAverage);		    	
 		    	} // Simply apply the average value of Synch pulses
 		    else{// Not the first tagg
 		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))/AdjPulseSynchCoeff+TimeTaggs[lineCount-1]);
 		    }
-		    OldLastTimeTagg=ValueReadTest;
+		    OldLastTimeTagg=(unsigned long long int)(ValueReadTest);
 		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
 		    
 		    ////////////////////////////////////////////////////////////////////////////////
