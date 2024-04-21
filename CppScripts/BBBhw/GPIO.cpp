@@ -245,7 +245,7 @@ int GPIO::PRUsignalTimerSynch(){
 	while(true){	
 		clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier. clock TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock)
 		if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriodMargin))){// It was possible to execute when needed
-			//cout << "Resetting PRUs timer!" << endl;
+			cout << "Resetting PRUs timer!" << endl;
 			this->acquire();
 			
 			// Important, the following line at the very beggining to reduce the command jitter
