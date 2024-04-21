@@ -342,6 +342,7 @@ return 0;// all ok
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 this->threadRefSig=std::thread(&GPIO::TriggerSignals,this);
+this->threadRefSig.join();
 return 0;// All Ok
 }
 
