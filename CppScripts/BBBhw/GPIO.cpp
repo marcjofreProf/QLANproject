@@ -632,6 +632,7 @@ int NumSynchPulseAvgAux=0;
 		    // Apply pulses time drift correction
 		    // using doubles, to represent usigned long long int can hold, with the 5ns PRU count, up to 2 years with presition!!!
 		    /////////////////////////////////////////////////////////////////////////////////
+		    // Synch pulses might be able to correct short term intra pulses, but not in between different sequences (inter pulses)
 		    /*
 		    // Simply apply the average value for adjusting synch pulses
 		    AdjPulseSynchCoeff=AdjPulseSynchCoeffAverage;
@@ -650,7 +651,7 @@ int NumSynchPulseAvgAux=0;
 		    }
 		    
 		    if (lineCount==0){
-		    	TimeTaggs[0]=(unsigned long long int)(ValueReadTest);		    	
+		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest)/AdjPulseSynchCoeffAverage);		    	
 		    	} // Simply apply the average value of Synch pulses
 		    else{// Not the first tagg
 		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))/AdjPulseSynchCoeff+TimeTaggs[lineCount-1]);
