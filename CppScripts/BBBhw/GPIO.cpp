@@ -574,6 +574,10 @@ int NumSynchPulseAvgAux=0;
 				//if (CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])/CoeffSynchAdjAux4-(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter+0])/CoeffSynchAdjAux3;}
 				if (CoeffSynchAdjAux3>0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])/CoeffSynchAdjAux3;}
 				if (CoeffSynchAdjAux3>0.0 and CoeffSynchAdjAux2>0.0){// and CoeffSynchAdjAux4!=0.0){
+					//SynPulse detect anomalies
+					if (CoeffSynchAdjAux2>1.11 or CoeffSynchAdjAux2<0.99){
+						cout << "Synch pulse anomaly CoeffSynchAdjAux2: " << CoeffSynchAdjAux2 << endl;
+					}
 					AdjPulseSynchCoeffArray[NumSynchPulseAvgAux]=CoeffSynchAdjAux2;//sqrt(CoeffSynchAdjAux2);//AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);					
 					//cout << "AdjPulseSynchCoeffArray[NumAvgAux]: " << AdjPulseSynchCoeffArray[NumAvgAux] << endl;
 					SynchPulsesTagsUsed[NumSynchPulseAvgAux]=SynchPulsesTags[iIter+1];
