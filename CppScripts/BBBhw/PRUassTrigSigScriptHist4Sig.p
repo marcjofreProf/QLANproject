@@ -121,28 +121,6 @@ INITIATIONS:
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
-//// With delays to produce longer pulses
-//SIGNALON:	// for setting just one pin would be set r30, r30, #Bit number
-//	//SET r30, r30, 6	
-//	MOV r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
-//	MOV r0, DELAY
-//
-//DELAYON:
-//	SUB r0, r0, 1
-//	QBNE DELAYON, r0, 0
-//	
-//SIGNALOFF:      // for clearing just one pin would be clr r30, r30, #Bit number	
-//	//CLR r30, r30, 6
-//	MOV r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
-//	MOV r0, DELAY
-//
-//DELAYOFF:
-//	SUB r0, r0, 1
-//	QBNE DELAYOFF, r0, 0
-//	JMP SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
-
-
-// Without delays (fastest possible) and CMD controlled
 CMDLOOP:
 	//LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
 	//QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction. Code 0 means idle
@@ -158,6 +136,10 @@ CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
+	QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
+PERIODICTIMESYNCH: // with command coded 2 means synch by reseting the IEP timer
+	SBCO	r4, CONST_IETREG, 0xC, 4 // Clear IEP timer count. It could also be cleared with 0xFFFFFFFF
+	JMP	CMDLOOP
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit t a specific bins for the histogram
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4

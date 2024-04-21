@@ -104,28 +104,6 @@ INITIATIONS:
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
-//// With delays to produce longer pulses
-//SIGNALON:	// for setting just one pin would be set r30, r30, #Bit number
-//	//SET r30, r30, 6	
-//	MOV r30.b0, r1.b0 // write the contents of r1 byte 0 to magic r30 output byte 0
-//	MOV r0, DELAY
-//
-//DELAYON:
-//	SUB r0, r0, 1
-//	QBNE DELAYON, r0, 0
-//	
-//SIGNALOFF:      // for clearing just one pin would be clr r30, r30, #Bit number	
-//	//CLR r30, r30, 6
-//	MOV r30.b0, r2.b0 // write the contents of r2 byte 0 to magic r30 byte 0
-//	MOV r0, DELAY
-//
-//DELAYOFF:
-//	SUB r0, r0, 1
-//	QBNE DELAYOFF, r0, 0
-//	JMP SIGNALON // Might consume more than one clock (maybe 3) but always the same amount
-
-
-// Without delays (fastest possible) and CMD controlled
 CMDLOOP:
 	//LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 4 bytes
 	//QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction. Code 0 means idle

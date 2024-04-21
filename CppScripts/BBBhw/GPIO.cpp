@@ -198,6 +198,77 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  prussdrv_pru_disable(PRU_Signal_NUM);
 	  prussdrv_pru_disable(PRU_Operation_NUM);  
 	  prussdrv_exit();*/
+	  ///////////////////////////////////////////////////////
+	  // Launch periodic synchronization of the IEP timer - like slotted time synchronization protocol
+	  this->threadRef=std::thread(&GPIO::PRUsignalTimerSynch,this);
+}
+
+////////////////////////////////////////////////////////
+void GPIO::acquire() {
+/*while(valueSemaphore==0);
+this->valueSemaphore=0; // Make sure it stays at 0
+*/
+// https://stackoverflow.com/questions/61493121/when-can-memory-order-acquire-or-memory-order-release-be-safely-removed-from-com
+// https://medium.com/@pauljlucas/advanced-thread-safety-in-c-4cbab821356e
+//int oldCount;
+bool valueSemaphoreExpected=true;
+while(true){
+	//oldCount = this->valueSemaphore.load(std::memory_order_acquire);
+	//if (oldCount > 0 && this->valueSemaphore.compare_exchange_strong(oldCount,oldCount-1,std::memory_order_acquire)){
+	if (this->valueSemaphore.compare_exchange_strong(valueSemaphoreExpected,false,std::memory_order_acquire)){	
+	break;
+	}
+}
+}
+ 
+void GPIO::release() {
+this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stays at 1
+//this->valueSemaphore.fetch_add(1,std::memory_order_release);
+}
+//////////////////////////////////////////////
+struct timespec GPIO::SetWhileWait(){
+	struct timespec requestWhileWaitAux;
+	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
+	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentSynchPRU1future.time_since_epoch();
+	// Convert duration to desired time
+	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Convert 
+	//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
+
+	requestWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
+	requestWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
+	return requestWhileWaitAux;
+}
+
+int GPIO::PRUsignalTimerSynch(){
+	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
+	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
+	while(true){	
+		clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
+		this->acquire();
+		
+		// Important, the following line at the very beggining to reduce the command jitter
+		pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
+		pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions
+		prussdrv_pru_send_event(22);
+
+		retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
+		//cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
+		if (retInterruptsPRU1>0){
+			prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+		}
+		else if (retInterruptsPRU1==0){
+			prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+			cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1 if necessary." << endl;
+		}
+		else{
+			prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+			cout << "PRU1 interrupt error" << endl;
+		}		
+		this->release();
+		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
+	}
+
+return 0; // All ok
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
@@ -266,6 +337,7 @@ return 0;// all ok
 }
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+this->acquire();
 // Important, the following line at the very beggining to reduce the command jitter
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
@@ -327,7 +399,7 @@ do // This is blocking
 		}
 } while(!finPRU1);
 */
-
+this->release();
 return 0;// all ok	
 }
 

@@ -29,6 +29,10 @@
 #define GPIO_H_
 #include<string>
 #include<fstream>
+// Threading
+#include <thread>
+// Semaphore
+#include <atomic>
 // Time/synchronization management
 #include <chrono>
 
@@ -58,11 +62,17 @@ class GPIO {
 //public: //Variables
 
 private:// Variables
+	// Semaphore
+	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
+	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 	// Time/synchronization management
 	using Clock = std::chrono::steady_clock;// We do not use system clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
 	TimePoint TimePointClockCurrentPRU0meas=std::chrono::time_point<Clock>();
 	TimePoint TimePointClockCurrentPRU0measOld=std::chrono::time_point<Clock>();
+	unsigned long long int TimePRU1synchPeriod=2000000000; // 2 second in nanoseconds, since captures due to tthe clock resolution for timetaggs cannot last than 2 or 2.5 seconds
+	struct timespec requestWhileWait;
+	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	unsigned long long int TimeElpasedNow_time_as_count=0;
 	// PRU
 	static int mem_fd;
@@ -189,7 +199,12 @@ public:	// Functions/Methods
 	virtual ~GPIO();  //destructor will unexport the pin
 
 private: // Functions/Methods
+	// Sempahore
+	void acquire();
+	void release();
 	// PRU
+	struct timespec SetWhileWait();
+	int PRUsignalTimerSynch(); // Periodic synchronizaton of the timer to control the generated signals
 	unsigned char packBits(unsigned char value);
 	// Non-PRU
 	int write(string path, string filename, string value);
