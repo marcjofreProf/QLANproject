@@ -70,7 +70,7 @@ private:// Variables
 	using TimePoint = std::chrono::time_point<Clock>;
 	TimePoint TimePointClockCurrentPRU0meas=std::chrono::time_point<Clock>();
 	TimePoint TimePointClockCurrentPRU0measOld=std::chrono::time_point<Clock>();
-	unsigned long long int TimePRU1synchPeriod=1342177280;//21474836480; // 2 second in nanoseconds, since captures due to tthe clock resolution for timetaggs cannot last than 2 or 2.5 seconds
+	unsigned long long int TimePRU1synchPeriod=2684354560;//21474836480; // 2 second in nanoseconds, since captures due to tthe clock resolution for timetaggs cannot last than 2 or 2.5 seconds
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	unsigned long long int TimeElpasedNow_time_as_count=0;
@@ -94,7 +94,7 @@ private:// Variables
 	// PRU Signal
 	unsigned int NumberRepetitionsSignal=8192;// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU
 	int retInterruptsPRU1;
-	int WaitTimeInterruptPRU1=50000000; // In microseconds
+	int WaitTimeInterruptPRU1=5000000; // In microseconds
 	//int WaitTimeToFutureTimePointPRU1=1000;// The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s.
 	//TimePoint TimePointClockNowPRU1;
 	//unsigned long long int TimeNow_time_as_countPRU1;	
