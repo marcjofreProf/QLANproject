@@ -77,7 +77,7 @@ private:// Variables
 	TimePoint TimePointClockCurrentPRU0meas=std::chrono::time_point<Clock>();
 	TimePoint TimePointClockCurrentPRU0measOld=std::chrono::time_point<Clock>();
 	unsigned long long int TimePRU1synchPeriod=500000000;//2684354560;//21474836480; // almost 1 second in nanoseconds, since captures due to tthe clock resolution for timetaggs cannot last than 2 or 2.5 seconds
-	unsigned long long int TimePRU1synchPeriodMargin=1000000;// Margin to enter and correct for PRU timer reset, in nanoseconds
+	unsigned long long int TimePRU1synchPeriodMargin=10000;// Margin to enter and correct for PRU timer reset, in nanoseconds
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	unsigned long long int TimeElpasedNow_time_as_count=0;
@@ -161,15 +161,15 @@ public:	// Functions/Methods
 	GPIO(int number); //constructor will export the pin	
 	// PRU
 	GPIO(); // initializates PRU operation
-	virtual int LOCAL_DDMinit();
-	virtual int DDRdumpdata();
-	virtual int DisablePRUs();
-	virtual int ReadTimeStamps();// Read the detected timestaps in four channels
-	virtual int SendTriggerSignals(); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-	virtual int SendTriggerSignalsSelfTest();//
-	virtual int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
-	virtual int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
-	virtual int ClearStoredQuBits(); // Send the writting pointer back to the beggining - effectively clearing stored QuBits
+	int LOCAL_DDMinit();
+	int DDRdumpdata();
+	int DisablePRUs();
+	int ReadTimeStamps();// Read the detected timestaps in four channels
+	int SendTriggerSignals(); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+	int SendTriggerSignalsSelfTest();//
+	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
+	 int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
+	 int ClearStoredQuBits(); // Send the writting pointer back to the beggining - effectively clearing stored QuBits
 	// Non PRU
 	virtual int getNumber() { return number; }
 	// General Input and Output Settings
