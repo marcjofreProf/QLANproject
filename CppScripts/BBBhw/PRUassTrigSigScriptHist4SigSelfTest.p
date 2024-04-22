@@ -25,7 +25,7 @@
 #define NUM_REPETITIONS		1024	//Not used 4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used). This defines the Maximum Transmission Unit - coul dbe named Quantum MTU (defined together with the clock)
 #define DELAY 4094//It has to be  related to an even power of 2!!! Example 1022=(2048-4)/2. How to do it. Substract 4 and divide by 2 for the common cost commands. For instance 58=(128-4)/2 // Assuming that QBNE always consumes one clock (check experimentally). It has to be a power of 2 to be able to do module in assembler
 #define DELAYMODULE	65536 // The whole histogram period
-#define DELAYHALFMODULE	65535 // One less than the power of two required of the period of the histogram which is 65536=2^16, hence 2^15=32768.
+#define DELAYHALFMODULE	65535 // One unit less than the power of two required of the period of the histogram which is 65535-1=2^16-1.
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
