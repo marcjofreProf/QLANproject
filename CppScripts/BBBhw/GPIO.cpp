@@ -161,6 +161,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 		}
 	}
 	////prussdrv_pru_enable(PRU_Operation_NUM);
+	/*
 	// Generate signals
 	pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 	pru1dataMem_int[1]=static_cast<unsigned int>(0); // set no command
@@ -170,8 +171,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 			perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScriptHist4Sig.bin");//perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
 		}
 	}
-	/*
-	// Self Test Histogram
+	*/
+	// Self Test Histogram - comment the PRU1 launching above "generate signals"
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4SigSelfTest.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
 		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4SigSelfTest.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
 			perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScriptHist4SigSelfTest.bin");//perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
@@ -180,7 +181,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	this->SendTriggerSignalsSelfTest(); // Self test initialization
 	cout << "Attention doing SendTriggerSignalsSelfTest. To be removed" << endl;	
-	*/
+	
 	
 	////prussdrv_pru_enable(PRU_Signal_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
