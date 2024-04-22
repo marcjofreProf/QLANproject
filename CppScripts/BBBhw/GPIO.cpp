@@ -646,6 +646,7 @@ int NumSynchPulseAvgAux=0;
 				CoeffSynchAdjAux3=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj;//(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
 				//CoeffSynchAdjAux4=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
 				//if (CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])/CoeffSynchAdjAux4-(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter+0])/CoeffSynchAdjAux3;}
+				CoeffSynchAdjAux2=0.0;
 				if (CoeffSynchAdjAux3>0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])/CoeffSynchAdjAux3;}
 				if (CoeffSynchAdjAux3>0.0 and CoeffSynchAdjAux2>0.0){// and CoeffSynchAdjAux4!=0.0){
 					//SynPulse detect anomalies
