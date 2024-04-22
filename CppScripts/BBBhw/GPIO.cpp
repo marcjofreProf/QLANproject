@@ -279,6 +279,7 @@ return 0; // All ok
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
+this->acquire();
 // Important, the following line at the very beggining to reduce the command jitter
 pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 pru0dataMem_int[1]=this->NumRecords; // set number captures
@@ -339,7 +340,7 @@ else{CheckTimeFlagPRU0=false;}
 	}
 } while(!finPRU0);
 */
-
+this->release();
 return 0;// all ok
 }
 
