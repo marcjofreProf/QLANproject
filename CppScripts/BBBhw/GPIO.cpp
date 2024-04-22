@@ -665,7 +665,7 @@ int NumSynchPulseAvgAux=0;
 			cout << "Last CoeffSynchAdjAux3: " << CoeffSynchAdjAux3 << endl;
 			//cout << "Last CoeffSynchAdjAux4: " << CoeffSynchAdjAux4 << endl;
 			if (NumSynchPulseAvgAux>0){
-				AdjPulseSynchCoeffAverage=this->DoubleMeanFilterSubArray(AdjPulseSynchCoeffArray,NumSynchPulseAvgAux);//this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumSynchPulseAvgAux);
+				AdjPulseSynchCoeffAverage=this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumSynchPulseAvgAux);//this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumSynchPulseAvgAux);
 				cout << "AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
 			}// Mean average//this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumAvgAux);//Median AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
 			else{AdjPulseSynchCoeffAverage=1.0;}// Reset
