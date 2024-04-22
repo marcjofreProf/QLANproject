@@ -66,7 +66,7 @@ private:// Variables
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
-	unsigned long long int PRUoffsetDriftError=0;
+	long long int PRUoffsetDriftError=0;
 	unsigned long long int PRUcurrentTimerVal=0;
 	unsigned long long int PRUcurrentTimerValOld=0;
 	// Time/synchronization management
