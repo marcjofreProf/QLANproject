@@ -278,10 +278,10 @@ int GPIO::PRUsignalTimerSynch(){
 					pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftError);// Apply correction
 				}
 				else{
-					pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not appy correction
+					pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction
 				}
 				if ((this->iIterPRUcurrentTimerVal%10)==0){cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;}
-				//this->EstimateSynch=static_cast<double>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))/static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
+				this->EstimateSynch=static_cast<double>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))/static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
 				if ((this->iIterPRUcurrentTimerVal%10)==0){cout << "EstimateSynch: " << this->EstimateSynch << endl;}
 			}
 			this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
