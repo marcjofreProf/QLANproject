@@ -71,7 +71,7 @@ private:// Variables
 	using TimePoint = std::chrono::time_point<Clock>;
 	TimePoint TimePointClockCurrentPRU0meas=std::chrono::time_point<Clock>();
 	TimePoint TimePointClockCurrentPRU0measOld=std::chrono::time_point<Clock>();
-	unsigned long long int TimePRU1synchPeriod=3276800;//2684354560;//21474836480; // 2 second in nanoseconds, since captures due to tthe clock resolution for timetaggs cannot last than 2 or 2.5 seconds
+	unsigned long long int TimePRU1synchPeriod=500000000;//2684354560;//21474836480; // almost 1 second in nanoseconds, since captures due to tthe clock resolution for timetaggs cannot last than 2 or 2.5 seconds
 	unsigned long long int TimePRU1synchPeriodMargin=100000;// Margin to enter and correct for PRU timer reset, in nanoseconds
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes

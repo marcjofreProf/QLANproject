@@ -161,7 +161,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 		}
 	}
 	////prussdrv_pru_enable(PRU_Operation_NUM);
-	/*
+	
 	// Generate signals
 	pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 	pru1dataMem_int[1]=static_cast<unsigned int>(0); // set no command
@@ -171,7 +171,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 			perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScriptHist4Sig.bin");//perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
 		}
 	}
-	*/
+	/*
 	// Self Test Histogram - comment the PRU1 launching above "generate signals"
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4SigSelfTest.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
 		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4SigSelfTest.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
@@ -181,7 +181,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	this->SendTriggerSignalsSelfTest(); // Self test initialization
 	cout << "Attention doing SendTriggerSignalsSelfTest. To be removed" << endl;	
-	
+	*/
 	
 	////prussdrv_pru_enable(PRU_Signal_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
@@ -474,15 +474,9 @@ valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts wit
 //cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
 
 auxUnskewingFactorResetCycle=auxUnskewingFactorResetCycle+static_cast<unsigned long long int>(valSkewCounts)+static_cast<unsigned long long int>(valOverflowCycleCountPRU-valOverflowCycleCountPRUold)*8;//static_cast<unsigned long long int>(valOverflowCycleCountPRU-valOverflowCycleCountPRUold)*static_cast<unsigned long long int>(valSkewCounts); // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
-cout << "valOverflowCycleCountPRU-valOverflowCycleCountPRUold: " << (valOverflowCycleCountPRU-valOverflowCycleCountPRUold) << endl;
+//cout << "valOverflowCycleCountPRU-valOverflowCycleCountPRUold: " << (valOverflowCycleCountPRU-valOverflowCycleCountPRUold) << endl;
 valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valOverflowCycleCountPRU);// The last addition of static_cast<unsigned long long int>(valOverflowCycleCountPRU) is to compensate for a continuous drift
-//if (valOverflowCycleCountPRU>0){
-//extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU;// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
-//}
-//else{
-//extendedCounterPRUaux=auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU;// 31 because the overflow counter is increment every half the maxium time for clock (to avoid overflows during execution time)
-//}
 
 // Reading or not Synch pulses
 NumSynchPulses=static_cast<unsigned int>(*synchp);
