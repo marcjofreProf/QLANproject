@@ -272,14 +272,17 @@ int GPIO::PRUsignalTimerSynch(){
 			//pru1dataMem_int[2]// Current IEP timer sample
 			//pru1dataMem_int[3]// Correction to apply to IEP timer
 			this->PRUcurrentTimerVal=static_cast<unsigned long long int>(pru1dataMem_int[2]);
-			if (this->PRUcurrentTimerVal > this->PRUcurrentTimerValOld){
+			if ((this->PRUcurrentTimerVal > this->PRUcurrentTimerValOld) and this->PRUcurrentTimerValOld!=0xFFFFFFFFFFFFFFFF){
 				this->PRUoffsetDriftError=static_cast<long long int>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
 				cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			}
 			this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
 			
 		}
-		//else{cout << "NOT Resetting PRUs timer!" << endl;}
+		else{
+			this->PRUcurrentTimerValOld=0xFFFFFFFFFFFFFFFF;
+			cout << "NOT Resetting PRUs timer!" << endl;
+		}
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	}
 

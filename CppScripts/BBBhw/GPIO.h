@@ -68,7 +68,7 @@ private:// Variables
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int PRUoffsetDriftError=0;
 	unsigned long long int PRUcurrentTimerVal=0;
-	unsigned long long int PRUcurrentTimerValOld=0;
+	unsigned long long int PRUcurrentTimerValOld=0xFFFFFFFFFFFFFFFF;
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;//steady_clock;// We do not use system clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
