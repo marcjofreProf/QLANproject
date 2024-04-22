@@ -160,6 +160,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 			perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
 		}
 	}
+	/*
 	////prussdrv_pru_enable(PRU_Operation_NUM);
 	// Generate signals
 	pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
@@ -169,8 +170,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
 			perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScriptHist4Sig.bin");//perror("prussdrv_exec_program non successfull writing of PRUassTrigSigScript.bin");
 		}
-	}
-	/*
+	}*/
+	
 	// Self Test Histogram
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4SigSelfTest.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
 		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4SigSelfTest.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
@@ -180,7 +181,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	this->SendTriggerSignalsSelfTest(); // Self test initialization
 	cout << "Attention doing SendTriggerSignalsSelfTest. To be removed" << endl;	
-	*/
+	
 	
 	////prussdrv_pru_enable(PRU_Signal_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
@@ -200,7 +201,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  prussdrv_exit();*/
 	  ///////////////////////////////////////////////////////
 	  // Launch periodic synchronization of the IEP timer - like slotted time synchronization protocol
-	  if (this->ResetPeriodicallyTimerPRU1){this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);}
+	  //if (this->ResetPeriodicallyTimerPRU1){this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);}
 }
 
 ////////////////////////////////////////////////////////
