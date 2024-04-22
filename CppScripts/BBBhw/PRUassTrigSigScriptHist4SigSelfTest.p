@@ -161,8 +161,8 @@ CMDLOOP2:// Double verification of host sending start command
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit t a specific bins for the histogram
 //	LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0.b0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
 //	AND	r0, r0, r6 //Maybe it can not be done becaue larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
-	LBCO	r0.w0, CONST_IETREG, 0xC, 2//LBBO	r0.b0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4// Trick since for period of 65536 we can direclty implement module reading 2 bytes//Maybe it can not be done becaue larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
-	SUB	r0, r7, r0 // Substract to find how long to wait
+	LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0.b0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4// Trick since for period of 65536 we can direclty implement module reading 2 bytes//Maybe it can not be done becaue larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
+	AND	r0, r0, r6 //Maybe it can not be done because larger than 255. 
 	SUB	r0, r7, r0 // Substract to find how long to wait	
 	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCH consumes double
 	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
@@ -182,9 +182,10 @@ PSEUDOSYNCHLOOP:
 SIGNALON1:	
 	MOV	r30.b0, 0x11 // Double channels 1. write to magic r30 output byte 0
 	MOV	r5, DELAY
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 //	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	MOV	r30.b0, 0x00 // All off
 SIGNALON1DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON1DEL, r5, 0
@@ -202,9 +203,10 @@ SIGNALON2DEL:
 SIGNALON3:
 	MOV	r30.b0, 0x22 // Double channels 2. write to magic r30 output byte 0
 	MOV	r5, DELAY
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 //	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	MOV	r30.b0, 0x00 // All off
 SIGNALON3DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON3DEL, r5, 0
@@ -222,9 +224,10 @@ SIGNALON4DEL:
 SIGNALON5:
 	MOV	r30.b0, 0x44 // Double channels 3. write to magic r30 output byte 0
 	MOV	r5, DELAY
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 //	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	MOV	r30.b0, 0x00 // All off
 SIGNALON5DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON5DEL, r5, 0
@@ -242,9 +245,10 @@ SIGNALON6DEL:
 SIGNALON7:
 	MOV	r30.b0, 0x88 // Double channels 4. write to magic r30 output byte 0
 	MOV	r5, DELAY
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 //	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	MOV	r30.b0, 0x00 // All off
 SIGNALON7DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON7DEL, r5, 0
@@ -257,9 +261,9 @@ SIGNALON8DEL:
 	QBNE	SIGNALON8DEL, r5, 0
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 FINISH:
-	SUB	r1, r1, 1 // Decrement counter
+//	SUB	r1, r1, 1 // Decrement counter
 	LDI	r1, 1 // Extra adjustment step
-	JMP	SIGNALON1//QBNE	SIGNALON1, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
+	QBNE	SIGNALON1, r1, 0 // condition jump to SIGNALON because we have not finished the number of repetitions
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 	//QBA	SIGNALON1//PSEUDOSYNCH// Debbuging - Infinite loop
 //	MOV	r0, DELAY
