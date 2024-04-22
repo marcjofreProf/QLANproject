@@ -62,7 +62,7 @@ class GPIO {
 //public: //Variables
 
 private:// Variables
-	bool ResetPeriodicallyTimerPRU1=true;
+	bool ResetPeriodicallyTimerPRU1=false;
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking

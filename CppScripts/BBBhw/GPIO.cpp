@@ -200,7 +200,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  prussdrv_exit();*/
 	  ///////////////////////////////////////////////////////
 	  // Launch periodic synchronization of the IEP timer - like slotted time synchronization protocol
-	  //if (this->ResetPeriodicallyTimerPRU1){this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);}
+	  if (this->ResetPeriodicallyTimerPRU1){this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);}
 }
 
 ////////////////////////////////////////////////////////
