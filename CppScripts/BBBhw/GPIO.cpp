@@ -274,16 +274,17 @@ int GPIO::PRUsignalTimerSynch(){
 			this->PRUcurrentTimerVal=static_cast<unsigned long long int>(pru1dataMem_int[2]);
 			if ((this->PRUcurrentTimerVal > this->PRUcurrentTimerValOld) and this->PRUcurrentTimerValOld!=0xFFFFFFFFFFFFFFFF){
 				this->PRUoffsetDriftError=static_cast<long long int>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
-				cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
+				if ((this->iIterPRUcurrentTimerVal%10)==0){cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;}
 			}
 			this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
 			
 		}
 		else{
 			this->PRUcurrentTimerValOld=0xFFFFFFFFFFFFFFFF;
-			cout << "NOT Resetting PRUs timer!" << endl;
+			//cout << "NOT Resetting PRUs timer!" << endl;
 		}
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
+		this->iIterPRUcurrentTimerVal++;
 	}
 
 return 0; // All ok
