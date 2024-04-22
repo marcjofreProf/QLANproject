@@ -96,7 +96,7 @@ private:// Variables
 	// PRU Signal
 	unsigned int NumberRepetitionsSignal=4096;// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU
 	int retInterruptsPRU1;
-	int WaitTimeInterruptPRU1=2500000; // In microseconds
+	int WaitTimeInterruptPRU1=3000000; // In microseconds
 	//int WaitTimeToFutureTimePointPRU1=1000;// The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s.
 	//TimePoint TimePointClockNowPRU1;
 	//unsigned long long int TimeNow_time_as_countPRU1;	
