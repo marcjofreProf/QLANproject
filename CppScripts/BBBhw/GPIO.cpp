@@ -241,6 +241,8 @@ struct timespec GPIO::SetWhileWait(){
 }
 
 int GPIO::PRUsignalTimerSynch(){
+	this->PRUcurrentTimerValOld=0;// To be deleted
+
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	//while(true){	
@@ -287,10 +289,10 @@ int GPIO::PRUsignalTimerSynch(){
 			this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
 			
 		//} //end if
-		else{
-			this->PRUcurrentTimerValOld=0xFFFFFFFFFFFFFFFF;
-			//cout << "NOT Resetting PRUs timer!" << endl;
-		}
+		//else{
+		//	this->PRUcurrentTimerValOld=0xFFFFFFFFFFFFFFFF;
+		//	//cout << "NOT Resetting PRUs timer!" << endl;
+		//}
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
 	//}// end while
