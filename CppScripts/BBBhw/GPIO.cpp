@@ -284,6 +284,7 @@ int GPIO::PRUsignalTimerSynch(){
 			this->PRUcurrentTimerVal=static_cast<unsigned long long int>(pru1dataMem_int[2]);
 			if ((this->PRUcurrentTimerVal > this->PRUcurrentTimerValOld) and this->PRUcurrentTimerValOld!=0xFFFFFFFFFFFFFFFF){
 				this->PRUoffsetDriftError=static_cast<long long int>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
+				this->PRUoffsetDriftErrorApplied=0;// Not disableIEP correction
 				this->PIDcontrolerTime();// Compute parameters for PID adjustment
 				if (this->PRUoffsetDriftErrorApplied<0 and (2*this->PRUcurrentTimerVal+this->PRUoffsetDriftErrorApplied)>0 and (2*this->PRUcurrentTimerVal)<0xFFFFFFFF){// Substraction correction					
 					pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
@@ -295,6 +296,7 @@ int GPIO::PRUsignalTimerSynch(){
 					pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction
 				}				
 				this->EstimateSynch=static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld))/static_cast<double>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds));
+				this->EstimateSynch=1.0; // To disable synch adjustment
 				if ((this->iIterPRUcurrentTimerVal%10)==0){
 					cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 					cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
@@ -757,11 +759,6 @@ int NumSynchPulseAvgAux=0;
 		    // using doubles, to represent usigned long long int can hold, with the 5ns PRU count, up to 2 years with presition!!!
 		    /////////////////////////////////////////////////////////////////////////////////
 		    // Synch pulses might be able to correct short term intra pulses, but not in between different sequences (inter pulses)
-		    /*
-		    // Simply apply the average value for adjusting synch pulses
-		    AdjPulseSynchCoeff=AdjPulseSynchCoeffAverage;
-		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))/AdjPulseSynchCoeff); // Simply apply the average value of Synch pulses
-		    */
 		    // Advanced application of the AdjPulseSynchCoeff per ranges - need improved short acurracy		    
 		    if (NumSynchPulsesRed>1){// If using Synch pulses
 			    if (ValueReadTest<=SynchPulsesTagsUsed[iIterMovAdjPulseSynchCoeff]){
@@ -775,7 +772,7 @@ int NumSynchPulseAvgAux=0;
 		    }
 		    
 		    if (lineCount==0){
-		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)/AdjPulseSynchCoeffAverage++TimeTaggsLast);		    	
+		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)/AdjPulseSynchCoeffAverage+TimeTaggsLast);		    	
 		    	} // Simply apply the average value of Synch pulses
 		    else{// Not the first tagg
 		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))/AdjPulseSynchCoeff+TimeTaggsLast);
