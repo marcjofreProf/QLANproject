@@ -65,6 +65,7 @@ private:// Variables
 	bool ResetPeriodicallyTimerPRU1=true;// Disaster when used, due to all the interrupts handling time uncertainty
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
+	std::atomic<bool> ManualSemaphore=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int PRUoffsetDriftError=0;
 	unsigned long long int PRUcurrentTimerVal=0;

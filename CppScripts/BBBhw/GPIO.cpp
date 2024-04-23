@@ -250,7 +250,7 @@ int GPIO::PRUsignalTimerSynch(){
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	while(true){	
 		clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier. clock TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock)
-		if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriodMargin))){// It was possible to execute when needed
+		if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriodMargin)) and this->ManualSemaphore==false){// It was possible to execute when needed
 			//cout << "Resetting PRUs timer!" << endl;
 			this->acquire();
 			
@@ -365,7 +365,7 @@ return 0;// all ok
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 this->acquire();
-
+this->ManualSemaphore=true;
 // Important, the following line at the very beggining to reduce the command jitter
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
@@ -387,6 +387,7 @@ else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU1 interrupt error" << endl;
 }
+this->ManualSemaphore=false;
 this->release();
 /*
 FutureTimePointPRU1 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU1);
