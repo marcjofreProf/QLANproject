@@ -293,12 +293,12 @@ int GPIO::PRUsignalTimerSynch(){
 					this->PRUoffsetDriftError=static_cast<long long int>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));				
 					this->PIDcontrolerTime();// Compute parameters for PID adjustment
 					//this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
-					if (this->PRUoffsetDriftErrorApplied<0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)>0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))<0xFFFFFFFF){// Substraction correction					
+					if (this->PRUoffsetDriftErrorApplied<0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)>(0+TimeClockMarging) and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))<(0xFFFFFFFF-TimeClockMarging)){// Substraction correction					
 						pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
 						PRUoffsetDriftErrorLast=PRUoffsetDriftError;// Update
 						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update
 					}
-					else if (this->PRUoffsetDriftErrorApplied>0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)<0xFFFFFFFF){// Addition correction
+					else if (this->PRUoffsetDriftErrorApplied>0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)<(0xFFFFFFFF-TimeClockMarging)){// Addition correction
 						pru1dataMem_int[3]=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);// Apply correction
 						PRUoffsetDriftErrorLast=PRUoffsetDriftError;// Update
 						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update
@@ -333,8 +333,8 @@ if (iIterPRUcurrentTimerVal>0){
 PRUoffsetDriftErrorIntegralOld=PRUoffsetDriftErrorIntegral;
 PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftError*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);
 this->PRUoffsetDriftErrorApplied=PIDconstant*PRUoffsetDriftError+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative;
-if (this->PRUoffsetDriftErrorApplied>0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied+5;}// The 5 is to compensate the lost counts in the PRU when applying the update
-else{this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied-5;}// The 5 is to compensate the lost counts in the PRU when applying the update
+if (this->PRUoffsetDriftErrorApplied>0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied+LostCounts;}// The 5 is to compensate the lost counts in the PRU when applying the update
+else{this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied-LostCounts;}// The 5 is to compensate the lost counts in the PRU when applying the update
 
 return 0; // All ok
 }

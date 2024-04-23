@@ -67,6 +67,7 @@ private:// Variables
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	std::atomic<bool> ManualSemaphore=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
+	long long int LostCounts=5;
 	long long int PRUoffsetDriftError=0;
 	long long int PRUoffsetDriftErrorLast=0;
 	long long int PRUoffsetDriftErrorIntegral=0;
