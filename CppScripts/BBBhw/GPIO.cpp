@@ -249,68 +249,65 @@ int GPIO::PRUsignalTimerSynch(){
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	while(true){		
-		if (Clock::now()<this->TimePointClockCurrentSynchPRU1future and this->ManualSemaphore==false){// It was possible to execute when needed
-			//cout << "Resetting PRUs timer!" << endl;
-			this->acquire();
-			this->ManualSemaphore=true;
+		if (Clock::now()<this->TimePointClockCurrentSynchPRU1future){// It was possible to execute when needed
+			//cout << "Resetting PRUs timer!" << endl;			
 			clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier. clock TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock)
-			// Important, the following line at the very beggining to reduce the command jitter
-			pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
-			if (this->PRUoffsetDriftErrorApplied>0){
-				pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 2, to execute synch functions addition correction
-			}
-			else{
-				pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
-			}
-			prussdrv_pru_send_event(22);
-			
-			retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
-			//cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
-			if (retInterruptsPRU1>0){
-				prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-			}
-			else if (retInterruptsPRU1==0){
-				prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-				cout << "GPIO::PRUsignalTimerSynch took to much time. Reset PRU1 if necessary." << endl;
-			}
-			else{
-				prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-				cout << "PRU1 interrupt error" << endl;
-			}
-			this->ManualSemaphore=false;
-			this->release();
-			//pru1dataMem_int[2]// Current IEP timer sample
-			//pru1dataMem_int[3]// Correction to apply to IEP timer
-			this->PRUcurrentTimerVal=static_cast<unsigned long long int>(pru1dataMem_int[2]);
-			if ((this->PRUcurrentTimerVal > this->PRUcurrentTimerValOld) and this->PRUcurrentTimerValOld!=0xFFFFFFFFFFFFFFFF){
-				this->PRUoffsetDriftError=static_cast<long long int>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));				
-				this->PIDcontrolerTime();// Compute parameters for PID adjustment
-				this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
-				if (this->PRUoffsetDriftErrorApplied<0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)>0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))<0xFFFFFFFF){// Substraction correction					
-					pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
-				}
-				else if (this->PRUoffsetDriftErrorApplied>0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)<0xFFFFFFFF){// Addition correction
-					pru1dataMem_int[3]=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);// Apply correction
+			if (this->ManualSemaphore==false){
+				this->acquire();
+				this->ManualSemaphore=true;
+				// Important, the following line at the very beggining to reduce the command jitter
+				pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
+				if (this->PRUoffsetDriftErrorApplied>0){
+					pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 2, to execute synch functions addition correction
 				}
 				else{
-					pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction
-				}				
-				this->EstimateSynch=static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld))/(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
-				//this->EstimateSynch=1.0; // To disable synch adjustment
-				if ((this->iIterPRUcurrentTimerVal%10)==0){
-					cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
-					cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
-					cout << "EstimateSynch: " << this->EstimateSynch << endl;
+					pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
 				}
+				prussdrv_pru_send_event(22);
+				
+				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
+				//cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
+				if (retInterruptsPRU1>0){
+					prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+				}
+				else if (retInterruptsPRU1==0){
+					prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+					cout << "GPIO::PRUsignalTimerSynch took to much time. Reset PRU1 if necessary." << endl;
+				}
+				else{
+					prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+					cout << "PRU1 interrupt error" << endl;
+				}
+				this->ManualSemaphore=false;
+				this->release();
+				//pru1dataMem_int[2]// Current IEP timer sample
+				//pru1dataMem_int[3]// Correction to apply to IEP timer
+				this->PRUcurrentTimerVal=static_cast<unsigned long long int>(pru1dataMem_int[2]);
+				if (this->PRUcurrentTimerVal > this->PRUcurrentTimerValOld){
+					this->PRUoffsetDriftError=static_cast<long long int>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));				
+					this->PIDcontrolerTime();// Compute parameters for PID adjustment
+					this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
+					if (this->PRUoffsetDriftErrorApplied<0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)>0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))<0xFFFFFFFF){// Substraction correction					
+						pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
+					}
+					else if (this->PRUoffsetDriftErrorApplied>0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)<0xFFFFFFFF){// Addition correction
+						pru1dataMem_int[3]=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);// Apply correction
+					}
+					else{
+						pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction
+					}				
+					this->EstimateSynch=static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld))/(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+					//this->EstimateSynch=1.0; // To disable synch adjustment
+					if ((this->iIterPRUcurrentTimerVal%10)==0){
+						cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
+						cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
+						cout << "EstimateSynch: " << this->EstimateSynch << endl;
+					}
+				}
+				this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
 			}
-			this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
 			
 		} //end if
-		else{
-			this->PRUcurrentTimerValOld=0xFFFFFFFFFFFFFFFF;
-			clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
-			//cout << "NOT Resetting PRUs timer!" << endl;
-		}
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
 	}// end while
