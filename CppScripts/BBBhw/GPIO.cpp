@@ -296,7 +296,7 @@ int GPIO::PRUsignalTimerSynch(){
 					else{
 						pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction
 					}				
-					this->EstimateSynch=static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld))/(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+					this->EstimateSynch=0.001*static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld))/(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 					//this->EstimateSynch=1.0; // To disable synch adjustment
 					if ((this->iIterPRUcurrentTimerVal%10)==0){
 						cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
@@ -770,10 +770,10 @@ int NumSynchPulseAvgAux=0;
 		    }
 		    
 		    if (lineCount==0){
-		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)*AdjPulseSynchCoeffAverage+TimeTaggsLast);		    	
+		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)/AdjPulseSynchCoeffAverage+TimeTaggsLast);		    	
 		    	} // Simply apply the average value of Synch pulses
 		    else{// Not the first tagg
-		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))*AdjPulseSynchCoeff+TimeTaggsLast);
+		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))/AdjPulseSynchCoeff+TimeTaggsLast);
 		    }
 		    
 		    OldLastTimeTagg=ValueReadTest;
