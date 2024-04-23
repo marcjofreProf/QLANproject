@@ -201,7 +201,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  prussdrv_exit();*/
 	  ///////////////////////////////////////////////////////
 	  // Launch periodic synchronization of the IEP timer - like slotted time synchronization protocol
-	  if (this->ResetPeriodicallyTimerPRU1){this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);}
+	  //if (this->ResetPeriodicallyTimerPRU1){this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);}
 }
 
 ////////////////////////////////////////////////////////
@@ -243,12 +243,12 @@ struct timespec GPIO::SetWhileWait(){
 int GPIO::PRUsignalTimerSynch(){
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
-	while(true){	
+	//while(true){	
 		clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier. clock TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock)
 		if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriodMargin))){// It was possible to execute when needed
 			//cout << "Resetting PRUs timer!" << endl;
 			this->acquire();
-			prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+			
 			// Important, the following line at the very beggining to reduce the command jitter
 			pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
 			pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions
@@ -293,7 +293,7 @@ int GPIO::PRUsignalTimerSynch(){
 		}
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
-	}
+	//}// end while
 
 return 0; // All ok
 }
@@ -360,7 +360,7 @@ return 0;// all ok
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 this->acquire();
-prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+
 // Important, the following line at the very beggining to reduce the command jitter
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
@@ -424,6 +424,7 @@ do // This is blocking
 */
 
 if (this->ResetPeriodicallyTimerPRU1){cout << "PRU1 timer is periodically reset!" << endl;}
+if (this->ResetPeriodicallyTimerPRU1){this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);this->threadRefSynch.join();}
 return 0;// all ok	
 }
 
