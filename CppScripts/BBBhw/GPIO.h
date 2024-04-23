@@ -159,6 +159,7 @@ public:	// Functions/Methods
 	GPIO(int number); //constructor will export the pin	
 	// PRU
 	GPIO(); // initializates PRU operation
+	int InitAgentProcess();
 	int LOCAL_DDMinit();
 	int DDRdumpdata();
 	int DisablePRUs();

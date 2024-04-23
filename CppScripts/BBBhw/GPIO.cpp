@@ -200,8 +200,13 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  prussdrv_pru_disable(PRU_Operation_NUM);  
 	  prussdrv_exit();*/
 	  ///////////////////////////////////////////////////////
-	  // Launch periodic synchronization of the IEP timer - like slotted time synchronization protocol
-	  //if (this->ResetPeriodicallyTimerPRU1){this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);}
+	  
+}
+
+int GPIO::InitAgentProcess(){
+	// Launch periodic synchronization of the IEP timer - like slotted time synchronization protocol
+	 if (this->ResetPeriodicallyTimerPRU1){this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);}
+	return 0; //All OK
 }
 
 ////////////////////////////////////////////////////////
@@ -241,13 +246,11 @@ struct timespec GPIO::SetWhileWait(){
 }
 
 int GPIO::PRUsignalTimerSynch(){
-	this->PRUcurrentTimerValOld=0;// To be deleted
-
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
-	//while(true){	
+	while(true){	
 		clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier. clock TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock)
-		//if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriodMargin))){// It was possible to execute when needed
+		if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriodMargin))){// It was possible to execute when needed
 			//cout << "Resetting PRUs timer!" << endl;
 			this->acquire();
 			
@@ -288,14 +291,14 @@ int GPIO::PRUsignalTimerSynch(){
 			}
 			this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
 			
-		//} //end if
-		//else{
-		//	this->PRUcurrentTimerValOld=0xFFFFFFFFFFFFFFFF;
-		//	//cout << "NOT Resetting PRUs timer!" << endl;
-		//}
+		} //end if
+		else{
+			this->PRUcurrentTimerValOld=0xFFFFFFFFFFFFFFFF;
+			//cout << "NOT Resetting PRUs timer!" << endl;
+		}
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
-	//}// end while
+	}// end while
 
 return 0; // All ok
 }
@@ -426,7 +429,6 @@ do // This is blocking
 */
 
 if (this->ResetPeriodicallyTimerPRU1){cout << "PRU1 timer is periodically reset!" << endl;}
-if (this->ResetPeriodicallyTimerPRU1){this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);this->threadRefSynch.join();}
 return 0;// all ok	
 }
 

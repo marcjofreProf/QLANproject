@@ -44,7 +44,8 @@ using namespace std;
 
 namespace nsQphysLayerAgent {
 QPLA::QPLA() {// Constructor
-	PRUGPIO=new GPIO();// Initiates custom PRU code in BBB	
+	PRUGPIO=new GPIO();// Initiates custom PRU code in BBB
+	PRUGPIO->InitAgentProcess(); // Launch the periodic synchronization
 	 //Very slow GPIO BBB not used anymore
 	/*// The above pins initializatoins (and also in the destructor will not be needed in the future since it is done with PRU
 	inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
