@@ -296,7 +296,8 @@ int GPIO::PRUsignalTimerSynch(){
 					else{
 						pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction
 					}				
-					this->EstimateSynch=0.001*static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld))/(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+					this->EstimateSynch=static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld))/(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+					this->EstimateSynch=1.0+0.001*(this->EstimateSynch-1.0);
 					//this->EstimateSynch=1.0; // To disable synch adjustment
 					if ((this->iIterPRUcurrentTimerVal%10)==0){
 						cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
