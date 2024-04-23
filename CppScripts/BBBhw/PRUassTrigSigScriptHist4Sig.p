@@ -143,7 +143,7 @@ PERIODICTIMESYNCH: // with command coded 2 means synch by reseting the IEP timer
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM positon the IEP current sample
 	SUB	r0, r0, r10 // Apply correction
-	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically	
+//	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP	CMDLOOP
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit t a specific bins for the histogram
