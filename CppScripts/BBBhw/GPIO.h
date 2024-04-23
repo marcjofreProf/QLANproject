@@ -155,6 +155,7 @@ private:// Variables
 	int toggleNumber;  //default -1 (infinite)
 	// Testing with periodic histogram signal
 	unsigned long long int OldLastTimeTagg=0;
+	unsigned long long int TimeTaggsLast=0;
 	// Pulses compensation
 	int NumSynchPulsesRed=0;
 	unsigned long long int SynchPulsesTags[MaxNumPulses]={0};
