@@ -255,7 +255,7 @@ int GPIO::PRUsignalTimerSynch(){
 			prussdrv_pru_send_event(22);
 			
 			retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
-			//cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
+			cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 			if (retInterruptsPRU1>0){
 				prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 			}
@@ -304,11 +304,7 @@ pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 pru0dataMem_int[1]=this->NumRecords; // set number captures
 prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
-this->TimePointClockCurrentPRU0meas=Clock::now();// To time stamp the current measurement, in contrast ot the old last measurement
-
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
-
-//this->TimePointClockCurrentPRU0measOld=Clock::now();// To time stamp the current measurement
 
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
 if (retInterruptsPRU0>0){
@@ -367,13 +363,13 @@ this->acquire();
 // Important, the following line at the very beggining to reduce the command jitter
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
-prussdrv_pru_send_event(22);//pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals//prussdrv_pru_send_event(22);
+prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
 
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
-//cout << "retInterruptsPRU1: " << retInterruptsPRU1 << endl;
+cout << "SendTriggerSignals: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 if (retInterruptsPRU1>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 }
@@ -385,7 +381,7 @@ else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU1 interrupt error" << endl;
 }
-
+this->release();
 /*
 FutureTimePointPRU1 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU1);
 auto duration_since_epochFutureTimePointPRU1=FutureTimePointPRU1.time_since_epoch();
@@ -425,7 +421,7 @@ do // This is blocking
 		}
 } while(!finPRU1);
 */
-this->release();
+
 if (this->ResetPeriodicallyTimerPRU1){cout << "PRU1 timer is periodically reset!" << endl;}
 return 0;// all ok	
 }
@@ -438,18 +434,6 @@ return 0;// all ok
 //PRU0 - Operation - getting iputs
 
 int GPIO::DDRdumpdata(){
-// Time elapsed between consecutive measurements
-if (this->TimePointClockCurrentPRU0measOld==std::chrono::time_point<Clock>()){// First measurement
-	this->TimeElpasedNow_time_as_count=0;
-}
-else{
-	auto duration_since_lastMeasTime=this->TimePointClockCurrentPRU0meas-this->TimePointClockCurrentPRU0measOld;
-// Convert duration to desired time
-	TimeElpasedNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_lastMeasTime).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds)
-	//cout << "TimeElpasedNow_time_as_count: " << TimeElpasedNow_time_as_count << endl;
-}
-this->TimePointClockCurrentPRU0measOld=this->TimePointClockCurrentPRU0meas;// Update old meas timestamp
-
 // Reading data from PRU shared and own RAMs
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=valpHolder; // Coincides with SHARED in PRUassTaggDetScript.p

@@ -145,7 +145,6 @@ PERIODICTIMESYNCH: // with command coded 2 means synch by reseting the IEP timer
 	SUB	r0, r0, r10 // Apply correction
 	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
-	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host. Twice to make sure
 	JMP	CMDLOOP
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit t a specific bins for the histogram
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
@@ -261,7 +260,6 @@ FINISH:
 FINISHLOOP:
 	// The following lines do not consume "signal speed"
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
-	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host. Twice to make sure
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
