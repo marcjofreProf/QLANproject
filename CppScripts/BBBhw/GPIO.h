@@ -70,6 +70,7 @@ private:// Variables
 	long long int PRUoffsetDriftError=0;
 	long long int PRUoffsetDriftErrorLast=0;
 	long long int PRUoffsetDriftErrorIntegral=0;
+	long long int PRUoffsetDriftErrorIntegralOld=0;
 	long long int PRUoffsetDriftErrorDerivative=0;
 	long long int PRUoffsetDriftErrorApplied=0;
 	unsigned long long int PRUcurrentTimerVal=0;
