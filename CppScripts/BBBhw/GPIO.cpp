@@ -260,6 +260,9 @@ int GPIO::PRUsignalTimerSynch(){
 				if (this->PRUoffsetDriftErrorApplied>0){
 					pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 3, to execute synch functions addition correction
 				}
+				else if (this->PRUoffsetDriftErrorApplied==0){
+					pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
+				}
 				else{
 					pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
 				}
@@ -284,13 +287,13 @@ int GPIO::PRUsignalTimerSynch(){
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerVal=static_cast<unsigned long long int>(pru1dataMem_int[2]);
 				if (this->PRUcurrentTimerVal > this->PRUcurrentTimerValOld){
-					this->EstimateSynch=static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld))/(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+					this->EstimateSynch=static_cast<double>(((this->PRUcurrentTimerVal-this->PRUoffsetDriftErrorApplied)-this->PRUcurrentTimerValOld))/(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 					this->EstimateSynch=1.0+this->SynchAdjconstant*(this->EstimateSynch-1.0);
 					//this->EstimateSynch=1.0; // To disable synch adjustment
 					this->PRUoffsetDriftError=static_cast<long long int>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));				
 					this->PIDcontrolerTime();// Compute parameters for PID adjustment
 					//this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
-					if (this->PRUoffsetDriftErrorApplied<=0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)>0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))<0xFFFFFFFF){// Substraction correction					
+					if (this->PRUoffsetDriftErrorApplied<0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)>0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))<0xFFFFFFFF){// Substraction correction					
 						pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
 						PRUoffsetDriftErrorLast=PRUoffsetDriftError;// Update
 						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update
@@ -301,8 +304,9 @@ int GPIO::PRUsignalTimerSynch(){
 						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update
 					}
 					else{
-						pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction
+						pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
 						PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegralOld;
+						this->PRUoffsetDriftErrorApplied=0;
 					}			
 					
 					if ((this->iIterPRUcurrentTimerVal%10)==0){
