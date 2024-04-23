@@ -695,7 +695,7 @@ int NumSynchPulseAvgAux=0;
 					if (CoeffSynchAdjAux2>1.11 or CoeffSynchAdjAux2<0.99){
 						cout << "Synch pulse anomaly CoeffSynchAdjAux2: " << CoeffSynchAdjAux2 << endl;
 					}
-					AdjPulseSynchCoeffArray[NumSynchPulseAvgAux]=CoeffSynchAdjAux2;//sqrt(CoeffSynchAdjAux2);//AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);					
+					AdjPulseSynchCoeffArray[NumSynchPulseAvgAux]=1.0+this->SynchAdjconstant*(CoeffSynchAdjAux2-1.0);//sqrt(CoeffSynchAdjAux2);//AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);					
 					//cout << "AdjPulseSynchCoeffArray[NumAvgAux]: " << AdjPulseSynchCoeffArray[NumAvgAux] << endl;
 					SynchPulsesTagsUsed[NumSynchPulseAvgAux]=SynchPulsesTags[iIter+1];
 					NumSynchPulseAvgAux++;
@@ -776,7 +776,7 @@ int NumSynchPulseAvgAux=0;
 		    }
 		    
 		    if (lineCount==0){
-		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)*AdjPulseSynchCoeffAverage+TimeTaggsLast);		    	
+		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)/AdjPulseSynchCoeffAverage+TimeTaggsLast);		    	
 		    	} // Simply apply the average value of Synch pulses
 		    else{// Not the first tagg
 		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))/AdjPulseSynchCoeff+TimeTaggsLast);
