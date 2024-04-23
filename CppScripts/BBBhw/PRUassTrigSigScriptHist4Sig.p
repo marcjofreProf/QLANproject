@@ -137,8 +137,16 @@ CMDLOOP2:// Double verification of host sending start command
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 4, and 1 bytes.
 	QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
-PERIODICTIMESYNCH: // with command coded 2 means synch by reseting the IEP timer
-//	SBCO	r4, CONST_IETREG, 0xC, 4 // Clear IEP timer count. It could also be cleared with 0xFFFFFFFF
+	QBEQ	PERIODICTIMESYNCHSUB, r0.b0, 2 // 2 command is measure IEP timer status and so a substraction correction
+PERIODICTIMESYNCHADD: // with command coded 2 means synch by reseting the IEP timer
+	LBCO	r10, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction
+	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically	
+	ADD	r0, r0, r10 // Apply correction
+	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
+	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM positon the IEP current sample	
+	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
+	JMP	CMDLOOP
+PERIODICTIMESYNCHSUB: // with command coded 2 means synch by reseting the IEP timer
 	LBCO	r10, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically	
 	SUB	r0, r0, r10 // Apply correction

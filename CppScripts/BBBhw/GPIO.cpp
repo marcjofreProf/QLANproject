@@ -256,7 +256,12 @@ int GPIO::PRUsignalTimerSynch(){
 			this->ManualSemaphore=true;
 			// Important, the following line at the very beggining to reduce the command jitter
 			pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
-			pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions
+			if (this->PRUoffsetDriftErrorApplied>0){
+				pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 2, to execute synch functions addition correction
+			}
+			else{
+				pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
+			}
 			prussdrv_pru_send_event(22);
 			
 			retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
@@ -280,15 +285,21 @@ int GPIO::PRUsignalTimerSynch(){
 			if ((this->PRUcurrentTimerVal > this->PRUcurrentTimerValOld) and this->PRUcurrentTimerValOld!=0xFFFFFFFFFFFFFFFF){
 				this->PRUoffsetDriftError=static_cast<long long int>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
 				this->PIDcontrolerTime();// Compute parameters for PID adjustment
-				if (this->PRUoffsetDriftErrorApplied<0 and (2*this->PRUcurrentTimerVal+this->PRUoffsetDriftErrorApplied)>0 and (2*this->PRUcurrentTimerVal)<0xFFFFFFFF){					
+				if (this->PRUoffsetDriftErrorApplied<0 and (2*this->PRUcurrentTimerVal+this->PRUoffsetDriftErrorApplied)>0 and (2*this->PRUcurrentTimerVal)<0xFFFFFFFF){// Substraction correction					
 					pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
+				}
+				else if (this->PRUoffsetDriftErrorApplied>0 and (2*this->PRUcurrentTimerVal+this->PRUoffsetDriftErrorApplied)<0xFFFFFFFF){// Addition correction
+					pru1dataMem_int[3]=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);// Apply correction
 				}
 				else{
 					pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction
-				}
-				if ((this->iIterPRUcurrentTimerVal%10)==0){cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;}
+				}				
 				this->EstimateSynch=static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld))/static_cast<double>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds));
-				if ((this->iIterPRUcurrentTimerVal%10)==0){cout << "EstimateSynch: " << this->EstimateSynch << endl;}
+				if ((this->iIterPRUcurrentTimerVal%10)==0){
+					cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
+					cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
+					cout << "EstimateSynch: " << this->EstimateSynch << endl;
+				}
 			}
 			this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
 			
@@ -703,6 +714,8 @@ int NumSynchPulseAvgAux=0;
 				this->AdjPulseSynchCoeffAverage=this->EstimateSynch;
 			this->release();
 			this->AdjPulseSynchCoeff=this->AdjPulseSynchCoeffAverage;
+			cout << " Applying re-synch estimated AdjPulseSynchCoeffAverage" << endl;
+			cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
 		}
 		else{
 			AdjPulseSynchCoeffAverage=1.0;
