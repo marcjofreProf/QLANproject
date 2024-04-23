@@ -81,7 +81,7 @@ private:// Variables
 	// PID error correction
 	double SynchAdjconstant=0.001;
 	double PIDconstant=0.075;
-	double PIDintegral=0.020;
+	double PIDintegral=0.0020;
 	double PIDderiv=0.005;	
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;//steady_clock;// We do not use system clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
