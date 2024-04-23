@@ -253,7 +253,7 @@ int GPIO::PRUsignalTimerSynch(){
 		if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriodMargin)) and this->ManualSemaphore==false){// It was possible to execute when needed
 			//cout << "Resetting PRUs timer!" << endl;
 			this->acquire();
-			
+			this->ManualSemaphore=true;
 			// Important, the following line at the very beggining to reduce the command jitter
 			pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
 			pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions
@@ -272,21 +272,22 @@ int GPIO::PRUsignalTimerSynch(){
 				prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 				cout << "PRU1 interrupt error" << endl;
 			}
-			
+			this->ManualSemaphore=false;
 			this->release();
 			//pru1dataMem_int[2]// Current IEP timer sample
 			//pru1dataMem_int[3]// Correction to apply to IEP timer
 			this->PRUcurrentTimerVal=static_cast<unsigned long long int>(pru1dataMem_int[2]);
 			if ((this->PRUcurrentTimerVal > this->PRUcurrentTimerValOld) and this->PRUcurrentTimerValOld!=0xFFFFFFFFFFFFFFFF){
 				this->PRUoffsetDriftError=static_cast<long long int>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
-				if (this->PRUoffsetDriftError<0 and (2*this->PRUcurrentTimerVal+this->PRUoffsetDriftError)>0 and (2*this->PRUcurrentTimerVal)<0xFFFFFFFF){
-					pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftError);// Apply correction
+				this->PIDcontrolerTime();// Compute parameters for PID adjustment
+				if (this->PRUoffsetDriftErrorApplied<0 and (2*this->PRUcurrentTimerVal+this->PRUoffsetDriftErrorApplied)>0 and (2*this->PRUcurrentTimerVal)<0xFFFFFFFF){					
+					pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
 				}
 				else{
 					pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction
 				}
 				if ((this->iIterPRUcurrentTimerVal%10)==0){cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;}
-				this->EstimateSynch=static_cast<double>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))/static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
+				this->EstimateSynch=static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld))/static_cast<double>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds));
 				if ((this->iIterPRUcurrentTimerVal%10)==0){cout << "EstimateSynch: " << this->EstimateSynch << endl;}
 			}
 			this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
@@ -300,6 +301,17 @@ int GPIO::PRUsignalTimerSynch(){
 		this->iIterPRUcurrentTimerVal++;
 	}// end while
 
+return 0; // All ok
+}
+
+int GPIO::PIDcontrolerTime(){
+if (iIterPRUcurrentTimerVal>0){
+	PRUoffsetDriftErrorDerivative=(PRUoffsetDriftError-PRUoffsetDriftErrorLast)/static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);
+}
+PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftError*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);
+this->PRUoffsetDriftErrorApplied=PIDconstant*PRUoffsetDriftError+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative;
+PRUoffsetDriftErrorLast=PRUoffsetDriftError;// Update
+iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update
 return 0; // All ok
 }
 
@@ -646,6 +658,7 @@ int NumSynchPulseAvgAux=0;
 		}
 		NumSynchPulsesRed=lineCount;		
 		if (NumSynchPulsesRed>1){//At least two points (two cycles separated by one cycle in between), we can generate a calibration curve
+			cout << "Synch pulses calcultion not working properly!" << endl;
 			//unsigned long long int CoeffSynchAdjAux0=1;
 			//double CoeffSynchAdjAux1=0.0;// Number theoretical counts given the number of cycles
 			double CoeffSynchAdjAux2=0.0;// PRU counting
@@ -683,6 +696,13 @@ int NumSynchPulseAvgAux=0;
 			}// Mean average//this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumAvgAux);//Median AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
 			else{AdjPulseSynchCoeffAverage=1.0;}// Reset
 			cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
+		}
+		else if(this->ResetPeriodicallyTimerPRU1){ // Using the estimation from the re-synchronization function
+			this->acquire();
+				while (this->ManualSemaphore);
+				this->AdjPulseSynchCoeffAverage=this->EstimateSynch;
+			this->release();
+			this->AdjPulseSynchCoeff=this->AdjPulseSynchCoeffAverage;
 		}
 		else{
 			AdjPulseSynchCoeffAverage=1.0;
@@ -730,7 +750,7 @@ int NumSynchPulseAvgAux=0;
 		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest))/AdjPulseSynchCoeff); // Simply apply the average value of Synch pulses
 		    */
 		    // Advanced application of the AdjPulseSynchCoeff per ranges - need improved short acurracy		    
-		    if (NumSynchPulsesRed>1){
+		    if (NumSynchPulsesRed>1){// If using Synch pulses
 			    if (ValueReadTest<=SynchPulsesTagsUsed[iIterMovAdjPulseSynchCoeff]){
 			    	AdjPulseSynchCoeff=AdjPulseSynchCoeffArray[iIterMovAdjPulseSynchCoeff];}// Use the value of adjust synch
 			    else{// Increase

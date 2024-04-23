@@ -68,10 +68,19 @@ private:// Variables
 	std::atomic<bool> ManualSemaphore=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int PRUoffsetDriftError=0;
+	long long int PRUoffsetDriftErrorLast=0;
+	long long int PRUoffsetDriftErrorIntegral=0;
+	long long int PRUoffsetDriftErrorDerivative=0;
+	long long int PRUoffsetDriftErrorApplied=0;
 	unsigned long long int PRUcurrentTimerVal=0;
 	unsigned long long int PRUcurrentTimerValOld=0xFFFFFFFFFFFFFFFF;
 	unsigned long long int iIterPRUcurrentTimerVal=0;
+	unsigned long long int iIterPRUcurrentTimerValLast=0;
 	double EstimateSynch=1.0;
+	// PID error correction
+	double PIDconstant=0.75;
+	double PIDintegral=0.20;
+	double PIDderiv=0.05;	
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;//steady_clock;// We do not use system clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
@@ -168,8 +177,8 @@ public:	// Functions/Methods
 	int SendTriggerSignals(); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	int SendTriggerSignalsSelfTest();//
 	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
-	 int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
-	 int ClearStoredQuBits(); // Send the writting pointer back to the beggining - effectively clearing stored QuBits
+	int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
+	int ClearStoredQuBits(); // Send the writting pointer back to the beggining - effectively clearing stored QuBits
 	// Non PRU
 	virtual int getNumber() { return number; }
 	// General Input and Output Settings
@@ -209,9 +218,11 @@ private: // Functions/Methods
 	// Sempahore
 	void acquire();
 	void release();
-	// PRU
+	// PRU synchronization
 	struct timespec SetWhileWait();
 	int PRUsignalTimerSynch(); // Periodic synchronizaton of the timer to control the generated signals
+	int PIDcontrolerTime();
+	// Data processing
 	unsigned char packBits(unsigned char value);
 	// Non-PRU
 	int write(string path, string filename, string value);
