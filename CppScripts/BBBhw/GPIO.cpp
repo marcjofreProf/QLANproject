@@ -296,7 +296,7 @@ int GPIO::PRUsignalTimerSynch(){
 					pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction
 				}				
 				this->EstimateSynch=static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld))/static_cast<double>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds));
-				this->EstimateSynch=1.0; // To disable synch adjustment
+				//this->EstimateSynch=1.0; // To disable synch adjustment
 				if ((this->iIterPRUcurrentTimerVal%10)==0){
 					cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 					cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
@@ -322,7 +322,7 @@ if (iIterPRUcurrentTimerVal>0){
 	PRUoffsetDriftErrorDerivative=(PRUoffsetDriftError-PRUoffsetDriftErrorLast)/static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);
 }
 PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftError*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);
-this->PRUoffsetDriftErrorApplied=PIDconstant*PRUoffsetDriftError+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative;
+this->PRUoffsetDriftErrorApplied=5+PIDconstant*PRUoffsetDriftError+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative;// The 5 is to compensate the lost counts in the PRU when applying the update
 PRUoffsetDriftErrorLast=PRUoffsetDriftError;// Update
 iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update
 return 0; // All ok
@@ -725,7 +725,7 @@ int NumSynchPulseAvgAux=0;
 		}
 		if (NumSynchPulsesRed>=MaxNumPulses){cout << "Too many pulses stored, increase buffer size or reduce number pulses: " << NumSynchPulsesRed << endl;}
 	    	else if (NumSynchPulsesRed==0){cout << "RetrieveNumStoredQuBits: No Synch pulses present!" << endl;}
-	    	cout << "GPIO: NumSynchPulsesRed: " << NumSynchPulsesRed << endl;
+	    	//cout << "GPIO: NumSynchPulsesRed: " << NumSynchPulsesRed << endl;
 	}
 	else{
 		cout << "RetrieveNumStoredQuBits: BBB streamSynchpru is not open!" << endl;
