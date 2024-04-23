@@ -248,12 +248,12 @@ struct timespec GPIO::SetWhileWait(){
 int GPIO::PRUsignalTimerSynch(){
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
-	while(true){	
-		clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier. clock TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock)
-		if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriodMargin)) and this->ManualSemaphore==false){// It was possible to execute when needed
+	while(true){		
+		if (Clock::now()<this->TimePointClockCurrentSynchPRU1future and this->ManualSemaphore==false){// It was possible to execute when needed
 			//cout << "Resetting PRUs timer!" << endl;
 			this->acquire();
 			this->ManualSemaphore=true;
+			clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier. clock TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock)
 			// Important, the following line at the very beggining to reduce the command jitter
 			pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
 			if (this->PRUoffsetDriftErrorApplied>0){
@@ -295,7 +295,7 @@ int GPIO::PRUsignalTimerSynch(){
 				else{
 					pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction
 				}				
-				this->EstimateSynch=static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld))/static_cast<double>((this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds));
+				this->EstimateSynch=static_cast<double>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld))/(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 				//this->EstimateSynch=1.0; // To disable synch adjustment
 				if ((this->iIterPRUcurrentTimerVal%10)==0){
 					cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
@@ -308,6 +308,7 @@ int GPIO::PRUsignalTimerSynch(){
 		} //end if
 		else{
 			this->PRUcurrentTimerValOld=0xFFFFFFFFFFFFFFFF;
+			clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 			//cout << "NOT Resetting PRUs timer!" << endl;
 		}
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
