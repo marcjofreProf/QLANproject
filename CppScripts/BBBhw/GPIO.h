@@ -81,7 +81,7 @@ private:// Variables
 	// PID error correction
 	double SynchAdjconstant=0.05;// Might depend the closenest to 1.0 with the jitter of the clocks
 	double PIDconstant=0.0075;
-	double PIDintegral=0.005;
+	double PIDintegral=0.0005;
 	double PIDderiv=0.005;	
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;//steady_clock;// We do not use system clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
@@ -89,6 +89,7 @@ private:// Variables
 	unsigned long long int TimePRU1synchPeriod=2000000000;//; // almost 1 second in nanoseconds, since captures due to tthe clock resolution for timetaggs cannot last than 2 or 2.5 seconds
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
+	unsigned long long int TimeClockMarging=10000;// In nanoseconds
 	unsigned long long int TimeElpasedNow_time_as_count=0;
 	// PRU
 	static int mem_fd;

@@ -249,7 +249,7 @@ int GPIO::PRUsignalTimerSynch(){
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	while(true){		
-		if (Clock::now()<this->TimePointClockCurrentSynchPRU1future){// It was possible to execute when needed
+		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMarging))){// It was possible to execute when needed
 			//cout << "Resetting PRUs timer!" << endl;			
 			clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier. clock TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock)
 			if (this->ManualSemaphore==false){
@@ -258,7 +258,7 @@ int GPIO::PRUsignalTimerSynch(){
 				// Important, the following line at the very beggining to reduce the command jitter
 				pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
 				if (this->PRUoffsetDriftErrorApplied>0){
-					pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 2, to execute synch functions addition correction
+					pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 3, to execute synch functions addition correction
 				}
 				else{
 					pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
@@ -327,7 +327,9 @@ if (iIterPRUcurrentTimerVal>0){
 }
 PRUoffsetDriftErrorIntegralOld=PRUoffsetDriftErrorIntegral;
 PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftError*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);
-this->PRUoffsetDriftErrorApplied=5+PIDconstant*PRUoffsetDriftError+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative;// The 5 is to compensate the lost counts in the PRU when applying the update
+this->PRUoffsetDriftErrorApplied=PIDconstant*PRUoffsetDriftError+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative;
+if (this->PRUoffsetDriftErrorApplied>0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied+5;}// The 5 is to compensate the lost counts in the PRU when applying the update
+else{this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied-5;}// The 5 is to compensate the lost counts in the PRU when applying the update
 
 return 0; // All ok
 }
