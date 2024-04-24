@@ -289,7 +289,7 @@ int GPIO::PRUsignalTimerSynch(){
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 				// Compute error
 				this->PRUoffsetDriftError=static_cast<long long int>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
-				if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<1 or this->iIterPRUcurrentTimerValPass>2){// Do computations				
+				if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<1){// Do computations				
 					//// PID error computation to correct for signal PRU 1 generation								
 					this->PIDcontrolerTime();// Compute parameters for PID adjustment
 					this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
