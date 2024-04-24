@@ -286,7 +286,7 @@ int GPIO::PRUsignalTimerSynch(){
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerValWrap=static_cast<unsigned long long int>(pru1dataMem_int[2]);
 				// Unwrap
-				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOld){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOld);}
+				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 				// Compute error
 				this->PRUoffsetDriftError=static_cast<long long int>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
@@ -313,7 +313,7 @@ int GPIO::PRUsignalTimerSynch(){
 						this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
 					}			
 					
-					if ((this->iIterPRUcurrentTimerVal%10)==0){
+					if ((this->iIterPRUcurrentTimerVal%5)==0){
 						cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 						cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
 						cout << "EstimateSynch: " << this->EstimateSynch << endl;
@@ -326,6 +326,7 @@ int GPIO::PRUsignalTimerSynch(){
 					
 					// Updates for next round				
 					this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
+					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
 					this->iIterPRUcurrentTimerValSynch++;
 					this->iIterPRUcurrentTimerValPass=1;
 				}
