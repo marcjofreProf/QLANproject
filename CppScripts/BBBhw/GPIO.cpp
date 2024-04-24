@@ -330,7 +330,9 @@ int GPIO::PRUsignalTimerSynch(){
 					this->iIterPRUcurrentTimerValPass=1;
 				}
 				else{// Do not do computations
-					this->iIterPRUcurrentTimerValPass++;
+					this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
+					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
+					this->iIterPRUcurrentTimerValPass=1;
 				}
 				this->ManualSemaphore=false;
 				this->release();
