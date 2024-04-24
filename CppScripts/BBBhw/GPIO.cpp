@@ -320,7 +320,7 @@ int GPIO::PRUsignalTimerSynch(){
 					}
 					
 					// Computations for Synch calculaton for PRU0 compensation
-					this->EstimateSynch=static_cast<double>(((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOld-0*this->PRUoffsetDriftErrorAppliedOldRaw)))/(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+					this->EstimateSynch=static_cast<double>(((this->PRUcurrentTimerVal-this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOld-this->PRUoffsetDriftErrorAppliedOldRaw)))/(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 					this->EstimateSynch=1.0+this->SynchAdjconstant*(this->EstimateSynch-1.0);
 					//this->EstimateSynch=1.0; // To disable synch adjustment
 					
