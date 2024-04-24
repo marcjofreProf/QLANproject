@@ -251,7 +251,7 @@ int GPIO::PRUsignalTimerSynch(){
 	while(true){		
 		if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMarging))){// It was possible to execute when needed
 			//cout << "Resetting PRUs timer!" << endl;			
-			clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier. clock TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock)
+			clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock)
 			if (this->ManualSemaphore==false){
 				this->acquire();
 				this->ManualSemaphore=true;
