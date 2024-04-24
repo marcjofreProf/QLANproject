@@ -288,41 +288,50 @@ int GPIO::PRUsignalTimerSynch(){
 				// Unwrap
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOld){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOld);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
-				
-				this->EstimateSynch=static_cast<double>(((this->PRUcurrentTimerVal-this->PRUoffsetDriftErrorApplied)-this->PRUcurrentTimerValOld))/(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
-				this->EstimateSynch=1.0+this->SynchAdjconstant*(this->EstimateSynch-1.0);
-				//this->EstimateSynch=1.0; // To disable synch adjustment
-				this->PRUoffsetDriftError=static_cast<long long int>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));				
-				this->PIDcontrolerTime();// Compute parameters for PID adjustment
-				this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
-				// Re wrap for correction
-				if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)>0xFFFFFFFF){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied-0xFFFFFFFF;}
-				else if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)<0){this->PRUoffsetDriftErrorApplied=0xFFFFFFFF-(-this->PRUoffsetDriftErrorApplied-this->PRUcurrentTimerValWrap);}
-				if (this->PRUoffsetDriftErrorApplied<0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)>(0+TimeClockMarging) and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))<(0xFFFFFFFF-TimeClockMarging) and this->iIterPRUcurrentTimerValSynch>1){// Substraction correction					
-					pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
-					PRUoffsetDriftErrorLast=PRUoffsetDriftError;// Update
-					iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update
+				// Compute error
+				this->PRUoffsetDriftError=static_cast<long long int>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
+				if (abs(this->PRUoffsetDriftError)<1e6){// Do computations				
+					//// PID error computation to correct for signal PRU 1 generation								
+					this->PIDcontrolerTime();// Compute parameters for PID adjustment
+					this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
+					// Re wrap for correction
+					if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)>0xFFFFFFFF){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied-0xFFFFFFFF;}
+					else if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)<0){this->PRUoffsetDriftErrorApplied=0xFFFFFFFF-(-this->PRUoffsetDriftErrorApplied-this->PRUcurrentTimerValWrap);}
+					if (this->PRUoffsetDriftErrorApplied<0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)>(0+TimeClockMarging) and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))<(0xFFFFFFFF-TimeClockMarging) and this->iIterPRUcurrentTimerValSynch>1){// Substraction correction					
+						pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
+						PRUoffsetDriftErrorLast=PRUoffsetDriftError;// Update
+						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update
+					}
+					else if (this->PRUoffsetDriftErrorApplied>0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)<(0xFFFFFFFF-TimeClockMarging)and this->iIterPRUcurrentTimerValSynch>1){// Addition correction
+						pru1dataMem_int[3]=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);// Apply correction
+						PRUoffsetDriftErrorLast=PRUoffsetDriftError;// Update
+						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update
+					}
+					else{
+						pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
+						PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegralOld;// Recover the old value of integral part
+						this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
+					}			
+					
+					if ((this->iIterPRUcurrentTimerVal%10)==0){
+						cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
+						cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
+						cout << "EstimateSynch: " << this->EstimateSynch << endl;
+					}
+					
+					// Computations for Synch calculaton for PRU0 compensation
+					this->EstimateSynch=static_cast<double>(((this->PRUcurrentTimerVal-this->PRUoffsetDriftErrorApplied)-this->PRUcurrentTimerValOld))/(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+					this->EstimateSynch=1.0+this->SynchAdjconstant*(this->EstimateSynch-1.0);
+					//this->EstimateSynch=1.0; // To disable synch adjustment
+					
+					// Updates for next round				
+					this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
+					this->iIterPRUcurrentTimerValSynch++;
+					this->iIterPRUcurrentTimerValPass=1;
 				}
-				else if (this->PRUoffsetDriftErrorApplied>0 and (this->PRUcurrentTimerVal+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)<(0xFFFFFFFF-TimeClockMarging)and this->iIterPRUcurrentTimerValSynch>1){// Addition correction
-					pru1dataMem_int[3]=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);// Apply correction
-					PRUoffsetDriftErrorLast=PRUoffsetDriftError;// Update
-					iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update
+				else{// Do not do computations
+					this->iIterPRUcurrentTimerValPass++;
 				}
-				else{
-					pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
-					PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegralOld;// Recover the old value of integral part
-					this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
-				}			
-				
-				if ((this->iIterPRUcurrentTimerVal%10)==0){
-					cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
-					cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
-					cout << "EstimateSynch: " << this->EstimateSynch << endl;
-				}
-				
-				this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
-				this->iIterPRUcurrentTimerValSynch++;
-				this->iIterPRUcurrentTimerValPass=1;
 				this->ManualSemaphore=false;
 				this->release();
 			}
