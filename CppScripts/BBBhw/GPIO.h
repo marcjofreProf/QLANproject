@@ -74,10 +74,10 @@ private:// Variables
 	long long int PRUoffsetDriftErrorIntegralOld=0;
 	double PRUoffsetDriftErrorDerivative=0;
 	long long int PRUoffsetDriftErrorApplied=0;
-	unsigned long long int PRUcurrentTimerVal=0;
-	unsigned long long int PRUcurrentTimerValWrap=0;
-	unsigned long long int PRUcurrentTimerValOldWrap=0;
-	unsigned long long int PRUcurrentTimerValOld=0;
+	long long int PRUcurrentTimerVal=0;
+	long long int PRUcurrentTimerValWrap=0;
+	long long int PRUcurrentTimerValOldWrap=0;
+	long long int PRUcurrentTimerValOld=0;
 	unsigned long long int iIterPRUcurrentTimerVal=0;
 	unsigned long long int iIterPRUcurrentTimerValSynch=0;// Account for rounds entered
 	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has no tentered

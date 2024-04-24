@@ -283,13 +283,13 @@ int GPIO::PRUsignalTimerSynch(){
 				
 				//pru1dataMem_int[2]// Current IEP timer sample
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
-				this->PRUcurrentTimerValWrap=static_cast<unsigned long long int>(pru1dataMem_int[2]);
+				this->PRUcurrentTimerValWrap=static_cast<long long int>(pru1dataMem_int[2]);
 				// Unwrap
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 				// Compute error
 				this->PRUoffsetDriftError=static_cast<long long int>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
-				if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerVal<10 or this->iIterPRUcurrentTimerValPass>2){// Do computations				
+				if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<1 or this->iIterPRUcurrentTimerValPass>2){// Do computations				
 					//// PID error computation to correct for signal PRU 1 generation								
 					this->PIDcontrolerTime();// Compute parameters for PID adjustment
 					this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
