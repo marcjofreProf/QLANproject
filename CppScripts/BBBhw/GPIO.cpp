@@ -288,7 +288,7 @@ int GPIO::PRUsignalTimerSynch(){
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 				// Compute error
-				this->PRUoffsetDriftError=static_cast<long long int>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld)-(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds));
+				this->PRUoffsetDriftError=static_cast<long long int>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
 				if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<1){// Do computations				
 					//// PID error computation to correct for signal PRU 1 generation								
 					this->PIDcontrolerTime();// Compute parameters for PID adjustment
@@ -354,11 +354,11 @@ return 0; // All ok
 
 int GPIO::PIDcontrolerTime(){
 if (iIterPRUcurrentTimerVal>0){
-	PRUoffsetDriftErrorDerivative=static_cast<double>(PRUoffsetDriftError-PRUoffsetDriftErrorLast)/static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);
+	PRUoffsetDriftErrorDerivative=static_cast<double>(-PRUoffsetDriftError+PRUoffsetDriftErrorLast)/static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);
 }
 PRUoffsetDriftErrorIntegralOld=PRUoffsetDriftErrorIntegral;
-PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftError*(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);
-this->PRUoffsetDriftErrorAppliedRaw=static_cast<long long int>(PIDconstant*static_cast<double>(PRUoffsetDriftError)+PIDintegral*static_cast<double>(PRUoffsetDriftErrorIntegral)+PIDderiv*PRUoffsetDriftErrorDerivative);
+PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral-PRUoffsetDriftError*(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);
+this->PRUoffsetDriftErrorAppliedRaw=static_cast<long long int>(PIDconstant*static_cast<double>(-PRUoffsetDriftError)+PIDintegral*static_cast<double>(PRUoffsetDriftErrorIntegral)+PIDderiv*PRUoffsetDriftErrorDerivative);
 if (this->PRUoffsetDriftErrorAppliedRaw>0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw+LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
 else if (this->PRUoffsetDriftErrorAppliedRaw<0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw-LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
 else{this->PRUoffsetDriftErrorApplied=0;}
