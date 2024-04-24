@@ -249,7 +249,7 @@ int GPIO::PRUsignalTimerSynch(){
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	while(true){		
-		if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMarging))){// It was possible to execute when needed
+		//if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMarging))){// It was possible to execute when needed
 			//cout << "Resetting PRUs timer!" << endl;
 			if (clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock)
 				this->acquire();
@@ -349,10 +349,10 @@ int GPIO::PRUsignalTimerSynch(){
 			else{// does not enter in time
 				this->iIterPRUcurrentTimerValPass++;
 			}			
-		} //end if
-		else{// does not enter in time
-			this->iIterPRUcurrentTimerValPass++;
-		}
+		//} //end if
+		//else{// does not enter in time
+		//	this->iIterPRUcurrentTimerValPass++;
+		//}
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
 	}// end while
