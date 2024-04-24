@@ -72,10 +72,11 @@ private:// Variables
 	long long int PRUoffsetDriftErrorLast=0;
 	long long int PRUoffsetDriftErrorIntegral=0;
 	long long int PRUoffsetDriftErrorIntegralOld=0;
-	long long int PRUoffsetDriftErrorDerivative=0;
+	double PRUoffsetDriftErrorDerivative=0;
 	long long int PRUoffsetDriftErrorApplied=0;
 	unsigned long long int PRUcurrentTimerVal=0;
-	unsigned long long int PRUcurrentTimerValOld=0xFFFFFFFFFFFFFFFF;
+	unsigned long long int PRUcurrentTimerValWrap=0;
+	unsigned long long int PRUcurrentTimerValOld=0;
 	unsigned long long int iIterPRUcurrentTimerVal=0;
 	unsigned long long int iIterPRUcurrentTimerValLast=0;
 	double EstimateSynch=1.0;
@@ -87,10 +88,10 @@ private:// Variables
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;//steady_clock;// We do not use system clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
-	unsigned long long int TimePRU1synchPeriod=2000000000;//; // almost 1 second in nanoseconds, since captures due to tthe clock resolution for timetaggs cannot last than 2 or 2.5 seconds
+	unsigned long long int TimePRU1synchPeriod=2000000000;//; // The larger the more stable, but the least capable of fast corrections (so the hardware clock has to be more stable)
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
-	unsigned long long int TimeClockMarging=10000;// In nanoseconds
+	unsigned long long int TimeClockMarging=100000;// In nanoseconds
 	unsigned long long int TimeElpasedNow_time_as_count=0;
 	// PRU
 	static int mem_fd;
