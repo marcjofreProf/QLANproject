@@ -74,6 +74,7 @@ private:// Variables
 	long long int PRUoffsetDriftErrorIntegralOld=0;
 	double PRUoffsetDriftErrorDerivative=0;
 	long long int PRUoffsetDriftErrorApplied=0;
+	long long int PRUoffsetDriftErrorAppliedCorrectionDirection=1;// 1: advancing; //-1 delaying
 	long long int PRUoffsetDriftErrorAppliedRaw=0;
 	long long int PRUcurrentTimerVal=0;
 	long long int PRUcurrentTimerValWrap=0;
@@ -85,6 +86,7 @@ private:// Variables
 	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has no tentered
 	unsigned long long int iIterPRUcurrentTimerValLast=0;
 	double EstimateSynch=1.0;
+	double EstimateSynchDirection=0.0;
 	// PID error correction
 	double SynchAdjconstant=0.05;// Might depend the closenest to 1.0 with the jitter of the clocks
 	double PIDconstant=0.1;
