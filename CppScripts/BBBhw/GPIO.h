@@ -74,6 +74,7 @@ private:// Variables
 	long long int PRUoffsetDriftErrorIntegralOld=0;
 	double PRUoffsetDriftErrorDerivative=0;
 	long long int PRUoffsetDriftErrorApplied=0;
+	long long int PRUoffsetDriftErrorAppliedRaw=0;
 	long long int PRUcurrentTimerVal=0;
 	long long int PRUcurrentTimerValWrap=0;
 	long long int PRUcurrentTimerValOldWrap=0;
@@ -89,7 +90,7 @@ private:// Variables
 	double PIDintegral=0.0005;
 	double PIDderiv=0.005;	
 	// Time/synchronization management
-	using Clock = std::chrono::system_clock;//system_clock or steady_clock;// We do not use system_clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
+	using Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;// We do not use system_clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
 	using TimePoint = std::chrono::time_point<Clock>;
 	unsigned long long int TimePRU1synchPeriod=2000000000;//; // The larger the more stable, but the least capable of fast corrections (so the hardware clock has to be more stable)
 	struct timespec requestWhileWait;

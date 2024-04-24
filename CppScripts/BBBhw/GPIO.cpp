@@ -292,7 +292,7 @@ int GPIO::PRUsignalTimerSynch(){
 				if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<1){// Do computations				
 					//// PID error computation to correct for signal PRU 1 generation								
 					this->PIDcontrolerTime();// Compute parameters for PID adjustment
-					this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
+					//this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
 					// Re wrap for correction
 					if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)>0xFFFFFFFF){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied-0xFFFFFFFF;}
 					else if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)<0){this->PRUoffsetDriftErrorApplied=0xFFFFFFFF-(-this->PRUoffsetDriftErrorApplied-this->PRUcurrentTimerValWrap);}
@@ -310,16 +310,17 @@ int GPIO::PRUsignalTimerSynch(){
 						pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
 						PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegralOld;// Recover the old value of integral part
 						this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
+						this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
 					}			
 					
-					if ((this->iIterPRUcurrentTimerVal%5)==0){
+					if ((this->iIterPRUcurrentTimerVal%4)==0){
 						cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 						cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
 						cout << "EstimateSynch: " << this->EstimateSynch << endl;
 					}
 					
 					// Computations for Synch calculaton for PRU0 compensation
-					this->EstimateSynch=static_cast<double>(((this->PRUcurrentTimerVal-this->PRUoffsetDriftErrorApplied)-this->PRUcurrentTimerValOld))/(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+					this->EstimateSynch=static_cast<double>(((this->PRUcurrentTimerVal-this->PRUoffsetDriftErrorAppliedRaw)-this->PRUcurrentTimerValOld))/(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 					this->EstimateSynch=1.0+this->SynchAdjconstant*(this->EstimateSynch-1.0);
 					//this->EstimateSynch=1.0; // To disable synch adjustment
 					
@@ -357,9 +358,10 @@ if (iIterPRUcurrentTimerVal>0){
 }
 PRUoffsetDriftErrorIntegralOld=PRUoffsetDriftErrorIntegral;
 PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftError*(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);
-this->PRUoffsetDriftErrorApplied=static_cast<long long int>(PIDconstant*static_cast<double>(PRUoffsetDriftError)+PIDintegral*static_cast<double>(PRUoffsetDriftErrorIntegral)+PIDderiv*PRUoffsetDriftErrorDerivative);
-if (this->PRUoffsetDriftErrorApplied>0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied+LostCounts;}// The 5 is to compensate the lost counts in the PRU when applying the update
-else if (this->PRUoffsetDriftErrorApplied<0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied-LostCounts;}// The 5 is to compensate the lost counts in the PRU when applying the update
+this->PRUoffsetDriftErrorAppliedRaw=static_cast<long long int>(PIDconstant*static_cast<double>(PRUoffsetDriftError)+PIDintegral*static_cast<double>(PRUoffsetDriftErrorIntegral)+PIDderiv*PRUoffsetDriftErrorDerivative);
+if (this->PRUoffsetDriftErrorApplied>0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw+LostCounts;}// The 5 is to compensate the lost counts in the PRU when applying the update
+else if (this->PRUoffsetDriftErrorApplied<0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw-LostCounts;}// The 5 is to compensate the lost counts in the PRU when applying the update
+else{this->PRUoffsetDriftErrorApplied=0;}
 
 return 0; // All ok
 }
