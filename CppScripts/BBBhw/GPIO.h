@@ -78,6 +78,8 @@ private:// Variables
 	unsigned long long int PRUcurrentTimerValWrap=0;
 	unsigned long long int PRUcurrentTimerValOld=0;
 	unsigned long long int iIterPRUcurrentTimerVal=0;
+	unsigned long long int iIterPRUcurrentTimerValSynch=0;// Account for rounds entered
+	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has no tentered
 	unsigned long long int iIterPRUcurrentTimerValLast=0;
 	double EstimateSynch=1.0;
 	// PID error correction
