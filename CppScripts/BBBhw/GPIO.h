@@ -86,8 +86,8 @@ private:// Variables
 	double EstimateSynch=1.0;
 	// PID error correction
 	double SynchAdjconstant=0.05;// Might depend the closenest to 1.0 with the jitter of the clocks
-	double PIDconstant=0.20;
-	double PIDintegral=0.005;
+	double PIDconstant=0.10;
+	double PIDintegral=0.0025;
 	double PIDderiv=0.0005;	
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;// We do not use system_clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
