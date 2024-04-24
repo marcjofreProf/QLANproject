@@ -293,11 +293,11 @@ int GPIO::PRUsignalTimerSynch(){
 					// Computations for Synch calculaton for PRU0 compensation
 					this->EstimateSynch=(static_cast<double>(this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(this->PRUcurrentTimerValOld-this->PRUoffsetDriftErrorAppliedOldRaw))/(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correctoin).
 					this->EstimateSynch=1.0+this->SynchAdjconstant*(this->EstimateSynch-1.0);
-					//this->EstimateSynch=1.0; // To disable synch adjustment
+					this->EstimateSynch=1.0; // To disable synch adjustment
 									
 					//// PID error computation to correct for signal PRU 1 generation								
 					this->PIDcontrolerTime();// Compute parameters for PID adjustment
-					//this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
+					this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
 					// Re wrap for correction
 					if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)>0xFFFFFFFF){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied-0xFFFFFFFF;}
 					else if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)<0){this->PRUoffsetDriftErrorApplied=0xFFFFFFFF-(-this->PRUoffsetDriftErrorApplied-this->PRUcurrentTimerValWrap);}
