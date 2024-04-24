@@ -326,6 +326,7 @@ int GPIO::PRUsignalTimerSynch(){
 						cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 						cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
 						cout << "EstimateSynch: " << this->EstimateSynch << endl;
+						cout << "EstimateSynchDirection: " << this->EstimateSynchDirection << endl;
 						if (this->EstimateSynchDirection>1.0){cout << "Clock estimatesynch advancing" << endl;}
 						else if (this->EstimateSynchDirection<1.0){cout << "Clock estimatesynch delaying" << endl;}
 						else{cout << "Clock estimatesynch neutral" << endl;}
