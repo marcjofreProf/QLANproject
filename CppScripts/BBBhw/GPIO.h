@@ -86,7 +86,7 @@ private:// Variables
 	unsigned long long int iIterPRUcurrentTimerValLast=0;
 	double EstimateSynch=1.0;
 	// PID error correction
-	double SynchAdjconstant=0.05;// Might depend the closenest to 1.0 with the jitter of the clocks
+	double SynchAdjconstant=0.04;// Might depend the closenest to 1.0 with the jitter of the clocks
 	double PIDconstant=0.10;
 	double PIDintegral=0.0025;
 	double PIDderiv=0.0005;	
