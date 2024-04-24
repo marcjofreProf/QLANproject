@@ -322,7 +322,7 @@ int GPIO::PRUsignalTimerSynch(){
 						this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
 					}			
 					
-					if ((this->iIterPRUcurrentTimerVal%4)==0){
+					if ((this->iIterPRUcurrentTimerVal%1)==0){
 						cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 						cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
 						cout << "EstimateSynch: " << this->EstimateSynch << endl;
