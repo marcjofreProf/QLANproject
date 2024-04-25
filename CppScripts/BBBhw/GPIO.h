@@ -89,7 +89,7 @@ private:// Variables
 	double EstimateSynchDirection=0.0;
 	// PID error correction
 	double SynchAdjconstant=0.05;// Might depend the closenest to 1.0 with the jitter of the clocks
-	double PIDconstant=0.25;
+	double PIDconstant=0.1;
 	double PIDintegral=0.0;
 	double PIDderiv=0.0;	
 	// Time/synchronization management
