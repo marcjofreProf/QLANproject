@@ -251,7 +251,7 @@ int GPIO::PRUsignalTimerSynch(){
 	while(true){		
 		//if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMarging))){// It was possible to execute when needed
 			//cout << "Resetting PRUs timer!" << endl;
-			if (clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock)
+			if (clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock)
 				this->acquire();
 				this->ManualSemaphore=true;
 				// Important, the following line at the very beggining to reduce the command jitter
@@ -363,11 +363,12 @@ return 0; // All ok
 }
 
 int GPIO::PIDcontrolerTime(){
-if (iIterPRUcurrentTimerVal>0){
+if (iIterPRUcurrentTimerVal>10){
 	PRUoffsetDriftErrorDerivative=static_cast<double>(PRUoffsetDriftError-PRUoffsetDriftErrorLast)/(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast)*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
+
+	PRUoffsetDriftErrorIntegralOld=PRUoffsetDriftErrorIntegral;
+	PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftError*(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast)*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 }
-PRUoffsetDriftErrorIntegralOld=PRUoffsetDriftErrorIntegral;
-PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftError*(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast)*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 this->PRUoffsetDriftErrorAppliedRaw=static_cast<long long int>(PIDconstant*static_cast<double>(PRUoffsetDriftError)+PIDintegral*static_cast<double>(PRUoffsetDriftErrorIntegral)+PIDderiv*PRUoffsetDriftErrorDerivative);
 if (this->PRUoffsetDriftErrorAppliedRaw>0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedCorrectionDirection*(-this->PRUoffsetDriftErrorAppliedRaw-LostCounts);}// The LostCounts is to compensate the lost counts in the PRU when applying the update
 else if (this->PRUoffsetDriftErrorAppliedRaw<0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedCorrectionDirection*(-this->PRUoffsetDriftErrorAppliedRaw+LostCounts);}// The LostCounts is to compensate the lost counts in the PRU when applying the update
