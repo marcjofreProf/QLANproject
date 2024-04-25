@@ -48,8 +48,8 @@ using std::fstream;
 #define PRUdataPATH2 "../PRUdata/"
 
 #define MaxNumPulses	8192
-#define PRUclockStepPeriodNanoseconds		5 // PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is multiplied by 8, so 192MHz, hence th period 5.2083...ns
-#define PulseFreq	999.98//1000 // Hz// Very critical parameter matched to the 1KHz timer. There might be some error in terms of real 1 KHz, the test is to use its own timmer to characterize what a real 1KHz is. Make sure that the timer produces a 1 KHz square singal with respect the clock used. 32.768kHz I think it is not used.
+#define PRUclockStepPeriodNanoseconds		4.99975 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
+#define PulseFreq	1000 // Hz// 
 
 namespace exploringBB {
 

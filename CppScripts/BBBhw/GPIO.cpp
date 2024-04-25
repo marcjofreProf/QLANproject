@@ -294,6 +294,8 @@ int GPIO::PRUsignalTimerSynch(){
 					this->EstimateSynch=(static_cast<double>(this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(this->PRUcurrentTimerValOld-this->PRUoffsetDriftErrorAppliedOldRaw))/(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correctoin).
 					this->EstimateSynch=1.0+this->SynchAdjconstant*(this->EstimateSynch-1.0);
 					this->EstimateSynchDirection=(static_cast<double>(this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw))-(static_cast<double>(this->PRUcurrentTimerValOld-1*this->PRUoffsetDriftErrorAppliedOldRaw)+(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
+					if (this->EstimateSynchDirection>=1.0){this->PRUoffsetDriftErrorAppliedCorrectionDirection=1;}
+					else{this->PRUoffsetDriftErrorAppliedCorrectionDirection=-1;}
 					//this->EstimateSynch=1.0; // To disable synch adjustment
 									
 					//// PID error computation to correct for signal PRU 1 generation								
@@ -327,8 +329,8 @@ int GPIO::PRUsignalTimerSynch(){
 						cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
 						cout << "EstimateSynch: " << this->EstimateSynch << endl;
 						cout << "EstimateSynchDirection: " << this->EstimateSynchDirection << endl;
-						if (this->EstimateSynchDirection>25000.0){cout << "Clock estimatesynch advancing" << endl;}
-						else if (this->EstimateSynchDirection<25000.0){cout << "Clock estimatesynch delaying" << endl;}
+						if (this->EstimateSynchDirection>0.0){cout << "Clock estimatesynch advancing" << endl;}
+						else if (this->EstimateSynchDirection<0.0){cout << "Clock estimatesynch delaying" << endl;}
 						else{cout << "Clock estimatesynch neutral" << endl;}
 					}
 										
