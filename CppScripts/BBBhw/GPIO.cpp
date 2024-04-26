@@ -336,8 +336,7 @@ int GPIO::PRUsignalTimerSynch(){
 						if (this->EstimateSynchDirection>0.0){cout << "Clock estimatesynch advancing" << endl;}
 						else if (this->EstimateSynchDirection<0.0){cout << "Clock estimatesynch delaying" << endl;}
 						else{cout << "Clock estimatesynch neutral" << endl;}
-					}
-										
+					}										
 					// Updates for next round				
 					this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
 					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
@@ -345,6 +344,8 @@ int GPIO::PRUsignalTimerSynch(){
 					this->iIterPRUcurrentTimerValPass=1;					
 				}
 				else{// Do not do computations
+					this->PRUoffsetDriftErrorApplied=0;
+					this->PRUoffsetDriftErrorAppliedRaw=0;
 					this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
 					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
 					this->iIterPRUcurrentTimerValPass=1;
