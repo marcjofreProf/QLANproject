@@ -48,7 +48,7 @@ using std::fstream;
 #define PRUdataPATH2 "../PRUdata/"
 
 #define MaxNumPulses	8192
-#define PRUclockStepPeriodNanoseconds		4.99975 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
+#define PRUclockStepPeriodNanoseconds		4.9997 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
 #define PulseFreq	1000 // Hz// 
 
 namespace exploringBB {
@@ -98,7 +98,7 @@ private:// Variables
 	unsigned long long int TimePRU1synchPeriod=5000000000;//; // The larger the more stable, but the least capable of fast corrections (so the hardware clock has to be more stable)
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
-	unsigned long long int TimeClockMarging=100000;// In nanoseconds
+	unsigned long long int TimeClockMarging=1000000;// In nanoseconds
 	unsigned long long int TimeElpasedNow_time_as_count=0;
 	// PRU
 	static int mem_fd;

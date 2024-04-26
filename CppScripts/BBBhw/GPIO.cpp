@@ -342,9 +342,7 @@ int GPIO::PRUsignalTimerSynch(){
 					this->iIterPRUcurrentTimerValPass=1;					
 				}
 				else{// Do not do computations
-					this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
-					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
-					this->iIterPRUcurrentTimerValPass=1;
+					this->iIterPRUcurrentTimerValPass++;
 				}
 				this->ManualSemaphore=false;
 				this->release();
@@ -364,7 +362,7 @@ return 0; // All ok
 }
 
 int GPIO::PIDcontrolerTime(){
-if (this->iIterPRUcurrentTimerValSynch>20){
+if (this->iIterPRUcurrentTimerValSynch>10){
 	PRUoffsetDriftErrorDerivative=static_cast<double>(PRUoffsetDriftError-PRUoffsetDriftErrorLast)/(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast)*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
 
 	PRUoffsetDriftErrorIntegralOld=PRUoffsetDriftErrorIntegral;
