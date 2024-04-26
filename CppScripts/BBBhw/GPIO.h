@@ -93,7 +93,7 @@ private:// Variables
 	double EstimateSynchDirectionAvg=0.0;
 	double EstimateSynchDirectionArray[MaxNumPulses]={0.0};
 	// PID error correction
-	double SynchAdjconstant=0.25;// Might depend the closenest to 1.0 with the jitter of the clocks
+	double SynchAdjconstant=0.75;// Might depend the closenest to 1.0 with the jitter of the clocks
 	double PIDconstant=0.75;
 	double PIDintegral=0.0;
 	double PIDderiv=0.0;	
