@@ -18,8 +18,7 @@
 // GPIO goes low. If a bit is 0 it is ignored.
 #define PRU1QuarterClocks	50000000
 // adjust to longest path so that the period of the signal is exact. The longest path is when in the OFF state the system has to check for an interrupt
-#define LOSTCLOCKCOUNTS1	2 // estimation of clocks lost
-#define LOSTCLOCKCOUNTS2	15 // estimation of clocks need 
+#define LOSTCLOCKCOUNTS1	14 // estimation of clocks lost
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -164,9 +163,8 @@ CMDLOOP2:// Double verification of host sending start command
 
 SIGNALON:
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
-	MOV	r0, r1
 DELAYON:
-	SUB 	r0, r0, 1
+	SUB 	r1, r1, 1
 	QBNE	DELAYON, r0, LOSTCLOCKCOUNTS1
 
 SIGNALOFF:
