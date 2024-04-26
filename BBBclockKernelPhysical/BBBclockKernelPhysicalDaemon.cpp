@@ -169,7 +169,7 @@ int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems phy
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);
 while(ClockWatch::now() < this->TimePointClockCurrentFinal);// Busy waiting
 
-this->TimePointClockCurrentInitial=ClockWatch::now();
+this->TimePointClockCurrentInitialMeas=ClockWatch::now();
 pru1dataMem_int[0]=PRU1QuarterClocksAux;//Information sent to and grabbed by PRU1
 
 //Triggered part
@@ -195,7 +195,7 @@ else{
 // Compute error
 if (retInterruptsPRU1>0){
 	// Compute clocks adjustment
-	auto duration_FinalInitial=this->TimePointClockCurrentFinal-this->TimePointClockCurrentInitial;
+	auto duration_FinalInitial=this->TimePointClockCurrentFinalMeas-this->TimePointClockCurrentInitialMeas;
 	unsigned long long int duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
 	
 	// Compute absolute error
