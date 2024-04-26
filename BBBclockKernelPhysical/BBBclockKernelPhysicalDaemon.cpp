@@ -155,7 +155,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 }
 
 int CKPD::GenerateSynchClockPRU(){// Only used once at the begging, because it runs continuosly
-pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq);
+pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq);// Here it is really aplied to the PRU
 pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
@@ -238,7 +238,7 @@ if (retInterruptsPRU1>0){
 }
 // Update values
 this->TimePointClockCurrentAdjFilErrorAppliedArray[this->CounterHandleInterruptSynchPRU%this->AppliedMeanFilterFactor]=this->TimePointClockCurrentAdjFilErrorApplied;
-PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorAppliedArray,this->AppliedMeanFilterFactor)/PRUclockStepPeriodNanoseconds/4.0);
+PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorAppliedArray,this->AppliedMeanFilterFactor)/PRUclockStepPeriodNanoseconds/4.0);// Here the correction is inserted
 if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 

@@ -54,7 +54,7 @@ private:// Variables
 	// Time/synchronization management
 	unsigned long long int CounterHandleInterruptSynchPRU=0;
 	unsigned long long int CounterHandleInterruptSynchPRUlast=0;
-	using ClockWatch = std::chrono::system_clock;// Since we do not need time sleep, it might make sense to use steady_clock;//system_clock; //system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
+	using ClockWatch = std::chrono::steady_clock;// Since we do not need time sleep, it might make sense to use steady_clock;//system_clock; //system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
 	//using ClockChrono = std::chrono::steady_clock;//Probably is also better to also measure with system_clock. system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than seady_clock aimed at measuring absolute time (like a watch)	
 		
 	using TimePointWatch = std::chrono::time_point<ClockWatch>;
@@ -94,7 +94,7 @@ private:// Variables
 	double TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0.0};
 	double TimePointClockCurrentAdjFilErrorAppliedArray[MaxMedianFilterArraySize]={0.0};
 	// PID error correction
-	double PIDconstant=0.75; // The larger than 1 the more aggressive correction. Below 1.0 is not aggressively enough to correct fully, eventhought it will try. This value times the maxium value set in MaxTimePointClockCurrentAdjError, has not ot exceed the period wanted. It has to be larger than the jitter of the hardware clocks
+	double PIDconstant=1.1; // The larger than 1 the more aggressive correction. Below 1.0 is not aggressively enough to correct fully, eventhought it will try. This value times the maxium value set in MaxTimePointClockCurrentAdjError, has not ot exceed the period wanted. It has to be larger than the jitter of the hardware clocks
 	double PIDintegral=0.0;
 	double PIDderiv=0.0;	
 	// Maximum values
