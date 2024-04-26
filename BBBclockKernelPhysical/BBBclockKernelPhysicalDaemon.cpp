@@ -254,7 +254,7 @@ this->CounterHandleInterruptSynchPRU++;// Update counter
 
 if (PlotPIDHAndlerInfo){
 	if (this->CounterHandleInterruptSynchPRU%3==0){
-	auto duration_FinalInitialExtra=this->TimePointClockCurrentFinal-this->TimePointClockCurrentInitialExtra;
+	auto duration_FinalInitialExtra=this->TimePointClockCurrentFinal-this->TimePointClockCurrentInitialExtra-std::chrono::nanoseconds(this->TimeAdjPeriod);
 	unsigned long long int duration_FinalInitialExtraCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialExtra).count();
 	//cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
 	//cout << "this->NumClocksQuarterPeriodPRUclock: " << this->NumClocksQuarterPeriodPRUclock << endl;
