@@ -249,7 +249,7 @@ int GPIO::PRUsignalTimerSynch(){
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	while(true){		
-		if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMarging))){// It was possible to execute when needed
+		//if (Clock::now()<=(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMarging))){// It was possible to execute when needed
 			//cout << "Resetting PRUs timer!" << endl;
 			if (clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html
@@ -257,14 +257,17 @@ int GPIO::PRUsignalTimerSynch(){
 				this->ManualSemaphore=true;
 				// Important, the following line at the very beggining to reduce the command jitter
 				pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
-				if (this->PRUoffsetDriftErrorApplied>0){
+				if (this->PRUoffsetDriftErrorApplied>0 and this->iIterPRUcurrentTimerValPass==1){
 					pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 3, to execute synch functions addition correction
-				}
-				else if (this->PRUoffsetDriftErrorApplied==0){
-					pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
-				}
-				else{
+				}				
+				else if (this->PRUoffsetDriftErrorApplied<0 and this->iIterPRUcurrentTimerValPass==1){
 					pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
+				}
+				else{// if (this->PRUoffsetDriftErrorApplied==0 or this->iIterPRUcurrentTimerValPass>1){
+					this->PRUoffsetDriftErrorApplied=0;
+					this->PRUoffsetDriftErrorAppliedRaw=0;
+					pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
+					pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
 				}
 				prussdrv_pru_send_event(22);
 				
@@ -305,13 +308,13 @@ int GPIO::PRUsignalTimerSynch(){
 					// Re wrap for correction
 					if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)>0xFFFFFFFF){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied-0xFFFFFFFF;}
 					else if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)<0){this->PRUoffsetDriftErrorApplied=0xFFFFFFFF-(-this->PRUoffsetDriftErrorApplied-this->PRUcurrentTimerValWrap);}
-					if (this->PRUoffsetDriftErrorApplied<0 and (this->PRUcurrentTimerValWrap+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)>(0+TimeClockMarging) and (this->PRUcurrentTimerValWrap+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))<(0xFFFFFFFF-TimeClockMarging) and this->iIterPRUcurrentTimerValSynch>4){// Substraction correction					
+					if (this->PRUoffsetDriftErrorApplied<0 and (this->PRUcurrentTimerValWrap+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)>(0+TimeClockMarging) and (this->PRUcurrentTimerValWrap+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))<(0xFFFFFFFF-TimeClockMarging) ){// Substraction correction					
 						pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
 						PRUoffsetDriftErrorLast=PRUoffsetDriftError;// Update
 						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update
 						this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
 					}
-					else if (this->PRUoffsetDriftErrorApplied>0 and (this->PRUcurrentTimerValWrap+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)<(0xFFFFFFFF-TimeClockMarging) and this->iIterPRUcurrentTimerValSynch>4){// Addition correction
+					else if (this->PRUoffsetDriftErrorApplied>0 and (this->PRUcurrentTimerValWrap+(this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)+this->PRUoffsetDriftErrorApplied)<(0xFFFFFFFF-TimeClockMarging)){// Addition correction
 						pru1dataMem_int[3]=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);// Apply correction
 						PRUoffsetDriftErrorLast=PRUoffsetDriftError;// Update
 						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update
@@ -350,10 +353,10 @@ int GPIO::PRUsignalTimerSynch(){
 			else{// does not enter in time
 				this->iIterPRUcurrentTimerValPass++;
 			}			
-		} //end if
-		else{// does not enter in time
-			this->iIterPRUcurrentTimerValPass++;
-		}
+		//} //end if
+		//else{// does not enter in time
+		//	this->iIterPRUcurrentTimerValPass++;
+		//}
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
 	}// end while
