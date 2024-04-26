@@ -304,7 +304,7 @@ int GPIO::PRUsignalTimerSynch(){
 					this->EstimateSynchDirection=(static_cast<double>(this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw))-(static_cast<double>(this->PRUcurrentTimerValOld-0*this->PRUoffsetDriftErrorAppliedOldRaw)+(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
 					EstimateSynchDirectionArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynchDirection;
 					this->EstimateSynchDirectionAvg=DoubleMedianFilterSubArray(EstimateSynchDirectionArray,NumSynchMeasAvgAux);
-					if (this->EstimateSynchDirectionAvg<=0.0){this->PRUoffsetDriftErrorAppliedCorrectionDirection=-1;}
+					if (this->EstimateSynchDirectionAvg<=0.0){this->PRUoffsetDriftErrorAppliedCorrectionDirection=1;}
 					else{this->PRUoffsetDriftErrorAppliedCorrectionDirection=-1;}
 					//this->EstimateSynch=1.0; // To disable synch adjustment
 									
@@ -382,8 +382,8 @@ if (this->iIterPRUcurrentTimerValSynch>10){
 	PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftError*(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast)*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 	
 	this->PRUoffsetDriftErrorAppliedRaw=static_cast<long long int>(PIDconstant*static_cast<double>(PRUoffsetDriftError)+PIDintegral*static_cast<double>(PRUoffsetDriftErrorIntegral)+PIDderiv*PRUoffsetDriftErrorDerivative);
-	if (this->PRUoffsetDriftErrorAppliedRaw>0){this->PRUoffsetDriftErrorAppliedRaw=this->PRUoffsetDriftErrorAppliedCorrectionDirection*(-this->PRUoffsetDriftErrorAppliedRaw);}
-	else if (this->PRUoffsetDriftErrorAppliedRaw<0){this->PRUoffsetDriftErrorAppliedRaw=this->PRUoffsetDriftErrorAppliedCorrectionDirection*(-this->PRUoffsetDriftErrorAppliedRaw);}
+	if (this->PRUoffsetDriftErrorAppliedRaw>0){this->PRUoffsetDriftErrorAppliedRaw=this->PRUoffsetDriftErrorAppliedCorrectionDirection*(this->PRUoffsetDriftErrorAppliedRaw);}
+	else if (this->PRUoffsetDriftErrorAppliedRaw<0){this->PRUoffsetDriftErrorAppliedRaw=this->PRUoffsetDriftErrorAppliedCorrectionDirection*(this->PRUoffsetDriftErrorAppliedRaw);}
 	else{this->PRUoffsetDriftErrorAppliedRaw=0;}
 
 	if (this->PRUoffsetDriftErrorAppliedRaw<0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw-LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
