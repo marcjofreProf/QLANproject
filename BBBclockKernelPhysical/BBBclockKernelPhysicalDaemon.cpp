@@ -192,6 +192,8 @@ else{
 	cout << "PRU1 interrupt poll error" << endl;
 }
 
+this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
+
 // Compute error
 if (retInterruptsPRU1>0){
 	// Compute clocks adjustment
