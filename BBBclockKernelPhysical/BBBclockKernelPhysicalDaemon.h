@@ -54,7 +54,7 @@ private:// Variables
 	// Time/synchronization management
 	unsigned long long int CounterHandleInterruptSynchPRU=0;
 	unsigned long long int CounterHandleInterruptSynchPRUlast=0;
-	using ClockWatch = std::chrono::steady_clock;// Since we do not need time sleep, it might make sense to use steady_clock;//system_clock; //system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
+	using ClockWatch = std::chrono::system_clock;// Since we do not need time sleep, it might make sense to use steady_clock;//system_clock; //system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
 	//using ClockChrono = std::chrono::steady_clock;//Probably is also better to also measure with system_clock. system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)	
 		
 	using TimePointWatch = std::chrono::time_point<ClockWatch>;
@@ -68,6 +68,7 @@ private:// Variables
 	//static int chunk;
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
 	// Time keeping
+	unsigned long long int TimeClockMarging=100000;// In nanoseconds
 	unsigned long long int TimeAdjPeriod=static_cast<unsigned long long int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted. VEry important parameter
 	double TimePointClockCurrentAdjError=0;
 	double TimePointClockCurrentAdjFilError=0;
