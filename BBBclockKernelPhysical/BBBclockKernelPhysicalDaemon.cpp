@@ -198,7 +198,7 @@ if (retInterruptsPRU1>0){
 	
 	// Compute absolute error
 	if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
-	this->TimePointClockCurrentAdjError=(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux)-static_cast<int>(PRU1QuarterClocksAux));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
+	this->TimePointClockCurrentAdjError=(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux)-static_cast<int>(this->TimePointClockCurrentAdjFilErrorAppliedOld));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
 	}
 	else{
 		this->TimePointClockCurrentAdjError=0;
@@ -273,6 +273,7 @@ return 0;// All ok
 int CKPD::PIDcontrolerTime(){
 TimePointClockCurrentAdjFilErrorDerivative=(TimePointClockCurrentAdjFilError-TimePointClockCurrentAdjFilErrorLast)/(static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast));
 TimePointClockCurrentAdjFilErrorIntegral=TimePointClockCurrentAdjFilErrorIntegral+TimePointClockCurrentAdjFilError*static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast);
+this->TimePointClockCurrentAdjFilErrorAppliedOld=this->TimePointClockCurrentAdjFilErrorApplied;
 this->TimePointClockCurrentAdjFilErrorApplied=PIDconstant*TimePointClockCurrentAdjFilError+PIDintegral*TimePointClockCurrentAdjFilErrorIntegral+PIDderiv*TimePointClockCurrentAdjFilErrorDerivative;
 TimePointClockCurrentAdjFilErrorLast=TimePointClockCurrentAdjFilError;// Update
 CounterHandleInterruptSynchPRUlast=CounterHandleInterruptSynchPRU;// Update
