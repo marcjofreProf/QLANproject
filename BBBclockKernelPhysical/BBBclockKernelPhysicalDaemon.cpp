@@ -199,12 +199,9 @@ if (retInterruptsPRU1>0){
 	auto duration_FinalExtraInitial=this->TimePointClockCurrentFinalExtra-this->TimePointClockCurrentFinal;
 	unsigned long long int duration_FinalExtraInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalExtraInitial).count();
 	
-	auto duration_FinalInitialExtra=this->TimePointClockCurrentFinal-this->TimePointClockCurrentInitialExtra;
-	unsigned long long int duration_FinalInitialExtraCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialExtra).count();	
-
 	// Compute absolute error
 	if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
-	this->TimePointClockCurrentAdjError=(static_cast<int>(this->TimeAdjPeriod)-(static_cast<int>(duration_FinalInitialCountAux)-static_cast<int>(duration_FinalExtraInitialCountAux))-(static_cast<int>(this->TimeAdjPeriod-duration_FinalInitialExtraCountAux)));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
+	this->TimePointClockCurrentAdjError=(static_cast<int>(this->TimeAdjPeriod)-(static_cast<int>(duration_FinalInitialCountAux)-static_cast<int>(duration_FinalExtraInitialCountAux)));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
 	}
 	else{
 		this->TimePointClockCurrentAdjError=0;
@@ -256,14 +253,16 @@ this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;
 this->CounterHandleInterruptSynchPRU++;// Update counter
 
 if (PlotPIDHAndlerInfo){
-	if (this->CounterHandleInterruptSynchPRU%3==0){	
+	if (this->CounterHandleInterruptSynchPRU%3==0){
+	auto duration_FinalInitialExtra=this->TimePointClockCurrentFinal-this->TimePointClockCurrentInitialExtra;
+	unsigned long long int duration_FinalInitialExtraCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialExtra).count();
 	//cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
 	//cout << "this->NumClocksQuarterPeriodPRUclock: " << this->NumClocksQuarterPeriodPRUclock << endl;
 	// Not used cout << "this->TimePointClockCurrentFinalInitialAdj_time_as_count: " << this->TimePointClockCurrentFinalInitialAdj_time_as_count << endl;
 	cout << "this->TimePointClockCurrentAdjError: " << this->TimePointClockCurrentAdjError << endl;
 	cout << "this->TimePointClockCurrentAdjFilError: " << this->TimePointClockCurrentAdjFilError << endl;
 	cout << "this->TimePointClockCurrentAdjFilErrorApplied: " << this->TimePointClockCurrentAdjFilErrorApplied << endl;
-	//cout << "duration_FinalInitialExtraCountAux: " << duration_FinalInitialExtraCountAux << endl;
+	cout << "duration_FinalInitialExtraCountAux: " << duration_FinalInitialExtraCountAux << endl;
 	//cout << "PRU1QuarterClocksAux: " << PRU1QuarterClocksAux << endl;
 	}
 }
