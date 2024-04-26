@@ -98,7 +98,7 @@ private:// Variables
 	unsigned long long int TimePRU1synchPeriod=5000000000;//; // The larger the more stable, but the least capable of fast corrections (so the hardware clock has to be more stable)
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
-	unsigned long long int TimeClockMarging=1000000;// In nanoseconds
+	unsigned long long int TimeClockMarging=100000;// In nanoseconds
 	unsigned long long int TimeElpasedNow_time_as_count=0;
 	// PRU
 	static int mem_fd;
