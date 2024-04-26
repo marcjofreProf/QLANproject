@@ -176,7 +176,6 @@ return 0;// all ok
 }
 
 int CKPDSD::HandleInterruptSynchPRU(){ // Uses output pins to count 24 MHz counts sunch with software 1pps
-this->TimePointClockCurrentInitialExtra=ClockWatch::now();
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);// After the interrupt update rapidly the new quarter value
 this->TimePointClockCurrentFinal=ClockWatch::now();
 
@@ -187,7 +186,6 @@ pru0dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(21);
 //
-this->TimePointClockCurrentFinalExtra=ClockWatch::now();
 
 // Receive info from PRU1
 NumRefSigCounts=pru0dataMem_int[3]; // Information of how many counts
@@ -213,16 +211,10 @@ if (retInterruptsPRU0>0){
 	// Compute clocks adjustment
 	auto duration_FinalInitial=this->TimePointClockCurrentFinal-this->TimePointClockCurrentInitial;
 	unsigned long long int duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
-	
-	auto duration_FinalExtraInitial=this->TimePointClockCurrentFinalExtra-this->TimePointClockCurrentFinal;
-	unsigned long long int duration_FinalExtraInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalExtraInitial).count();
-	
-	auto duration_FinalInitialExtra=this->TimePointClockCurrentFinal-this->TimePointClockCurrentInitialExtra;
-	unsigned long long int duration_FinalInitialExtraCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialExtra).count();
 
 	// Compute absolute error
 	if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
-	this->TimePointClockCurrentAdjError=(static_cast<int>(this->TimeAdjPeriod)-(static_cast<int>(duration_FinalInitialCountAux)-static_cast<int>(duration_FinalExtraInitialCountAux))-(static_cast<int>(this->TimeAdjPeriod-duration_FinalInitialExtraCountAux)));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
+	this->TimePointClockCurrentAdjError=(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
 	}
 	else{
 		this->TimePointClockCurrentAdjError=0;
@@ -231,17 +223,17 @@ if (retInterruptsPRU0>0){
 	// Error filtering
 	switch(FilterMode) {
 	case 2:{// Mean implementation
-	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=static_cast<double>(this->TimePointClockCurrentAdjError);// Error to be compensated for
+	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
 	this->TimePointClockCurrentAdjFilError=this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray,this->MeanFilterFactor);
 	break;
 	}
 	case 1:{// Median implementation
-	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=static_cast<double>(this->TimePointClockCurrentAdjError);// Error to be compensated for
+	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
 	this->TimePointClockCurrentAdjFilError=this->DoubleMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
 	break;
 	}
 	default:{// Average implementation
-	this->TimePointClockCurrentAdjFilError = this->RatioAverageFactorClockFullPeriod*this->TimePointClockCurrentAdjFilError+(1.0-this->RatioAverageFactorClockFullPeriod)*static_cast<double>(this->TimePointClockCurrentAdjError);
+	this->TimePointClockCurrentAdjFilError = this->RatioAverageFactorClockFullPeriod*this->TimePointClockCurrentAdjFilError+(1.0-this->RatioAverageFactorClockFullPeriod)*this->TimePointClockCurrentAdjError;
 	}
 	}
 	// Limit applied error correction
