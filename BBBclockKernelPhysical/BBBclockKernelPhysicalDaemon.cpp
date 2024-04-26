@@ -198,7 +198,7 @@ if (retInterruptsPRU1>0){
 	
 	// Compute absolute error
 	if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
-	this->TimePointClockCurrentAdjError=(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux)-static_cast<int>(this->TimePointClockCurrentAdjFilErrorAppliedOld));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
+	this->TimePointClockCurrentAdjError=(static_cast<double>(this->TimeAdjPeriod)-static_cast<double>(duration_FinalInitialCountAux));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
 	}
 	else{
 		this->TimePointClockCurrentAdjError=0;
@@ -207,17 +207,17 @@ if (retInterruptsPRU1>0){
 	// Error filtering
 	switch(FilterMode) {
 	case 2:{// Mean implementation
-	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=static_cast<double>(this->TimePointClockCurrentAdjError);// Error to be compensated for
+	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
 	this->TimePointClockCurrentAdjFilError=this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray,this->MeanFilterFactor);
 	break;
 	}
 	case 1:{// Median implementation
-	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=static_cast<double>(this->TimePointClockCurrentAdjError);// Error to be compensated for
+	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
 	this->TimePointClockCurrentAdjFilError=this->DoubleMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
 	break;
 	}
 	default:{// Average implementation
-	this->TimePointClockCurrentAdjFilError = this->RatioAverageFactorClockQuarterPeriod*this->TimePointClockCurrentAdjFilError+(1.0-this->RatioAverageFactorClockQuarterPeriod)*static_cast<double>(this->TimePointClockCurrentAdjError);
+	this->TimePointClockCurrentAdjFilError = this->RatioAverageFactorClockQuarterPeriod*this->TimePointClockCurrentAdjFilError+(1.0-this->RatioAverageFactorClockQuarterPeriod)*this->TimePointClockCurrentAdjError;
 	}
 	}
 	// Limit applied error correction
