@@ -178,7 +178,7 @@ pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
 prussdrv_pru_send_event(22);
 //
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// After the interrupt update rapidly the new quarter value
-this->TimePointClockCurrentFinal=ClockWatch::now();
+this->TimePointClockCurrentFinalMeas=ClockWatch::now();
 
 if (retInterruptsPRU1>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
