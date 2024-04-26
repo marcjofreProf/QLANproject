@@ -186,8 +186,9 @@ pru0dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(21);
 //
+this->TimePointClockCurrentInitial=ClockWatch::now();
 
-// Send info to PRU1
+// Receive info from PRU1
 NumRefSigCounts=pru0dataMem_int[3]; // Information of how many counts
 
 pru1dataMem_int[1]=static_cast<unsigned int>(NumOnSigCounts);// Correcton ON counts
@@ -260,7 +261,7 @@ PRU0PeriodClocksAux=static_cast<unsigned int>(this->NumClocksFullPeriodPRUclock+
 if (PRU0PeriodClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU0PeriodClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU0PeriodClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU0PeriodClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
-this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;
+//this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;
 this->CounterHandleInterruptSynchPRU++;// Update counter
 
 if (PlotPIDHAndlerInfo){

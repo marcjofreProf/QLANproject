@@ -175,6 +175,7 @@ pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
 //
+this->TimePointClockCurrentInitial=ClockWatch::now();
 
 if (retInterruptsPRU1>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -242,7 +243,7 @@ PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUcl
 if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
-this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;
+//this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;
 this->CounterHandleInterruptSynchPRU++;// Update counter
 
 if (PlotPIDHAndlerInfo){
@@ -261,8 +262,8 @@ return 0;// All ok
 }
 
 int CKPD::PIDcontrolerTime(){
-TimePointClockCurrentAdjFilErrorDerivative=(TimePointClockCurrentAdjFilError-TimePointClockCurrentAdjFilErrorLast)/(static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast)*static_cast<double>(this->TimeAdjPeriod));
-TimePointClockCurrentAdjFilErrorIntegral=TimePointClockCurrentAdjFilErrorIntegral+TimePointClockCurrentAdjFilError*static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast)*static_cast<double>(this->TimeAdjPeriod);
+TimePointClockCurrentAdjFilErrorDerivative=(TimePointClockCurrentAdjFilError-TimePointClockCurrentAdjFilErrorLast)/(static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast));
+TimePointClockCurrentAdjFilErrorIntegral=TimePointClockCurrentAdjFilErrorIntegral+TimePointClockCurrentAdjFilError*static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast);
 this->TimePointClockCurrentAdjFilErrorApplied=PIDconstant*TimePointClockCurrentAdjFilError+PIDintegral*TimePointClockCurrentAdjFilErrorIntegral+PIDderiv*TimePointClockCurrentAdjFilErrorDerivative;
 TimePointClockCurrentAdjFilErrorLast=TimePointClockCurrentAdjFilError;// Update
 CounterHandleInterruptSynchPRUlast=CounterHandleInterruptSynchPRU;// Update
