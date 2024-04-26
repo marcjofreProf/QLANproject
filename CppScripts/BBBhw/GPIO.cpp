@@ -293,7 +293,7 @@ int GPIO::PRUsignalTimerSynch(){
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 				// Compute error
-				this->PRUoffsetDriftError=static_cast<long long int>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
+				this->PRUoffsetDriftError=static_cast<long long int>((this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld)-(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds));
 				if (abs(this->PRUoffsetDriftError)<1e5 or this->iIterPRUcurrentTimerValSynch<20){// Do computations
 					// Computations for Synch calculaton for PRU0 compensation
 					this->EstimateSynch=(static_cast<double>(this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(this->PRUcurrentTimerValOld-0*this->PRUoffsetDriftErrorAppliedOldRaw))/(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correctoin).
@@ -738,7 +738,7 @@ int NumSynchPulseAvgAux=0;
 		if (NumSynchPulsesRed>1){//At least two points (two cycles separated by one cycle in between), we can generate a calibration curve
 			cout << "Synch pulses calcultion not working properly!" << endl;
 			//unsigned long long int CoeffSynchAdjAux0=1;
-			//double CoeffSynchAdjAux1=0.0;// Number theoretical counts given the number of cycles
+			double CoeffSynchAdjAux1=0.0;// Number theoretical counts given the number of cycles
 			double CoeffSynchAdjAux2=0.0;// PRU counting
 			double CoeffSynchAdjAux3=0.0;// Number theoretical counts given the number of cycles
 			//double CoeffSynchAdjAux4=0.0;// Number theoretical counts given the number of cycles
@@ -746,17 +746,16 @@ int NumSynchPulseAvgAux=0;
 				//CoeffSynchAdjAux0=(unsigned long long int)(((double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj); // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
 				//CoeffSynchAdjAux1=(double)(CoeffSynchAdjAux0)*PeriodCountsPulseAdj;//((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
 				// It makes a lot of difference to compute the pulse synchs fixed from the first pulse tagg rather than against the last one!!!!!
-				CoeffSynchAdjAux3=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj;//(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
-				//CoeffSynchAdjAux4=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
+				CoeffSynchAdjAux1=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj;//(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
+				CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter]);
 				//if (CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])/CoeffSynchAdjAux4-(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter+0])/CoeffSynchAdjAux3;}
-				CoeffSynchAdjAux2=0.0;
-				if (CoeffSynchAdjAux3>0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])/CoeffSynchAdjAux3;}
-				if (CoeffSynchAdjAux3>0.0 and CoeffSynchAdjAux2>0.0){// and CoeffSynchAdjAux4!=0.0){
+				if (CoeffSynchAdjAux2>0.0){CoeffSynchAdjAux3=CoeffSynchAdjAux1/CoeffSynchAdjAux2;}
+				if (CoeffSynchAdjAux1>0.0 and CoeffSynchAdjAux2>0.0){// and CoeffSynchAdjAux4!=0.0){
 					//SynPulse detect anomalies
-					if (CoeffSynchAdjAux2>1.11 or CoeffSynchAdjAux2<0.99){
-						cout << "Synch pulse anomaly CoeffSynchAdjAux2: " << CoeffSynchAdjAux2 << endl;
+					if (CoeffSynchAdjAux3>1.11 or CoeffSynchAdjAux3<0.99){
+						cout << "Synch pulse anomaly CoeffSynchAdjAux3: " << CoeffSynchAdjAux3 << endl;
 					}
-					AdjPulseSynchCoeffArray[NumSynchPulseAvgAux]=1.0+this->SynchAdjconstant*(CoeffSynchAdjAux2-1.0);//sqrt(CoeffSynchAdjAux2);//AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);					
+					AdjPulseSynchCoeffArray[NumSynchPulseAvgAux]=1.0+this->SynchAdjconstant*(CoeffSynchAdjAux3-1.0);//sqrt(CoeffSynchAdjAux3);//AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);					
 					//cout << "AdjPulseSynchCoeffArray[NumAvgAux]: " << AdjPulseSynchCoeffArray[NumAvgAux] << endl;
 					SynchPulsesTagsUsed[NumSynchPulseAvgAux]=SynchPulsesTags[iIter+1];
 					NumSynchPulseAvgAux++;
