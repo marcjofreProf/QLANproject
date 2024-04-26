@@ -240,7 +240,7 @@ if (retInterruptsPRU1>0){
 }
 // Update values
 //this->TimePointClockCurrentAdjFilErrorAppliedArray[this->CounterHandleInterruptSynchPRU%this->AppliedMeanFilterFactor]=this->TimePointClockCurrentAdjFilErrorApplied;// Averaging of PId Not used
-
+this->TimePointClockCurrentAdjFilErrorAppliedOld=this->TimePointClockCurrentAdjFilErrorApplied;
 PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->TimePointClockCurrentAdjFilErrorApplied/PRUclockStepPeriodNanoseconds/4.0);// Here the correction is inserted
 
 if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
@@ -277,7 +277,6 @@ TimePointClockCurrentAdjFilErrorIntegral=TimePointClockCurrentAdjFilErrorIntegra
 
 this->TimePointClockCurrentAdjFilErrorApplied=PIDconstant*TimePointClockCurrentAdjFilError+PIDintegral*TimePointClockCurrentAdjFilErrorIntegral+PIDderiv*TimePointClockCurrentAdjFilErrorDerivative;
 TimePointClockCurrentAdjFilErrorLast=TimePointClockCurrentAdjFilError;// Update
-this->TimePointClockCurrentAdjFilErrorAppliedOld=this->TimePointClockCurrentAdjFilErrorApplied;
 CounterHandleInterruptSynchPRUlast=CounterHandleInterruptSynchPRU;// Update
 return 0; // All ok
 }
