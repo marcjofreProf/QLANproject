@@ -176,6 +176,7 @@ return 0;// all ok
 }
 
 int CKPDSD::HandleInterruptSynchPRU(){ // Uses output pins to count 24 MHz counts sunch with software 1pps
+this->TimePointClockCurrentInitialExtra=ClockWatch::now();
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);// After the interrupt update rapidly the new quarter value
 this->TimePointClockCurrentFinal=ClockWatch::now();
 
@@ -215,10 +216,13 @@ if (retInterruptsPRU0>0){
 	
 	auto duration_FinalExtraInitial=this->TimePointClockCurrentFinalExtra-this->TimePointClockCurrentFinal;
 	unsigned long long int duration_FinalExtraInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalExtraInitial).count();
+	
+	auto duration_FinalInitialExtra=this->TimePointClockCurrentFinal-this->TimePointClockCurrentInitialExtra;
+	unsigned long long int duration_FinalInitialExtraCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialExtra).count();
 
 	// Compute absolute error
 	if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
-	this->TimePointClockCurrentAdjError=(static_cast<int>(this->TimeAdjPeriod)-(static_cast<int>(duration_FinalInitialCountAux)-static_cast<int>(duration_FinalExtraInitialCountAux)));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
+	this->TimePointClockCurrentAdjError=(static_cast<int>(this->TimeAdjPeriod)-(static_cast<int>(duration_FinalInitialCountAux)-static_cast<int>(duration_FinalExtraInitialCountAux))-(static_cast<int>(this->TimeAdjPeriod-duration_FinalInitialExtraCountAux)));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
 	}
 	else{
 		this->TimePointClockCurrentAdjError=0;
