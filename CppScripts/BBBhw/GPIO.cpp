@@ -367,7 +367,7 @@ int GPIO::PRUsignalTimerSynch(){
 		if (this->EstimateSynchDirectionAvg>0.0){cout << "Clock estimatesynch advancing" << endl;}
 		else if (this->EstimateSynchDirectionAvg<0.0){cout << "Clock estimatesynch delaying" << endl;}
 		else{cout << "Clock estimatesynch neutral" << endl;}
-		cout << "this->iIterPRUcurrentTimerValPass: "<< this->iIterPRUcurrentTimerValPass << endl;
+		//cout << "this->iIterPRUcurrentTimerValPass: "<< this->iIterPRUcurrentTimerValPass << endl;
 		}
 	}// end while
 
