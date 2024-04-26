@@ -274,9 +274,10 @@ return 0;// All ok
 int CKPD::PIDcontrolerTime(){
 TimePointClockCurrentAdjFilErrorDerivative=(TimePointClockCurrentAdjFilError-TimePointClockCurrentAdjFilErrorLast)/(static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast));
 TimePointClockCurrentAdjFilErrorIntegral=TimePointClockCurrentAdjFilErrorIntegral+TimePointClockCurrentAdjFilError*static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast);
-this->TimePointClockCurrentAdjFilErrorAppliedOld=this->TimePointClockCurrentAdjFilErrorApplied;
+
 this->TimePointClockCurrentAdjFilErrorApplied=PIDconstant*TimePointClockCurrentAdjFilError+PIDintegral*TimePointClockCurrentAdjFilErrorIntegral+PIDderiv*TimePointClockCurrentAdjFilErrorDerivative;
 TimePointClockCurrentAdjFilErrorLast=TimePointClockCurrentAdjFilError;// Update
+this->TimePointClockCurrentAdjFilErrorAppliedOld=this->TimePointClockCurrentAdjFilErrorApplied;
 CounterHandleInterruptSynchPRUlast=CounterHandleInterruptSynchPRU;// Update
 return 0; // All ok
 }
