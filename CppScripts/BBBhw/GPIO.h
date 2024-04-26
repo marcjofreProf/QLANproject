@@ -84,10 +84,10 @@ private:// Variables
 	unsigned long long int iIterPRUcurrentTimerValSynch=0;// Account for rounds entered
 	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has no tentered
 	unsigned long long int iIterPRUcurrentTimerValLast=0;
-	int NumSynchMeasAvgAux=50; // Num averages to compute the time error
-	double EstimateSynch=0.9;
+	int NumSynchMeasAvgAux=120; // Num averages to compute the time error
+	double EstimateSynch=1.0;
 	double EstimateSynchAvg=1.0;
-	double EstimateSynchArray[MaxNumPulses]={1.0};
+	double EstimateSynchArray[MaxNumPulses]={EstimateSynch};
 	double EstimateSynchDirection=0.0;
 	double EstimateSynchDirectionAvg=0.0;
 	double EstimateSynchDirectionArray[MaxNumPulses]={0.0};
