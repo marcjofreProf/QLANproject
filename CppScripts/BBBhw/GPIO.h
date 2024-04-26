@@ -74,7 +74,6 @@ private:// Variables
 	long long int PRUoffsetDriftErrorIntegralOld=0;
 	double PRUoffsetDriftErrorDerivative=0;
 	long long int PRUoffsetDriftErrorApplied=0;
-	long long int PRUoffsetDriftErrorAppliedCorrectionDirection=1;// 1: advancing; //-1 delaying
 	long long int PRUoffsetDriftErrorAppliedRaw=0;
 	long long int PRUcurrentTimerVal=0;
 	long long int PRUcurrentTimerValWrap=0;
