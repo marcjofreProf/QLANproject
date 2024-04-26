@@ -165,6 +165,7 @@ return 0;// all ok
 }
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+this->TimePointClockCurrentInitialExtra=ClockWatch::now();
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// After the interrupt update rapidly the new quarter value
 this->TimePointClockCurrentFinal=ClockWatch::now();
 
@@ -196,7 +197,7 @@ if (retInterruptsPRU1>0){
 	unsigned long long int duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
 	
 	auto duration_FinalExtraInitial=this->TimePointClockCurrentFinalExtra-this->TimePointClockCurrentFinal;
-	unsigned long long int duration_FinalExtraInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalExtraInitial).count();
+	unsigned long long int duration_FinalExtraInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalExtraInitial).count();	
 
 	// Compute absolute error
 	if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
@@ -243,7 +244,7 @@ if (retInterruptsPRU1>0){
 // Update values
 //this->TimePointClockCurrentAdjFilErrorAppliedArray[this->CounterHandleInterruptSynchPRU%this->AppliedMeanFilterFactor]=this->TimePointClockCurrentAdjFilErrorApplied;// Averaging of PId Not used
 
-PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq-this->TimePointClockCurrentAdjFilErrorApplied/PRUclockStepPeriodNanoseconds/4.0);// Here the correction is inserted
+PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->TimePointClockCurrentAdjFilErrorApplied/PRUclockStepPeriodNanoseconds/4.0);// Here the correction is inserted
 
 if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
@@ -253,12 +254,15 @@ this->CounterHandleInterruptSynchPRU++;// Update counter
 
 if (PlotPIDHAndlerInfo){
 	if (this->CounterHandleInterruptSynchPRU%3==0){
+	auto duration_FinalInitialExtra=this->TimePointClockCurrentFinal-this->TimePointClockCurrentInitialExtra;
+	unsigned long long int duration_FinalInitialExtraCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialExtra).count();
 	//cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
 	//cout << "this->NumClocksQuarterPeriodPRUclock: " << this->NumClocksQuarterPeriodPRUclock << endl;
 	// Not used cout << "this->TimePointClockCurrentFinalInitialAdj_time_as_count: " << this->TimePointClockCurrentFinalInitialAdj_time_as_count << endl;
 	cout << "this->TimePointClockCurrentAdjError: " << this->TimePointClockCurrentAdjError << endl;
 	cout << "this->TimePointClockCurrentAdjFilError: " << this->TimePointClockCurrentAdjFilError << endl;
 	cout << "this->TimePointClockCurrentAdjFilErrorApplied: " << this->TimePointClockCurrentAdjFilErrorApplied << endl;
+	cout << "duration_FinalInitialExtraCountAux: " << duration_FinalInitialExtraCountAux << endl;
 	//cout << "PRU1QuarterClocksAux: " << PRU1QuarterClocksAux << endl;
 	}
 }

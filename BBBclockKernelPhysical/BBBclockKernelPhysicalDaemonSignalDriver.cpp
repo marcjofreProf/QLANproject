@@ -261,7 +261,7 @@ if (retInterruptsPRU0>0){
 // Update values
 //this->TimePointClockCurrentAdjFilErrorAppliedArray[this->CounterHandleInterruptSynchPRU%this->AppliedMeanFilterFactor]=this->TimePointClockCurrentAdjFilErrorApplied;// Averaging of PID not used.
 
-PRU0PeriodClocksAux=static_cast<unsigned int>(this->NumClocksFullPeriodPRUclock+this->AdjCountsFreq-this->TimePointClockCurrentAdjFilErrorApplied/PRUclockStepPeriodNanoseconds);
+PRU0PeriodClocksAux=static_cast<unsigned int>(this->NumClocksFullPeriodPRUclock+this->AdjCountsFreq+this->TimePointClockCurrentAdjFilErrorApplied/PRUclockStepPeriodNanoseconds);
 if (PRU0PeriodClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU0PeriodClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU0PeriodClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU0PeriodClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
