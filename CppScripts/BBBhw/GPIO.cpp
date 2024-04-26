@@ -305,7 +305,7 @@ int GPIO::PRUsignalTimerSynch(){
 					EstimateSynchDirectionArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynchDirection;
 					this->EstimateSynchDirectionAvg=DoubleMedianFilterSubArray(EstimateSynchDirectionArray,NumSynchMeasAvgAux);
 					if (this->EstimateSynchDirectionAvg<=0.0){this->PRUoffsetDriftErrorAppliedCorrectionDirection=1;}
-					else{this->PRUoffsetDriftErrorAppliedCorrectionDirection=-1;}
+					else{this->PRUoffsetDriftErrorAppliedCorrectionDirection=1;}
 					//this->EstimateSynch=1.0; // To disable synch adjustment
 									
 					//// PID error computation to correct for signal PRU 1 generation								
