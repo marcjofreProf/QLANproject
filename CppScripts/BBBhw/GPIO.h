@@ -85,8 +85,13 @@ private:// Variables
 	unsigned long long int iIterPRUcurrentTimerValSynch=0;// Account for rounds entered
 	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has no tentered
 	unsigned long long int iIterPRUcurrentTimerValLast=0;
+	int NumSynchMeasAvgAux=10;
 	double EstimateSynch=1.0;
+	double EstimateSynchAvg=1.0;
+	double EstimateSynchArray[MaxNumPulses]={1.0};
 	double EstimateSynchDirection=0.0;
+	double EstimateSynchDirectionAvg=0.0;
+	double EstimateSynchDirectionArray[MaxNumPulses]={0.0};
 	// PID error correction
 	double SynchAdjconstant=0.075;// Might depend the closenest to 1.0 with the jitter of the clocks
 	double PIDconstant=0.3;

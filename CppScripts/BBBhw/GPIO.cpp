@@ -237,7 +237,7 @@ struct timespec GPIO::SetWhileWait(){
 	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentSynchPRU1future.time_since_epoch();
 	// Convert duration to desired time
-	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()-this->TimeClockMarging; // Convert 
+	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()-this->TimeClockMarging; // Add an offset, since the final barrier is implemented with a busy wait
 	//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
 
 	requestWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
@@ -298,8 +298,13 @@ int GPIO::PRUsignalTimerSynch(){
 					// Computations for Synch calculaton for PRU0 compensation
 					this->EstimateSynch=(static_cast<double>(this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(this->PRUcurrentTimerValOld-0*this->PRUoffsetDriftErrorAppliedOldRaw))/(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correctoin).
 					this->EstimateSynch=1.0+this->SynchAdjconstant*(this->EstimateSynch-1.0);
+					this->EstimateSynchArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynch;
+					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
+					// Estimate synch direction
 					this->EstimateSynchDirection=(static_cast<double>(this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw))-(static_cast<double>(this->PRUcurrentTimerValOld-0*this->PRUoffsetDriftErrorAppliedOldRaw)+(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
-					if (this->EstimateSynchDirection>=0.0){this->PRUoffsetDriftErrorAppliedCorrectionDirection=1;}
+					EstimateSynchDirectionArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynchDirection;
+					this->EstimateSynchDirectionAvg=DoubleMedianFilterSubArray(EstimateSynchDirectionArray,NumSynchMeasAvgAux);
+					if (this->EstimateSynchDirectionAvg>=0.0){this->PRUoffsetDriftErrorAppliedCorrectionDirection=1;}
 					else{this->PRUoffsetDriftErrorAppliedCorrectionDirection=-1;}
 					//this->EstimateSynch=1.0; // To disable synch adjustment
 									
@@ -357,10 +362,10 @@ int GPIO::PRUsignalTimerSynch(){
 		if ((this->iIterPRUcurrentTimerVal%8)==0){
 		cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 		cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
-		cout << "EstimateSynch: " << this->EstimateSynch << endl;
-		cout << "EstimateSynchDirection: " << this->EstimateSynchDirection << endl;
-		if (this->EstimateSynchDirection>0.0){cout << "Clock estimatesynch advancing" << endl;}
-		else if (this->EstimateSynchDirection<0.0){cout << "Clock estimatesynch delaying" << endl;}
+		cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
+		cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
+		if (this->EstimateSynchDirectionAvg>0.0){cout << "Clock estimatesynch advancing" << endl;}
+		else if (this->EstimateSynchDirectionAvg<0.0){cout << "Clock estimatesynch delaying" << endl;}
 		else{cout << "Clock estimatesynch neutral" << endl;}
 		cout << "this->iIterPRUcurrentTimerValPass: "<< this->iIterPRUcurrentTimerValPass << endl;
 		}
@@ -773,7 +778,7 @@ int NumSynchPulseAvgAux=0;
 		else if(this->ResetPeriodicallyTimerPRU1){ // Using the estimation from the re-synchronization function
 			this->acquire();
 				while (this->ManualSemaphore);
-				this->AdjPulseSynchCoeffAverage=this->EstimateSynch;
+				this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 			this->release();
 			this->AdjPulseSynchCoeff=this->AdjPulseSynchCoeffAverage;
 			cout << "Applying re-synch estimated AdjPulseSynchCoeffAverage!" << endl;
