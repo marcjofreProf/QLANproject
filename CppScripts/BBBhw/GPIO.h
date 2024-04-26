@@ -85,7 +85,7 @@ private:// Variables
 	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has no tentered
 	unsigned long long int iIterPRUcurrentTimerValLast=0;
 	int NumSynchMeasAvgAux=25;
-	double EstimateSynch=1.0;
+	double EstimateSynch=0.9;
 	double EstimateSynchAvg=1.0;
 	double EstimateSynchArray[MaxNumPulses]={1.0};
 	double EstimateSynchDirection=0.0;

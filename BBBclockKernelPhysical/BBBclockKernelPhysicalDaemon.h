@@ -74,7 +74,6 @@ private:// Variables
 	double TimePointClockCurrentAdjFilErrorIntegral=0;
 	double TimePointClockCurrentAdjFilErrorDerivative=0;
 	double TimePointClockCurrentAdjFilErrorLast=0;
-	double TimePointClockCurrentAdjFilErrorAppliedOld=0;
 	double TimePointClockCurrentAdjFilErrorApplied=0;
 	TimePointWatch TimePointClockCurrentInitial=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
 	TimePointWatch TimePointClockCurrentFinal=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
