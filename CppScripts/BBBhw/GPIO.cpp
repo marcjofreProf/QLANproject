@@ -274,7 +274,7 @@ int GPIO::PRUsignalTimerSynch(){
 					this->EstimateSynchArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynch;
 					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
 					// Estimate synch direction
-					this->EstimateSynchDirection=(static_cast<double>(this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw))-(static_cast<double>(this->PRUcurrentTimerValOld-0*this->PRUoffsetDriftErrorAppliedOldRaw)+(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
+					this->EstimateSynchDirection=(static_cast<double>(this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw))-(static_cast<double>(this->PRUcurrentTimerValOld-0*this->PRUoffsetDriftErrorAppliedOldRaw)+(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
 					EstimateSynchDirectionArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynchDirection;
 					this->EstimateSynchDirectionAvg=DoubleMedianFilterSubArray(EstimateSynchDirectionArray,NumSynchMeasAvgAux);					
 					//this->EstimateSynch=1.0; // To disable synch adjustment
