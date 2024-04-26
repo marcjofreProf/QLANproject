@@ -43,9 +43,9 @@ public: //Variables
 	unsigned long long int MeanFilterFactor=1; // When using mean filter
 	unsigned long long int AppliedMeanFilterFactor=CyclesAvgErrorApplied; // When using mean filter
 	bool PlotPIDHAndlerInfo=false;
-	double NumClocksFullPeriodPRUclock=(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the period of the 1pps.
-	double NumClocksFullPeriodPRUclockOld=0.0;
-	double NumClocksFullPeriodPRUclockUpdated=0.0;
+	double NumClocksQuarterPeriodPRUclock=0.25*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the period of the 1pps.
+	double NumClocksQuarterPeriodPRUclockOld=0.0;
+	double NumClocksQuarterPeriodPRUclockUpdated=0.0;
 
 private:// Variables
 	ApplicationState m_state;
@@ -54,7 +54,7 @@ private:// Variables
 	// Time/synchronization management
 	unsigned long long int CounterHandleInterruptSynchPRU=0;
 	unsigned long long int CounterHandleInterruptSynchPRUlast=0;
-	using ClockWatch = std::chrono::steady_clock;//// Since we do not need time sleep, it might make sense to use steady_clock;//system_clock; //system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
+	using ClockWatch = std::chrono::system_clock;//// Since we do not need time sleep, it might make sense to use steady_clock;//system_clock; //system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
 	//using ClockChrono = std::chrono::steady_clock;//Probably is also better to also measure with system_clock. system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than seady_clock aimed at measuring absolute time (like a watch)	
 		
 	using TimePointWatch = std::chrono::time_point<ClockWatch>;
@@ -68,6 +68,7 @@ private:// Variables
 	//static int chunk;
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
 	// Time keeping
+	unsigned long long int TimeClockMarging=100000;// In nanoseconds
 	unsigned long long int TimeAdjPeriod=static_cast<unsigned long long int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted. VEry important parameter
 	double TimePointClockCurrentAdjError=0;
 	double TimePointClockCurrentAdjFilError=0;
@@ -76,38 +77,38 @@ private:// Variables
 	double TimePointClockCurrentAdjFilErrorLast=0;
 	double TimePointClockCurrentAdjFilErrorApplied=0;
 	TimePointWatch TimePointClockCurrentInitial=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
-	TimePointWatch TimePointClockCurrentInitialExtra=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
 	TimePointWatch TimePointClockCurrentFinal=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
-	TimePointWatch TimePointClockCurrentFinalExtra=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
+	TimePointWatch TimePointClockCurrentInitialMeas=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
+	TimePointWatch TimePointClockCurrentFinalMeas=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
 	//TimePointChrono TimePointClockCurrentInitialAdj=std::chrono::time_point<ClockChrono>(); // Initial updated value of the clock (updated in each iteration)
 	//TimePointChrono TimePointClockCurrentFinalAdj=std::chrono::time_point<ClockChrono>(); // Initial updated value of the clock (updated in each iteration)
 	// PRU clock handling			
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=static_cast<int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds/2000); // In microseconds
 	// PRU clock generation
-	unsigned int PRU0PeriodClocksAux=static_cast<unsigned int>(this->NumClocksFullPeriodPRUclock);
+	unsigned int PRU0QuarterPeriodClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock);
 	int retInterruptsPRU0;
 	int WaitTimeInterruptPRU0=1500000; // In microseconds
 	unsigned int MinNumPeriodColcksPRUnoHalt=1000;// Protection againts very low numbers
 	unsigned int MaxNumPeriodColcksPRUnoHalt=200000000;// Protecion agains very large numbers
 	// Median filter implementation
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_countArray[MaxMedianFilterArraySize]={1000000000};
-	double NumClocksFullPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksFullPeriodPRUclock};
+	double NumClocksQuarterPeriodPRUclockArray[MaxMedianFilterArraySize]={NumClocksQuarterPeriodPRUclock};
 	double TimePointClockCurrentAdjFilErrorArray[MaxMedianFilterArraySize]={0.0};
 	double TimePointClockCurrentAdjFilErrorAppliedArray[MaxMedianFilterArraySize]={0.0};
 	// PID error correction
-	double PIDconstant=0.6; // The larger than 1 the more aggressive correction. Below 1.0 is not aggressively enough to correct fully, eventhought it will try. This value times the maxium value set in MaxTimePointClockCurrentAdjError, has not ot exceed the period wanted. It has to be larger than the jitter of the hardware clocks
+	double PIDconstant=1.0; // The larger than 1 the more aggressive correction. Below 1.0 is not aggressively enough to correct fully, eventhought it will try. This value times the maxium value set in MaxTimePointClockCurrentAdjError, has not ot exceed the period wanted. It has to be larger than the jitter of the hardware clocks
 	double PIDintegral=0.0;
 	double PIDderiv=0.0;	
 	// Maximum values
 	double MaxAdjCountsFreq=1000000000;
 	double MinAdjCountsFreq=-1000000000+MinNumPeriodColcksPRUnoHalt;
-	double MaxNumClocksFullPeriodPRUclockUpdated=2.0*NumClocksFullPeriodPRUclock;
-	double MinNumClocksFullPeriodPRUclockUpdated=0.01*NumClocksFullPeriodPRUclock;
+	double MaxNumClocksQuarterPeriodPRUclockUpdated=2.0*NumClocksQuarterPeriodPRUclock;
+	double MinNumClocksQuarterPeriodPRUclockUpdated=0.01*NumClocksQuarterPeriodPRUclock;
 	unsigned long long int MaxTimePointClockCurrentFinalInitialAdj_time_as_count=2*ClockPeriodNanoseconds; // Not used
 	unsigned long long int MinTimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds/100; // Not used
-	double MaxTimePointClockCurrentAdjFilError=5.0*static_cast<double>(NumClocksFullPeriodPRUclock)/100.0;
-	double MinTimePointClockCurrentAdjFilError=-5.0*static_cast<double>(NumClocksFullPeriodPRUclock)/100.0;
+	double MaxTimePointClockCurrentAdjFilError=5.0*static_cast<double>(NumClocksQuarterPeriodPRUclock)/100.0;
+	double MinTimePointClockCurrentAdjFilError=-5.0*static_cast<double>(NumClocksQuarterPeriodPRUclock)/100.0;
 	// 24 MHz counts
 	unsigned int NumRefSigCounts=24000000;
 	unsigned int NumOnSigCounts=100000000;

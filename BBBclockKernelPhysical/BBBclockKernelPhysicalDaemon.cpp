@@ -669,7 +669,6 @@ int main(int argc, char const * argv[]){
 		 if (CKPDagent.MeanFilterFactor>MaxMedianFilterArraySize){
 		 	CKPDagent.MeanFilterFactor=MaxMedianFilterArraySize;
 		 	cout << "Attention, mean filter size too large." << endl;
-		 	cout << "Using averaging, reduces jitter, but produces a skew over time!!!!" << endl;
 		 }
 		 else if (CKPDagent.MeanFilterFactor<1){
 		 	CKPDagent.MeanFilterFactor=1;
@@ -677,19 +676,16 @@ int main(int argc, char const * argv[]){
 		 }
 		 else{// For fast median computing the length should be odd
 		 	CKPDagent.MeanFilterFactor=(CKPDagent.MeanFilterFactor/2)*2+1;
-		 	cout << "Using averaging, reduces jitter, but produces a skew over time!!!!" << endl;
 		 }
 		 break;
 	}
 	case 1:{// Median implementation
 		cout << "Using median filtering." << endl;
-		cout << "Median filtering not working." << endl;
 		CKPDagent.MedianFilterFactor=stoull(argv[2]);
 		 if (CKPDagent.MedianFilterFactor>MaxMedianFilterArraySize){
 		 	CKPDagent.MedianFilterFactor=MaxMedianFilterArraySize;
 		 	CKPDagent.MedianFilterFactor=(CKPDagent.MedianFilterFactor/2)*2+1;// odd
 		 	cout << "Attention, median filter size too large." << endl;
-		 	cout << "Using averaging, reduces jitter, but produces a skew over time!!!!" << endl;
 		 }
 		 else if (CKPDagent.MedianFilterFactor<1){
 		 	CKPDagent.MedianFilterFactor=1;
@@ -697,26 +693,14 @@ int main(int argc, char const * argv[]){
 		 }
 		 else{// For fast median computing the length should be odd
 		 	CKPDagent.MedianFilterFactor=(CKPDagent.MedianFilterFactor/2)*2+1;// odd
-		 	cout << "Using averaging, reduces jitter, but produces a skew over time!!!!" << endl;
 		 }
 		 break;
 	}
 	default:{// Average implementation
 		cout << "Using average filtering." << endl;
 		CKPDagent.RatioAverageFactorClockQuarterPeriod=stod(argv[2]);
-		cout << "Using averaging, reduces jitter, but produces a skew over time!!!!" << endl;
 	}
 	}
-
-
-	 CKPDagent.PlotPIDHAndlerInfo=(strcmp(argv[3], "true") == 0);
-	 // Recompute some values:
-	 //cout << "CKPDagent.AdjCountsFreq: " << CKPDagent.AdjCountsFreq << endl;
-	 //cout << "CKPDagent.RatioAverageFactorClockQuarterPeriod: " << CKPDagent.RatioAverageFactorClockQuarterPeriod << endl;
-	 //cout << "CKPDagent.PlotPIDHAndlerInfo: " << CKPDagent.PlotPIDHAndlerInfo << endl;
-	 if (CKPDagent.PlotPIDHAndlerInfo==true){
-	 	cout << "Attention, when outputing PID values, the synch performance decreases because of the uncontrolled/large time offset between periodic timer computing." << endl;
-	 }
 	 } catch(const std::invalid_argument& e) {
             cout << "Invalid argument: Could not convert to double." << endl;
         } catch(const std::out_of_range& e) {
