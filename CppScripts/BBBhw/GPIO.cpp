@@ -327,16 +327,6 @@ int GPIO::PRUsignalTimerSynch(){
 						this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
 						this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
 						this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
-					}			
-					
-					if ((this->iIterPRUcurrentTimerVal%2)==0){
-						cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
-						cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
-						cout << "EstimateSynch: " << this->EstimateSynch << endl;
-						cout << "EstimateSynchDirection: " << this->EstimateSynchDirection << endl;
-						if (this->EstimateSynchDirection>0.0){cout << "Clock estimatesynch advancing" << endl;}
-						else if (this->EstimateSynchDirection<0.0){cout << "Clock estimatesynch delaying" << endl;}
-						else{cout << "Clock estimatesynch neutral" << endl;}
 					}										
 					// Updates for next round				
 					this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
@@ -363,6 +353,16 @@ int GPIO::PRUsignalTimerSynch(){
 		//}
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
+		// Information
+		if ((this->iIterPRUcurrentTimerVal%2)==0){
+		cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
+		cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
+		cout << "EstimateSynch: " << this->EstimateSynch << endl;
+		cout << "EstimateSynchDirection: " << this->EstimateSynchDirection << endl;
+		if (this->EstimateSynchDirection>0.0){cout << "Clock estimatesynch advancing" << endl;}
+		else if (this->EstimateSynchDirection<0.0){cout << "Clock estimatesynch delaying" << endl;}
+		else{cout << "Clock estimatesynch neutral" << endl;}
+		}
 	}// end while
 
 return 0; // All ok
