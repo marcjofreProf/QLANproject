@@ -230,7 +230,7 @@ if (retInterruptsPRU1>0){
 		this->AdjCountsFreq=0.0;
 	}
 	else{
-		this->AdjCountsFreq=this->AdjCountsFreqHolder/5.0/4.0;// divided by 4 because it is for Quarter period for the PRU1.
+		this->AdjCountsFreq=this->AdjCountsFreqHolder/PRUclockStepPeriodNanoseconds/4.0;// divided by 4 because it is for Quarter period for the PRU1.
 	}
 	this->MinAdjCountsFreq=-this->NumClocksQuarterPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
 	if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}
@@ -238,7 +238,7 @@ if (retInterruptsPRU1>0){
 }
 // Update values
 this->TimePointClockCurrentAdjFilErrorAppliedArray[this->CounterHandleInterruptSynchPRU%this->AppliedMeanFilterFactor]=this->TimePointClockCurrentAdjFilErrorApplied;
-PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorAppliedArray,this->AppliedMeanFilterFactor)/5.0/4.0);
+PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorAppliedArray,this->AppliedMeanFilterFactor)/PRUclockStepPeriodNanoseconds/4.0);
 if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
@@ -272,7 +272,7 @@ return 0; // All ok
 /* Old - affected by the clocks drifts
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 //pru0dataMem_int[0]=this->NumClocksQuarterPeriodPRUclock; // set
-unsigned int PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/5.0/4.0);
+unsigned int PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)/PRUclockStepPeriodNanoseconds/4.0);
 if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 

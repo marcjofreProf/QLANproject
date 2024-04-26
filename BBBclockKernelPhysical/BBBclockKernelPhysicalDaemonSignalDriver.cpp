@@ -248,7 +248,7 @@ if (retInterruptsPRU0>0){
 		this->AdjCountsFreq=0.0;
 	}
 	else{
-		this->AdjCountsFreq=this->AdjCountsFreqHolder/5.0;// divided by 5 because is the time per clock of PRU in nanoseconds.
+		this->AdjCountsFreq=this->AdjCountsFreqHolder/PRUclockStepPeriodNanoseconds;// divided by 5 because is the time per clock of PRU in nanoseconds.
 	}
 	this->MinAdjCountsFreq=-this->NumClocksFullPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
 	if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}
@@ -256,7 +256,7 @@ if (retInterruptsPRU0>0){
 }
 // Update values
 this->TimePointClockCurrentAdjFilErrorAppliedArray[this->CounterHandleInterruptSynchPRU%this->AppliedMeanFilterFactor]=this->TimePointClockCurrentAdjFilErrorApplied;
-PRU0PeriodClocksAux=static_cast<unsigned int>(this->NumClocksFullPeriodPRUclock+this->AdjCountsFreq+this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorAppliedArray,this->AppliedMeanFilterFactor)/5.0);
+PRU0PeriodClocksAux=static_cast<unsigned int>(this->NumClocksFullPeriodPRUclock+this->AdjCountsFreq+this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorAppliedArray,this->AppliedMeanFilterFactor)/PRUclockStepPeriodNanoseconds);
 if (PRU0PeriodClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU0PeriodClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
 else if (PRU0PeriodClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU0PeriodClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
 
