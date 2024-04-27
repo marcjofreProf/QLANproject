@@ -47,7 +47,7 @@ private:// Variables
 	std::atomic<bool> ManualSemaphore=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=9; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
-	int NumSynchMeasAvgAux=241; // Num averages to compute the time error. Better to be odd number.
+	int NumSynchMeasAvgAux=61; // Num averages to compute the time error. Better to be odd number.
 	long long int PRUoffsetDriftError=0;
 	double PRUoffsetDriftErrorArray[MaxNumPulses]={0};
 	double PRUoffsetDriftErrorAvg=0.0;
@@ -74,8 +74,8 @@ private:// Variables
 	double EstimateSynchDirectionArray[MaxNumPulses]={0.0};
 	// PID error correction
 	double SynchAdjconstant=1.0;// Might depend the closenest to 1.0 with the jitter of the clocks
-	double PIDconstant=0.975;
-	double PIDintegral=0.011;
+	double PIDconstant=0.95;
+	double PIDintegral=0.01;
 	double PIDderiv=0.0;	
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
