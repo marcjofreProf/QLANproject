@@ -155,7 +155,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	this->SendTriggerSignalsSelfTest(); // Self test initialization
 	cout << "Attention doing SendTriggerSignalsSelfTest. To be removed" << endl;	
 	*/
-	
+	cout << "Wait to proceed, calibrating synchronization!" << endl;
 	////prussdrv_pru_enable(PRU_Signal_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	  
@@ -331,6 +331,9 @@ int GPIO::PRUsignalTimerSynch(){
 		}
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
+		if (this->iIterPRUcurrentTimerValSynch==this->NumSynchMeasAvgAux){
+			cout << "Synchronized, ready to proceed..." << endl;
+		}
 		// Information
 		if ((this->iIterPRUcurrentTimerVal%NumSynchMeasAvgAux)==0){
 		cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
