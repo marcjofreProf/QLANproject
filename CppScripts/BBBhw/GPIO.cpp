@@ -231,10 +231,10 @@ int GPIO::PRUsignalTimerSynch(){
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
 				// Important, the following line at the very beggining to reduce the command jitter
 				pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
-				if (this->PRUoffsetDriftErrorApplied>0 and this->iIterPRUcurrentTimerValPass==1){
+				if (this->PRUoffsetDriftErrorApplied>0){// and this->iIterPRUcurrentTimerValPass==1){
 					pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 3, to execute synch functions addition correction
 				}				
-				else if (this->PRUoffsetDriftErrorApplied<0 and this->iIterPRUcurrentTimerValPass==1){
+				else if (this->PRUoffsetDriftErrorApplied<0){// and this->iIterPRUcurrentTimerValPass==1){
 					pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
 				}
 				else{// if (this->PRUoffsetDriftErrorApplied==0 or this->iIterPRUcurrentTimerValPass>1){
@@ -278,7 +278,10 @@ int GPIO::PRUsignalTimerSynch(){
 					EstimateSynchDirectionArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynchDirection;
 					this->EstimateSynchDirectionAvg=DoubleMedianFilterSubArray(EstimateSynchDirectionArray,NumSynchMeasAvgAux);					
 					//this->EstimateSynch=1.0; // To disable synch adjustment
-									
+					// Error averaging
+					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=static_cast<double>(this->PRUoffsetDriftError);
+					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
+					
 					//// PID error computation to correct for signal PRU 1 generation								
 					this->PIDcontrolerTime();// Compute parameters for PID adjustment
 					//this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
@@ -330,8 +333,8 @@ int GPIO::PRUsignalTimerSynch(){
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
 		// Information
-		if ((this->iIterPRUcurrentTimerVal%120)==0){
-		cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
+		if ((this->iIterPRUcurrentTimerVal%10)==0){
+		cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
 		cout << "PRUoffsetDriftErrorApplied: " << this->PRUoffsetDriftErrorApplied << endl;
 		cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
 		cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
@@ -347,12 +350,12 @@ return 0; // All ok
 
 int GPIO::PIDcontrolerTime(){
 if (this->iIterPRUcurrentTimerValSynch>10){
-	PRUoffsetDriftErrorDerivative=static_cast<double>(PRUoffsetDriftError-PRUoffsetDriftErrorLast)/(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast)*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
+	PRUoffsetDriftErrorDerivative=(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorLast)/(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast));//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
 
 	PRUoffsetDriftErrorIntegralOld=PRUoffsetDriftErrorIntegral;
-	PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftError*(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast)*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+	PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftErrorAvg*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 	
-	this->PRUoffsetDriftErrorAppliedRaw=static_cast<long long int>(PIDconstant*static_cast<double>(PRUoffsetDriftError)+PIDintegral*static_cast<double>(PRUoffsetDriftErrorIntegral)+PIDderiv*PRUoffsetDriftErrorDerivative);	
+	this->PRUoffsetDriftErrorAppliedRaw=static_cast<long long int>(PIDconstant*PRUoffsetDriftErrorAvg+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative);	
 
 	if (this->PRUoffsetDriftErrorAppliedRaw<0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw-LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
 	else if (this->PRUoffsetDriftErrorAppliedRaw>0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw+LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
@@ -487,7 +490,7 @@ do // This is blocking
 } while(!finPRU1);
 */
 
-if (this->ResetPeriodicallyTimerPRU1){cout << "PRU1 timer is periodically reset!" << endl;}
+//if (this->ResetPeriodicallyTimerPRU1){cout << "PRU1 timer is periodically reset!" << endl;}
 return 0;// all ok	
 }
 
@@ -518,7 +521,7 @@ valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<16;
 valpAux++;// 1 times 8 bits
 valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<24;
 valpAux++;// 1 times 8 bits
-cout << "valSkewCounts: " << valSkewCounts << endl;
+//cout << "valSkewCounts: " << valSkewCounts << endl;
 
 valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
 valpAux++;// 1 times 8 bits
@@ -528,7 +531,7 @@ valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*va
 valpAux++;// 1 times 8 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<24;
 valpAux++;// 1 times 8 bits
-cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
+//cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
 //////////////////////////////////////////////////////////////////////////////*/
 
 // First 32 bits is the overflow register for DWT_CYCCNT
@@ -704,7 +707,6 @@ int NumSynchPulseAvgAux=0;
 		}
 		NumSynchPulsesRed=lineCount;		
 		if (NumSynchPulsesRed>1){//At least two points (two cycles separated by one cycle in between), we can generate a calibration curve
-			cout << "Synch pulses calcultion not working properly!" << endl;
 			//unsigned long long int CoeffSynchAdjAux0=1;
 			double CoeffSynchAdjAux1=0.0;// Number theoretical counts given the number of cycles
 			double CoeffSynchAdjAux2=0.0;// PRU counting
@@ -756,7 +758,7 @@ int NumSynchPulseAvgAux=0;
 			cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
 		}
 		if (NumSynchPulsesRed>=MaxNumPulses){cout << "Too many pulses stored, increase buffer size or reduce number pulses: " << NumSynchPulsesRed << endl;}
-	    	else if (NumSynchPulsesRed==0){cout << "RetrieveNumStoredQuBits: No Synch pulses present!" << endl;}
+	    	//else if (NumSynchPulsesRed==0){cout << "RetrieveNumStoredQuBits: No Synch pulses present!" << endl;}
 	    	//cout << "GPIO: NumSynchPulsesRed: " << NumSynchPulsesRed << endl;
 	}
 	else{

@@ -47,10 +47,13 @@ private:// Variables
 	std::atomic<bool> ManualSemaphore=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=5;
+	int NumSynchMeasAvgAux=121; // Num averages to compute the time error. Better to be odd number.
 	long long int PRUoffsetDriftError=0;
-	long long int PRUoffsetDriftErrorLast=0;
-	long long int PRUoffsetDriftErrorIntegral=0;
-	long long int PRUoffsetDriftErrorIntegralOld=0;
+	double PRUoffsetDriftErrorArray[MaxNumPulses]={0};
+	double PRUoffsetDriftErrorAvg=0.0;
+	double PRUoffsetDriftErrorLast=0;
+	double PRUoffsetDriftErrorIntegral=0;
+	double PRUoffsetDriftErrorIntegralOld=0;
 	double PRUoffsetDriftErrorDerivative=0;
 	long long int PRUoffsetDriftErrorApplied=0;
 	long long int PRUoffsetDriftErrorAppliedRaw=0;
@@ -62,8 +65,7 @@ private:// Variables
 	unsigned long long int iIterPRUcurrentTimerVal=0;
 	unsigned long long int iIterPRUcurrentTimerValSynch=0;// Account for rounds entered
 	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has no tentered
-	unsigned long long int iIterPRUcurrentTimerValLast=0;
-	int NumSynchMeasAvgAux=121; // Num averages to compute the time error. Better to be odd number.
+	unsigned long long int iIterPRUcurrentTimerValLast=0;	
 	double EstimateSynch=1.0;
 	double EstimateSynchAvg=1.0;
 	double EstimateSynchArray[MaxNumPulses]={EstimateSynch};
