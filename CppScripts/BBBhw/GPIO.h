@@ -80,7 +80,7 @@ private:// Variables
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
 	using TimePoint = std::chrono::time_point<Clock>;
-	unsigned long long int TimePRU1synchPeriod=200000000;// The faster the more corrections, and less time passed isnce last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts.
+	unsigned long long int TimePRU1synchPeriod=400000000;// The faster the more corrections, and less time passed isnce last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts.
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	unsigned long long int TimeClockMarging=100000;// In nanoseconds
