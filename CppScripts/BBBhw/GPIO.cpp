@@ -332,7 +332,7 @@ int GPIO::PRUsignalTimerSynch(){
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
 		// Information
-		if ((this->iIterPRUcurrentTimerVal%320)==0){
+		if ((this->iIterPRUcurrentTimerVal%NumSynchMeasAvgAux)==0){
 		cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
 		cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 		cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
