@@ -63,7 +63,7 @@ private:// Variables
 	unsigned long long int iIterPRUcurrentTimerValSynch=0;// Account for rounds entered
 	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has no tentered
 	unsigned long long int iIterPRUcurrentTimerValLast=0;
-	int NumSynchMeasAvgAux=240; // Num averages to compute the time error
+	int NumSynchMeasAvgAux=121; // Num averages to compute the time error. Better to be odd number.
 	double EstimateSynch=1.0;
 	double EstimateSynchAvg=1.0;
 	double EstimateSynchArray[MaxNumPulses]={EstimateSynch};
@@ -76,7 +76,7 @@ private:// Variables
 	double PIDintegral=0.0;
 	double PIDderiv=0.0;	
 	// Time/synchronization management
-	using Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;// We do not use system_clock because we do not need a watch, but instead we use steady_clock because we need a chrono /system_clock;steady_clock;high_resolution_clock
+	using Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
 	using TimePoint = std::chrono::time_point<Clock>;
 	unsigned long long int TimePRU1synchPeriod=500000000;//; // The larger the more stable, but the least capable of fast corrections (so the hardware clock has to be more stable)
 	struct timespec requestWhileWait;
