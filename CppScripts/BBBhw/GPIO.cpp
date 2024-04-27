@@ -331,7 +331,7 @@ int GPIO::PRUsignalTimerSynch(){
 		}
 		
 		// Information
-		if ((this->iIterPRUcurrentTimerVal%NumSynchMeasAvgAux==0) and this->iIterPRUcurrentTimerVal%NumSynchMeasAvgAux!=0){
+		if ((this->iIterPRUcurrentTimerVal%NumSynchMeasAvgAux==0) and this->iIterPRUcurrentTimerVal!=0){
 		cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
 		cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 		cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
