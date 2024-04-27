@@ -177,7 +177,7 @@ return 0;// all ok
 }
 
 int CKPDSD::HandleInterruptSynchPRU(){ // Uses output pins to count 24 MHz counts sunch with software 1pps
-clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI
+clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME
 while(ClockWatch::now() < this->TimePointClockCurrentFinal);// Busy waiting
 
 this->TimePointClockCurrentInitialMeas=ClockWatch::now();
