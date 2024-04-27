@@ -329,13 +329,9 @@ int GPIO::PRUsignalTimerSynch(){
 		else{// does not enter in time
 			this->iIterPRUcurrentTimerValPass++;
 		}
-		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
-		this->iIterPRUcurrentTimerVal++;
-		if (this->iIterPRUcurrentTimerValSynch==(2*this->NumSynchMeasAvgAux)){
-			cout << "Synchronized, ready to proceed..." << endl;
-		}
+		
 		// Information
-		if ((this->iIterPRUcurrentTimerVal%NumSynchMeasAvgAux)==0){
+		if ((this->iIterPRUcurrentTimerVal%NumSynchMeasAvgAux==0) and this->iIterPRUcurrentTimerVal%NumSynchMeasAvgAux!=0){
 		cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
 		cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 		cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
@@ -344,6 +340,11 @@ int GPIO::PRUsignalTimerSynch(){
 		else if (this->EstimateSynchDirectionAvg<0.0){cout << "Clock estimatesynch delaying" << endl;}
 		else{cout << "Clock estimatesynch neutral" << endl;}
 		//cout << "this->iIterPRUcurrentTimerValPass: "<< this->iIterPRUcurrentTimerValPass << endl;
+		}
+		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
+		this->iIterPRUcurrentTimerVal++;
+		if (this->iIterPRUcurrentTimerValSynch==(2*this->NumSynchMeasAvgAux)){
+			cout << "Synchronized, ready to proceed..." << endl;
 		}
 	}// end while
 
