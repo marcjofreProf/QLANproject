@@ -46,7 +46,7 @@ private:// Variables
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	std::atomic<bool> ManualSemaphore=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
-	long long int LostCounts=5; // For stoping and changing IEP counter
+	long long int LostCounts=9; // For stoping and changing IEP counter
 	int NumSynchMeasAvgAux=121; // Num averages to compute the time error. Better to be odd number.
 	long long int PRUoffsetDriftError=0;
 	double PRUoffsetDriftErrorArray[MaxNumPulses]={0};
