@@ -73,9 +73,9 @@ private:// Variables
 	double EstimateSynchDirectionAvg=0.0;
 	double EstimateSynchDirectionArray[MaxNumPulses]={0.0};
 	// PID error correction
-	double SynchAdjconstant=1.0;// Might depend the closenest to 1.0 with the jitter of the clocks
+	double SynchAdjconstant=1.0;// 
 	double PIDconstant=0.75;// Too close to 1.0 makes it unstable and too much correction
-	double PIDintegral=0.001;
+	double PIDintegral=0.00075;
 	double PIDderiv=0.0;	
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
