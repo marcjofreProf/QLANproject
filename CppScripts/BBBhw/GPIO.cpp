@@ -348,7 +348,7 @@ return 0; // All ok
 }
 
 int GPIO::PIDcontrolerTime(){
-if (this->iIterPRUcurrentTimerValSynch>NumSynchMeasAvgAux){
+if (this->iIterPRUcurrentTimerValSynch>(NumSynchMeasAvgAux/2)){
 	PRUoffsetDriftErrorDerivative=(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorLast)/(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast));//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
 
 	PRUoffsetDriftErrorIntegralOld=PRUoffsetDriftErrorIntegral;
