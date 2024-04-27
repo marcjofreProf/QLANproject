@@ -75,7 +75,7 @@ private:// Variables
 	// PID error correction
 	double SynchAdjconstant=1.0;// Might depend the closenest to 1.0 with the jitter of the clocks
 	double PIDconstant=0.95;
-	double PIDintegral=0.01;
+	double PIDintegral=0.0125;
 	double PIDderiv=0.0;	
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
