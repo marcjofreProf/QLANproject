@@ -223,12 +223,12 @@ int GPIO::PRUsignalTimerSynch(){
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	while(true){		
 		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra))){// It was possible to execute when needed
+			this->acquire();
 			//cout << "Resetting PRUs timer!" << endl;
-			if (clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).
+			if (clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).				
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html
 				this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement
-				this->acquire();
-				this->ManualSemaphore=true;
+				this->ManualSemaphore=true;				
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
 				// Important, the following line at the very beggining to reduce the command jitter
 				//pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
@@ -342,8 +342,7 @@ int GPIO::PRUsignalTimerSynch(){
 				//	this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
 				//	this->iIterPRUcurrentTimerValPass=1;
 				//}
-				this->ManualSemaphore=false;
-				this->release();
+				this->ManualSemaphore=false;				
 			}
 			else{// does not enter in time
 				pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
@@ -354,7 +353,8 @@ int GPIO::PRUsignalTimerSynch(){
 				this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap+static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds);// Update
 				// Re wrap					
 				if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
-			}			
+			}
+			this->release();	
 		} //end if
 		else{// does not enter in time
 			pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
