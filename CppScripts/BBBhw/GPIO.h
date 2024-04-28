@@ -76,7 +76,8 @@ private:// Variables
 	double SynchAdjconstant=1.0;// 
 	double PIDconstantAdvancing=0.95;// Too close to 1.0 makes it unstable and too much correction
 	double PIDconstantDelaying=0.5;// Too close to 1.0 makes it unstable and too much correction
-	double PIDintegral=0.0;//0.00075;
+	double PIDintegralAdvancing=0.00075;
+	double PIDintegralDelaying=0.0;//0.00075;
 	double PIDderiv=0.0;	
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;

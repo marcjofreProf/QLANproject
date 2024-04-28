@@ -359,9 +359,20 @@ if (this->iIterPRUcurrentTimerValSynch>(NumSynchMeasAvgAux/2)){
 	PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftErrorAvg*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 }
 double PIDconstant;
-if (PRUoffsetDriftErrorAvg<0.0){PIDconstant=PIDconstantAdvancing;}
-else if(PRUoffsetDriftErrorAvg>0.0){PIDconstant=PIDconstantDelaying;}
-else{PIDconstant=0;}
+double PIDintegral;
+if (PRUoffsetDriftErrorAvg<0.0){
+	PIDconstant=PIDconstantAdvancing;
+	PIDintegral=PIDintegralAdvancing;
+}
+else if(PRUoffsetDriftErrorAvg>0.0){
+	PIDconstant=PIDconstantDelaying;
+	PIDintegral=PIDintegralDelaying;
+}
+else{
+	PIDconstant=0;
+	PIDintegral=0;
+}
+
 this->PRUoffsetDriftErrorAppliedRaw=static_cast<long long int>(PIDconstant*PRUoffsetDriftErrorAvg+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative);	
 
 if (this->PRUoffsetDriftErrorAppliedRaw<0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw-LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
