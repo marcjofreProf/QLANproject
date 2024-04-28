@@ -26,8 +26,8 @@ using std::fstream;
 #define PRUdataPATH1 "./PRUdata/"
 #define PRUdataPATH2 "../PRUdata/"
 
-#define MaxNumPulses	8192
-#define PRUclockStepPeriodNanoseconds		4.99973525 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
+#define MaxNumPulses	8192	// Used in the averging of time synchronization arrays
+#define PRUclockStepPeriodNanoseconds		4.99973125 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
 #define PulseFreq	1000 // Hz// 
 
 namespace exploringBB {
