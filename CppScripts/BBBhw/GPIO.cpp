@@ -266,10 +266,11 @@ int GPIO::PRUsignalTimerSynch(){
 				//pru1dataMem_int[2]// Current IEP timer sample
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerValWrap=static_cast<long long int>(pru1dataMem_int[2]);
+				this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux;// Remove time for sending command
 				// Unwrap
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
-				this->PRUcurrentTimerVal=this->PRUcurrentTimerVal-duration_FinalInitialCountAux;// Remove time for sending command
+				
 				// Compute error
 				this->PRUoffsetDriftError=static_cast<long long int>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
 				if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<(NumSynchMeasAvgAux/2)){// Do computations
@@ -308,7 +309,7 @@ int GPIO::PRUsignalTimerSynch(){
 					// Updates for next round
 					PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
 					iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
-					this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
+					this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
 					this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
 					this->iIterPRUcurrentTimerValSynch++;
