@@ -48,20 +48,20 @@ private:// Variables
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=9; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
 	int NumSynchMeasAvgAux=61; // Num averages to compute the time error. Better to be odd number.
-	long long int PRUoffsetDriftError=0;
+	double PRUoffsetDriftError=0;
 	double PRUoffsetDriftErrorArray[MaxNumPulses]={0};
 	double PRUoffsetDriftErrorAvg=0.0;
 	double PRUoffsetDriftErrorLast=0;
 	double PRUoffsetDriftErrorIntegral=0;
 	double PRUoffsetDriftErrorIntegralOld=0;
 	double PRUoffsetDriftErrorDerivative=0;
-	long long int PRUoffsetDriftErrorApplied=0;
-	long long int PRUoffsetDriftErrorAppliedRaw=0;
-	long long int PRUcurrentTimerVal=0;
-	long long int PRUcurrentTimerValWrap=0;
-	long long int PRUcurrentTimerValOldWrap=0;
-	long long int PRUcurrentTimerValOld=0;
-	long long int PRUoffsetDriftErrorAppliedOldRaw=0;
+	double PRUoffsetDriftErrorApplied=0;
+	double PRUoffsetDriftErrorAppliedRaw=0;
+	double PRUcurrentTimerVal=0;
+	double PRUcurrentTimerValWrap=0;
+	double PRUcurrentTimerValOldWrap=0;
+	double PRUcurrentTimerValOld=0;
+	double PRUoffsetDriftErrorAppliedOldRaw=0;
 	unsigned long long int iIterPRUcurrentTimerVal=0;
 	unsigned long long int iIterPRUcurrentTimerValSynch=0;// Account for rounds entered
 	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has no tentered
@@ -76,8 +76,7 @@ private:// Variables
 	double SynchAdjconstant=1.0;// 
 	double PIDconstantAdvancing=0.75;// Too close to 1.0 makes it unstable and too much correction
 	double PIDconstantDelaying=PIDconstantAdvancing;// Too close to 1.0 makes it unstable and too much correction
-	double PIDintegralAdvancing=0.00075;
-	double PIDintegralDelaying=0.0;//0.00075;
+	double PIDintegral=0.0;
 	double PIDderiv=0.0;	
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
