@@ -341,8 +341,7 @@ int GPIO::PRUsignalTimerSynch(){
 				//	this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 				//	this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
 				//	this->iIterPRUcurrentTimerValPass=1;
-				//}
-				this->ManualSemaphore=false;				
+				//}								
 			}
 			else{// does not enter in time
 				pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
@@ -354,6 +353,7 @@ int GPIO::PRUsignalTimerSynch(){
 				// Re wrap					
 				if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
 			}
+			this->ManualSemaphore=false;
 			this->release();	
 		} //end if
 		else{// does not enter in time
