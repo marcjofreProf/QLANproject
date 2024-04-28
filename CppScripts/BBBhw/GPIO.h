@@ -27,7 +27,7 @@ using std::fstream;
 #define PRUdataPATH2 "../PRUdata/"
 
 #define MaxNumPulses	8192
-#define PRUclockStepPeriodNanoseconds		4.99973775 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
+#define PRUclockStepPeriodNanoseconds		4.99973725 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
 #define PulseFreq	1000 // Hz// 
 
 namespace exploringBB {
@@ -47,7 +47,7 @@ private:// Variables
 	std::atomic<bool> ManualSemaphore=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=9; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
-	int NumSynchMeasAvgAux=301; // Num averages to compute the time error. Better to be odd number.
+	int NumSynchMeasAvgAux=181; // Num averages to compute the time error. Better to be odd number.
 	long long int PRUoffsetDriftError=0;
 	double PRUoffsetDriftErrorArray[MaxNumPulses]={0};
 	double PRUoffsetDriftErrorAvg=0.0;
@@ -74,13 +74,13 @@ private:// Variables
 	double EstimateSynchDirectionArray[MaxNumPulses]={0.0};
 	// PID error correction
 	double SynchAdjconstant=1.0;// 
-	double PIDconstant=0.7;// Too close to 1.0 makes it unstable and too much correction
+	double PIDconstant=0.75;// Too close to 1.0 makes it unstable and too much correction
 	double PIDintegral=0.0;//0.00075;
 	double PIDderiv=0.0;	
 	// Time/synchronization management
 	using Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
 	using TimePoint = std::chrono::time_point<Clock>;
-	unsigned long long int TimePRU1synchPeriod=400000000;// The faster the more corrections, and less time passed isnce last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts.
+	unsigned long long int TimePRU1synchPeriod=800000000;// The faster the more corrections, and less time passed isnce last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts.
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	unsigned long long int TimeClockMarging=100000;// In nanoseconds
