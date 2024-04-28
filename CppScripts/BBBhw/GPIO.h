@@ -47,7 +47,7 @@ private:// Variables
 	std::atomic<bool> ManualSemaphore=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=9; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
-	int NumSynchMeasAvgAux=121; // Num averages to compute the time error. Better to be odd number.
+	int NumSynchMeasAvgAux=61; // Num averages to compute the time error. Better to be odd number.
 	long long int PRUoffsetDriftError=0;
 	double PRUoffsetDriftErrorArray[MaxNumPulses]={0};
 	double PRUoffsetDriftErrorAvg=0.0;
@@ -74,7 +74,7 @@ private:// Variables
 	double EstimateSynchDirectionArray[MaxNumPulses]={0.0};
 	// PID error correction
 	double SynchAdjconstant=1.0;// 
-	double PIDconstant=0.75;// Too close to 1.0 makes it unstable and too much correction
+	double PIDconstant=0.5;// Too close to 1.0 makes it unstable and too much correction
 	double PIDintegral=0.0;//0.00075;
 	double PIDderiv=0.0;	
 	// Time/synchronization management
@@ -84,7 +84,7 @@ private:// Variables
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	unsigned long long int TimeClockMarging=100000;// In nanoseconds
-	unsigned long long int TimeClockMargingExtra=10*TimeClockMarging;// In nanoseconds
+	unsigned long long int TimeClockMargingExtra=50*TimeClockMarging;// In nanoseconds
 	unsigned long long int TimeElpasedNow_time_as_count=0;
 	// PRU
 	static int mem_fd;
