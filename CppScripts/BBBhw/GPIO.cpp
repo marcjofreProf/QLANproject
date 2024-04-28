@@ -478,8 +478,8 @@ return 0;// all ok
 }
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-this->acquire();
 while (this->ManualSemaphore==true);// Wait other process
+this->acquire();
 this->ManualSemaphore=true;
 // Important, the following line at the very beggining to reduce the command jitter
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
