@@ -309,7 +309,7 @@ int GPIO::PRUsignalTimerSynch(){
 					// Updates for next round
 					PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
 					iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
-					this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
+					this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
 					this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
 					this->iIterPRUcurrentTimerValSynch++;
@@ -320,10 +320,10 @@ int GPIO::PRUsignalTimerSynch(){
 					//iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update
 					this->PRUoffsetDriftErrorApplied=0;
 					this->PRUoffsetDriftErrorAppliedRaw=0;
-					//this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
-					this->PRUcurrentTimerValOld=this->PRUcurrentTimerVal;// Update
+					this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
+					this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
-					this->iIterPRUcurrentTimerValPass++;
+					this->iIterPRUcurrentTimerValPass=1;
 				}
 				this->ManualSemaphore=false;
 				this->release();
@@ -338,6 +338,7 @@ int GPIO::PRUsignalTimerSynch(){
 		
 		// Information
 		if ((this->iIterPRUcurrentTimerVal%5==0)){//if ((this->iIterPRUcurrentTimerVal%NumSynchMeasAvgAux==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){
+		cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 		cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 		cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
 		cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
