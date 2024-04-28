@@ -369,7 +369,7 @@ int GPIO::PRUsignalTimerSynch(){
 		
 		// Information
 		if ((this->iIterPRUcurrentTimerVal%5==0)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){
-		cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
+		//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 		cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 		cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
 		//cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
@@ -408,7 +408,7 @@ else{
 	PIDconstant=0;
 }
 
-this->PRUoffsetDriftErrorAppliedRaw=PIDconstant*PRUoffsetDriftErrorAvg+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative;	
+this->PRUoffsetDriftErrorAppliedRaw=this->iIterPRUcurrentTimerValPass*(PIDconstant*PRUoffsetDriftErrorAvg+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative);	
 
 if (this->PRUoffsetDriftErrorAppliedRaw<0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw-LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
 else if (this->PRUoffsetDriftErrorAppliedRaw>0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw+LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
