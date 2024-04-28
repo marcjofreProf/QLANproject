@@ -267,7 +267,7 @@ int GPIO::PRUsignalTimerSynch(){
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 				// Compute error
 				this->PRUoffsetDriftError=static_cast<long long int>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds)-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld));
-				if (abs(this->PRUoffsetDriftError)<1e5 or this->iIterPRUcurrentTimerValSynch<20){// Do computations
+				if (abs(this->PRUoffsetDriftError)<1e7 or this->iIterPRUcurrentTimerValSynch<20){// Do computations
 					// Computations for Synch calculaton for PRU0 compensation
 					this->EstimateSynch=(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))/(static_cast<double>(this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(this->PRUcurrentTimerValOld+1*this->PRUoffsetDriftErrorAppliedOldRaw));// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correctoin).
 					this->EstimateSynch=1.0+this->SynchAdjconstant*(this->EstimateSynch-1.0);
@@ -343,7 +343,7 @@ int GPIO::PRUsignalTimerSynch(){
 		}
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
-		if (this->iIterPRUcurrentTimerValSynch==(2*this->NumSynchMeasAvgAux)){
+		if (this->iIterPRUcurrentTimerValSynch==(1.5*this->NumSynchMeasAvgAux)){
 			cout << "Synchronized, ready to proceed..." << endl;
 		}
 	}// end while
