@@ -27,7 +27,7 @@ using std::fstream;
 #define PRUdataPATH2 "../PRUdata/"
 
 #define MaxNumPulses	8192	// Used in the averging of time synchronization arrays
-#define PRUclockStepPeriodNanoseconds		4.99973225 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
+#define PRUclockStepPeriodNanoseconds		4.9997325 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
 #define PulseFreq	1000 // Hz// 
 
 namespace exploringBB {
@@ -74,7 +74,7 @@ private:// Variables
 	double EstimateSynchDirectionArray[MaxNumPulses]={0.0};
 	// PID error correction
 	double SynchAdjconstant=1.0;// 
-	double PIDconstantAdvancing=0.70;// Too close to 1.0 makes it unstable and too much correction
+	double PIDconstantAdvancing=0.75;// Too close to 1.0 makes it unstable and too much correction
 	double PIDconstantDelaying=PIDconstantAdvancing;// Too close to 1.0 makes it unstable and too much correction
 	double PIDintegralAdvancing=0.00075;
 	double PIDintegralDelaying=0.0;//0.00075;
@@ -85,6 +85,8 @@ private:// Variables
 	unsigned long long int TimePRU1synchPeriod=800000000;// The faster the more corrections, and less time passed isnce last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts.
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
+	TimePoint TimePointClockSendCommandFinal=std::chrono::time_point<Clock>();// For synch purposes
+	TimePoint TimePointClockSendCommandInitial=std::chrono::time_point<Clock>();// For synch purposes
 	unsigned long long int TimeClockMarging=100000;// In nanoseconds
 	unsigned long long int TimeClockMargingExtra=50*TimeClockMarging;// In nanoseconds
 	unsigned long long int TimeElpasedNow_time_as_count=0;
