@@ -74,7 +74,7 @@ private:// Variables
 	double EstimateSynchDirectionArray[MaxNumPulses]={0.0};
 	// PID error correction
 	double SynchAdjconstant=1.0;// 
-	double PIDconstantAdvancing=0.75;// Too close to 1.0 makes it unstable and too much correction
+	double PIDconstantAdvancing=0.95;// Too close to 1.0 makes it unstable and too much correction
 	double PIDconstantDelaying=0.5;// Too close to 1.0 makes it unstable and too much correction
 	double PIDintegral=0.0;//0.00075;
 	double PIDderiv=0.0;	
