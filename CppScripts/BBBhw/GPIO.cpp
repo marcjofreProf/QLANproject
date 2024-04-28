@@ -222,14 +222,14 @@ int GPIO::PRUsignalTimerSynch(){
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	while(true){		
-		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra))){// It was possible to execute when needed
+		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra)) and this->ManualSemaphore==false){// It was possible to execute when needed
 			this->acquire();
+			this->ManualSemaphore=true;			
 			//cout << "Resetting PRUs timer!" << endl;
-			if (clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).				
-				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html
-				this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement
-				this->ManualSemaphore=true;				
+			if (clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL)==0){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).				
+				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html												
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
+				this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement
 				// Important, the following line at the very beggining to reduce the command jitter
 				//pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
 				if (this->PRUoffsetDriftErrorApplied>0){// and this->iIterPRUcurrentTimerValPass==1){
