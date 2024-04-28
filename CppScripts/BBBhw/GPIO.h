@@ -27,7 +27,7 @@ using std::fstream;
 #define PRUdataPATH2 "../PRUdata/"
 
 #define MaxNumPulses	8192	// Used in the averging of time synchronization arrays
-#define PRUclockStepPeriodNanoseconds		4.99972825 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
+#define PRUclockStepPeriodNanoseconds		4.99973225 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
 #define PulseFreq	1000 // Hz// 
 
 namespace exploringBB {
@@ -75,7 +75,7 @@ private:// Variables
 	// PID error correction
 	double SynchAdjconstant=1.0;// 
 	double PIDconstantAdvancing=0.95;// Too close to 1.0 makes it unstable and too much correction
-	double PIDconstantDelaying=0.5;// Too close to 1.0 makes it unstable and too much correction
+	double PIDconstantDelaying=0.75;// Too close to 1.0 makes it unstable and too much correction
 	double PIDintegralAdvancing=0.00075;
 	double PIDintegralDelaying=0.0;//0.00075;
 	double PIDderiv=0.0;	
