@@ -331,14 +331,14 @@ int GPIO::PRUsignalTimerSynch(){
 		}
 		
 		// Information
-		if ((this->iIterPRUcurrentTimerVal%NumSynchMeasAvgAux==0) and this->iIterPRUcurrentTimerVal!=0){
+		if ((this->iIterPRUcurrentTimerVal%NumSynchMeasAvgAux==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){
 		cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
 		cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 		cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
 		cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
-		if (this->EstimateSynchDirectionAvg>0.0){cout << "Clock estimatesynch advancing" << endl;}
-		else if (this->EstimateSynchDirectionAvg<0.0){cout << "Clock estimatesynch delaying" << endl;}
-		else{cout << "Clock estimatesynch neutral" << endl;}
+		if (this->EstimateSynchDirectionAvg>0.0){cout << "Clock EstimateSynch advancing" << endl;}
+		else if (this->EstimateSynchDirectionAvg<0.0){cout << "Clock EstimateSynch delaying" << endl;}
+		else{cout << "Clock EstimateSynch neutral" << endl;}
 		//cout << "this->iIterPRUcurrentTimerValPass: "<< this->iIterPRUcurrentTimerValPass << endl;
 		}
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
