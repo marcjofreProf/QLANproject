@@ -172,9 +172,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  prussdrv_pru_disable(PRU_Signal_NUM);
 	  prussdrv_pru_disable(PRU_Operation_NUM);  
 	  prussdrv_exit();*/
-	  ///////////////////////////////////////////////////////
-	  this->InitAgentProcess();// Periodic synchronization
-	  
+	  ///////////////////////////////////////////////////////	  
 }
 
 int GPIO::InitAgentProcess(){
@@ -365,7 +363,6 @@ int GPIO::PRUsignalTimerSynch(){
 		else if (this->ManualSemaphoreExtra==true){
 			// Double entry for some reason. Do not do anything
 			cout << "Double run in time sync method. This should not happen!" << endl;
-			this->ManualSemaphoreExtra=false;
 		}
 		else{// does not enter in time
 			pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
