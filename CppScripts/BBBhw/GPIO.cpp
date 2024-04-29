@@ -494,9 +494,9 @@ return 0;// all ok
 }
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-while (this->ManualSemaphoreExtra==true);// Wait other process
-this->acquire();
+while (this->ManualSemaphore);// Wait other process
 this->ManualSemaphore=true;
+this->acquire();
 // Important, the following line at the very beggining to reduce the command jitter
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
@@ -815,9 +815,11 @@ int NumSynchPulseAvgAux=0;
 			cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
 		}
 		else if(this->ResetPeriodicallyTimerPRU1){ // Using the estimation from the re-synchronization function			
-			while (this->ManualSemaphoreExtra);
+			while (this->ManualSemaphore);
+			this->ManualSemaphore=true;
 			this->acquire();
 			this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
+			this->ManualSemaphore=false;
 			this->release();
 			this->AdjPulseSynchCoeff=this->AdjPulseSynchCoeffAverage;
 			cout << "Applying re-synch estimated AdjPulseSynchCoeffAverage!" << endl;
