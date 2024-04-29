@@ -45,6 +45,7 @@ private:// Variables
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	std::atomic<bool> ManualSemaphore=false;
+	std::atomic<bool> ManualSemaphoreExtra=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=9; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
 	int NumSynchMeasAvgAux=181; // Num averages to compute the time error. Better to be odd number.

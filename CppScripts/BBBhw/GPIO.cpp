@@ -223,7 +223,8 @@ int GPIO::PRUsignalTimerSynch(){
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	while(true){		
-		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra))){// It was possible to execute when needed						
+		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra)) and this->ManualSemaphoreExtra==false){// It was possible to execute when needed		
+			this->ManualSemaphoreExtra=true;
 			//cout << "Resetting PRUs timer!" << endl;
 			if (clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).//https://opensource.com/article/17/6/timekeeping-linux-vms
 				this->acquire();
@@ -355,8 +356,12 @@ int GPIO::PRUsignalTimerSynch(){
 				this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap+static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds);// Update
 				// Re wrap					
 				if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
-			}			
+			}
+			this->ManualSemaphoreExtra=false;		
 		} //end if
+		else if (this->ManualSemaphoreExtra==true){
+			// Double entry for some reason. Do not do anything
+		}
 		else{// does not enter in time
 			pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
 			this->iIterPRUcurrentTimerValPass++;
