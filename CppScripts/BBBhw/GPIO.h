@@ -87,7 +87,7 @@ private:// Variables
 	    using rep        = duration::rep;
 	    using period     = duration::period;
 	    using time_point = std::chrono::time_point<my_clock>;
-	    static constexpr bool is_steady = true;// true, false. MAybe for measuring this (which might be as a chrono, not a watch) it is better steady=true;
+	    static constexpr bool is_steady = false;// true, false.
 
 	    static time_point now()
 	    {
