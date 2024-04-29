@@ -173,6 +173,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  prussdrv_pru_disable(PRU_Operation_NUM);  
 	  prussdrv_exit();*/
 	  ///////////////////////////////////////////////////////
+	  this->InitAgentProcess();// Periodic synchronization
 	  
 }
 

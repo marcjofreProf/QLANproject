@@ -1,8 +1,9 @@
 trap "kill 0" EXIT
 echo 'Running PTP'
 sudo /etc/init.d/rsyslog stop # stop logging
-sudo systemctl stop systemd-timesyncd # stop system synch
 sudo timedatectl set-ntp false
+sudo systemctl stop systemd-timesyncd # stop system synch
+sudo systemctl disable systemd-timesyncd # stop system synch
 sudo ./linuxptp/ptp4l -i eth0 -s & #-f PTP4lConfigQLANprojectMaster.cfg &
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w & #-f PTP2pcConfigQLANprojectSlave.cfg &
 echo 'Enabling BBB pins'
@@ -30,6 +31,7 @@ sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo ./CppScripts/QtransportLayerAgentN dealer 192.168.10.2 192.168.10.1
+sudo systemctl enable systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP
