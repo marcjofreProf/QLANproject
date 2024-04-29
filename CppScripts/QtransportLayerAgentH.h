@@ -69,6 +69,25 @@ private: // Variables/Objects
 	double TimeTaggsDetAnalytics[8]={0.0};// Array containing the timetaggs detections analytics (proceesses by the nodes)
 	int NumSockets=0;
 	bool SimulateRetrieveNumStoredQubitsNodeFlag=false; // Flag to only allow one process for ask to retrieve QuBits info
+	// Time synchronization
+	struct my_clock
+	{
+	    using duration   = std::chrono::nanoseconds;
+	    using rep        = duration::rep;
+	    using period     = duration::period;
+	    using time_point = std::chrono::time_point<my_clock>;
+	    static constexpr bool is_steady = false;// true, false
+
+	    static time_point now()
+	    {
+		timespec ts;
+		if (clock_gettime(CLOCK_TAI, &ts))// CLOCK_REALTIME//CLOCK_TAI
+		    throw 1;
+		using sec = std::chrono::seconds;
+		return time_point{sec{ts.tv_sec}+duration{ts.tv_nsec}};
+	    }
+	};
+	using Clock = my_clock;//
 
 public: // Functions
 	// Management

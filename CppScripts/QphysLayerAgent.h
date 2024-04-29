@@ -32,7 +32,7 @@ using std::ofstream;
 
 // #define GPIO_PATH "/sys/class/gpio/"
 
-using namespace exploringBB; // API to easily use GPIO in c++
+//using namespace exploringBB; // API to easily use GPIO in c++. No because it will confuse variables (like semaphore acquire)
 
 namespace nsQphysLayerAgent {
 
@@ -56,11 +56,28 @@ private: //Variables/Instances
 	char PayloadReadBuffer[NumBytesPayloadBuffer]={0}; //Buffer to read payload messages
 	char PayloadSendBuffer[NumBytesPayloadBuffer]={0}; //Buffer to send payload messages
 	// GPIO
-	GPIO* PRUGPIO; // Object for handling PRU
+	//GPIO* PRUGPIO; // Object for handling PRU
 	//GPIO* inGPIO; // Slow (not used) Object for reading Qubits
 	//GPIO* outGPIO; // Slow (not used) Object for sending Qubits
 	// Time/synchronization management
-	using Clock = std::chrono::system_clock;//system_clock;steady_clock;high_resolution_clock. We need a wathc to wall synchronize starting of signal and measurement, that is why we use system_clock (if we wanted a chrono we would use steady_clock)
+	struct my_clock
+	{
+	    using duration   = std::chrono::nanoseconds;
+	    using rep        = duration::rep;
+	    using period     = duration::period;
+	    using time_point = std::chrono::time_point<my_clock>;
+	    static constexpr bool is_steady = false;// true, false
+
+	    static time_point now()
+	    {
+		timespec ts;
+		if (clock_gettime(CLOCK_TAI, &ts))// CLOCK_REALTIME//CLOCK_TAI
+		    throw 1;
+		using sec = std::chrono::seconds;
+		return time_point{sec{ts.tv_sec}+duration{ts.tv_nsec}};
+	    }
+	};
+	using Clock = my_clock;//using Clock = std::chrono::system_clock;//system_clock;steady_clock;high_resolution_clock. We need a wathc to wall synchronize starting of signal and measurement, that is why we use system_clock (if we wanted a chrono we would use steady_clock)
 	using TimePoint = std::chrono::time_point<Clock>;
 	TimePoint FutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
 	TimePoint OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
@@ -72,6 +89,7 @@ private: //Variables/Instances
 	unsigned long long int OldLastTimeTagg=0;
         
 public: // Variables/Instances
+	exploringBB::GPIO PRUGPIO;
 	enum ApplicationState { // State of the agent sequences
 		APPLICATION_RUNNING = 0,
 		APPLICATION_PAUSED = 1,  // Out of Focus or Paused If In A Timed Situation
@@ -127,8 +145,7 @@ private: // Functions/Methods
 	int ThreadSimulateEmitQuBit();
 	int ThreadSimulateReceiveQubit();
 	struct timespec SetFutureTimePointOtherNode();
-	struct timespec GetFutureTimePointOtherNode();
-	
+	struct timespec GetFutureTimePointOtherNode();	
 };
 
 

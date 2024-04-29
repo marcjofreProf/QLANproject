@@ -39,6 +39,25 @@ private:// Variables/Instances
 	// Payload messages
 	char PayloadReadBuffer[NumBytesPayloadBuffer]={0}; //Buffer to read payload messages
 	char PayloadSendBuffer[NumBytesPayloadBuffer]={0}; //Buffer to send payload messages
+	// Time synchronization
+	struct my_clock
+	{
+	    using duration   = std::chrono::nanoseconds;
+	    using rep        = duration::rep;
+	    using period     = duration::period;
+	    using time_point = std::chrono::time_point<my_clock>;
+	    static constexpr bool is_steady = false;// true, false
+
+	    static time_point now()
+	    {
+		timespec ts;
+		if (clock_gettime(CLOCK_TAI, &ts))// CLOCK_REALTIME//CLOCK_TAI
+		    throw 1;
+		using sec = std::chrono::seconds;
+		return time_point{sec{ts.tv_sec}+duration{ts.tv_nsec}};
+	    }
+	};
+	using Clock = my_clock;//
 
 public: // Variables/Instances
 	enum ApplicationState { // State of the agent sequences
