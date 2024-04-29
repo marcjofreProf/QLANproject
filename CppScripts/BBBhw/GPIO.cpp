@@ -364,6 +364,7 @@ int GPIO::PRUsignalTimerSynch(){
 		} //end if
 		else if (this->ManualSemaphoreExtra==true){
 			// Double entry for some reason. Do not do anything
+			cout << "Double run in time sync method. This should no thappen!" << endl;
 		}
 		else{// does not enter in time
 			pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
@@ -416,6 +417,11 @@ else if(PRUoffsetDriftErrorAvg>0.0){
 }
 else{
 	PIDconstant=0;
+}
+
+if (this->iIterPRUcurrentTimerGradInit<10 and PRUoffsetDriftErrorAvg!=0.0){// Gradual correction initialiization to avoid going into a wrong correct point
+	PIDconstant=(static_cast<double>(this->iIterPRUcurrentTimerGradInit)/10.0)*PIDconstant;
+	this->iIterPRUcurrentTimerGradInit++;
 }
 
 this->PRUoffsetDriftErrorAppliedRaw=this->iIterPRUcurrentTimerValPass*(PIDconstant*PRUoffsetDriftErrorAvg+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative);	
