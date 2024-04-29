@@ -166,7 +166,7 @@ return 0;// all ok
 }
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME
+clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME// https://opensource.com/article/17/6/timekeeping-linux-vms
 while(ClockWatch::now() < this->TimePointClockCurrentFinal);// Busy waiting
 
 this->TimePointClockCurrentInitialMeas=ClockWatch::now();

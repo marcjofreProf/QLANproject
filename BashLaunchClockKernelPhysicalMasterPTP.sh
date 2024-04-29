@@ -5,9 +5,8 @@
 trap "kill 0" EXIT
 echo 'Running PTP'
 sudo /etc/init.d/rsyslog stop # stop logging
-sudo systemctl start systemd-timesyncd # start system synch
-sudo systemctl daemon-reload
 sudo timedatectl set-ntp false
+sudo systemctl stop systemd-timesyncd # stop system synch
 sudo ./linuxptp/ptp4l -i eth0 & #-f PTP4lConfigQLANproject.cfg & #-m
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w & #-f PTP2pcConfigQLANprojectSlave.cfg & -m
 echo 'Enabling PWM for 24 MHz ref clock'
@@ -50,6 +49,8 @@ sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3
+sudo systemctl start systemd-timesyncd # start system synch
+sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP
 echo 'Stopped PTP'
 #sudo /etc/init.d/rsyslog start # start logging
