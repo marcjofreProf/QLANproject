@@ -815,10 +815,10 @@ int NumSynchPulseAvgAux=0;
 			cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
 		}
 		else if(this->ResetPeriodicallyTimerPRU1){ // Using the estimation from the re-synchronization function
-			this->acquire();
-				while (this->ManualSemaphore);
+			//this->acquire();// Reduces the accuraccy of the synch estimation
+			//	while (this->ManualSemaphore);
 				this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
-			this->release();
+			//this->release();
 			this->AdjPulseSynchCoeff=this->AdjPulseSynchCoeffAverage;
 			cout << "Applying re-synch estimated AdjPulseSynchCoeffAverage!" << endl;
 			cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
