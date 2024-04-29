@@ -230,8 +230,8 @@ int GPIO::PRUsignalTimerSynch(){
 			this->ManualSemaphoreExtra=true;
 			//cout << "Resetting PRUs timer!" << endl;
 			if (clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).//https://opensource.com/article/17/6/timekeeping-linux-vms
-				this->acquire();
-				this->ManualSemaphore=true;			
+				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
+				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization						
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html												
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
 				this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement
@@ -494,9 +494,9 @@ return 0;// all ok
 }
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-while (this->ManualSemaphore);// Wait other process
-this->ManualSemaphore=true;
-this->acquire();
+while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
+this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
+this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 // Important, the following line at the very beggining to reduce the command jitter
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
@@ -812,12 +812,12 @@ int NumSynchPulseAvgAux=0;
 				cout << "AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
 			}// Mean average//this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumAvgAux);//Median AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
 			else{AdjPulseSynchCoeffAverage=1.0;}// Reset
-			cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
+			//cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
 		}
 		else if(this->ResetPeriodicallyTimerPRU1){ // Using the estimation from the re-synchronization function			
-			while (this->ManualSemaphore);
-			this->ManualSemaphore=true;
-			this->acquire();
+			while (this->ManualSemaphore);// Very critical to not produce measurement deviations when assessing the periodic snchronization
+			this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
+			this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 			this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 			this->ManualSemaphore=false;
 			this->release();
