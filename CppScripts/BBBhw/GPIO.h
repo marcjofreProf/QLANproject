@@ -232,7 +232,7 @@ public:	// Functions/Methods
 	virtual int waitForEdge(CallbackType callback); // threaded with callback
 	virtual void waitForEdgeCancel() { this->threadRunning = false; }
 
-	virtual ~GPIO();  //destructor will unexport the pin
+	~GPIO();  //destructor
 
 private: // Functions/Methods
 	// Sempahore
