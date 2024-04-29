@@ -369,17 +369,18 @@ int GPIO::PRUsignalTimerSynch(){
 		
 		// Information
 		if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
-		//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
-		//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
-		cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
-		//cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
-		cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
-		cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
-		cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
-		if (this->EstimateSynchDirectionAvg>0.0){cout << "Clock EstimateSynch advancing" << endl;}
-		else if (this->EstimateSynchDirectionAvg<0.0){cout << "Clock EstimateSynch delaying" << endl;}
-		else{cout << "Clock EstimateSynch neutral" << endl;}
-		//cout << "this->iIterPRUcurrentTimerValPass: "<< this->iIterPRUcurrentTimerValPass << endl;
+			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
+			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
+			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
+			//cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
+			cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
+			cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
+			cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
+			if (this->EstimateSynchDirectionAvg>0.0){cout << "Clock EstimateSynch advancing" << endl;}
+			else if (this->EstimateSynchDirectionAvg<0.0){cout << "Clock EstimateSynch delaying" << endl;}
+			else{cout << "Clock EstimateSynch neutral" << endl;}
+			cout << "this->iIterPRUcurrentTimerValPass: "<< this->iIterPRUcurrentTimerValPass << endl;
+			cout << "this->iIterPRUcurrentTimerValSynch: "<< this->iIterPRUcurrentTimerValSynch << endl;
 		}
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
