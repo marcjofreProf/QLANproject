@@ -364,7 +364,8 @@ int GPIO::PRUsignalTimerSynch(){
 		} //end if
 		else if (this->ManualSemaphoreExtra==true){
 			// Double entry for some reason. Do not do anything
-			cout << "Double run in time sync method. This should no thappen!" << endl;
+			cout << "Double run in time sync method. This should not happen!" << endl;
+			this->ManualSemaphoreExtra=false;
 		}
 		else{// does not enter in time
 			pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
