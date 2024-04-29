@@ -79,7 +79,24 @@ private:// Variables
 	double PIDintegral=0.0;
 	double PIDderiv=0.0;	
 	// Time/synchronization management
-	using Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
+	struct my_clock
+	{
+	    using duration   = std::chrono::nanoseconds;
+	    using rep        = duration::rep;
+	    using period     = duration::period;
+	    using time_point = std::chrono::time_point<my_clock>;
+	    static constexpr bool is_steady = false;
+
+	    static time_point now()
+	    {
+		timespec ts;
+		if (clock_gettime(CLOCK_TAI, &ts))// CLOCK_REALTIME//CLOCK_TAI
+		    throw 1;
+		using sec = std::chrono::seconds;
+		return time_point{sec{ts.tv_sec}+duration{ts.tv_nsec}};
+	    }
+	};
+	using Clock = my_clock;//Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
 	using TimePoint = std::chrono::time_point<Clock>;
 	unsigned long long int TimePRU1synchPeriod=800000000;// The faster the more corrections, and less time passed isnce last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts.
 	struct timespec requestWhileWait;
