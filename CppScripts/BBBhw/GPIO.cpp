@@ -296,8 +296,8 @@ int GPIO::PRUsignalTimerSynch(){
 					//this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
 					//this->PRUoffsetDriftErrorAppliedRaw=0;// Disable IEP correction
 					// Re wrap for correction					
-					if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)>0xFFFFFFFF){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied-0xFFFFFFFF;}
-					else if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)<0){this->PRUoffsetDriftErrorApplied=0xFFFFFFFF-(-this->PRUoffsetDriftErrorApplied-this->PRUcurrentTimerValWrap);}
+					if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)>0xFFFFFFFF){this->PRUoffsetDriftErrorApplied=this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied-0xFFFFFFFF-1.0;}
+					else if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)<0){this->PRUoffsetDriftErrorApplied=0xFFFFFFFF+(this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)+1.0;}
 					else{
 						this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied;
 					}
@@ -417,8 +417,8 @@ else{
 	PIDconstant=0;
 }
 
-if (this->iIterPRUcurrentTimerGradInit<10 and PRUoffsetDriftErrorAvg!=0.0){// Gradual correction initialiization to avoid going into a wrong correct point
-	PIDconstant=(static_cast<double>(this->iIterPRUcurrentTimerGradInit)/10.0)*PIDconstant;
+if (this->iIterPRUcurrentTimerGradInit<this->NumSynchMeasAvgAux and PRUoffsetDriftErrorAvg!=0.0){// Gradual correction initialiization to avoid going into a wrong correct point
+	PIDconstant=(static_cast<double>(this->iIterPRUcurrentTimerGradInit)/static_cast<double>(this->NumSynchMeasAvgAux))*PIDconstant;
 	this->iIterPRUcurrentTimerGradInit++;
 }
 
