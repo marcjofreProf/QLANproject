@@ -417,11 +417,6 @@ else{
 	PIDconstant=0;
 }
 
-if (this->iIterPRUcurrentTimerGradInit<this->NumSynchMeasAvgAux and PRUoffsetDriftErrorAvg!=0.0){// Gradual correction initialiization to avoid going into a wrong correct point
-	PIDconstant=(static_cast<double>(this->iIterPRUcurrentTimerGradInit)/static_cast<double>(this->NumSynchMeasAvgAux))*PIDconstant;
-	this->iIterPRUcurrentTimerGradInit++;
-}
-
 this->PRUoffsetDriftErrorAppliedRaw=this->iIterPRUcurrentTimerValPass*(PIDconstant*PRUoffsetDriftErrorAvg+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative);	
 
 if (this->PRUoffsetDriftErrorAppliedRaw<0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw-LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
