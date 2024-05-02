@@ -871,7 +871,7 @@ int NumSynchPulseAvgAux=0;
 			    }
 		    }
 		    
-		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest)+PRUoffsetDriftErrorIntegralOld)*AdjPulseSynchCoeff);
+		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest)-PRUoffsetDriftErrorIntegralOld)*AdjPulseSynchCoeff);
 		    
 		    //OldLastTimeTagg=ValueReadTest;
 		    //OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
