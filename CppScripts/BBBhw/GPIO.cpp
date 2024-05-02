@@ -812,7 +812,7 @@ int NumSynchPulseAvgAux=0;
 			this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 			this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 			this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
-			this->PRUoffsetDriftErrorIntegralOld=this->PRUoffsetDriftErrorIntegral/static_cast<double>(PRUclockStepPeriodNanoseconds);
+			this->PRUoffsetDriftErrorIntegralOld=this->PRUoffsetDriftErrorIntegral;///static_cast<double>(PRUclockStepPeriodNanoseconds);
 			this->ManualSemaphore=false;
 			this->release();
 			this->AdjPulseSynchCoeff=this->AdjPulseSynchCoeffAverage;
@@ -871,11 +871,11 @@ int NumSynchPulseAvgAux=0;
 			    }
 		    }
 		    
-		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg)-PRUoffsetDriftErrorIntegralOld)*AdjPulseSynchCoeff)+TimeTaggsLast;
+		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest)+PRUoffsetDriftErrorIntegralOld)*AdjPulseSynchCoeff);
 		    
-		    OldLastTimeTagg=ValueReadTest;
-		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
-		    TimeTaggsLast=TimeTaggs[lineCount];// For the next capturing
+		    //OldLastTimeTagg=ValueReadTest;
+		    //OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
+		    //TimeTaggsLast=TimeTaggs[lineCount];// For the next capturing
 		    /*
 		    if (lineCount==0){
 		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;		    	
