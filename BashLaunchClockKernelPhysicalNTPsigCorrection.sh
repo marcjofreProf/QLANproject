@@ -9,6 +9,7 @@ sudo systemctl enable --now systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
 sudo timedatectl set-ntp true
+sudo hwclock --systohc
 echo 'Enabling PWM for 24 MHz ref clock'
 sudo config-pin P8.19 pwm
 sudo sh -c "echo '38' >> /sys/class/pwm/pwmchip7/pwm-7\:0/period"

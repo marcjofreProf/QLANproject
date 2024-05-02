@@ -6,6 +6,7 @@ sudo systemctl stop systemd-timesyncd # stop system synch
 sudo systemctl disable systemd-timesyncd # disable system synch
 sudo ./linuxptp/ptp4l -i eth0 -s & # -f PTP4lConfigQLANprojectSlave.cfg &
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w & # -f PTP2pcConfigQLANprojectSlave.cfg &
+sudo hwclock --systohc
 echo 'Enabling BBB pins'
 sudo config-pin P9_28 pruin
 sudo config-pin P9_29 pruin

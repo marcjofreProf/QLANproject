@@ -31,5 +31,6 @@ sudo systemctl enable --now systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP
+sudo hwclock --systohc
 #sudo /etc/init.d/rsyslog start # start logging
 
