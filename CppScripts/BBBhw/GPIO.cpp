@@ -380,7 +380,7 @@ int GPIO::PRUsignalTimerSynch(){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
-			//cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
+			cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
 			cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 			cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
 			cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
@@ -401,10 +401,10 @@ return 0; // All ok
 }
 
 int GPIO::PIDcontrolerTime(){
-if (this->iIterPRUcurrentTimerValSynch>(NumSynchMeasAvgAux/2)){
-	PRUoffsetDriftErrorDerivative=(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorLast)/(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast));//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
+if (this->iIterPRUcurrentTimerValSynch>(this->NumSynchMeasAvgAux)){
+	PRUoffsetDriftErrorDerivative=(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorLast)*(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast));//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
 
-	//PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftErrorAvg*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+	PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftErrorAvg*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 }
 double PIDconstant;
 if (PRUoffsetDriftErrorAvg<0.0){
@@ -870,16 +870,23 @@ int NumSynchPulseAvgAux=0;
 			    }
 		    }
 		    
+		    while (this->ManualSemaphore);// Very critical to not produce measurement deviations when assessing the periodic snchronization
+		    this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
+		    this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
+			
 		    if (lineCount==0){
-		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)*AdjPulseSynchCoeffAverage+TimeTaggsLast);		    	
+		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast+static_cast<unsigned long long int>(this->PRUoffsetDriftErrorIntegral);		    	
 		    	} // Simply apply the average value of Synch pulses
 		    else{// Not the first tagg
-		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))*AdjPulseSynchCoeff+TimeTaggsLast);
+		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))*AdjPulseSynchCoeff)+TimeTaggsLast+static_cast<unsigned long long int>(this->PRUoffsetDriftErrorIntegral);
 		    }
 		    
 		    OldLastTimeTagg=ValueReadTest;
 		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
-		    TimeTaggsLast=TimeTaggs[lineCount];// For the next capturing
+		    TimeTaggsLast=TimeTaggs[lineCount]-static_cast<unsigned long long int>(this->PRUoffsetDriftErrorIntegral);// For the next capturing
+		    
+		    this->ManualSemaphore=false;
+		    this->release();
 		    
 		    ////////////////////////////////////////////////////////////////////////////////
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
