@@ -221,8 +221,7 @@ struct timespec GPIO::SetWhileWait(){
 }
 
 int GPIO::PRUsignalTimerSynch(){
-	this->TimePointClockCurrentSynchPRU1futureInitial=Clock::now();// First time
-	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1futureInitial;// First time
+	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	while(true){		
 		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra)) and this->ManualSemaphoreExtra==false){// It was possible to execute when needed		
@@ -381,8 +380,8 @@ int GPIO::PRUsignalTimerSynch(){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
-			//cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
-			cout << "PRUcurrentTimerValAbsError: " << this->PRUcurrentTimerValAbsError<< endl;
+			cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
+			//cout << "PRUcurrentTimerValAbsError: " << this->PRUcurrentTimerValAbsError<< endl;
 			cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 			cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
 			cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
@@ -394,10 +393,6 @@ int GPIO::PRUsignalTimerSynch(){
 		}		
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
-		auto CurrentTimePointAbsDuration=TimePointClockSendCommandInitial-TimePointClockCurrentSynchPRU1futureInitial;
-		// Convert duration to desired time
-		unsigned long long int TimePointClockFinalInitial_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(CurrentTimePointAbsDuration).count(); // Add an of
-		this->PRUcurrentTimerValAbsError=static_cast<double>(TimePointClockFinalInitial_time_as_count-(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds);
 		if (this->iIterPRUcurrentTimerValSynch==(2*this->NumSynchMeasAvgAux)){
 			cout << "Synchronized, ready to proceed..." << endl;
 		}
@@ -876,23 +871,16 @@ int NumSynchPulseAvgAux=0;
 			    }
 		    }
 		    
-		    while (this->ManualSemaphore);// Very critical to not produce measurement deviations when assessing the periodic snchronization
-		    this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
-		    this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
-			
 		    if (lineCount==0){
-		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast+static_cast<unsigned long long int>(this->PRUcurrentTimerValAbsError);		    	
+		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;		    	
 		    	} // Simply apply the average value of Synch pulses
 		    else{// Not the first tagg
-		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))*AdjPulseSynchCoeff)+TimeTaggsLast+static_cast<unsigned long long int>(this->PRUcurrentTimerValAbsError);
+		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))*AdjPulseSynchCoeff)+TimeTaggsLast;
 		    }
 		    
 		    OldLastTimeTagg=ValueReadTest;
 		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
-		    TimeTaggsLast=TimeTaggs[lineCount]-static_cast<unsigned long long int>(this->PRUoffsetDriftErrorIntegral);// For the next capturing
-		    
-		    this->ManualSemaphore=false;
-		    this->release();
+		    TimeTaggsLast=TimeTaggs[lineCount];// For the next capturing		    
 		    
 		    ////////////////////////////////////////////////////////////////////////////////
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations

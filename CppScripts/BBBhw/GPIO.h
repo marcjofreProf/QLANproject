@@ -67,7 +67,6 @@ private:// Variables
 	unsigned long long int iIterPRUcurrentTimerValSynch=0;// Account for rounds entered
 	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has no tentered
 	unsigned long long int iIterPRUcurrentTimerValLast=0;
-	double PRUcurrentTimerValAbsError=0;
 	double EstimateSynch=1.0;
 	double EstimateSynchAvg=1.0;
 	double EstimateSynchArray[MaxNumPulses]={EstimateSynch};// They are not all set to the value, only the first one (a function in the declarator should be used to fill them in.
@@ -105,7 +104,6 @@ private:// Variables
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockSendCommandFinal=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockSendCommandInitial=std::chrono::time_point<Clock>();// For synch purposes
-	TimePoint TimePointClockCurrentSynchPRU1futureInitial=std::chrono::time_point<Clock>();// For absolute error pruposes
 	unsigned long long int TimeClockMarging=100000;// In nanoseconds
 	unsigned long long int TimeClockMargingExtra=10*TimeClockMarging;// In nanoseconds
 	unsigned long long int TimeElpasedNow_time_as_count=0;
