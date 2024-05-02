@@ -381,7 +381,6 @@ int GPIO::PRUsignalTimerSynch(){
 			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
 			cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
-			//cout << "PRUcurrentTimerValAbsError: " << this->PRUcurrentTimerValAbsError<< endl;
 			cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 			cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
 			cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
@@ -871,6 +870,8 @@ int NumSynchPulseAvgAux=0;
 			    }
 		    }
 		    
+		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest)+PRUoffsetDriftErrorIntegral)*AdjPulseSynchCoeff);
+		    /*
 		    if (lineCount==0){
 		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;		    	
 		    	} // Simply apply the average value of Synch pulses
@@ -881,7 +882,7 @@ int NumSynchPulseAvgAux=0;
 		    OldLastTimeTagg=ValueReadTest;
 		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
 		    TimeTaggsLast=TimeTaggs[lineCount];// For the next capturing		    
-		    
+		    */
 		    ////////////////////////////////////////////////////////////////////////////////
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
