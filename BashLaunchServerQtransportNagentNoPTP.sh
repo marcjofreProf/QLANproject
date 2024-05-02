@@ -27,7 +27,7 @@ sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo ./CppScripts/QtransportLayerAgentN server 192.168.9.2 192.168.9.1
-sudo systemctl enable systemd-timesyncd # start system synch
+sudo systemctl enable --now systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP

@@ -1,7 +1,7 @@
 trap "kill 0" EXIT
 echo 'Running NTP'
 sudo /etc/init.d/rsyslog stop # stop logging
-sudo systemctl enable systemd-timesyncd # start system synch
+sudo systemctl enable --now systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP
