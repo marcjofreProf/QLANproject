@@ -871,11 +871,11 @@ int NumSynchPulseAvgAux=0;
 			    }
 		    }
 		    
-		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest)-OldLastTimeTagg)*AdjPulseSynchCoeff+PRUoffsetDriftErrorIntegralOld);
+		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest)-OldLastTimeTagg+PRUoffsetDriftErrorIntegralOld)*AdjPulseSynchCoeff)+TimeTaggsLast;
 		    
 		    OldLastTimeTagg=ValueReadTest;
 		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
-		    TimeTaggsLast=TimeTaggs[lineCount]-PRUoffsetDriftErrorIntegralOld;// For the next capturing
+		    TimeTaggsLast=TimeTaggs[lineCount];// For the next capturing
 		    /*
 		    if (lineCount==0){
 		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;		    	
