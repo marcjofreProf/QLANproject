@@ -402,9 +402,9 @@ return 0; // All ok
 
 int GPIO::PIDcontrolerTime(){
 if (this->iIterPRUcurrentTimerValSynch>(this->NumSynchMeasAvgAux)){
-	PRUoffsetDriftErrorDerivative=(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorLast)*(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast));//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
+	PRUoffsetDriftErrorDerivative=(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorLast);//*(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast));//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
 
-	PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftErrorAvg*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+	PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftErrorAvg;//*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 }
 double PIDconstant;
 if (PRUoffsetDriftErrorAvg<0.0){
@@ -812,7 +812,7 @@ int NumSynchPulseAvgAux=0;
 			this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 			this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 			this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
-			this->PRUoffsetDriftErrorIntegralOld=this->PRUoffsetDriftErrorIntegral;
+			this->PRUoffsetDriftErrorIntegralOld=this->PRUoffsetDriftErrorIntegral/static_cast<double>(PRUclockStepPeriodNanoseconds);
 			this->ManualSemaphore=false;
 			this->release();
 			this->AdjPulseSynchCoeff=this->AdjPulseSynchCoeffAverage;
@@ -871,7 +871,7 @@ int NumSynchPulseAvgAux=0;
 			    }
 		    }
 		    
-		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest)-PRUoffsetDriftErrorIntegralOld)*AdjPulseSynchCoeff);
+		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest)+PRUoffsetDriftErrorIntegralOld)*AdjPulseSynchCoeff);
 		    /*
 		    if (lineCount==0){
 		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;		    	
