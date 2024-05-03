@@ -235,7 +235,7 @@ FINISH:
 	MOV	r11, r5 //LBBO	r11, r13, 0, 4// Read the last value of DWT_CYCNT	
 	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 8 // writes values of r8 and r9
 	LDI	r8, 0 // Reset the count of skews
-	SBCO 	r19, CONST_PRUDRAM, 8, 4 // writes values of r19
+	SBCO 	r19, CONST_PRUDRAM, 12, 4 // writes values of r19
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 //	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
