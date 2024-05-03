@@ -625,7 +625,7 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 
 // Reading first calibration tag - To be done. Better handled and saved together with SynchAvginto file for retrievel from multiple captures
 OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
-TimeTaggsLast=OldLastTimeTagg+static_cast<unsigned long long int>(abs(PRUoffsetDriftErrorIntegralOld));
+TimeTaggsLast=OldLastTimeTagg+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
 cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
 cout << "TimeTaggsLast: " << TimeTaggsLast << endl; 
 
