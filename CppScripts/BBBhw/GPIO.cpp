@@ -625,8 +625,10 @@ valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valOverflowCycleCountPRU);// The last addition of static_cast<unsigned long long int>(valOverflowCycleCountPRU) is to compensate for a continuous drift
 
 // Reading first calibration tag - To be done. Better handled and saved together with SynchAvginto file for retrievel from multiple captures
-OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(static_cast<unsigned int>(*CalpHolder));
-TimeTaggsLast=(unsigned long long int)((double)(OldLastTimeTagg)+PRUoffsetDriftErrorIntegralOld);
+OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder)+(unsigned long long int)(PRUoffsetDriftErrorIntegralOld);
+TimeTaggsLast=OldLastTimeTagg;
+cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
+//cout << "TimeTaggsLast: " << TimeTaggsLast << endl; 
 
 // Reading or not Synch pulses
 NumSynchPulses=static_cast<unsigned int>(*synchp);
@@ -867,6 +869,7 @@ int NumSynchPulseAvgAux=0;
 		    /////////////////////////////////////////////////////////////////////////////////
 		    // Synch pulses might be able to correct short term intra pulses, but not in between different sequences (inter pulses)
 		    // Advanced application of the AdjPulseSynchCoeff per ranges - need improved short acurracy		    
+		    /*
 		    if (NumSynchPulsesRed>1){// If using Synch pulses
 			    if (ValueReadTest<=SynchPulsesTagsUsed[iIterMovAdjPulseSynchCoeff]){
 			    	AdjPulseSynchCoeff=AdjPulseSynchCoeffArray[iIterMovAdjPulseSynchCoeff];}// Use the value of adjust synch
@@ -876,8 +879,13 @@ int NumSynchPulseAvgAux=0;
 			    	}
 			    	AdjPulseSynchCoeff=AdjPulseSynchCoeffArray[iIterMovAdjPulseSynchCoeff];
 			    }
+		    }*/
+		    if (lineCount==0){
+		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error	    	
+		    	} // Simply apply the average value of Synch pulses
+		    else{// Not the first tagg
+		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))*AdjPulseSynchCoeff)+TimeTaggsLast;
 		    }
-		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))*AdjPulseSynchCoeff)+TimeTaggsLast;// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error
 		    
 		    OldLastTimeTagg=ValueReadTest;
 		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
