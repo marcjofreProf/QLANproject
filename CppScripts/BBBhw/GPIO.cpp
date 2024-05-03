@@ -624,8 +624,9 @@ auxUnskewingFactorResetCycle=auxUnskewingFactorResetCycle+static_cast<unsigned l
 valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valOverflowCycleCountPRU);// The last addition of static_cast<unsigned long long int>(valOverflowCycleCountPRU) is to compensate for a continuous drift
 
-// Reading first calibration tag
-TimeTaggsLast=(unsigned long long int)((double)(extendedCounterPRUaux + static_cast<unsigned long long int>(static_cast<unsigned int>(*CalpHolder)))+PRUoffsetDriftErrorIntegralOld);
+// Reading first calibration tag - To be done. Better handled and saved together with SynchAvginto file for retrievel from multiple captures
+OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(static_cast<unsigned int>(*CalpHolder));
+TimeTaggsLast=(unsigned long long int)((double)(OldLastTimeTagg)+PRUoffsetDriftErrorIntegralOld);
 
 // Reading or not Synch pulses
 NumSynchPulses=static_cast<unsigned int>(*synchp);
@@ -876,7 +877,7 @@ int NumSynchPulseAvgAux=0;
 			    	AdjPulseSynchCoeff=AdjPulseSynchCoeffArray[iIterMovAdjPulseSynchCoeff];
 			    }
 		    }
-		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))*AdjPulseSynchCoeff)+TimeTaggsLast;// The fist TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error
+		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))*AdjPulseSynchCoeff)+TimeTaggsLast;// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error
 		    
 		    OldLastTimeTagg=ValueReadTest;
 		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
