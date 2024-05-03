@@ -432,6 +432,15 @@ pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 pru0dataMem_int[1]=this->NumRecords; // set number captures
 prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
+/////////////
+while (this->ManualSemaphore);// Very critical to not produce measurement deviations when assessing the periodic snchronization
+this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
+this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
+this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
+this->PRUoffsetDriftErrorIntegralOld=this->PRUoffsetDriftErrorIntegral;///static_cast<double>(PRUclockStepPeriodNanoseconds);
+this->ManualSemaphore=false;
+this->release();
+///////////
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
@@ -807,14 +816,7 @@ int NumSynchPulseAvgAux=0;
 			else{AdjPulseSynchCoeffAverage=1.0;}// Reset
 			//cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
 		}
-		else if(this->ResetPeriodicallyTimerPRU1){ // Using the estimation from the re-synchronization function			
-			while (this->ManualSemaphore);// Very critical to not produce measurement deviations when assessing the periodic snchronization
-			this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
-			this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
-			this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
-			this->PRUoffsetDriftErrorIntegralOld=this->PRUoffsetDriftErrorIntegral;///static_cast<double>(PRUclockStepPeriodNanoseconds);
-			this->ManualSemaphore=false;
-			this->release();
+		else if(this->ResetPeriodicallyTimerPRU1){ // Using the estimation from the re-synchronization function		
 			this->AdjPulseSynchCoeff=this->AdjPulseSynchCoeffAverage;
 			cout << "Applying re-synch estimated AdjPulseSynchCoeffAverage!" << endl;
 			cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
