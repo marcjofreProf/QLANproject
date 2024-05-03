@@ -111,7 +111,7 @@ INITIATIONS:// This is only run once
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 //	SUB	r3, r3, 1  Maybe not possible, so account it in c++ code // Initially decrement overflow counter because at least it goes through RESET_CYCLECNT once which will increment the overflow counter	
-	LDI	r18, 12 // Initialize 8 bytes above for PRU RAM
+	LDI	r18, 16 // Initialize 16 bytes above for PRU RAM
 	LDI	r19, 0 // Reset number of synch pulses register
 	// Initializations for faster execution
 	LDI	r7, 0 // Register for clearing other registers
@@ -184,13 +184,17 @@ CMDLOOP:
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 1 bytes. It is the command to start
 	QBEQ	CHECK_CYCLECNT, r0.b0, 0 // loop until we get an instruction
+	// Store a calibration timetagg
+	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
+	SBCO	r5, CONST_PRUDRAM, 8, 4// Calibration time tag (together with the acumulated synchronization error)
+	//
 	LBCO	r4, CONST_PRUDRAM, 4, 4 // Load to r4 the content of CONST_PRUDRAM with offset 4, and 4 bytes. It is the number of RECORDS
 	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start 
 	SBCO	r7.b0, C0, 0x24, 1 // Reset host interrupt
 	/// Relative synch count down
 //	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 REGISTERCNT:
-	SBCO 	r7, CONST_PRUDRAM, 8, 4 // writes values of r19. to clear the number of synch pulses communicate din PRU RAM
+	SBCO 	r7, CONST_PRUDRAM, 12, 4 // writes values of r19. to clear the number of synch pulses communicate din PRU RAM
 	// Here include once the overflow register
 	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address offset at r1
 	ADD 	r1, r1, 4 // increment address by 4 bytes
@@ -203,21 +207,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 // Do not lose time with the below if there are no detections
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
 	AND	r6, r6, r16 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
-	//////////////////////////////////////
-// Do not touch this part below. Somehow it works to have fast edge detections of both synch pulses and detections!!!
-//	//Synch pulse is in the second byte, in bit 14 actually
-//	MOV 	r17.b0, r6.b1
-//	MOV 	r20.b0, r16.b1
-//	//AND	r17, r17, r20 // Only does complying with a rising edge.// AND has to be done with the whole register, not a byte of it!!!!
-//	// Mask the relevant bits you're interested in	
-//	// For example, if you're interested in any of the first 8 bits being high, you could use 0xFF as the mask
-//	//AND 	r6.b0, r6.b0, MASKevents // Interested specifically to the bits with MASKevents. MAybe there are never counts in this first 8 bits if there is not explicitly a signal.
-//	// Compare the result with 0. If it's 0, no relevant bits are high, so loop
-//	//Synch pulse is in the second byte, in bit 14 actually
-//	AND	r17, r17, r22 // Mask to only look at bit 7 (bit 14 when considering the two bytes)// AND has to be done with the whole register, not a byte of it!!!!	Nto needed because not visible to pru the other bits
-//	QBNE	SYNCHPULSES, r17.b0, 0
-	///////////////////////////////////
-	QBNE	SYNCHPULSES, r6.b1, 0
+//	QBNE	SYNCHPULSES, r6.b1, 0 // For the time being commented since active synch pulses not used!!!
 	// If not a synch pulse, a detector timetag
 // Do not touch this part above. Somehow it works to have fast edge detections of both synch pulses and detections!!!
 CHECKDET:		
@@ -249,7 +239,7 @@ FINISH:
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 //	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
-	LDI	r18, 12 // Initialize 8 bytes above for PRU RAM
+	LDI	r18, 16 // Initialize 16 bytes above for PRU RAM
 	LDI	r19, 0 // Reset number of synch pulses register
 	//// For checking control, place as the last value the current estimated skew counts and threshold reset counts	
 	// we're done. Signal to the application

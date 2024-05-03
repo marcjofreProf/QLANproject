@@ -120,7 +120,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Here we can update memory space assigned address
 	valpHolder=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM];
 	valpAuxHolder=valpHolder+4+5*NumRecords;
-	synchpHolder=(unsigned int*)&pru0dataMem_int[2];
+	CalpHolder=(unsigned int*)&pru0dataMem_int[2];// First tagg captured at the very beggining
+	synchpHolder=(unsigned int*)&pru0dataMem_int[3];// Starts at 12
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Timetagging
@@ -623,6 +624,9 @@ auxUnskewingFactorResetCycle=auxUnskewingFactorResetCycle+static_cast<unsigned l
 valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valOverflowCycleCountPRU);// The last addition of static_cast<unsigned long long int>(valOverflowCycleCountPRU) is to compensate for a continuous drift
 
+// Reading first calibration tag
+TimeTaggsLast=(unsigned long long int)((double)(extendedCounterPRUaux + static_cast<unsigned long long int>(static_cast<unsigned int>(*CalpHolder)))+PRUoffsetDriftErrorIntegralOld);
+
 // Reading or not Synch pulses
 NumSynchPulses=static_cast<unsigned int>(*synchp);
 synchp++;
@@ -872,13 +876,7 @@ int NumSynchPulseAvgAux=0;
 			    	AdjPulseSynchCoeff=AdjPulseSynchCoeffArray[iIterMovAdjPulseSynchCoeff];
 			    }
 		    }
-		    
-		    if (lineCount==0){
-		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest)+PRUoffsetDriftErrorIntegralOld);		    	
-		    	} // Simply apply the average value of Synch pulses
-		    else{// Not the first tagg
-		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))*AdjPulseSynchCoeff)+TimeTaggsLast;
-		    }
+		    TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))*AdjPulseSynchCoeff)+TimeTaggsLast;// The fist TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error
 		    
 		    OldLastTimeTagg=ValueReadTest;
 		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;

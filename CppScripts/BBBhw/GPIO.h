@@ -141,6 +141,7 @@ private:// Variables
 	unsigned int NumSynchPulses=0;
 	unsigned char* valpHolder;
 	unsigned char* valpAuxHolder;
+	unsigned int* CalpHolder; // 32 bits
 	unsigned int* synchpHolder; // 32 bits
 	unsigned char* valp; // 8 bits
 	unsigned char* valpAux; // 8 bits
