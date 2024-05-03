@@ -405,7 +405,7 @@ int GPIO::PIDcontrolerTime(){
 if (this->iIterPRUcurrentTimerValSynch>(this->NumSynchMeasAvgAux)){
 	PRUoffsetDriftErrorDerivative=(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorLast);//*(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast));//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
 
-	PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftErrorAvg*EstimateSynchAvg;//*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+	PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftErrorAvg/EstimateSynchAvg;//*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 }
 double PIDconstant;
 if (PRUoffsetDriftErrorAvg<0.0){
@@ -418,7 +418,7 @@ else{
 	PIDconstant=0;
 }
 
-this->PRUoffsetDriftErrorAppliedRaw=PIDconstant*PRUoffsetDriftErrorAvg+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative;//this->iIterPRUcurrentTimerValPass*(PIDconstant*PRUoffsetDriftErrorAvg+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative);	
+this->PRUoffsetDriftErrorAppliedRaw=PIDconstant*PRUoffsetDriftErrorAvg;//+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative;//this->iIterPRUcurrentTimerValPass*(PIDconstant*PRUoffsetDriftErrorAvg+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative);	
 
 if (this->PRUoffsetDriftErrorAppliedRaw<0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw-LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
 else if (this->PRUoffsetDriftErrorAppliedRaw>0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw+LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
