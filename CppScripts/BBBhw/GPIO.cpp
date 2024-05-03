@@ -874,7 +874,7 @@ int NumSynchPulseAvgAux=0;
 		    }
 		    
 		    if (lineCount==0){
-		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest)-PRUoffsetDriftErrorIntegralOld);		    	
+		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest)+PRUoffsetDriftErrorIntegralOld);		    	
 		    	} // Simply apply the average value of Synch pulses
 		    else{// Not the first tagg
 		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))*AdjPulseSynchCoeff)+TimeTaggsLast;
