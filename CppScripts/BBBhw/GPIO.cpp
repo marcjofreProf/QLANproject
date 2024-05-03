@@ -625,10 +625,10 @@ valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valOverflowCycleCountPRU);// The last addition of static_cast<unsigned long long int>(valOverflowCycleCountPRU) is to compensate for a continuous drift
 
 // Reading first calibration tag - To be done. Better handled and saved together with SynchAvginto file for retrievel from multiple captures
-OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder)+(unsigned long long int)(PRUoffsetDriftErrorIntegralOld);
-TimeTaggsLast=OldLastTimeTagg;
+OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
+TimeTaggsLast=static_cast<unsigned long long int>((static_cast<double>(OldLastTimeTagg)+PRUoffsetDriftErrorIntegralOld)*AdjPulseSynchCoeffAverage);
 cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
-//cout << "TimeTaggsLast: " << TimeTaggsLast << endl; 
+cout << "TimeTaggsLast: " << TimeTaggsLast << endl; 
 
 // Reading or not Synch pulses
 NumSynchPulses=static_cast<unsigned int>(*synchp);
