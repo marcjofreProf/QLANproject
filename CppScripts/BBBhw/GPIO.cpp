@@ -376,7 +376,7 @@ int GPIO::PRUsignalTimerSynch(){
 			if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
 		}
 		// Information
-		if ((this->iIterPRUcurrentTimerVal%(4*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
+		if ((this->iIterPRUcurrentTimerVal%(8*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
@@ -426,6 +426,10 @@ return 0; // All ok
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
+// Important, the following line at the very beggining to reduce the command jitter
+pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
+pru0dataMem_int[1]=this->NumRecords; // set number captures
+
 /////////////
 while (this->ManualSemaphore);// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
@@ -435,9 +439,7 @@ this->PRUoffsetDriftErrorIntegralOld=this->PRUoffsetDriftErrorIntegral;///static
 this->ManualSemaphore=false;
 this->release();
 ///////////
-// Important, the following line at the very beggining to reduce the command jitter
-pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
-pru0dataMem_int[1]=this->NumRecords; // set number captures
+
 prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
