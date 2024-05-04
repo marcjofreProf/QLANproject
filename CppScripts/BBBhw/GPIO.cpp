@@ -445,6 +445,7 @@ this->ManualSemaphore=true;// Very critical to not produce measurement deviation
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 this->PRUoffsetDriftErrorIntegralOld=this->PRUoffsetDriftErrorIntegral;///static_cast<double>(PRUclockStepPeriodNanoseconds);
+this->PRUoffsetDriftErrorIntegral=0.0;// Reset until next measurement
 this->ManualSemaphore=false;
 this->release();
 ///////////
@@ -634,9 +635,9 @@ valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valOverflowCycleCountPRU);// The last addition of static_cast<unsigned long long int>(valOverflowCycleCountPRU) is to compensate for a continuous drift
 
 // Reading first calibration tag - To be done. Better handled and saved together with SynchAvginto file for retrievel from multiple captures
-
-TimeTaggsLast=static_cast<unsigned long long int>(static_cast<double>((extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder))-OldLastTimeTagg)*this->AdjPulseSynchCoeffAverage)+TimeTaggsLast;//+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
+//TimeTaggsLast=static_cast<unsigned long long int>(static_cast<double>((extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder))-OldLastTimeTagg)*this->AdjPulseSynchCoeffAverage)+TimeTaggsLast;//+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
 OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
+TimeTaggsLast=OldLastTimeTagg+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
 //cout << "TimeTaggsLast: " << TimeTaggsLast << endl; 
 
