@@ -54,7 +54,6 @@ private:// Variables
 	double PRUoffsetDriftErrorAvg=0.0;
 	double PRUoffsetDriftErrorLast=0;
 	double PRUoffsetDriftErrorIntegral=0;
-	double PRUoffsetDriftErrorIntegralOld=0;
 	double PRUoffsetDriftErrorDerivative=0;
 	double PRUoffsetDriftErrorApplied=0;
 	double PRUoffsetDriftErrorAppliedRaw=0;
@@ -75,8 +74,7 @@ private:// Variables
 	double EstimateSynchDirectionArray[MaxNumPulses]={0.0};
 	// PID error correction
 	double SynchAdjconstant=1.0;// 
-	double PIDconstantAdvancing=1.0;// Too close to 1.0 makes it unstable and too much correction
-	double PIDconstantDelaying=PIDconstantAdvancing;// Too close to 1.0 makes it unstable and too much correction
+	double PIDconstant=1.0;
 	double PIDintegral=0.0;
 	double PIDderiv=0.0;	
 	// Time/synchronization management
@@ -156,6 +154,7 @@ private:// Variables
 	unsigned int valOverflowCycleCountPRUold=0; // 32 bits
 	//unsigned int valIEPtimerFinalCounts; // 32 bits
 	unsigned long long int extendedCounterPRU=0; // 64 bits
+	unsigned long long int extendedCounterPRUholder=0; // 64 bits
 	unsigned long long int extendedCounterPRUaux=0; // 64 bits
 	//unsigned char val; // 8 bits
 	unsigned char valBitsInterest=0; // 8 bits
@@ -186,7 +185,6 @@ private:// Variables
 	unsigned long long int SynchPulsesTagsUsed[MaxNumPulses]={0};
 	double PeriodCountsPulseAdj=(((1.0/(double)(PulseFreq))*1e9)/((double)(PRUclockStepPeriodNanoseconds)));
 	double AdjPulseSynchCoeff=1.0;
-	double OldLastAdjPulseSynchCoeff=1.0;
 	double AdjPulseSynchCoeffAverage=1.0;
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
 

@@ -389,7 +389,7 @@ int GPIO::PRUsignalTimerSynch(){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
-			cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
+			//cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
 			cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 			cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
 			cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
@@ -412,18 +412,7 @@ return 0; // All ok
 
 int GPIO::PIDcontrolerTime(){
 PRUoffsetDriftErrorDerivative=(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorLast);//*(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast));//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
-PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftErrorAvg;//*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
-
-double PIDconstant;
-if (PRUoffsetDriftErrorAvg<0.0){
-	PIDconstant=PIDconstantAdvancing;
-}
-else if(PRUoffsetDriftErrorAvg>0.0){
-	PIDconstant=PIDconstantDelaying;
-}
-else{
-	PIDconstant=0;
-}
+//PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftErrorAvg;//*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 
 this->PRUoffsetDriftErrorAppliedRaw=PIDconstant*PRUoffsetDriftErrorAvg;//+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative;//this->iIterPRUcurrentTimerValPass*(PIDconstant*PRUoffsetDriftErrorAvg+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative);	
 
@@ -444,8 +433,6 @@ while (this->ManualSemaphore);// Very critical to not produce measurement deviat
 this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
-this->PRUoffsetDriftErrorIntegralOld=this->PRUoffsetDriftErrorIntegral;///static_cast<double>(PRUclockStepPeriodNanoseconds);
-this->PRUoffsetDriftErrorIntegral=0.0;// Reset until next measurement
 this->ManualSemaphore=false;
 this->release();
 ///////////
@@ -634,14 +621,14 @@ auxUnskewingFactorResetCycle=auxUnskewingFactorResetCycle+static_cast<unsigned l
 valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valOverflowCycleCountPRU);// The last addition of static_cast<unsigned long long int>(valOverflowCycleCountPRU) is to compensate for a continuous drift
 
-// Reading first calibration tag - To be done. Better handled and saved together with SynchAvginto file for retrievel from multiple captures
-//TimeTaggsLast=static_cast<unsigned long long int>(static_cast<double>((extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder))-OldLastTimeTagg)*this->AdjPulseSynchCoeffAverage)+TimeTaggsLast;//+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
+// Reading first calibration tag and link it to the system clock
 OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
 auto duration_InitialTag=this->TimePointClockTagPRUinitial-this->TimePointClockPRUinitial;
-TimeTaggsLast=static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count())/static_cast<double>(PRUclockStepPeriodNanoseconds));//OldLastTimeTagg+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
+TimeTaggsLast=static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count())/static_cast<double>(PRUclockStepPeriodNanoseconds));
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
 //cout << "TimeTaggsLast: " << TimeTaggsLast << endl; 
 
+/* External synch pulses not used
 // Reading or not Synch pulses
 NumSynchPulses=static_cast<unsigned int>(*synchp);
 synchp++;
@@ -662,6 +649,7 @@ if (NumSynchPulses>0){// There are synch pulses
 		cout << "DDRdumpdata streamSynchpru is not open!" << endl;
 	}
 }
+*/
 
 // Reading TimeTaggs
 if (streamDDRpru.is_open()){
@@ -678,8 +666,13 @@ if (streamDDRpru.is_open()){
 		valp++;// 1 times 8 bits
 		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
 		// Mount the extended counter value
-		extendedCounterPRU=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
+		extendedCounterPRUholder=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
 		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
+		// Apply system clock corrections
+		extendedCounterPRU=static_cast<unsigned long long int>(static_cast<double>(extendedCounterPRUholder-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error		    
+		OldLastTimeTagg=extendedCounterPRUholder;
+		TimeTaggsLast=extendedCounterPRU;// For the next tagg		    
+		//////////////////////////////////////////////////////////////
 		// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
 		valBitsInterest=static_cast<unsigned char>(*valp);
 		valp++;// 1 times 8 bits
@@ -765,6 +758,7 @@ return 0; // all ok
 }
 
 int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags){
+/* External synch pulses not used - done with system clock calibration
 unsigned int ValueReadNumSynchPulses;
 int NumSynchPulseAvgAux=0;
 	// Synch taggs
@@ -852,7 +846,7 @@ int NumSynchPulseAvgAux=0;
 		cout << "RetrieveNumStoredQuBits: BBB streamSynchpru is not open!" << endl;
 	return -1;
 	}
-
+*/
 	// Detection tags
 	if (streamDDRpru.is_open()){
 		streamDDRpru.close();	
@@ -876,39 +870,7 @@ int NumSynchPulseAvgAux=0;
 		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 		int iIterMovAdjPulseSynchCoeff=0;
 		while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
-		    // Apply pulses time drift correction
-		    // using doubles, to represent usigned long long int can hold, with the 5ns PRU count, up to 2 years with presition!!!
-		    /////////////////////////////////////////////////////////////////////////////////
-		    // Synch pulses might be able to correct short term intra pulses, but not in between different sequences (inter pulses)
-		    // Advanced application of the AdjPulseSynchCoeff per ranges - need improved short acurracy		    
-		    /*
-		    if (NumSynchPulsesRed>1){// If using Synch pulses
-			    if (ValueReadTest<=SynchPulsesTagsUsed[iIterMovAdjPulseSynchCoeff]){
-			    	AdjPulseSynchCoeff=AdjPulseSynchCoeffArray[iIterMovAdjPulseSynchCoeff];}// Use the value of adjust synch
-			    else{// Increase
-			    	if (iIterMovAdjPulseSynchCoeff<(NumSynchPulseAvgAux-1)){
-			    	iIterMovAdjPulseSynchCoeff++;
-			    	}
-			    	AdjPulseSynchCoeff=AdjPulseSynchCoeffArray[iIterMovAdjPulseSynchCoeff];
-			    }
-		    }*/
-		    TimeTaggs[lineCount]=static_cast<unsigned long long int>(static_cast<double>(ValueReadTest-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error
-		    
-		    OldLastTimeTagg=ValueReadTest;
-		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
-		    TimeTaggsLast=TimeTaggs[lineCount];// For the next capturing
-		    /*
-		    if (lineCount==0){
-		    	TimeTaggs[0]=(unsigned long long int)((double)(ValueReadTest-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;		    	
-		    	} // Simply apply the average value of Synch pulses
-		    else{// Not the first tagg
-		    	TimeTaggs[lineCount]=(unsigned long long int)(((double)(ValueReadTest-OldLastTimeTagg))*AdjPulseSynchCoeff)+TimeTaggsLast;
-		    }
-		    
-		    OldLastTimeTagg=ValueReadTest;
-		    OldLastAdjPulseSynchCoeff=AdjPulseSynchCoeff;
-		    TimeTaggsLast=TimeTaggs[lineCount];// For the next capturing		    
-		    */
+		    TimeTaggs[lineCount]=static_cast<unsigned long long int>(ValueReadTest);		    
 		    ////////////////////////////////////////////////////////////////////////////////
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
