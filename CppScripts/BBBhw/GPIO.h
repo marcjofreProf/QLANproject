@@ -105,9 +105,9 @@ private:// Variables
 	TimePoint TimePointClockSendCommandFinal=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockSendCommandInitial=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
-	long long int duration_FinalInitialDriftAux=0;// For absolute drift purposes
-	double duration_FinalInitialDriftAuxArray[MaxNumPulses]={0.0};
-	double duration_FinalInitialDriftAuxArrayAvg=0.0;
+	int duration_FinalInitialDriftAux=0;// For absolute drift purposes
+	int duration_FinalInitialDriftAuxArray[MaxNumPulses]={0};// For absolute drift purposes
+	int duration_FinalInitialDriftAuxArrayAvg=0;// For absolute drift purposes
 	unsigned long long int TimeClockMarging=100000;// In nanoseconds
 	unsigned long long int TimeClockMargingExtra=10*TimeClockMarging;// In nanoseconds
 	unsigned long long int TimeElpasedNow_time_as_count=0;
@@ -258,8 +258,10 @@ private: // Functions/Methods
 	friend void* threadedToggle(void *value);
 	// Median filter
 	double DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor);
+	int IntMedianFilterSubArray(int* ArrayHolderAux,int MedianFilterFactor);
 	double DoubleMeanFilterSubArray(double* ArrayHolderAux,int MeanFilterFactor);
 	int DoubleBubbleSort(double* arr,int MedianFilterFactor);
+	int IntBubbleSort(int* arr,int MedianFilterFactor);
 };
 
 void* threadedPoll(void *value);

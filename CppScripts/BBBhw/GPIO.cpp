@@ -210,7 +210,7 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 //////////////////////////////////////////////
 struct timespec GPIO::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
-	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod);//-std::chrono::nanoseconds(duration_FinalInitialDriftAux);
+	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod)-std::chrono::nanoseconds(duration_FinalInitialDriftAuxArrayAvg);
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentSynchPRU1future.time_since_epoch();
 	// Convert duration to desired time
 	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()-this->TimeClockMarging; // Add an offset, since the final barrier is implemented with a busy wait
@@ -379,14 +379,13 @@ int GPIO::PRUsignalTimerSynch(){
 			this->TimePointClockSendCommandInitial=this->TimePointClockSendCommandInitial+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
 		}
 		// Absolute drift monitoring
-		//auto duration_FinalInitialDrift=this->TimePointClockSendCommandInitial-this->TimePointClockPRUinitial;
-		//duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->iIterPRUcurrentTimerVal+1)*this->TimePRU1synchPeriod);
-		//duration_FinalInitialDriftAuxArray[iIterPRUcurrentTimerVal%NumSynchMeasAvgAux]=static_cast<double>(duration_FinalInitialDriftAux)/static_cast<double>(PRUclockStepPeriodNanoseconds);
-		//duration_FinalInitialDriftAuxArrayAvg=DoubleMedianFilterSubArray(duration_FinalInitialDriftAuxArray,NumSynchMeasAvgAux);
-		//PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral-duration_FinalInitialDriftAuxArrayAvg;//*(1.0-this->EstimateSynchAvg);
+		auto duration_FinalInitialDrift=this->TimePointClockSendCommandInitial-this->TimePointClockPRUinitial;
+		duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->iIterPRUcurrentTimerVal+1)*this->TimePRU1synchPeriod);
+		duration_FinalInitialDriftAuxArray[iIterPRUcurrentTimerVal%NumSynchMeasAvgAux]=duration_FinalInitialDriftAux;
+		duration_FinalInitialDriftAuxArrayAvg=IntMedianFilterSubArray(duration_FinalInitialDriftAuxArray,NumSynchMeasAvgAux);
 		
 		// Information
-		if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
+		if ((this->iIterPRUcurrentTimerVal%(8*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
@@ -923,6 +922,39 @@ int NumSynchPulseAvgAux=0;
 	return -1;
 }
 
+}
+
+int GPIO::IntMedianFilterSubArray(int* ArrayHolderAux,int MedianFilterFactor){
+if (MedianFilterFactor<=1){
+	return ArrayHolderAux[0];
+}
+else{
+	// Step 1: Copy the array to a temporary array
+    int temp[MedianFilterFactor]={0};
+    for(int i = 0; i < MedianFilterFactor; i++) {
+        temp[i] = ArrayHolderAux[i];
+    }
+    
+    // Step 2: Sort the temporary array
+    this->IntBubbleSort(temp,MedianFilterFactor);
+    // If odd, middle number
+      return temp[MedianFilterFactor/2];
+}
+}
+
+// Function to implement Bubble Sort
+int GPIO::IntBubbleSort(int* arr,int MedianFilterFactor) {
+    for (int i = 0; i < MedianFilterFactor-1; i++) {
+        for (int j = 0; j < MedianFilterFactor-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                // Swap arr[j] and arr[j+1]
+                int temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+    return 0; // All ok
 }
 
 double GPIO::DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor){
