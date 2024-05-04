@@ -449,6 +449,7 @@ if (retInterruptsPRU0>0){
 else if (retInterruptsPRU0==0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "GPIO::ReadTimeStamps took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
+	cout << "We have lost ttg counts! Lost of tags accuracy! Reduce the number of tags per run, and if needed increse the runs number." << endl;
 }
 else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
