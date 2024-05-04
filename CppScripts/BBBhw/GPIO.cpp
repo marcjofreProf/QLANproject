@@ -697,8 +697,9 @@ if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterC
 else{this->AfterCountsThreshold=this->valThresholdResetCounts+5;};//0x00000000;// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
 this->FirstTimeDDRdumpdata=false;
 if (valCycleCountPRU > (0x80000000-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
-this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0x80000000);//static_cast<unsigned long long int>(valCycleCountPRU & 0x7FFFFFFF);
+//this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0x80000000);//static_cast<unsigned long long int>(valCycleCountPRU & 0x7FFFFFFF);
 cout << "Counted for valCarryOnCycleCountPRU" << endl;
+cout << "this->valCarryOnCycleCountPRU" << this->valCarryOnCycleCountPRU << endl;
 }
 
 //cout << "valCarryOnCycleCountPRU: " << valCarryOnCycleCountPRU << endl;
