@@ -635,8 +635,8 @@ valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valOverflowCycleCountPRU);// The last addition of static_cast<unsigned long long int>(valOverflowCycleCountPRU) is to compensate for a continuous drift
 
 // Reading first calibration tag - To be done. Better handled and saved together with SynchAvginto file for retrievel from multiple captures
-OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
-TimeTaggsLast=OldLastTimeTagg;//+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
+//OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
+//TimeTaggsLast=OldLastTimeTagg;//+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
 //cout << "TimeTaggsLast: " << TimeTaggsLast << endl; 
 
