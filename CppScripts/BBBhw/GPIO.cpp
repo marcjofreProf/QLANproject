@@ -381,7 +381,7 @@ int GPIO::PRUsignalTimerSynch(){
 		// Absolute drift monitoring
 		auto duration_FinalInitialDrift=this->TimePointClockSendCommandInitial-this->TimePointClockPRUinitial;
 		duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->iIterPRUcurrentTimerVal+1)*this->TimePRU1synchPeriod);
-		PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+static_cast<double>(duration_FinalInitialDriftAux);
+		PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+static_cast<double>(duration_FinalInitialDriftAux)/static_cast<double>(PRUclockStepPeriodNanoseconds);
 		// Information
 		if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
