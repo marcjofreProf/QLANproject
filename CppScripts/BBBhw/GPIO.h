@@ -152,6 +152,7 @@ private:// Variables
 	unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquition run
 	unsigned int valOverflowCycleCountPRU=0; // 32 bits
 	unsigned int valOverflowCycleCountPRUold=0; // 32 bits
+	int AboveThresoldCycleCountPRUCompValue=8;//VAlue adjusted experimentally when PRU clock goes aboe 0x80000000
 	//unsigned int valIEPtimerFinalCounts; // 32 bits
 	unsigned long long int extendedCounterPRU=0; // 64 bits
 	unsigned long long int extendedCounterPRUholder=0; // 64 bits
