@@ -381,7 +381,9 @@ int GPIO::PRUsignalTimerSynch(){
 		// Absolute drift monitoring
 		auto duration_FinalInitialDrift=this->TimePointClockSendCommandInitial-this->TimePointClockPRUinitial;
 		duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->iIterPRUcurrentTimerVal+1)*this->TimePRU1synchPeriod);
-		PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+static_cast<double>(duration_FinalInitialDriftAux)/static_cast<double>(PRUclockStepPeriodNanoseconds);
+		duration_FinalInitialDriftAuxArray[iIterPRUcurrentTimerVal%NumSynchMeasAvgAux]=static_cast<double>(duration_FinalInitialDriftAux)/static_cast<double>(PRUclockStepPeriodNanoseconds);
+		duration_FinalInitialDriftAuxArrayAvg=DoubleMedianFilterSubArray(duration_FinalInitialDriftAuxArray,NumSynchMeasAvgAux);
+		PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral-duration_FinalInitialDriftAuxArrayAvg;
 		// Information
 		if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
@@ -394,7 +396,7 @@ int GPIO::PRUsignalTimerSynch(){
 			if (this->EstimateSynchDirectionAvg>0.0){cout << "Clock EstimateSynch advancing" << endl;}
 			else if (this->EstimateSynchDirectionAvg<0.0){cout << "Clock EstimateSynch delaying" << endl;}
 			else{cout << "Clock EstimateSynch neutral" << endl;}
-			cout << "duration_FinalInitialDriftAux: " << duration_FinalInitialDriftAux << endl;
+			cout << "duration_FinalInitialDriftAuxArrayAvg: " << duration_FinalInitialDriftAuxArrayAvg << endl;
 			//cout << "this->iIterPRUcurrentTimerValPass: "<< this->iIterPRUcurrentTimerValPass << endl;
 			//cout << "this->iIterPRUcurrentTimerValSynch: "<< this->iIterPRUcurrentTimerValSynch << endl;
 		}		
