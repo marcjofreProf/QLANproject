@@ -210,7 +210,7 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 //////////////////////////////////////////////
 struct timespec GPIO::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
-	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod);//-std::chrono::nanoseconds(duration_FinalInitialDriftAux);
+	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod)-std::chrono::nanoseconds(duration_FinalInitialDriftAux);
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentSynchPRU1future.time_since_epoch();
 	// Convert duration to desired time
 	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()-this->TimeClockMarging; // Add an offset, since the final barrier is implemented with a busy wait
@@ -449,7 +449,7 @@ this->PRUoffsetDriftErrorIntegral=0.0;// Reset until next measurement
 this->ManualSemaphore=false;
 this->release();
 ///////////
-this->TimePointClockTagPRUinitial=Clock::now();
+this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
 prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
