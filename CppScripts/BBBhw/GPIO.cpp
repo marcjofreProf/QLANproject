@@ -697,14 +697,12 @@ else{
 	cout << "DDRdumpdata streamDDRpru is not open!" << endl;
 }
 
-// Store the last Clock counter carry over if it exceed 0xFFFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
-// The number below is an estimation since there are instructions that are not accounted for
-if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5+8;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
-else{this->AfterCountsThreshold=this->valThresholdResetCounts+5+8;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
+// Correct the last Clock counter carry over if it exceed 0x80000000; Because there is a multiplication of 8, and here we remove it reducing by 7 de excees
+if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
+else{this->AfterCountsThreshold=this->valThresholdResetCounts+5;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
 this->FirstTimeDDRdumpdata=false;
-if (valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
-this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0xFFFFFFFF);
-cout << "We have lost ttg counts! Lost of tags accuracy! Reduce the number of tags per run, and if needed increse the runs number." << endl;
+if (valCycleCountPRU > (0x80000000-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
+this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU-7*static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0x80000000);
 cout << "this->valCarryOnCycleCountPRU" << this->valCarryOnCycleCountPRU << endl;
 }
 

@@ -17,8 +17,8 @@ Header declaration file for Quantum physical Layer Agent
 // Payload messages
 #define NumBytesPayloadBuffer 1000
 //Qubits
-#define NumQubitsMemoryBuffer 1024//256 //2048 //4096 //8192 // In multiples of 2048. Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
-#define NumQuBitsPerRun 1024 // Really defined in GPIO.h. Max 2048
+#define NumQubitsMemoryBuffer 512//256 //2048 //4096 //8192 // In multiples of 2048. Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
+#define NumQuBitsPerRun 512 // Really defined in GPIO.h. Max 2048
 
 #include<string>
 #include<fstream>
