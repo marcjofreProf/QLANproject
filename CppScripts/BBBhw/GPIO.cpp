@@ -625,10 +625,8 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 // Reading first calibration tag and link it to the system clock
 OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
 auto duration_InitialTag=this->TimePointClockTagPRUinitial-this->TimePointClockPRUinitial;
-double duration_InitialTagAux=static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count());
-if (duration_InitialTagAux>0.0){// Protection to negative numbers
-	TimeTaggsLast=static_cast<unsigned long long int>(duration_InitialTagAux/static_cast<double>(PRUclockStepPeriodNanoseconds));
-}
+TimeTaggsLast=static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count())/static_cast<double>(PRUclockStepPeriodNanoseconds));
+
 //else{Use the latest used, so do not update
 //}
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
@@ -703,7 +701,7 @@ else{this->AfterCountsThreshold=this->valThresholdResetCounts+5;};// Related to 
 this->FirstTimeDDRdumpdata=false;
 if (valCycleCountPRU > (0x80000000-this->AfterCountsThreshold)){// The exceeded counts, remove them
 this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU-7*static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0x80000000);
-cout << "this->valCarryOnCycleCountPRU" << this->valCarryOnCycleCountPRU << endl;
+cout << "this->valCarryOnCycleCountPRU: " << this->valCarryOnCycleCountPRU << endl;
 }
 else if(valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
 this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0xFFFFFFFF);

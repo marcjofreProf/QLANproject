@@ -116,7 +116,7 @@ private:// Variables
 	static void *pru_int;       // Points to start of PRU memory.
 	//static int chunk;
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
-	unsigned long long int valCarryOnCycleCountPRU=0; // 64 bits
+	long long int valCarryOnCycleCountPRU=0; // 64 bits
 	// PRU timetagger
 	int retInterruptsPRU0;
 	int WaitTimeInterruptPRU0=2000000; // In microseconds. 2.5 seconds because the clock can go up to 5 seconds, but has an active range of 2.5 seconds, then discounting some clock misadjustments. 2.0s is safe.
