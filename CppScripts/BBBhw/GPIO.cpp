@@ -601,7 +601,7 @@ valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*va
 valpAux++;// 1 times 8 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<24;
 valpAux++;// 1 times 8 bits
-cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
+//cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
 //////////////////////////////////////////////////////////////////////////////*/
 
 // First 32 bits is the overflow register for DWT_CYCCNT
@@ -693,7 +693,7 @@ else{
 
 // Store the last Clock counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
 // The number below is an estimation since there are instructions that are not accounted for
-if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=25+5;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
+if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
 else{this->AfterCountsThreshold=this->valThresholdResetCounts+5;};//0x00000000;// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
 this->FirstTimeDDRdumpdata=false;
 if (valCycleCountPRU > (0x80000000-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
