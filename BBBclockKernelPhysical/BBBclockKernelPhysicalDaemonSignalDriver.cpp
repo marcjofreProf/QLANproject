@@ -150,6 +150,7 @@ CKPDSD::CKPDSD(){// Redeclaration of constructor GPIO when no argument is specif
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=ClockWatch::now();
 	//this->TimePointClockCurrentInitialAdj=ClockChrono::now();
+	this->TimePointClockPRUinitial=ClockWatch::now();// First time
 	this->SetFutureTimePoint();// Used with busy-wait
 	//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	cout << "Generating clock output..." << endl;
@@ -198,6 +199,11 @@ NumRefSigCounts=pru0dataMem_int[3]; // Information of how many counts
 pru1dataMem_int[1]=static_cast<unsigned int>(NumOnSigCounts);// Correcton ON counts
 pru1dataMem_int[2]=static_cast<unsigned int>(NumOffSigCounts);// Correction OFF counts
 prussdrv_pru_send_event(22); // Send interrupt to PRU1
+
+
+auto duration_FinalInitialDrift=this->TimePointClockCurrentInitialMeas-this->TimePointClockPRUinitial;
+duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
+this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 
 if (retInterruptsPRU0>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -296,7 +302,7 @@ return 0; // All ok
 
 struct timespec CKPDSD::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
-	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
+	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod)-std::chrono::nanoseconds(duration_FinalInitialDriftAux);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
 	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;//+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError))); //Update value
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentFinal.time_since_epoch();
 	// Convert duration to desired time
@@ -309,7 +315,7 @@ struct timespec CKPDSD::SetWhileWait(){
 }
 
 int CKPDSD::SetFutureTimePoint(){
-	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
+	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod)-std::chrono::nanoseconds(duration_FinalInitialDriftAux);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
 	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;//+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError))); //Update value
 	return 0; // All Ok
 }

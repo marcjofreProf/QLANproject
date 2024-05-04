@@ -151,6 +151,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	this->TimePointClockCurrentInitial=ClockWatch::now();
 	//this->TimePointClockCurrentInitialAdj=ClockChrono::now();
 	//this->SetFutureTimePoint();// Used with busy-wait
+	this->TimePointClockPRUinitial=ClockWatch::now();// First time
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	cout << "Generating clock output..." << endl;	
 }
@@ -192,6 +193,8 @@ else{
 	cout << "PRU1 interrupt poll error" << endl;
 }
 
+auto duration_FinalInitialDrift=this->TimePointClockCurrentInitialMeas-this->TimePointClockPRUinitial;
+duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
 this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 
 // Compute error
@@ -379,7 +382,7 @@ return 0; // All ok
 
 struct timespec CKPD::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
-	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
+	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod)-std::chrono::nanoseconds(duration_FinalInitialDriftAux);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
 	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;//+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError))); //Update value
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentFinal.time_since_epoch();
 	// Convert duration to desired time
@@ -392,7 +395,7 @@ struct timespec CKPD::SetWhileWait(){
 }
 
 int CKPD::SetFutureTimePoint(){
-	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
+	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod)-std::chrono::nanoseconds(duration_FinalInitialDriftAux);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
 	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;//+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError))); //Update value
 	return 0; // All Ok
 }

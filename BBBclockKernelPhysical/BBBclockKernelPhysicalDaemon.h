@@ -99,6 +99,8 @@ private:// Variables
 	TimePointWatch TimePointClockCurrentFinalMeas=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
 	//TimePointChrono TimePointClockCurrentInitialAdj=std::chrono::time_point<ClockChrono>(); // Initial updated value of the clock (updated in each iteration)
 	//TimePointChrono TimePointClockCurrentFinalAdj=std::chrono::time_point<ClockChrono>(); // Initial updated value of the clock (updated in each iteration)
+	TimePointWatch TimePointClockPRUinitial=std::chrono::time_point<ClockWatch>();// For absolute drift purposes
+	int duration_FinalInitialDriftAux=0;// For absolute drift purposes
 	// PRU clock handling			
 	int retInterruptsPRU0;
 	int WaitTimeInterruptPRU0=static_cast<int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds/2000); // In microseconds
