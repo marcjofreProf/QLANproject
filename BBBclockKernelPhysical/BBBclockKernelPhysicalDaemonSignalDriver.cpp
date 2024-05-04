@@ -302,7 +302,7 @@ return 0; // All ok
 
 struct timespec CKPDSD::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
-	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod)-std::chrono::nanoseconds(duration_FinalInitialDriftAux);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
+	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);//-std::chrono::nanoseconds(duration_FinalInitialDriftAux);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
 	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;//+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError))); //Update value
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentFinal.time_since_epoch();
 	// Convert duration to desired time
@@ -315,7 +315,7 @@ struct timespec CKPDSD::SetWhileWait(){
 }
 
 int CKPDSD::SetFutureTimePoint(){
-	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod)-std::chrono::nanoseconds(duration_FinalInitialDriftAux);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
+	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);//-std::chrono::nanoseconds(duration_FinalInitialDriftAux);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
 	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;//+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError))); //Update value
 	return 0; // All Ok
 }
