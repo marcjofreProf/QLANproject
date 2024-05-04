@@ -396,7 +396,7 @@ int GPIO::PRUsignalTimerSynch(){
 			if (this->EstimateSynchDirectionAvg>0.0){cout << "Clock EstimateSynch advancing" << endl;}
 			else if (this->EstimateSynchDirectionAvg<0.0){cout << "Clock EstimateSynch delaying" << endl;}
 			else{cout << "Clock EstimateSynch neutral" << endl;}
-			cout << "duration_FinalInitialDriftAuxArrayAvg: " << duration_FinalInitialDriftAuxArrayAvg << endl;
+			cout << "duration_FinalInitialDriftAux: " << duration_FinalInitialDriftAux << endl;
 			//cout << "this->iIterPRUcurrentTimerValPass: "<< this->iIterPRUcurrentTimerValPass << endl;
 			//cout << "this->iIterPRUcurrentTimerValSynch: "<< this->iIterPRUcurrentTimerValSynch << endl;
 		}		
@@ -412,7 +412,7 @@ return 0; // All ok
 
 int GPIO::PIDcontrolerTime(){
 PRUoffsetDriftErrorDerivative=(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorLast);//*(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast));//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
-PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftErrorAvg;//*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftError;//PRUoffsetDriftErrorAvg;//*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 
 double PIDconstant;
 if (PRUoffsetDriftErrorAvg<0.0){
