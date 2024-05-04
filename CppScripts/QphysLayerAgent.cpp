@@ -29,9 +29,7 @@ Agent script for Quantum Physical Layer
 #include <atomic>
 // time points
 #define WaitTimeToFutureTimePoint 399000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
-//Qubits
-#define NumQuBitsPerRun 2048 // Really defined in GPIO.h. Max 2048
-// Mathemtical calculations
+// Mathematical calculations
 #include <cmath>
 
 //using namespace exploringBB; // API to easily use GPIO in c++. No because it will confuse variables (like semaphore acquire)
