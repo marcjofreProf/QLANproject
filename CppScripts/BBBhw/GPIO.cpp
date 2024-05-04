@@ -396,7 +396,7 @@ int GPIO::PRUsignalTimerSynch(){
 			if (this->EstimateSynchDirectionAvg>0.0){cout << "Clock EstimateSynch advancing" << endl;}
 			else if (this->EstimateSynchDirectionAvg<0.0){cout << "Clock EstimateSynch delaying" << endl;}
 			else{cout << "Clock EstimateSynch neutral" << endl;}
-			cout << "duration_FinalInitialDriftAux: " << duration_FinalInitialDriftAux << endl;
+			//cout << "duration_FinalInitialDriftAux: " << duration_FinalInitialDriftAux << endl;
 			//cout << "this->iIterPRUcurrentTimerValPass: "<< this->iIterPRUcurrentTimerValPass << endl;
 			//cout << "this->iIterPRUcurrentTimerValSynch: "<< this->iIterPRUcurrentTimerValSynch << endl;
 		}		
@@ -449,7 +449,7 @@ this->PRUoffsetDriftErrorIntegral=0.0;// Reset until next measurement
 this->ManualSemaphore=false;
 this->release();
 ///////////
-
+this->TimePointClockTagPRUinitial=Clock::now();
 prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
@@ -637,7 +637,8 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 // Reading first calibration tag - To be done. Better handled and saved together with SynchAvginto file for retrievel from multiple captures
 //TimeTaggsLast=static_cast<unsigned long long int>(static_cast<double>((extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder))-OldLastTimeTagg)*this->AdjPulseSynchCoeffAverage)+TimeTaggsLast;//+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
 OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
-TimeTaggsLast=OldLastTimeTagg+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
+auto duration_InitialTag=this->TimePointClockTagPRUinitial-this->TimePointClockPRUinitial;
+TimeTaggsLast=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count();//OldLastTimeTagg+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
 //cout << "TimeTaggsLast: " << TimeTaggsLast << endl; 
 
