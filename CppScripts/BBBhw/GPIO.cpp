@@ -379,11 +379,12 @@ int GPIO::PRUsignalTimerSynch(){
 			this->TimePointClockSendCommandInitial=this->TimePointClockSendCommandInitial+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
 		}
 		// Absolute drift monitoring
-		auto duration_FinalInitialDrift=this->TimePointClockSendCommandInitial-this->TimePointClockPRUinitial;
-		duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->iIterPRUcurrentTimerVal+1)*this->TimePRU1synchPeriod);
-		duration_FinalInitialDriftAuxArray[iIterPRUcurrentTimerVal%NumSynchMeasAvgAux]=static_cast<double>(duration_FinalInitialDriftAux)/static_cast<double>(PRUclockStepPeriodNanoseconds);
-		duration_FinalInitialDriftAuxArrayAvg=DoubleMedianFilterSubArray(duration_FinalInitialDriftAuxArray,NumSynchMeasAvgAux);
-		PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral-duration_FinalInitialDriftAuxArrayAvg;//*(1.0-this->EstimateSynchAvg);
+		//auto duration_FinalInitialDrift=this->TimePointClockSendCommandInitial-this->TimePointClockPRUinitial;
+		//duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->iIterPRUcurrentTimerVal+1)*this->TimePRU1synchPeriod);
+		//duration_FinalInitialDriftAuxArray[iIterPRUcurrentTimerVal%NumSynchMeasAvgAux]=static_cast<double>(duration_FinalInitialDriftAux)/static_cast<double>(PRUclockStepPeriodNanoseconds);
+		//duration_FinalInitialDriftAuxArrayAvg=DoubleMedianFilterSubArray(duration_FinalInitialDriftAuxArray,NumSynchMeasAvgAux);
+		//PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral-duration_FinalInitialDriftAuxArrayAvg;//*(1.0-this->EstimateSynchAvg);
+		
 		// Information
 		if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
@@ -635,7 +636,7 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 
 // Reading first calibration tag - To be done. Better handled and saved together with SynchAvginto file for retrievel from multiple captures
 OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
-TimeTaggsLast=OldLastTimeTagg+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
+TimeTaggsLast=OldLastTimeTagg;//+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
 //cout << "TimeTaggsLast: " << TimeTaggsLast << endl; 
 
