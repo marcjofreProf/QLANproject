@@ -638,7 +638,7 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 //TimeTaggsLast=static_cast<unsigned long long int>(static_cast<double>((extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder))-OldLastTimeTagg)*this->AdjPulseSynchCoeffAverage)+TimeTaggsLast;//+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
 OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
 auto duration_InitialTag=this->TimePointClockTagPRUinitial-this->TimePointClockPRUinitial;
-TimeTaggsLast=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count();//OldLastTimeTagg+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
+TimeTaggsLast=static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count())/static_cast<double>(PRUclockStepPeriodNanoseconds));//OldLastTimeTagg+static_cast<unsigned long long int>(PRUoffsetDriftErrorIntegralOld);
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
 //cout << "TimeTaggsLast: " << TimeTaggsLast << endl; 
 
