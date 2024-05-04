@@ -383,7 +383,7 @@ int GPIO::PRUsignalTimerSynch(){
 		duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->iIterPRUcurrentTimerVal+1)*this->TimePRU1synchPeriod);
 		duration_FinalInitialDriftAuxArray[iIterPRUcurrentTimerVal%NumSynchMeasAvgAux]=static_cast<double>(duration_FinalInitialDriftAux)/static_cast<double>(PRUclockStepPeriodNanoseconds);
 		duration_FinalInitialDriftAuxArrayAvg=DoubleMedianFilterSubArray(duration_FinalInitialDriftAuxArray,NumSynchMeasAvgAux);
-		PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+duration_FinalInitialDriftAuxArrayAvg;//*(1.0-this->EstimateSynchAvg);
+		PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral-duration_FinalInitialDriftAuxArrayAvg;//*(1.0-this->EstimateSynchAvg);
 		// Information
 		if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
