@@ -624,7 +624,12 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 // Reading first calibration tag and link it to the system clock
 OldLastTimeTagg=extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
 auto duration_InitialTag=this->TimePointClockTagPRUinitial-this->TimePointClockPRUinitial;
-TimeTaggsLast=static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count())/static_cast<double>(PRUclockStepPeriodNanoseconds));
+double duration_InitialTagAux=static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count());
+if (duration_InitialTagAux>0.0){// Protection to negative numbers
+	TimeTaggsLast=static_cast<unsigned long long int>(duration_InitialTagAux/static_cast<double>(PRUclockStepPeriodNanoseconds));
+}
+//else{Use the latest used, so do not update
+//}
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
 //cout << "TimeTaggsLast: " << TimeTaggsLast << endl; 
 
@@ -691,14 +696,14 @@ else{
 	cout << "DDRdumpdata streamDDRpru is not open!" << endl;
 }
 
-// Store the last Clock counter carry over if it exceed 0x7FFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
+// Store the last Clock counter carry over if it exceed 0xFFFFFFFF; Maybe deterministically account a lower limit since there are operations that will make it pass
 // The number below is an estimation since there are instructions that are not accounted for
-if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
-else{this->AfterCountsThreshold=this->valThresholdResetCounts+5;};//0x00000000;// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
+if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5+8;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
+else{this->AfterCountsThreshold=this->valThresholdResetCounts+5+8;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
 this->FirstTimeDDRdumpdata=false;
-if (valCycleCountPRU > (0x80000000-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
-//this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0x80000000);//static_cast<unsigned long long int>(valCycleCountPRU & 0x7FFFFFFF);
-cout << "Counted for valCarryOnCycleCountPRU" << endl;
+if (valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
+this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0xFFFFFFFE);
+cout << "WE have lost ttg counts! Lost of tags precition" << endl;
 cout << "this->valCarryOnCycleCountPRU" << this->valCarryOnCycleCountPRU << endl;
 }
 
