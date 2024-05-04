@@ -210,7 +210,7 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 //////////////////////////////////////////////
 struct timespec GPIO::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
-	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod)-std::chrono::nanoseconds(duration_FinalInitialDriftAux);
+	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod);//-std::chrono::nanoseconds(duration_FinalInitialDriftAux);
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentSynchPRU1future.time_since_epoch();
 	// Convert duration to desired time
 	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()-this->TimeClockMarging; // Add an offset, since the final barrier is implemented with a busy wait
