@@ -145,8 +145,6 @@ CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 1 bytes. It is the command to start
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	// Re-start DWT_CYCNT
-	CLR	r2.t3
-	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
@@ -170,7 +168,6 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	AND	r6, r6, r16 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
 //	QBNE	SYNCHPULSES, r6.b1, 0 // For the time being commented since active synch pulses not used!!!
 	// If not a synch pulse, a detector timetag
-// Do not touch this part above. Somehow it works to have fast edge detections of both synch pulses and detections!!!
 CHECKDET:		
 	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0
 	// If the program reaches this point, at least one of the bits is high
