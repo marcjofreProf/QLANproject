@@ -104,6 +104,7 @@ private:// Variables
 	TimePoint TimePointClockSendCommandInitial=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint TimePointClockTagPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
+	TimePoint TimePointClockTagPRUinitialOld=std::chrono::time_point<Clock>();// For absolute drift purposes
 	int duration_FinalInitialDriftAux=0;// For absolute drift purposes
 	//int duration_FinalInitialDriftAuxArray[MaxNumPulses]={0};// For absolute drift purposes
 	//int duration_FinalInitialDriftAuxArrayAvg=0;// For absolute drift purposes
@@ -140,7 +141,7 @@ private:// Variables
 	//bool finPRU1;
 	// SHARED RAM to file dump
 	int iIterDump;
-	unsigned int NumRecords=256; //2048; //Number of records per run. Max 2048. It is also defined in PRUassTaggDetScript.p and QphysLayerAgent.cpp
+	unsigned int NumRecords=512; //2048; //Number of records per run. Max 2048. It is also defined in PRUassTaggDetScript.p and QphysLayerAgent.cpp
 	unsigned int NumSynchPulses=0;
 	unsigned char* valpHolder;
 	unsigned char* valpAuxHolder;
@@ -180,6 +181,7 @@ private:// Variables
 	// Testing with periodic histogram signal
 	unsigned long long int OldLastTimeTagg=0;
 	unsigned long long int TimeTaggsLast=0;
+	unsigned long long int TimeTaggsInit=0;
 	// Pulses compensation
 	int NumSynchPulsesRed=0;
 	unsigned long long int SynchPulsesTags[MaxNumPulses]={0};

@@ -119,7 +119,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	LOCAL_DDMinit(); // DDR (Double Data Rate): A class of memory technology used in DRAM where data is transferred on both the rising and falling edges of the clock signal, effectively doubling the data rate without increasing the clock frequency.
 	// Here we can update memory space assigned address
 	valpHolder=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM];
-	valpAuxHolder=valpHolder+4+5*NumRecords;
+	valpAuxHolder=valpHolder+4+5*NumRecords;// 5* since each deteciton also includes the channels, and plus 4 since the first tag is captured at the very beggining
 	CalpHolder=(unsigned int*)&pru0dataMem_int[2];// First tagg captured at the very beggining
 	synchpHolder=(unsigned int*)&pru0dataMem_int[3];// Starts at 12
 	
@@ -178,7 +178,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  prussdrv_pru_disable(PRU_Signal_NUM);
 	  prussdrv_pru_disable(PRU_Operation_NUM);  
 	  prussdrv_exit();*/
-	  ///////////////////////////////////////////////////////	  
+	  ///////////////////////////////////////////////////////
+	this->TimePointClockTagPRUinitialOld=Clock::now();// First time	  
 }
 
 int GPIO::InitAgentProcess(){
@@ -609,7 +610,7 @@ valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*va
 valpAux++;// 1 times 8 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<24;
 valpAux++;// 1 times 8 bits
-cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
+//cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
 //////////////////////////////////////////////////////////////////////////////
 /*
 // First 32 bits is the overflow register for DWT_CYCCNT
@@ -631,9 +632,10 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 */
 // Reading first calibration tag and link it to the system clock
 OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
-auto duration_InitialTag=this->TimePointClockTagPRUinitial-this->TimePointClockPRUinitial;
-TimeTaggsLast=static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count())/static_cast<double>(PRUclockStepPeriodNanoseconds));
-
+auto duration_InitialTag=this->TimePointClockTagPRUinitial-this->TimePointClockTagPRUinitialOld;
+this->TimePointClockTagPRUinitialOld=this->TimePointClockTagPRUinitial;// Update
+this->TimeTaggsLast=this->TimeTaggsInit+static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count())/static_cast<double>(PRUclockStepPeriodNanoseconds));
+this->TimeTaggsInit=this->TimeTaggsLast;// Update
 //else{Use the latest used, so do not update
 //}
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
@@ -707,9 +709,7 @@ if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterC
 else{this->AfterCountsThreshold=this->valThresholdResetCounts+5;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
 this->FirstTimeDDRdumpdata=false;
 if(valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
-this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0xFFFFFFFF);
 cout << "We have lost ttg counts! Lost of tags accuracy! Reduce the number of tags per run, and if needed increse the runs number." << endl;
-cout << "this->valCarryOnCycleCountPRU: " << this->valCarryOnCycleCountPRU << endl;
 }
 //else if (valCycleCountPRU > (0x80000000-this->AfterCountsThreshold)){// The exceeded counts, remove them
 //this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU-(AboveThresoldCycleCountPRUCompValue-1)*static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0x80000000);
