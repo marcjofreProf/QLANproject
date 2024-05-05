@@ -101,19 +101,19 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 		//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	}
 	
-	// Open file where temporally are stored synch	
-	streamSynchpru.open(string(PRUdataPATH1) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
-	if (!streamSynchpru.is_open()) {
-		streamSynchpru.open(string(PRUdataPATH2) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
-		if (!streamSynchpru.is_open()) {
-	        	cout << "Failed to open the streamSynchpru file." << endl;
-	        }
-        }
-        
-        if (streamSynchpru.is_open()){
-		streamSynchpru.close();	
-		//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	}
+	//// Open file where temporally are stored synch	
+	//streamSynchpru.open(string(PRUdataPATH1) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
+	//if (!streamSynchpru.is_open()) {
+	//	streamSynchpru.open(string(PRUdataPATH2) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
+	//	if (!streamSynchpru.is_open()) {
+	//        	cout << "Failed to open the streamSynchpru file." << endl;
+	//        }
+        //}
+        //
+        //if (streamSynchpru.is_open()){
+	//	streamSynchpru.close();	
+	//	//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	//}
 	
         // Initialize DDM
 	LOCAL_DDMinit(); // DDR (Double Data Rate): A class of memory technology used in DRAM where data is transferred on both the rising and falling edges of the clock signal, effectively doubling the data rate without increasing the clock frequency.
@@ -128,10 +128,15 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
 	pru0dataMem_int[0]=static_cast<unsigned int>(0); // set no command
-	pru0dataMem_int[1]=this->NumRecords; // set number captures
-	if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
-		if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
-			perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
+	pru0dataMem_int[1]=this->NumRecords; // set number captures, with overflow clock - Not used
+	//if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
+	//	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
+	//		perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
+	//	}
+	//}
+	if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScriptSimple.bin") == -1){
+		if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScriptSimple.bin") == -1){
+			perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScriptSimple.bin");
 		}
 	}
 	////prussdrv_pru_enable(PRU_Operation_NUM);
@@ -576,6 +581,150 @@ int GPIO::DDRdumpdata(){
 // Reading data from PRU shared and own RAMs
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=valpHolder; // Coincides with SHARED in PRUassTaggDetScript.p
+//valpAux=valpAuxHolder;
+//synchp=synchpHolder;
+//for each capture bursts, at the beggining is stored the overflow counter of 32 bits. From there, each capture consists of 32 bits of the DWT_CYCCNT register and 8 bits of the channels detected (40 bits per detection tag).
+// The shared memory space has 12KB=12×1024bytes=12×1024×8bits=98304bits.
+//Doing numbers, we can store up to 2456 captures. To be in the safe side, we can do 2048 captures
+
+/*
+///////////////////////////////////////////////////////////////////////////////////////
+// Checking control - Clock skew and threshold
+valSkewCounts=static_cast<unsigned int>(*valpAux);
+valpAux++;// 1 times 8 bits
+valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<8;
+valpAux++;// 1 times 8 bits
+valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<16;
+valpAux++;// 1 times 8 bits
+valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<24;
+valpAux++;// 1 times 8 bits
+//cout << "valSkewCounts: " << valSkewCounts << endl;
+
+valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
+valpAux++;// 1 times 8 bits
+valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<8;
+valpAux++;// 1 times 8 bits
+valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<16;
+valpAux++;// 1 times 8 bits
+valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<24;
+valpAux++;// 1 times 8 bits
+//cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
+//////////////////////////////////////////////////////////////////////////////
+
+// First 32 bits is the overflow register for DWT_CYCCNT
+valOverflowCycleCountPRU=static_cast<unsigned int>(*valp);
+valp++;// 1 times 8 bits
+valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*valp))<<8;
+valp++;// 1 times 8 bits
+valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
+valp++;// 1 times 8 bits
+valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
+valp++;// 1 times 8 bits
+valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts with a 1 offset
+//cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
+
+auxUnskewingFactorResetCycle=auxUnskewingFactorResetCycle+static_cast<unsigned long long int>(valSkewCounts)+static_cast<unsigned long long int>(valOverflowCycleCountPRU-valOverflowCycleCountPRUold)*AboveThresoldCycleCountPRUCompValue;//static_cast<unsigned long long int>(valOverflowCycleCountPRU-valOverflowCycleCountPRUold)*static_cast<unsigned long long int>(valSkewCounts); // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
+//cout << "valOverflowCycleCountPRU-valOverflowCycleCountPRUold: " << (valOverflowCycleCountPRU-valOverflowCycleCountPRUold) << endl;
+valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
+extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valOverflowCycleCountPRU);// The last addition of static_cast<unsigned long long int>(valOverflowCycleCountPRU) is to compensate for a continuous drift
+*/
+// Reading first calibration tag and link it to the system clock
+OldLastTimeTagg=0;//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
+auto duration_InitialTag=this->TimePointClockTagPRUinitial-this->TimePointClockPRUinitial;
+TimeTaggsLast=static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count())/static_cast<double>(PRUclockStepPeriodNanoseconds));
+
+//else{Use the latest used, so do not update
+//}
+//cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
+//cout << "TimeTaggsLast: " << TimeTaggsLast << endl; 
+
+//// External synch pulses not used
+//// Reading or not Synch pulses
+//NumSynchPulses=static_cast<unsigned int>(*synchp);
+//synchp++;
+////cout << "This slows down and unsynchronizes (comment) GPIO::NumSynchPulses: " << NumSynchPulses << endl;
+//if (NumSynchPulses>0){// There are synch pulses
+//	if (streamSynchpru.is_open()){
+//		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations		
+//		streamSynchpru.write(reinterpret_cast<const char*>(&NumSynchPulses), sizeof(NumSynchPulses));
+//		for (unsigned int iIterSynch=0;iIterSynch<NumSynchPulses;iIterSynch++){
+//			valCycleCountPRU=static_cast<unsigned int>(*synchp);
+//			synchp++;// 1 times 32 bits
+//			extendedCounterPRU=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);			
+//			streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+//			streamSynchpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
+//		}
+//	}
+//	else{
+//		cout << "DDRdumpdata streamSynchpru is not open!" << endl;
+//	}
+//}
+
+
+// Reading TimeTaggs
+if (streamDDRpru.is_open()){
+	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	for (iIterDump=0; iIterDump<NumRecords; iIterDump++){
+		// First 32 bits is the DWT_CYCCNT of the PRU
+		valCycleCountPRU=static_cast<unsigned int>(*valp);
+		valp++;// 1 times 8 bits
+		valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<8;
+		valp++;// 1 times 8 bits
+		valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
+		valp++;// 1 times 8 bits
+		valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
+		valp++;// 1 times 8 bits
+		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
+		// Mount the extended counter value
+		extendedCounterPRUholder=static_cast<unsigned long long int>(valCycleCountPRU);//extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
+		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
+		// Apply system clock corrections
+		extendedCounterPRU=static_cast<unsigned long long int>(static_cast<double>(extendedCounterPRUholder-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error		    
+		OldLastTimeTagg=extendedCounterPRUholder;
+		TimeTaggsLast=extendedCounterPRU;// For the next tagg		    
+		//////////////////////////////////////////////////////////////
+		// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
+		valBitsInterest=static_cast<unsigned char>(*valp);
+		valp++;// 1 times 8 bits
+		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "val: " << std::bitset<8>(val) << endl;}
+		//valBitsInterest=this->packBits(val); // we're just interested in 4 bits
+		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}	
+		//fprintf(outfile, "%d\n", val);
+		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		streamDDRpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
+		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		streamDDRpru.write(reinterpret_cast<const char*>(&valBitsInterest), sizeof(valBitsInterest));
+		//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
+	}
+}
+else{
+	cout << "DDRdumpdata streamDDRpru is not open!" << endl;
+}
+
+// Correct the last Clock counter carry over if it exceed 0x80000000; Because there is a multiplication of 8, and here we remove it reducing by 7 de excees
+//if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
+//else{this->AfterCountsThreshold=this->valThresholdResetCounts;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
+this->AfterCountsThreshold=24+5;
+this->FirstTimeDDRdumpdata=false;
+if(valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
+this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0xFFFFFFFF);
+cout << "We have lost ttg counts! Lost of tags accuracy! Reduce the number of tags per run, and if needed increse the runs number." << endl;
+cout << "this->valCarryOnCycleCountPRU: " << this->valCarryOnCycleCountPRU << endl;
+}
+//else if (valCycleCountPRU > (0x80000000-this->AfterCountsThreshold)){// The exceeded counts, remove them
+//this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU-(AboveThresoldCycleCountPRUCompValue-1)*static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0x80000000);
+////cout << "this->valCarryOnCycleCountPRU: " << this->valCarryOnCycleCountPRU << endl;
+//}
+
+//cout << "sharedMem_int: " << sharedMem_int << endl;
+
+return 0; // all ok
+}
+/* With timer overflow - results in spike errors
+int GPIO::DDRdumpdata(){
+// Reading data from PRU shared and own RAMs
+//DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
+valp=valpHolder; // Coincides with SHARED in PRUassTaggDetScript.p
 valpAux=valpAuxHolder;
 synchp=synchpHolder;
 //for each capture bursts, at the beggining is stored the overflow counter of 32 bits. From there, each capture consists of 32 bits of the DWT_CYCCNT register and 8 bits of the channels detected (40 bits per detection tag).
@@ -603,7 +752,7 @@ valpAux++;// 1 times 8 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<24;
 valpAux++;// 1 times 8 bits
 //cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
-//////////////////////////////////////////////////////////////////////////////*/
+//////////////////////////////////////////////////////////////////////////////
 
 // First 32 bits is the overflow register for DWT_CYCCNT
 valOverflowCycleCountPRU=static_cast<unsigned int>(*valp);
@@ -632,28 +781,28 @@ TimeTaggsLast=static_cast<unsigned long long int>(static_cast<double>(std::chron
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
 //cout << "TimeTaggsLast: " << TimeTaggsLast << endl; 
 
-/* External synch pulses not used
+// External synch pulses not used
 // Reading or not Synch pulses
-NumSynchPulses=static_cast<unsigned int>(*synchp);
-synchp++;
-//cout << "This slows down and unsynchronizes (comment) GPIO::NumSynchPulses: " << NumSynchPulses << endl;
-if (NumSynchPulses>0){// There are synch pulses
-	if (streamSynchpru.is_open()){
-		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations		
-		streamSynchpru.write(reinterpret_cast<const char*>(&NumSynchPulses), sizeof(NumSynchPulses));
-		for (unsigned int iIterSynch=0;iIterSynch<NumSynchPulses;iIterSynch++){
-			valCycleCountPRU=static_cast<unsigned int>(*synchp);
-			synchp++;// 1 times 32 bits
-			extendedCounterPRU=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);			
-			streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-			streamSynchpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
-		}
-	}
-	else{
-		cout << "DDRdumpdata streamSynchpru is not open!" << endl;
-	}
-}
-*/
+//NumSynchPulses=static_cast<unsigned int>(*synchp);
+//synchp++;
+////cout << "This slows down and unsynchronizes (comment) GPIO::NumSynchPulses: " << NumSynchPulses << endl;
+//if (NumSynchPulses>0){// There are synch pulses
+//	if (streamSynchpru.is_open()){
+//		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations		
+//		streamSynchpru.write(reinterpret_cast<const char*>(&NumSynchPulses), sizeof(NumSynchPulses));
+//		for (unsigned int iIterSynch=0;iIterSynch<NumSynchPulses;iIterSynch++){
+//			valCycleCountPRU=static_cast<unsigned int>(*synchp);
+//			synchp++;// 1 times 32 bits
+//			extendedCounterPRU=extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);			
+//			streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+//			streamSynchpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
+//		}
+//	}
+//	else{
+//		cout << "DDRdumpdata streamSynchpru is not open!" << endl;
+//	}
+//}
+
 
 // Reading TimeTaggs
 if (streamDDRpru.is_open()){
@@ -713,6 +862,7 @@ this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU-(AboveThresoldCycleC
 
 return 0; // all ok
 }
+*/
 
 // Function to pack bits 1, 2, 3, and 5 of an unsigned int into a single byte
 unsigned char GPIO::packBits(unsigned char value) {
@@ -744,22 +894,23 @@ if (!streamDDRpru.is_open()) {
 streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 streamDDRpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
 
-// Synch data
-if (streamSynchpru.is_open()){
-	streamSynchpru.close();	
-	//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-}
+//// Synch data
+//if (streamSynchpru.is_open()){
+//	streamSynchpru.close();	
+//	//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+//}
+//
+//streamSynchpru.open(string(PRUdataPATH1) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
+//if (!streamSynchpru.is_open()) {
+//	streamSynchpru.open(string(PRUdataPATH2) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
+//	if (!streamSynchpru.is_open()) {
+//        	cout << "Failed to re-open the streamSynchpru file." << endl;
+//        	return -1;
+//        }
+//}
+//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+//streamSynchpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
 
-streamSynchpru.open(string(PRUdataPATH1) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
-if (!streamSynchpru.is_open()) {
-	streamSynchpru.open(string(PRUdataPATH2) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
-	if (!streamSynchpru.is_open()) {
-        	cout << "Failed to re-open the streamSynchpru file." << endl;
-        	return -1;
-        }
-}
-streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-streamSynchpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
 return 0; // all ok
 }
 
@@ -1341,7 +1492,7 @@ GPIO::~GPIO() {
 	//	cout << "GPIO destructor: munmap failed" << endl;
 	//}
 	streamDDRpru.close();
-	streamSynchpru.close();
+	//streamSynchpru.close(); //Not used
 }
 
 } /* namespace exploringBB */
