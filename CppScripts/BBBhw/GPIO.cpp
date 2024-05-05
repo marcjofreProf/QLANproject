@@ -581,7 +581,7 @@ int GPIO::DDRdumpdata(){
 // Reading data from PRU shared and own RAMs
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=valpHolder; // Coincides with SHARED in PRUassTaggDetScript.p
-//valpAux=valpAuxHolder;
+valpAux=valpAuxHolder;
 //synchp=synchpHolder;
 //for each capture bursts, at the beggining is stored the overflow counter of 32 bits. From there, each capture consists of 32 bits of the DWT_CYCCNT register and 8 bits of the channels detected (40 bits per detection tag).
 // The shared memory space has 12KB=12×1024bytes=12×1024×8bits=98304bits.
