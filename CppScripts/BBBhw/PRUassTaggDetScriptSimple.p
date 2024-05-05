@@ -148,31 +148,6 @@ INITIATIONS:// This is only run once
 	// Keep close together the clearing of the counters (keep order)
 	SBBO	r7, r13, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts	
 //	SBCO	r10, CONST_IETREG, 0xC, 4 // Clear IEP timer count	
-
-//NORMSTEPS: // So that always takes the same amount of counts for reset
-//	QBA     CHECK_CYCLECNT
-RESET_CYCLECNT:// This instruction block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew
-	LBBO	r0, r13, 0, 4//read DWT_CYCNT // LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT
-	//SBCO	r10, CONST_IETREG, 0xC, 4 // Reset IEP counter to 0xFFFFFFFF. Account that we lose 12 cycle counts
-//	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
-//	CLR	r2.t3
-//	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
-	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
-	//LBBO	r2, r12, 0, 1 // r2 maps b0 control register
-//	SET	r2.t3 // done the first time and r2 is not touched. Hence it can be commented to increas speed.
-	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT. Just to make it robust
-//	LBBO	r8, r13, 0, 4//read DWT_CYCNT // LBCO	r8, CONST_IETREG, 0xC, 4 // read IEP counter //LBBO	r8, r13, 0, 4 // read DWT_CYCNT	
-	SUB	r0, r0, r5
-	ADD	r8, r8, r0 // Will read 5, 10 or 12 typically (in the cpp we have to add 4 for the reset instruction) to not lost counts
-	// Non critical but necessary instructions once IEP counter and DWT_CYCCNT have been reset				
-	ADD	r3, r3, 1    // Increment overflow counter. Account that we lose 1 cycle count
-//START1:
-//	SET r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-	
-// Assuming CYCLECNT is mapped or accessible directly in PRU assembly, and there's a way to reset it, which might involve writing to a control register
-CHECK_CYCLECNT: // This instruciton block has to contain the minimum number of lines and the most simple possible, to better approximate the DWT_CYCCNT clock skew	
-	LBBO	r5, r13, 0, 4//LBBO	r5.b0, r13, 3, 1 // Read DWT_CYCCNT counter // LBCO	r5.b0, CONST_IETREG, 0xF, 1 // Read IEP counter	// from here, if a reset of count we will lose some counts. We read byte b3 of counter		
-	QBLE	RESET_CYCLECNT, r5.b3, MAX_VALUE_BEFORE_RESETmostsigByte // If MAX_VALUE_BEFORE_RESETmostsigByte <= r5.b3, go to RESET_CYCLECNT. Account that we lose 1 cycle counts
 CMDLOOP:
 	QBBC	CMDLOOP, r31, 30	// Reception or not of the host interrupt
 	//QBEQ	CHECK_CYCLECNT, r0.b0, 1 // loop until we get an instruction
@@ -186,6 +161,9 @@ CMDLOOP2:// Double verification of host sending start command
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
+	// Store a calibration timetagg
+	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
+	SBCO	r5, CONST_PRUDRAM, 8, 4// Calibration time tag (together with the acumulated synchronization error)
 	//
 	LBCO	r4, CONST_PRUDRAM, 4, 4 // Load to r4 the content of CONST_PRUDRAM with offset 4, and 4 bytes. It is the number of RECORDS
 	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start 
@@ -195,8 +173,8 @@ CMDLOOP2:// Double verification of host sending start command
 REGISTERCNT:
 	SBCO 	r7, CONST_PRUDRAM, 12, 4 // writes values of r19. to clear the number of synch pulses communicate din PRU RAM
 	// Here include once the overflow register
-	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address offset at r1
-	ADD 	r1, r1, 4 // increment address by 4 bytes
+//	SBCO 	r3, CONST_PRUSHAREDRAM, r1, 4 // Put contents of overflow DWT_CYCCNT into the address offset at r1
+//	ADD 	r1, r1, 4 // increment address by 4 bytes
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register
 	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
