@@ -696,8 +696,8 @@ else{
 }
 
 // Correct the last Clock counter carry over if it exceed 0x80000000; Because there is a multiplication of 8, and here we remove it reducing by 7 de excees
-if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+18;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
-else{this->AfterCountsThreshold=this->valThresholdResetCounts+18;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
+if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+1024;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
+else{this->AfterCountsThreshold=this->valThresholdResetCounts+1024;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
 this->FirstTimeDDRdumpdata=false;
 if(valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
 this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0xFFFFFFFF);
