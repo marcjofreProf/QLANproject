@@ -599,7 +599,8 @@ valpAux++;// 1 times 8 bits
 valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<24;
 valpAux++;// 1 times 8 bits
 //cout << "valSkewCounts: " << valSkewCounts << endl;
-
+/////////////////////////////////////////////////////////////////////////////////////
+*/
 valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
 valpAux++;// 1 times 8 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<8;
@@ -608,9 +609,9 @@ valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*va
 valpAux++;// 1 times 8 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<24;
 valpAux++;// 1 times 8 bits
-//cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
+cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
 //////////////////////////////////////////////////////////////////////////////
-
+/*
 // First 32 bits is the overflow register for DWT_CYCCNT
 valOverflowCycleCountPRU=static_cast<unsigned int>(*valp);
 valp++;// 1 times 8 bits
@@ -629,7 +630,7 @@ valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valOverflowCycleCountPRU);// The last addition of static_cast<unsigned long long int>(valOverflowCycleCountPRU) is to compensate for a continuous drift
 */
 // Reading first calibration tag and link it to the system clock
-OldLastTimeTagg=0;//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
+OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
 auto duration_InitialTag=this->TimePointClockTagPRUinitial-this->TimePointClockPRUinitial;
 TimeTaggsLast=static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count())/static_cast<double>(PRUclockStepPeriodNanoseconds));
 
@@ -701,10 +702,9 @@ else{
 	cout << "DDRdumpdata streamDDRpru is not open!" << endl;
 }
 
-// Correct the last Clock counter carry over if it exceed 0x80000000; Because there is a multiplication of 8, and here we remove it reducing by 7 de excees
-//if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
-//else{this->AfterCountsThreshold=this->valThresholdResetCounts;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
-this->AfterCountsThreshold=24+5;
+// Notify lost of track of counts due to timer overflow
+if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
+else{this->AfterCountsThreshold=this->valThresholdResetCounts+5;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
 this->FirstTimeDDRdumpdata=false;
 if(valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
 this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0xFFFFFFFF);
