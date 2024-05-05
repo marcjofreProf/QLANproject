@@ -41,7 +41,7 @@
 // r7 reserved for 0 value (zeroing registers)
 // r8 reserved for cycle count final threshold reset
 
-// r11 reserved for initial count offset value
+
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
 // r12 reserved for 0x22000 Control register
@@ -109,7 +109,6 @@ INITIATIONS:// This is only run once
 	LDI	r7, 0 // Register for clearing other registers
 	// Initiate to zero for counters of skew and offset
 	LDI	r8, 0
-	LDI	r11, 0
 	MOV	r14, 0xFFFFFFFF
 	
 	// Initial Re-initialization of DWT_CYCCNT
@@ -136,9 +135,6 @@ INITIATIONS:// This is only run once
 //	// Deactivate IEP compensation
 //	SBCO 	r7, CONST_IETREG, 0x08, 4
 	
-	// Keep close together the clearing of the counters (keep order)
-	SBBO	r7, r13, 0, 4 // Clear DWT_CYCNT. Account that we lose 2 cycle counts	
-//	SBCO	r10, CONST_IETREG, 0xC, 4 // Clear IEP timer count	
 CMDLOOP:
 	QBBC	CMDLOOP, r31, 30	// Reception or not of the host interrupt
 	//QBEQ	CHECK_CYCLECNT, r0.b0, 1 // loop until we get an instruction
@@ -149,6 +145,8 @@ CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 1 bytes. It is the command to start
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	// Re-start DWT_CYCNT
+	CLR	r2.t3
+	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
@@ -185,8 +183,7 @@ TIMETAG:
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
 FINISH:
-	// Faster Concatenated Checks writting
-	MOV	r11, r5 //LBBO	r11, r13, 0, 4// Read the last value of DWT_CYCNT	
+	// Faster Concatenated Checks writting	
 	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 4 // writes values of r8
 //	SBCO 	r19, CONST_PRUDRAM, 12, 4 // writes values of r19
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
@@ -200,7 +197,7 @@ FINISH:
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF	
 	LBBO	r14, r13, 0, 4//LBCO	r9, CONST_IETREG, 0xC, 4 // read IEP	 // LBBO	r9, r13, 0, 4 // read DWT_CYCNT
-	SUB	r8, r14, r11	
+	SUB	r8, r14, r5 // Use the last value of DWT_CYCNT
 	JMP 	CMDLOOP // finished, wait for next command. So it continuosly loops	
 EXIT:
 	// Send notification (interrupt) to Host for program completion
