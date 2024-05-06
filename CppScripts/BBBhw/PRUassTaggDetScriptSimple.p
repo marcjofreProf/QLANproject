@@ -142,7 +142,7 @@ CMDLOOP:
 	//SBCO 	r7.b0, CONST_PRUDRAM, 4, 1 // Put contents of r7 into CONST_PRUDRAM	
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 1 bytes. It is the command to start
-	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
+	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
 	// Re-start DWT_CYCNT
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	SET	r2.t3
