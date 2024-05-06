@@ -97,7 +97,7 @@ private:// Variables
 	};
 	using Clock = my_clock;//Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
 	using TimePoint = std::chrono::time_point<Clock>;
-	unsigned long long int TimePRU1synchPeriod=500000000;// In nanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts.
+	unsigned long long int TimePRU1synchPeriod=500000000;// In nanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockSendCommandFinal=std::chrono::time_point<Clock>();// For synch purposes
@@ -153,7 +153,7 @@ private:// Variables
 	unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquition run
 	unsigned int valOverflowCycleCountPRU=0; // 32 bits
 	unsigned int valOverflowCycleCountPRUold=0; // 32 bits
-	int AboveThresoldCycleCountPRUCompValue=8;//VAlue adjusted experimentally when PRU clock goes aboe 0x80000000
+	int AboveThresoldCycleCountPRUCompValue=8;//Value adjusted experimentally when PRU clock goes aboe 0x80000000. Not used
 	//unsigned int valIEPtimerFinalCounts; // 32 bits
 	unsigned long long int extendedCounterPRU=0; // 64 bits
 	unsigned long long int extendedCounterPRUholder=0; // 64 bits
