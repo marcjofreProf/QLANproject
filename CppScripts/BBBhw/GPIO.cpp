@@ -729,8 +729,8 @@ else{this->AfterCountsThreshold=this->valThresholdResetCounts+5;};// Related to 
 this->FirstTimeDDRdumpdata=false;
 if(valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
 cout << "We have lost ttg counts! Lost of tags accuracy! Reduce the number of tags per run, and if needed increase the runs number." << endl;
-cout "AfterCountsThreshold: " << AfterCountsThreshold << endl;
-cout "valCycleCountPRU: " << valCycleCountPRU << endl;
+cout << "AfterCountsThreshold: " << AfterCountsThreshold << endl;
+cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
 }
 //else if (valCycleCountPRU > (0x80000000-this->AfterCountsThreshold)){// The exceeded counts, remove them
 //this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU-(AboveThresoldCycleCountPRUCompValue-1)*static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0x80000000);

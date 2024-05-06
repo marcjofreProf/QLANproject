@@ -191,8 +191,8 @@ FINISH:
 	//// For checking control, place as the last value the current estimated skew counts and threshold reset counts	
 	// we're done. Signal to the application
 	MOV	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
-	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
-	//LED_OFF	
+	LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
+	LED_OFF	
 	LBBO	r14, r13, 0, 4//LBCO	r9, CONST_IETREG, 0xC, 4 // read IEP	 // LBBO	r9, r13, 0, 4 // read DWT_CYCNT
 	SUB	r8, r14, r5 // Use the last value of DWT_CYCNT
 	JMP 	CMDLOOP // finished, wait for next command. So it continuosly loops	
