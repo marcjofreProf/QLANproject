@@ -152,8 +152,6 @@ CMDLOOP2:// Double verification of host sending start command
 	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start 	
 	/// Relative synch count down
 //	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
-	JMP 	CMDLOOP
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register
 	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
@@ -165,6 +163,8 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	AND	r6.b0, r6.b0, r16.b0 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
 //	QBNE	SYNCHPULSES, r6.b1, 0 // For the time being commented since active synch pulses not used!!!
 	// If not a synch pulse, a detector timetag
+	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
+	JMP 	CMDLOOP
 CHECKDET:		
 	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0
 	// If the program reaches this point, at least one of the bits is high
