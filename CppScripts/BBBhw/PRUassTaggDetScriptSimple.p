@@ -139,10 +139,7 @@ CMDLOOP:
 	SBCO	r7.b0, C0, 0x24, 1 // Reset host interrupt	
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 1 bytes. It is the command to start
-	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
-	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
-	JMP 	CMDLOOP
-	
+	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction	
 	// Re-start DWT_CYCNT
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	SET	r2.t3
@@ -155,6 +152,8 @@ CMDLOOP2:// Double verification of host sending start command
 	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start 	
 	/// Relative synch count down
 //	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
+	JMP 	CMDLOOP
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register
 	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
