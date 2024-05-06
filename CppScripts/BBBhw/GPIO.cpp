@@ -185,15 +185,14 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread
 	this->TimePointClockTagPRUinitialOld=Clock::now();// First time
 	//////////////////////////////////////////////////////////
-	// Launch periodic synchronization of the IEP timer - like slotted time synchronization protocol
-	 if (this->ResetPeriodicallyTimerPRU1){
- 	this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);
- 	this->threadRefSynch.join();//this->threadRefSynch.detach();// If detach, then at the end comment the join.
- 	}
 }
 
 int GPIO::InitAgentProcess(){
-	
+	// Launch periodic synchronization of the IEP timer - like slotted time synchronization protocol
+	 if (this->ResetPeriodicallyTimerPRU1){
+ 	this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);
+ 	//this->threadRefSynch.detach();// If detach, then at the end comment the join. Otherwise, uncomment the join().
+ 	}
 	return 0; //All OK
 }
 /////////////////////////////////////////////////////////
