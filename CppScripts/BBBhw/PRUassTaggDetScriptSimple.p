@@ -1,4 +1,4 @@
-// PRUassTaggDetScript.p
+// PRUassTaggDetScriptSimple.p
 // Time Tagging functionality on PRU0 with Shared Memory Access (not Direct Memory Access nor DDR)
 // It is pending studying if it is worth making use of DMA or DDR in terms of larger memory space or transfer speed
 
@@ -11,7 +11,6 @@
 
 // Length of acquisition:
 #define RECORDS 2048 // readings and it matches in the host c++ script
-#define MAX_VALUE_BEFORE_RESETmostsigByte 0x80 // 128 in decimal
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
@@ -160,12 +159,12 @@ CMDLOOP2:// Double verification of host sending start command
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register
 	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
-	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection
-	NOT	r16, r16 // 0s converted to 1s. This step can be placed here to increase chances of detection. Limits the pulse rate to 50 MHz.
-	MOV	r6.w0, r31.w0 // Consecutive red for edge detection
-	QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 // Do not lose time with the below if there are no detections
+	MOV 	r16.b0, r31.b0 // This wants to be zeros for edge detection
+	NOT	r16.b0, r16.b0 // 0s converted to 1s. This step can be placed here to increase chances of detection. Limits the pulse rate to 50 MHz.
+	MOV	r6.b0, r31.b0 // Consecutive red for edge detection
+	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0 // Do not lose time with the below if there are no detections
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
-	AND	r6, r6, r16 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
+	AND	r6.b0, r6.b0, r16.b0 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
 //	QBNE	SYNCHPULSES, r6.b1, 0 // For the time being commented since active synch pulses not used!!!
 	// If not a synch pulse, a detector timetag
 CHECKDET:		

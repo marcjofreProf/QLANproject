@@ -130,7 +130,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
 	pru0dataMem_int[0]=static_cast<unsigned int>(0); // set no command
-	pru0dataMem_int[1]=this->NumRecords; // set number captures, with overflow clock - Not used
+	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures, with overflow clock - Not used
 	//if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
 	//	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
 	//		perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
@@ -447,7 +447,7 @@ return 0; // All ok
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
-pru0dataMem_int[1]=this->NumRecords; // set number captures
+pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures
 pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 
 /////////////
