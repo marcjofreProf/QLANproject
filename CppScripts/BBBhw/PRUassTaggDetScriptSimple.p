@@ -139,12 +139,14 @@ CMDLOOP:
 	//QBEQ	CHECK_CYCLECNT, r0.b0, 1 // loop until we get an instruction
 	// ok, we have an instruction. Assume it means 'begin capture'
 	// We remove the command from the host (in case there is a reset from host, we are saved)
-	//SBCO 	r7.b0, CONST_PRUDRAM, 4, 1 // Put contents of r7 into CONST_PRUDRAM	
+	//SBCO 	r7.b0, CONST_PRUDRAM, 4, 1 // Put contents of r7 into CONST_PRUDRAM
+	SBCO	r7.b0, C0, 0x24, 1 // Reset host interrupt	
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 1 bytes. It is the command to start
-	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
+	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	// Re-start DWT_CYCNT
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
+	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
 	// Store a calibration timetagg
@@ -152,8 +154,7 @@ CMDLOOP2:// Double verification of host sending start command
 	SBCO	r5, CONST_PRUDRAM, 8, 4// Calibration time tag (together with the acumulated synchronization error)
 	//
 	LBCO	r4, CONST_PRUDRAM, 4, 4 // Load to r4 the content of CONST_PRUDRAM with offset 4, and 4 bytes. It is the number of RECORDS
-	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start 
-	SBCO	r7.b0, C0, 0x24, 1 // Reset host interrupt
+	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start 	
 	/// Relative synch count down
 //	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
