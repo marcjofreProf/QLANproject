@@ -446,8 +446,8 @@ return 0; // All ok
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
-pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 pru0dataMem_int[1]=this->NumRecords; // set number captures
+pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 
 /////////////
 //while (this->ManualSemaphore);// Very critical to not produce measurement deviations when assessing the periodic snchronization

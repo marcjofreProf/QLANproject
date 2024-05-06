@@ -120,7 +120,7 @@ private:// Variables
 	long long int valCarryOnCycleCountPRU=0; // 64 bits
 	// PRU timetagger
 	int retInterruptsPRU0;
-	int WaitTimeInterruptPRU0=5000000; //5000000 with Simple TTG. 2000000: With overflow counter - In microseconds. 2.5 seconds because the clock can go up to 5 seconds, but has an active range of 2.5 seconds, then discounting some clock misadjustments. 2.0s is safe.
+	int WaitTimeInterruptPRU0=10000000; //5000000 with Simple TTG. 2000000: With overflow counter - In microseconds. 2.5 seconds because the clock can go up to 5 seconds, but has an active range of 2.5 seconds, then discounting some clock misadjustments. 2.0s is safe.
 	//int WaitTimeToFutureTimePointPRU0=1000; // The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s.
 	//TimePoint TimePointClockNowPRU0;
 	//unsigned long long int TimeNow_time_as_countPRU0;	
