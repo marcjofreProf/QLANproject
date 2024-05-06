@@ -188,10 +188,10 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 
 int GPIO::InitAgentProcess(){
 	// Launch periodic synchronization of the IEP timer - like slotted time synchronization protocol
-	 if (this->ResetPeriodicallyTimerPRU1){
-	 	this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);
-	 	this->threadRefSynch.detach();// If detach, then at the end comment the join.
-	 	}
+	// if (this->ResetPeriodicallyTimerPRU1){
+	// 	this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);
+	// 	this->threadRefSynch.detach();// If detach, then at the end comment the join.
+	// 	}
 	return 0; //All OK
 }
 /////////////////////////////////////////////////////////
@@ -458,7 +458,7 @@ this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 this->release();
 ///////////
 this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
-prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
+prussdrv_pru_send_event(21);
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 
