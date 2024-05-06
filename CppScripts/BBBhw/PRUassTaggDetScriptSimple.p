@@ -158,10 +158,10 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	MOV 	r16.b0, r31.b0 // This wants to be zeros for edge detection
 	NOT	r16.b0, r16.b0 // 0s converted to 1s. This step can be placed here to increase chances of detection. Limits the pulse rate to 50 MHz.
 	MOV	r6.b0, r31.b0 // Consecutive red for edge detection
-//	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0 // Do not lose time with the below if there are no detections
+	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0 // Do not lose time with the below if there are no detections
 	AND	r6.b0, r6.b0, r16.b0 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
 CHECKDET:		
-//	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0
+	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0
 	// If the program reaches this point, at least one of the bits is high
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
 TIMETAG:
@@ -174,14 +174,8 @@ TIMETAG:
 FINISH:
 	// Faster Concatenated Checks writting	
 	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 4 // writes values of r8
-//	SBCO 	r19, CONST_PRUDRAM, 12, 4 // writes values of r19
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
-//	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
-//	LDI	r18, 16 // Initialize 16 bytes above for PRU RAM
-//	LDI	r19, 0 // Reset number of synch pulses register
-	//// For checking control, place as the last value the current estimated skew counts and threshold reset counts	
-	// we're done. Signal to the application
 	MOV	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF	
