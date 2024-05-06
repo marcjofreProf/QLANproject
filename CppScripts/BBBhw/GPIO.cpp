@@ -145,7 +145,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	// Generate signals
 	pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-	pru1dataMem_int[1]=static_cast<unsigned int>(0); // set no command
+	//pru1dataMem_int[1]=static_cast<unsigned int>(0); // set no command
+	pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
 	// Load and execute the PRU program on the PRU1
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
 		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
@@ -253,23 +254,11 @@ int GPIO::PRUsignalTimerSynch(){
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization						
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html												
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
-				this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement
+				//this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. Introduces jitter and does not provide info
 				// Important, the following line at the very beggining to reduce the command jitter
-				//pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
-				if (this->PRUoffsetDriftErrorApplied>0.0){// and this->iIterPRUcurrentTimerValPass==1){
-					pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 3, to execute synch functions addition correction
-				}				
-				else if (this->PRUoffsetDriftErrorApplied<0.0){// and this->iIterPRUcurrentTimerValPass==1){
-					pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
-				}
-				else{// if (this->PRUoffsetDriftErrorApplied==0 or this->iIterPRUcurrentTimerValPass>1){
-					//this->PRUoffsetDriftErrorApplied=0;
-					//this->PRUoffsetDriftErrorAppliedRaw=0;
-					//pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
-					pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
-				}
+				
 				prussdrv_pru_send_event(22);
-				this->TimePointClockSendCommandFinal=Clock::now(); // Initial measurement
+				//this->TimePointClockSendCommandFinal=Clock::now(); // Initial measurement. Not useful information
 				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
 				//cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 				if (retInterruptsPRU1>0){
@@ -284,13 +273,13 @@ int GPIO::PRUsignalTimerSynch(){
 					cout << "PRU1 interrupt error" << endl;
 				}
 				
-				auto duration_FinalInitial=this->TimePointClockSendCommandFinal-this->TimePointClockSendCommandInitial;
-				double duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
+				//auto duration_FinalInitial=this->TimePointClockSendCommandFinal-this->TimePointClockSendCommandInitial;
+				//double duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
 				
 				//pru1dataMem_int[2]// Current IEP timer sample
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[2]);
-				this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
+				//this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
 				// Unwrap
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
@@ -366,6 +355,20 @@ int GPIO::PRUsignalTimerSynch(){
 				//	this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
 				//	this->iIterPRUcurrentTimerValPass=1;
 				//}
+				// Apply corrections here to reduce jitter
+				//pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
+				if (this->PRUoffsetDriftErrorApplied>0.0){// and this->iIterPRUcurrentTimerValPass==1){
+					pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 3, to execute synch functions addition correction
+				}				
+				else if (this->PRUoffsetDriftErrorApplied<0.0){// and this->iIterPRUcurrentTimerValPass==1){
+					pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
+				}
+				else{// if (this->PRUoffsetDriftErrorApplied==0 or this->iIterPRUcurrentTimerValPass>1){
+					//this->PRUoffsetDriftErrorApplied=0;
+					//this->PRUoffsetDriftErrorAppliedRaw=0;
+					//pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
+					pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
+				}
 				this->ManualSemaphore=false;
 				this->release();							
 			}
@@ -398,8 +401,8 @@ int GPIO::PRUsignalTimerSynch(){
 			this->TimePointClockSendCommandInitial=this->TimePointClockSendCommandInitial+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
 		}
 		// Absolute drift monitoring
-		auto duration_FinalInitialDrift=this->TimePointClockSendCommandInitial-this->TimePointClockPRUinitial;
-		duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->iIterPRUcurrentTimerVal+1)*this->TimePRU1synchPeriod);
+		//auto duration_FinalInitialDrift=this->TimePointClockSendCommandInitial-this->TimePointClockPRUinitial;
+		//duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->iIterPRUcurrentTimerVal+1)*this->TimePRU1synchPeriod);
 		//duration_FinalInitialDriftAuxArray[iIterPRUcurrentTimerVal%NumSynchMeasAvgAux]=duration_FinalInitialDriftAux;
 		//duration_FinalInitialDriftAuxArrayAvg=IntMedianFilterSubArray(duration_FinalInitialDriftAuxArray,NumSynchMeasAvgAux);
 		
@@ -443,7 +446,6 @@ return 0; // All ok
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
-// Important, the following line at the very beggining to reduce the command jitter
 pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 pru0dataMem_int[1]=this->NumRecords; // set number captures
 

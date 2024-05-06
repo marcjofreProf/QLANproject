@@ -184,16 +184,12 @@ int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems phy
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME// https://opensource.com/article/17/6/timekeeping-linux-vms
 while(ClockWatch::now() < this->TimePointClockCurrentFinal);// Busy waiting
 
-this->TimePointClockCurrentInitialMeas=ClockWatch::now();
-pru1dataMem_int[0]=PRU1QuarterClocksAux;//Information sent to and grabbed by PRU1
-
-//Triggered part
-pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
+//this->TimePointClockCurrentInitialMeas=ClockWatch::now(); Jitter and no information
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
 //
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// After the interrupt update rapidly the new quarter value
-this->TimePointClockCurrentFinalMeas=ClockWatch::now();
+//this->TimePointClockCurrentFinalMeas=ClockWatch::now(); Jitter and no information
 
 if (retInterruptsPRU1>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -207,22 +203,22 @@ else{
 	cout << "PRU1 interrupt poll error" << endl;
 }
 
-auto duration_FinalInitialDrift=this->TimePointClockCurrentInitialMeas-this->TimePointClockPRUinitial;
-duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
+//auto duration_FinalInitialDrift=this->TimePointClockCurrentInitialMeas-this->TimePointClockPRUinitial;
+//duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
 this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 
 // Compute error
 if (retInterruptsPRU1>0){
 	// Compute clocks adjustment
-	auto duration_FinalInitial=this->TimePointClockCurrentFinalMeas-this->TimePointClockCurrentInitialMeas;
-	unsigned long long int duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
+	//auto duration_FinalInitial=this->TimePointClockCurrentFinalMeas-this->TimePointClockCurrentInitialMeas;
+	//unsigned long long int duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
 	
 	// Compute absolute error
 	if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
-	this->TimePointClockCurrentAdjError=(static_cast<double>(this->TimeAdjPeriod)/2.0-static_cast<double>(duration_FinalInitialCountAux));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
+	this->TimePointClockCurrentAdjError=0.0;//(static_cast<double>(this->TimeAdjPeriod)/2.0-static_cast<double>(duration_FinalInitialCountAux));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
 	}
 	else{
-		this->TimePointClockCurrentAdjError=0;
+		this->TimePointClockCurrentAdjError=0.0;
 	}
 
 	// Error filtering
@@ -281,6 +277,12 @@ if (PlotPIDHAndlerInfo){
 	//cout << "PRU1QuarterClocksAux: " << PRU1QuarterClocksAux << endl;
 	}
 }
+
+// Applu PRU command for next roung
+pru1dataMem_int[0]=PRU1QuarterClocksAux;//Information sent to and grabbed by PRU1
+
+//Triggered part
+pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
 
 return 0;// All ok
 }
