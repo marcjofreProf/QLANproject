@@ -152,7 +152,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	*/
 	    // Load and execute the PRU program on the PRU1
 	    pru1dataMem_int[0]=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq); // set the number of clocks that defines the Quarter period of the clock. 
-	    pru1dataMem_int[1]=static_cast<unsigned int>(0);
+	    pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command//static_cast<unsigned int>(0);// No command
 	if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./BBBclockKernelPhysical/PRUassClockPhysicalAdjTrigHalf.bin") == -1){
 		if (prussdrv_exec_program(PRU_ClockPhys_NUM, "./PRUassClockPhysicalAdjTrigHalf.bin") == -1){
 			perror("prussdrv_exec_program non successfull writing of PRUassClockPhysicalAdjTrigHalf.bin");
