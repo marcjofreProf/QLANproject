@@ -78,6 +78,19 @@ void CKPD::release() {
 this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stays at 1
 //this->valueSemaphore.fetch_add(1,std::memory_order_release);
 }
+
+//////////////////////////////////////////////////////////////////////////
+bool CKPD::setMaxRrPriority(){// For rapidly handling interrupts
+int max_priority=sched_get_priority_max(SCHED_RR);
+sched_param sch_params;
+sch_params.sched_priority = max_priority;
+if (sched_setscheduler(0,SCHED_RR,&sch_params)==-1){
+	cout <<" Failed to set maximum real-time priority (round-robin)." << endl;
+	return false;
+}
+return true;
+}
+/////////////////////////////////////////////////////////////////////////////
 /// Errors handling
 std::atomic<bool> signalReceivedFlag{false};
 static void SignalINTHandler(int s) {
@@ -147,6 +160,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	//prussdrv_pru_enable(PRU_ClockPhys_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
+	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=ClockWatch::now();
 	//this->TimePointClockCurrentInitialAdj=ClockChrono::now();

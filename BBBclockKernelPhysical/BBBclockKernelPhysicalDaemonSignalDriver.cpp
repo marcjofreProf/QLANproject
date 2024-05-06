@@ -147,6 +147,7 @@ CKPDSD::CKPDSD(){// Redeclaration of constructor GPIO when no argument is specif
 	}
 	//prussdrv_pru_enable(PRU_ClockPhys_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
+	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=ClockWatch::now();
 	//this->TimePointClockCurrentInitialAdj=ClockChrono::now();
@@ -155,7 +156,18 @@ CKPDSD::CKPDSD(){// Redeclaration of constructor GPIO when no argument is specif
 	//this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	cout << "Generating clock output..." << endl;
 }
-
+///////////////////////////////////////////////////////////////////////
+bool CKPDSD::setMaxRrPriority(){// For rapidly handling interrupts
+int max_priority=sched_get_priority_max(SCHED_RR);
+sched_param sch_params;
+sch_params.sched_priority = max_priority;
+if (sched_setscheduler(0,SCHED_RR,&sch_params)==-1){
+	cout <<" Failed to set maximum real-time priority (round-robin)." << endl;
+	return false;
+}
+return true;
+}
+//////////////////////////////////////////////////////////////////////
 int CKPDSD::InitiateClockCorrectionPRU(){// PRU1 Only used once at the begging, because it runs continuosly
 pru1dataMem_int[0]=static_cast<unsigned int>(1);// Double start command
 pru1dataMem_int[1]=static_cast<unsigned int>(NumOnSigCounts);// Correcton ON counts

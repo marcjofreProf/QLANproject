@@ -152,6 +152,9 @@ public:	// Functions/Methods
 	~CKPD();  //destructor
 
 private: // Functions/Methods
+	// Task manager priority
+	bool setMaxRrPriority();
+	// Handling errors
 	static void SignalINTHandler(int s); // Handler for socket SIGPIPE signal error
 	static void SignalPIPEHandler(int s); // Handler for socket SIGPIPE signal error	
 	//static void SignalSegmentationFaultHandler(int s); // Handler for segmentation error
