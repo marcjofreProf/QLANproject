@@ -11,6 +11,8 @@
 #include<sys/epoll.h>
 #include<thread>
 #include<pthread.h>
+// Handling priority in task manager
+#include<sched.h>
 // Time/synchronization management
 #include <chrono>
 // Mathemtical calculations
@@ -179,6 +181,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  prussdrv_pru_disable(PRU_Operation_NUM);  
 	  prussdrv_exit();*/
 	  ///////////////////////////////////////////////////////
+	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread
 	this->TimePointClockTagPRUinitialOld=Clock::now();// First time	  
 }
 
@@ -190,7 +193,17 @@ int GPIO::InitAgentProcess(){
 	 	}
 	return 0; //All OK
 }
-
+/////////////////////////////////////////////////////////
+bool GPIO::setMaxRrPriority(){// For rapidly handling interrupts
+int max_priority=sched_get_priority_max(SCHED_RR);
+sched_param sch_params;
+sch_params.sched_priority = max_priority;
+if (sched_setscheduler(0,SCHED_RR,&sch_params)==-1){
+	cout <<" Failed to set maximum real-time priority (round-robin)." << endl;
+	return false;
+}
+return true;
+}
 ////////////////////////////////////////////////////////
 void GPIO::acquire() {
 /*while(valueSemaphore==0);
@@ -232,8 +245,8 @@ int GPIO::PRUsignalTimerSynch(){
 	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockPRUinitial;// First time
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	while(true){		
-		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra)) and this->ManualSemaphoreExtra==false){// It was possible to execute when needed		
-			this->ManualSemaphoreExtra=true;
+		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra))){// and this->ManualSemaphoreExtra==false){// It was possible to execute when needed		
+			//this->ManualSemaphoreExtra=true;
 			//cout << "Resetting PRUs timer!" << endl;
 			if (clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).//https://opensource.com/article/17/6/timekeeping-linux-vms
 				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
@@ -367,7 +380,7 @@ int GPIO::PRUsignalTimerSynch(){
 				if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
 				this->TimePointClockSendCommandInitial=this->TimePointClockSendCommandInitial+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
 			}
-			this->ManualSemaphoreExtra=false;		
+			//this->ManualSemaphoreExtra=false;		
 		} //end if
 		else if (this->ManualSemaphoreExtra==true){
 			// Double entry for some reason. Do not do anything
@@ -435,11 +448,11 @@ pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 pru0dataMem_int[1]=this->NumRecords; // set number captures
 
 /////////////
-while (this->ManualSemaphore);// Very critical to not produce measurement deviations when assessing the periodic snchronization
-this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
+//while (this->ManualSemaphore);// Very critical to not produce measurement deviations when assessing the periodic snchronization
+//this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
-this->ManualSemaphore=false;
+//this->ManualSemaphore=false;
 this->release();
 ///////////
 this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
@@ -501,9 +514,10 @@ return 0;// all ok
 }
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
-this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
+//while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
+//this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
+this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 // Important, the following line at the very beggining to reduce the command jitter
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command

@@ -241,6 +241,8 @@ public:	// Functions/Methods
 	~GPIO();  //destructor
 
 private: // Functions/Methods
+	// Task manager priority
+	bool setMaxRrPriority();
 	// Sempahore
 	void acquire();
 	void release();
