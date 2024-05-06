@@ -450,12 +450,12 @@ pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 pru0dataMem_int[1]=this->NumRecords; // set number captures
 
 /////////////
-//while (this->ManualSemaphore);// Very critical to not produce measurement deviations when assessing the periodic snchronization
-//this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
-//this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
+while (this->ManualSemaphore);// Very critical to not produce measurement deviations when assessing the periodic snchronization
+this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
+this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
-//this->ManualSemaphore=false;
-//this->release();
+this->ManualSemaphore=false;
+this->release();
 ///////////
 this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
 prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
