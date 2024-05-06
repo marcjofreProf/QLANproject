@@ -452,10 +452,10 @@ pru0dataMem_int[1]=this->NumRecords; // set number captures
 /////////////
 //while (this->ManualSemaphore);// Very critical to not produce measurement deviations when assessing the periodic snchronization
 //this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
-this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
+//this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 //this->ManualSemaphore=false;
-this->release();
+//this->release();
 ///////////
 this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
 prussdrv_pru_send_event(21);//pru0dataMem_int[1]=(unsigned int)2; // set to 2 means perform capture
@@ -529,6 +529,7 @@ prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
 
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
+pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction, for the periodic synch script
 //cout << "SendTriggerSignals: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 if (retInterruptsPRU1>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
