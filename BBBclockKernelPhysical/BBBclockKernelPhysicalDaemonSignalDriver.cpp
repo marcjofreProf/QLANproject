@@ -191,24 +191,36 @@ return 0;// all ok
 
 int CKPDSD::HandleInterruptSynchPRU(){ // Uses output pins to count 24 MHz counts sunch with software 1pps
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME// https://opensource.com/article/17/6/timekeeping-linux-vms
-while(ClockWatch::now() < this->TimePointClockCurrentFinal);// Busy waiting
+while(ClockWatch::now() < (this->TimePointClockCurrentFinal-std::chrono::nanoseconds(this->duration_FinalInitialDriftAuxArrayAvg)));// Busy waiting
 
-//this->TimePointClockCurrentInitialMeas=ClockWatch::now(); Introduces jitter and does not add info
+this->TimePointClockCurrentInitialMeas=ClockWatch::now(); //Introduces jitter and does not add info
 
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(21);
 
-//this->TimePointClockCurrentFinalMeas=ClockWatch::now();Introduces jitter and does not add info
-
+this->TimePointClockCurrentFinalMeas=ClockWatch::now();//Introduces jitter and does not add info
 
 prussdrv_pru_send_event(22); // Send interrupt to PRU1
 
-
-//auto duration_FinalInitialDrift=this->TimePointClockCurrentInitialMeas-this->TimePointClockPRUinitial;
-//duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
-
-//
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);// After the interrupt update rapidly the new quarter value
+
+auto duration_FinalInitialDrift=this->TimePointClockCurrentInitialMeas-this->TimePointClockPRUinitial;
+duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count();//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
+switch(FilterMode) {
+case 2:{// Mean implementation
+this->duration_FinalInitialDriftAuxArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->duration_FinalInitialDriftAux;
+this->duration_FinalInitialDriftAuxArrayAvg=IMeanFilterSubArray(this->duration_FinalInitialDriftAuxArray);
+break;
+}
+case 1:{// Median implementation
+this->duration_FinalInitialDriftAuxArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->duration_FinalInitialDriftAux;
+this->duration_FinalInitialDriftAuxArrayAvg=IMedianFilterSubArray(this->duration_FinalInitialDriftAuxArray);
+break;
+}
+default:{// Average implementation
+this->duration_FinalInitialDriftAuxArrayAvg = this->RatioAverageFactorClockFullPeriod*this->duration_FinalInitialDriftAuxArrayAvg+(1.0-this->RatioAverageFactorClockFullPeriod)*this->duration_FinalInitialDriftAux;
+}
+}
 
 this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 
