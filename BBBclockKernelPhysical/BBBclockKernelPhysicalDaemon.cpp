@@ -202,7 +202,7 @@ else{
 	cout << "PRU1 interrupt poll error" << endl;
 }
 
-auto duration_FinalInitialDrift=this->TimePointClockCurrentInitialMeas-this->TimePointClockPRUinitial;
+auto duration_FinalInitialDrift=this->TimePointClockCurrentInitialMeas-this->TimePointClockCurrentFinalMeas;
 duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count();//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
 
 switch(FilterMode) {
