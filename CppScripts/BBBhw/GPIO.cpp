@@ -320,7 +320,7 @@ int GPIO::PRUsignalTimerSynch(){
 						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
 						this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 					}
-					else if (this->PRUoffsetDriftErrorApplied<0 and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))+this->PRUoffsetDriftErrorApplied)>(0+TimeClockMarging) and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)))<(0xFFFFFFFF-TimeClockMarging) ){// Substraction correction					
+					else if (this->PRUoffsetDriftErrorApplied<(-this->LostCounts) and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))+this->PRUoffsetDriftErrorApplied)>(0+TimeClockMarging) and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)))<(0xFFFFFFFF-TimeClockMarging) ){// Substraction correction					
 						pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
 						this->iIterPRUcurrentTimerValSynch++;
 						this->iIterPRUcurrentTimerValPass=1;
@@ -328,7 +328,7 @@ int GPIO::PRUsignalTimerSynch(){
 						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
 						this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 					}
-					else if (this->PRUoffsetDriftErrorApplied>0 and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))+this->PRUoffsetDriftErrorApplied)<(0xFFFFFFFF-TimeClockMarging)){// Addition correction
+					else if (this->PRUoffsetDriftErrorApplied>this->LostCounts and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))+this->PRUoffsetDriftErrorApplied)<(0xFFFFFFFF-TimeClockMarging)){// Addition correction
 						pru1dataMem_int[3]=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);// Apply correction
 						this->iIterPRUcurrentTimerValSynch++;
 						this->iIterPRUcurrentTimerValPass=1;
@@ -358,18 +358,17 @@ int GPIO::PRUsignalTimerSynch(){
 				//}
 				// Apply corrections here to reduce jitter
 				//pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
-				if (this->PRUoffsetDriftErrorApplied>0.0){// and this->iIterPRUcurrentTimerValPass==1){
+				if (this->PRUoffsetDriftErrorApplied>this->LostCounts){// and this->iIterPRUcurrentTimerValPass==1){
 					pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 3, to execute synch functions addition correction
 					this->NextSynchPRUcommand=static_cast<unsigned int>(3);
 				}				
-				else if (this->PRUoffsetDriftErrorApplied<0.0){// and this->iIterPRUcurrentTimerValPass==1){
+				else if (this->PRUoffsetDriftErrorApplied<(-this->LostCounts)){// and this->iIterPRUcurrentTimerValPass==1){
 					pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
 					this->NextSynchPRUcommand=static_cast<unsigned int>(2);
 				}
 				else{// if (this->PRUoffsetDriftErrorApplied==0 or this->iIterPRUcurrentTimerValPass>1){
-					//this->PRUoffsetDriftErrorApplied=0;
-					//this->PRUoffsetDriftErrorAppliedRaw=0;
-					//pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
+					this->PRUoffsetDriftErrorApplied=0;
+					this->PRUoffsetDriftErrorAppliedRaw=0;
 					pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
 					this->NextSynchPRUcommand=static_cast<unsigned int>(4);
 				}
@@ -377,7 +376,7 @@ int GPIO::PRUsignalTimerSynch(){
 				this->release();							
 			}
 			else{// does not enter in time
-				pru1dataMem_int[3]=static_cast<unsigned int>(4);// Do not apply correction.
+				pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
 				this->NextSynchPRUcommand=static_cast<unsigned int>(4);
 				this->iIterPRUcurrentTimerValPass++;
 				this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
@@ -395,7 +394,7 @@ int GPIO::PRUsignalTimerSynch(){
 			cout << "Double run in time sync method. This should not happen!" << endl;
 		}
 		else{// does not enter in time
-			pru1dataMem_int[3]=static_cast<unsigned int>(4);// Do not apply correction.
+			pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
 			this->NextSynchPRUcommand=static_cast<unsigned int>(4);
 			this->iIterPRUcurrentTimerValPass++;
 			this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
@@ -444,8 +443,8 @@ PRUoffsetDriftErrorDerivative=(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorLast);/
 
 this->PRUoffsetDriftErrorAppliedRaw=PIDconstant*PRUoffsetDriftErrorAvg;//+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative;//this->iIterPRUcurrentTimerValPass*(PIDconstant*PRUoffsetDriftErrorAvg+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative);	
 
-if (this->PRUoffsetDriftErrorAppliedRaw<0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw-LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
-else if (this->PRUoffsetDriftErrorAppliedRaw>0){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw+LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
+if (this->PRUoffsetDriftErrorAppliedRaw<(-this->LostCounts)){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw-LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
+else if (this->PRUoffsetDriftErrorAppliedRaw>this->LostCounts){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw+LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
 else{this->PRUoffsetDriftErrorApplied=0;}
 
 return 0; // All ok
