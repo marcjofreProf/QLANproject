@@ -191,7 +191,7 @@ int GPIO::InitAgentProcess(){
 	// Launch periodic synchronization of the IEP timer - like slotted time synchronization protocol
 	 if (this->ResetPeriodicallyTimerPRU1){
  	this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);
- 	this->threadRefSynch.detach();// If detach, then at the end comment the join. Otherwise, uncomment the join().
+ 	//this->threadRefSynch.detach();// If detach, then at the end comment the join. Otherwise, uncomment the join().
  	}
 	return 0; //All OK
 }
@@ -273,13 +273,13 @@ int GPIO::PRUsignalTimerSynch(){
 					cout << "PRU1 interrupt error" << endl;
 				}
 				
-				auto duration_FinalInitial=this->TimePointClockSendCommandFinal-this->TimePointClockSendCommandInitial;
-				double duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
+				//auto duration_FinalInitial=this->TimePointClockSendCommandFinal-this->TimePointClockSendCommandInitial;
+				//double duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
 				
 				//pru1dataMem_int[2]// Current IEP timer sample
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[2]);
-				this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
+				//this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
 				// Unwrap
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
@@ -1509,7 +1509,7 @@ return 0;
 
 GPIO::~GPIO() {
 //	this->unexportGPIO();
-	//this->threadRefSynch.join();
+	this->threadRefSynch.join();
 	this->DisablePRUs();
 	//fclose(outfile); 
 	prussdrv_exit();
