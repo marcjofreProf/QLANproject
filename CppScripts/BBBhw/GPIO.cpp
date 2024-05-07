@@ -360,21 +360,25 @@ int GPIO::PRUsignalTimerSynch(){
 				//pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
 				if (this->PRUoffsetDriftErrorApplied>0.0){// and this->iIterPRUcurrentTimerValPass==1){
 					pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 3, to execute synch functions addition correction
+					this->NextSynchPRUcommand=static_cast<unsigned int>(3);
 				}				
 				else if (this->PRUoffsetDriftErrorApplied<0.0){// and this->iIterPRUcurrentTimerValPass==1){
 					pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
+					this->NextSynchPRUcommand=static_cast<unsigned int>(2);
 				}
 				else{// if (this->PRUoffsetDriftErrorApplied==0 or this->iIterPRUcurrentTimerValPass>1){
 					//this->PRUoffsetDriftErrorApplied=0;
 					//this->PRUoffsetDriftErrorAppliedRaw=0;
 					//pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
 					pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
+					this->NextSynchPRUcommand=static_cast<unsigned int>(4);
 				}
 				this->ManualSemaphore=false;
 				this->release();							
 			}
 			else{// does not enter in time
-				pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
+				pru1dataMem_int[3]=static_cast<unsigned int>(4);// Do not apply correction.
+				this->NextSynchPRUcommand=static_cast<unsigned int>(4);
 				this->iIterPRUcurrentTimerValPass++;
 				this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
 				this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
@@ -391,7 +395,8 @@ int GPIO::PRUsignalTimerSynch(){
 			cout << "Double run in time sync method. This should not happen!" << endl;
 		}
 		else{// does not enter in time
-			pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
+			pru1dataMem_int[3]=static_cast<unsigned int>(4);// Do not apply correction.
+			this->NextSynchPRUcommand=static_cast<unsigned int>(4);
 			this->iIterPRUcurrentTimerValPass++;
 			this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
 			this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
@@ -531,7 +536,7 @@ prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
 
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
-pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction, for the periodic synch script
+pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // set command computed in synch process
 this->ManualSemaphore=false;
 this->release();
 //cout << "SendTriggerSignals: retInterruptsPRU1: " << retInterruptsPRU1 << endl;

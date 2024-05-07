@@ -49,6 +49,7 @@ private:// Variables
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=9; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
 	int NumSynchMeasAvgAux=61;//31; // Num averages to compute the time error. Better to be odd number.
+	unsigned int NextSynchPRUcommand=4;// Do not do correction
 	double PRUoffsetDriftError=0;
 	double PRUoffsetDriftErrorArray[MaxNumPulses]={0};
 	double PRUoffsetDriftErrorAvg=0.0;
