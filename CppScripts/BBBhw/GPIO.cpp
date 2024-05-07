@@ -319,7 +319,7 @@ int GPIO::PRUsignalTimerSynch(){
 						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
 						this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 					}
-					else if (this->PRUoffsetDriftErrorApplied<(-this->LostCounts) and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))+this->PRUoffsetDriftErrorApplied)>(0+TimeClockMarging) and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)))<(0xFFFFFFFF-TimeClockMarging) ){// Substraction correction					
+					else if (this->PRUoffsetDriftErrorApplied<0.0 and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))+this->PRUoffsetDriftErrorApplied)>(0+TimeClockMarging) and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)))<(0xFFFFFFFF-TimeClockMarging) ){// Substraction correction					
 						pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
 						this->iIterPRUcurrentTimerValSynch++;
 						this->iIterPRUcurrentTimerValPass=1;
@@ -327,7 +327,7 @@ int GPIO::PRUsignalTimerSynch(){
 						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
 						this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 					}
-					else if (this->PRUoffsetDriftErrorApplied>this->LostCounts and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))+this->PRUoffsetDriftErrorApplied)<(0xFFFFFFFF-TimeClockMarging)){// Addition correction
+					else if (this->PRUoffsetDriftErrorApplied>0.0 and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))+this->PRUoffsetDriftErrorApplied)<(0xFFFFFFFF-TimeClockMarging)){// Addition correction
 						pru1dataMem_int[3]=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);// Apply correction
 						this->iIterPRUcurrentTimerValSynch++;
 						this->iIterPRUcurrentTimerValPass=1;
@@ -357,11 +357,11 @@ int GPIO::PRUsignalTimerSynch(){
 				//}
 				// Apply corrections here to reduce jitter
 				//pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions. Not really used for this synchronization
-				if (this->PRUoffsetDriftErrorApplied>this->LostCounts){// and this->iIterPRUcurrentTimerValPass==1){
+				if (this->PRUoffsetDriftErrorApplied>0.0){// and this->iIterPRUcurrentTimerValPass==1){
 					pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 3, to execute synch functions addition correction
 					this->NextSynchPRUcommand=static_cast<unsigned int>(3);
 				}				
-				else if (this->PRUoffsetDriftErrorApplied<(-this->LostCounts)){// and this->iIterPRUcurrentTimerValPass==1){
+				else if (this->PRUoffsetDriftErrorApplied<0.0){// and this->iIterPRUcurrentTimerValPass==1){
 					pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
 					this->NextSynchPRUcommand=static_cast<unsigned int>(2);
 				}
