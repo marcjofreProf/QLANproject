@@ -462,9 +462,9 @@ pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 ///////////
-prussdrv_pru_send_event(21);
 this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
-//this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
+prussdrv_pru_send_event(21);
+this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 //this->ManualSemaphore=false;
 this->release();
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
@@ -658,7 +658,7 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 */
 // Reading first calibration tag and link it to the system clock
 OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
-auto duration_InitialTag=this->TimePointClockTagPRUinitial-this->TimePointClockTagPRUinitialOld;//this->TimePointClockTagPRUinitial-(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial)-this->TimePointClockTagPRUinitialOld;
+auto duration_InitialTag=this->TimePointClockTagPRUinitial-(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial)-this->TimePointClockTagPRUinitialOld;//this->TimePointClockTagPRUinitial-this->TimePointClockTagPRUinitialOld;//this->TimePointClockTagPRUinitial-(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial)-this->TimePointClockTagPRUinitialOld;
 this->TimePointClockTagPRUinitialOld=this->TimePointClockTagPRUinitial;// Update
 this->TimeTaggsLast=this->TimeTaggsInit+static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count())/static_cast<double>(PRUclockStepPeriodNanoseconds));
 this->TimeTaggsInit=this->TimeTaggsLast;// Update
