@@ -191,7 +191,7 @@ int GPIO::InitAgentProcess(){
 	// Launch periodic synchronization of the IEP timer - like slotted time synchronization protocol
 	 if (this->ResetPeriodicallyTimerPRU1){
  	this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);
- 	//this->threadRefSynch.detach();// If detach, then at the end comment the join. Otherwise, uncomment the join().
+ 	this->threadRefSynch.detach();// If detach, then at the end comment the join. Otherwise, uncomment the join().
  	}
 	return 0; //All OK
 }
@@ -1510,7 +1510,7 @@ return 0;
 
 GPIO::~GPIO() {
 //	this->unexportGPIO();
-	this->threadRefSynch.join();
+	//this->threadRefSynch.join();
 	this->DisablePRUs();
 	//fclose(outfile); 
 	prussdrv_exit();
