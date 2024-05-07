@@ -444,8 +444,7 @@ PRUoffsetDriftErrorDerivative=(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorLast);/
 
 this->PRUoffsetDriftErrorAppliedRaw=PIDconstant*PRUoffsetDriftErrorAvg;//+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative;//this->iIterPRUcurrentTimerValPass*(PIDconstant*PRUoffsetDriftErrorAvg+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative);	
 
-if (this->PRUoffsetDriftErrorAppliedRaw<(-this->LostCounts)){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw-LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
-else if (this->PRUoffsetDriftErrorAppliedRaw>this->LostCounts){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw+LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
+if (this->PRUoffsetDriftErrorAppliedRaw<(-this->LostCounts) or this->PRUoffsetDriftErrorAppliedRaw>this->LostCounts){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw+LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
 else{this->PRUoffsetDriftErrorApplied=0;}
 
 return 0; // All ok
@@ -460,12 +459,12 @@ pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 //this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
+///////////
+prussdrv_pru_send_event(21);
+this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
+//this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 //this->ManualSemaphore=false;
 this->release();
-///////////
-this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
-prussdrv_pru_send_event(21);
-//this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
