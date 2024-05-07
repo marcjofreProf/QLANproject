@@ -255,10 +255,10 @@ int GPIO::PRUsignalTimerSynch(){
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization						
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html												
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
-				this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. Introduces jitter and does not provide info
+				this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info
 				// Important, the following line at the very beggining to reduce the command jitter				
 				prussdrv_pru_send_event(22);
-				this->TimePointClockSendCommandFinal=Clock::now(); // Initial measurement. Not useful information
+				this->TimePointClockSendCommandFinal=Clock::now(); // Initial measurement.
 				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
 				//cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 				if (retInterruptsPRU1>0){
@@ -465,7 +465,7 @@ this->release();
 ///////////
 this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
 prussdrv_pru_send_event(21);
-
+this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
@@ -657,7 +657,7 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 */
 // Reading first calibration tag and link it to the system clock
 OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
-auto duration_InitialTag=this->TimePointClockTagPRUinitial-this->TimePointClockTagPRUinitialOld;
+auto duration_InitialTag=this->TimePointClockTagPRUinitial-(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial)-this->TimePointClockTagPRUinitialOld;
 this->TimePointClockTagPRUinitialOld=this->TimePointClockTagPRUinitial;// Update
 this->TimeTaggsLast=this->TimeTaggsInit+static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count())/static_cast<double>(PRUclockStepPeriodNanoseconds));
 this->TimeTaggsInit=this->TimeTaggsLast;// Update

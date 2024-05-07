@@ -105,6 +105,7 @@ private:// Variables
 	TimePoint TimePointClockSendCommandInitial=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint TimePointClockTagPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
+	TimePoint TimePointClockTagPRUfinal=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint TimePointClockTagPRUinitialOld=std::chrono::time_point<Clock>();// For absolute drift purposes
 	int duration_FinalInitialDriftAux=0;// For absolute drift purposes
 	//int duration_FinalInitialDriftAuxArray[MaxNumPulses]={0};// For absolute drift purposes
