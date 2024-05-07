@@ -255,11 +255,10 @@ int GPIO::PRUsignalTimerSynch(){
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization						
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html												
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
-				//this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. Introduces jitter and does not provide info
-				// Important, the following line at the very beggining to reduce the command jitter
-				
+				this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. Introduces jitter and does not provide info
+				// Important, the following line at the very beggining to reduce the command jitter				
 				prussdrv_pru_send_event(22);
-				//this->TimePointClockSendCommandFinal=Clock::now(); // Initial measurement. Not useful information
+				this->TimePointClockSendCommandFinal=Clock::now(); // Initial measurement. Not useful information
 				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
 				//cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 				if (retInterruptsPRU1>0){
@@ -274,13 +273,13 @@ int GPIO::PRUsignalTimerSynch(){
 					cout << "PRU1 interrupt error" << endl;
 				}
 				
-				//auto duration_FinalInitial=this->TimePointClockSendCommandFinal-this->TimePointClockSendCommandInitial;
-				//double duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
+				auto duration_FinalInitial=this->TimePointClockSendCommandFinal-this->TimePointClockSendCommandInitial;
+				double duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
 				
 				//pru1dataMem_int[2]// Current IEP timer sample
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[2]);
-				//this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
+				this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
 				// Unwrap
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
