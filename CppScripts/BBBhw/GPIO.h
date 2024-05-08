@@ -111,8 +111,8 @@ private:// Variables
 	//int duration_FinalInitialDriftAuxArray[MaxNumPulses]={0};// For absolute drift purposes
 	//int duration_FinalInitialDriftAuxArrayAvg=0;// For absolute drift purposes
 	double duration_FinalInitialCountAux=0.0;
-	double duration_FinalInitialCountAuxArray[MaxNumPulses]={0.0};
-	double duration_FinalInitialCountAuxArrayAvg=0.0;
+	//double duration_FinalInitialCountAuxArray[MaxNumPulses]={0.0};
+	//double duration_FinalInitialCountAuxArrayAvg=0.0;
 	unsigned long long int TimeClockMarging=100000;// In nanoseconds
 	unsigned long long int TimeClockMargingExtra=10*TimeClockMarging;// In nanoseconds
 	unsigned long long int TimeElpasedNow_time_as_count=0;
