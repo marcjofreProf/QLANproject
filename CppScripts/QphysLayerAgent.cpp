@@ -506,12 +506,12 @@ if (SimulateNumStoredQubitsNodeAux>0){
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 //cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
 //cout << "ChannelTags[i]: "<< std::bitset<8>(ChannelTags[i]) << endl;
-if (ChannelTags[i]&0x01==1){TimeTaggsDetAnalytics[0]++;}
-if ((ChannelTags[i]>>1)&0x01==1){TimeTaggsDetAnalytics[1]++;}
-if ((ChannelTags[i]>>2)&0x01==1){TimeTaggsDetAnalytics[2]++;}
-if ((ChannelTags[i]>>3)&0x01==1){TimeTaggsDetAnalytics[3]++;}
+if (ChannelTags[i]&0x0001==1 or (ChannelTags[i]>>4)&0x0001==1){TimeTaggsDetAnalytics[0]++;}
+if ((ChannelTags[i]>>1)&0x0001==1 or (ChannelTags[i]>>5)&0x0001==1){TimeTaggsDetAnalytics[1]++;}
+if ((ChannelTags[i]>>2)&0x0001==1 or (ChannelTags[i]>>6)&0x0001==1){TimeTaggsDetAnalytics[2]++;}
+if ((ChannelTags[i]>>3)&0x0001==1 or (ChannelTags[i]>>7)&0x0001==1){TimeTaggsDetAnalytics[3]++;}
 
-if (((ChannelTags[i]&0x01)+((ChannelTags[i]>>1)&0x01)+((ChannelTags[i]>>2)&0x01)+((ChannelTags[i]>>3)&0x01))>1){
+if (((ChannelTags[i]&0x0001)+((ChannelTags[i]>>1)&0x0001)+((ChannelTags[i]>>2)&0x0001)+((ChannelTags[i]>>3)&0x0001)+((ChannelTags[i]>>4)&0x0001)+((ChannelTags[i]>>5)&0x0001)+((ChannelTags[i]>>6)&0x0001)+((ChannelTags[i]>>7)&0x0001))>1){
 TimeTaggsDetAnalytics[4]=(double)TimeTaggsDetAnalytics[4]+1.0;
 }
 if (i>1){//Compute the mean value
