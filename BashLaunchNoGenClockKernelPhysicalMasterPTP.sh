@@ -16,7 +16,7 @@ sudo ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -m #& #-f PTP2pcConfigQLANp
 #sudo timedatectl set-ntp false
 #sudo systemctl stop systemd-timesyncd # stop system synch
 #sudo systemctl disable systemd-timesyncd # start system synch
-#sudo ./linuxptp/ptp4l -i eth0 -m #& #-f PTP4lConfigQLANproject.cfg & #-m
+#sudo ./linuxptp/ptp4l -i eth0 -f PTP4lConfigQLANproject.cfg & #-m
 ##sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -m #& #-f PTP2pcConfigQLANprojectSlave.cfg & -m
 
 sudo hwclock --systohc
