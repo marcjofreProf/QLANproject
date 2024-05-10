@@ -6,7 +6,7 @@ trap "kill 0" EXIT
 echo 'Running PTP'
 
 sudo /etc/init.d/rsyslog stop # stop logging
-sudo ./linuxptp/ptp4l -i eth0 -f PTP4lConfigQLANproject.cfg & #-m
+sudo ./linuxptp/ptp4l -i eth0 -f PTP4lConfigQLANproject.cfg -m & #-m
 
 ## If at least the grand master is synch to NTP (good reference)
 sudo systemctl enable systemd-timesyncd # start system synch
