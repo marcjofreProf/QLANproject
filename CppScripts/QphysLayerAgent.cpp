@@ -368,7 +368,7 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadSimulateEmitQuBit(){
-cout << "Simulate Emiting Qubits" << endl;
+cout << "Emiting Qubits" << endl;
 struct timespec requestWhileWait=this->SetFutureTimePointOtherNode();
 //struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
 this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum priority
@@ -430,7 +430,7 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::ThreadSimulateReceiveQubit(){
-cout << "Simulate Receiving Qubits" << endl;
+cout << "Receiving Qubits" << endl;
 this->acquire();
 PRUGPIO.ClearStoredQuBits();//PRUGPIO->ClearStoredQuBits();
 this->release();
