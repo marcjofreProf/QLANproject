@@ -182,9 +182,9 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME// https://opensource.com/article/17/6/timekeeping-linux-vms
-while(ClockWatch::now() < (this->TimePointClockCurrentFinal-std::chrono::nanoseconds(this->duration_FinalInitialDriftAuxArrayAvg)));// Busy waiting
-
-this->TimePointClockCurrentInitialMeas=ClockWatch::now(); //Jitter and no information
+this->TimePointClockCurrentInitialMeas=this->TimePointClockCurrentFinal-std::chrono::nanoseconds(this->duration_FinalInitialDriftAuxArrayAvg);
+while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);// Busy waiting
+//this->TimePointClockCurrentInitialMeas=ClockWatch::now(); //Computed in the step before
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
 this->TimePointClockCurrentFinalMeas=ClockWatch::now(); //Jitter and no information

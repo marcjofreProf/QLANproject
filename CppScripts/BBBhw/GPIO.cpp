@@ -256,7 +256,7 @@ int GPIO::PRUsignalTimerSynch(){
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization						
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html												
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
-				//this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info
+				//this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info. Already computed in thesteps before
 				// Important, the following line at the very beggining to reduce the command jitter				
 				prussdrv_pru_send_event(22);
 				this->TimePointClockSendCommandFinal=Clock::now(); // Initial measurement.
@@ -535,8 +535,8 @@ this->acquire();// Very critical to not produce measurement deviations when asse
 TimePoint TimePointFutureSynch=Clock::now();
 auto duration_InitialTrig=TimePointFutureSynch-TimePointClockSynchPRUinitial;
 unsigned long long int SynchRem=SynchTrigPeriod-static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTrig).count())/static_cast<double>(PRUclockStepPeriodNanoseconds))%SynchTrigPeriod;
-TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
-while (Clock::now()<(TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg)));// Busy wait time synch sending signals
+TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem)-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
+while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
