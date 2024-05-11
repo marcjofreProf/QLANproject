@@ -305,7 +305,7 @@ int GPIO::PRUsignalTimerSynch(){
 					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
 					
 					//// PID error computation to correct for signal PRU 1 generation								
-					this->PIDcontrolerTime();// Compute parameters for PID adjustment
+					//this->PIDcontrolerTime();// Compute parameters for PID adjustment
 					//this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
 					//this->PRUoffsetDriftErrorAppliedRaw=0;// Disable IEP correction
 					// Re wrap for correction					
