@@ -161,17 +161,17 @@ PERIODICTIMESYNCHSUB: // with command coded 2 means synch by reseting the IEP ti
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP	CMDLOOP
-PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit t a specific bins for the histogram
-	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
-	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
-	AND	r0, r0, r6 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
-//	LBCO	r0.w0, CONST_IETREG, 0xC, 2//LBBO	r0.b0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4// Trick since for period of 65536 we can direclty implement module reading 2 bytes//Maybe it can not be done becaue larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
-	SUB	r0, r7, r0 // Substract to find how long to wait	
-	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCH consumes double
-	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
-PSEUDOSYNCHLOOP:
-	SUB	r0, r0, 1
-	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
+//PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit t a specific bins for the histogram
+//	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
+//	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
+//	AND	r0, r0, r6 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
+////	LBCO	r0.w0, CONST_IETREG, 0xC, 2//LBBO	r0.b0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4// Trick since for period of 65536 we can direclty implement module reading 2 bytes//Maybe it can not be done becaue larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
+//	SUB	r0, r7, r0 // Substract to find how long to wait	
+//	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCH consumes double
+//	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+//PSEUDOSYNCHLOOP:
+//	SUB	r0, r0, 1
+//	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
 //BASICPSEUDOSYNCH:
 //	AND	r0, r0, 0x07 // Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) we can get a value between 0 and 7
 //	QBEQ	SIGNALON1, r0.b0, 7 // Coincides with a 7

@@ -102,9 +102,10 @@ private:// Variables
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockSendCommandFinal=std::chrono::time_point<Clock>();// For synch purposes
-	TimePoint TimePointClockSendCommandInitial=std::chrono::time_point<Clock>();// For synch purposes
+	//TimePoint TimePointClockSendCommandInitial=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint TimePointClockSynchPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
+	TimePoint TimePointClockSynchPRUfinal=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint TimePointClockTagPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint TimePointClockTagPRUfinal=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint TimePointClockTagPRUinitialOld=std::chrono::time_point<Clock>();// For absolute drift purposes
@@ -114,6 +115,10 @@ private:// Variables
 	double duration_FinalInitialCountAux=0.0;
 	//double duration_FinalInitialCountAuxArray[MaxNumPulses]={0.0};
 	//double duration_FinalInitialCountAuxArrayAvg=0.0;
+	//int duration_FinalInitialMeasTrigAux=0;
+	int duration_FinalInitialMeasTrigAuxArray[MaxNumPulses]={0};
+	int duration_FinalInitialMeasTrigAuxAvg=0;
+	unsigned long long int TrigAuxIterCount=0;
 	unsigned long SynchTrigPeriod=65536; //For histogram analysis this is 65536
 	unsigned long TimeClockMarging=100000;// In nanoseconds
 	unsigned long long int TimeClockMargingExtra=10*TimeClockMarging;// In nanoseconds

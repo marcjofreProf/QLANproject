@@ -256,7 +256,7 @@ int GPIO::PRUsignalTimerSynch(){
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization						
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html												
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
-				this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info
+				//this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info
 				// Important, the following line at the very beggining to reduce the command jitter				
 				prussdrv_pru_send_event(22);
 				this->TimePointClockSendCommandFinal=Clock::now(); // Initial measurement.
@@ -274,7 +274,7 @@ int GPIO::PRUsignalTimerSynch(){
 					cout << "PRU1 interrupt error" << endl;
 				}
 				
-				auto duration_FinalInitial=this->TimePointClockSendCommandFinal-this->TimePointClockSendCommandInitial;
+				auto duration_FinalInitial=this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future;
 				duration_FinalInitialCountAux=static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count());
 				//duration_FinalInitialCountAuxArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->duration_FinalInitialCountAux;
 				//duration_FinalInitialCountAuxArrayAvg=DoubleMedianFilterSubArray(duration_FinalInitialCountAuxArray,NumSynchMeasAvgAux);					
@@ -536,13 +536,11 @@ TimePoint TimePointFutureSynch=Clock::now();
 auto duration_InitialTrig=TimePointFutureSynch-TimePointClockSynchPRUinitial;
 unsigned long long int SynchRem=SynchTrigPeriod-static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTrig).count())/static_cast<double>(PRUclockStepPeriodNanoseconds))%SynchTrigPeriod;
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
-TimePointClockSynchPRUinitial=TimePointFutureSynch;// Update
-while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
-
+while (Clock::now()<(TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg)));// Busy wait time synch sending signals
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
-
+this->TimePointClockSynchPRUfinal=Clock::now();
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
 
@@ -550,6 +548,13 @@ retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterrupt
 pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // set command computed in synch process
 this->ManualSemaphore=false;
 this->release();
+
+// Synch trig part
+auto duration_FinalInitialMeasTrig=std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynch).count();
+this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=static_cast<unsigned int>(duration_FinalInitialMeasTrig);
+this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
+TimePointClockSynchPRUinitial=TimePointFutureSynch;// Update
+
 //cout << "SendTriggerSignals: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 if (retInterruptsPRU1>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -603,7 +608,7 @@ do // This is blocking
 } while(!finPRU1);
 */
 
-//if (this->ResetPeriodicallyTimerPRU1){cout << "PRU1 timer is periodically reset!" << endl;}
+this->TrigAuxIterCount++;
 return 0;// all ok	
 }
 
