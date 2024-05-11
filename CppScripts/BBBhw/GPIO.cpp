@@ -184,6 +184,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  ///////////////////////////////////////////////////////
 	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread
 	this->TimePointClockTagPRUinitialOld=Clock::now();// First time
+	this->TimePointClockSynchPRUinitial=Clock::now();// First time
 	//////////////////////////////////////////////////////////
 }
 
@@ -529,6 +530,15 @@ this->ManualSemaphore=true;// Very critical to not produce measurement deviation
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 //this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 // Important, the following line at the very beggining to reduce the command jitter
+
+// Apply a slotted synch configuration (like synchronized Ethernet)
+TimePoint TimePointFutureSynch=Clock::now();
+auto duration_InitialTrig=TimePointFutureSynch-TimePointClockSynchPRUinitial;
+unsigned long long int SynchRem=SynchTrigPeriod-static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTrig).count())/static_cast<double>(PRUclockStepPeriodNanoseconds))%SynchTrigPeriod;
+TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
+TimePointClockSynchPRUinitial=TimePointFutureSynch;// Update
+while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
+
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
