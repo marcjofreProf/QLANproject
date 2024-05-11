@@ -534,7 +534,7 @@ this->acquire();// Very critical to not produce measurement deviations when asse
 // Apply a slotted synch configuration (like synchronized Ethernet)
 TimePoint TimePointFutureSynch=Clock::now();
 auto duration_InitialTrig=TimePointFutureSynch-TimePointClockSynchPRUinitial;
-unsigned long long int SynchRem=SynchTrigPeriod-static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTrig).count())/static_cast<double>(PRUclockStepPeriodNanoseconds))%SynchTrigPeriod;
+unsigned long long int SynchRem=static_cast<unsigned long long int>(static_cast<double>(SynchTrigPeriod-static_cast<unsigned long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTrig).count())/static_cast<double>(PRUclockStepPeriodNanoseconds))%SynchTrigPeriod)*static_cast<double>(PRUclockStepPeriodNanoseconds));
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
