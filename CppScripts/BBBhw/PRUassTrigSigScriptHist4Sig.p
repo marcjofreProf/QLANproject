@@ -136,7 +136,7 @@ CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 4, and 1 bytes
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 4, and 1 bytes.
-	QBEQ	PSEUDOSYNCH, r0.b0, 1 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
+	QBEQ	SIGNALON1, r0.b0, 1 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
 	QBEQ	PERIODICTIMESYNCHSUB, r0.b0, 2 // 2 command is measure IEP timer status and so a substraction correction
 	QBEQ	PERIODICTIMESYNCHADD, r0.b0, 3 // 2 command is measure IEP timer status and so a substraction correction
 PERIODICTIMESYNCHCHECK: // with command coded 4 means chech synch only
