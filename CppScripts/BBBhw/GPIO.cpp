@@ -536,12 +536,13 @@ TimePoint TimePointFutureSynch=Clock::now();
 auto duration_InitialTrig=TimePointFutureSynch-TimePointClockSynchPRUinitial;
 unsigned long long int SynchRem=static_cast<unsigned long long int>((static_cast<double>(SynchTrigPeriod)-fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTrig).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),static_cast<double>(SynchTrigPeriod)))*static_cast<double>(PRUclockStepPeriodNanoseconds));
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
-TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
-while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
+//TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
+//while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
+while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
-this->TimePointClockSynchPRUfinal=Clock::now();
+//this->TimePointClockSynchPRUfinal=Clock::now();
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
 
@@ -551,9 +552,10 @@ this->ManualSemaphore=false;
 this->release();
 
 // Synch trig part
-auto duration_FinalInitialMeasTrig=std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynchAux).count();
-this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=static_cast<unsigned int>(duration_FinalInitialMeasTrig);
-this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
+//auto duration_FinalInitialMeasTrig=std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynchAux).count();
+//this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=static_cast<unsigned int>(duration_FinalInitialMeasTrig);
+//this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
+
 TimePointClockSynchPRUinitial=TimePointFutureSynch;// Update
 
 //cout << "SendTriggerSignals: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
