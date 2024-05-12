@@ -4,6 +4,10 @@
 # arg3: Daemon print PID values: true or false
 trap "kill 0" EXIT
 echo 'Running NTP'
+# Kill potentially previously running PTP clock processes
+sudo pkill ptp4l
+sudo pkill phc2sys
+########################################################
 sudo /etc/init.d/rsyslog stop # stop logging
 sudo systemctl enable --now systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch

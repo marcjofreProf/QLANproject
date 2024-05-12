@@ -1,5 +1,9 @@
 trap "kill 0" EXIT
 echo 'Running PTP'
+# Kill potentially previously running PTP clock processes
+sudo pkill ptp4l
+sudo pkill phc2sys
+########################################################
 sudo /etc/init.d/rsyslog stop # stop logging
 sudo timedatectl set-ntp false
 sudo systemctl stop systemd-timesyncd # stop system synch
