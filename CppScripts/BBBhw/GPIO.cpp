@@ -539,7 +539,7 @@ pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 // Apply a slotted synch configuration (like synchronized Ethernet)
 //this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 TimePoint TimePointFutureSynch=Clock::now();
-int SynchRem=static_cast<int>((static_cast<double>(2*SynchTrigPeriod)-fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),static_cast<double>(SynchTrigPeriod)))*static_cast<double>(PRUclockStepPeriodNanoseconds));
+int SynchRem=static_cast<int>(((2.0*SynchTrigPeriod)-fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<double>(PRUclockStepPeriodNanoseconds));
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 ////if (Clock::now()<TimePointFutureSynchAux){cout << "Check that we have enough time" << endl;}
@@ -548,7 +548,7 @@ while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending sig
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 this->TimePointClockSynchPRUfinal=Clock::now();
 // Here there should be the instruction command to tell PRU1 to start generating signals
-// We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
+// We have to define a command, compatible with the memory space of PRU0 to tell PRU1 to initiate signals
 
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
 pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // set command computed in synch process

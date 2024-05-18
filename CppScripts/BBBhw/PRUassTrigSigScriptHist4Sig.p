@@ -26,7 +26,7 @@
 #define DELAY 4094//It has to be  related to an even power of 2!!! Example 1022=(2048-4)/2. How to do it. Substract 4 and divide by 2 for the common cost commands. For instance 58=(128-4)/2 // Assuming that QBNE always consumes one clock (check experimentally). It has to be a power of 2 to be able to do module in assembler. The original value is DELAYMODULE divided by 8.
 #define DELAYMODULE	65536// Slightly above the std jitter of the 24 MHz hardware clock//65536 // Not used. The whole histogram period. It has to be divisible by the 2^32 total clock register.
 #define DELAYHALFMODULE	65535//65535 // Not used. One unit less than the power of two required of the period of the histogram which is 65535-1=2^16-1.
-#define HALFMODULE	512 // To center the arrival of the interrupt. It is half of DELAYMODULE
+#define HALFMODULE	32768 // To center the arrival of the interrupt. It is half of DELAYMODULE
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -167,7 +167,7 @@ PERIODICTIMESYNCHSUB: // with command coded 2 means synch by reseting the IEP ti
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
-//	ADD	r0, r0, r8 // Center the arrival of the interrupt
+	ADD	r0, r0, r8 // Center the arrival of the interrupt
 	AND	r0, r0, r6 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
 //	LBCO	r0.w0, CONST_IETREG, 0xC, 2//LBBO	r0.b0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4// Trick since for period of 65536 we can direclty implement module reading 2 bytes//Maybe it can not be done becaue larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
 	SUB	r0, r7, r0 // Substract to find how long to wait	
