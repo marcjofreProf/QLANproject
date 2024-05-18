@@ -538,8 +538,9 @@ this->acquire();// Very critical to not produce measurement deviations when asse
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 // Apply a slotted synch configuration (like synchronized Ethernet)
+this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 TimePoint TimePointFutureSynch=Clock::now();
-unsigned long long int SynchRem=static_cast<long long int>((static_cast<double>(SynchTrigPeriod)-fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),static_cast<double>(SynchTrigPeriod)))*static_cast<double>(PRUclockStepPeriodNanoseconds));
+unsigned long long int SynchRem=static_cast<long long int>(this->AdjPulseSynchCoeffAverage*(static_cast<double>(SynchTrigPeriod)-fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),static_cast<double>(SynchTrigPeriod)))*static_cast<double>(PRUclockStepPeriodNanoseconds));
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 ////if (Clock::now()<TimePointFutureSynchAux){cout << "Check that we have enough time" << endl;}
