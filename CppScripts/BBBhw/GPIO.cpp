@@ -275,9 +275,14 @@ int GPIO::PRUsignalTimerSynch(){
 				}
 				
 				auto duration_FinalInitial=this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future;
-				duration_FinalInitialCountAux=static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count());
+				duration_FinalInitialCountAux=static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count());				
 				//duration_FinalInitialCountAuxArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->duration_FinalInitialCountAux;
-				//duration_FinalInitialCountAuxArrayAvg=DoubleMedianFilterSubArray(duration_FinalInitialCountAuxArray,NumSynchMeasAvgAux);					
+				//duration_FinalInitialCountAuxArrayAvg=DoubleMedianFilterSubArray(duration_FinalInitialCountAuxArray,NumSynchMeasAvgAux);
+				// Below for the triggering
+				auto duration_FinalInitialMeasTrig=std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-TimePointClockCurrentSynchPRU1future).count();
+				this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=static_cast<unsigned int>(duration_FinalInitialMeasTrig);
+				this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
+				this->TrigAuxIterCount++;					
 				
 				//pru1dataMem_int[2]// Current IEP timer sample
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
@@ -530,7 +535,8 @@ this->ManualSemaphore=true;// Very critical to not produce measurement deviation
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 //this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 // Important, the following line at the very beggining to reduce the command jitter
-
+pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
+pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 // Apply a slotted synch configuration (like synchronized Ethernet)
 TimePoint TimePointFutureSynch=Clock::now();
 auto duration_InitialTrig=TimePointFutureSynch-TimePointClockSynchPRUinitial;
@@ -539,8 +545,6 @@ TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
 //while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
-pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 this->TimePointClockSynchPRUfinal=Clock::now();
 // Here there should be the instruction command to tell PRU1 to start generating signals
