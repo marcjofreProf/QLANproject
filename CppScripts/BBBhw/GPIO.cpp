@@ -559,6 +559,9 @@ this->release();
 auto duration_FinalInitialMeasTrig=std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynchAux).count();
 this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=static_cast<unsigned int>(duration_FinalInitialMeasTrig);
 this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
+this->TrigAuxIterCount++;
+
+cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 
 TimePointClockSynchPRUinitial=TimePointFutureSynch;// Update
 
@@ -615,7 +618,6 @@ do // This is blocking
 } while(!finPRU1);
 */
 
-this->TrigAuxIterCount++;
 return 0;// all ok	
 }
 
