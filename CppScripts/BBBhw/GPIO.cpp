@@ -463,8 +463,8 @@ pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 ///////////
-prussdrv_pru_send_event(21);
 this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
+prussdrv_pru_send_event(21);
 //this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 //this->ManualSemaphore=false;
 this->release();
