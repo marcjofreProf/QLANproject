@@ -541,12 +541,11 @@ pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 //this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 TimePoint TimePointFutureSynch=Clock::now();
 unsigned long long int SynchRem=static_cast<long long int>((static_cast<double>(SynchTrigPeriod)-fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),static_cast<double>(SynchTrigPeriod)))*static_cast<double>(PRUclockStepPeriodNanoseconds));
-cout << "fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),static_cast<double>(SynchTrigPeriod)): " << fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),static_cast<double>(SynchTrigPeriod)) << endl;
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 ////if (Clock::now()<TimePointFutureSynchAux){cout << "Check that we have enough time" << endl;}
-while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
-//while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
+//while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
+while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 this->TimePointClockSynchPRUfinal=Clock::now();
 // Here there should be the instruction command to tell PRU1 to start generating signals
