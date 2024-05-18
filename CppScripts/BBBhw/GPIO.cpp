@@ -468,8 +468,8 @@ pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 ///////////
-this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
 prussdrv_pru_send_event(21);
+this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
 //this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 //this->ManualSemaphore=false;
 this->release();
@@ -541,10 +541,10 @@ pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 TimePoint TimePointFutureSynch=Clock::now();
 auto duration_InitialTrig=TimePointFutureSynch-TimePointClockSynchPRUinitial;
 unsigned long long int SynchRem=static_cast<unsigned long long int>((static_cast<double>(SynchTrigPeriod)-fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTrig).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),static_cast<double>(SynchTrigPeriod)))*static_cast<double>(PRUclockStepPeriodNanoseconds));
-TimePointFutureSynch=TimePointFutureSynch-std::chrono::nanoseconds(SynchRem);
-//TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
-//while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
-while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
+TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
+TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
+while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
+//while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 this->TimePointClockSynchPRUfinal=Clock::now();
 // Here there should be the instruction command to tell PRU1 to start generating signals
@@ -554,7 +554,7 @@ retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterrupt
 pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // set command computed in synch process
 
 // Synch trig part
-auto duration_FinalInitialMeasTrig=std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynch).count();
+auto duration_FinalInitialMeasTrig=std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynchAux).count();
 this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=static_cast<int>(duration_FinalInitialMeasTrig);
 this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
 this->TrigAuxIterCount++;
@@ -562,7 +562,7 @@ this->TrigAuxIterCount++;
 this->ManualSemaphore=false;
 this->release();
 
-cout << "SynchRem: " << SynchRem << endl;
+//cout << "SynchRem: " << SynchRem << endl;
 //cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 
 TimePointClockSynchPRUinitial=TimePointFutureSynch;// Update
