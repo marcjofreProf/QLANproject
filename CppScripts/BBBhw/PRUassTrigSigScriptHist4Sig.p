@@ -24,9 +24,9 @@
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
 #define NUM_REPETITIONS		1024	//Not used 4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used). This defines the Maximum Transmission Unit - coul dbe named Quantum MTU (defined together with the clock)
 #define DELAY 4094//It has to be  related to an even power of 2!!! Example 1022=(2048-4)/2. How to do it. Substract 4 and divide by 2 for the common cost commands. For instance 58=(128-4)/2 // Assuming that QBNE always consumes one clock (check experimentally). It has to be a power of 2 to be able to do module in assembler. The original value is DELAYMODULE divided by 8.
-#define DELAYMODULE	1024// Slightly above the std jitter of the 24 MHz hardware clock//65536 // Not used. The whole histogram period. It has to be divisible by the 2^32 total clock register.
-#define DELAYHALFMODULE	1023//65535 // Not used. One unit less than the power of two required of the period of the histogram which is 65535-1=2^16-1.
-#define HALFMODULE	512 // To center the arrival of the interrupt. It is half of DELAYMODULE
+#define DELAYMODULE	65536// Slightly above the std jitter of the 24 MHz hardware clock//65536 // Not used. The whole histogram period. It has to be divisible by the 2^32 total clock register.
+#define DELAYHALFMODULE	65535//65535 // Not used. One unit less than the power of two required of the period of the histogram which is 65535-1=2^16-1.
+#define HALFMODULE	32768 // To center the arrival of the interrupt. It is half of DELAYMODULE
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -139,7 +139,7 @@ CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 4, and 1 bytes
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 4, and 1 bytes.
-	QBEQ	SIGNALON1, r0.b0, 1 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
+	QBEQ	PSEUDOSYNCH, r0.b0, 1 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
 	QBEQ	PERIODICTIMESYNCHSUB, r0.b0, 2 // 2 command is measure IEP timer status and so a substraction correction
 	QBEQ	PERIODICTIMESYNCHADD, r0.b0, 3 // 2 command is measure IEP timer status and so a substraction correction
 PERIODICTIMESYNCHCHECK: // with command coded 4 means chech synch only
