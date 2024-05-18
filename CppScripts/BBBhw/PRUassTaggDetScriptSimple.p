@@ -117,7 +117,7 @@ INITIATIONS:// This is only run once
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 	SET	r2.t3
-	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT. We start it when the commands enters
+	//SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT. We start it when the commands enters
 		
 	// Initial Re-initialization for IET counter. Used in the other PRU1
 	// The Clock gating Register controls the state of Clock Management
@@ -139,9 +139,7 @@ CMDLOOP:
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 1 bytes. It is the command to start
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction	
-	// Re-start DWT_CYCNT
-	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
-	SET	r2.t3
+	// Re-start DWT_CYCNT	
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
 	// Store a calibration timetagg
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
@@ -175,7 +173,13 @@ FINISH:
 	// Faster Concatenated Checks writting	
 	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 4 // writes values of r8
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM	
+	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
+	// Prepare DWT_CYCNT for next round
+	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+	CLR	r2.t3
+	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
+	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
+	SET	r2.t3
 	////////////////////////////////////////
 	MOV	r31.b0, PRU0_ARM_INTERRUPT+16//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
