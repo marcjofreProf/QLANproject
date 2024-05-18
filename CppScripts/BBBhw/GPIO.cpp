@@ -539,10 +539,10 @@ pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // 
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 // Apply a slotted synch configuration (like synchronized Ethernet)
 TimePoint TimePointFutureSynch=Clock::now();
-auto duration_InitialTrig=TimePointFutureSynch-TimePointClockSynchPRUinitial;
-unsigned long long int SynchRem=static_cast<unsigned long long int>((static_cast<double>(SynchTrigPeriod)-fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTrig).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),static_cast<double>(SynchTrigPeriod)))*static_cast<double>(PRUclockStepPeriodNanoseconds));
+unsigned long long int SynchRem=static_cast<long long int>((static_cast<double>(SynchTrigPeriod)-fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),static_cast<double>(SynchTrigPeriod)))*static_cast<double>(PRUclockStepPeriodNanoseconds));
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
+if (Clock::now()<TimePointFutureSynchAux){cout << "Check that we have enough time" << endl;}
 while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
 //while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
@@ -562,10 +562,10 @@ this->TrigAuxIterCount++;
 this->ManualSemaphore=false;
 this->release();
 
-//cout << "SynchRem: " << SynchRem << endl;
+cout << "SynchRem: " << SynchRem << endl;
 //cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 
-TimePointClockSynchPRUinitial=TimePointFutureSynch;// Update
+//TimePointClockSynchPRUinitial=TimePointFutureSynch;// Update
 
 //cout << "SendTriggerSignals: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 if (retInterruptsPRU1>0){
