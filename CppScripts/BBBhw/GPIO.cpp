@@ -677,6 +677,8 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 // Reading first calibration tag and link it to the system clock
 OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
 auto duration_InitialTag=this->TimePointClockTagPRUinitial-this->TimePointClockTagPRUinitialOld;//this->TimePointClockTagPRUinitial-this->TimePointClockTagPRUinitialOld;//this->TimePointClockTagPRUinitial-(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial)-this->TimePointClockTagPRUinitialOld;
+auto duration_InterruptTag=this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial;
+cout << "static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count()): " << static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count()) << endl;
 this->TimePointClockTagPRUinitialOld=this->TimePointClockTagPRUinitial;// Update
 this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsInit)+static_cast<long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InitialTag).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)));
 this->TimeTaggsInit=this->TimeTaggsLast;// Update
