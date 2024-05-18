@@ -562,6 +562,7 @@ this->TrigAuxIterCount++;
 this->ManualSemaphore=false;
 this->release();
 
+cout << "SynchRem: " << SynchRem << endl;
 //cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 
 TimePointClockSynchPRUinitial=TimePointFutureSynch;// Update
@@ -683,7 +684,7 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 */
 // Reading first calibration tag and link it to the system clock
 OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
-cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl;
+//cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl;
 auto duration_InitialTag=this->TimePointClockTagPRUinitial-this->TimePointClockTagPRUinitialOld;//this->TimePointClockTagPRUinitial-this->TimePointClockTagPRUinitialOld;//this->TimePointClockTagPRUinitial-(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial)-this->TimePointClockTagPRUinitialOld;
 //auto duration_InterruptTag=this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial;
 //cout << "static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InterruptTag).count()): " << static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InterruptTag).count()) << endl;
