@@ -532,7 +532,7 @@ return 0;// all ok
 }
 
 int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
+while (this->ManualSemaphoreExtra);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 //this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
