@@ -537,6 +537,10 @@ this->acquire();// Very critical to not produce measurement deviations when asse
 //this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 // Apply a slotted synch configuration (like synchronized Ethernet)
 //this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
+pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
+pru1dataMem_int[3]=static_cast<unsigned int>(SynchTrigPeriod);// Indicate period of the sequence signal
+pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
+
 TimePoint TimePointFutureSynch=Clock::now();
 int SynchRem=static_cast<int>(((2.0*SynchTrigPeriod)-fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<double>(PRUclockStepPeriodNanoseconds));
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
@@ -545,9 +549,6 @@ TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 //while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
 while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
 // Important, the following line at the very beggining to reduce the command jitter
-pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-pru1dataMem_int[3]=static_cast<unsigned int>(SynchTrigPeriod);// Indicate period of the sequence signal
-pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 this->TimePointClockSynchPRUfinal=Clock::now();
 // Here there should be the instruction command to tell PRU1 to start generating signals
