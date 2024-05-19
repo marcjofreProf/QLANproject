@@ -9,7 +9,7 @@
  
 .origin 0				// start of program in PRU memory
 .entrypoint INITIATIONS			// program entry point (for debbuger)
-#define DATARAMoffset	0x800 //4*512=2048=0x00000800 To avoid data corruption due to PRU storing data for itself for itself
+
 #define GPIO0_BANK 0x44E07000
 #define GPIO1_BANK 0x4804c000 // this is the address of the BB GPIO1 Bank Register for PR0
 #define GPIO2_BANK 0x481ac000 // this is the address of the BBB GPIO2 Bank Register for PRU1. We set bits in special locations in offsets here to put a GPIO high or low.
@@ -87,8 +87,8 @@ INITIATIONS:
 
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
-	MOV	r0, OWN_RAM// | OWN_RAMoffset
-	MOV	r10, 0x24000+0x20+DATARAMoffset// | C24add//CONST_PRUDRAM
+	MOV	r0, OWN_RAM+OWN_RAMoffset// | OWN_RAMoffset
+	MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
 	SBBO	r0, r10, 0, 4//SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
 	// Initial Re-initialization for IET counter
