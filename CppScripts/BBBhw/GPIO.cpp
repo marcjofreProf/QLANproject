@@ -42,7 +42,7 @@
 
 #define PRU0_DATARAM 0x00000000 //Global Memory Map (from the perspective of the host)// Already initiated at this position with LOCAL_DDMinit
 #define PRU1_DATARAM 0x00002000 //Global Memory Map (from the perspective of the host)// Already initiated at this position with LOCAL_DDMinit
-#define DATARAMoffset	     128 //0x00000200 // Offset from Base OWN_RAM to avoid collision with some data. Used
+#define DATARAMoffset 0x00000050 // Offset from Base OWN_RAM to avoid collision with some data. 0x50 insted of 0x200 since it is unsigned int (32 bits) instead of char (8 bits), so a factor 4 less. Used
 
 #define PRUSS0_PRU0_DATARAM 0
 #define PRUSS0_PRU1_DATARAM 1
