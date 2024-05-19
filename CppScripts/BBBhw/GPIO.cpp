@@ -469,8 +469,8 @@ this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;// Acquire this value for
 ///////////
 pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures
 pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
-this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
 prussdrv_pru_send_event(21);
+this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
 //this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
