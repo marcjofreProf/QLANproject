@@ -182,7 +182,7 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME// https://opensource.com/article/17/6/timekeeping-linux-vms
-this->TimePointClockCurrentInitialMeas=this->TimePointClockCurrentFinal-std::chrono::nanoseconds(this->duration_FinalInitialDriftAuxArrayAvg);
+this->TimePointClockCurrentInitialMeas=this->TimePointClockCurrentFinal;//-std::chrono::nanoseconds(this->duration_FinalInitialDriftAuxArrayAvg);
 while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);// Busy waiting
 //this->TimePointClockCurrentInitialMeas=ClockWatch::now(); //Computed in the step before
 // Important, the following line at the very beggining to reduce the command jitter
@@ -202,8 +202,7 @@ else{
 	cout << "PRU1 interrupt poll error" << endl;
 }
 
-auto duration_FinalInitialDrift=this->TimePointClockCurrentInitialMeas-this->TimePointClockCurrentFinalMeas;
-duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count();//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
+duration_FinalInitialDriftAux=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-this->TimePointClockCurrentFinalMeas).count());//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
 
 switch(FilterMode) {
 case 2:{// Mean implementation

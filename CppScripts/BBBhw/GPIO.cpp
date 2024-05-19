@@ -467,8 +467,8 @@ pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 ///////////
-prussdrv_pru_send_event(21);
 this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
+prussdrv_pru_send_event(21);
 //this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 //this->ManualSemaphore=false;
 this->release();
@@ -541,10 +541,10 @@ pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 TimePoint TimePointFutureSynch=Clock::now();
 int SynchRem=static_cast<int>(((2.0*SynchTrigPeriod)-fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<double>(PRUclockStepPeriodNanoseconds));
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
-TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
+//TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 ////if (Clock::now()<TimePointFutureSynchAux){cout << "Check that we have enough time" << endl;}
-while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
-//while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
+//while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
+while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 this->TimePointClockSynchPRUfinal=Clock::now();
 // Here there should be the instruction command to tell PRU1 to start generating signals
@@ -554,7 +554,7 @@ retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterrupt
 pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // set command computed in synch process
 
 // Synch trig part
-int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynchAux).count());
+int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynch).count());
 this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
 this->TrigAuxIterCount++;
@@ -565,7 +565,7 @@ this->release();
 //cout << "SynchRem: " << SynchRem << endl;
 //cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 
-TimePointClockSynchPRUinitial=TimePointFutureSynch;// Update
+//TimePointClockSynchPRUinitial=TimePointFutureSynch;// Update. When commented is in absolute value. Might create precition errors for long evaluatoin times
 
 //cout << "SendTriggerSignals: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 if (retInterruptsPRU1>0){

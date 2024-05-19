@@ -69,7 +69,6 @@
 // r5 reserved for delay count
 // r6 reserved for half period of delay module
 // r7 reserved for period of delay module
-// r8 reserved for increasing to mid point the arrival of the interrupt
 
 // r10 is arbitrary used for operations
 
