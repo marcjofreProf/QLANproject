@@ -567,7 +567,7 @@ retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterrupt
 //this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
 //this->TrigAuxIterCount++;
 
-//this->ManualSemaphore=false;
+this->ManualSemaphore=false;
 this->release();
 
 //cout << "SynchRem: " << SynchRem << endl;
