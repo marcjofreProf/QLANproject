@@ -136,7 +136,7 @@ CMDLOOP2:// Double verification of host sending start command
 	LBCO	r10, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction or sequence signal period
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // We remove the command from the host (in case there is a reset from host, we are saved) 1 bytes.
 	// Start executing	
-	QBEQ	PSEUDOSYNCH, r0.b0, 1 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
+	QBEQ	SIGNALON1, r0.b0, 1 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
 	QBEQ	PERIODICTIMESYNCHSUB, r0.b0, 2 // 2 command is measure IEP timer status and so a substraction correction
 	QBEQ	PERIODICTIMESYNCHADD, r0.b0, 3 // 2 command is measure IEP timer status and so a substraction correction
 PERIODICTIMESYNCHCHECK: // with command coded 4 means chech synch only	
