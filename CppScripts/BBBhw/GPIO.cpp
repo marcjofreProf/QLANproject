@@ -260,7 +260,7 @@ int GPIO::PRUsignalTimerSynch(){
 				//this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info. Already computed in thesteps before				
 				// Important, the following line at the very beggining to reduce the command jitter				
 				prussdrv_pru_send_event(22);
-				this->TimePointClockSendCommandFinal=Clock::now(); // Initial measurement.
+				//this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
 				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
 				//cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 				if (retInterruptsPRU1>0){
@@ -275,19 +275,19 @@ int GPIO::PRUsignalTimerSynch(){
 					cout << "PRU1 interrupt error" << endl;
 				}							
 				// Below for the triggering
-				int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-TimePointClockCurrentSynchPRU1future).count());
-				//this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
-				//this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
-				//this->TrigAuxIterCount++;
+				//int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-TimePointClockCurrentSynchPRU1future).count());
+				////this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
+				////this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
+				////this->TrigAuxIterCount++;
 				// Below for synch calculation compensation
-				duration_FinalInitialCountAux=static_cast<double>(duration_FinalInitialMeasTrig);				
-				//duration_FinalInitialCountAuxArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->duration_FinalInitialCountAux;
-				//duration_FinalInitialCountAuxArrayAvg=DoubleMedianFilterSubArray(duration_FinalInitialCountAuxArray,NumSynchMeasAvgAux);					
+				//duration_FinalInitialCountAux=static_cast<double>(duration_FinalInitialMeasTrig);				
+				////duration_FinalInitialCountAuxArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->duration_FinalInitialCountAux;
+				////duration_FinalInitialCountAuxArrayAvg=DoubleMedianFilterSubArray(duration_FinalInitialCountAuxArray,NumSynchMeasAvgAux);					
 				
 				//pru1dataMem_int[2]// Current IEP timer sample
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[2]);
-				this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
+				//this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
 				// Unwrap
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
