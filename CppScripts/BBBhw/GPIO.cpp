@@ -42,7 +42,7 @@
 
 #define PRU0_DATARAM 0x00000000 //Global Memory Map (from the perspective of the host)// Already initiated at this position with LOCAL_DDMinit
 #define PRU1_DATARAM 0x00002000 //Global Memory Map (from the perspective of the host)// Already initiated at this position with LOCAL_DDMinit
-#define DATARAMoffset 0x00000200 // Offset from Base OWN_RAM to avoid collision with some data. Used
+#define DATARAMoffset 0x00000200 // Offset from Base OWN_RAM to avoid collision with some data. // Already initiated at this position with LOCAL_DDMinit
 
 #define PRUSS0_PRU0_DATARAM 0
 #define PRUSS0_PRU1_DATARAM 1
@@ -122,15 +122,15 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Here we can update memory space assigned address
 	valpHolder=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM];
 	valpAuxHolder=valpHolder+4+5*NumRecords;// 5* since each deteciton also includes the channels, and plus 4 since the first tag is captured at the very beggining
-	CalpHolder=(unsigned int*)&pru0dataMem_int[DATARAMoffset+2];// First tagg captured at the very beggining
-	synchpHolder=(unsigned int*)&pru0dataMem_int[DATARAMoffset+3];// Starts at 12
+	CalpHolder=(unsigned int*)&pru0dataMem_int[2];// First tagg captured at the very beggining
+	synchpHolder=(unsigned int*)&pru0dataMem_int[3];// Starts at 12
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Timetagging
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
-	pru0dataMem_int[DATARAMoffset+0]=static_cast<unsigned int>(0); // set no command
-	pru0dataMem_int[DATARAMoffset+1]=static_cast<unsigned int>(this->NumRecords); // set number captures, with overflow clock - Not used
+	pru0dataMem_int[0]=static_cast<unsigned int>(0); // set no command
+	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures, with overflow clock - Not used
 	//if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
 	//	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
 	//		perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
@@ -144,9 +144,9 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	////prussdrv_pru_enable(PRU_Operation_NUM);
 	
 	// Generate signals
-	pru1dataMem_int[DATARAMoffset+0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-	//pru1dataMem_int[DATARAMoffset+1]=static_cast<unsigned int>(0); // set no command
-	pru1dataMem_int[DATARAMoffset+1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
+	pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
+	//pru1dataMem_int[1]=static_cast<unsigned int>(0); // set no command
+	pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
 	// Load and execute the PRU program on the PRU1
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
 		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
@@ -257,8 +257,8 @@ int GPIO::PRUsignalTimerSynch(){
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html												
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
 				//this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info. Already computed in thesteps before
-				pru1dataMem_int[DATARAMoffset+3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
-				pru1dataMem_int[DATARAMoffset+1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
+				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
+				pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
 				// Important, the following line at the very beggining to reduce the command jitter				
 				prussdrv_pru_send_event(22);
 				this->TimePointClockSendCommandFinal=Clock::now(); // Initial measurement.
@@ -285,9 +285,9 @@ int GPIO::PRUsignalTimerSynch(){
 				//duration_FinalInitialCountAuxArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->duration_FinalInitialCountAux;
 				//duration_FinalInitialCountAuxArrayAvg=DoubleMedianFilterSubArray(duration_FinalInitialCountAuxArray,NumSynchMeasAvgAux);					
 				
-				//pru1dataMem_int[DATARAMoffset+2]// Current IEP timer sample
-				//pru1dataMem_int[DATARAMoffset+3]// Correction to apply to IEP timer
-				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[DATARAMoffset+2]);
+				//pru1dataMem_int[2]// Current IEP timer sample
+				//pru1dataMem_int[3]// Correction to apply to IEP timer
+				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[2]);
 				this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
 				// Unwrap
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
@@ -321,7 +321,7 @@ int GPIO::PRUsignalTimerSynch(){
 						this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied;
 					}
 					if (this->PRUoffsetDriftErrorApplied==0){
-						//pru1dataMem_int[DATARAMoffset+3]=static_cast<unsigned int>(0);
+						//pru1dataMem_int[3]=static_cast<unsigned int>(0);
 						this->NextSynchPRUcorrection=static_cast<unsigned int>(0);
 						this->iIterPRUcurrentTimerValSynch++;
 						this->iIterPRUcurrentTimerValPass=1;
@@ -330,7 +330,7 @@ int GPIO::PRUsignalTimerSynch(){
 						this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 					}
 					else if (this->PRUoffsetDriftErrorApplied<0.0 and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))+this->PRUoffsetDriftErrorApplied)>(0+TimeClockMarging) and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)))<(0xFFFFFFFF-TimeClockMarging) ){// Substraction correction					
-						//pru1dataMem_int[DATARAMoffset+3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
+						//pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
 						this->NextSynchPRUcorrection=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied); 
 						this->iIterPRUcurrentTimerValSynch++;
 						this->iIterPRUcurrentTimerValPass=1;
@@ -339,7 +339,7 @@ int GPIO::PRUsignalTimerSynch(){
 						this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 					}
 					else if (this->PRUoffsetDriftErrorApplied>0.0 and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))+this->PRUoffsetDriftErrorApplied)<(0xFFFFFFFF-TimeClockMarging)){// Addition correction
-						//pru1dataMem_int[DATARAMoffset+3]=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);// Apply correction
+						//pru1dataMem_int[3]=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);// Apply correction
 						this->NextSynchPRUcorrection=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);
 						this->iIterPRUcurrentTimerValSynch++;
 						this->iIterPRUcurrentTimerValPass=1;
@@ -348,7 +348,7 @@ int GPIO::PRUsignalTimerSynch(){
 						this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 					}
 					else{
-						//pru1dataMem_int[DATARAMoffset+3]=static_cast<unsigned int>(0);// Do not apply correction.
+						//pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
 						this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.					
 						this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
 						this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
@@ -369,25 +369,25 @@ int GPIO::PRUsignalTimerSynch(){
 				//	this->iIterPRUcurrentTimerValPass=1;
 				//}
 				if (this->PRUoffsetDriftErrorApplied>0.0){// and this->iIterPRUcurrentTimerValPass==1){
-					//pru1dataMem_int[DATARAMoffset+1]=static_cast<unsigned int>(3); // set command 3, to execute synch functions addition correction
+					//pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 3, to execute synch functions addition correction
 					this->NextSynchPRUcommand=static_cast<unsigned int>(3);
 				}				
 				else if (this->PRUoffsetDriftErrorApplied<0.0){// and this->iIterPRUcurrentTimerValPass==1){
-					//pru1dataMem_int[DATARAMoffset+1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
+					//pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
 					this->NextSynchPRUcommand=static_cast<unsigned int>(2);
 				}
 				else{// if (this->PRUoffsetDriftErrorApplied==0 or this->iIterPRUcurrentTimerValPass>1){
 					this->PRUoffsetDriftErrorApplied=0;
 					this->PRUoffsetDriftErrorAppliedRaw=0;
-					//pru1dataMem_int[DATARAMoffset+1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
+					//pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
 					this->NextSynchPRUcommand=static_cast<unsigned int>(4);
 				}
 				this->ManualSemaphore=false;
 				this->release();							
 			}
 			else{// does not enter in time
-				//pru1dataMem_int[DATARAMoffset+3]=static_cast<unsigned int>(0);// Do not apply correction.
-				//pru1dataMem_int[DATARAMoffset+1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
+				//pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
+				//pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
 				this->NextSynchPRUcommand=static_cast<unsigned int>(4);
 				this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.
 				this->iIterPRUcurrentTimerValPass++;
@@ -406,8 +406,8 @@ int GPIO::PRUsignalTimerSynch(){
 			cout << "Double run in time sync method. This should not happen!" << endl;
 		}
 		else{// does not enter in time
-			//pru1dataMem_int[DATARAMoffset+3]=static_cast<unsigned int>(0);// Do not apply correction.
-			//pru1dataMem_int[DATARAMoffset+1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
+			//pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
+			//pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
 			this->NextSynchPRUcommand=static_cast<unsigned int>(4);
 			this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.
 			this->iIterPRUcurrentTimerValPass++;
@@ -464,8 +464,8 @@ return 0; // All ok
 }
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
-pru0dataMem_int[DATARAMoffset+1]=static_cast<unsigned int>(this->NumRecords); // set number captures
-pru0dataMem_int[DATARAMoffset+0]=static_cast<unsigned int>(1); // set command
+pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures
+pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 
 /////////////
 //while (this->ManualSemaphore);// Very critical to not produce measurement deviations when assessing the periodic snchronization
@@ -513,14 +513,14 @@ TimeNow_time_as_countPRU0 = std::chrono::duration_cast<std::chrono::milliseconds
 
 if (TimeNow_time_as_countPRU0>TimePointFuture_time_as_countPRU0){CheckTimeFlagPRU0=true;}
 else{CheckTimeFlagPRU0=false;}
-	if (pru0dataMem_int[DATARAMoffset+1] == (unsigned int)1 and CheckTimeFlagPRU0==false)// Seems that it checks if it has finished the acquisition
+	if (pru0dataMem_int[1] == (unsigned int)1 and CheckTimeFlagPRU0==false)// Seems that it checks if it has finished the acquisition
 	{
-		pru0dataMem_int[DATARAMoffset+1] = (unsigned int)0; // Here clears the value
+		pru0dataMem_int[1] = (unsigned int)0; // Here clears the value
 		this->DDRdumpdata(); // Store to file		
 		finPRU0=true;
 	}
 	else if (CheckTimeFlagPRU0==true){// too much time
-		pru0dataMem_int[DATARAMoffset+1]=(unsigned int)0; // set to zero means no command.
+		pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command.
 		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
 		//prussdrv_pru_reset(PRU_Operation_NUM);
 		//prussdrv_pru_disable(PRU_Operation_NUM);// Disable the PRU
@@ -549,17 +549,17 @@ TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 //while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
 while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
 // Important, the following line at the very beggining to reduce the command jitter
-pru1dataMem_int[DATARAMoffset+0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-pru1dataMem_int[DATARAMoffset+1]=static_cast<unsigned int>(1); // set command
-pru1dataMem_int[DATARAMoffset+3]=static_cast<unsigned int>(SynchTrigPeriod);// Indicate period of the sequence signal
+pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
+pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
+pru1dataMem_int[3]=static_cast<unsigned int>(SynchTrigPeriod);// Indicate period of the sequence signal
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 this->TimePointClockSynchPRUfinal=Clock::now();
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memory space of PRU0 to tell PRU1 to initiate signals
 
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
-//pru1dataMem_int[DATARAMoffset+1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // set command computed in synch process
-//pru1dataMem_int[DATARAMoffset+3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// Re-insert the correction for next cycle
+//pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // set command computed in synch process
+//pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// Re-insert the correction for next cycle
 
 // Synch trig part
 //int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynch).count());
@@ -609,14 +609,14 @@ do // This is blocking
 	if (TimeNow_time_as_countPRU1>TimePointFuture_time_as_countPRU1){CheckTimeFlagPRU1=true;}
 	else{CheckTimeFlagPRU1=false;}
 	//cout << "CheckTimeFlag: " << CheckTimeFlag << endl;
-	if (pru1dataMem_int[DATARAMoffset+1] == (unsigned int)1 and CheckTimeFlagPRU1==false)// Seems that it checks if it has finished the sequence
+	if (pru1dataMem_int[1] == (unsigned int)1 and CheckTimeFlagPRU1==false)// Seems that it checks if it has finished the sequence
 	{	
-		pru1dataMem_int[DATARAMoffset+1] = (unsigned int)0; // Here clears the value
+		pru1dataMem_int[1] = (unsigned int)0; // Here clears the value
 		//cout << "GPIO::SendTriggerSignals finished" << endl;
 		finPRU1=true;
 	}
 	else if (CheckTimeFlagPRU1==true){// too much time		
-		pru1dataMem_int[DATARAMoffset+1]=(unsigned int)0; // set to zero means no command.	
+		pru1dataMem_int[1]=(unsigned int)0; // set to zero means no command.	
 		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
 		//prussdrv_pru_reset(PRU_Signal_NUM);
 		//prussdrv_pru_disable(PRU_Signal_NUM);// Disable the PRU
@@ -1192,9 +1192,9 @@ else{
 
 int GPIO::SendTriggerSignalsSelfTest(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 // Important, the following line at the very beggining to reduce the command jitter
-pru1dataMem_int[DATARAMoffset+0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-pru1dataMem_int[DATARAMoffset+1]=static_cast<unsigned int>(1); // set command
-prussdrv_pru_send_event(22);//pru1dataMem_int[DATARAMoffset+1]=(unsigned int)2; // set to 2 means perform signals//prussdrv_pru_send_event(22);
+pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
+pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
+prussdrv_pru_send_event(22);//pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals//prussdrv_pru_send_event(22);
 
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memoryspace of PRU0 to tell PRU1 to initiate signals
