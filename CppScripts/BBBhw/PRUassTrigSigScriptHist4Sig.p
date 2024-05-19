@@ -126,27 +126,25 @@ CMDLOOP:
 	//QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction. Code 0 means idle
 	//QBEQ	CMDLOOP, r0.b0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
 	QBBC	CMDLOOP, r31, 31
-	// ok, we have an instruction (code 2). Assume it means 'begin signals'
-	// Read the number of NUM_REPETITIONS from positon 0 of PRU1 DATA RAM and stored it
-	LBCO 	r1, CONST_PRUDRAM, 0, 4
-	// We remove the command from the host (in case there is a reset from host, we are saved)
-	//SBCO 	r4.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM
+	// We remove the interrupt from the host (in case there is a reset from host, we are saved)
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 4, and 1 bytes
 	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
-	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 4, and 1 bytes.
+	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // We remove the command from the host (in case there is a reset from host, we are saved)d 1 bytes.
+	// Read the number of NUM_REPETITIONS from positon 0 of PRU1 DATA RAM and stored it
+	LBCO 	r1, CONST_PRUDRAM, 0, 4
+	LBCO	r10, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction or sequence signal period
+	// Start executing	
 	QBEQ	PSEUDOSYNCH, r0.b0, 1 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
 	QBEQ	PERIODICTIMESYNCHSUB, r0.b0, 2 // 2 command is measure IEP timer status and so a substraction correction
 	QBEQ	PERIODICTIMESYNCHADD, r0.b0, 3 // 2 command is measure IEP timer status and so a substraction correction
-PERIODICTIMESYNCHCHECK: // with command coded 4 means chech synch only
-	LBCO	r10, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction
+PERIODICTIMESYNCHCHECK: // with command coded 4 means chech synch only	
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP	CMDLOOP
 PERIODICTIMESYNCHADD: // with command coded 3 means synch by reseting the IEP timer
-	LBCO	r10, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
 	ADD	r0, r0, r10 // Apply correction
 	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
@@ -154,7 +152,6 @@ PERIODICTIMESYNCHADD: // with command coded 3 means synch by reseting the IEP ti
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP	CMDLOOP
 PERIODICTIMESYNCHSUB: // with command coded 2 means synch by reseting the IEP timer
-	LBCO	r10, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
 	SUB	r0, r0, r10 // Apply correction
 	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
@@ -163,8 +160,8 @@ PERIODICTIMESYNCHSUB: // with command coded 2 means synch by reseting the IEP ti
 	JMP	CMDLOOP
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
-//	LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM the period of the signal sequence
-//	SUB	r6, r7, 1 // Generate the value for r6
+	MOV	r7, r10 // Sequence signal period
+	SUB	r6, r10, 1 // Generate the value for r6
 	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
 	AND	r0, r0, r6 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
 //	LBCO	r0.w0, CONST_IETREG, 0xC, 2//LBBO	r0.b0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4// Trick since for period of 65536 we can direclty implement module reading 2 bytes//Maybe it can not be done becaue larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
