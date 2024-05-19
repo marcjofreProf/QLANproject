@@ -468,9 +468,9 @@ int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 while (this->ManualSemaphoreExtra);// Wait until periodic synch method finishes
 this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;// Acquire this value for the this tag reading set
 ///////////
-this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
 pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures
 pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
+this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
 prussdrv_pru_send_event(21);
 //this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 
@@ -546,8 +546,8 @@ TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
 // Important, the following line at the very beggining to reduce the command jitter
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 pru1dataMem_int[3]=static_cast<unsigned int>(SynchTrigPeriod);// Indicate period of the sequence signal
+pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 this->TimePointClockSynchPRUfinal=Clock::now();
 // Here there should be the instruction command to tell PRU1 to start generating signals
