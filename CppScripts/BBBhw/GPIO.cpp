@@ -537,7 +537,7 @@ this->acquire();// Very critical to not produce measurement deviations when asse
 // Apply a slotted synch configuration (like synchronized Ethernet)
 //this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod/128);// Indicate period of the sequence signal
+pru1dataMem_int[3]=static_cast<unsigned int>(2*this->SynchTrigPeriod);// Indicate period of the sequence signal
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
 
 TimePoint TimePointFutureSynch=Clock::now();
