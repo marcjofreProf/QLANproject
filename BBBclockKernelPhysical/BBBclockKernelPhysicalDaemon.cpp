@@ -187,7 +187,7 @@ while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);// Busy waitin
 //this->TimePointClockCurrentInitialMeas=ClockWatch::now(); //Computed in the step before
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
-this->TimePointClockCurrentFinalMeas=ClockWatch::now(); //Jitter and no information
+//this->TimePointClockCurrentFinalMeas=ClockWatch::now(); //Jitter and no information
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// After the interrupt update rapidly the new quarter value
 
 if (retInterruptsPRU1>0){
@@ -202,7 +202,7 @@ else{
 	cout << "PRU1 interrupt poll error" << endl;
 }
 
-duration_FinalInitialDriftAux=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-this->TimePointClockCurrentFinalMeas).count());//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
+/*duration_FinalInitialDriftAux=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-this->TimePointClockCurrentFinalMeas).count());//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
 
 switch(FilterMode) {
 case 2:{// Mean implementation
@@ -218,7 +218,7 @@ break;
 default:{// Average implementation
 this->duration_FinalInitialDriftAuxArrayAvg = this->RatioAverageFactorClockQuarterPeriod*this->duration_FinalInitialDriftAuxArrayAvg+(1.0-this->RatioAverageFactorClockQuarterPeriod)*this->duration_FinalInitialDriftAux;
 }
-}
+}*/
 
 this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 

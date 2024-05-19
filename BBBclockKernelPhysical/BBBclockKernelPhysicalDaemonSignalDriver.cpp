@@ -196,12 +196,12 @@ while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);// Busy waitin
 //this->TimePointClockCurrentInitialMeas=ClockWatch::now(); //Computed in the step before
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(21);
-this->TimePointClockCurrentFinalMeas=ClockWatch::now();
+//this->TimePointClockCurrentFinalMeas=ClockWatch::now();
 
 prussdrv_pru_send_event(22); // Send interrupt to PRU1
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);// After the interrupt update rapidly the new quarter value
-
+/*
 duration_FinalInitialDriftAux=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-this->TimePointClockCurrentFinalMeas).count());//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
 switch(FilterMode) {
 case 2:{// Mean implementation
@@ -217,7 +217,7 @@ break;
 default:{// Average implementation
 this->duration_FinalInitialDriftAuxArrayAvg = this->RatioAverageFactorClockFullPeriod*this->duration_FinalInitialDriftAuxArrayAvg+(1.0-this->RatioAverageFactorClockFullPeriod)*this->duration_FinalInitialDriftAux;
 }
-}
+}*/
 
 this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 
