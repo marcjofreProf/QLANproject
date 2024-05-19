@@ -418,7 +418,6 @@ int GPIO::PRUsignalTimerSynch(){
 			if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
 			//this->TimePointClockSendCommandInitial=this->TimePointClockSendCommandInitial+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
 		}
-		this->ManualSemaphore=false;
 		this->ManualSemaphoreExtra=false;
 		// Absolute drift monitoring
 		//auto duration_FinalInitialDrift=this->TimePointClockSendCommandInitial-this->TimePointClockPRUinitial;
