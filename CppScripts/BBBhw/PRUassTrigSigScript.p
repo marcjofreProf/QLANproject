@@ -110,15 +110,14 @@ CMDLOOP:
 	//QBEQ	CMDLOOP, r0.b0, 1 // loop until we get an instruction. Code 1 means finished (to inform the ARM host)
 	QBBC	CMDLOOP, r31, 31	//
 	// ok, we have an instruction (code 2). Assume it means 'begin signals'
-	// Read the number of NUM_REPETITIONS from positon 0 of PRU1 DATA RAM and stored it
-	LBCO 	r1, CONST_PRUDRAM, 0, 4
 	// We remove the command from the host (in case there is a reset from host, we are saved)
 	//SBCO 	r4.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
-	QBEQ	CMDLOOP2, r0.b0, 0 // loop until we get an instruction
-	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes.
+	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction	
+	LBCO 	r1, CONST_PRUDRAM, 0, 4// Read the number of NUM_REPETITIONS from positon 0 of PRU1 DATA RAM and stored it
+	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes. Reset the command
 //PSEUDOSYNCH:
 //	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
 //	LBBO	r0.b0, r3, 0, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1

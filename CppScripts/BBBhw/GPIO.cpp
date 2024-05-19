@@ -465,12 +465,8 @@ return 0; // All ok
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 /////////////
-//while (this->ManualSemaphore);// Very critical to not produce measurement deviations when assessing the periodic snchronization
-//this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
-this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
-this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
-//this->ManualSemaphore=false;
-this->release();
+while (this->ManualSemaphoreExtra);// Wait until periodic synch method finishes
+this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;// Acquire this value for the this tag reading set
 ///////////
 this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
 pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures
