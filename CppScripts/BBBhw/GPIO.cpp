@@ -248,11 +248,11 @@ int GPIO::PRUsignalTimerSynch(){
 	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockPRUinitial;// First time
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	while(true){		
-		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra)) and this->ManualSemaphoreExtra==false){// It was possible to execute when needed		
-			this->ManualSemaphoreExtra=true;
+		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra)) and this->ManualSemaphoreExtra==false){// It was possible to execute when needed			
 			//cout << "Resetting PRUs timer!" << endl;
 			if (clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).//https://opensource.com/article/17/6/timekeeping-linux-vms
 				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
+				this->ManualSemaphoreExtra=true;
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization						
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html												
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
@@ -382,6 +382,7 @@ int GPIO::PRUsignalTimerSynch(){
 					//pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
 					this->NextSynchPRUcommand=static_cast<unsigned int>(4);
 				}
+				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
 				this->release();							
 			}
@@ -398,8 +399,7 @@ int GPIO::PRUsignalTimerSynch(){
 				// Re wrap					
 				if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
 				//this->TimePointClockSendCommandInitial=this->TimePointClockSendCommandInitial+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
-			}
-			this->ManualSemaphoreExtra=false;		
+			}					
 		} //end if
 		else if (this->ManualSemaphoreExtra==true){
 			// Double entry for some reason. Do not do anything
