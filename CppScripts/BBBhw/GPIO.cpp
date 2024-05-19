@@ -254,11 +254,11 @@ int GPIO::PRUsignalTimerSynch(){
 			if (clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).//https://opensource.com/article/17/6/timekeeping-linux-vms
 				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization						
-				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html
-				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
-				pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command								
+				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html												
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
 				//this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info. Already computed in thesteps before
+				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
+				pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
 				// Important, the following line at the very beggining to reduce the command jitter				
 				prussdrv_pru_send_event(22);
 				this->TimePointClockSendCommandFinal=Clock::now(); // Initial measurement.
@@ -539,10 +539,6 @@ int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physical
 //this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
-// Important, the following line at the very beggining to reduce the command jitter
-pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
-pru1dataMem_int[3]=static_cast<unsigned int>(SynchTrigPeriod);// Indicate period of the sequence signal
 // Apply a slotted synch configuration (like synchronized Ethernet)
 //this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 TimePoint TimePointFutureSynch=Clock::now();
@@ -552,6 +548,10 @@ TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 ////if (Clock::now()<TimePointFutureSynchAux){cout << "Check that we have enough time" << endl;}
 //while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
 while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
+// Important, the following line at the very beggining to reduce the command jitter
+pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
+pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
+pru1dataMem_int[3]=static_cast<unsigned int>(SynchTrigPeriod);// Indicate period of the sequence signal
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 this->TimePointClockSynchPRUfinal=Clock::now();
 // Here there should be the instruction command to tell PRU1 to start generating signals
