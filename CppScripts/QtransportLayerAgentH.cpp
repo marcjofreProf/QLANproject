@@ -860,7 +860,6 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		// The node of a host is always identified in the Array in position 0			    
 		    int socket_fd_conn;
 		    // Mount message
-		    /*
 		    // Notice that nodes Control (and only Control messages, Operational messages do not have this) messages meant to other nodes through their respective hosts have a composed payload, where the first part has the other host's node to whom the message has to be forwarded (at least up to its host - the host of the node sending the message). Hence, the Payload has to be processed a bit.
 		    for (int iIterOpHost=0;iIterOpHost<2;iIterOpHost++){// Manually set - This should be programmed in order to scale
 		    	    char PayLoadReassembled[NumBytesPayloadBuffer] = {0};
@@ -910,8 +909,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    	}
 			    	strcat(PayLoadReassembled,";");	// Finish with semicolon	    			    				    
 			    }
-			    //cout << "Host's node Control Message original: " << Payload << endl;
-			    //cout << "Host's node Control Message reassembled: " << PayLoadReassembled << endl;
+			    cout << "Host's node Control Message original: " << Payload << endl;
+			    cout << "Host's node Control Message reassembled: " << PayLoadReassembled << endl;
 			    
 			    // Actually mount the reassembled message
 			    char ParamsCharArray[NumBytesBufferICPMAX] = {0};
@@ -925,8 +924,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				strcat(ParamsCharArray,",");
 				strcat(ParamsCharArray,PayLoadReassembled);//Payload);
 				strcat(ParamsCharArray,",");// Very important to end the message
-				//cout << "Node message  to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
-				//cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
+				cout << "Node message  to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
+				cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
 				
 			    strcpy(this->SendBuffer,ParamsCharArray);			
 			    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
@@ -937,7 +936,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
 				    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);//this->IPaddressesSockets[3]);
 			    }
-		     } // end for*/
+		     } // end for
 			    /*
 			    /////////////////////////////////////////////// To be eliminated
 			    // Mount message

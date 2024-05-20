@@ -325,9 +325,9 @@ for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){// Iterate o
 		sprintf(charNum, "%llu", TimePointFuture_time_as_count);//%llu: unsigned long long int
 		strcat(ParamsCharArray,charNum);
 		strcat(ParamsCharArray,"_"); // Final _
-		//cout << "ParamsCharArray: " << ParamsCharArray << endl;
 	}
 } // end for to the different addresses to send the params information
+cout << "QPLA::ParamsCharArray: " << ParamsCharArray << endl;
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 this->release();
