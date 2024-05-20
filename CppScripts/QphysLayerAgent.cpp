@@ -374,7 +374,8 @@ struct timespec requestWhileWait = this->GetFutureTimePointOtherNode(); // Bette
 this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum priority
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 
-while (Clock::now() < this->FutureTimePoint);// Busy wait
+//while (Clock::now() < this->FutureTimePoint);// Busy wait for sender getting the Future time point from the sender
+while (Clock::now() < this->OtherClientNodeFutureTimePoint);// Busy wait for sender setting the Future
 
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 
@@ -444,7 +445,8 @@ struct timespec requestWhileWait=this->SetFutureTimePointOtherNode(); // Better 
 this->acquire();
 // So that there are no segmentation faults by grabbing the CLOCK REALTIME and also this has maximum priority
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrier
-while (Clock::now() < this->OtherClientNodeFutureTimePoint);// Busy wait
+//while (Clock::now() < this->OtherClientNodeFutureTimePoint);// Busy wait for receiver getting the Future time point from the sender
+while (Clock::now() < this->FutureTimePoint);// Busy wait for receiver setting the Future time point
 
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 
