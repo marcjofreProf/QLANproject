@@ -432,6 +432,8 @@ return 0; // return 0 is for no error
 int QPLA::ThreadSimulateReceiveQubit(){
 cout << "Receiving Qubits" << endl;
 this->acquire();
+TimeTaggs[NumQubitsMemoryBuffer]={0}; // Clear the array. Actually only the first items is set to 0.
+ChannelTags[NumQubitsMemoryBuffer]={0}; // Clear the array. Actually only the first items is set to 0.
 PRUGPIO.ClearStoredQuBits();//PRUGPIO->ClearStoredQuBits();
 this->release();
 int iIterRuns;
@@ -440,8 +442,6 @@ int DetRunsCount = NumQubitsMemoryBuffer/NumQuBitsPerRun;
 struct timespec requestWhileWait=this->SetFutureTimePointOtherNode(); // Better that the receiver sets the time point of the future
 //struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
 this->acquire();
-TimeTaggs[NumQubitsMemoryBuffer]={0}; // Clear the array
-ChannelTags[NumQubitsMemoryBuffer]={0}; // Clear the array
 // So that there are no segmentation faults by grabbing the CLOCK REALTIME and also this has maximum priority
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrier
 while (Clock::now() < this->OtherClientNodeFutureTimePoint);// Busy wait
