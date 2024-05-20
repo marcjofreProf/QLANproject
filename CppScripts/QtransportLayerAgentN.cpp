@@ -754,7 +754,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			}
 			else{
 			//discard
-			cout << "Node does not have this information "<< Payload << endl;
+			cout << "Node does not have this information: "<< Payload << endl;
 			}
 		}		
 		else if (string(Command)==string("InfoProcess")){// Params messages
@@ -762,6 +762,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			this->ReadParametersAgent(Payload);
 		}
 		else if (string(Command)==string("SimulateSendQubits")){// Send qubits to the requesting host
+			cout << "Node Payload: "<< Payload << endl;
 			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
 			char PayloadAux[NumBytesPayloadBuffer]={0};
 			strcpy(PayloadAux,strtok(NULL,";"));
