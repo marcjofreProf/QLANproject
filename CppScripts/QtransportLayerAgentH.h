@@ -141,6 +141,10 @@ private: //Functions//Methods
 	int ProcessNewMessage(); // main function perferming the required operatons to process the task
 	int countQintupleComas(char* ParamsCharArray);
 	int countColons(char* ParamsCharArray);
+	int countDoubleColons(char* ParamsCharArray);
+	int countDoubleUnderscores(char* ParamsCharArray);
+	int countQuadrupleUnderscores(char* ParamsCharArray);
+
 };
 
 
