@@ -369,6 +369,9 @@ return 0; // return 0 is for no error
 
 int QPLA::ThreadSimulateEmitQuBit(){
 cout << "Emiting Qubits" << endl;
+this->acquire();
+// Important to have the control. As done for ThreadSimulateReceiveQuBit
+this->release();
 //struct timespec requestWhileWait=this->SetFutureTimePointOtherNode();
 struct timespec requestWhileWait = this->GetFutureTimePointOtherNode(); // Better that the node generating the signals receives the time point future from the receiver node.
 this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum priority
