@@ -312,6 +312,7 @@ unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cas
 //cout << "time_as_count: " << time_as_count << endl;
 
 // Tell to the other nodes
+/*
 char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){// Iterate over the different nodes to tell
 	if (isPotentialIpAddressStructure(IPaddresses[iIterIPaddr])){
@@ -331,6 +332,7 @@ for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){// Iterate o
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 this->release();
+*/
 this->RelativeNanoSleepWait((unsigned int)(100*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));// Give some time to be able to send the above message
 ////////////////////////////////////////////
 TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()-this->TimeClockMarging; // Add some margin so that busywait can be implemented for faster response
@@ -385,9 +387,9 @@ return requestWhileWait;
 
 int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux){
 this->acquire();
-strcpy(this->ModeActivePassive,ModeActivePassiveAux);
+/*strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
-this->numReqQuBits=numReqQuBitsAux;
+this->numReqQuBits=numReqQuBitsAux;*/
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
@@ -456,9 +458,9 @@ cout << "End Emiting Qubits" << endl;
 
 int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux){
 this->acquire();
-strcpy(this->ModeActivePassive,ModeActivePassiveAux);
+/*strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
-this->numReqQuBits=numReqQuBitsAux;
+this->numReqQuBits=numReqQuBitsAux;*/
 if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);

@@ -860,6 +860,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		// The node of a host is always identified in the Array in position 0			    
 		    int socket_fd_conn;
 		    // Mount message
+		    /*
 		    // Notice that nodes Control (and only Control messages, Operational messages do not have this) messages meant to other nodes through their respective hosts have a composed payload, where the first part has the other host's node to whom the message has to be forwarded (at least up to its host - the host of the node sending the message). Hence, the Payload has to be processed a bit.
 		    for (int iIterOpHost=0;iIterOpHost<2;iIterOpHost++){// Manually set - This should be programmed in order to scale
 		    	    char PayLoadReassembled[NumBytesPayloadBuffer] = {0};
@@ -936,6 +937,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
 				    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);//this->IPaddressesSockets[3]);
 			    }
+		     } // end for*/
 			    /*
 			    /////////////////////////////////////////////// To be eliminated
 			    // Mount message
@@ -963,8 +965,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[4]);
 			    }
 			    ///////////////////////////////////////////// To be eliminated
-			    */
-		    } // end for
+			    */		    
 		}	
 		else{// It does not come from its node and it is a control message, so it has to forward to its node
 		   // The node of a host is always identified in the Array in position 0	
