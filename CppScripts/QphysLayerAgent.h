@@ -82,7 +82,7 @@ private: //Variables/Instances
 	using TimePoint = std::chrono::time_point<Clock>;
 	TimePoint FutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
 	TimePoint OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
-	unsigned long long int TimeClockMarging=0;// In nanoseconds. Eventually, implemented in GPIO.cpp
+	unsigned long long int TimeClockMarging=100000;// In nanoseconds. So that we can do a busy wait to be more accurate and responsive.
 	// Private threads
 	bool RunThreadSimulateEmitQuBitFlag=true;
 	bool RunThreadSimulateReceiveQuBitFlag=true;
