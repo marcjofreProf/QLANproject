@@ -909,8 +909,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    	}
 			    	strcat(PayLoadReassembled,";");	// Finish with semicolon	    			    				    
 			    }
-			    cout << "Host's node Control Message original: " << Payload << endl;
-			    cout << "Host's node Control Message reassembled: " << PayLoadReassembled << endl;
+			    //cout << "Host's node Control Message original: " << Payload << endl;
+			    //cout << "Host's node Control Message reassembled: " << PayLoadReassembled << endl;
 			    
 			    // Actually mount the reassembled message
 			    char ParamsCharArray[NumBytesBufferICPMAX] = {0};
@@ -924,8 +924,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				strcat(ParamsCharArray,",");
 				strcat(ParamsCharArray,PayLoadReassembled);//Payload);
 				strcat(ParamsCharArray,",");// Very important to end the message
-				cout << "Node message  to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
-				cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
+				//cout << "Node message  to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
+				//cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
 				
 			    strcpy(this->SendBuffer,ParamsCharArray);			
 			    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client

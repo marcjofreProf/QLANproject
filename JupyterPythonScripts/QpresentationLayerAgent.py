@@ -64,21 +64,21 @@ class QPLA:
 		self.QSLAagent.SendMessageAgent(messageAuxChar)	
 	
 	def SimulateSendEntangledQubitsHost(self,IPhostDest1OpNet,IPhostOrg1OpNet,IPhostDest2OpNet,IPhostOrg2OpNet,IPnodeDestConNet,IPhostOrgConNet,NumSendQubits): # Request that the other nodes of the specified hosts get ready to receive entangled qubits from the dealer's node		
-		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",IPhostOrg2OpNet,str(NumRequestedQubits)])
+		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",IPhostOrg2OpNet,str(NumSendQubits)])
 		messageCommandAux="SimulateReceiveQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrg2OpNet
 		messageIPdest=IPhostDest2OpNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)		
-		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",IPhostOrg1OpNet,str(NumRequestedQubits)])
+		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",IPhostOrg1OpNet,str(NumSendQubits)])
 		messageCommandAux="SimulateReceiveQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrg1OpNet
 		messageIPdest=IPhostDest1OpNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
-		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostDest2OpNet]),str(NumRequestedQubits)])
+		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostDest2OpNet]),str(NumSendQubits)])
 		messageCommandAux="SimulateSendQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrgConNet
