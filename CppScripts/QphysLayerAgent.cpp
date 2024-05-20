@@ -10,8 +10,8 @@ Agent script for Quantum Physical Layer
 #include "QphysLayerAgent.h"
 #include<iostream>
 #include<unistd.h>
-#include <stdio.h>
-#include <string.h>
+#include<stdio.h>
+#include<string.h>
 #include<bitset>
 // Time/synchronization management
 #include <chrono>
@@ -24,6 +24,9 @@ Agent script for Quantum Physical Layer
 // Payload messages
 #define NumBytesPayloadBuffer 1000
 #define NumParamMessagesMax 20
+#define IPcharArrayLengthMAX 15
+#define NumHostConnection 5
+// Threads
 #include <thread>
 // Semaphore
 #include <atomic>
@@ -157,6 +160,27 @@ int QPLA::countDoubleUnderscores(char* ParamsCharArray) {
   return underscoreCount/2;
 }
 
+bool QPLA::isPotentialIpAddressStructure(const char* ipAddress) {
+  int dots = 0;
+  int digitCount = 0;
+
+  for (int i = 0; ipAddress[i] != '\0'; ++i) {
+    if (isdigit(ipAddress[i])) {
+      digitCount++;
+    } else if (ipAddress[i] == '.') {
+      if (digitCount == 0 || digitCount > 3) {
+        return false; // Invalid structure
+      }
+      dots++;
+      digitCount = 0;
+    } else {
+      return false; // Invalid character
+    }
+  }
+
+  return dots == 3 && digitCount > 0 && digitCount <= 3; // Check for 4 octets
+}
+
 int QPLA::ProcessNewParameters(){
 char ParamsCharArray[NumBytesPayloadBuffer]={0};
 char HeaderCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
@@ -286,15 +310,24 @@ auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
 unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin so that busywait can be implemented for faster response // Convert 
 //cout << "time_as_count: " << time_as_count << endl;
-// Tell to the other node
-// Mount the Parameters message for the other node
+
+// Tell to the other nodes
 char ParamsCharArray[NumBytesPayloadBuffer] = {0};
-strcpy(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Initiates the ParamsCharArray, so use strcpy
-char charNum[NumBytesPayloadBuffer] = {0}; 
-sprintf(charNum, "%llu", TimePointFuture_time_as_count);//%llu: unsigned long long int
-strcat(ParamsCharArray,charNum);
-strcat(ParamsCharArray,"_"); // Final _
-//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){// Iterate over the different nodes to tell
+	if (isPotentialIpAddressStructure(IPaddresses[iIterIPaddr])){
+		// Mount the Parameters message for the other node
+		if (iIterIPaddr==0){strcpy(ParamsCharArray,"IPdest_");} // Initiates the ParamsCharArray, so use strcpy
+		else{strcat(ParamsCharArray,"IPdest_");} // Continues the ParamsCharArray, so use strcat
+		strcat(ParamsCharArray,IPaddresses[iIterIPaddr]);// Indicate the address to send the Future time Point
+		strcat(ParamsCharArray,"_");// Add underscore separator
+		strcat(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Continues the ParamsCharArray, so use strcat
+		char charNum[NumBytesPayloadBuffer] = {0}; 
+		sprintf(charNum, "%llu", TimePointFuture_time_as_count);//%llu: unsigned long long int
+		strcat(ParamsCharArray,charNum);
+		strcat(ParamsCharArray,"_"); // Final _
+		//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+	}
+} // end for to the different addresses to send the params information
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 this->release();
@@ -350,8 +383,11 @@ return requestWhileWait;
 }
 
 
-int QPLA::SimulateEmitQuBit(){
+int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux){
 this->acquire();
+strcpy(this->ModeActivePassive,ModeActivePassiveAux);
+for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
+this->numReqQuBits=numReqQuBitsAux;
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
@@ -367,8 +403,13 @@ return 0; // return 0 is for no error
 
 int QPLA::ThreadSimulateEmitQuBit(){
 cout << "Emiting Qubits" << endl;
-struct timespec requestWhileWait=this->SetFutureTimePointOtherNode();
-//struct timespec requestWhileWait = this->GetFutureTimePointOtherNode(); // Better that the node generating the signals receives the time point future from the receiver node.
+struct timespec requestWhileWait;
+if (string(this->ModeActivePassive)==string("Active")){
+	requestWhileWait=this->SetFutureTimePointOtherNode();
+}
+else{
+	requestWhileWait = this->GetFutureTimePointOtherNode();
+}
 this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum priority
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 
@@ -413,8 +454,11 @@ cout << "End Emiting Qubits" << endl;
  return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateReceiveQuBit(){
+int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux){
 this->acquire();
+strcpy(this->ModeActivePassive,ModeActivePassiveAux);
+for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
+this->numReqQuBits=numReqQuBitsAux;
 if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
@@ -437,8 +481,13 @@ this->release();
 int iIterRuns;
 int DetRunsCount = NumQubitsMemoryBuffer/NumQuBitsPerRun;
 //cout << "DetRunsCount: " << DetRunsCount << endl;
-//struct timespec requestWhileWait=this->SetFutureTimePointOtherNode(); // Better that the receiver sets the time point of the future
-struct timespec requestWhileWait = this->GetFutureTimePointOtherNode();
+struct timespec requestWhileWait;
+if (string(this->ModeActivePassive)==string("Active")){
+	requestWhileWait=this->SetFutureTimePointOtherNode();
+}
+else{
+	requestWhileWait = this->GetFutureTimePointOtherNode();
+}
 this->acquire();
 // So that there are no segmentation faults by grabbing the CLOCK REALTIME and also this has maximum priority
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrier

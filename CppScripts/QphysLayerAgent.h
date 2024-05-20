@@ -16,10 +16,12 @@ Header declaration file for Quantum physical Layer Agent
 #define LinkNumberMAX 2
 // Payload messages
 #define NumBytesPayloadBuffer 1000
+#define IPcharArrayLengthMAX 15
+#define NumHostConnection 5
 //Qubits
 #define NumQubitsMemoryBuffer 2048//256 //2048 //4096 //8192 // In multiples of 2048. Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
 #define NumQuBitsPerRun 2048 // Really defined in GPIO.h. Max 2048
-
+// String operations
 #include<string>
 #include<fstream>
 // Threading
@@ -89,6 +91,11 @@ private: //Variables/Instances
 	bool RunThreadAcquireSimulateNumStoredQubitsNode=true;
 	// Periodic signal histogram analysis
 	unsigned long long int OldLastTimeTagg=0;
+	// Above agents passed values to this agent
+	char ModeActivePassive[NumBytesPayloadBuffer] = {0};// "Active" or "Passive"
+	char IPaddresses[NumHostConnection][IPcharArrayLengthMAX] = {0};
+	int numReqQuBits=0;
+	
         
 public: // Variables/Instances
 	exploringBB::GPIO PRUGPIO;
@@ -109,8 +116,8 @@ public: // Functions/Methods
 	int SendParametersAgent(char* ParamsCharArray);// The upper layer gets the information to be send
         int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node
         // General Input and Output functions
-	int SimulateEmitQuBit();
-	int SimulateReceiveQuBit();
+	int SimulateEmitQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux);
+	int SimulateReceiveQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux);
 	int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
 	~QPLA();  //destructor
 
@@ -144,6 +151,7 @@ private: // Functions/Methods
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 	// Particular process threads
+	bool isPotentialIpAddressStructure(const char* ipAddress);
 	int ThreadSimulateEmitQuBit();
 	int ThreadSimulateReceiveQubit();
 	struct timespec SetFutureTimePointOtherNode();

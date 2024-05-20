@@ -225,6 +225,18 @@ int QTLAN::countDoubleUnderscores(char* ParamsCharArray) {
   return underscoreCount/2;
 }
 
+int QTLAN::countUnderscores(char* ParamsCharArray) {
+  int underscoreCount = 0;
+
+  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+    if (ParamsCharArray[i] == '_') {
+      underscoreCount++;
+    }
+  }
+
+  return underscoreCount;
+}
+
 int QTLAN::ProcessNewParameters(){
 char ParamsCharArray[NumBytesPayloadBuffer]={0};
 char HeaderCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
@@ -749,11 +761,29 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			//cout << "Node InfoProcess: New Message: "<< Payload << endl;
 			this->ReadParametersAgent(Payload);
 		}
-		else if (string(Command)==string("SimulateSendQubits")){// Send qubits to the requesting host			
+		else if (string(Command)==string("SimulateSendQubits")){// Send qubits to the requesting host
+			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
+			char PayloadAux[NumBytesPayloadBuffer]={0};
+			strcpy(PayloadAux,strtok(NULL,";"));
+			this->QLLAnumReqQuBits=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			int numColons=countUnderscores(PayloadAux);
+			for (int iIterQLLAIPaddr=0;iIterQLLAIPaddr<numColons;iIterQLLAIPaddr++){
+				if(iIterQLLAIPaddr==0){strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(PayloadAux,"_"));}
+				else{strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(NULL,"_"));}
+			}				
 			std::thread threadSimulateEmitQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitQuBit,this);
 			threadSimulateEmitQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("SimulateReceiveQubits")){// Read qubits to the attached node
+			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
+			char PayloadAux[NumBytesPayloadBuffer]={0};
+			strcpy(PayloadAux,strtok(NULL,";"));
+			this->QLLAnumReqQuBits=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			int numColons=countUnderscores(PayloadAux);
+			for (int iIterQLLAIPaddr=0;iIterQLLAIPaddr<numColons;iIterQLLAIPaddr++){
+				if(iIterQLLAIPaddr==0){strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(PayloadAux,"_"));}
+				else{strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(NULL,"_"));}
+			}
 			std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveQuBit,this);
 			threadSimulateReceiveQuBitRefAux.detach();
 		}
@@ -782,7 +812,7 @@ int QTLAN::QPLASimulateEmitQuBit() {
 this->acquire();	  
 if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateEmitQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitQuBit();
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLAnumReqQuBits);
 	this->QPLASimulateEmitQuBitFlag=false;
 }
 this->release();
@@ -793,7 +823,7 @@ int QTLAN::QPLASimulateReceiveQuBit() {
 this->acquire();	  
 if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateReceiveQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveQuBit();
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLAnumReqQuBits);
 	this->QPLASimulateReceiveQuBitFlag=false;
 }
 this->release();

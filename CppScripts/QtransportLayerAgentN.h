@@ -18,6 +18,7 @@ Header declaration file for Quantum transport Layer Agent Node
 
 // Payload messages
 #define NumBytesPayloadBuffer 1000
+#define NumHostConnection 5
 
 #include<string>
 #include<fstream>
@@ -95,6 +96,11 @@ private: // Variables/Objects
 	    }
 	};
 	using Clock = my_clock;//
+	// Variables to pass to below agents
+	// QLLA agent
+	char QLLAModeActivePassive[NumBytesPayloadBuffer] = {0};// "Active" or "Passive"
+	char QLLAIPaddresses[NumHostConnection][IPcharArrayLengthMAX] = {0};
+	int QLLAnumReqQuBits=0;
 	
 public: // Functions/Methods
 	int RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep);
@@ -159,6 +165,7 @@ private: // Functions/Methods
 	int ProcessNewParameters();// Process the parameters received
 	int countDoubleColons(char* ParamsCharArray);
 	int countDoubleUnderscores(char* ParamsCharArray);
+	int countUnderscores(char* ParamsCharArray);
 	int countQintupleComas(char* ParamsCharArray);
 	//
 	int QPLASimulateEmitQuBit();
