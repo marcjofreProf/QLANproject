@@ -865,6 +865,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		    for (int iIterOpHost=0;iIterOpHost<2;iIterOpHost++){// Manually set - This should be programmed in order to scale
 		    	    char PayLoadReassembled[NumBytesPayloadBuffer] = {0};
 		    	    char PayLoadProc1[NumBytesPayloadBuffer] = {0};// To process the "_" level
+		    	    char PayLoadProc1Aux[NumBytesPayloadBuffer] = {0};// To process the "_" level Aux
 		    	    char PayloadAux[NumBytesPayloadBuffer] = {0};
 			    // Process the payload first
 			    char IPaddressesSocketsAux[IPcharArrayLengthMAX] = {0};
@@ -882,21 +883,25 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    		strcpy(PayLoadReassembled,strtok(PayloadAux,";"));
 			    	}
 			    	else{// Discard the following Layer Names = Net; Link; Phys
-			    		strcpy(PayLoadReassembled,strtok(NULL,";"));			    		
+			    		strcat(PayLoadReassembled,strtok(NULL,";"));			    		
 			    	}
 			    	strcat(PayLoadReassembled,";");// Finish with semicolon
 			    	strcpy(PayLoadProc1,strtok(NULL,";"));// To process the "_" level
 			    	if (string(PayLoadProc1)!=string("") and string(PayLoadProc1)!=string("none_none_")){// There is data to process
 			    		int NumSubPayloads=countQuadrupleUnderscores(PayLoadProc1);//
-			    		cout << "NumSubPayloads: " << NumSubPayloads << endl;
-			    		cout << "PayLoadProc1: " << PayLoadProc1 << endl;
+			    		//cout << "NumSubPayloads: " << NumSubPayloads << endl;
+			    		//cout << "PayLoadProc1: " << PayLoadProc1 << endl;
 			    		int NumInterestSubPayloads=0;
-			    		for (int iIterSubPayloads=0;iIterSubPayloads<NumSubPayloads;NumSubPayloads++){
-			    			cout << "strtok(PayLoadProc1,): " << strtok(PayLoadProc1,"_") << endl;// Discard because it should be IPdest
-			    			if (string(IPaddressesSocketsAux)==string(strtok(NULL,"_"))){// Param message meant for the host's node of current interest
+			    		for (int iIterSubPayloads=0;iIterSubPayloads<NumSubPayloads;iIterSubPayloads++){
+			    			if (iIterSubPayloads==0){strtok(PayLoadProc1,"_");}// Discard because it should be IPdest
+			    			else{strtok(NULL,"_");}// Discard because it should be IPdest
+			    			strcpy(PayLoadProc1Aux,strtok(NULL,"_"));// Indicates the IP	
+			    			//cout << "PayLoadProc1Aux: " << PayLoadProc1Aux << endl;			    						    				    			
+			    			if (string(IPaddressesSocketsAux)==string(PayLoadProc1Aux)){// Param message meant for the host's node of current interest
 			    				strcat(PayLoadReassembled,strtok(NULL,"_"));
 			    				strcat(PayLoadReassembled,"_");	// Finish with underscore
-			    				cout << "PayLoadReassembled: " << PayLoadReassembled << endl;
+			    				strcat(PayLoadReassembled,strtok(NULL,"_"));
+			    				strcat(PayLoadReassembled,"_");	// Finish with underscore
 			    				NumInterestSubPayloads++;
 				    		}
 			    		}
@@ -910,8 +915,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    	}
 			    	strcat(PayLoadReassembled,";");	// Finish with semicolon	    			    				    
 			    }
-			    cout << "Host's node Control Message original: " << Payload << endl;
-			    cout << "Host's node Control Message reassembled: " << PayLoadReassembled << endl;
+			    //cout << "Host's node Control Message original: " << Payload << endl;
+			    //cout << "Host's node Control Message reassembled: " << PayLoadReassembled << endl;
 			    
 			    // Actually mount the reassembled message
 			    char ParamsCharArray[NumBytesBufferICPMAX] = {0};
@@ -925,8 +930,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				strcat(ParamsCharArray,",");
 				strcat(ParamsCharArray,PayLoadReassembled);//Payload);
 				strcat(ParamsCharArray,",");// Very important to end the message
-				cout << "Node message to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
-				cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
+				//cout << "Node message to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
+				//cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
 			
 			    strcpy(this->SendBuffer,ParamsCharArray);			
 			    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
