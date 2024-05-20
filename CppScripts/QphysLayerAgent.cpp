@@ -295,14 +295,14 @@ sprintf(charNum, "%llu", TimePointFuture_time_as_count);//%llu: unsigned long lo
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,"_"); // Final _
 //cout << "ParamsCharArray: " << ParamsCharArray << endl;
-////////////////////////////////////////////
-TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()-this->TimeClockMarging; // Add some margin so that busywait can be implemented for faster response
-requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
-requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 this->release();
 this->RelativeNanoSleepWait((unsigned int)(100*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));// Give some time to be able to send the above message
+////////////////////////////////////////////
+TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()-this->TimeClockMarging; // Add some margin so that busywait can be implemented for faster response
+requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
+requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 //////////////////////////
 return requestWhileWait;
 }
@@ -327,7 +327,6 @@ this->FutureTimePoint=this->OtherClientNodeFutureTimePoint;
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 this->release();
 //cout << "MaxWhileRound: " << MaxWhileRound << endl;
-
 /////////////////////////////////////////////
 // Checks
 TimePoint TimePointClockNow=Clock::now();
@@ -346,7 +345,6 @@ CheckTimePointsDiff_time_as_count=(long long int)(TimeNow_time_as_count-TimePoin
 cout << "CheckTimePointsDiff_time_as_count: " << CheckTimePointsDiff_time_as_count << endl;
 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
-
 ///////////////////////////////////
 return requestWhileWait;
 }

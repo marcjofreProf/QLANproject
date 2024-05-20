@@ -746,7 +746,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			}
 		}		
 		else if (string(Command)==string("InfoProcess")){// Params messages
-			//cout << "New Message: "<< Payload << endl;
+			//cout << "Node InfoProcess: New Message: "<< Payload << endl;
 			this->ReadParametersAgent(Payload);
 		}
 		else if (string(Command)==string("SimulateSendQubits")){// Send qubits to the requesting host			
@@ -758,7 +758,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			threadSimulateReceiveQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("print")){
-			cout << "New Message: "<< Payload << endl;
+			cout << "Node New Message: "<< Payload << endl;
 		}
 		else{//Default
 			cout << "Control message to node not handled: "<< Payload << endl;
