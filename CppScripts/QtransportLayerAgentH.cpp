@@ -836,8 +836,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,Payload);
 			strcat(ParamsCharArray,",");// Very important to end the message
-			cout << "Node message 1 to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
-			cout << "IPaddressesSockets[3]: " << IPaddressesSockets[3] << endl;
+			//cout << "Node message 1 to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
+			//cout << "IPaddressesSockets[3]: " << IPaddressesSockets[3] << endl;
 			
 		    strcpy(this->SendBuffer,ParamsCharArray);			
 		    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
@@ -860,8 +860,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArrayAux,",");
 			strcat(ParamsCharArrayAux,Payload);
 			strcat(ParamsCharArrayAux,",");// Very important to end the message
-			cout << "Node message 2 to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
-			cout << "IPaddressesSockets[4]: " << IPaddressesSockets[4] << endl;
+			//cout << "Node message 2 to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
+			//cout << "IPaddressesSockets[4]: " << IPaddressesSockets[4] << endl;
 			
 		    strcpy(this->SendBuffer,ParamsCharArrayAux);			
 		    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
