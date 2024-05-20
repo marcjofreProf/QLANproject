@@ -857,14 +857,14 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	}
 	else if(string(Type)==string("Control")){//Control message are not meant for host, so forward it accordingly
 		if (string(IPorg)==string(this->IPaddressesSockets[0])){ // If it comes from its attached node and is a control message then it is not for this host, forward it to other hosts' nodes
-		// The node of a host is always identified in the Array in position 0			    
+		// The node of a host is always identified in the Array in position 0
+		    //cout << "Host retransmit params from node: " << Payload << endl;			    
 		    int socket_fd_conn;
 		    // Mount message
 		    // Notice that nodes Control (and only Control messages, Operational messages do not have this) messages meant to other nodes through their respective hosts have a composed payload, where the first part has the other host's node to whom the message has to be forwarded (at least up to its host - the host of the node sending the message). Hence, the Payload has to be processed a bit.
 		    for (int iIterOpHost=0;iIterOpHost<2;iIterOpHost++){// Manually set - This should be programmed in order to scale
 		    	    char PayLoadReassembled[NumBytesPayloadBuffer] = {0};
 		    	    char PayLoadProc1[NumBytesPayloadBuffer] = {0};// To process the "_" level
-		    	    char PayLoadProc1Aux[NumBytesPayloadBuffer] = {0};// To process the "_" level Auxiliary
 		    	    char PayloadAux[NumBytesPayloadBuffer] = {0};
 			    // Process the payload first
 			    char IPaddressesSocketsAux[IPcharArrayLengthMAX] = {0};
@@ -872,7 +872,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    // Analyze if there are messages for host this->IPaddressesSockets[iIterOpHost+3]
 			    // Payload message is like: Trans;Header_Payload1:Payload2:_Header_Payload_;Header_Payload_Header_Payload_;Net;none_none_;Link;none_none_;Phys;none_none_; 
 			    
-			    for (int iIterNodeAgents=0;iIterNodeAgents<4;iIterNodeAgents){// Discard the first Layer Name = Trans
+			    for (int iIterNodeAgents=0;iIterNodeAgents<4;iIterNodeAgents++){// Discard the first Layer Name = Trans
 			        strcpy(PayloadAux,Payload);// Make a copy of the original Payload
 			    	for (int iIterPayloadDump=0;iIterPayloadDump<(2*iIterNodeAgents);iIterPayloadDump++){// Reposition the pointer of strtok
 					if (iIterPayloadDump==0){strtok(PayloadAux,";");}
@@ -888,19 +888,20 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    	strcpy(PayLoadProc1,strtok(NULL,";"));// To process the "_" level
 			    	if (string(PayLoadProc1)!=string("") and string(PayLoadProc1)!=string("none_none_")){// There is data to process
 			    		int NumSubPayloads=countQuadrupleUnderscores(PayLoadProc1);//
+			    		cout << "NumSubPayloads: " << NumSubPayloads << endl;
+			    		cout << "PayLoadProc1: " << PayLoadProc1 << endl;
 			    		int NumInterestSubPayloads=0;
 			    		for (int iIterSubPayloads=0;iIterSubPayloads<NumSubPayloads;NumSubPayloads++){
-			    			strtok(PayLoadProc1,"_");// Discard because it should be IPdest
+			    			cout << "strtok(PayLoadProc1,): " << strtok(PayLoadProc1,"_") << endl;// Discard because it should be IPdest
 			    			if (string(IPaddressesSocketsAux)==string(strtok(NULL,"_"))){// Param message meant for the host's node of current interest
 			    				strcat(PayLoadReassembled,strtok(NULL,"_"));
 			    				strcat(PayLoadReassembled,"_");	// Finish with underscore
-			    				strcat(PayLoadReassembled,strtok(NULL,"_"));
-			    				strcat(PayLoadReassembled,"_");	// Finish with underscore
+			    				cout << "PayLoadReassembled: " << PayLoadReassembled << endl;
 			    				NumInterestSubPayloads++;
 				    		}
-				    		else if (NumInterestSubPayloads==0){// Just put "none_none_" if empty; otherwise it is already ok
-				    			strcat(PayLoadReassembled,"none_none_");
-				    		}
+			    		}
+			    		if (NumInterestSubPayloads==0){// Just put "none_none_" if empty; none of the parameters was for the IP checked
+			    			strcat(PayLoadReassembled,"none_none_");
 			    		}
 			    		
 			    	}
@@ -924,9 +925,9 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				strcat(ParamsCharArray,",");
 				strcat(ParamsCharArray,PayLoadReassembled);//Payload);
 				strcat(ParamsCharArray,",");// Very important to end the message
-				cout << "Node message  to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
+				cout << "Node message to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
 				cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
-				
+			
 			    strcpy(this->SendBuffer,ParamsCharArray);			
 			    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
 				    socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 

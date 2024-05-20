@@ -327,7 +327,7 @@ for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){// Iterate o
 		strcat(ParamsCharArray,"_"); // Final _
 	}
 } // end for to the different addresses to send the params information
-cout << "QPLA::ParamsCharArray: " << ParamsCharArray << endl;
+//cout << "QPLA::ParamsCharArray: " << ParamsCharArray << endl;
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 this->release();
