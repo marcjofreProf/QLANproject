@@ -762,7 +762,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			this->ReadParametersAgent(Payload);
 		}
 		else if (string(Command)==string("SimulateSendQubits")){// Send qubits to the requesting host
-			/*strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
+			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
 			char PayloadAux[NumBytesPayloadBuffer]={0};
 			strcpy(PayloadAux,strtok(NULL,";"));
 			this->QLLAnumReqQuBits=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
@@ -770,7 +770,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			for (int iIterQLLAIPaddr=0;iIterQLLAIPaddr<numColons;iIterQLLAIPaddr++){
 				if(iIterQLLAIPaddr==0){strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(PayloadAux,"_"));}
 				else{strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(NULL,"_"));}
-			}*/				
+			}				
 			std::thread threadSimulateEmitQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitQuBit,this);
 			threadSimulateEmitQuBitRefAux.detach();
 		}
