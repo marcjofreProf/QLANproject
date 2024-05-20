@@ -312,7 +312,6 @@ unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cas
 //cout << "time_as_count: " << time_as_count << endl;
 
 // Tell to the other nodes
-/*
 char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){// Iterate over the different nodes to tell
 	if (isPotentialIpAddressStructure(IPaddresses[iIterIPaddr])){
@@ -332,7 +331,6 @@ for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){// Iterate o
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 this->release();
-*/
 this->RelativeNanoSleepWait((unsigned int)(100*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));// Give some time to be able to send the above message
 ////////////////////////////////////////////
 TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()-this->TimeClockMarging; // Add some margin so that busywait can be implemented for faster response
