@@ -200,8 +200,9 @@ else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]"))
 */
 if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread	
-	std::chrono::nanoseconds duration_back((unsigned long long int)strtoull(ValuesCharArray[iHeaders],NULL,10));
-	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
+	//std::chrono::nanoseconds duration_back((unsigned long long int)strtoull(ValuesCharArray[iHeaders],NULL,10));
+	//this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
+	this->OtherClientNodeFutureTimePoint=std::chrono::nanoseconds(static_cast<unsigned long long int>(strtoull(ValuesCharArray[iHeaders],NULL,10)));
 	//cout << "OtherClientNodeFutureTimePoint: " << (unsigned long long int)strtoull(ValuesCharArray[iHeaders],NULL,10) << endl;
 	// Debugging
 	//TimePoint TimePointClockNow=Clock::now();
@@ -369,9 +370,6 @@ return 0; // return 0 is for no error
 
 int QPLA::ThreadSimulateEmitQuBit(){
 cout << "Emiting Qubits" << endl;
-this->acquire();
-// Important to have the control. As done for ThreadSimulateReceiveQuBit
-this->release();
 //struct timespec requestWhileWait=this->SetFutureTimePointOtherNode();
 struct timespec requestWhileWait = this->GetFutureTimePointOtherNode(); // Better that the node generating the signals receives the time point future from the receiver node.
 this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum priority
