@@ -904,6 +904,10 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    				strcat(PayLoadReassembled,"_");	// Finish with underscore
 			    				NumInterestSubPayloads++;
 				    		}
+				    		else{// Discard params because not meant for the IP of interest
+				    			strtok(NULL,"_");
+				    			strtok(NULL,"_");
+				    		}
 			    		}
 			    		if (NumInterestSubPayloads==0){// Just put "none_none_" if empty; none of the parameters was for the IP checked
 			    			strcat(PayLoadReassembled,"none_none_");
