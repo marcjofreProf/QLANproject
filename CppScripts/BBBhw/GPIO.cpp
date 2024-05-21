@@ -687,15 +687,16 @@ valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valOverflowCycleCountPRU);// The last addition of static_cast<unsigned long long int>(valOverflowCycleCountPRU) is to compensate for a continuous drift
 */
 // Reading first calibration tag and link it to the system clock
-OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
+OldLastTimeTagg=static_cast<unsigned long long int>(0);//static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl;
 //auto duration_InterruptTag=this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial;
-//unsigned long long int duration_InterruptTag=static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial).count());
+double PercentageToEndDurationTag=0.1;// Estimation of where the time is produced. The lower the closer to the interrupt exit
+unsigned long long int duration_InterruptTag=static_cast<unsigned long long int>(PercentageToEndDurationTag*static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial).count()));
 //cout << "static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InterruptTag).count()): " << static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InterruptTag).count()) << endl;
 //this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsInit)+static_cast<long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial-this->TimePointClockTagPRUinitialOld).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)));
 //this->TimePointClockTagPRUinitialOld=this->TimePointClockTagPRUinitial;// Update
-this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsInit)+static_cast<long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitialOld).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)));
-this->TimePointClockTagPRUinitialOld=this->TimePointClockTagPRUinitial;//-std::chrono::nanoseconds(duration_InterruptTag);// Update
+this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsInit)+static_cast<long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitialOld).count()-duration_InterruptTag)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
+this->TimePointClockTagPRUinitialOld=this->TimePointClockTagPRUfinal-std::chrono::nanoseconds(duration_InterruptTag);// Update
 this->TimeTaggsInit=this->TimeTaggsLast;// Update
 //else{Use the latest used, so do not update
 //}
