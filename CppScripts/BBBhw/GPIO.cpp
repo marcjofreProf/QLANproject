@@ -312,7 +312,7 @@ int GPIO::PRUsignalTimerSynch(){
 				this->ManualSemaphore=false;
 				this->release();
 					//// PID error computation to correct for signal PRU 1 generation								
-					//this->PIDcontrolerTime();// Acting on the IEP timer produces jitter. Compute parameters for PID adjustment. Do not apply correction since the code has evolved that the signal synchronization is done in system space!!! Nevertheless, it can be applied, to correct small time differences when entering into triggering the signal, so the period of interest should be less than the overall large period and at least larger than the time to enter the interrupt for signal triggering. In this way, absolute continuous drift does not occur
+					this->PIDcontrolerTime();// Acting on the IEP timer produces jitter. Compute parameters for PID adjustment. Do not apply correction since the code has evolved that the signal synchronization is done in system space!!! Nevertheless, it can be applied, to correct small time differences when entering into triggering the signal, so the period of interest should be less than the overall large period and at least larger than the time to enter the interrupt for signal triggering. In this way, absolute continuous drift does not occur
 					//this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
 					//this->PRUoffsetDriftErrorAppliedRaw=0;// Disable IEP correction
 					// Re wrap for correction					
@@ -690,7 +690,7 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl;
 //auto duration_InterruptTag=this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial;
-double PercentageToEndDurationTag=0.1;// Estimation of where the time is tag produced. The lower the closer to the interrupt exit
+double PercentageToEndDurationTag=0.0;//0.1;// Estimation of where the time is tag produced. The lower the closer to the interrupt exit
 unsigned long long int duration_InterruptTag=static_cast<unsigned long long int>(PercentageToEndDurationTag*static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial).count()));
 //cout << "static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InterruptTag).count()): " << static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InterruptTag).count()) << endl;
 //this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsInit)+static_cast<long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial-this->TimePointClockTagPRUinitialOld).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)));
