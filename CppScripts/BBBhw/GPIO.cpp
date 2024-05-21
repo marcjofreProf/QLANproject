@@ -690,12 +690,12 @@ extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCoun
 OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl;
 //auto duration_InterruptTag=this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial;
-unsigned long long int duration_InterruptTag=static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial).count());
+//unsigned long long int duration_InterruptTag=static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial).count());
 //cout << "static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InterruptTag).count()): " << static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InterruptTag).count()) << endl;
 //this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsInit)+static_cast<long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial-this->TimePointClockTagPRUinitialOld).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)));
 //this->TimePointClockTagPRUinitialOld=this->TimePointClockTagPRUinitial;// Update
-this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsInit)+static_cast<long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitialOld).count()-duration_InterruptTag)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
-this->TimePointClockTagPRUinitialOld=this->TimePointClockTagPRUfinal-std::chrono::nanoseconds(duration_InterruptTag);// Update
+this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsInit)+static_cast<long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitialOld).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)));
+this->TimePointClockTagPRUinitialOld=this->TimePointClockTagPRUinitial;//-std::chrono::nanoseconds(duration_InterruptTag);// Update
 this->TimeTaggsInit=this->TimeTaggsLast;// Update
 //else{Use the latest used, so do not update
 //}
