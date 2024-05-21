@@ -870,6 +870,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    // Process the payload first
 			    char IPaddressesSocketsAux[IPcharArrayLengthMAX] = {0};
 			    strcpy(IPaddressesSocketsAux,this->IPaddressesSockets[iIterOpHost+3]);
+			    bool NonEmptyPayloadAux=false;
 			    // Analyze if there are messages for host this->IPaddressesSockets[iIterOpHost+3]
 			    // Payload message is like: Trans;Header_Payload1:Payload2:_Header_Payload_;Header_Payload_Header_Payload_;Net;none_none_;Link;none_none_;Phys;none_none_; 
 			    
@@ -903,6 +904,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    				strcat(PayLoadReassembled,strtok(NULL,"_"));
 			    				strcat(PayLoadReassembled,"_");	// Finish with underscore
 			    				NumInterestSubPayloads++;
+			    				NonEmptyPayloadAux=true;
 				    		}
 				    		else{// Discard params because not meant for the IP of interest
 				    			strtok(NULL,"_");
@@ -936,7 +938,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				strcat(ParamsCharArray,",");// Very important to end the message
 				//cout << "Node message to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
 				//cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
-			
+			if(NonEmptyPayloadAux){// Non-empty, hence send
 			    strcpy(this->SendBuffer,ParamsCharArray);			
 			    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
 				    socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
@@ -946,35 +948,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
 				    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);//this->IPaddressesSockets[3]);
 			    }
-		     } // end for
-			    /*
-			    /////////////////////////////////////////////// To be eliminated
-			    // Mount message
-			    char ParamsCharArrayAux[NumBytesBufferICPMAX] = {0};
-				strcpy(ParamsCharArrayAux,IPdest);
-				strcat(ParamsCharArrayAux,",");
-				strcat(ParamsCharArrayAux,IPorg);
-				strcat(ParamsCharArrayAux,",");
-				strcat(ParamsCharArrayAux,Type);
-				strcat(ParamsCharArrayAux,",");
-				strcat(ParamsCharArrayAux,Command);
-				strcat(ParamsCharArrayAux,",");
-				strcat(ParamsCharArrayAux,Payload);
-				strcat(ParamsCharArrayAux,",");// Very important to end the message
-				//cout << "Node message 2 to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
-				//cout << "IPaddressesSockets[4]: " << IPaddressesSockets[4] << endl;
-				
-			    strcpy(this->SendBuffer,ParamsCharArrayAux);			
-			    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
-				    socket_fd_conn=this->socket_fdArray[2];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
-				    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[4]);
 			    }
-			    else{ //host acts as server		    
-				    socket_fd_conn=this->new_socketArray[2];  // host acts as server to the other host, so it needs the socket connection   
-				    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[4]);
-			    }
-			    ///////////////////////////////////////////// To be eliminated
-			    */		    
+		     } // end for	    
 		}	
 		else{// It does not come from its node and it is a control message, so it has to forward to its node
 		   // The node of a host is always identified in the Array in position 0	
