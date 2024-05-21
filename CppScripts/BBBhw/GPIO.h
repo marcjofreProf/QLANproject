@@ -99,7 +99,8 @@ private:// Variables
 	};
 	using Clock = my_clock;//Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
 	using TimePoint = std::chrono::time_point<Clock>;
-	unsigned long long int TimePRU1synchPeriod=500000000;// In nanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
+	double SynchTrigPeriod=65536; //For histogram analysis this is 65536
+	unsigned long long int TimePRU1synchPeriod=static_cast<unsigned long long int>(SynchTrigPeriod*10000);//500000000;// In nanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockSendCommandFinal=std::chrono::time_point<Clock>();// For synch purposes
@@ -119,8 +120,7 @@ private:// Variables
 	//int duration_FinalInitialMeasTrigAux=0;
 	int duration_FinalInitialMeasTrigAuxArray[MaxNumPulses]={0};
 	int duration_FinalInitialMeasTrigAuxAvg=0;
-	unsigned long long int TrigAuxIterCount=0;
-	double SynchTrigPeriod=65536; //For histogram analysis this is 65536
+	unsigned long long int TrigAuxIterCount=0;	
 	unsigned long TimeClockMarging=100000;// In nanoseconds
 	unsigned long long int TimeClockMargingExtra=10*TimeClockMarging;// In nanoseconds
 	unsigned long long int TimeElpasedNow_time_as_count=0;
