@@ -687,7 +687,7 @@ valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
 extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valOverflowCycleCountPRU);// The last addition of static_cast<unsigned long long int>(valOverflowCycleCountPRU) is to compensate for a continuous drift
 */
 // Reading first calibration tag and link it to the system clock
-OldLastTimeTagg=static_cast<unsigned long long int>(0);//static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
+OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl;
 //auto duration_InterruptTag=this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial;
 double PercentageToEndDurationTag=0.1;// Estimation of where the time is produced. The lower the closer to the interrupt exit
@@ -744,7 +744,7 @@ if (streamDDRpru.is_open()){
 		extendedCounterPRUholder=static_cast<unsigned long long int>(valCycleCountPRU);//extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
 		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
 		// Apply system clock corrections
-		extendedCounterPRU=static_cast<unsigned long long int>(static_cast<double>(extendedCounterPRUholder-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error	    
+		extendedCounterPRU=static_cast<unsigned long long int>(static_cast<double>(extendedCounterPRUholder+OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error	    
 		//////////////////////////////////////////////////////////////
 		// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
 		valBitsInterest=static_cast<unsigned char>(*valp);
