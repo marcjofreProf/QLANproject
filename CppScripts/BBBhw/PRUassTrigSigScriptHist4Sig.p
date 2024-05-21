@@ -161,11 +161,11 @@ PERIODICTIMESYNCHSUB: // with command coded 2 means synch by reseting the IEP ti
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	MOV	r7, r10 // Sequence signal period
-//	SUB	r6, r7, 1 // Generate the value for r6
-//	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
-//	AND	r0, r0, r6 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
-	LDI	r0, 0 // To remove previous values
-	LBCO	r0.w0, CONST_IETREG, 0xC, 2// Trick since for period of 65536 we can directly implement module reading 2 bytes
+	SUB	r6, r7, 1 // Generate the value for r6
+	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
+	AND	r0, r0, r6 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
+	//LDI	r0, 0 // To remove previous values
+	//LBCO	r0.w0, CONST_IETREG, 0xC, 2// Trick since for period of 65536 we can directly implement module reading 2 bytes
 	SUB	r0, r7, r0 // Substract to find how long to wait	
 	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCH consumes double
 	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
