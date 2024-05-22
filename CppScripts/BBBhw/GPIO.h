@@ -76,7 +76,7 @@ private:// Variables
 	double EstimateSynchDirectionArray[MaxNumPulses]={0.0};
 	// PID error correction
 	double SynchAdjconstant=1.0;// 
-	double PIDconstant=1.5;
+	double PIDconstant=10.0; // MAybe a little bit over 1.0 to be more aggresive
 	double PIDintegral=0.0;// Not used
 	double PIDderiv=0.0;	// Not used
 	// Time/synchronization management
