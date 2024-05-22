@@ -541,7 +541,15 @@ this->acquire();
 while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
-/*
+TimeTaggsDetAnalytics[0]=0.0;
+TimeTaggsDetAnalytics[1]=0.0;
+TimeTaggsDetAnalytics[2]=0.0;
+TimeTaggsDetAnalytics[3]=0.0;
+TimeTaggsDetAnalytics[4]=0.0;
+TimeTaggsDetAnalytics[5]=0.0;
+TimeTaggsDetAnalytics[6]=0.0;
+TimeTaggsDetAnalytics[7]=0.0;
+// General computations - might be overriden by the below activated particular analysis
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Compute interesting analytics on the TIMETAGGS and detection so that not all data has to be transfered through sockets
 // It has to have double precision so that statistics are useful
@@ -586,7 +594,17 @@ if (i>0){TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)Simulat
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 TimeTaggsDetAnalytics[7]=(double)(TimeTaggs[0]);// Timetag of the first capture
-
+}
+else{
+TimeTaggsDetAnalytics[0]=0.0;
+TimeTaggsDetAnalytics[1]=0.0;
+TimeTaggsDetAnalytics[2]=0.0;
+TimeTaggsDetAnalytics[3]=0.0;
+TimeTaggsDetAnalytics[4]=0.0;
+TimeTaggsDetAnalytics[5]=0.0;
+TimeTaggsDetAnalytics[6]=0.0;
+TimeTaggsDetAnalytics[7]=0.0;
+}
 //cout << "TimeTaggsDetAnalytics[0]: " << TimeTaggsDetAnalytics[0] << endl;
 //cout << "TimeTaggsDetAnalytics[1]: " << TimeTaggsDetAnalytics[1] << endl;
 //cout << "TimeTaggsDetAnalytics[2]: " << TimeTaggsDetAnalytics[2] << endl;
@@ -595,7 +613,8 @@ TimeTaggsDetAnalytics[7]=(double)(TimeTaggs[0]);// Timetag of the first capture
 //cout << "TimeTaggsDetAnalytics[5]: " << TimeTaggsDetAnalytics[5] << endl;
 //cout << "TimeTaggsDetAnalytics[6]: " << TimeTaggsDetAnalytics[6] << endl;
 //cout << "TimeTaggsDetAnalytics[7]: " << TimeTaggsDetAnalytics[7] << endl;
-
+/* Particular analysis
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Part to analyze if there is absolute synch between clocks with channel 1 and and histogram periodic signals of 4 steps (ch1, ch2, ch3, ch4).
 // Accordingly a complete sycle has 8 counts (2 counts for each step)
 // Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
@@ -609,12 +628,22 @@ cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference
 cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
 cout << "Attention a Periodic signal sent, so time synch between different acquisitions is corrected" << endl;
 cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
+if (SimulateNumStoredQubitsNodeAux>0){
 unsigned long long int HistPeriodicityAux=8*8192; // Periodicity in number of PRU counts
 unsigned long long int TimeTaggs0Aux=TimeTaggs[0];
 unsigned long long int TimeTaggsLastAux=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];
 //for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures. For long range synch testing with histogram, this could be commented
 //TimeTaggs[i]=TimeTaggs[i]-TimeTaggs0Aux+OldLastTimeTagg+HistPeriodicityAux;
 //}
+
+TimeTaggsDetAnalytics[0]=0.0;
+TimeTaggsDetAnalytics[1]=0.0;
+TimeTaggsDetAnalytics[2]=0.0;
+TimeTaggsDetAnalytics[3]=0.0;
+TimeTaggsDetAnalytics[4]=0.0;
+TimeTaggsDetAnalytics[5]=0.0;
+TimeTaggsDetAnalytics[6]=0.0;
+TimeTaggsDetAnalytics[7]=0.0;
 
 TimeTaggsDetAnalytics[7]=(double)(TimeTaggs[0]);
 
@@ -663,10 +692,14 @@ TimeTaggsDetAnalytics[7]=0.0;
 // Param 5: Mean time difference between coincidences tags
 // Param 6: std time difference between coincidences tags
 // Param 7: time value first coincidence tags
-
-// Check that we now exceed the QuBits buffer size
-if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
-
+TimeTaggsDetAnalytics[0]=0.0;
+TimeTaggsDetAnalytics[1]=0.0;
+TimeTaggsDetAnalytics[2]=0.0;
+TimeTaggsDetAnalytics[3]=0.0;
+TimeTaggsDetAnalytics[4]=0.0;
+TimeTaggsDetAnalytics[5]=0.0;
+TimeTaggsDetAnalytics[6]=0.0;
+TimeTaggsDetAnalytics[7]=0.0;
 if (SimulateNumStoredQubitsNodeAux>0){
 int iIterCoincidence=0;
 unsigned long long int TimeCoincidenceTaggs[NumQubitsMemoryBuffer]={0}; // Coincidence Timetaggs of the detections
@@ -753,10 +786,10 @@ TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
 //OldLastTimeTagg=TimeTaggsLastAux;// Update value
 
-//cout << "Offset corrected TimeTaggs[0]: " << TimeTaggs[0] << endl;
-//cout << "Offset corrected TimeTaggs[1]: " << TimeTaggs[1] << endl;
-//cout << "Offset corrected TimeTaggs[2]: " << TimeTaggs[2] << endl;
-//cout << "Offset corrected TimeTaggs[3]: " << TimeTaggs[3] << endl;
+//cout << "Offset corrected TimeCoincidenceTaggs[0]: " << TimeCoincidenceTaggs[0] << endl;
+//cout << "Offset corrected TimeCoincidenceTaggs[1]: " << TimeCoincidenceTaggs[1] << endl;
+//cout << "Offset corrected TimeCoincidenceTaggs[2]: " << TimeCoincidenceTaggs[2] << endl;
+//cout << "Offset corrected TimeCoincidenceTaggs[3]: " << TimeCoincidenceTaggs[3] << endl;
 
 }
 else{

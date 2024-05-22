@@ -385,8 +385,6 @@ int GPIO::PRUsignalTimerSynch(){
 				}											
 			}
 			else{// does not enter in time
-				//pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
-				//pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
 				this->NextSynchPRUcommand=static_cast<unsigned int>(4);
 				this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.
 				this->iIterPRUcurrentTimerValPass++;
@@ -404,8 +402,6 @@ int GPIO::PRUsignalTimerSynch(){
 			cout << "Double run in time sync method. This should not happen!" << endl;
 		}
 		else{// does not enter in time
-			//pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
-			//pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
 			this->NextSynchPRUcommand=static_cast<unsigned int>(4);
 			this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.
 			this->iIterPRUcurrentTimerValPass++;
