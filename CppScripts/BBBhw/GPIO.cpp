@@ -312,7 +312,7 @@ int GPIO::PRUsignalTimerSynch(){
 				this->ManualSemaphore=false;
 				this->release();
 					//// PID error computation to correct for signal PRU 1 generation								
-					this->PIDcontrolerTime();// Acting on the IEP timer produces jitter. Compute parameters for PID adjustment. Do not apply correction since the code has evolved that the signal synchronization is done in system space!!! Nevertheless, it can be applied, to correct small time differences when entering into triggering the signal, so the period of interest should be less than the overall large period and at least larger than the time to enter the interrupt for signal triggering. In this way, absolute continuous drift does not occur
+					//this->PIDcontrolerTime();// Acting on the IEP timer produces jitter. Compute parameters for PID adjustment. Do not apply correction since the code has evolved that the signal synchronization is done in system space!!! Nevertheless, it can be applied, to correct small time differences when entering into triggering the signal, so the period of interest should be less than the overall large period and at least larger than the time to enter the interrupt for signal triggering. In this way, absolute continuous drift does not occur
 					//this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
 					//this->PRUoffsetDriftErrorAppliedRaw=0;// Disable IEP correction
 					// Re wrap for correction					
