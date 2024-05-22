@@ -250,7 +250,8 @@ int GPIO::PRUsignalTimerSynch(){
 	while(true){		
 		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra)) and this->ManualSemaphoreExtra==false){// It was possible to execute when needed			
 			//cout << "Resetting PRUs timer!" << endl;
-			if (clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).//https://opensource.com/article/17/6/timekeeping-linux-vms
+			clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);
+			if (this->ManualSemaphore==false){//clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).//https://opensource.com/article/17/6/timekeeping-linux-vms
 				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization						
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html	
@@ -349,11 +350,18 @@ int GPIO::PRUsignalTimerSynch(){
 						this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 					}
 					else{
-						//pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
-						this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.					
-						this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
-						this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
-						this->iIterPRUcurrentTimerValPass++;
+						////pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
+						//this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.	
+						// Keep last recommended command and correction - signal with iIterPRUcurrentTimerValPass++ that it jump one iteration				
+						//this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
+						//this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
+						//this->iIterPRUcurrentTimerValPass++;
+						this->NextSynchPRUcorrection=static_cast<unsigned int>(0);
+						this->iIterPRUcurrentTimerValSynch++;
+						this->iIterPRUcurrentTimerValPass=1;
+						PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
+						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
+						this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 					}										
 					// Updates for next round					
 					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
