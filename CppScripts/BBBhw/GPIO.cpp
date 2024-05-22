@@ -544,7 +544,7 @@ this->acquire();// Very critical to not produce measurement deviations when asse
 //this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
-pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
+pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command. Generate signals
 
 TimePoint TimePointFutureSynch=Clock::now();
 unsigned int SynchRem=static_cast<int>(((2.0*SynchTrigPeriod)-fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<double>(PRUclockStepPeriodNanoseconds));
