@@ -48,7 +48,7 @@ private:// Variables
 	std::atomic<bool> ManualSemaphoreExtra=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=9; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
-	int NumSynchMeasAvgAux=91;//31; // Num averages to compute the time error. Better to be odd number.
+	int NumSynchMeasAvgAux=31;//31; // Num averages to compute the time error. Better to be odd number.
 	unsigned int NextSynchPRUcommand=4;// Do not do correction
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
 	double PRUoffsetDriftError=0;
@@ -100,7 +100,7 @@ private:// Variables
 	using Clock = my_clock;//Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
 	using TimePoint = std::chrono::time_point<Clock>;
 	double SynchTrigPeriod=65536; //For histogram analysis this is 8*65536
-	unsigned long long int TimePRU1synchPeriod=100000000;// In nanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
+	unsigned long long int TimePRU1synchPeriod=500000000;// In nanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockSendCommandFinal=std::chrono::time_point<Clock>();// For synch purposes
