@@ -358,7 +358,7 @@ int GPIO::PRUsignalTimerSynch(){
 						//this->iIterPRUcurrentTimerValPass++;
 						this->NextSynchPRUcorrection=static_cast<unsigned int>(0);
 						this->iIterPRUcurrentTimerValSynch++;
-						this->iIterPRUcurrentTimerValPass=1;
+						this->iIterPRUcurrentTimerValPass++;//this->iIterPRUcurrentTimerValPass=1;
 						PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
 						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
 						this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
