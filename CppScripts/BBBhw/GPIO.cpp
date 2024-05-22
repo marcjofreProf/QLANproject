@@ -387,8 +387,6 @@ int GPIO::PRUsignalTimerSynch(){
 					this->NextSynchPRUcommand=static_cast<unsigned int>(2);
 				}
 				else{// if (this->PRUoffsetDriftErrorApplied==0 or this->iIterPRUcurrentTimerValPass>1){
-					this->PRUoffsetDriftErrorApplied=0;
-					this->PRUoffsetDriftErrorAppliedRaw=0;
 					//pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
 					this->NextSynchPRUcommand=static_cast<unsigned int>(4);
 				}											
