@@ -385,15 +385,16 @@ int GPIO::PRUsignalTimerSynch(){
 				}											
 			}
 			else{// does not enter in time
-				this->NextSynchPRUcommand=static_cast<unsigned int>(4);
-				this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.
+				//this->NextSynchPRUcommand=static_cast<unsigned int>(4);
+				//this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.
+				// Keep last recommended command and correction - signal with iIterPRUcurrentTimerValPass++ that it jump one iteration
 				this->iIterPRUcurrentTimerValPass++;
-				this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
-				this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
-				this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
-				this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap+static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds);// Update
+				//this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
+				//this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
+				//this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
+				//this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap+static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds);// Update
 				// Re wrap					
-				if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
+				//if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
 				//this->TimePointClockSendCommandInitial=this->TimePointClockSendCommandInitial+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
 			}					
 		} //end if
@@ -402,15 +403,16 @@ int GPIO::PRUsignalTimerSynch(){
 			cout << "Double run in time sync method. This should not happen!" << endl;
 		}
 		else{// does not enter in time
-			this->NextSynchPRUcommand=static_cast<unsigned int>(4);
-			this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.
+			//this->NextSynchPRUcommand=static_cast<unsigned int>(4);
+			//this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.
+			// Keep last recommended command and correction - signal with iIterPRUcurrentTimerValPass++ that it jump one iteration
 			this->iIterPRUcurrentTimerValPass++;
-			this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
-			this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
-			this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
-			this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap+static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds);// Update
+			//this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
+			//this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
+			//this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
+			//this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap+static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds);// Update
 			// Re wrap					
-			if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
+			//if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
 			//this->TimePointClockSendCommandInitial=this->TimePointClockSendCommandInitial+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
 		}
 		//this->ManualSemaphoreExtra=false;

@@ -613,7 +613,7 @@ TimeTaggsDetAnalytics[7]=0.0;
 //cout << "TimeTaggsDetAnalytics[5]: " << TimeTaggsDetAnalytics[5] << endl;
 //cout << "TimeTaggsDetAnalytics[6]: " << TimeTaggsDetAnalytics[6] << endl;
 //cout << "TimeTaggsDetAnalytics[7]: " << TimeTaggsDetAnalytics[7] << endl;
-/* Particular analysis
+// Particular analysis
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Part to analyze if there is absolute synch between clocks with channel 1 and and histogram periodic signals of 4 steps (ch1, ch2, ch3, ch4).
 // Accordingly a complete sycle has 8 counts (2 counts for each step)
@@ -680,7 +680,8 @@ TimeTaggsDetAnalytics[6]=0.0;
 TimeTaggsDetAnalytics[7]=0.0;
 }
 ////////////////////////////////
-*/
+// Particular analysis
+/*
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Compute interesting analytics on the COINCIDENCE Timetaggs and detection so that not all data has to be transfered through sockets
 // It has to have double precision so that statistics are useful
@@ -803,6 +804,7 @@ TimeTaggsDetAnalytics[6]=0.0;
 TimeTaggsDetAnalytics[7]=0.0;
 }
 ////////////////////////////////
+*/
 
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();
