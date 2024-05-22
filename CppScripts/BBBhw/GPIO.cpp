@@ -543,6 +543,7 @@ this->acquire();// Very critical to not produce measurement deviations when asse
 // Apply a slotted synch configuration (like synchronized Ethernet)
 //this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
+pru1dataMem_int[2]=static_cast<unsigned int>(SynchTrigPeriod+10000);// Use it to indicate some offset
 pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command. Generate signals
 
@@ -550,7 +551,6 @@ TimePoint TimePointFutureSynch=Clock::now();
 unsigned int SynchRem=static_cast<int>(((2.0*SynchTrigPeriod)-fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<double>(PRUclockStepPeriodNanoseconds));
 // If the PRU wander was not corrected then computation below - transforming from and to the different time domains system vs. PRU
 //int SynchRem=static_cast<int>(((2.0*SynchTrigPeriod)-fmod((static_cast<double>((1.0/this->EstimateSynchAvg)*std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<double>(PRUclockStepPeriodNanoseconds)*this->EstimateSynchAvg);// Multiple conversion of time domains, from the system clock to the PRU clock what is remaining, then back to the system clock to do the busy wait.
-unsigned int FineSynchOffsetAdj=static_cast<unsigned int>(10000*static_cast<double>(PRUclockStepPeriodNanoseconds));
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 ////if (Clock::now()<TimePointFutureSynchAux){cout << "Check that we have enough time" << endl;}

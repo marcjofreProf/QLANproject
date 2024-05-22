@@ -167,11 +167,18 @@ PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of star
 	//LDI	r0, 0 // To remove previous values
 	//LBCO	r0.w0, CONST_IETREG, 0xC, 2// Trick since for period of 65536 we can directly implement module reading 2 bytes
 	SUB	r0, r7, r0 // Substract to find how long to wait	
-	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCH consumes double
+	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCHLOOP consumes double
 	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
 PSEUDOSYNCHLOOP:
 	SUB	r0, r0, 1
 	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
+FINETIMEOFFSETADJ:
+	LBCO	r0, CONST_PRUDRAM, 8, 4 // Load from PRU RAM position the extra delay
+	LSR	r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
+	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+FINETIMEOFFSETADJLOOP:
+	SUB	r0, r0, 1
+	QBNE	FINETIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
 //BASICPSEUDOSYNCH:
 //	AND	r0, r0, 0x07 // Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) we can get a value between 0 and 7
 //	QBEQ	SIGNALON1, r0.b0, 7 // Coincides with a 7
