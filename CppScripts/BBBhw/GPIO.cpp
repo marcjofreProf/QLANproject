@@ -357,6 +357,8 @@ int GPIO::PRUsignalTimerSynch(){
 						//this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
 						//this->iIterPRUcurrentTimerValPass++;
 						this->NextSynchPRUcorrection=static_cast<unsigned int>(0);
+						this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
+						this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
 						this->iIterPRUcurrentTimerValSynch++;
 						this->iIterPRUcurrentTimerValPass++;//this->iIterPRUcurrentTimerValPass=1;
 						PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
