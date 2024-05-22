@@ -250,8 +250,7 @@ int GPIO::PRUsignalTimerSynch(){
 	while(true){		
 		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra)) and this->ManualSemaphoreExtra==false){// It was possible to execute when needed			
 			//cout << "Resetting PRUs timer!" << endl;
-			clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);
-			if (this->ManualSemaphore==false){//clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).//https://opensource.com/article/17/6/timekeeping-linux-vms
+			if (clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).//https://opensource.com/article/17/6/timekeeping-linux-vms
 				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization						
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html	
@@ -362,8 +361,8 @@ int GPIO::PRUsignalTimerSynch(){
 						this->iIterPRUcurrentTimerValSynch++;
 						this->iIterPRUcurrentTimerValPass++;//this->iIterPRUcurrentTimerValPass=1;
 						PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
-						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
-						this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
+						//iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
+						//this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 					}										
 					// Updates for next round					
 					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
@@ -433,7 +432,7 @@ int GPIO::PRUsignalTimerSynch(){
 		//duration_FinalInitialDriftAuxArrayAvg=IntMedianFilterSubArray(duration_FinalInitialDriftAuxArray,NumSynchMeasAvgAux);
 		
 		// Information
-		if ((this->iIterPRUcurrentTimerVal%(64*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
+		if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
