@@ -550,6 +550,7 @@ TimePoint TimePointFutureSynch=Clock::now();
 unsigned int SynchRem=static_cast<int>(((2.0*SynchTrigPeriod)-fmod((static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<double>(PRUclockStepPeriodNanoseconds));
 // If the PRU wander was not corrected then computation below - transforming from and to the different time domains system vs. PRU
 //int SynchRem=static_cast<int>(((2.0*SynchTrigPeriod)-fmod((static_cast<double>((1.0/this->EstimateSynchAvg)*std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<double>(PRUclockStepPeriodNanoseconds)*this->EstimateSynchAvg);// Multiple conversion of time domains, from the system clock to the PRU clock what is remaining, then back to the system clock to do the busy wait.
+unsigned int FineSynchOffsetAdj=static_cast<unsigned int>(10000*static_cast<double>(PRUclockStepPeriodNanoseconds));
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 ////if (Clock::now()<TimePointFutureSynchAux){cout << "Check that we have enough time" << endl;}
