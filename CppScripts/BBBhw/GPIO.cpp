@@ -545,8 +545,8 @@ int SynchRem=static_cast<int>(((2.0*SynchTrigPeriod)-fmod((static_cast<double>((
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 ////if (Clock::now()<TimePointFutureSynchAux){cout << "Check that we have enough time" << endl;}
-//while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
-while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
+while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
+//while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 this->TimePointClockSynchPRUfinal=Clock::now();
@@ -558,7 +558,7 @@ retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterrupt
 //pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// Re-insert the correction for next cycle
 
 // Synch trig part
-int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynch).count());
+int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynchAux).count());
 this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
 this->TrigAuxIterCount++;
