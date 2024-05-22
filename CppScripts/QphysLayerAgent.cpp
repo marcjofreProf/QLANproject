@@ -541,8 +541,9 @@ this->acquire();
 while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
+/*
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Compute interesting analystics on the Timetaggs and deteciton so that not all data has to be transfered through sockets
+// Compute interesting analytics on the TIMETAGGS and detection so that not all data has to be transfered through sockets
 // It has to have double precision so that statistics are useful
 // Param 0: Num detections channel 1
 // Param 1: Num detections channel 2
@@ -568,7 +569,7 @@ if ((ChannelTags[i]>>3)&0x0001==1 or (ChannelTags[i]>>7)&0x0001==1){TimeTaggsDet
 if (((ChannelTags[i]&0x0001)+((ChannelTags[i]>>1)&0x0001)+((ChannelTags[i]>>2)&0x0001)+((ChannelTags[i]>>3)&0x0001)+((ChannelTags[i]>>4)&0x0001)+((ChannelTags[i]>>5)&0x0001)+((ChannelTags[i]>>6)&0x0001)+((ChannelTags[i]>>7)&0x0001))>1){
 TimeTaggsDetAnalytics[4]=(double)TimeTaggsDetAnalytics[4]+1.0;
 }
-if (i>1){//Compute the mean value
+if (i>0){//Compute the mean value
 TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*((double)(TimeTaggs[i]-TimeTaggs[i-1]));
 
 //// Debugging
@@ -599,6 +600,7 @@ TimeTaggsDetAnalytics[7]=(double)(TimeTaggs[0]);// Timetag of the first capture
 // Accordingly a complete sycle has 8 counts (2 counts for each step)
 // Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
 // Accordingly, the std wrapped count difference is stored in TimeTaggsDetAnalytics[6]
+cout << "TIMETAGGING ANALYSIS of QphysLayerAgent.h" << endl;
 cout << "When not using hist analysis, it can be changed back to 2048 NUMRECORDS in PRUassTaggDetScript.p, GPIO.h and top of QphysLayerAgent.h" << endl;
 cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 cout << "It has to have connected only ch1 timetagger" << endl;
@@ -630,7 +632,126 @@ TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStore
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
-OldLastTimeTagg=TimeTaggsLastAux;// Update value
+//OldLastTimeTagg=TimeTaggsLastAux;// Update value
+
+//cout << "Offset corrected TimeTaggs[0]: " << TimeTaggs[0] << endl;
+//cout << "Offset corrected TimeTaggs[1]: " << TimeTaggs[1] << endl;
+//cout << "Offset corrected TimeTaggs[2]: " << TimeTaggs[2] << endl;
+//cout << "Offset corrected TimeTaggs[3]: " << TimeTaggs[3] << endl;
+
+}
+else{
+TimeTaggsDetAnalytics[0]=0.0;
+TimeTaggsDetAnalytics[1]=0.0;
+TimeTaggsDetAnalytics[2]=0.0;
+TimeTaggsDetAnalytics[3]=0.0;
+TimeTaggsDetAnalytics[4]=0.0;
+TimeTaggsDetAnalytics[5]=0.0;
+TimeTaggsDetAnalytics[6]=0.0;
+TimeTaggsDetAnalytics[7]=0.0;
+}
+////////////////////////////////
+*/
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Compute interesting analytics on the COINCIDENCE Timetaggs and detection so that not all data has to be transfered through sockets
+// It has to have double precision so that statistics are useful
+// Param 0: Num detections channel 1
+// Param 1: Num detections channel 2
+// Param 2: Num detections channel 3
+// Param 3: Num detections channel 4
+// Param 4: Multidetection events
+// Param 5: Mean time difference between coincidences tags
+// Param 6: std time difference between coincidences tags
+// Param 7: time value first coincidence tags
+
+// Check that we now exceed the QuBits buffer size
+if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
+
+if (SimulateNumStoredQubitsNodeAux>0){
+int iIterCoincidence=0;
+unsigned long long int TimeCoincidenceTaggs[NumQubitsMemoryBuffer]={0}; // Coincidence Timetaggs of the detections
+
+for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
+//cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
+//cout << "ChannelTags[i]: "<< std::bitset<8>(ChannelTags[i]) << endl;
+if (ChannelTags[i]&0x0001==1 and (ChannelTags[i]>>4)&0x0001==1){TimeTaggsDetAnalytics[0]++;TimeCoincidenceTaggs[iIterCoincidence]=TimeTaggs[i];iIterCoincidence++;}
+if ((ChannelTags[i]>>1)&0x0001==1 and (ChannelTags[i]>>5)&0x0001==1){TimeTaggsDetAnalytics[1]++;TimeCoincidenceTaggs[iIterCoincidence]=TimeTaggs[i];iIterCoincidence++;}
+if ((ChannelTags[i]>>2)&0x0001==1 and (ChannelTags[i]>>6)&0x0001==1){TimeTaggsDetAnalytics[2]++;TimeCoincidenceTaggs[iIterCoincidence]=TimeTaggs[i];iIterCoincidence++;}
+if ((ChannelTags[i]>>3)&0x0001==1 and (ChannelTags[i]>>7)&0x0001==1){TimeTaggsDetAnalytics[3]++;TimeCoincidenceTaggs[iIterCoincidence]=TimeTaggs[i];iIterCoincidence++;}
+
+if (((ChannelTags[i]&0x0001)+((ChannelTags[i]>>1)&0x0001)+((ChannelTags[i]>>2)&0x0001)+((ChannelTags[i]>>3)&0x0001)+((ChannelTags[i]>>4)&0x0001)+((ChannelTags[i]>>5)&0x0001)+((ChannelTags[i]>>6)&0x0001)+((ChannelTags[i]>>7)&0x0001))>1){
+TimeTaggsDetAnalytics[4]=(double)TimeTaggsDetAnalytics[4]+1.0;
+}
+
+
+}// end of for
+int NumCoincidences=iIterCoincidence;
+
+for (int iIterCoincidence=1;iIterCoincidence<NumCoincidences;iIterCoincidence++){
+if (iIterCoincidence>0){//Compute the mean value for coincidences
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)NumCoincidences-1.0))*((double)(TimeCoincidenceTaggs[iIterCoincidence]-TimeCoincidenceTaggs[iIterCoincidence-1]));
+
+//// Debugging
+//if ((TimeCoincidenceTaggs[iIterCoincidence]-TimeCoincidenceTaggs[iIterCoincidence-1])>100){
+//cout << "TimeCoincidenceTaggs[iIterCoincidence]: " << TimeCoincidenceTaggs[iIterCoincidence] << endl;
+//cout << "TimeCoincidenceTaggs[iIterCoincidence-1]: " << TimeCoincidenceTaggs[iIterCoincidence-1] << endl;
+//}
+
+}
+}
+
+for (int iIterCoincidence=1;iIterCoincidence<NumCoincidences;iIterCoincidence++){
+if (iIterCoincidence>0){TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)NumCoincidences-1.0))*pow((double)(TimeCoincidenceTaggs[iIterCoincidence]-TimeCoincidenceTaggs[iIterCoincidence-1])-TimeTaggsDetAnalytics[5],2.0);}
+}
+TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
+TimeTaggsDetAnalytics[7]=(double)(TimeCoincidenceTaggs[0]);// Timetag of the first coincidence capture
+
+//cout << "TimeTaggsDetAnalytics[0]: " << TimeTaggsDetAnalytics[0] << endl;
+//cout << "TimeTaggsDetAnalytics[1]: " << TimeTaggsDetAnalytics[1] << endl;
+//cout << "TimeTaggsDetAnalytics[2]: " << TimeTaggsDetAnalytics[2] << endl;
+//cout << "TimeTaggsDetAnalytics[3]: " << TimeTaggsDetAnalytics[3] << endl;
+//cout << "TimeTaggsDetAnalytics[4]: " << TimeTaggsDetAnalytics[4] << endl;
+//cout << "TimeTaggsDetAnalytics[5]: " << TimeTaggsDetAnalytics[5] << endl;
+//cout << "TimeTaggsDetAnalytics[6]: " << TimeTaggsDetAnalytics[6] << endl;
+//cout << "TimeTaggsDetAnalytics[7]: " << TimeTaggsDetAnalytics[7] << endl;
+
+/// Part to analyze if there is absolute synch between clocks with channel 1 and and histogram periodic signals of 4 steps (ch1, ch2, ch3, ch4).
+// Accordingly a complete sycle has 8 counts (2 counts for each step)
+// Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
+// Accordingly, the std wrapped count difference is stored in TimeTaggsDetAnalytics[6]
+cout << "COINCIDENCE ANALYSIS of QphysLayerAgent.h" << endl;
+cout << "When not using hist analysis, it can be changed back to 2048 NUMRECORDS in PRUassTaggDetScript.p, GPIO.h and top of QphysLayerAgent.h" << endl;
+cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
+cout << "It has to have connected only ch1 timetagger" << endl;
+cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
+cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
+cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
+cout << "Attention a Periodic signal sent, so time synch between different acquisitions is corrected" << endl;
+cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
+unsigned long long int HistPeriodicityAux=8*8192; // Periodicity in number of PRU counts
+unsigned long long int TimeTaggs0Aux=TimeTaggs[0];
+unsigned long long int TimeTaggsLastAux=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];
+//for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures. For long range synch testing with histogram, this could be commented
+//TimeTaggs[i]=TimeTaggs[i]-TimeTaggs0Aux+OldLastTimeTagg+HistPeriodicityAux;
+//}
+
+TimeTaggsDetAnalytics[7]=(double)(TimeCoincidenceTaggs[0]);
+
+TimeTaggsDetAnalytics[5]=0.0;
+TimeTaggsDetAnalytics[6]=0.0;
+for (int iIterCoincidence=0;iIterCoincidence<(NumCoincidences-1);iIterCoincidence++){
+if (iIterCoincidence==0){cout << "TimeCoincidenceTaggs[1]-TimeCoincidenceTaggs[0]: " << TimeCoincidenceTaggs[1]-TimeCoincidenceTaggs[0] << endl;}
+else if(iIterCoincidence==(NumCoincidences-2)){cout << "TimeTaggs[iIterCoincidence+1]-TimeTaggs[iIterCoincidence]: " << TimeCoincidenceTaggs[iIterCoincidence+1]-TimeCoincidenceTaggs[iIterCoincidence] << endl;}
+
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)NumCoincidences-1.0))*(((double)((HistPeriodicityAux/2+TimeCoincidenceTaggs[iIterCoincidence+1]-TimeCoincidenceTaggs[iIterCoincidence])%(HistPeriodicityAux)))-(double)(HistPeriodicityAux/2));
+}
+
+for (int i=0;i<(SimulateNumStoredQubitsNodeAux-1);i++){
+TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)NumCoincidences-1.0))*pow(((double)((HistPeriodicityAux/2+TimeCoincidenceTaggs[iIterCoincidence+1]-TimeCoincidenceTaggs[iIterCoincidence])%(HistPeriodicityAux)))-(double)(HistPeriodicityAux/2)-TimeTaggsDetAnalytics[5],2.0);
+}
+TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
+
+//OldLastTimeTagg=TimeTaggsLastAux;// Update value
 
 //cout << "Offset corrected TimeTaggs[0]: " << TimeTaggs[0] << endl;
 //cout << "Offset corrected TimeTaggs[1]: " << TimeTaggs[1] << endl;

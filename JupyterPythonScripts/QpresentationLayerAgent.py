@@ -86,6 +86,29 @@ class QPLA:
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
 		
+	def SimulateRequestMultipleNodesQubitsHost(self,IPhostDest1OpNet,IPhostOrg1OpNet,IPhostDest2OpNet,IPhostOrg2OpNet,IPnodeDestConNet,IPhostOrgConNet,NumSendQubits): # Request other nodes to send to this node qubits
+		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrg2OpNet]),str(NumSendQubits)])
+		messageCommandAux="SimulateSendQubits"
+		messageTypeAux="Control"
+		messageIPorg=IPhostOrg2OpNet
+		messageIPdest=IPhostDest2OpNet
+		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
+		self.QSLAagent.SendMessageAgent(messageAuxChar)		
+		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrg1OpNet]),str(NumSendQubits)])
+		messageCommandAux="SimulateSendQubits"
+		messageTypeAux="Control"
+		messageIPorg=IPhostOrg1OpNet
+		messageIPdest=IPhostDest1OpNet
+		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
+		self.QSLAagent.SendMessageAgent(messageAuxChar)
+		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostDest2OpNet]),str(NumSendQubits)])
+		messageCommandAux="SimulateReceiveQubits"
+		messageTypeAux="Control"
+		messageIPorg=IPhostOrgConNet
+		messageIPdest=IPnodeDestConNet
+		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
+		self.QSLAagent.SendMessageAgent(messageAuxChar)
+		
 	def SimulateRetrieveNumStoredQubitsNode(self,IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray): # Supposing that node has received quBits, make use of them
 		self.QSLAagent.SimulateRetrieveNumStoredQubitsNode(IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray)
 	
