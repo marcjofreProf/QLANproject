@@ -535,7 +535,8 @@ else{CheckTimeFlagPRU0=false;}
 return 0;// all ok
 }
 
-int GPIO::SendTriggerSignals(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+int GPIO::SendTriggerSignals(int FineSynchAdjValAux){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+this->FineSynchAdjVal=FineSynchAdjValAux;
 while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization

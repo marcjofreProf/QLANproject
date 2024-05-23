@@ -767,6 +767,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			char PayloadAux[NumBytesPayloadBuffer]={0};
 			strcpy(PayloadAux,strtok(NULL,";"));
 			this->QLLAnumReqQuBits=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			this->QLLAFineSynchAdjVal=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			int numUnderScores=countUnderscores(PayloadAux);
 			for (int iIterQLLAIPaddr=0;iIterQLLAIPaddr<numUnderScores;iIterQLLAIPaddr++){
 				if(iIterQLLAIPaddr==0){strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(PayloadAux,"_"));}
@@ -813,7 +814,7 @@ int QTLAN::QPLASimulateEmitQuBit() {
 this->acquire();	  
 if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateEmitQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLAnumReqQuBits);
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLAFineSynchAdjVal);
 	this->QPLASimulateEmitQuBitFlag=false;
 }
 this->release();

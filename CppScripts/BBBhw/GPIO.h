@@ -214,7 +214,7 @@ public:	// Functions/Methods
 	int DDRdumpdata();
 	int DisablePRUs();
 	int ReadTimeStamps();// Read the detected timestaps in four channels
-	int SendTriggerSignals(); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+	int SendTriggerSignals(int FineSynchAdjValAux); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	int SendTriggerSignalsSelfTest();//
 	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
 	int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
