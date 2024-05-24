@@ -27,8 +27,8 @@ using std::fstream;
 #define PRUdataPATH2 "../PRUdata/"
 
 #define MaxNumPulses	8192	// Used in the averging of time synchronization arrays
-#define PRUclockStepPeriodNanoseconds		4.999775 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
-#define PulseFreq	1000 // Hz// 
+#define PRUclockStepPeriodNanoseconds		4.99975 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
+#define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
 
 namespace exploringBB {
 
@@ -200,7 +200,7 @@ private:// Variables
 	int NumSynchPulsesRed=0;
 	unsigned long long int SynchPulsesTags[MaxNumPulses]={0};
 	unsigned long long int SynchPulsesTagsUsed[MaxNumPulses]={0};
-	double PeriodCountsPulseAdj=(((1.0/(double)(PulseFreq))*1e9)/((double)(PRUclockStepPeriodNanoseconds)));
+	double PeriodCountsPulseAdj=(((1.0/(double)(PulseFreq))*1e9)/((double)(PRUclockStepPeriodNanoseconds)));// Not used
 	double AdjPulseSynchCoeff=1.0;
 	double AdjPulseSynchCoeffAverage=1.0;
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
