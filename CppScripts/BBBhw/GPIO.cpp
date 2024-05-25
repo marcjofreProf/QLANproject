@@ -292,7 +292,7 @@ int GPIO::PRUsignalTimerSynch(){
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 				
 				// Compute error
-				this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld);
+				this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw));
 				//if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<(NumSynchMeasAvgAux/2)){// Do computations
 				this->ManualSemaphoreExtra=true;
 					// Computations for Synch calculaton for PRU0 compensation
@@ -430,7 +430,7 @@ int GPIO::PRUsignalTimerSynch(){
 		//duration_FinalInitialDriftAuxArrayAvg=IntMedianFilterSubArray(duration_FinalInitialDriftAuxArray,NumSynchMeasAvgAux);
 		
 		// Information
-		if ((this->iIterPRUcurrentTimerVal%(64*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
+		if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
