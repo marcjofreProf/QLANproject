@@ -317,11 +317,11 @@ int GPIO::PRUsignalTimerSynch(){
 					//this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
 					//this->PRUoffsetDriftErrorAppliedRaw=0;// Disable IEP correction
 					// Re wrap for correction					
-					if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)>0xFFFFFFFF){this->PRUoffsetDriftErrorApplied=this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied-0xFFFFFFFF-1.0;}
-					else if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)<0){this->PRUoffsetDriftErrorApplied=0xFFFFFFFF+(this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)+1.0;}
-					else{
-						this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied;
-					}
+					//if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)>0xFFFFFFFF){this->PRUoffsetDriftErrorApplied=this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied-0xFFFFFFFF-1.0;}
+					//else if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)<0){this->PRUoffsetDriftErrorApplied=0xFFFFFFFF+(this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)+1.0;}
+					//else{
+					//	this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied;
+					//}
 					if (this->PRUoffsetDriftErrorApplied==0){
 						//pru1dataMem_int[3]=static_cast<unsigned int>(0);
 						this->NextSynchPRUcorrection=static_cast<unsigned int>(0);
