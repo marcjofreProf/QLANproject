@@ -292,7 +292,7 @@ int GPIO::PRUsignalTimerSynch(){
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 				
 				// Compute error
-				this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOld+1*this->PRUoffsetDriftErrorAppliedOldRaw));
+				this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw));
 				//if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<(NumSynchMeasAvgAux/2)){// Do computations
 				this->ManualSemaphoreExtra=true;
 					// Computations for Synch calculaton for PRU0 compensation
