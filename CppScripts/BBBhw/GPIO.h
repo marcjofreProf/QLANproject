@@ -77,7 +77,7 @@ private:// Variables
 	// PID error correction
 	double SynchAdjconstant=1.0;// 
 	double PIDconstant=1.0; // Maybe a little bit over 1.0 to be more aggresive
-	double PIDintegral=0.0;// Not used
+	double PIDintegral=0.1;// Slightly make the error synch correction absolute
 	double PIDderiv=0.0;	// Not used
 	// Time/synchronization management
 	struct my_clock
@@ -147,7 +147,7 @@ private:// Variables
 	unsigned int NumberRepetitionsSignal=15000;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=5000000; // In microseconds
-	//int WaitTimeToFutureTimePointPRU1=1000;// The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s.
+	//int WaitTimeToFutureTimePointPRU1=1000;// The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s, not more otherwise the synch calculation error overflows as well and things go bad.
 	//TimePoint TimePointClockNowPRU1;
 	//unsigned long long int TimeNow_time_as_countPRU1;	
 	//TimePoint FutureTimePointPRU1;
