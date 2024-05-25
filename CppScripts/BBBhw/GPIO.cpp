@@ -294,16 +294,16 @@ int GPIO::PRUsignalTimerSynch(){
 				
 				// Compute error
 				// Relative error
-				this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/static_cast<double>(PRUclockStepPeriodNanoseconds)))-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld);
+				this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/static_cast<double>(PRUclockStepPeriodNanoseconds)))-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap);
 				//if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<(NumSynchMeasAvgAux/2)){// Do computations
 				this->ManualSemaphoreExtra=true;
 					// Computations for Synch calculaton for PRU0 compensation
-					this->EstimateSynch=(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))/(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld);// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correction).
+					this->EstimateSynch=(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))/(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap);
 					this->EstimateSynch=1.0+this->SynchAdjconstant*(this->EstimateSynch-1.0);
 					this->EstimateSynchArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynch;
 					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
 					// Estimate synch direction
-					this->EstimateSynchDirection=(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOld)+(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+					this->EstimateSynchDirection=(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap)+(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 					EstimateSynchDirectionArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynchDirection;
 					this->EstimateSynchDirectionAvg=DoubleMedianFilterSubArray(EstimateSynchDirectionArray,NumSynchMeasAvgAux);					
 					//this->EstimateSynch=1.0; // To disable synch adjustment
@@ -314,13 +314,9 @@ int GPIO::PRUsignalTimerSynch(){
 				this->ManualSemaphore=false;
 				this->release();
 				// SEt the value to IEP timer					
-					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
-					this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update					
+					this->PRUcurrentTimerValOldWrap=this->PRUoffsetDriftErrorAppliedRaw;//this->PRUcurrentTimerValWrap;// Update				
 					this->iIterPRUcurrentTimerValSynch++;
-					this->iIterPRUcurrentTimerValPass=1;
-					PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
-					iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
-					this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update									
+					this->iIterPRUcurrentTimerValPass=1;									
 			}
 			else{// does not enter in time
 				this->iIterPRUcurrentTimerValPass++;
@@ -575,6 +571,7 @@ int GPIO::PRUsignalTimerSynchOld(){
 return 0; // All ok
 }
 */
+/*
 int GPIO::PIDcontrolerTime(){// Not used
 //PRUoffsetDriftErrorDerivative=(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorLast);//*(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast));//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
 //PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+(PRUoffsetDriftError-PRUoffsetDriftErrorAppliedRaw);//*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
@@ -587,6 +584,7 @@ else{this->PRUoffsetDriftErrorApplied=0;}
 
 return 0; // All ok
 }
+*/
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 /////////////

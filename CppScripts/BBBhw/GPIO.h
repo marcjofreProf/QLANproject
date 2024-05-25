@@ -265,7 +265,7 @@ private: // Functions/Methods
 	// PRU synchronization
 	struct timespec SetWhileWait();
 	int PRUsignalTimerSynch(); // Periodic synchronizaton of the timer to control the generated signals
-	int PIDcontrolerTime();
+	//int PIDcontrolerTime();// Not used
 	// Data processing
 	unsigned char packBits(unsigned char value);
 	// Non-PRU
