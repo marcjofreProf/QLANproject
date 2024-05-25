@@ -145,8 +145,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	// Generate signals
 	pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-	//pru1dataMem_int[1]=static_cast<unsigned int>(0); // set no command
-	pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
+	pru1dataMem_int[1]=static_cast<unsigned int>(0); // set no command
 	// Load and execute the PRU program on the PRU1
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
 		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
@@ -312,6 +311,19 @@ int GPIO::PRUsignalTimerSynch(){
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
 				this->release();
+				// SEt the value to IEP timer
+					this->PRUoffsetDriftErrorAppliedRaw=static_cast<double>(fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
+					this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw+LostCounts;
+					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
+					this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
+					this->NextSynchPRUcorrection=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);
+					this->NextSynchPRUcommand=static_cast<unsigned int>(5);// set a particular value to IEP timer
+					this->iIterPRUcurrentTimerValSynch++;
+					this->iIterPRUcurrentTimerValPass=1;
+					PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
+					iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
+					this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
+					/* Old way - relative, not good
 					//// PID error computation to correct for signal PRU 1 generation								
 					this->PIDcontrolerTime();// Acting on the IEP timer produces jitter. Compute parameters for PID adjustment. Do not apply correction since the code has evolved that the signal synchronization is done in system space!!! Nevertheless, it can be applied, to correct small time differences when entering into triggering the signal, so the period of interest should be less than the overall large period and at least larger than the time to enter the interrupt for signal triggering. In this way, absolute continuous drift does not occur
 					//this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
@@ -322,6 +334,7 @@ int GPIO::PRUsignalTimerSynch(){
 					//else{
 					//	this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied;
 					//}
+					
 					if (this->PRUoffsetDriftErrorApplied==0){
 						//pru1dataMem_int[3]=static_cast<unsigned int>(0);
 						this->NextSynchPRUcorrection=static_cast<unsigned int>(0);
@@ -390,7 +403,8 @@ int GPIO::PRUsignalTimerSynch(){
 				else{// if (this->PRUoffsetDriftErrorApplied==0 or this->iIterPRUcurrentTimerValPass>1){
 					//pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
 					this->NextSynchPRUcommand=static_cast<unsigned int>(4);
-				}											
+				}	
+				*/										
 			}
 			else{// does not enter in time
 				//this->NextSynchPRUcommand=static_cast<unsigned int>(4);
@@ -431,11 +445,11 @@ int GPIO::PRUsignalTimerSynch(){
 		//duration_FinalInitialDriftAuxArrayAvg=IntMedianFilterSubArray(duration_FinalInitialDriftAuxArray,NumSynchMeasAvgAux);
 		
 		// Information
-		if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
+		if ((this->iIterPRUcurrentTimerVal%(128*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
-			cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
+			//cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
 			//cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 			cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
 			//cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
@@ -551,7 +565,7 @@ pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate 
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command. Generate signals
 
 TimePoint TimePointFutureSynch=Clock::now();
-unsigned int SynchRem=static_cast<int>((static_cast<long double>(2.0*SynchTrigPeriod)-fmod((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
+unsigned int SynchRem=static_cast<int>((static_cast<long double>(2.0*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 // If the PRU wander was not corrected then computation below - transforming from and to the different time domains system vs. PRU
 //int SynchRem=static_cast<int>(((2.0*SynchTrigPeriod)-fmod((static_cast<double>((1.0/this->EstimateSynchAvg)*std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<double>(PRUclockStepPeriodNanoseconds)*this->EstimateSynchAvg);// Multiple conversion of time domains, from the system clock to the PRU clock what is remaining, then back to the system clock to do the busy wait.
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
