@@ -535,8 +535,9 @@ else{CheckTimeFlagPRU0=false;}
 return 0;// all ok
 }
 
-int GPIO::SendTriggerSignals(int FineSynchAdjValAux){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-this->FineSynchAdjVal=FineSynchAdjValAux;
+int GPIO::SendTriggerSignals(int* FineSynchAdjValAux){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+this->FineSynchAdjOffVal=FineSynchAdjValAux[0];// Synch trig offset
+this->FineSynchAdjFreqVal=FineSynchAdjValAux[1]; // Synch trig frequency
 while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
@@ -544,7 +545,7 @@ this->acquire();// Very critical to not produce measurement deviations when asse
 // Apply a slotted synch configuration (like synchronized Ethernet)
 //this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-pru1dataMem_int[2]=static_cast<unsigned int>(FineSynchAdjVal);// Regular offset of trig signal//static_cast<unsigned int>((static_cast<unsigned long long int>(FineSynchAdjVal)*this->iIterPRUcurrentTimerVal)%static_cast<unsigned long long int>(SynchTrigPeriod));// Use it to indicate some offset for time. It is dependent for each node and channel. With respect SynchTrigPeriod sp that it can be extra or less. It has to be changing to adjust the variation as a frequency offset
+pru1dataMem_int[2]=static_cast<unsigned int>(FineSynchAdjOffVal+(static_cast<unsigned long long int>(FineSynchAdjFreqVal)*this->iIterPRUcurrentTimerVal)%static_cast<unsigned long long int>(SynchTrigPeriod));// Regular offset of trig signal//static_cast<unsigned int>(// Use it to indicate some offset for time. It is dependent for each node and channel. With respect SynchTrigPeriod sp that it can be extra or less. It has to be changing to adjust the variation as a frequency offset
 pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command. Generate signals
 

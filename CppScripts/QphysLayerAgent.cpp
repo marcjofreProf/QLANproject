@@ -383,12 +383,13 @@ return requestWhileWait;
 }
 
 
-int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux,int FineSynchAdjValAux){
+int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux,int* FineSynchAdjValAux){
 this->acquire();
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
 this->numReqQuBits=numReqQuBitsAux;
-this->FineSynchAdjVal=FineSynchAdjValAux;
+this->FineSynchAdjVal[0]=FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]=FineSynchAdjValAux[1];// synch trig frequency
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);

@@ -101,7 +101,7 @@ private: // Variables/Objects
 	char QLLAModeActivePassive[NumBytesPayloadBuffer] = {0};// "Active" or "Passive"
 	char QLLAIPaddresses[NumHostConnection][IPcharArrayLengthMAX] = {0};
 	int QLLAnumReqQuBits=0;
-	int QLLAFineSynchAdjVal=0;
+	int QLLAFineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
 	
 public: // Functions/Methods
 	int RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep);
