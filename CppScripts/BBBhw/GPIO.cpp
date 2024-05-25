@@ -253,7 +253,7 @@ int GPIO::PRUsignalTimerSynch(){
 				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization						
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html
-				this->PRUoffsetDriftErrorAppliedRaw=static_cast<double>(fmodl(static_cast<long double>((this->iIterPRUcurrentTimerVal+1)*this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
+				this->PRUoffsetDriftErrorAppliedRaw=static_cast<double>(fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
 				this->NextSynchPRUcorrection=static_cast<unsigned int>(static_cast<unsigned int>((static_cast<unsigned long long int>(this->PRUoffsetDriftErrorAppliedRaw)+static_cast<unsigned long long int>(LostCounts))%iepPRUtimerRange32bits));
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
 				pru1dataMem_int[1]=static_cast<unsigned int>(5);//static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command											
@@ -323,17 +323,7 @@ int GPIO::PRUsignalTimerSynch(){
 					this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update									
 			}
 			else{// does not enter in time
-				//this->NextSynchPRUcommand=static_cast<unsigned int>(4);
-				//this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.
-				// Keep last recommended command and correction - signal with iIterPRUcurrentTimerValPass++ that it jump one iteration
 				this->iIterPRUcurrentTimerValPass++;
-				//this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
-				//this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
-				//this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
-				//this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap+static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds);// Update
-				// Re wrap					
-				//if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
-				//this->TimePointClockSendCommandInitial=this->TimePointClockSendCommandInitial+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
 			}					
 		} //end if
 		else if (this->ManualSemaphoreExtra==true){
@@ -341,24 +331,8 @@ int GPIO::PRUsignalTimerSynch(){
 			cout << "Double run in time sync method. This should not happen!" << endl;
 		}
 		else{// does not enter in time
-			//this->NextSynchPRUcommand=static_cast<unsigned int>(4);
-			//this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.
-			// Keep last recommended command and correction - signal with iIterPRUcurrentTimerValPass++ that it jump one iteration
 			this->iIterPRUcurrentTimerValPass++;
-			//this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
-			//this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
-			//this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
-			//this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap+static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds);// Update
-			// Re wrap					
-			//if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
-			//this->TimePointClockSendCommandInitial=this->TimePointClockSendCommandInitial+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
 		}
-		//this->ManualSemaphoreExtra=false;
-		// Absolute drift monitoring
-		//auto duration_FinalInitialDrift=this->TimePointClockSendCommandInitial-this->TimePointClockPRUinitial;
-		//duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->iIterPRUcurrentTimerVal+1)*this->TimePRU1synchPeriod);
-		//duration_FinalInitialDriftAuxArray[iIterPRUcurrentTimerVal%NumSynchMeasAvgAux]=duration_FinalInitialDriftAux;
-		//duration_FinalInitialDriftAuxArrayAvg=IntMedianFilterSubArray(duration_FinalInitialDriftAuxArray,NumSynchMeasAvgAux);
 		
 		// Information
 		if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
