@@ -313,10 +313,9 @@ int GPIO::PRUsignalTimerSynch(){
 				this->release();
 				// SEt the value to IEP timer
 					this->PRUoffsetDriftErrorAppliedRaw=static_cast<double>(fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
-					this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw+LostCounts;
 					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
 					this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
-					this->NextSynchPRUcorrection=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);
+					this->NextSynchPRUcorrection=static_cast<unsigned int>(static_cast<unsigned int>((static_cast<unsigned long long int>(this->PRUoffsetDriftErrorAppliedRaw)+static_cast<unsigned long long int>(LostCounts))%iepPRUtimerRange32bits));
 					this->NextSynchPRUcommand=static_cast<unsigned int>(5);// set a particular value to IEP timer
 					this->iIterPRUcurrentTimerValSynch++;
 					this->iIterPRUcurrentTimerValPass=1;
@@ -450,7 +449,7 @@ int GPIO::PRUsignalTimerSynch(){
 			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
 			//cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
-			//cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
+			cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 			cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
 			//cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
 			if (this->EstimateSynchDirectionAvg>0.0){cout << "Clock EstimateSynch advancing" << endl;}
