@@ -67,7 +67,7 @@ private:// Variables
 	unsigned long long int iIterPRUcurrentTimerVal=0;
 	unsigned long long int iIterPRUcurrentTimerValSynch=0;// Account for rounds entered
 	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has no tentered
-	unsigned long long int iIterPRUcurrentTimerValLast=0;
+	//unsigned long long int iIterPRUcurrentTimerValLast=0;
 	double EstimateSynch=1.0;
 	double EstimateSynchAvg=1.0;
 	double EstimateSynchArray[MaxNumPulses]={EstimateSynch};// They are not all set to the value, only the first one (a function in the declarator should be used to fill them in.
@@ -75,10 +75,10 @@ private:// Variables
 	double EstimateSynchDirectionAvg=0.0;
 	double EstimateSynchDirectionArray[MaxNumPulses]={0.0};
 	// PID error correction
-	double SynchAdjconstant=1.0;// 
-	double PIDconstant=1.0; // Maybe a little bit over 1.0 to be more aggresive
-	double PIDintegral=0.0;// Not used
-	double PIDderiv=0.0;	// Not used
+	//double SynchAdjconstant=1.0;// 
+	//double PIDconstant=1.0; // Maybe a little bit over 1.0 to be more aggresive
+	//double PIDintegral=0.0;// Not used
+	//double PIDderiv=0.0;	// Not used
 	// Time/synchronization management
 	struct my_clock
 	{
@@ -118,8 +118,8 @@ private:// Variables
 	//int duration_FinalInitialDriftAuxArray[MaxNumPulses]={0};// For absolute drift purposes
 	//int duration_FinalInitialDriftAuxArrayAvg=0;// For absolute drift purposes
 	double duration_FinalInitialCountAux=0.0;
-	//double duration_FinalInitialCountAuxArray[MaxNumPulses]={0.0};
-	//double duration_FinalInitialCountAuxArrayAvg=0.0;
+	double duration_FinalInitialCountAuxArray[MaxNumPulses]={0.0};
+	double duration_FinalInitialCountAuxArrayAvg=0.0;
 	//int duration_FinalInitialMeasTrigAux=0;
 	int duration_FinalInitialMeasTrigAuxArray[MaxNumPulses]={0};
 	int duration_FinalInitialMeasTrigAuxAvg=0;
