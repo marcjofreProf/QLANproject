@@ -243,8 +243,9 @@ struct timespec GPIO::SetWhileWait(){
 }
 
 int GPIO::PRUsignalTimerSynch(){
-	this->TimePointClockPRUinitial=Clock::now();// First time
-	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockPRUinitial;// First time
+	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time	
+	unsigned int SynchRem=static_cast<int>((static_cast<long double>(iepPRUtimerRange32bits)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(iepPRUtimerRange32bits)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
+	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(SynchRem);
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	while(true){		
 		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra)) and this->ManualSemaphoreExtra==false){// It was possible to execute when needed			
@@ -667,7 +668,7 @@ pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate 
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command. Generate signals
 
 TimePoint TimePointFutureSynch=Clock::now();
-unsigned int SynchRem=static_cast<int>((static_cast<long double>(2.0*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<long double>(PRUclockStepPeriodNanoseconds));//static_cast<int>((static_cast<long double>(2.0*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
+unsigned int SynchRem=static_cast<int>((static_cast<long double>(2.0*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));//static_cast<int>((static_cast<long double>(2.0*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 // If the PRU wander was not corrected then computation below - transforming from and to the different time domains system vs. PRU
 //int SynchRem=static_cast<int>(((2.0*SynchTrigPeriod)-fmod((static_cast<double>((1.0/this->EstimateSynchAvg)*std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<double>(PRUclockStepPeriodNanoseconds)*this->EstimateSynchAvg);// Multiple conversion of time domains, from the system clock to the PRU clock what is remaining, then back to the system clock to do the busy wait.
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);

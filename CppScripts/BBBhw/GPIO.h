@@ -108,7 +108,7 @@ private:// Variables
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockSendCommandFinal=std::chrono::time_point<Clock>();// For synch purposes
 	//TimePoint TimePointClockSendCommandInitial=std::chrono::time_point<Clock>();// For synch purposes
-	TimePoint TimePointClockPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
+	//TimePoint TimePointClockPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes. Not used
 	//TimePoint TimePointClockSynchPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes. Not used
 	TimePoint TimePointClockSynchPRUfinal=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint TimePointClockTagPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
@@ -145,7 +145,7 @@ private:// Variables
 	//bool CheckTimeFlagPRU0;
 	//bool finPRU0;
 	// PRU Signal
-	unsigned int NumberRepetitionsSignal=15000;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
+	unsigned int NumberRepetitionsSignal=14000;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=5000000; // In microseconds
 	//int WaitTimeToFutureTimePointPRU1=1000;// The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s, not more otherwise the synch calculation error overflows as well and things go bad.
