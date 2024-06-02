@@ -9,7 +9,7 @@ sudo pkill -f phc2sys
 
 sudo /etc/init.d/rsyslog stop # stop logging
 
-## If at least the grand master is synch to NTP (good reference)
+## If at least the grand master is synch to NTP (good reference) - difficult then to converge because also following NTP
 sudo systemctl enable systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
