@@ -348,7 +348,7 @@ int GPIO::PRUsignalTimerSynch(){
 		}		
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
-		if (this->iIterPRUcurrentTimerValSynch==(2*this->NumSynchMeasAvgAux)){
+		if (this->iIterPRUcurrentTimerValSynch==(3*this->NumSynchMeasAvgAux)){
 			cout << "Synchronized, ready to proceed..." << endl;
 		}
 	}// end while
