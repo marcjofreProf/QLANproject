@@ -5,14 +5,14 @@ sudo pkill -f ptp4l
 sudo pkill -f phc2sys
 ########################################################
 sudo /etc/init.d/rsyslog stop # stop logging
+# Get the current time in seconds and nanoseconds
+current_time=$(date +%s)
+current_nano=$(date +%N)
+sudo phc_ctl /dev/ptp0 set $current_time $current_nano # if the initial phc2sys offset is really huge. Then, run "sudo phc_ctl /dev/ptp0 set" before starting the ptp4l service, so that it has an initial time based on the RTC that is "in the ballpark" and and set "step_threshold" at least or below to 0.00002 in the config file so that it can jump to converge
+sudo hwclock --systohc
 sudo timedatectl set-ntp false
 sudo systemctl stop systemd-timesyncd # stop system synch
 sudo systemctl disable systemd-timesyncd # stop system synch
-# Get the current time in seconds and nanoseconds
-sudo hwclock --systohc
-current_time=$(date +%s)
-current_nano=$(date +%N)
-sudo phc_ctl /dev/ptp0 set $current_time $current_nano # if the initial phc2sys offset is really huge. Then, run "sudo phc_ctl /dev/ptp0 set" before starting the ptp4l service, so that it has an initial time based on the RTC taht is "in the ballpark" and and set "step_threshold" at least or below to 0.00002 in the config file so that it can jump to converge
 sudo ./linuxptp/ptp4l -i eth0 -s -f PTP4lConfigQLANprojectMaster.cfg &
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w & #-f PTP2pcConfigQLANprojectSlave.cfg & #-m
 echo 'Enabling BBB pins'
