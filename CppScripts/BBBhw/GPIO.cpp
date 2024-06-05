@@ -231,7 +231,7 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 //////////////////////////////////////////////
 struct timespec GPIO::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
-	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod);//-std::chrono::nanoseconds(duration_FinalInitialDriftAux);
+	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod);//-std::chrono::nanoseconds(duration_FinalInitialCountAuxArrayAvg);
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentSynchPRU1future.time_since_epoch();
 	// Convert duration to desired time
 	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()-this->TimeClockMarging; // Add an offset, since the final barrier is implemented with a busy wait
@@ -257,8 +257,9 @@ int GPIO::PRUsignalTimerSynch(){
 				this->PRUoffsetDriftErrorAppliedRaw=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
 				this->NextSynchPRUcorrection=static_cast<unsigned int>(static_cast<unsigned int>((static_cast<unsigned long long int>(this->PRUoffsetDriftErrorAppliedRaw)+static_cast<unsigned long long int>(LostCounts))%iepPRUtimerRange32bits));
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
-				pru1dataMem_int[1]=static_cast<unsigned int>(5);//static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command											
-				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
+				pru1dataMem_int[1]=static_cast<unsigned int>(5);//static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command		
+				TimePoint TimePointClockCurrentSynchPRU1futureAux=this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);//Important to discount the time to enter the interrupt here (in average) so that the rectification of the PRU clock is reference to an absolute time									
+				while(Clock::now() < TimePointClockCurrentSynchPRU1futureAux);// Busy waiting
 				////this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info. Already computed in the steps before				// Important, the following line at the very beggining to reduce the command jitter				
 				prussdrv_pru_send_event(22);
 				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
@@ -276,7 +277,7 @@ int GPIO::PRUsignalTimerSynch(){
 					cout << "PRU1 interrupt error" << endl;
 				}							
 				// Below for the triggering
-				int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-TimePointClockCurrentSynchPRU1future).count());
+				int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-TimePointClockCurrentSynchPRU1futureAux).count());
 				this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 				this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
 				this->TrigAuxIterCount++;
@@ -288,7 +289,8 @@ int GPIO::PRUsignalTimerSynch(){
 				//pru1dataMem_int[2]// Current IEP timer sample
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[2]);
-				this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
+				// Discounting the time to enter the interrupt to measure the deviation is not a good idea because it introduces more error and besides in general de time between measurements is autocorrected for deviations.
+				//this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
 				// Unwrap
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
@@ -355,236 +357,6 @@ int GPIO::PRUsignalTimerSynch(){
 
 return 0; // All ok
 }
-
-/*
-int GPIO::PRUsignalTimerSynchOld(){
-	this->TimePointClockPRUinitial=Clock::now();// First time
-	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockPRUinitial;// First time
-	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
-	while(true){		
-		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra)) and this->ManualSemaphoreExtra==false){// It was possible to execute when needed			
-			//cout << "Resetting PRUs timer!" << endl;
-			if (clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).//https://opensource.com/article/17/6/timekeeping-linux-vms
-				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
-				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization						
-				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html	
-				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
-				pru1dataMem_int[1]=static_cast<unsigned int>(5);//static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command											
-				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
-				////this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info. Already computed in the steps before				// Important, the following line at the very beggining to reduce the command jitter				
-				prussdrv_pru_send_event(22);
-				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
-				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
-				//cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
-				if (retInterruptsPRU1>0){
-					prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-				}
-				else if (retInterruptsPRU1==0){
-					prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-					cout << "GPIO::PRUsignalTimerSynch took to much time. Reset PRU1 if necessary." << endl;
-				}
-				else{
-					prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-					cout << "PRU1 interrupt error" << endl;
-				}							
-				// Below for the triggering
-				int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-TimePointClockCurrentSynchPRU1future).count());
-				this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
-				this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
-				this->TrigAuxIterCount++;
-				// Below for synch calculation compensation
-				duration_FinalInitialCountAux=static_cast<double>(duration_FinalInitialMeasTrig);				
-				////duration_FinalInitialCountAuxArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->duration_FinalInitialCountAux;
-				////duration_FinalInitialCountAuxArrayAvg=DoubleMedianFilterSubArray(duration_FinalInitialCountAuxArray,NumSynchMeasAvgAux);					
-				
-				//pru1dataMem_int[2]// Current IEP timer sample
-				//pru1dataMem_int[3]// Correction to apply to IEP timer
-				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[2]);
-				this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
-				// Unwrap
-				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
-				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
-				
-				// Compute error
-				// Relative error
-				this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/static_cast<double>(PRUclockStepPeriodNanoseconds)))-((this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw));
-				//if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<(NumSynchMeasAvgAux/2)){// Do computations
-				this->ManualSemaphoreExtra=true;
-					// Computations for Synch calculaton for PRU0 compensation
-					this->EstimateSynch=(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))/((this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw));// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correction).
-					this->EstimateSynch=1.0+this->SynchAdjconstant*(this->EstimateSynch-1.0);
-					this->EstimateSynchArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynch;
-					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
-					// Estimate synch direction
-					this->EstimateSynchDirection=((this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw))-((this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw)+(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
-					EstimateSynchDirectionArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynchDirection;
-					this->EstimateSynchDirectionAvg=DoubleMedianFilterSubArray(EstimateSynchDirectionArray,NumSynchMeasAvgAux);					
-					//this->EstimateSynch=1.0; // To disable synch adjustment
-					// Error averaging
-					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
-					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
-				this->ManualSemaphoreExtra=false;
-				this->ManualSemaphore=false;
-				this->release();
-					//// PID error computation to correct for signal PRU 1 generation								
-					this->PIDcontrolerTime();// Acting on the IEP timer produces jitter. Compute parameters for PID adjustment. Do not apply correction since the code has evolved that the signal synchronization is done in system space!!! Nevertheless, it can be applied, to correct small time differences when entering into triggering the signal, so the period of interest should be less than the overall large period and at least larger than the time to enter the interrupt for signal triggering. In this way, absolute continuous drift does not occur
-					//this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
-					//this->PRUoffsetDriftErrorAppliedRaw=0;// Disable IEP correction
-					// Re wrap for correction					
-					//if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)>0xFFFFFFFF){this->PRUoffsetDriftErrorApplied=this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied-0xFFFFFFFF-1.0;}
-					//else if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)<0){this->PRUoffsetDriftErrorApplied=0xFFFFFFFF+(this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)+1.0;}
-					//else{
-					//	this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied;
-					//}
-					
-					if (this->PRUoffsetDriftErrorApplied==0){
-						//pru1dataMem_int[3]=static_cast<unsigned int>(0);
-						this->NextSynchPRUcorrection=static_cast<unsigned int>(0);
-						this->iIterPRUcurrentTimerValSynch++;
-						this->iIterPRUcurrentTimerValPass=1;
-						PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
-						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
-						this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
-					}
-					else if (this->PRUoffsetDriftErrorApplied<0.0){// and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))+this->PRUoffsetDriftErrorApplied)>(0+TimeClockMarging) and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)))<(0xFFFFFFFF-TimeClockMarging) ){// Substraction correction					
-						//pru1dataMem_int[3]=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied);// Apply correction
-						this->NextSynchPRUcorrection=static_cast<unsigned int>(-this->PRUoffsetDriftErrorApplied); 
-						this->iIterPRUcurrentTimerValSynch++;
-						this->iIterPRUcurrentTimerValPass=1;
-						PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
-						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
-						this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
-					}
-					else if (this->PRUoffsetDriftErrorApplied>0.0){// and (this->PRUcurrentTimerValWrap+(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))+this->PRUoffsetDriftErrorApplied)<(0xFFFFFFFF-TimeClockMarging)){// Addition correction
-						//pru1dataMem_int[3]=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);// Apply correction
-						this->NextSynchPRUcorrection=static_cast<unsigned int>(this->PRUoffsetDriftErrorApplied);
-						this->iIterPRUcurrentTimerValSynch++;
-						this->iIterPRUcurrentTimerValPass=1;
-						PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
-						iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
-						this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
-					}
-					else{
-						////pru1dataMem_int[3]=static_cast<unsigned int>(0);// Do not apply correction.
-						//this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.	
-						// Keep last recommended command and correction - signal with iIterPRUcurrentTimerValPass++ that it jump one iteration				
-						//this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
-						//this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
-						//this->iIterPRUcurrentTimerValPass++;
-						this->NextSynchPRUcorrection=static_cast<unsigned int>(0);
-						this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
-						this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
-						this->iIterPRUcurrentTimerValSynch++;
-						this->iIterPRUcurrentTimerValPass++;
-						//PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
-						//iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
-						//this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
-					}										
-					// Updates for next round					
-					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
-					this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
-				//}
-				//else{// Do not do computations
-				//	//PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
-				//	//iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update
-				//	this->PRUoffsetDriftErrorApplied=0;
-				//	this->PRUoffsetDriftErrorAppliedRaw=0;
-				//	this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
-				//	this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
-				//	this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
-				//	this->iIterPRUcurrentTimerValPass=1;
-				//}
-				if (this->PRUoffsetDriftErrorApplied>0.0){// and this->iIterPRUcurrentTimerValPass==1){
-					//pru1dataMem_int[1]=static_cast<unsigned int>(3); // set command 3, to execute synch functions addition correction
-					this->NextSynchPRUcommand=static_cast<unsigned int>(3);
-				}				
-				else if (this->PRUoffsetDriftErrorApplied<0.0){// and this->iIterPRUcurrentTimerValPass==1){
-					//pru1dataMem_int[1]=static_cast<unsigned int>(2); // set command 2, to execute synch functions substraciton correction
-					this->NextSynchPRUcommand=static_cast<unsigned int>(2);
-				}
-				else{// if (this->PRUoffsetDriftErrorApplied==0 or this->iIterPRUcurrentTimerValPass>1){
-					//pru1dataMem_int[1]=static_cast<unsigned int>(4); // set command 4, to execute synch functions no correction
-					this->NextSynchPRUcommand=static_cast<unsigned int>(4);
-				}										
-			}
-			else{// does not enter in time
-				//this->NextSynchPRUcommand=static_cast<unsigned int>(4);
-				//this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.
-				// Keep last recommended command and correction - signal with iIterPRUcurrentTimerValPass++ that it jump one iteration
-				this->iIterPRUcurrentTimerValPass++;
-				//this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
-				//this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
-				//this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
-				//this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap+static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds);// Update
-				// Re wrap					
-				//if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
-				//this->TimePointClockSendCommandInitial=this->TimePointClockSendCommandInitial+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
-			}					
-		} //end if
-		else if (this->ManualSemaphoreExtra==true){
-			// Double entry for some reason. Do not do anything
-			cout << "Double run in time sync method. This should not happen!" << endl;
-		}
-		else{// does not enter in time
-			//this->NextSynchPRUcommand=static_cast<unsigned int>(4);
-			//this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Do not apply correction.
-			// Keep last recommended command and correction - signal with iIterPRUcurrentTimerValPass++ that it jump one iteration
-			this->iIterPRUcurrentTimerValPass++;
-			//this->PRUoffsetDriftErrorApplied=0;// Do not apply correction
-			//this->PRUoffsetDriftErrorAppliedRaw=0;// Do not apply correction
-			//this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update
-			//this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap+static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds);// Update
-			// Re wrap					
-			//if (this->PRUcurrentTimerValOldWrap>0xFFFFFFFF){this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValOldWrap-0xFFFFFFFF;}
-			//this->TimePointClockSendCommandInitial=this->TimePointClockSendCommandInitial+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
-		}
-		//this->ManualSemaphoreExtra=false;
-		// Absolute drift monitoring
-		//auto duration_FinalInitialDrift=this->TimePointClockSendCommandInitial-this->TimePointClockPRUinitial;
-		//duration_FinalInitialDriftAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitialDrift).count()-((this->iIterPRUcurrentTimerVal+1)*this->TimePRU1synchPeriod);
-		//duration_FinalInitialDriftAuxArray[iIterPRUcurrentTimerVal%NumSynchMeasAvgAux]=duration_FinalInitialDriftAux;
-		//duration_FinalInitialDriftAuxArrayAvg=IntMedianFilterSubArray(duration_FinalInitialDriftAuxArray,NumSynchMeasAvgAux);
-		
-		// Information
-		if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
-			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
-			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
-			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
-			//cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
-			cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
-			cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
-			//cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
-			if (this->EstimateSynchDirectionAvg>0.0){cout << "Clock EstimateSynch advancing" << endl;}
-			else if (this->EstimateSynchDirectionAvg<0.0){cout << "Clock EstimateSynch delaying" << endl;}
-			else{cout << "Clock EstimateSynch neutral" << endl;}
-			//cout << "duration_FinalInitialDriftAux: " << duration_FinalInitialDriftAux << endl;
-			//cout << "this->iIterPRUcurrentTimerValPass: "<< this->iIterPRUcurrentTimerValPass << endl;
-			//cout << "this->iIterPRUcurrentTimerValSynch: "<< this->iIterPRUcurrentTimerValSynch << endl;
-		}		
-		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
-		this->iIterPRUcurrentTimerVal++;
-		if (this->iIterPRUcurrentTimerValSynch==(2*this->NumSynchMeasAvgAux)){
-			cout << "Synchronized, ready to proceed..." << endl;
-		}
-	}// end while
-
-return 0; // All ok
-}
-*/
-/*
-int GPIO::PIDcontrolerTime(){// Not used
-//PRUoffsetDriftErrorDerivative=(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorLast);//*(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast));//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
-//PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+(PRUoffsetDriftError-PRUoffsetDriftErrorAppliedRaw);//*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
-
-this->PRUoffsetDriftErrorAppliedRaw=PIDconstant*PRUoffsetDriftErrorAvg;//+PIDintegral*PRUoffsetDriftErrorIntegral;//+PIDderiv*PRUoffsetDriftErrorDerivative;//this->iIterPRUcurrentTimerValPass*(PIDconstant*PRUoffsetDriftErrorAvg+PIDintegral*PRUoffsetDriftErrorIntegral+PIDderiv*PRUoffsetDriftErrorDerivative);	
-
-if (this->PRUoffsetDriftErrorAppliedRaw<(-this->LostCounts)){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw-LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
-else if(this->PRUoffsetDriftErrorAppliedRaw>this->LostCounts){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw+LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
-else{this->PRUoffsetDriftErrorApplied=0;}
-
-return 0; // All ok
-}
-*/
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 /////////////
