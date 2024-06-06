@@ -87,7 +87,7 @@ private:// Variables
 	    using rep        = duration::rep;
 	    using period     = duration::period;
 	    using time_point = std::chrono::time_point<my_clock>;
-	    static constexpr bool is_steady = true;// true, false. With false, probably the corrections are abrupt, but less slots affected by misadjustments in time. True, the corrections are smooth and probably more slots affected by misadjustments in time.
+	    static constexpr bool is_steady = false;// true, false. With false, probably the corrections are abrupt, but less slots affected by misadjustments in time. True, the corrections are smooth and probably more slots affected by misadjustments in time.
 
 	    static time_point now()
 	    {
@@ -103,7 +103,7 @@ private:// Variables
 	double SynchTrigPeriod=65536; //For histogram analysis this is 8*65536
 	int FineSynchAdjOffVal=0;// Value provided by user space to adjust the triggering of the signals - offset
 	int FineSynchAdjFreqVal=0;// Value provided by user space to adjust the triggering of the signals - frequency
-	unsigned long long int TimePRU1synchPeriod=500000000;// In nanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
+	unsigned long long int TimePRU1synchPeriod=100000000;// In nanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
 	unsigned long long int iepPRUtimerRange32bits=4294967296;
 	struct timespec requestWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
