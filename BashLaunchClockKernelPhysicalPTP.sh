@@ -10,15 +10,17 @@ sudo pkill -f phc2sys
 ########################################################
 sudo /etc/init.d/rsyslog stop # stop logging
 # Get the current time in seconds and nanoseconds
-#current_time=$(date +%s)
+current_time=$(date +%s)
 #current_nano=$(date +%N)
-#sudo phc_ctl /dev/ptp0 set $current_time # $current_nano # if the initial phc2sys offset is really huge. Then, run "sudo phc_ctl /dev/ptp0 set" before starting the ptp4l service, so that it has an initial time based on the RTC that is "in the ballpark" and and set "step_threshold" at least or below to 0.00002 in the config file so that it can jump to converge
+sudo phc_ctl /dev/ptp0 set $current_time # $current_nano # if the initial phc2sys offset is really huge. Then, run "sudo phc_ctl /dev/ptp0 set" before starting the ptp4l service, so that it has an initial time based on the RTC that is "in the ballpark" and and set "step_threshold" at least or below to 0.00002 in the config file so that it can jump to converge
 sudo hwclock --systohc
+
 sudo timedatectl set-ntp false
 sudo systemctl stop systemd-timesyncd # stop system synch
 sudo systemctl disable systemd-timesyncd # disable system synch
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -m & #-f PTP2pcConfigQLANprojectSlave.cfg & #-m # Seems important that phc2sys is launched first
 sudo ./linuxptp/ptp4l -i eth0 -s -f PTP4lConfigQLANproject.cfg -m & #-m
+
 echo 'Enabling PWM for 24 MHz ref clock'
 sudo config-pin P8.19 pwm
 sudo sh -c "echo '38' >> /sys/class/pwm/pwmchip7/pwm-7\:0/period"
