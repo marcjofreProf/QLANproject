@@ -19,10 +19,13 @@ sudo pmc -u -b 0 -t 1 "SET GRANDMASTER_SETTINGS_NP clockClass 248 \
         timeSource 0xa0"
 
 sudo timedatectl set-ntp false
-sudo systemctl stop systemd-timesyncd # stop system synch
-sudo systemctl disable systemd-timesyncd # stop system synch
+#sudo systemctl stop systemd-timesyncd # stop system synch
+#sudo systemctl disable systemd-timesyncd # stop system synch
+sudo systemctl enable --now systemd-timesyncd # start system synch
+sudo systemctl start systemd-timesyncd # start system synch
+sudo systemctl daemon-reload
 # Maybe since systemd-timesyncd is disabled, then maybe adjtimex might update some needed parameters such as the difference between UTC and TAI clocks
-sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
+#sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w & # -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
 sudo ./linuxptp/ptp4l -i eth0 -s -f PTP4lConfigQLANprojectSlave.cfg &
