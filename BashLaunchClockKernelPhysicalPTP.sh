@@ -15,6 +15,13 @@ sudo /etc/init.d/rsyslog stop # stop logging
 #sudo phc_ctl /dev/ptp0 set $current_time # $current_nano # if the initial phc2sys offset is really huge. Then, run "sudo phc_ctl /dev/ptp0 set" before starting the ptp4l service, so that it has an initial time based on the RTC that is "in the ballpark" and and set "step_threshold" at least or below to 0.00002 in the config file so that it can jump to converge
 sudo hwclock --systohc
 
+# Configure SYSTEM CLOCKS: CLOCK_REALTIME and CLOCK_TAI
+sudo pmc -u -b 0 -t 1 "SET GRANDMASTER_SETTINGS_NP clockClass 248 \
+        clockAccuracy 0xfe offsetScaledLogVariance 0xffff \
+        currentUtcOffset 37 leap61 0 leap59 0 currentUtcOffsetValid 1 \
+        ptpTimescale 1 timeTraceable 1 frequencyTraceable 0 \
+        timeSource 0xa0"
+
 sudo timedatectl set-ntp false
 sudo systemctl stop systemd-timesyncd # stop system synch
 sudo systemctl disable systemd-timesyncd # disable system synch
