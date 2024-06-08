@@ -14,14 +14,14 @@ sudo hwclock --systohc
 # Configure SYSTEM CLOCKS: CLOCK_REALTIME and CLOCK_TAI
 sudo pmc -u -b 0 -t 1 "SET GRANDMASTER_SETTINGS_NP clockClass 248 \
         clockAccuracy 0xfe offsetScaledLogVariance 0xffff \
-        currentUtcOffset 0 leap61 0 leap59 0 currentUtcOffsetValid 1 \
+        currentUtcOffset 37 leap61 0 leap59 0 currentUtcOffsetValid 1 \
         ptpTimescale 1 timeTraceable 1 frequencyTraceable 0 \
         timeSource 0xa0"
 
 sudo timedatectl set-ntp false
 sudo systemctl stop systemd-timesyncd # stop system synch
 sudo systemctl disable systemd-timesyncd # stop system synch
-sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -O 0 -w & # -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
+sudo ./linuxptp/phc2sys -a -r -s eth0 -c CLOCK_REALTIME -w & # -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
 sudo ./linuxptp/ptp4l -i eth0 -s -f PTP4lConfigQLANprojectSlave.cfg &
 
 echo 'Enabling BBB pins'
