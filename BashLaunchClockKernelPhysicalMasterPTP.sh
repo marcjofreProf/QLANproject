@@ -24,7 +24,7 @@ sudo pmc -u -b 0 -t 1 "SET GRANDMASTER_SETTINGS_NP clockClass 248 \
         timeSource 0xa0"
 
 # Maybe since systemd-timesyncd is disabled, then maybe adjtimex might update some needed parameters such as the difference between UTC and TAI clocks
-sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
+#sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
 # Important to launch phc2sys first
 
