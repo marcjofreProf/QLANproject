@@ -18,8 +18,8 @@ sudo hwclock --systohc
 sudo timedatectl set-ntp false
 sudo systemctl stop systemd-timesyncd # stop system synch
 sudo systemctl disable systemd-timesyncd # disable system synch
-sudo ./linuxptp/ptp4l -i eth0 -s -f PTP4lConfigQLANproject.cfg -m & #-m
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -m & #-f PTP2pcConfigQLANprojectSlave.cfg & #-m # Seems important that phc2sys is launched first (not on slave)
+sudo ./linuxptp/ptp4l -i eth0 -s -f PTP4lConfigQLANproject.cfg -m & #-m
 
 echo 'Enabling PWM for 24 MHz ref clock'
 sudo config-pin P8.19 pwm
