@@ -27,7 +27,7 @@ sudo systemctl disable systemd-timesyncd # disable system synch
 # 	If ethtool not installed then the utc and tai offsets are not well configured 
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
 sudo ./linuxptp/ptp4l -i eth0 -s -f PTP4lConfigQLANprojectSlave.cfg &
-sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -O 0 & # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
+sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w & # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
 
 echo 'Enabling BBB pins'
 sudo config-pin P9_28 pruin
