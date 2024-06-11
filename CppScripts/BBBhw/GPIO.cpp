@@ -130,7 +130,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
 	pru0dataMem_int[0]=static_cast<unsigned int>(0); // set no command
-	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures, with overflow clock - Not used
+	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures, with overflow clock
+	pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	//if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
 	//	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
 	//		perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
@@ -278,6 +279,7 @@ int GPIO::PRUsignalTimerSynch(){
 				}							
 				// Below for the triggering
 				int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-TimePointClockCurrentSynchPRU1futureAux).count());
+				// Below for the triggering
 				this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 				this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
 				this->TrigAuxIterCount++;
@@ -360,16 +362,32 @@ return 0; // All ok
 
 int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
 /////////////
-while (this->ManualSemaphoreExtra);// Wait until periodic synch method finishes
+//while (this->ManualSemaphoreExtra);// Wait until periodic synch method finishes
+while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
+this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
+this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;// Acquire this value for the this tag reading set
 ///////////
+pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures
 pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
+unsigned int SynchRem=static_cast<int>((static_cast<long double>(2.0*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
+TimePointClockTagPRUinitial=TimePointClockTagPRUinitial+std::chrono::nanoseconds(SynchRem);
+TimePoint TimePointClockTagPRUinitialAux=TimePointClockTagPRUinitial-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
+while (Clock::now()<TimePointClockTagPRUinitialAux);// Busy wait time synch sending signals
 prussdrv_pru_send_event(21);
 this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
+
+int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-TimePointClockTagPRUinitialAux).count());
+this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
+this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
+this->TrigAuxIterCount++;
+
+this->ManualSemaphore=false;
+this->release();
 
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
 if (retInterruptsPRU0>0){
@@ -458,14 +476,8 @@ retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterrupt
 //pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // set command computed in synch process
 //pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// Re-insert the correction for next cycle
 
-// Slot the final time
-std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(static_cast<long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockSynchPRUfinal.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))*static_cast<long double>(PRUclockStepPeriodNanoseconds)));
-TimePoint TimePointClockSynchPRUfinalAux=Clock::time_point(duration_back);
-
-
-
 // Synch trig part
-int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockSynchPRUfinalAux-TimePointFutureSynchAux).count());
+int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynchAux).count());
 this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
 this->TrigAuxIterCount++;
@@ -551,20 +563,6 @@ valpAux=valpAuxHolder;
 // The shared memory space has 12KB=12×1024bytes=12×1024×8bits=98304bits.
 //Doing numbers, we can store up to 2456 captures. To be in the safe side, we can do 2048 captures
 
-/*
-///////////////////////////////////////////////////////////////////////////////////////
-// Checking control - Clock skew and threshold
-valSkewCounts=static_cast<unsigned int>(*valpAux);
-valpAux++;// 1 times 8 bits
-valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<8;
-valpAux++;// 1 times 8 bits
-valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<16;
-valpAux++;// 1 times 8 bits
-valSkewCounts=valSkewCounts | (static_cast<unsigned int>(*valpAux))<<24;
-valpAux++;// 1 times 8 bits
-//cout << "valSkewCounts: " << valSkewCounts << endl;
-/////////////////////////////////////////////////////////////////////////////////////
-*/
 valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
 valpAux++;// 1 times 8 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<8;
@@ -575,39 +573,20 @@ valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*va
 valpAux++;// 1 times 8 bits
 //cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
 //////////////////////////////////////////////////////////////////////////////
-/*
-// First 32 bits is the overflow register for DWT_CYCCNT
-valOverflowCycleCountPRU=static_cast<unsigned int>(*valp);
-valp++;// 1 times 8 bits
-valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*valp))<<8;
-valp++;// 1 times 8 bits
-valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
-valp++;// 1 times 8 bits
-valOverflowCycleCountPRU=valOverflowCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
-valp++;// 1 times 8 bits
-valOverflowCycleCountPRU=valOverflowCycleCountPRU-1;//Account that it starts with a 1 offset
-//cout << "valOverflowCycleCountPRU: " << valOverflowCycleCountPRU << endl;
 
-auxUnskewingFactorResetCycle=auxUnskewingFactorResetCycle+static_cast<unsigned long long int>(valSkewCounts)+static_cast<unsigned long long int>(valOverflowCycleCountPRU-valOverflowCycleCountPRUold)*AboveThresoldCycleCountPRUCompValue;//static_cast<unsigned long long int>(valOverflowCycleCountPRU-valOverflowCycleCountPRUold)*static_cast<unsigned long long int>(valSkewCounts); // Related to the number of instruction/cycles when a reset happens and are lost the counts; // 64 bits. The unskewing is for the deterministic part. The undeterministic part is accounted with valCarryOnCycleCountPRU. This parameter can be adjusted by setting it to 0 and running the analysis of synch and checking the periodicity and also it is better to do it with Precise Time Protocol activated (to reduce the clock difference drift).
-//cout << "valOverflowCycleCountPRU-valOverflowCycleCountPRUold: " << (valOverflowCycleCountPRU-valOverflowCycleCountPRUold) << endl;
-valOverflowCycleCountPRUold=valOverflowCycleCountPRU; // Update
-extendedCounterPRUaux=((static_cast<unsigned long long int>(valOverflowCycleCountPRU)) << 31) + auxUnskewingFactorResetCycle + this->valCarryOnCycleCountPRU+static_cast<unsigned long long int>(valOverflowCycleCountPRU);// The last addition of static_cast<unsigned long long int>(valOverflowCycleCountPRU) is to compensate for a continuous drift
-*/
 // Reading first calibration tag and link it to the system clock
 OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl;
 //auto duration_InterruptTag=this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial;
 double PercentageToEndDurationTag=0.0;//0.1;// Estimation of where the time is tag produced. The lower the closer to the interrupt exit
 unsigned long long int duration_InterruptTag=static_cast<unsigned long long int>(PercentageToEndDurationTag*static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial).count()));
-//cout << "static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InterruptTag).count()): " << static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_InterruptTag).count()) << endl;
-//this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsInit)+static_cast<long long int>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial-this->TimePointClockTagPRUinitialOld).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)));
-//this->TimePointClockTagPRUinitialOld=this->TimePointClockTagPRUinitial;// Update
-// Relative time point not good
-//this->TimeTaggsLast=this->TimeTaggsInit+static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitialOld).count()-duration_InterruptTag)/static_cast<long double>(PRUclockStepPeriodNanoseconds));
-//this->TimePointClockTagPRUinitialOld=this->TimePointClockTagPRUfinal-std::chrono::nanoseconds(duration_InterruptTag);// Update
-//this->TimeTaggsInit=this->TimeTaggsLast;// Update
+
+// Slot the final time - to remove interrupt jitter
+std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(static_cast<long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinal.time_since_epoch()).count()-duration_InterruptTag)/static_cast<long double>(PRUclockStepPeriodNanoseconds))*static_cast<long double>(PRUclockStepPeriodNanoseconds)));
+TimePoint TimePointClockTagPRUfinalAux=Clock::time_point(duration_back);
+
 // Absolute time point
-this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal.time_since_epoch()).count()-duration_InterruptTag)/static_cast<long double>(PRUclockStepPeriodNanoseconds));//static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitialOld).count()-duration_InterruptTag)/static_cast<long double>(PRUclockStepPeriodNanoseconds));
+this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinalAux.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds));
 //else{Use the latest used, so do not update
 //}
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
