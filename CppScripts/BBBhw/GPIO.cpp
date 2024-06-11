@@ -404,42 +404,7 @@ else{
 	cout << "PRU0 interrupt poll error" << endl;
 }
 this->DDRdumpdata(); // Store to file
-/*
-FutureTimePointPRU0 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU0);
-auto duration_since_epochFutureTimePointPRU0=FutureTimePointPRU0.time_since_epoch();
-auto duration_since_epochTimeNowPRU0=FutureTimePointPRU0.time_since_epoch(); //just for initialization
-// Convert duration to desired time
-TimePointFuture_time_as_countPRU0 = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePointPRU0).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds) 
 
-CheckTimeFlagPRU0=false;
-
-finPRU0=false;
-do // This is blocking
-{
-TimePointClockNowPRU0=Clock::now();
-duration_since_epochTimeNowPRU0=TimePointClockNowPRU0.time_since_epoch();
-TimeNow_time_as_countPRU0 = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNowPRU0).count();
-
-if (TimeNow_time_as_countPRU0>TimePointFuture_time_as_countPRU0){CheckTimeFlagPRU0=true;}
-else{CheckTimeFlagPRU0=false;}
-	if (pru0dataMem_int[1] == (unsigned int)1 and CheckTimeFlagPRU0==false)// Seems that it checks if it has finished the acquisition
-	{
-		pru0dataMem_int[1] = (unsigned int)0; // Here clears the value
-		this->DDRdumpdata(); // Store to file		
-		finPRU0=true;
-	}
-	else if (CheckTimeFlagPRU0==true){// too much time
-		pru0dataMem_int[1]=(unsigned int)0; // set to zero means no command.
-		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
-		//prussdrv_pru_reset(PRU_Operation_NUM);
-		//prussdrv_pru_disable(PRU_Operation_NUM);// Disable the PRU
-		//prussdrv_pru_enable(PRU_Operation_NUM);// Enable the PRU from 0		
-		cout << "GPIO::ReadTimeStamps took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
-		//sleep(10);// Give some time to load programs in PRUs and initiate
-		finPRU0=true;
-	}
-} while(!finPRU0);
-*/
 return 0;// all ok
 }
 
