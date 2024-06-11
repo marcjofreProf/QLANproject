@@ -144,7 +144,7 @@ PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of star
 	// Read the number of RECORDS from positon 0 of PRU1 DATA RAM and stored it
 	LBCO	r10, CONST_PRUDRAM, 8, 4 // Read from PRU RAM offset correction or sequence signal period
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
-	SUB	r3, r7, 1 // Generate the value for r3
+	SUB	r3, r10, 1 // Generate the value for r3 from r10
 	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
 	AND	r0, r0, r3 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
 	SUB	r0, r10, r0 // Substract to find how long to wait	
