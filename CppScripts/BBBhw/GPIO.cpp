@@ -458,8 +458,14 @@ retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterrupt
 //pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // set command computed in synch process
 //pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// Re-insert the correction for next cycle
 
+// Slot the final time
+std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(static_cast<long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockSynchPRUfinal.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))*static_cast<long double>(PRUclockStepPeriodNanoseconds)));
+TimePoint TimePointClockSynchPRUfinalAux=Clock::time_point(duration_back);
+
+
+
 // Synch trig part
-int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynchAux).count());
+int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockSynchPRUfinalAux-TimePointFutureSynchAux).count());
 this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
 this->TrigAuxIterCount++;
