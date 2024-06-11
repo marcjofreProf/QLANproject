@@ -28,7 +28,7 @@ sudo systemctl disable systemd-timesyncd # disable system synch
 #sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
 sudo ./linuxptp/ptp4l -i eth0 -s -f PTP4lConfigQLANprojectSlave.cfg -m &
-sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -m # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
+sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -O 0 -m # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
 
 sudo systemctl enable --now systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
