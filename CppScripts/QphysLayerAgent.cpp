@@ -378,7 +378,7 @@ long long int CheckTimePointsDiff_time_as_count=0;
 CheckTimePointsDiff_time_as_count=(long long int)(TimeNow_time_as_count-TimePointFuture_time_as_count);
 cout << "CheckTimePointsDiff_time_as_count: " << CheckTimePointsDiff_time_as_count << endl;
 if (CheckTimePointsDiff_time_as_count<=UTCoffsetBarrierErrorThreshold){
-	cout << "UTc TAI offset wrongly resolved!" << endl;
+	cout << "UTC TAI offset wrongly resolved!" << endl;
 	TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()+UTCoffsetBarrierErrorThreshold-this->TimeClockMarging; // Add some margin so that busywait can be implemented for faster response // // Convert duration to desired time unit (e.g., milliseconds,microseconds)
 	CheckTimePointsDiff_time_as_count=(long long int)(TimeNow_time_as_count-TimePointFuture_time_as_count);
 	cout << "New CheckTimePointsDiff_time_as_count: " << CheckTimePointsDiff_time_as_count << endl;
