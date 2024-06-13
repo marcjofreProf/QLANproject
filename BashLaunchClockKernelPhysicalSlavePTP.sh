@@ -28,7 +28,7 @@ sudo systemctl disable systemd-timesyncd # disable system synch
 # Maybe since systemd-timesyncd is disabled, then maybe adjtimex might update some needed parameters such as the difference between UTC and TAI clocks
 #sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
-sudo ./linuxptp/ptp4l -i eth0 -s -f PTP4lConfigQLANproject.cfg -m & #-m
+sudo ./linuxptp/ptp4l -i eth0 -s -H -f PTP4lConfigQLANproject.cfg -m & #-m
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANproject.cfg & # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
 
 

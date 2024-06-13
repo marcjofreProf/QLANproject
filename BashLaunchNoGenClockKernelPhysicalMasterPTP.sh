@@ -40,7 +40,7 @@ sudo ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANproject.c
 #sudo systemctl disable systemd-timesyncd # start system synch
 #sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANproject.cfg -m & #-f PTP2pcConfigQLANprojectSlave.cfg & -m
 
-sudo ./linuxptp/ptp4l -i eth0 -f PTP4lConfigQLANproject.cfg -m #& #-m
+sudo ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANproject.cfg -m #& #-m
 
 sudo systemctl enable --now systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
