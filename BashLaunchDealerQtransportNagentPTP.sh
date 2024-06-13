@@ -5,6 +5,7 @@ sudo pkill -f ptp4l
 sudo pkill -f phc2sys
 ########################################################
 sudo /etc/init.d/rsyslog stop # stop logging
+
 ## Get the current time in seconds and nanoseconds
 #current_time=$(date +%s)
 #current_nano=$(date +%N)
