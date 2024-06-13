@@ -32,6 +32,7 @@ Agent script for Quantum Physical Layer
 #include <atomic>
 // time points
 #define WaitTimeToFutureTimePoint 399000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
+#define UTCoffsetBarrierErrorThreshold 37000000000 // Some BBB when synch with linuxPTP have an error on the UTC offset with respect TAI. Remove this sistemic offset and announce it!
 // Mathematical calculations
 #include <cmath>
 
@@ -376,6 +377,13 @@ unsigned long long int TimePointsDiff_time_as_count=0;
 long long int CheckTimePointsDiff_time_as_count=0;
 CheckTimePointsDiff_time_as_count=(long long int)(TimeNow_time_as_count-TimePointFuture_time_as_count);
 cout << "CheckTimePointsDiff_time_as_count: " << CheckTimePointsDiff_time_as_count << endl;
+if (CheckTimePointsDiff_time_as_count>=UTCoffsetBarrierErrorThreshold){
+	cout << "UTc TAI offset wrongly resolved!" << endl;
+	TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()+UTCoffsetBarrierErrorThreshold-this->TimeClockMarging; // Add some margin so that busywait can be implemented for faster response // // Convert duration to desired time unit (e.g., milliseconds,microseconds)
+	CheckTimePointsDiff_time_as_count=(long long int)(TimeNow_time_as_count-TimePointFuture_time_as_count);
+	cout << "New CheckTimePointsDiff_time_as_count: " << CheckTimePointsDiff_time_as_count << endl;
+}
+
 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 ///////////////////////////////////
