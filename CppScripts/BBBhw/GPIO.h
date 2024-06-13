@@ -92,7 +92,7 @@ private:// Variables
 	    static time_point now()
 	    {
 		timespec ts;
-		if (clock_gettime(CLOCK_REALTIME, &ts))// CLOCK_REALTIME//CLOCK_TAI
+		if (clock_gettime(CLOCK_TAI, &ts))// CLOCK_REALTIME//CLOCK_TAI
 		    throw 1;
 		using sec = std::chrono::seconds;
 		return time_point{sec{ts.tv_sec}+duration{ts.tv_nsec}};
