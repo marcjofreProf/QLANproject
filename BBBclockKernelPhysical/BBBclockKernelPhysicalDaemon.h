@@ -99,7 +99,7 @@ private:// Variables
 	TimePointWatch TimePointClockCurrentFinalMeas=std::chrono::time_point<ClockWatch>(); // Initial updated value of the clock (updated in each iteration)
 	//TimePointChrono TimePointClockCurrentInitialAdj=std::chrono::time_point<ClockChrono>(); // Initial updated value of the clock (updated in each iteration)
 	//TimePointChrono TimePointClockCurrentFinalAdj=std::chrono::time_point<ClockChrono>(); // Initial updated value of the clock (updated in each iteration)
-	TimePointWatch TimePointClockPRUinitial=std::chrono::time_point<ClockWatch>();// For absolute drift purposes
+	//TimePointWatch TimePointClockPRUinitial=std::chrono::time_point<ClockWatch>();// For absolute drift purposes
 	int duration_FinalInitialDriftAux=0;// For absolute drift purposes
 	int duration_FinalInitialDriftAuxArray[MaxMedianFilterArraySize]={0};
 	int duration_FinalInitialDriftAuxArrayAvg=0;
