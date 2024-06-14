@@ -202,7 +202,7 @@ else{
 	cout << "PRU1 interrupt poll error" << endl;
 }
 
-duration_FinalInitialDriftAux=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-this->TimePointClockCurrentFinalMeas).count());//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
+duration_FinalInitialDriftAux=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentFinalMeas-this->TimePointClockCurrentInitialMeas).count());//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
 
 switch(FilterMode) {
 case 2:{// Mean implementation

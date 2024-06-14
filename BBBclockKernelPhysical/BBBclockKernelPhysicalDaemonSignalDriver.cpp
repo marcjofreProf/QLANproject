@@ -202,7 +202,7 @@ prussdrv_pru_send_event(22); // Send interrupt to PRU1
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);// After the interrupt update rapidly the new quarter value
 
-duration_FinalInitialDriftAux=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-this->TimePointClockCurrentFinalMeas).count());//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
+duration_FinalInitialDriftAux=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentFinalMeas-this->TimePointClockCurrentInitialMeas).count());//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
 switch(FilterMode) {
 case 2:{// Mean implementation
 this->duration_FinalInitialDriftAuxArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->duration_FinalInitialDriftAux;
