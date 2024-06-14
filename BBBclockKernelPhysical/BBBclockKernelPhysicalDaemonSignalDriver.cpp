@@ -10,6 +10,8 @@
 #include <cstring>
 // Time/synchronization management
 #include <chrono>
+// Mathematical functions
+#include <cmath> // floor function
 // PRU programming
 #include <poll.h>
 #include <stdio.h>
@@ -150,7 +152,7 @@ CKPDSD::CKPDSD(){// Redeclaration of constructor GPIO when no argument is specif
 	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=ClockWatch::now();
-	std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(fmodl(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentInitial.time_since_epoch()).count()),static_cast<long double>(this->TimeAdjPeriod))*static_cast<long double>(this->TimeAdjPeriod)));
+	std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(floor(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentInitial.time_since_epoch()).count())/static_cast<long double>(this->TimeAdjPeriod))*static_cast<long double>(this->TimeAdjPeriod)));
 	this->TimePointClockCurrentInitial=ClockWatch::time_point(duration_back);
 	//this->TimePointClockCurrentInitialAdj=ClockChrono::now();
 	this->TimePointClockPRUinitial=ClockWatch::now();// First time
