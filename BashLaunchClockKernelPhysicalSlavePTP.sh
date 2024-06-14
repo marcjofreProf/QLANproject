@@ -16,9 +16,10 @@ sudo /etc/init.d/rsyslog stop # stop logging
 sudo hwclock --systohc
 
 # Configure SYSTEM CLOCKS: CLOCK_REALTIME and CLOCK_TAI
+# utc_offset should be 37, but seems that some slaves do not acquire it propperly, so set to zero (so TAI and UTC time will be the same)
 sudo pmc -u -b 0 -t 1 "SET GRANDMASTER_SETTINGS_NP clockClass 248 \
         clockAccuracy 0xfe offsetScaledLogVariance 0xffff \
-        currentUtcOffset 37 leap61 0 leap59 0 currentUtcOffsetValid 1 \
+        currentUtcOffset 0 leap61 0 leap59 0 currentUtcOffsetValid 1 \
         ptpTimescale 1 timeTraceable 1 frequencyTraceable 0 \
         timeSource 0xa0"
 
