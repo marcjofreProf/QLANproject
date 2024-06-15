@@ -64,7 +64,7 @@ sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 &
-pidAux=$(pidof -s BBBclockKernelPhysicalDaemon)
+pidAux=$(pgrep -f "BBBclockKernelPhysicalDaemon")
 sudo chrt -r -p 1 $pidAux
 
 read -r # Block operation until Ctrl+C is pressed

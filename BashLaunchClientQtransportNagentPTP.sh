@@ -35,10 +35,10 @@ sudo systemctl disable systemd-timesyncd # disable system synch
 # 	If ethtool not installed then the utc and tai offsets are not well configured 
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
 sudo ./linuxptp/ptp4l -i eth0 -s -H -f PTP4lConfigQLANprojectSlave.cfg &
-pidAux=$(pidof -s ptp4l)
+pidAux=$(pgrep -f "ptp4l")
 sudo chrt -r -p 1 $pidAux
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectSlave.cfg & # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
-pidAux=$(pidof -s phc2sys)
+pidAux=$(pgrep -f "phc2sys")
 sudo chrt -r -p 1 $pidAux
 
 echo 'Enabling BBB pins'
@@ -66,7 +66,7 @@ sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo ./CppScripts/QtransportLayerAgentN client 192.168.8.2 192.168.8.1 &
-pidAux=$(pidof -s QtransportLayerAgentN)
+pidAux=$(pgrep -f "QtransportLayerAgentN")
 sudo chrt -r -p 1 $pidAux
 
 read -r # Block operation until Ctrl+C is pressed
