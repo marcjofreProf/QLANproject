@@ -14,7 +14,7 @@ sleep 1 # wait 1 second to make sure to kill the old processes
 ########################################################
 pidAux=$(pidof -s ptp0)
 echo $pidAux
-sudo chrt -r -p 1 $pidAux
+sudo chrt -f -p 0 $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
 # Get the current time in seconds and nanoseconds
