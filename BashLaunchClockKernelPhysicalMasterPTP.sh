@@ -8,6 +8,8 @@ echo 'Running PTP'
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
 ########################################################
+# Set realtime priority with chrt -f and priority 0
+########################################################
 sudo /etc/init.d/rsyslog stop # stop logging
 
 # Get the current time in seconds and nanoseconds
@@ -34,15 +36,15 @@ sudo systemctl enable systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP
-sudo ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # Important to launch phc2sys first
+sudo chrt -f -p 0 ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # Important to launch phc2sys first
 
 ## If synch to the RTC of the system, stop the NTP. The quality of the internal crystal/clock matters
 #sudo timedatectl set-ntp false
 #sudo systemctl stop systemd-timesyncd # stop system synch
 #sudo systemctl disable systemd-timesyncd # start system synch
-#sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANproject.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # Important to launch phc2sys first
+#sudo chrt -f -p 0 ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANproject.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # Important to launch phc2sys first
 
-sudo ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
+sudo chrt -f -p 0 ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
 
 echo 'Enabling PWM for 24 MHz ref clock'
 sudo config-pin P8.19 pwm
@@ -83,7 +85,7 @@ sudo config-pin P8_43 pruout
 sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
-sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3
+sudo chrt -f -p 0 ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3
 sudo systemctl enable --now systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload

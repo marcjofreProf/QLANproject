@@ -4,6 +4,8 @@ echo 'Running PTP'
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
 ########################################################
+# Set realtime priority with chrt -f and priority 0
+########################################################
 sudo /etc/init.d/rsyslog stop # stop logging
 
 ## Get the current time in seconds and nanoseconds
@@ -27,8 +29,8 @@ sudo systemctl disable systemd-timesyncd # disable system synch
 #sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
 # 	If ethtool not installed then the utc and tai offsets are not well configured 
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
-sudo ./linuxptp/ptp4l -i eth0 -s -H -f PTP4lConfigQLANprojectSlave.cfg &
-sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectSlave.cfg & # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
+sudo chrt -f -p 0 ./linuxptp/ptp4l -i eth0 -s -H -f PTP4lConfigQLANprojectSlave.cfg &
+sudo chrt -f -p 0 ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectSlave.cfg & # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
 
 echo 'Enabling BBB pins'
 sudo config-pin P9_28 pruin
@@ -54,7 +56,7 @@ sudo config-pin P8_43 pruout
 sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
-sudo ./CppScripts/QtransportLayerAgentN client 192.168.8.2 192.168.8.1
+sudo chrt -f -p 0 ./CppScripts/QtransportLayerAgentN client 192.168.8.2 192.168.8.1
 sudo systemctl enable --now systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
