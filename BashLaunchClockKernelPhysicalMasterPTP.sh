@@ -8,12 +8,11 @@ echo 'Running PTP'
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
 sudo pkill -f BBBclockKernelPhysicalDaemon
-sleep 1 # wait for 1 second, to make sure that the processes are killed
 ########################################################
 # Set realtime priority with chrt -r and priority 0
 ########################################################
 pidAux=$(pidof -s ptp0)
-sudo chrt -r -p 0 -a $pidAux
+sudo chrt -r -p 0 $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
 
@@ -43,7 +42,7 @@ sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP
 sudo ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # Important to launch phc2sys first
 pidAux=$(pidof -s ph2sys)
-sudo chrt -r -p 0 -a $pidAux
+sudo chrt -r -p 0 $pidAux
 
 ## If synch to the RTC of the system, stop the NTP. The quality of the internal crystal/clock matters
 #sudo timedatectl set-ntp false
@@ -55,7 +54,7 @@ sudo chrt -r -p 0 -a $pidAux
 
 sudo ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
 pidAux=$(pidof -s ptp4l)
-sudo chrt -r -p 0 -a $pidAux
+sudo chrt -r -p 0 $pidAux
 
 echo 'Enabling PWM for 24 MHz ref clock'
 sudo config-pin P8.19 pwm
@@ -98,7 +97,7 @@ sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 &
 pidAux=$!
-sudo chrt -r -p 0 -a $pidAux
+sudo chrt -r -p 0 $pidAux
 
 read -r # Block operation until Ctrl+C is pressed
 
