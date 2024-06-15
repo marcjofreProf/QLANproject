@@ -14,7 +14,7 @@ sleep 1 # wait 1 second to make sure to kill the old processes
 ########################################################
 pidAux=$(pidof -s ptp0)
 echo $pidAux
-sudo chrt -r -p 0 $pidAux
+sudo chrt -r -p 1 $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
 # Get the current time in seconds and nanoseconds
@@ -43,7 +43,7 @@ echo $pidAux
 sudo chrt -r -p 1 $pidAux
 
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectSlave.cfg & # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
-pidAux=$!
+pidAux=$(pgrep -f "phc2sys")
 echo $pidAux
 sudo chrt -r -p 1 $pidAux
 
