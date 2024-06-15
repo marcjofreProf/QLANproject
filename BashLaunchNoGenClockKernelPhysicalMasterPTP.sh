@@ -6,6 +6,8 @@ echo 'Running PTP'
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
 ########################################################
+# Set realtime priority with chrt -f and priority 0
+########################################################
 
 sudo /etc/init.d/rsyslog stop # stop logging
 
@@ -33,15 +35,20 @@ sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP
 sudo ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP4lConfigQLANprojectMaster.cfg & -m
-
+pidAux=$(pidof -s ph2sys)
+sudo chrt -f -p 0 $pidAux
 
 ## If synch to the RTC of the system, stop the NTP. The quality of the internal crystal/clock matters
 #sudo timedatectl set-ntp false
 #sudo systemctl stop systemd-timesyncd # stop system synch
 #sudo systemctl disable systemd-timesyncd # start system synch
 #sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m
+#pidAux=$(pidof -s ph2sys)
+#sudo chrt -f -p 0 $pidAux
 
 sudo ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m #& #-m
+pidAux=$(pidof -s ptp4l)
+sudo chrt -f -p 0 $pidAux
 
 sudo systemctl enable --now systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
