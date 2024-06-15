@@ -33,11 +33,11 @@ sudo systemctl disable systemd-timesyncd # disable system synch
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
 sudo ./linuxptp/ptp4l -i eth0 -s -H -f PTP4lConfigQLANprojectSlave.cfg -m & #-m
 pidAux=$(pgrep -f "^ptp4l$")
-sudo chrt -f -p 0 "$pidAux"
+sudo chrt -f -p 0 $pidAux
 
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectSlave.cfg & # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
 pidAux=$(pgrep -f "^phc2sys$")
-sudo chrt -f -p 0 "$pidAux"
+sudo chrt -f -p 0 $pidAux
 
 echo 'Enabling PWM for 24 MHz ref clock'
 sudo config-pin P8.19 pwm
@@ -80,7 +80,7 @@ sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3
 pidAux=$(pgrep -f "^BBBclockKernelPhysicalDaemon$")
-sudo chrt -f -p 0 "$pidAux"
+sudo chrt -f -p 0 $pidAux
 
 sudo systemctl enable --now systemd-timesyncd # enable system synch
 sudo systemctl start systemd-timesyncd # start system synch
