@@ -85,7 +85,7 @@ sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 &
 pidAux=$!
 sudo chrt -f -p 1 $pidAux
 
-sudo read -r # Block operation until Ctrl+C is pressed
+read -r # Block operation until Ctrl+C is pressed
 
 sudo systemctl enable --now systemd-timesyncd # enable system synch
 sudo systemctl start systemd-timesyncd # start system synch
