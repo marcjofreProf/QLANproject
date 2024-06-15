@@ -12,7 +12,7 @@ sleep 1 # wait 1 second to make sure to kill the old processes
 ########################################################
 # Set realtime priority with chrt -r and priority 1
 ########################################################
-pidAux=$(pidof -s ptp0)
+pidAux=pidof -s ptp0
 sudo chrt -r -p 1 $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
