@@ -7,9 +7,13 @@ echo 'Running PTP'
 # Kill potentially previously running PTP clock processes
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
+sudo pkill -f BBBclockKernelPhysicalDaemon
 ########################################################
-# Set realtime priority with chrt -f and priority 0
+# Set realtime priority with chrt -f and priority 1
 ########################################################
+pidAux=$(pidof -s ptp0)
+sudo chrt -f -p 1 $pidAux
+
 sudo /etc/init.d/rsyslog stop # stop logging
 
 # Get the current time in seconds and nanoseconds
@@ -91,9 +95,11 @@ sudo config-pin P8_43 pruout
 sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
-sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3
-pidAux=$(pidof -s BBBclockKernelPhysicalDaemon)
+sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 &
+pidAux=$!
 sudo chrt -f -p 0 $pidAux
+
+read -r # Block operation until Ctrl+C is pressed
 
 sudo systemctl enable --now systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
