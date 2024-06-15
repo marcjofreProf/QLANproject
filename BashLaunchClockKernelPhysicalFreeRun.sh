@@ -9,6 +9,7 @@ echo 'Free Running'
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
 sudo pkill -f BBBclockKernelPhysicalDaemon
+sleep 1 # wait 1 second to make sure to kill the old processes
 ########################################################
 # Set realtime priority with chrt -r and priority 0
 ########################################################
@@ -64,7 +65,7 @@ sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 &
 pidAux=$(pidof -s BBBclockKernelPhysicalDaemon)
-sudo chrt -r -p 0 $pidAux
+sudo chrt -r -p 1 $pidAux
 
 read -r # Block operation until Ctrl+C is pressed
 

@@ -5,11 +5,12 @@ echo 'Running PTP'
 # Kill potentially previously running PTP clock processes
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
+sleep 1 # wait 1 second to make sure to kill the old processes
 ########################################################
-# Set realtime priority with chrt -r and priority 0
+# Set realtime priority with chrt -r and priority 1
 ########################################################
 pidAux=$(pidof -s ptp0)
-sudo chrt -r -p 0 $pidAux
+sudo chrt -r -p 1 $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
 
@@ -38,7 +39,7 @@ sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP
 sudo ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP4lConfigQLANprojectMaster.cfg & -m
 pidAux=$(pidof -s phc2sys)
-sudo chrt -r -p 0 $pidAux
+sudo chrt -r -p 1 $pidAux
 
 ## If synch to the RTC of the system, stop the NTP. The quality of the internal crystal/clock matters
 #sudo timedatectl set-ntp false
@@ -50,7 +51,7 @@ sudo chrt -r -p 0 $pidAux
 
 sudo ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
 pidAux=$(pidof -s ptp4l)
-sudo chrt -r -p 0 $pidAux
+sudo chrt -r -p 1 $pidAux
 
 read -r # Block operation until Ctrl+C is pressed
 

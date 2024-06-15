@@ -8,11 +8,12 @@ echo 'Running PTP'
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
 sudo pkill -f BBBclockKernelPhysicalDaemon
+sleep 1 # wait 1 second to make sure to kill the old processes
 ########################################################
-# Set realtime priority with chrt -r and priority 0
+# Set realtime priority with chrt -r and priority 1
 ########################################################
 pidAux=$(pidof -s ptp0)
-sudo chrt -r -p 0 $pidAux
+sudo chrt -r -p 1 $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
 
@@ -54,7 +55,7 @@ sudo chrt -r -p 0 $pidAux
 
 sudo ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
 pidAux=$(pidof -s ptp4l)
-sudo chrt -r -p 0 $pidAux
+sudo chrt -r -p 1 $pidAux
 
 echo 'Enabling PWM for 24 MHz ref clock'
 sudo config-pin P8.19 pwm
@@ -96,8 +97,8 @@ sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 &
-pidAux=$!
-sudo chrt -r -p 0 $pidAux
+pidAux=$(pidof -s BBBclockKernelPhysicalDaemon)
+sudo chrt -r -p 1 $pidAux
 
 read -r # Block operation until Ctrl+C is pressed
 
