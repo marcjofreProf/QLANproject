@@ -4,7 +4,7 @@
 # arg2: Daemon average filter, median filter or mean window. For example (odd number): 5. 1<= arg2 <= 50. Probably, only larger if there is too much jitter.
 # arg3: Daemon print PID values: true or false
 trap "kill 0" EXIT
-echo 'Running PTP'
+echo 'Free Running'
 # Kill potentially previously running PTP clock processes
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
