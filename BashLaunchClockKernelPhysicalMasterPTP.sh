@@ -41,7 +41,7 @@ sudo systemctl enable systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP
-sudo ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # Important to launch phc2sys first
+sudo nice -n -20 ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # Important to launch phc2sys first
 pidAux=$(pgrep -f "ph2sys")
 sudo chrt -r -p 0 $pidAux
 
@@ -49,11 +49,11 @@ sudo chrt -r -p 0 $pidAux
 #sudo timedatectl set-ntp false
 #sudo systemctl stop systemd-timesyncd # stop system synch
 #sudo systemctl disable systemd-timesyncd # start system synch
-#sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANproject.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # Important to launch phc2sys first
+#sudo nice -n -20 ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANproject.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # Important to launch phc2sys first
 #pidAux=$(pgrep -f "ph2sys")
 #sudo chrt -r -p 1 $pidAux
 
-sudo ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
+sudo nice -n -20 ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
 pidAux=$(pgrep -f "ptp4l")
 sudo chrt -r -p 1 $pidAux
 
@@ -96,7 +96,7 @@ sudo config-pin P8_43 pruout
 sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
-sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 &
+sudo nice -n -20 ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 &
 pidAux=$(pgrep -f "BBBclockKernelPhysicalDaemon")
 sudo chrt -r -p 1 $pidAux
 

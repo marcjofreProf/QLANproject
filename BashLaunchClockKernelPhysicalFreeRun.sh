@@ -63,7 +63,7 @@ sudo config-pin P8_43 pruout
 sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
-sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 &
+sudo nice -n -20 ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 &
 pidAux=$(pgrep -f "BBBclockKernelPhysicalDaemon")
 sudo chrt -r -p 1 $pidAux
 
