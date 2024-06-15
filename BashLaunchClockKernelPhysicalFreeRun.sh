@@ -5,6 +5,8 @@
 # arg3: Daemon print PID values: true or false
 trap "kill 0" EXIT
 echo 'Free Running'
+# Kill non-wanted processes
+sudo pkill -f nodejs # javascript applicatoins
 # Kill potentially previously running PTP clock processes and processes
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys

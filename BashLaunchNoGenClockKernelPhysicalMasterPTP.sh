@@ -2,6 +2,8 @@
 trap "kill 0" EXIT
 echo 'Running PTP'
 
+# Kill non-wanted processes
+sudo pkill -f nodejs # javascript applicatoins
 # Kill potentially previously running PTP clock processes
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
