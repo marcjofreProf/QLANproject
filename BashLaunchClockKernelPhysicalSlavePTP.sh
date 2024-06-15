@@ -38,12 +38,12 @@ sudo systemctl disable systemd-timesyncd # disable system synch
 #sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
 sudo ./linuxptp/ptp4l -i eth0 -s -H -f PTP4lConfigQLANprojectSlave.cfg -m & #-m
-pidAux=$(pidof -s ptp4l)
+pidAux=$!
 echo $pidAux
 sudo chrt -r -p 1 $pidAux
 
 sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectSlave.cfg & # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
-pidAux=$(pidof -s phc2sys)
+pidAux=$!
 echo $pidAux
 sudo chrt -r -p 1 $pidAux
 
@@ -87,7 +87,7 @@ sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 &
-pidAux=$(pidof -s BBBclockKernelPhysicalDaemon)
+pidAux=$!
 echo $pidAux
 sudo chrt -r -p 1 $pidAux
 
