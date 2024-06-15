@@ -14,7 +14,7 @@ sleep 1 # wait 1 second to make sure to kill the old processes
 ########################################################
 pidAux=$(pidof -s ptp0)
 echo $pidAux
-sudo chrt -f -p 0 $pidAux
+sudo chrt -r -p 0 $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
 # Get the current time in seconds and nanoseconds
@@ -38,7 +38,7 @@ sudo systemctl disable systemd-timesyncd # disable system synch
 #sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
 sudo ./linuxptp/ptp4l -i eth0 -s -H -f PTP4lConfigQLANprojectSlave.cfg -m & #-m
-pidAux=$!
+pidAux=$(pgrep -f "ptp4l")
 echo $pidAux
 sudo chrt -r -p 1 $pidAux
 
