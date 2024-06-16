@@ -504,7 +504,7 @@ valpAux++;// 1 times 8 bits
 //////////////////////////////////////////////////////////////////////////////
 
 // Reading first calibration tag and link it to the system clock
-OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
+OldLastTimeTagg=static_cast<unsigned long long int>(0);//static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl;
 
 // Slot the final time - to remove interrupt jitter
