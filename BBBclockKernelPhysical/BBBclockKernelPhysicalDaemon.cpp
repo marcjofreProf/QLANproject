@@ -191,9 +191,7 @@ while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);// Busy waitin
 prussdrv_pru_send_event(22);
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// First interrupt sent to measure time
 this->TimePointClockCurrentFinalMeas=ClockWatch::now(); //Masure time to act
-prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-// PRU long code running
-retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// After the interrupt update rapidly the new quarter value
+// PRU long code running which ensures that it does not overlap in terms of interrupts of the subsequent executions
 
 if (retInterruptsPRU1>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations

@@ -176,7 +176,7 @@ FINISHLOOP:
 
 EXIT:
 	// Send notification (interrupt) to Host for program completion
-	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
+	//MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Notification sent at the beginning of the signal
 	// Halt the processor
 	HALT
 
