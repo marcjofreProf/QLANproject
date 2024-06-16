@@ -171,12 +171,12 @@ SIGNALOFF:
 FINISHLOOP:
 //	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period updated
 	// Send notification (interrupt) to Host for program completion
-	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16	
+	//MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Notification sent at the beginning of the signal
 	JMP	CMDLOOP
 
 EXIT:
 	// Send notification (interrupt) to Host for program completion
-	//MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Notification sent at the beginning of the signal
+	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
 	// Halt the processor
 	HALT
 
