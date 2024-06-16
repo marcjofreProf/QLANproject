@@ -190,7 +190,9 @@ while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);// Busy waitin
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// First interrupt sent to measure time
-this->TimePointClockCurrentFinalMeas=ClockWatch::now(); //Jitter and no information
+this->TimePointClockCurrentFinalMeas=ClockWatch::now(); //Masure time to act
+prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+// PRU long code running
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// After the interrupt update rapidly the new quarter value
 
 if (retInterruptsPRU1>0){
