@@ -512,7 +512,7 @@ OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCount
 //TimePoint TimePointClockTagPRUfinalAux=Clock::time_point(duration_back);
 //this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinalAux.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds));
 
-this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count()+std::chrono::nanoseconds(this->duration_FinalInitialMeasTrigAuxAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds));
+this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count()+static_cast<long long int>(this->duration_FinalInitialMeasTrigAuxAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds));
 //else{Use the latest used, so do not update
 //}
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
