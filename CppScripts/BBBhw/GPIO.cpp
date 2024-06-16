@@ -377,15 +377,15 @@ pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
 unsigned int SynchRem=static_cast<int>((static_cast<long double>(2.0*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 TimePointClockTagPRUinitial=TimePointClockTagPRUinitial+std::chrono::nanoseconds(SynchRem);
-TimePoint TimePointClockTagPRUinitialAux=TimePointClockTagPRUinitial-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
-while (Clock::now()<TimePointClockTagPRUinitialAux);// Busy wait time synch sending signals
+TimePointClockTagPRUinitial=TimePointClockTagPRUinitial-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
+while (Clock::now()<TimePointClockTagPRUinitial);// Busy wait time synch sending signals
 prussdrv_pru_send_event(21);
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);// First interrupt sent to measure time
 this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 //  PRU long execution making sure that notification interrupts do not overlap
 ////retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 
-int duration_FinalInitialMeasTrig=static_cast<int>(0.5*std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-TimePointClockTagPRUinitialAux).count());
+int duration_FinalInitialMeasTrig=static_cast<int>(0.5*std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-TimePointClockTagPRUinitial).count());
 this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
 this->TrigAuxIterCount++;
@@ -431,10 +431,9 @@ unsigned int SynchRem=static_cast<int>((static_cast<long double>(2.0*SynchTrigPe
 // If the PRU wander was not corrected then computation below - transforming from and to the different time domains system vs. PRU
 //int SynchRem=static_cast<int>(((2.0*SynchTrigPeriod)-fmod((static_cast<double>((1.0/this->EstimateSynchAvg)*std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<double>(PRUclockStepPeriodNanoseconds)*this->EstimateSynchAvg);// Multiple conversion of time domains, from the system clock to the PRU clock what is remaining, then back to the system clock to do the busy wait.
 TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
-TimePoint TimePointFutureSynchAux=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
-////if (Clock::now()<TimePointFutureSynchAux){cout << "Check that we have enough time" << endl;}
-while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending signals
-//while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
+TimePointFutureSynch=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
+////if (Clock::now()<TimePointFutureSynch){cout << "Check that we have enough time" << endl;}
+while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// First interrupt sent to measure time
@@ -447,7 +446,7 @@ this->TimePointClockSynchPRUfinal=Clock::now();
 //pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// Re-insert the correction for next cycle
 
 // Synch trig part
-int duration_FinalInitialMeasTrig=static_cast<int>(0.5*std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynchAux).count());
+int duration_FinalInitialMeasTrig=static_cast<int>(0.5*std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynch).count());
 this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
 this->TrigAuxIterCount++;
@@ -507,16 +506,13 @@ valpAux++;// 1 times 8 bits
 // Reading first calibration tag and link it to the system clock
 OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl;
-//auto duration_InterruptTag=this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial;
-double PercentageToEndDurationTag=0.0;//0.1;// Estimation of where the time is tag produced. The lower the closer to the interrupt exit
-unsigned long long int duration_InterruptTag=static_cast<unsigned long long int>(PercentageToEndDurationTag*static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial).count()));
 
 // Slot the final time - to remove interrupt jitter
 //std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(static_cast<long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinal.time_since_epoch()).count()-duration_InterruptTag)/static_cast<long double>(PRUclockStepPeriodNanoseconds))*static_cast<long double>(PRUclockStepPeriodNanoseconds)));
 //TimePoint TimePointClockTagPRUfinalAux=Clock::time_point(duration_back);
 //this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinalAux.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds));
 
-this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinal.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds));
+this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count()+std::chrono::nanoseconds(this->duration_FinalInitialMeasTrigAuxAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds));
 //else{Use the latest used, so do not update
 //}
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
