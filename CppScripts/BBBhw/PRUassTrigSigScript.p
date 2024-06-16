@@ -118,6 +118,7 @@ CMDLOOP2:// Double verification of host sending start command
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction	
 	LBCO 	r1, CONST_PRUDRAM, 0, 4// Read the number of NUM_REPETITIONS from positon 0 of PRU1 DATA RAM and stored it
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes. Reset the command
+	MOV	r31.b0, PRU1_ARM_INTERRUPT+16// Here send interrupt to host to measure time
 //PSEUDOSYNCH:
 //	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
 //	LBBO	r0.b0, r3, 0, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1

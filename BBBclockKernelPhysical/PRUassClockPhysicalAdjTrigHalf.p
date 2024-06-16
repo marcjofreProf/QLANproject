@@ -158,7 +158,7 @@ CMDLOOP2:// Double verification of host sending start command
 //PSEUDOSYNCHLOOP:
 //	SUB	r0, r0, 1
 //	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
-
+	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Here send interrupt to host to measure time
 SIGNALON:
 	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
 DELAYON:

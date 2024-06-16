@@ -264,6 +264,7 @@ int GPIO::PRUsignalTimerSynch(){
 				// Notice that if the duration for estimating the synch deviation is done with discounting the average time of the interrupt (and not removing the instantaneous error of the interrupt itme) then the time is referenced in average to the PRU time, but then there is a lot of fluctuation when transforming to the system time. Instead, if the synch deviation is computed removing the instantaneous error of te interupt time then, the system clock error is minimized but aflourish the relative small frequency differents of the different PRU clcokcs - this can be accounted for adding a general frequency deviation in the triggered sequences (specified in the python code).
 				////this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info. Already computed in the steps before				// Important, the following line at the very beggining to reduce the command jitter				
 				prussdrv_pru_send_event(22);
+				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// First interrupt sent to measure time
 				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
 				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
 				//cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
@@ -373,11 +374,12 @@ pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate 
 pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures
 pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
-unsigned int SynchRem=static_cast<int>((static_cast<long double>(2.0*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
+unsigned int SynchRem=static_cast<int>((static_cast<long double>(1.5*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 TimePointClockTagPRUinitial=TimePointClockTagPRUinitial+std::chrono::nanoseconds(SynchRem);
 TimePoint TimePointClockTagPRUinitialAux=TimePointClockTagPRUinitial-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 while (Clock::now()<TimePointClockTagPRUinitialAux);// Busy wait time synch sending signals
 prussdrv_pru_send_event(21);
+retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);// First interrupt sent to measure time
 this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 
 retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
@@ -434,6 +436,7 @@ while (Clock::now()<TimePointFutureSynchAux);// Busy wait time synch sending sig
 //while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
+retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// First interrupt sent to measure time
 this->TimePointClockSynchPRUfinal=Clock::now();
 // Here there should be the instruction command to tell PRU1 to start generating signals
 // We have to define a command, compatible with the memory space of PRU0 to tell PRU1 to initiate signals
@@ -468,46 +471,6 @@ else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU1 interrupt error" << endl;
 }
-
-/*
-FutureTimePointPRU1 = Clock::now()+std::chrono::milliseconds(WaitTimeToFutureTimePointPRU1);
-auto duration_since_epochFutureTimePointPRU1=FutureTimePointPRU1.time_since_epoch();
-auto duration_since_epochTimeNowPRU1=FutureTimePointPRU1.time_since_epoch();// JUST FOR INITIALIZATION
-// Convert duration to desired time
-TimePointFuture_time_as_countPRU1 = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochFutureTimePointPRU1).count(); // Convert duration to desired time unit (e.g., milliseconds,microseconds)
-//cout << "TimePointFuture_time_as_count: " << TimePointFuture_time_as_count << endl;
-
-CheckTimeFlagPRU1=false;
-
-// Here we should wait for the PRU1 to finish, we can check it with the value modified in command
-finPRU1=false;
-do // This is blocking
-{
-	TimePointClockNowPRU1=Clock::now();
-	duration_since_epochTimeNowPRU1=TimePointClockNowPRU1.time_since_epoch();
-	TimeNow_time_as_countPRU1 = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epochTimeNowPRU1).count();
-	//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
-	if (TimeNow_time_as_countPRU1>TimePointFuture_time_as_countPRU1){CheckTimeFlagPRU1=true;}
-	else{CheckTimeFlagPRU1=false;}
-	//cout << "CheckTimeFlag: " << CheckTimeFlag << endl;
-	if (pru1dataMem_int[1] == (unsigned int)1 and CheckTimeFlagPRU1==false)// Seems that it checks if it has finished the sequence
-	{	
-		pru1dataMem_int[1] = (unsigned int)0; // Here clears the value
-		//cout << "GPIO::SendTriggerSignals finished" << endl;
-		finPRU1=true;
-	}
-	else if (CheckTimeFlagPRU1==true){// too much time		
-		pru1dataMem_int[1]=(unsigned int)0; // set to zero means no command.	
-		//prussdrv_pru_disable() will reset the program counter to 0 (zero), while after prussdrv_pru_reset() you can resume at the current position.
-		//prussdrv_pru_reset(PRU_Signal_NUM);
-		//prussdrv_pru_disable(PRU_Signal_NUM);// Disable the PRU
-		//prussdrv_pru_enable(PRU_Signal_NUM);// Enable the PRU from 0		
-		cout << "GPIO::SendTriggerSignals took to much time. Reset PRU1 if necessary." << endl;
-		//sleep(10);// Give some time to load programs in PRUs and initiate
-		finPRU1=true;
-		}
-} while(!finPRU1);
-*/
 
 return 0;// all ok	
 }
@@ -548,11 +511,11 @@ double PercentageToEndDurationTag=0.0;//0.1;// Estimation of where the time is t
 unsigned long long int duration_InterruptTag=static_cast<unsigned long long int>(PercentageToEndDurationTag*static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-this->TimePointClockTagPRUinitial).count()));
 
 // Slot the final time - to remove interrupt jitter
-std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(static_cast<long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinal.time_since_epoch()).count()-duration_InterruptTag)/static_cast<long double>(PRUclockStepPeriodNanoseconds))*static_cast<long double>(PRUclockStepPeriodNanoseconds)));
-TimePoint TimePointClockTagPRUfinalAux=Clock::time_point(duration_back);
+//std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(static_cast<long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinal.time_since_epoch()).count()-duration_InterruptTag)/static_cast<long double>(PRUclockStepPeriodNanoseconds))*static_cast<long double>(PRUclockStepPeriodNanoseconds)));
+//TimePoint TimePointClockTagPRUfinalAux=Clock::time_point(duration_back);
+//this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinalAux.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds));
 
-// Absolute time point
-this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinalAux.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds));
+this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinal.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds));
 //else{Use the latest used, so do not update
 //}
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl; 
