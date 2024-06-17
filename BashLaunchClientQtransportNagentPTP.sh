@@ -15,6 +15,7 @@ sudo chrt -f -p 1 $pidAux
 
 pidAux=$(pgrep -f "irq/66-TI-am335")
 sudo chrt -f -p 1 $pidAux
+sudo renice -n -20 $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
 

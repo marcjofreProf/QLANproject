@@ -16,7 +16,8 @@ sleep 1 # wait 1 second to make sure to kill the old processes
 # Set realtime priority with chrt -f and priority 0
 ########################################################
 pidAux=$(pgrep -f "irq/66-TI-am335")
-sudo chrt -f -p 1 $pidAux
+#sudo chrt -f -p 1 $pidAux
+sudo renice -n -20 $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
 # Get the current time in seconds and nanoseconds
