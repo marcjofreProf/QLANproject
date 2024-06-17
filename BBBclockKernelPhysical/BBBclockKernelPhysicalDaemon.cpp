@@ -189,9 +189,10 @@ while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);// Busy waitin
 //this->TimePointClockCurrentInitialMeas=ClockWatch::now(); //Computed in the step before
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
-retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// First interrupt sent to measure time
+//retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// First interrupt sent to measure time
 this->TimePointClockCurrentFinalMeas=ClockWatch::now(); //Masure time to act
 // PRU long code running which ensures that it does not overlap in terms of interrupts of the subsequent executions
+retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
 
 if (retInterruptsPRU1>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -205,7 +206,7 @@ else{
 	cout << "PRU1 interrupt poll error" << endl;
 }
 
-duration_FinalInitialDriftAux=static_cast<int>(0.5*std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentFinalMeas-this->TimePointClockCurrentInitialMeas).count());//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
+duration_FinalInitialDriftAux=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentFinalMeas-this->TimePointClockCurrentInitialMeas).count());//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
 
 switch(FilterMode) {
 case 2:{// Mean implementation
