@@ -12,10 +12,13 @@ sudo pkill -f phc2sys
 sudo pkill -f BBBclockKernelPhysicalDaemon
 sleep 1 # wait 1 second to make sure to kill the old processes
 ########################################################
-# Set realtime priority with chrt -r and priority 1
+# Set realtime priority with chrt -f and priority 1
 ########################################################
 pidAux=$(pidof -s ptp0)
-sudo chrt -r -p 1 $pidAux
+sudo chrt -f -p 1 $pidAux
+
+pidAux=$(pgrep -f "irq/66-TI-am335")
+sudo chrt -f -p 1 $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
 # Get the current time in seconds and nanoseconds
@@ -40,11 +43,11 @@ sudo systemctl disable systemd-timesyncd # disable system synch
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
 sudo nice -n -20 ./linuxptp/ptp4l -i eth0 -s -H -f PTP4lConfigQLANprojectSlave.cfg -m & #-m
 pidAux=$(pgrep -f "ptp4l")
-sudo chrt -r -p 1 $pidAux
+sudo chrt -f -p 1 $pidAux
 
 sudo nice -n -20 ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectSlave.cfg & # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
 pidAux=$(pgrep -f "phc2sys")
-sudo chrt -r -p 1 $pidAux
+sudo chrt -f -p 1 $pidAux
 
 echo 'Enabling PWM for 24 MHz ref clock'
 sudo config-pin P8.19 pwm
@@ -87,7 +90,7 @@ sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo nice -n -20 ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 &
 pidAux=$(pgrep -f "BBBclockKernelPhysicalDaemon")
-sudo chrt -r -p 1 $pidAux
+sudo chrt -f -p 1 $pidAux
 
 read -r # Block operation until Ctrl+C is pressed
 

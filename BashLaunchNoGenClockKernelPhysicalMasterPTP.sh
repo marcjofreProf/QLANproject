@@ -9,10 +9,13 @@ sudo pkill -f ptp4l
 sudo pkill -f phc2sys
 sleep 1 # wait 1 second to make sure to kill the old processes
 ########################################################
-# Set realtime priority with chrt -r and priority 1
+# Set realtime priority with chrt -f and priority 1
 ########################################################
 pidAux=$(pidof -s ptp0)
-sudo chrt -r -p 1 $pidAux
+sudo chrt -f -p 1 $pidAux
+
+pidAux=$(pgrep -f "irq/66-TI-am335")
+sudo chrt -f -p 1 $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
 
@@ -41,7 +44,7 @@ sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP
 sudo nice -n -20 ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP4lConfigQLANprojectMaster.cfg & -m
 pidAux=$(pgrep -f "phc2sys")
-sudo chrt -r -p 1 $pidAux
+sudo chrt -f -p 1 $pidAux
 
 ## If synch to the RTC of the system, stop the NTP. The quality of the internal crystal/clock matters
 #sudo timedatectl set-ntp false
@@ -49,11 +52,11 @@ sudo chrt -r -p 1 $pidAux
 #sudo systemctl disable systemd-timesyncd # start system synch
 #sudo nice -n -20 ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m
 #pidAux=$(pgrep -f "ph2sys")
-#sudo chrt -r -p 1 $pidAux
+#sudo chrt -f -p 1 $pidAux
 
 sudo nice -n -20 ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
 pidAux=$(pgrep -f "ptp4l")
-sudo chrt -r -p 1 $pidAux
+sudo chrt -f -p 1 $pidAux
 
 read -r # Block operation until Ctrl+C is pressed
 
