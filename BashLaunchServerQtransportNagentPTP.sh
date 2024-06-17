@@ -12,6 +12,7 @@ sleep 1 # wait 1 second to make sure to kill the old processes
 ########################################################
 pidAux=$(pidof -s ptp0)
 sudo chrt -f -p 1 $pidAux
+sudo renice -n -20 $pidAux
 
 pidAux=$(pgrep -f "irq/66-TI-am335")
 #sudo chrt -f -p 1 $pidAux
