@@ -1,20 +1,21 @@
 trap "kill 0" EXIT
 echo 'Running PTP'
 # Kill non-wanted processes
-sudo pkill -f nodejs # javascript applicatoins
-# Kill potentially previously running PTP clock processes
+sudo pkill -f nodejs # javascript applications
+# Kill potentially previously running PTP clock processes and processes
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
 sudo pkill -f QtransportLayerAgentN
+sudo pkill -f BBBclockKernelPhysicalDaemon
 sleep 1 # wait 1 second to make sure to kill the old processes
 ########################################################
 # Set realtime priority with chrt -f and priority 0
 ########################################################
-pidAux=$(pidof -s ptp0)
-sudo chrt -f -p 1 $pidAux
+pidAux=$(pgrep -f "irq/66-TI-am335")
+#sudo chrt -f -p 1 $pidAux
 sudo renice -n -20 $pidAux
 
-pidAux=$(pgrep -f "irq/66-TI-am335")
+pidAux=$(pidof -s ptp0)
 sudo chrt -f -p 1 $pidAux
 sudo renice -n -20 $pidAux
 

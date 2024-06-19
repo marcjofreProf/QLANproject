@@ -1,7 +1,22 @@
-# Kill potentially previously running PTP clock processes
+trap "kill 0" EXIT
+echo 'Free Running'
+
+##############################################
+# Kill non-wanted processes
+sudo pkill -f nodejs # javascript applications
+# Kill potentially previously running PTP clock processes and processes
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
-##############################################
+sudo pkill -f QtransportLayerAgentN
+sudo pkill -f BBBclockKernelPhysicalDaemon
+sleep 1 # wait 1 second to make sure to kill the old processes
+########################################################
+# Set realtime priority with chrt -f and priority 0
+########################################################
+pidAux=$(pgrep -f "irq/66-TI-am335")
+#sudo chrt -f -p 1 $pidAux
+sudo renice -n -20 $pidAux
+
 sudo /etc/init.d/rsyslog stop # stop logging
 sudo timedatectl set-ntp false # Stop NTP
 sudo systemctl stop systemd-timesyncd # stop system synch

@@ -4,9 +4,21 @@
 # arg3: Daemon print PID values: true or false
 trap "kill 0" EXIT
 echo 'Running NTP'
-# Kill potentially previously running PTP clock processes
+# Kill non-wanted processes
+sudo pkill -f nodejs # javascript applications
+# Kill potentially previously running PTP clock processes and processes
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
+sudo pkill -f QtransportLayerAgentN
+sudo pkill -f BBBclockKernelPhysicalDaemon
+sleep 1 # wait 1 second to make sure to kill the old processes
+########################################################
+# Set realtime priority with chrt -f and priority 0
+########################################################
+pidAux=$(pgrep -f "irq/66-TI-am335")
+#sudo chrt -f -p 1 $pidAux
+sudo renice -n -20 $pidAux
+
 ########################################################
 sudo /etc/init.d/rsyslog stop # stop logging
 sudo systemctl enable --now systemd-timesyncd # start system synch
@@ -54,6 +66,11 @@ sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
 sudo ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3
+
+sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip7/pwm-7\:0/enable"
+sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip4/pwm-4\:0/enable"
+sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip1/pwm-1\:0/enable" 
+
 #sudo /etc/init.d/rsyslog start # start logging
 # Kill all the launched processes with same group PID
 #kill -INT $$
