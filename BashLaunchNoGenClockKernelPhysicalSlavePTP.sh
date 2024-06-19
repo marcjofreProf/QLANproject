@@ -1,4 +1,15 @@
 # Just launching a PTP slave
+cleanup_on_SIGINT() {
+  echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
+  sudo systemctl enable --now systemd-timesyncd # start system synch
+  sudo systemctl start systemd-timesyncd # start system synch
+  sudo systemctl daemon-reload
+  sudo timedatectl set-ntp true # Start NTP
+  echo 'Stopped PTP slave'
+  exit 0
+}
+
+trap cleanup_on_SIGINT SIGINT
 trap "kill 0" EXIT
 echo 'Running PTP slave'
 # Kill non-wanted processes
@@ -48,13 +59,6 @@ sudo nice -n -20 ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQ
 pidAux=$(pgrep -f "phc2sys")
 sudo chrt -f -p 1 $pidAux
 
-read -r # Block operation until Ctrl+C is pressed
+read -r -p "Press Ctrl+C to kill launched processes" # Block operation until Ctrl+C is pressed
 
-sudo systemctl enable --now systemd-timesyncd # start system synch
-sudo systemctl start systemd-timesyncd # start system synch
-sudo systemctl daemon-reload
-sudo timedatectl set-ntp true # Start NTP
-echo 'Stopped PTP slave'
-#sudo /etc/init.d/rsyslog start # start logging
-# Kill all the launched processes with same group PID
-#kill -INT $$
+

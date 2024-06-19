@@ -1,3 +1,14 @@
+cleanup_on_SIGINT() {
+  echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
+  sudo systemctl enable --now systemd-timesyncd # start system synch
+  sudo systemctl start systemd-timesyncd # start system synch
+  sudo systemctl daemon-reload
+  sudo timedatectl set-ntp true # Start NTP
+  sudo hwclock --systohc
+  exit 0
+}
+
+trap cleanup_on_SIGINT SIGINT
 trap "kill 0" EXIT
 echo 'Free Running'
 # Kill non-wanted processes
@@ -19,6 +30,7 @@ sudo /etc/init.d/rsyslog stop # stop logging
 sudo timedatectl set-ntp false # Stop NTP
 sudo systemctl stop systemd-timesyncd # stop system synch
 sudo systemctl disable systemd-timesyncd # stop system synch
+
 echo 'Enabling BBB pins'
 sudo config-pin P9_28 pruin
 sudo config-pin P9_29 pruin
@@ -43,12 +55,10 @@ sudo config-pin P8_43 pruout
 sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
-sudo ./CppScripts/QtransportLayerAgentN server 192.168.9.2 192.168.9.1
-sudo systemctl enable --now systemd-timesyncd # start system synch
-sudo systemctl start systemd-timesyncd # start system synch
-sudo systemctl daemon-reload
-sudo timedatectl set-ntp true # Start NTP
-sudo hwclock --systohc
-#sudo /etc/init.d/rsyslog start # start logging
-# Kill all the launched processes with same group PID
-#kill -INT $$
+sudo ./CppScripts/QtransportLayerAgentN server 192.168.9.2 192.168.9.1 &
+pidAux=$(pgrep -f "QtransportLayerAgentN")
+sudo chrt -f -p 1 $pidAux
+
+read -r -p "Press Ctrl+C to kill launched processes" # Block operation until Ctrl+C is pressed
+
+

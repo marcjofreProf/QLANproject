@@ -1,4 +1,15 @@
 # Just launching a PTP master
+cleanup_on_SIGINT() {
+  echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
+  sudo systemctl enable --now systemd-timesyncd # start system synch
+  sudo systemctl start systemd-timesyncd # start system synch
+  sudo systemctl daemon-reload
+  sudo timedatectl set-ntp true # Start NTP
+  echo 'Stopped PTP'
+  exit 0
+}
+
+trap cleanup_on_SIGINT SIGINT
 trap "kill 0" EXIT
 echo 'Running PTP'
 
@@ -62,13 +73,5 @@ sudo nice -n -20 ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg
 pidAux=$(pgrep -f "ptp4l")
 sudo chrt -f -p 1 $pidAux
 
-read -r # Block operation until Ctrl+C is pressed
+read -r -p "Press Ctrl+C to kill launched processes" # Block operation until Ctrl+C is pressed
 
-sudo systemctl enable --now systemd-timesyncd # start system synch
-sudo systemctl start systemd-timesyncd # start system synch
-sudo systemctl daemon-reload
-sudo timedatectl set-ntp true # Start NTP
-echo 'Stopped PTP'
-#sudo /etc/init.d/rsyslog start # start logging
-# Kill all the launched processes with same group PID
-#kill -INT $$

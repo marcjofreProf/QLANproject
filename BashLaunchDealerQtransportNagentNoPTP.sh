@@ -1,3 +1,15 @@
+cleanup_on_SIGINT() {
+  echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
+  sudo systemctl enable --now systemd-timesyncd # start system synch
+  sudo systemctl start systemd-timesyncd # start system synch
+  sudo systemctl daemon-reload
+  sudo timedatectl set-ntp true # Start NTP
+  sudo hwclock --systohc
+  #sudo /etc/init.d/rsyslog start # start logging
+  exit 0
+}
+
+trap cleanup_on_SIGINT SIGINT
 trap "kill 0" EXIT
 echo 'Free Running'
 # Kill potentially previously running PTP clock processes
@@ -44,11 +56,10 @@ sudo config-pin P8_43 pruout
 sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
-sudo ./CppScripts/QtransportLayerAgentN dealer 192.168.10.2 192.168.10.1
-sudo systemctl enable --now systemd-timesyncd # start system synch
-sudo systemctl start systemd-timesyncd # start system synch
-sudo systemctl daemon-reload
-sudo timedatectl set-ntp true # Start NTP
-sudo hwclock --systohc
-#sudo /etc/init.d/rsyslog start # start logging
+sudo ./CppScripts/QtransportLayerAgentN dealer 192.168.10.2 192.168.10.1 &
+pidAux=$(pgrep -f "QtransportLayerAgentN")
+sudo chrt -f -p 1 $pidAux
+
+read -r -p "Press Ctrl+C to kill launched processes" # Block operation until Ctrl+C is pressed
+
 

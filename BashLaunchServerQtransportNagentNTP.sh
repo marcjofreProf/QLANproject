@@ -1,3 +1,10 @@
+cleanup_on_SIGINT() {
+  echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
+  echo 'Stopped'
+  exit 0
+}
+
+trap cleanup_on_SIGINT SIGINT
 trap "kill 0" EXIT
 echo 'Running NTP'
 # Kill non-wanted processes
@@ -45,8 +52,9 @@ sudo config-pin P8_43 pruout
 sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
-sudo ./CppScripts/QtransportLayerAgentN server 192.168.9.2 192.168.9.1
-echo 'Stopped'
-#sudo /etc/init.d/rsyslog start # start logging
-# Kill all the launched processes with same group PID
-#kill -INT $$
+sudo ./CppScripts/QtransportLayerAgentN server 192.168.9.2 192.168.9.1 &
+pidAux=$(pgrep -f "QtransportLayerAgentN")
+sudo chrt -f -p 1 $pidAux
+
+read -r # Block operation until Ctrl+C is pressed
+
