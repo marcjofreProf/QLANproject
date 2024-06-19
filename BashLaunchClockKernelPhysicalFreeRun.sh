@@ -3,6 +3,22 @@
 # arg1: Daemon ticks to fine adust to required Frequency: For example, 0.0 for 1pps, or -99900000 for 1 KHz. Defined double, but it has to be small in order to not produce negative half periods (defined as unsigned int)
 # arg2: Daemon average filter, median filter or mean window. For example (odd number): 5. 1<= arg2 <= 50. Probably, only larger if there is too much jitter.
 # arg3: Daemon print PID values: true or false
+
+cleanup_on_SIGINT() {
+  echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
+  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip7/pwm-7\:0/enable"
+  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip4/pwm-4\:0/enable"
+  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip1/pwm-1\:0/enable" 
+  
+  sudo systemctl enable --now systemd-timesyncd # enable system synch
+  sudo systemctl start systemd-timesyncd # start system synch
+  sudo systemctl daemon-reload
+  sudo timedatectl set-ntp true # Start NTP
+  sudo hwclock --systohc
+  echo 'Stopped PTP'
+  exit 0
+}
+
 trap cleanup_on_SIGINT SIGINT
 trap "kill 0" EXIT
 echo 'Free Running'
@@ -77,18 +93,4 @@ sudo chrt -f -p 1 $pidAux
 
 read -r -p "Press Ctrl+C to kill launched processes" # Block operation until Ctrl+C is pressed
 
-cleanup_on_SIGINT() {
-  echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
-  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip7/pwm-7\:0/enable"
-  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip4/pwm-4\:0/enable"
-  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip1/pwm-1\:0/enable" 
-  
-  sudo systemctl enable --now systemd-timesyncd # enable system synch
-  sudo systemctl start systemd-timesyncd # start system synch
-  sudo systemctl daemon-reload
-  sudo timedatectl set-ntp true # Start NTP
-  sudo hwclock --systohc
-  echo 'Stopped PTP'
-}
 
-exit 0
