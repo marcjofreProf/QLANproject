@@ -74,18 +74,19 @@ sudo nice -n -20 ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 
 pidAux=$(pgrep -f "BBBclockKernelPhysicalDaemon")
 sudo chrt -f -p 1 $pidAux
 
-read -r # Block operation until Ctrl+C is pressed
+read -r -p "Press return to stop all processes" # Block operation until Ctrl+C is pressed
 
-sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip7/pwm-7\:0/enable"
-sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip4/pwm-4\:0/enable"
-sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip1/pwm-1\:0/enable" 
+EXIT:
+	sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip7/pwm-7\:0/enable"
+	sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip4/pwm-4\:0/enable"
+	sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip1/pwm-1\:0/enable" 
 
-sudo systemctl enable --now systemd-timesyncd # enable system synch
-sudo systemctl start systemd-timesyncd # start system synch
-sudo systemctl daemon-reload
-sudo timedatectl set-ntp true # Start NTP
-sudo hwclock --systohc
-echo 'Stopped PTP'
+	sudo systemctl enable --now systemd-timesyncd # enable system synch
+	sudo systemctl start systemd-timesyncd # start system synch
+	sudo systemctl daemon-reload
+	sudo timedatectl set-ntp true # Start NTP
+	sudo hwclock --systohc
+	echo 'Stopped PTP'
 #sudo /etc/init.d/rsyslog start # start logging
 # Kill all the launched processes with same group PID
 #kill -INT $$
