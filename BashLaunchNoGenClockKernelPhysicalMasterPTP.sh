@@ -57,6 +57,11 @@ sudo systemctl enable systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP
+
+sudo nice -n -20 ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
+pidAux=$(pgrep -f "ptp4l")
+sudo chrt -f -p 1 $pidAux
+
 sudo nice -n -20 ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP4lConfigQLANprojectMaster.cfg & -m
 pidAux=$(pgrep -f "phc2sys")
 sudo chrt -f -p 1 $pidAux
@@ -68,10 +73,6 @@ sudo chrt -f -p 1 $pidAux
 #sudo nice -n -20 ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m
 #pidAux=$(pgrep -f "ph2sys")
 #sudo chrt -f -p 1 $pidAux
-
-sudo nice -n -20 ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
-pidAux=$(pgrep -f "ptp4l")
-sudo chrt -f -p 1 $pidAux
 
 read -r -p "Press Ctrl+C to kill launched processes" # Block operation until Ctrl+C is pressed
 
