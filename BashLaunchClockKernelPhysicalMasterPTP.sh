@@ -54,6 +54,10 @@ sudo pmc -u -b 0 -t 1 "SET GRANDMASTER_SETTINGS_NP clockClass 248 \
         ptpTimescale 1 timeTraceable 1 frequencyTraceable 0 \
         timeSource 0xa0"
 
+sudo nice -n -20 ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
+pidAux=$(pgrep -f "ptp4l")
+sudo chrt -f -p 1 $pidAux
+
 # Maybe since systemd-timesyncd is disabled, then maybe adjtimex might update some needed parameters such as the difference between UTC and TAI clocks
 #sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
@@ -62,13 +66,6 @@ sudo systemctl enable systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP
-
-sudo nice -n -20 ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
-pidAux=$(pgrep -f "ptp4l")
-sudo chrt -f -p 1 $pidAux
-
-# Important to launch phc2sys first
-
 sudo nice -n -20 ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # Important to launch phc2sys first
 pidAux=$(pgrep -f "ph2sys")
 sudo chrt -f -p 1 $pidAux

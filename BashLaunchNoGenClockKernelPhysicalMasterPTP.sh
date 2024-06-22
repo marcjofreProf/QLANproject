@@ -52,27 +52,26 @@ sudo pmc -u -b 0 -t 1 "SET GRANDMASTER_SETTINGS_NP clockClass 248 \
 #sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
 
-## If at least the grand master is synch to NTP ((good long stability reference - but short time less stable)) - difficult then to converge because also following NTP
-sudo systemctl enable systemd-timesyncd # start system synch
-sudo systemctl start systemd-timesyncd # start system synch
-sudo systemctl daemon-reload
-sudo timedatectl set-ntp true # Start NTP
-
 sudo nice -n -20 ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
 pidAux=$(pgrep -f "ptp4l")
 sudo chrt -f -p 1 $pidAux
 
-sudo nice -n -20 ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP4lConfigQLANprojectMaster.cfg & -m
-pidAux=$(pgrep -f "phc2sys")
-sudo chrt -f -p 1 $pidAux
+## If at least the grand master is synch to NTP ((good long stability reference - but short time less stable)) - difficult then to converge because also following NTP
+#sudo systemctl enable systemd-timesyncd # start system synch
+#sudo systemctl start systemd-timesyncd # start system synch
+#sudo systemctl daemon-reload
+#sudo timedatectl set-ntp true # Start NTP
+#sudo nice -n -20 ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP4lConfigQLANprojectMaster.cfg & -m
+#pidAux=$(pgrep -f "phc2sys")
+#sudo chrt -f -p 1 $pidAux
 
 ## If synch to the RTC of the system, stop the NTP. The quality of the internal crystal/clock matters
-#sudo timedatectl set-ntp false
-#sudo systemctl stop systemd-timesyncd # stop system synch
-#sudo systemctl disable systemd-timesyncd # start system synch
-#sudo nice -n -20 ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m
-#pidAux=$(pgrep -f "ph2sys")
-#sudo chrt -f -p 1 $pidAux
+sudo timedatectl set-ntp false
+sudo systemctl stop systemd-timesyncd # stop system synch
+sudo systemctl disable systemd-timesyncd # start system synch
+sudo nice -n -20 ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m
+pidAux=$(pgrep -f "ph2sys")
+sudo chrt -f -p 1 $pidAux
 
 read -r -p "Press Ctrl+C to kill launched processes" # Block operation until Ctrl+C is pressed
 
