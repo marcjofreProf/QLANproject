@@ -71,7 +71,7 @@ sudo chrt -f -p 1 $pidAux
 
 sudo nice -n -20 ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # Important to launch phc2sys first
 pidAux=$(pgrep -f "ph2sys")
-sudo chrt -f -p 0 $pidAux
+sudo chrt -f -p 1 $pidAux
 
 ## If synch to the RTC of the system, stop the NTP. The quality of the internal crystal/clock matters
 #sudo timedatectl set-ntp false
