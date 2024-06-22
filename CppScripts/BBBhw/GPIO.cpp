@@ -198,12 +198,12 @@ int GPIO::InitAgentProcess(){
 }
 /////////////////////////////////////////////////////////
 bool GPIO::setMaxRrPriority(){// For rapidly handling interrupts
-int max_priority=sched_get_priority_max(SCHED_FIFO);
+int max_priority=sched_get_priority_max(SCHED_RR);
 // SCHED_RR: Round robin
 // SCHED_FIFO: First-In-First-Out
 sched_param sch_params;
 sch_params.sched_priority = max_priority;
-if (sched_setscheduler(0,SCHED_FIFO,&sch_params)==-1){
+if (sched_setscheduler(0,SCHED_RR,&sch_params)==-1){
 	cout <<" Failed to set maximum real-time priority." << endl;
 	return false;
 }
