@@ -264,9 +264,17 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 			if (clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).//https://opensource.com/article/17/6/timekeeping-linux-vms
 				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization						
-				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html	
-				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
-				pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command											
+				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html
+				if ((this->iIterPRUcurrentTimerVal%10)==0){// Every now and then correct absolutelly, although some interrupt jitter will be present
+					this->PRUoffsetDriftErrorAppliedRaw=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
+					this->NextSynchPRUcorrection=static_cast<unsigned int>(static_cast<unsigned int>((static_cast<unsigned long long int>(this->PRUoffsetDriftErrorAppliedRaw)+static_cast<unsigned long long int>(LostCounts))%iepPRUtimerRange32bits));
+					pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
+					pru1dataMem_int[1]=static_cast<unsigned int>(5);
+				}
+				else{
+					pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
+					pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command											
+				}
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
 				////this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info. Already computed in the steps before				// Important, the following line at the very beggining to reduce the command jitter				
 				prussdrv_pru_send_event(22);
