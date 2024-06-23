@@ -307,7 +307,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				
 				// Absolute correction to have absolute time reference				
 				this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
-				this->PRUoffsetDriftError=(static_cast<double>(this->PRUcurrentTimerVal)+1*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(this->PRUoffsetDriftError);
+				this->PRUoffsetDriftError=(static_cast<double>(this->PRUcurrentTimerVal)-0*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(this->PRUoffsetDriftError);
 				
 				
 				//if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<(NumSynchMeasAvgAux/2)){// Do computations
