@@ -303,7 +303,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 				
 				//// Compute error - Relative correction
-				this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw));				
+				this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw));				
 				
 				//if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<(NumSynchMeasAvgAux/2)){// Do computations
 				this->ManualSemaphoreExtra=true;
