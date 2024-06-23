@@ -137,34 +137,34 @@ CMDLOOP2:// Double verification of host sending start command
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // We remove the command from the host (in case there is a reset from host, we are saved) 1 bytes.
 	// Start executing	
 	QBEQ	PSEUDOSYNCH, r0.b0, 1 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
-//	QBEQ	PERIODICTIMESYNCHSUB, r0.b0, 2 // 2 command is measure IEP timer status and so a substraction correction
-//	QBEQ	PERIODICTIMESYNCHADD, r0.b0, 3 // 3 command is measure IEP timer status and so a addition correction
-//	QBEQ	PERIODICTIMESYNCHCHECK, r0.b0, 4 // 4 command is measure IEP timer status and so a check
+	QBEQ	PERIODICTIMESYNCHSUB, r0.b0, 2 // 2 command is measure IEP timer status and so a substraction correction
+	QBEQ	PERIODICTIMESYNCHADD, r0.b0, 3 // 3 command is measure IEP timer status and so a addition correction
+	QBEQ	PERIODICTIMESYNCHCHECK, r0.b0, 4 // 4 command is measure IEP timer status and so a check
 PERIODICTIMESYNCHSET: // with command coded 5 means setting synch
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
 	SBCO	r10, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP	CMDLOOP
-//PERIODICTIMESYNCHCHECK: // with command coded 4 means chech synch only	
-//	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
-//	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample	
-//	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
-//	JMP	CMDLOOP
-//PERIODICTIMESYNCHADD: // with command coded 3 means synch by reseting the IEP timer
-//	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
-//	ADD	r0, r0, r10 // Apply correction
-//	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
-//	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample		
-//	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
-//	JMP	CMDLOOP
-//PERIODICTIMESYNCHSUB: // with command coded 2 means synch by reseting the IEP timer
-//	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
-//	SUB	r0, r0, r10 // Apply correction
-//	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
-//	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample	
-//	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
-//	JMP	CMDLOOP
+PERIODICTIMESYNCHCHECK: // with command coded 4 means chech synch only	
+	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
+	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample	
+	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
+	JMP	CMDLOOP
+PERIODICTIMESYNCHADD: // with command coded 3 means synch by reseting the IEP timer
+	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
+	ADD	r0, r0, r10 // Apply correction
+	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
+	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample		
+	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
+	JMP	CMDLOOP
+PERIODICTIMESYNCHSUB: // with command coded 2 means synch by reseting the IEP timer
+	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
+	SUB	r0, r0, r10 // Apply correction
+	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
+	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample	
+	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
+	JMP	CMDLOOP
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	MOV	r7, r10 // Sequence signal period

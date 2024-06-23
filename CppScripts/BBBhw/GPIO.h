@@ -68,7 +68,7 @@ private:// Variables
 	unsigned long long int iIterPRUcurrentTimerVal=0;
 	unsigned long long int iIterPRUcurrentTimerValSynch=0;// Account for rounds entered
 	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has no tentered
-	//unsigned long long int iIterPRUcurrentTimerValLast=0;
+	unsigned long long int iIterPRUcurrentTimerValLast=0;
 	double EstimateSynch=1.0;
 	double EstimateSynchAvg=1.0;
 	double EstimateSynchArray[MaxNumPulses]={EstimateSynch};// They are not all set to the value, only the first one (a function in the declarator should be used to fill them in.
@@ -265,7 +265,8 @@ private: // Functions/Methods
 	// PRU synchronization
 	struct timespec SetWhileWait();
 	int PRUsignalTimerSynch(); // Periodic synchronizaton of the timer to control the generated signals
-	//int PIDcontrolerTime();// Not used
+	int PRUsignalTimerSynchJitterLessInterrupt();// Tries to avoid interrupt jitter (might not be completely absolute time
+	int PIDcontrolerTimeJiterlessInterrupt();
 	// Data processing
 	unsigned char packBits(unsigned char value);
 	// Non-PRU
