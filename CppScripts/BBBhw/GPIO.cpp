@@ -246,6 +246,7 @@ struct timespec GPIO::SetWhileWait(){
 }
 
 int GPIO::PRUsignalTimerSynch(){
+	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time	
 	unsigned int SynchRem=static_cast<int>((static_cast<long double>(iepPRUtimerRange32bits)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(iepPRUtimerRange32bits)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(SynchRem);
