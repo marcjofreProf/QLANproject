@@ -333,11 +333,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
 					//this->PRUoffsetDriftErrorAppliedRaw=0;// Disable IEP correction
 					// Re wrap for correction					
-					if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)>0xFFFFFFFF){this->PRUoffsetDriftErrorApplied=this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied-0xFFFFFFFF-1.0;}
-					else if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)<0){this->PRUoffsetDriftErrorApplied=0xFFFFFFFF+(this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)+1.0;}
-					else{
-						this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied;
-					}
+					//if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)>0xFFFFFFFF){this->PRUoffsetDriftErrorApplied=this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied-0xFFFFFFFF-1.0;}
+					//else if ((this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)<0){this->PRUoffsetDriftErrorApplied=0xFFFFFFFF+(this->PRUcurrentTimerValWrap+this->PRUoffsetDriftErrorApplied)+1.0;}
+					//else{
+					//	this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied;
+					//}					
+					this->PRUoffsetDriftErrorApplied=static_cast<double>(fmodl(static_cast<long double>(this->PRUoffsetDriftErrorApplied),static_cast<long double>(iepPRUtimerRange32bits)));
 					
 					if (this->PRUoffsetDriftErrorApplied==0){
 						//pru1dataMem_int[3]=static_cast<unsigned int>(0);
@@ -450,7 +451,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		// Information
 		if ((this->iIterPRUcurrentTimerVal%5==0)){//if ((this->iIterPRUcurrentTimerVal%(128*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
-			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
+			cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
 			//cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
 			//cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
