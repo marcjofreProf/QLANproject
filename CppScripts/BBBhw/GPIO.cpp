@@ -338,6 +338,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					else{
 						this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorApplied;
 					}
+					
 					if (this->PRUoffsetDriftErrorApplied==0){
 						//pru1dataMem_int[3]=static_cast<unsigned int>(0);
 						this->NextSynchPRUcorrection=static_cast<unsigned int>(0);
@@ -447,7 +448,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		//duration_FinalInitialDriftAuxArrayAvg=IntMedianFilterSubArray(duration_FinalInitialDriftAuxArray,NumSynchMeasAvgAux);
 		
 		// Information
-		if ((this->iIterPRUcurrentTimerVal%(128*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
+		if ((this->iIterPRUcurrentTimerVal%5==0)){//if ((this->iIterPRUcurrentTimerVal%(128*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
