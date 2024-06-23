@@ -322,7 +322,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//this->EstimateSynch=1.0; // To disable synch adjustment
 					// Error averaging
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
-					if (this->iIterPRUcurrentTimerVal<NumSynchMeasAvgAux){this->PRUoffsetDriftErrorAvg=this->PRUoffsetDriftError;}
+					if (this->iIterPRUcurrentTimerVal<NumSynchMeasAvgAux){this->PRUoffsetDriftErrorAvg=0.1*this->PRUoffsetDriftError;}
 					else{this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);}
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
