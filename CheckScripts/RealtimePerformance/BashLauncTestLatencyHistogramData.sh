@@ -2,7 +2,7 @@
 
 # 1. Run cyclictest
 #../../../OSrealtimeTools/rt-tests/cyclictest -l100000000 -m -Sp90 -i200 -h400 -q >output
-../../../OSrealtimeTools/rt-tests/cyclictest -l10000 -m -Sp90 -i200 -h400 -q > "../../../OSrealtimeTools/rt-tests/LatencyHistData/output"
+../../../OSrealtimeTools/rt-tests/cyclictest -l1000000 -m -Sp90 -i200 -h400 -q > "../../../OSrealtimeTools/rt-tests/LatencyHistData/output"
 
 # 2. Get maximum latency
 max=`grep "Max Latencies" "../../../OSrealtimeTools/rt-tests/LatencyHistData/output" | tr " " "\n" | sort -n | tail -1 | sed s/^0*//`
