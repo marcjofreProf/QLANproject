@@ -1,11 +1,36 @@
 # Just launching a PTP master
+cleanup_on_SIGINT() {
+  echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
+  sudo systemctl enable --now systemd-timesyncd # start system synch
+  sudo systemctl start systemd-timesyncd # start system synch
+  sudo systemctl daemon-reload
+  sudo timedatectl set-ntp true # Start NTP
+  echo 'Stopped PTP'
+  exit 0
+}
+
+trap cleanup_on_SIGINT SIGINT
 trap "kill 0" EXIT
 echo 'Running PTP'
 
-# Kill potentially previously running PTP clock processes
+# Kill non-wanted processes
+sudo pkill -f nodejs # javascript applications
+# Kill potentially previously running PTP clock processes and processes
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
+sudo pkill -f QtransportLayerAgentN
+sudo pkill -f BBBclockKernelPhysicalDaemon
+sleep 1 # wait 1 second to make sure to kill the old processes
 ########################################################
+# Set realtime priority with chrt -f and priority 0
+########################################################
+pidAux=$(pgrep -f "irq/66-TI-am335")
+#sudo chrt -f -p 1 $pidAux
+sudo renice -n -20 $pidAux
+
+pidAux=$(pidof -s ptp0)
+sudo chrt -f -p 1 $pidAux
+sudo renice -n -20 $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
 
@@ -16,6 +41,7 @@ sudo /etc/init.d/rsyslog stop # stop logging
 sudo hwclock --systohc
 
 # Configure SYSTEM CLOCKS: CLOCK_REALTIME and CLOCK_TAI
+# utc_offset should be 37, but seems that some slaves do not acquire it propperly, so set to zero (so TAI and UTC time will be the same)
 sudo pmc -u -b 0 -t 1 "SET GRANDMASTER_SETTINGS_NP clockClass 248 \
         clockAccuracy 0xfe offsetScaledLogVariance 0xffff \
         currentUtcOffset 37 leap61 0 leap59 0 currentUtcOffsetValid 1 \
@@ -26,27 +52,26 @@ sudo pmc -u -b 0 -t 1 "SET GRANDMASTER_SETTINGS_NP clockClass 248 \
 #sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
 
+sudo nice -n -20 ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
+pidAux=$(pgrep -f "ptp4l")
+sudo chrt -f -p 1 $pidAux
+
 ## If at least the grand master is synch to NTP ((good long stability reference - but short time less stable)) - difficult then to converge because also following NTP
 sudo systemctl enable systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP
-sudo ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -m & #-f PTP2pcConfigQLANprojectSlave.cfg & -m
-
+sudo nice -n -20 ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP4lConfigQLANprojectMaster.cfg & -m
+pidAux=$(pgrep -f "phc2sys")
+sudo chrt -f -p 1 $pidAux
 
 ## If synch to the RTC of the system, stop the NTP. The quality of the internal crystal/clock matters
 #sudo timedatectl set-ntp false
 #sudo systemctl stop systemd-timesyncd # stop system synch
 #sudo systemctl disable systemd-timesyncd # start system synch
-#sudo ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -m & #-f PTP2pcConfigQLANprojectSlave.cfg & -m
+#sudo nice -n -20 ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m
+#pidAux=$(pgrep -f "ph2sys")
+#sudo chrt -f -p 1 $pidAux
 
-sudo ./linuxptp/ptp4l -i eth0 -f PTP4lConfigQLANproject.cfg -m #& #-m
+read -r -p "Press Ctrl+C to kill launched processes" # Block operation until Ctrl+C is pressed
 
-sudo systemctl enable --now systemd-timesyncd # start system synch
-sudo systemctl start systemd-timesyncd # start system synch
-sudo systemctl daemon-reload
-sudo timedatectl set-ntp true # Start NTP
-echo 'Stopped PTP'
-#sudo /etc/init.d/rsyslog start # start logging
-# Kill all the launched processes with same group PID
-#kill -INT $$

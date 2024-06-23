@@ -1,9 +1,31 @@
+cleanup_on_SIGINT() {
+  echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
+  echo 'Stopped'
+  exit 0
+}
+
+trap cleanup_on_SIGINT SIGINT
 trap "kill 0" EXIT
 echo 'Running NTP'
 # Kill potentially previously running PTP clock processes
 sudo pkill -f ptp4l
 sudo pkill -f phc2sys
 ########################################################
+# Kill non-wanted processes
+sudo pkill -f nodejs # javascript applications
+# Kill potentially previously running PTP clock processes and processes
+sudo pkill -f ptp4l
+sudo pkill -f phc2sys
+sudo pkill -f QtransportLayerAgentN
+sudo pkill -f BBBclockKernelPhysicalDaemon
+sleep 1 # wait 1 second to make sure to kill the old processes
+########################################################
+# Set realtime priority with chrt -f and priority 0
+########################################################
+pidAux=$(pgrep -f "irq/66-TI-am335")
+#sudo chrt -f -p 1 $pidAux
+sudo renice -n -20 $pidAux
+
 sudo /etc/init.d/rsyslog stop # stop logging
 sudo systemctl enable --now systemd-timesyncd # enable system synch
 sudo systemctl start systemd-timesyncd # start system synch
@@ -34,8 +56,10 @@ sudo config-pin P8_43 pruout
 sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
-sudo ./CppScripts/QtransportLayerAgentN client 192.168.8.2 192.168.8.1
-echo 'Stopped'
-#sudo /etc/init.d/rsyslog start # start logging
-# Kill all the launched processes with same group PID
-#kill -INT $$
+sudo ./CppScripts/QtransportLayerAgentN client 192.168.8.2 192.168.8.1 &
+pidAux=$(pgrep -f "QtransportLayerAgentN")
+sudo chrt -f -p 1 $pidAux
+
+read -r -p "Press Ctrl+C to kill launched processes" # Block operation until Ctrl+C is pressed
+
+

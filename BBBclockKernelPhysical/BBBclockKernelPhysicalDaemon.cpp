@@ -10,6 +10,8 @@
 #include <cstring>
 // Time/synchronization management
 #include <chrono>
+// Mathematical functions
+#include <cmath> // floor function
 // PRU programming
 #include <poll.h>
 #include <stdio.h>
@@ -81,11 +83,13 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 
 //////////////////////////////////////////////////////////////////////////
 bool CKPD::setMaxRrPriority(){// For rapidly handling interrupts
-int max_priority=sched_get_priority_max(SCHED_RR);
+int max_priority=sched_get_priority_max(SCHED_FIFO);
+// SCHED_RR: Round robin
+// SCHED_FIFO: First-In-First-Out
 sched_param sch_params;
 sch_params.sched_priority = max_priority;
-if (sched_setscheduler(0,SCHED_RR,&sch_params)==-1){
-	cout <<" Failed to set maximum real-time priority (round-robin)." << endl;
+if (sched_setscheduler(0,SCHED_FIFO,&sch_params)==-1){
+	cout <<" Failed to set maximum real-time priority." << endl;
 	return false;
 }
 return true;
@@ -163,9 +167,9 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=ClockWatch::now();
-	//this->TimePointClockCurrentInitialAdj=ClockChrono::now();
-	//this->SetFutureTimePoint();// Used with busy-wait
-	this->TimePointClockPRUinitial=ClockWatch::now();// First time
+	// Absolute time reference	
+	std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(floor(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentInitial.time_since_epoch()).count())/static_cast<long double>(this->TimeAdjPeriod))*static_cast<long double>(this->TimeAdjPeriod)));
+	this->TimePointClockCurrentInitial=ClockWatch::time_point(duration_back);
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	cout << "Generating clock output..." << endl;	
 }
@@ -187,8 +191,10 @@ while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);// Busy waitin
 //this->TimePointClockCurrentInitialMeas=ClockWatch::now(); //Computed in the step before
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
-this->TimePointClockCurrentFinalMeas=ClockWatch::now(); //Jitter and no information
-retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// After the interrupt update rapidly the new quarter value
+//retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// First interrupt sent to measure time
+this->TimePointClockCurrentFinalMeas=ClockWatch::now(); //Masure time to act
+// PRU long code running which ensures that it does not overlap in terms of interrupts of the subsequent executions
+retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
 
 if (retInterruptsPRU1>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -202,7 +208,7 @@ else{
 	cout << "PRU1 interrupt poll error" << endl;
 }
 
-duration_FinalInitialDriftAux=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-this->TimePointClockCurrentFinalMeas).count());//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
+duration_FinalInitialDriftAux=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentFinalMeas-this->TimePointClockCurrentInitialMeas).count());//-((this->CounterHandleInterruptSynchPRU+1)*this->TimeAdjPeriod);
 
 switch(FilterMode) {
 case 2:{// Mean implementation
@@ -301,106 +307,7 @@ pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
 
 return 0;// All ok
 }
-/*
-int CKPD::HandleInterruptSynchPRUold(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// After the interrupt update rapidly the new quarter value
-this->TimePointClockCurrentFinal=ClockWatch::now();
 
-pru1dataMem_int[0]=PRU1QuarterClocksAux;//Information sent to and grabbed by PRU1
-
-//Triggered part
-pru1dataMem_int[1]=static_cast<unsigned int>(1);// Double start command
-// Important, the following line at the very beggining to reduce the command jitter
-prussdrv_pru_send_event(22);
-//
-
-if (retInterruptsPRU1>0){
-	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-}
-else if (retInterruptsPRU1==0){
-	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-	cout << "CKPD::HandleInterruptSynchPRU took to much time for the ClockHandler. Reset PRU1 if necessary." << endl;	
-}
-else{
-	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-	cout << "PRU1 interrupt poll error" << endl;
-}
-
-// Compute error
-if (retInterruptsPRU1>0){
-	// Compute clocks adjustment
-	auto duration_FinalInitial=this->TimePointClockCurrentFinal-this->TimePointClockCurrentInitial;
-	unsigned long long int duration_FinalInitialCountAux=std::chrono::duration_cast<std::chrono::nanoseconds>(duration_FinalInitial).count();
-	
-	// Compute absolute error
-	if (this->CounterHandleInterruptSynchPRU>=WaitCyclesBeforeAveraging){// Error should not be filtered
-	this->TimePointClockCurrentAdjError=(static_cast<double>(this->TimeAdjPeriod)-static_cast<double>(duration_FinalInitialCountAux));//(this->TimePointClockCurrentAdjError-static_cast<int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)))+(static_cast<int>(this->TimeAdjPeriod)-static_cast<int>(duration_FinalInitialCountAux));//static_cast<int>(duration_FinalInitialAdjCountAux-this->TimeAdjPeriod);// Error to be compensated for. Critical part to not have continuous drift. The old error we substract the part corrected sent to PRU and we add the new computed error
-	}
-	else{
-		this->TimePointClockCurrentAdjError=0;
-	}
-
-	// Error filtering
-	switch(FilterMode) {
-	case 2:{// Mean implementation
-	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MeanFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
-	this->TimePointClockCurrentAdjFilError=this->DoubleMeanFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray,this->MeanFilterFactor);
-	break;
-	}
-	case 1:{// Median implementation
-	this->TimePointClockCurrentAdjFilErrorArray[this->CounterHandleInterruptSynchPRU%MedianFilterFactor]=this->TimePointClockCurrentAdjError;// Error to be compensated for
-	this->TimePointClockCurrentAdjFilError=this->DoubleMedianFilterSubArray(this->TimePointClockCurrentAdjFilErrorArray);
-	break;
-	}
-	default:{// Average implementation
-	this->TimePointClockCurrentAdjFilError = this->RatioAverageFactorClockQuarterPeriod*this->TimePointClockCurrentAdjFilError+(1.0-this->RatioAverageFactorClockQuarterPeriod)*this->TimePointClockCurrentAdjError;
-	}
-	}
-	// Limit applied error correction
-	if (this->TimePointClockCurrentAdjFilError>this->MaxTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MaxTimePointClockCurrentAdjFilError;}
-	else if (this->TimePointClockCurrentAdjFilError<this->MinTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MinTimePointClockCurrentAdjFilError;}
-	
-	// PID implementation
-	this->PIDcontrolerTime();
-	
-	// Apply period scaling selected by the user
-	if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
-		this->AdjCountsFreq=0.0;
-	}
-	else{
-		this->AdjCountsFreq=this->AdjCountsFreqHolder/PRUclockStepPeriodNanoseconds/4.0;// divided by 4 because it is for Quarter period for the PRU1.
-	}
-	this->MinAdjCountsFreq=-this->NumClocksQuarterPeriodPRUclock+static_cast<double>(MinNumPeriodColcksPRUnoHalt);
-	if (this->AdjCountsFreq>this->MaxAdjCountsFreq){this->AdjCountsFreq=this->MaxAdjCountsFreq;}
-	else if(this->AdjCountsFreq<this->MinAdjCountsFreq){this->AdjCountsFreq=this->MinAdjCountsFreq;}
-}
-// Update values
-//this->TimePointClockCurrentAdjFilErrorAppliedArray[this->CounterHandleInterruptSynchPRU%this->AppliedMeanFilterFactor]=this->TimePointClockCurrentAdjFilErrorApplied;// Averaging of PId Not used
-
-PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock+this->AdjCountsFreq+this->TimePointClockCurrentAdjFilErrorApplied/PRUclockStepPeriodNanoseconds/4.0);// Here the correction is inserted
-
-if (PRU1QuarterClocksAux>this->MaxNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MaxNumPeriodColcksPRUnoHalt;}
-else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterClocksAux=this->MinNumPeriodColcksPRUnoHalt;}
-
-this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;
-this->CounterHandleInterruptSynchPRU++;// Update counter
-
-if (PlotPIDHAndlerInfo){
-	if (this->CounterHandleInterruptSynchPRU%3==0){
-	//cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
-	cout << "this->NumClocksQuarterPeriodPRUclock: " << this->NumClocksQuarterPeriodPRUclock << endl;
-	// Not used cout << "this->TimePointClockCurrentFinalInitialAdj_time_as_count: " << this->TimePointClockCurrentFinalInitialAdj_time_as_count << endl;
-	cout << "this->TimePointClockCurrentAdjError: " << this->TimePointClockCurrentAdjError << endl;
-	cout << "this->TimePointClockCurrentAdjFilError: " << this->TimePointClockCurrentAdjFilError << endl;
-	cout << "this->TimePointClockCurrentAdjFilErrorApplied: " << this->TimePointClockCurrentAdjFilErrorApplied << endl;
-	//cout << "this->TimePointClockCurrentAdjFilErrorAppliedOld: " << this->TimePointClockCurrentAdjFilErrorAppliedOld << endl;
-	//cout << "PRU1QuarterClocksAux: " << PRU1QuarterClocksAux << endl;
-	}
-}
-
-return 0;// All ok
-}
-*/
 int CKPD::PIDcontrolerTime(){
 TimePointClockCurrentAdjFilErrorDerivative=(TimePointClockCurrentAdjFilError-TimePointClockCurrentAdjFilErrorLast)/(static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast));
 TimePointClockCurrentAdjFilErrorIntegral=TimePointClockCurrentAdjFilErrorIntegral+TimePointClockCurrentAdjFilError*static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast);
@@ -413,8 +320,10 @@ return 0; // All ok
 
 struct timespec CKPD::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
+	// Relative incrment
 	this->TimePointClockCurrentFinal=this->TimePointClockCurrentInitial+std::chrono::nanoseconds(this->TimeAdjPeriod);//-std::chrono::nanoseconds(duration_FinalInitialDriftAux);//-std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError)));
 	this->TimePointClockCurrentInitial=this->TimePointClockCurrentFinal;//+std::chrono::nanoseconds(static_cast<unsigned long long int>(this->PIDconstant*static_cast<double>(this->TimePointClockCurrentAdjFilError))); //Update value
+		
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentFinal.time_since_epoch();
 	// Convert duration to desired time
 	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()-this->TimeClockMarging; // Add an offset, since the final barrier is implemented with a busy wait 
