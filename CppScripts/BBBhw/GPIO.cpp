@@ -303,22 +303,17 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 				
 				//// Compute error - Relative correction
-				//this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw));
-				
-				// Absolute correction to have absolute time reference				
-				this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
-				this->PRUoffsetDriftError=(static_cast<double>(this->PRUcurrentTimerVal)-0*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(this->PRUoffsetDriftError);
-				
+				this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw));				
 				
 				//if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<(NumSynchMeasAvgAux/2)){// Do computations
 				this->ManualSemaphoreExtra=true;
 					// Computations for Synch calculaton for PRU0 compensation
-					this->EstimateSynch=(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))/((this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw));// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correction).
+					this->EstimateSynch=(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))/((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw));// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correction).
 					//this->EstimateSynch=1.0+this->SynchAdjconstant*(this->EstimateSynch-1.0);
 					this->EstimateSynchArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynch;
 					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
 					// Estimate synch direction
-					this->EstimateSynchDirection=((this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw))-((this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw)+(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
+					this->EstimateSynchDirection=((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw))-((this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw)+(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
 					EstimateSynchDirectionArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynchDirection;
 					this->EstimateSynchDirectionAvg=DoubleMedianFilterSubArray(EstimateSynchDirectionArray,NumSynchMeasAvgAux);					
 					//this->EstimateSynch=1.0; // To disable synch adjustment
