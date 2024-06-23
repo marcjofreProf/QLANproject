@@ -325,7 +325,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					// Error averaging
 					//this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					//this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
-					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=static_cast<double>(fmodl(static_cast<long double>(SynchTrigPeriod)/2.0+static_cast<long double>(this->PRUoffsetDriftError),static_cast<long double>(SynchTrigPeriod)))-static_cast<long double>(SynchTrigPeriod)/2.0;// protection agains large errors
+					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;//static_cast<double>(fmodl(static_cast<long double>(SynchTrigPeriod)/2.0+static_cast<long double>(this->PRUoffsetDriftError),static_cast<long double>(SynchTrigPeriod)))-static_cast<long double>(SynchTrigPeriod)/2.0;// protection agains large errors
 					if (this->iIterPRUcurrentTimerVal<NumSynchMeasAvgAux){this->PRUoffsetDriftErrorAvg=this->PRUoffsetDriftError;}
 					else{this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);}
 				this->ManualSemaphoreExtra=false;
