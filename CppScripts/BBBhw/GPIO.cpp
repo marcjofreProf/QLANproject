@@ -191,8 +191,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 int GPIO::InitAgentProcess(){
 	// Launch periodic synchronization of the IEP timer - like slotted time synchronization protocol
 	 if (this->ResetPeriodicallyTimerPRU1){
- 		this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);// More absolute in time
- 		//this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynchJitterLessInterrupt,this);
+ 		//this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynch,this);// More absolute in time
+ 		this->threadRefSynch=std::thread(&GPIO::PRUsignalTimerSynchJitterLessInterrupt,this);// reduce the interrupt jitter of non-real-time OS
  	//this->threadRefSynch.detach();// If detach, then at the end comment the join. Otherwise, uncomment the join().
  	}
 	return 0; //All OK
@@ -302,8 +302,14 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 				
-				// Compute error
-				this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw));
+				//// Compute error - Relative correction
+				//this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw));
+				
+				// Absolute correction to have absolute time reference				
+				this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
+				this->PRUoffsetDriftError=static_cast<double>(this->PRUoffsetDriftError)-static_cast<double>(this->PRUcurrentTimerVal);
+				
+				
 				//if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<(NumSynchMeasAvgAux/2)){// Do computations
 				this->ManualSemaphoreExtra=true;
 					// Computations for Synch calculaton for PRU0 compensation
@@ -441,7 +447,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		//duration_FinalInitialDriftAuxArrayAvg=IntMedianFilterSubArray(duration_FinalInitialDriftAuxArray,NumSynchMeasAvgAux);
 		
 		// Information
-		if ((this->iIterPRUcurrentTimerVal%(128*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
+		if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0 and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux)){//if ((this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
