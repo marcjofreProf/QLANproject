@@ -325,15 +325,9 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					// Error averaging
 					//this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					//this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
-					if (this->iIterPRUcurrentTimerVal<ExtraNumSynchMeasAvgAux){
-						this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
-						this->PRUoffsetDriftErrorAvg=this->PRUoffsetDriftError;
-						}
-					else{
-						this->PRUoffsetDriftError=static_cast<double>(fmodl(static_cast<long double>(this->PRUoffsetDriftError),static_cast<long double>(SynchTrigPeriod)));
-						this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
-						this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
-					}
+					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=static_cast<double>(fmodl(static_cast<long double>(this->PRUoffsetDriftError),static_cast<long double>(SynchTrigPeriod)));// protection agains large errors
+					if (this->iIterPRUcurrentTimerVal<ExtraNumSynchMeasAvgAux){this->PRUoffsetDriftErrorAvg=this->PRUoffsetDriftError;}
+					else{this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);}
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
 				this->release();
