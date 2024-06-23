@@ -306,7 +306,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOld+0*this->PRUoffsetDriftErrorAppliedOldRaw));	
 				
 				// Compute error - Absolute correction	
-				this->PRUoffsetDriftError=static_cast<double>(this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(fmodl((static_cast<long double>((this->iIterPRUcurrentTimerVal-1)*this->TimePRU1synchPeriod)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));		
+				this->PRUoffsetDriftError=static_cast<double>(this->PRUcurrentTimerVal-1*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));		
 				
 				//if (abs(this->PRUoffsetDriftError)<1e6 or this->iIterPRUcurrentTimerValSynch<(NumSynchMeasAvgAux/2)){// Do computations
 				this->ManualSemaphoreExtra=true;
@@ -322,7 +322,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//this->EstimateSynch=1.0; // To disable synch adjustment
 					// Error averaging
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
-					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
+					if (this->iIterPRUcurrentTimerVal<NumSynchMeasAvgAux){this->PRUoffsetDriftErrorAvg=this->PRUoffsetDriftError;}
+					else{this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);}
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
 				this->release();
