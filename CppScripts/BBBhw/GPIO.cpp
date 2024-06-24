@@ -182,7 +182,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  prussdrv_pru_disable(PRU_Operation_NUM);  
 	  prussdrv_exit();*/
 	  ///////////////////////////////////////////////////////
-	//this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread (only applied to the periodic thread)
+	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread (only applied to the periodic thread)
 	//this->TimePointClockTagPRUinitialOld=Clock::now();// First time. Not needed because we do ti since epoch to have aboslute timming
 	//this->TimePointClockSynchPRUinitial=Clock::now();// First time. Not needed because we do it since epoch to have absolute timming
 	//////////////////////////////////////////////////////////
