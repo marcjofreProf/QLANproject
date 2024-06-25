@@ -433,7 +433,8 @@ int GPIO::PIDcontrolerTimeJiterlessInterrupt(){
 
 // Autocompensating the error with the relative frequency offset
 if (AdjPulseSynchPeriodicCorrectionCoeffAverage>0.0){
-	this->PRUoffsetDriftErrorAppliedRaw=PRUoffsetDriftErrorAvg/AdjPulseSynchPeriodicCorrectionCoeffAverage;// compensating by the relative frequency difference
+	//this->PRUoffsetDriftErrorAppliedRaw=PRUoffsetDriftErrorAvg/AdjPulseSynchPeriodicCorrectionCoeffAverage;// compensating by the relative frequency difference
+	this->PRUoffsetDriftErrorAppliedRaw=PRUoffsetDriftErrorAvg*AdjPulseSynchPeriodicCorrectionCoeffAverage;// compensating by the relative frequency difference
 }
 else{
 	this->PRUoffsetDriftErrorAppliedRaw=PRUoffsetDriftErrorAvg;
