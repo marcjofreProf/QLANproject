@@ -205,6 +205,7 @@ private:// Variables
 	double PeriodCountsPulseAdj=(((1.0/(double)(PulseFreq))*1e9)/((double)(PRUclockStepPeriodNanoseconds)));// Not used
 	double AdjPulseSynchCoeff=1.0;
 	double AdjPulseSynchCoeffAverage=1.0;
+	double AdjPulseSynchPeriodicCorrectionCoeffAverage=1.0;
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
 
 public:	// Functions/Methods
