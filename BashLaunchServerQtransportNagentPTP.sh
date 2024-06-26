@@ -88,5 +88,5 @@ sudo nice -n -20 ./CppScripts/QtransportLayerAgentN server 192.168.9.2 192.168.9
 pidAux=$(pgrep -f "QtransportLayerAgentN")
 sudo chrt -f -p 1 $pidAux
 
-read -r -p "Press Ctrl+C to kill launched processes" # Block operation until Ctrl+C is pressed
+read -r -p "Press Ctrl+C to kill launched processes\n" # Block operation until Ctrl+C is pressed
 

@@ -111,5 +111,5 @@ sudo nice -n -20 ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $1 $2 $3 
 pidAux=$(pgrep -f "BBBclockKernelPhysicalDaemon")
 sudo chrt -f -p 1 $pidAux
 
-read -r -p "Press Ctrl+C to kill launched processes" # Block operation until Ctrl+C is pressed
+read -r -p "Press Ctrl+C to kill launched processes\n" # Block operation until Ctrl+C is pressed
 
