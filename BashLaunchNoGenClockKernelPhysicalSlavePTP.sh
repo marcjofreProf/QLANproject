@@ -59,6 +59,7 @@ sudo nice -n -20 ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQ
 pidAux=$(pgrep -f "phc2sys")
 sudo chrt -f -p 1 $pidAux
 
-read -r -p "Press Ctrl+C to kill launched processes\n" # Block operation until Ctrl+C is pressed
+read -r -p "Press Ctrl+C to kill launched processes
+" # Block operation until Ctrl+C is pressed
 
 
