@@ -636,7 +636,7 @@ cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 cout << "It has to have connected only ch1 timetagger" << endl;
 cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
 cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
-cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected seconds timetagg" << endl; // It seems to be a glitch in the first timetagg
+cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
 cout << "Attention a Periodic signal sent, so time synch between different acquisitions is corrected" << endl;
 cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
 if (SimulateNumStoredQubitsNodeAux>0){
@@ -656,7 +656,7 @@ TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
 TimeTaggsDetAnalytics[7]=0.0;
 
-TimeTaggsDetAnalytics[7]=(double)(TimeTaggs[1]);
+TimeTaggsDetAnalytics[7]=(double)(TimeTaggs[0]);
 
 TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
@@ -749,7 +749,7 @@ for (int iIterCoincidence=1;iIterCoincidence<NumCoincidences;iIterCoincidence++)
 if (iIterCoincidence>0){TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)NumCoincidences-1.0))*pow((double)(TimeCoincidenceTaggs[iIterCoincidence]-TimeCoincidenceTaggs[iIterCoincidence-1])-TimeTaggsDetAnalytics[5],2.0);}
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
-TimeTaggsDetAnalytics[7]=(double)(TimeCoincidenceTaggs[1]);// Timetag of the second coincidence capture
+TimeTaggsDetAnalytics[7]=(double)(TimeCoincidenceTaggs[0]);// Timetag of the first coincidence capture
 
 //cout << "TimeTaggsDetAnalytics[0]: " << TimeTaggsDetAnalytics[0] << endl;
 //cout << "TimeTaggsDetAnalytics[1]: " << TimeTaggsDetAnalytics[1] << endl;
@@ -770,7 +770,7 @@ cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 cout << "It has to have connected only ch1 timetagger" << endl;
 cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
 cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
-cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected seconds timetagg" << endl; // First time tagg seem to be aglitch
+cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
 cout << "Attention a Periodic signal sent, so time synch between different acquisitions is corrected" << endl;
 cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
 unsigned long long int HistPeriodicityAux=8*8192; // Periodicity in number of PRU counts
@@ -780,7 +780,7 @@ unsigned long long int TimeTaggsLastAux=TimeTaggs[SimulateNumStoredQubitsNodeAux
 //TimeTaggs[i]=TimeTaggs[i]-TimeTaggs0Aux+OldLastTimeTagg+HistPeriodicityAux;
 //}
 
-TimeTaggsDetAnalytics[7]=(double)(TimeCoincidenceTaggs[1]); // Second
+TimeTaggsDetAnalytics[7]=(double)(TimeCoincidenceTaggs[0]);
 
 TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
