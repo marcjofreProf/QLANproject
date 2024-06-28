@@ -173,7 +173,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	NOT	r16.w0, r16.w0 // 0s converted to 1s. This step can be placed here to increase chances of detection. Limits the pulse rate to 50 MHz.
 	MOV	r6.w0, r31.w0 // Consecutive red for edge detection
 	QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 // Do not lose time with the below if there are no detections
-	AND	r6.b0, r6.b0, r16.b0 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
+	AND	r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
 CHECKDET:		
 	QBEQ 	WAIT_FOR_EVENT, r6.w0, 0
 	// If the program reaches this point, at least one of the bits is high

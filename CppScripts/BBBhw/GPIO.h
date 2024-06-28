@@ -137,7 +137,7 @@ private:// Variables
 	long long int valCarryOnCycleCountPRU=0; // 64 bits
 	// PRU timetagger
 	int retInterruptsPRU0;
-	int WaitTimeInterruptPRU0=15000000; //up to 20000000 with Simple TTG. In microseconds.
+	int WaitTimeInterruptPRU0=20000000; //up to 20000000 with Simple TTG. In microseconds.
 	//TimePoint TimePointClockNowPRU0;
 	//unsigned long long int TimeNow_time_as_countPRU0;	
 	//TimePoint FutureTimePointPRU0;
