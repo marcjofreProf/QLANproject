@@ -142,7 +142,9 @@ CMDLOOP2:// Double verification of host sending start command
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
 	//MOV 	r31.b0, PRU0_ARM_INTERRUPT+16// Here send interrupt to host to measure time
 DWTSTART:
-	// Re-start DWT_CYCNT	
+	// Re-start DWT_CYCNT
+	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
+	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
 	// Some loadings and resets
 	LBCO	r4, CONST_PRUDRAM, 4, 4 // Load to r4 the content of CONST_PRUDRAM with offset 4, and 4 bytes. It is the number of RECORDS
