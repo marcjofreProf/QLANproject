@@ -57,7 +57,7 @@ sudo config-pin P8_43 pruout
 sudo config-pin P8_44 pruout
 sudo config-pin P8_45 pruout
 sudo config-pin P8_46 pruout
-sudo ./CppScripts/QtransportLayerAgentN client 10.0.0.254 10.0.0.2 & #192.168.8.2 192.168.8.1 &
+sudo ./CppScripts/QtransportLayerAgentN client 10.0.0.254 10.0.0.1 & #10.0.0.254 10.0.0.2 & #192.168.8.2 192.168.8.1 &
 pidAux=$(pgrep -f "QtransportLayerAgentN")
 sudo chrt -f -p 1 $pidAux
 
