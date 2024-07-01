@@ -41,7 +41,7 @@ class GPIO {
 //public: //Variables
 
 private:// Variables
-	bool ResetPeriodicallyTimerPRU1=true;// Disaster when used, due to all the interrupts handling time uncertainty
+	bool ResetPeriodicallyTimerPRU1=false;// Disaster when used, due to all the interrupts handling time uncertainty
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	std::atomic<bool> ManualSemaphore=false;
