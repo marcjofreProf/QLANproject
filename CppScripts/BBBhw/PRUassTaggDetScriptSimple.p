@@ -166,7 +166,7 @@ FIRSTREF:
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
 	SBCO	r5, CONST_PRUDRAM, 8, 4// Calibration time tag (together with the acumulated synchronization error)	
 	/// Relative synch count down
-//WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
+WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 //	// Load the value of R31 into a working register
 //	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
 //	MOV 	r16.b0, r31.b0 // This wants to be zeros for edge detection
@@ -178,13 +178,13 @@ FIRSTREF:
 //	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0 //all the b0 above can be converted to w0 to capture more channels, but then in the chennel tag recorded has to be increaed and appropiatelly handled in c++ (also the number of tags per run has to be reduced)
 //	// If the program reaches this point, at least one of the bits is high
 //	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
-//TIMETAG:
-//	// Faster Concatenated Time counter and Detection channels
-//	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 5 // Put contents of r5 and r6.b0 of DWT_CYCCNT into the address offset at r1.
-//	ADD 	r1, r1, 5 // increment address by 5 bytes	
-//	// Check to see if we still need to read more data
-//	SUB 	r4, r4, 1
-//	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
+TIMETAG:
+	// Faster Concatenated Time counter and Detection channels
+	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 5 // Put contents of r5 and r6.b0 of DWT_CYCCNT into the address offset at r1.
+	ADD 	r1, r1, 5 // increment address by 5 bytes	
+	// Check to see if we still need to read more data
+	SUB 	r4, r4, 1
+	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
 FINISH:
 	// Faster Concatenated Checks writting	
 	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 4 // writes values of r8
