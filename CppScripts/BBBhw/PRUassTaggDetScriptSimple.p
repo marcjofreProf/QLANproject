@@ -143,8 +143,6 @@ CMDLOOP2:// Double verification of host sending start command
 	//MOV 	r31.b0, PRU0_ARM_INTERRUPT+16// Here send interrupt to host to measure time
 DWTSTART:
 	// Re-start DWT_CYCNT
-	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
-	SET	r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
 //	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	// Some loadings and resets
@@ -199,7 +197,8 @@ FINISH:
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	SET	r2.t3
 	////////////////////////////////////////
-	MOV	r31.b0, PRU0_ARM_INTERRUPT+16// Notification sent at the beginning of the signal//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
+	// When modifying the hardware cloc, not really working this interrupt MOV	r31.b0, PRU0_ARM_INTERRUPT+16// Notification sent at the beginning of the signal//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
+	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16 //Alternative to send an interrupt when modifying the hardware clock
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF	
 	LBBO	r14, r13, 0, 4//LBCO	r9, CONST_IETREG, 0xC, 4 // read IEP	 // LBBO	r9, r13, 0, 4 // read DWT_CYCNT

@@ -587,7 +587,7 @@ prussdrv_pru_send_event(21);
 //retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);// First interrupt sent to measure time
 this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 //  PRU long execution making sure that notification interrupts do not overlap
-retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
+retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU0);// Modifid to receive interrupt as PRU1, when modifying the hardware clock//prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 
 // Better to not update the time to trig with this since the interrupt is different
 //int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-TimePointClockTagPRUinitial).count());
