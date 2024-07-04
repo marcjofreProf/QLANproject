@@ -23,9 +23,9 @@
 #define INS_PER_US		200		// 5ns per instruction for Beaglebone black
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
 #define NUM_REPETITIONS		1024	//Not used 4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used). This defines the Maximum Transmission Unit - coul dbe named Quantum MTU (defined together with the clock)
-#define DELAY 4094//It has to be related to an even power of 2!!! Example 1022=(2048-4)/2. How to do it. Substract 4 and divide by 2 for the common cost commands. For instance 58=(128-4)/2 // Assuming that QBNE always consumes one clock (check experimentally). It has to be a power of 2 to be able to do module in assembler. The original value is DELAYMODULE divided by 8.
-#define DELAYMODULE	65536// Slightly above the std jitter of the 24 MHz hardware clock//65536 // Not used. The whole histogram period. It has to be divisible by the 2^32 total clock register.
-#define DELAYHALFMODULE	65535//65535 // Not used. One unit less than the power of two required of the period of the histogram which is 65535-1=2^16-1.
+#define DELAY 1022//It has to be related to an even power of 2!!! Example 1022=(2048-4)/2. How to do it. Substract 4 and divide by 2 for the common cost commands. For instance 58=(128-4)/2 // Assuming that QBNE always consumes one clock (check experimentally). It has to be a power of 2 to be able to do module in assembler. The original value is DELAYMODULE divided by 8.
+#define DELAYMODULE	16384// Slightly above the std jitter of the 24 MHz hardware clock//65536 // Not used. The whole histogram period. It has to be divisible by the 2^32 total clock register.
+#define DELAYHALFMODULE	16383//65535 // Not used. One unit less than the power of two required of the period of the histogram which is 65535-1=2^16-1.
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -213,7 +213,6 @@ SIGNALON2:
 	MOV	r5, DELAY
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 SIGNALON2DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON2DEL, r5, 0
@@ -234,7 +233,6 @@ SIGNALON4:
 	MOV	r5, DELAY
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 SIGNALON4DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON4DEL, r5, 0
@@ -255,7 +253,6 @@ SIGNALON6:
 	MOV	r5, DELAY
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
 SIGNALON6DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON6DEL, r5, 0
