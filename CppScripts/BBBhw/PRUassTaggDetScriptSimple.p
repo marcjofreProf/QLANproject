@@ -167,13 +167,13 @@ FIRSTREF:
 	SBCO	r5, CONST_PRUDRAM, 8, 4// Calibration time tag (together with the acumulated synchronization error)	
 	/// Relative synch count down
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
-//	// Load the value of R31 into a working register
-//	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
-//	MOV 	r16.b0, r31.b0 // This wants to be zeros for edge detection
-//	NOT	r16.b0, r16.b0 // 0s converted to 1s. This step can be placed here to increase chances of detection. Limits the pulse rate to 50 MHz.
+	// Load the value of R31 into a working register
+	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
+	MOV 	r16.b0, r31.b0 // This wants to be zeros for edge detection
+	NOT	r16.b0, r16.b0 // 0s converted to 1s. This step can be placed here to increase chances of detection. Limits the pulse rate to 50 MHz.
 	MOV	r6.b0, r31.b0 // Consecutive red for edge detection
-//	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0 // Do not lose time with the below if there are no detections
-//	AND	r6.b0, r6.b0, r16.b0 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
+	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0 // Do not lose time with the below if there are no detections
+	AND	r6.b0, r6.b0, r16.b0 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
 CHECKDET:		
 	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0 //all the b0 above can be converted to w0 to capture more channels, but then in the chennel tag recorded has to be increaed and appropiatelly handled in c++ (also the number of tags per run has to be reduced)
 	// If the program reaches this point, at least one of the bits is high
