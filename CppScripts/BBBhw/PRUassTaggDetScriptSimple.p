@@ -176,8 +176,8 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 //	AND	r6.b0, r6.b0, r16.b0 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
 //CHECKDET:		
 //	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0 //all the b0 above can be converted to w0 to capture more channels, but then in the chennel tag recorded has to be increaed and appropiatelly handled in c++ (also the number of tags per run has to be reduced)
-//	// If the program reaches this point, at least one of the bits is high
-//	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
+	// If the program reaches this point, at least one of the bits is high
+	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
 TIMETAG:
 	// Faster Concatenated Time counter and Detection channels
 	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 5 // Put contents of r5 and r6.b0 of DWT_CYCCNT into the address offset at r1.
