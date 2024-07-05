@@ -41,7 +41,7 @@ class GPIO {
 //public: //Variables
 
 private:// Variables
-	bool ResetPeriodicallyTimerPRU1=true;// Disaster when used, due to all the interrupts handling time uncertainty
+	bool ResetPeriodicallyTimerPRU1=false;// Disaster when used, due to all the interrupts handling time uncertainty
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	std::atomic<bool> ManualSemaphore=false;
@@ -145,7 +145,7 @@ private:// Variables
 	//bool CheckTimeFlagPRU0;
 	//bool finPRU0;
 	// PRU Signal
-	unsigned int NumberRepetitionsSignal=32768;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
+	unsigned int NumberRepetitionsSignal=16384;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=20000000; // In microseconds
 	//int WaitTimeToFutureTimePointPRU1=1000;// The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s, not more otherwise the synch calculation error overflows as well and things go bad.
