@@ -593,9 +593,6 @@ retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterrupt
 //this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
 //this->TrigAuxIterCount++;
 
-this->ManualSemaphore=false;
-this->release();
-
 //cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
 if (retInterruptsPRU0>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -610,6 +607,10 @@ else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU0 interrupt poll error" << endl;
 }
+
+this->ManualSemaphore=false;
+this->release();
+
 this->DDRdumpdata(); // Store to file
 
 return 0;// all ok
@@ -654,15 +655,6 @@ this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAv
 this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
 this->TrigAuxIterCount++;
 
-this->ManualSemaphore=false;
-this->release();
-
-//cout << "SynchRem: " << SynchRem << endl;
-//cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
-
-//TimePointClockSynchPRUinitial=TimePointFutureSynch;// Update. When commented is in absolute value. Might create precition errors.
-
-//cout << "SendTriggerSignals: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 if (retInterruptsPRU1>0){
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 }
@@ -674,6 +666,17 @@ else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU1 interrupt error" << endl;
 }
+
+this->ManualSemaphore=false;
+this->release();
+
+//cout << "SynchRem: " << SynchRem << endl;
+//cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
+
+//TimePointClockSynchPRUinitial=TimePointFutureSynch;// Update. When commented is in absolute value. Might create precition errors.
+
+//cout << "SendTriggerSignals: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
+
 
 return 0;// all ok	
 }
