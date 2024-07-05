@@ -396,7 +396,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		} //end if
 		else if (this->ManualSemaphoreExtra==true){
 			// Double entry for some reason. Do not do anything
-			cout << "Double run in time sync method. This should not happen!" << endl;
+			////cout << "PRUs in use by other process TTU or SignalGen!" << endl
+			this->iIterPRUcurrentTimerValPass++;
 		}
 		else{// does not enter in time
 			this->iIterPRUcurrentTimerValPass++;
@@ -533,7 +534,8 @@ int GPIO::PRUsignalTimerSynch(){
 		} //end if
 		else if (this->ManualSemaphoreExtra==true){
 			// Double entry for some reason. Do not do anything
-			cout << "Double run in time sync method. This should not happen!" << endl;
+			//cout << "PRUs in use by other process TTU or SignalGen!" << endl;
+			this->iIterPRUcurrentTimerValPass++;
 		}
 		else{// does not enter in time
 			this->iIterPRUcurrentTimerValPass++;
