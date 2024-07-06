@@ -639,8 +639,7 @@ pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command. Generate signal
 unsigned int SynchRem=static_cast<int>((static_cast<long double>(1.5*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));//static_cast<int>((static_cast<long double>(2.0*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 // If the PRU wander was not corrected then computation below - transforming from and to the different time domains system vs. PRU
 //int SynchRem=static_cast<int>(((2.0*SynchTrigPeriod)-fmod((static_cast<double>((1.0/this->EstimateSynchAvg)*std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSynchPRUinitial).count())/static_cast<double>(PRUclockStepPeriodNanoseconds)),SynchTrigPeriod))*static_cast<double>(PRUclockStepPeriodNanoseconds)*this->EstimateSynchAvg);// Multiple conversion of time domains, from the system clock to the PRU clock what is remaining, then back to the system clock to do the busy wait.
-TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
-TimePointFutureSynch=TimePointFutureSynch-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
+TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem)-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 ////if (Clock::now()<TimePointFutureSynch){cout << "Check that we have enough time" << endl;}
 while (Clock::now()<TimePointFutureSynch);// Busy wait time synch sending signals
 // Important, the following line at the very beggining to reduce the command jitter
@@ -1154,17 +1153,18 @@ else{
     // Step 2: Sort the temporary array
     this->IntBubbleSort(temp,MedianFilterFactor);
     // If odd, middle number
-      return temp[MedianFilterFactor/2];
+    return temp[MedianFilterFactor/2];
 }
 }
 
 // Function to implement Bubble Sort
 int GPIO::IntBubbleSort(int* arr,int MedianFilterFactor) {
+    int temp=0;
     for (int i = 0; i < MedianFilterFactor-1; i++) {
         for (int j = 0; j < MedianFilterFactor-i-1; j++) {
             if (arr[j] > arr[j+1]) {
                 // Swap arr[j] and arr[j+1]
-                int temp = arr[j];
+                temp = arr[j];
                 arr[j] = arr[j+1];
                 arr[j+1] = temp;
             }
@@ -1187,17 +1187,18 @@ else{
     // Step 2: Sort the temporary array
     this->DoubleBubbleSort(temp,MedianFilterFactor);
     // If odd, middle number
-      return temp[MedianFilterFactor/2];
+    return temp[MedianFilterFactor/2];
 }
 }
 
 // Function to implement Bubble Sort
 int GPIO::DoubleBubbleSort(double* arr,int MedianFilterFactor) {
+    double temp=0.0;
     for (int i = 0; i < MedianFilterFactor-1; i++) {
         for (int j = 0; j < MedianFilterFactor-i-1; j++) {
             if (arr[j] > arr[j+1]) {
                 // Swap arr[j] and arr[j+1]
-                double temp = arr[j];
+                temp = arr[j];
                 arr[j] = arr[j+1];
                 arr[j+1] = temp;
             }
