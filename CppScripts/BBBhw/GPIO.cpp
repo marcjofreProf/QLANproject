@@ -582,7 +582,7 @@ pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate 
 pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures
 pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
 this->TimePointClockTagPRUinitial=Clock::now();// Crucial to make the link between PRU clock and system clock (already well synchronized)
-int SynchRem=static_cast<int>((static_cast<long double>(1.5*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
+int SynchRem=static_cast<int>((static_cast<long double>(2.5*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));// Here it is used 2.5, since for the SignalTrig it consumes 1.5 to enter period and 1 more period to allow if rel frequency
 TimePointClockTagPRUinitial=TimePointClockTagPRUinitial+std::chrono::nanoseconds(SynchRem)-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 while (Clock::now()<TimePointClockTagPRUinitial);// Busy wait time synch sending signals
 prussdrv_pru_send_event(21);
