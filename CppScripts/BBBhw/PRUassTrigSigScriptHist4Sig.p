@@ -92,6 +92,9 @@ INITIATIONS:
 	MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
 	SBBO	r0, r10, 0, 4//SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
+	// Initial initializations
+	LDI	r4, 0 // zeroing
+	
 	// Initial Re-initialization for IET counter
 	// The Clock gating Register controls the state of Clock Management. 
 	//LBCO 	r0, CONST_PRUCFG, 0x10, 4                    
@@ -99,7 +102,7 @@ INITIATIONS:
 	SBCO 	r0, CONST_PRUCFG, 0x10, 4 
 	//LBCO	r2, CONST_IETREG, 0, 1 //
 	//SET ocp_clk:1 or of iep_clk:0// It is important ot select the clock source to be in synch with the PRU clock. I believe it should be ocp_clk
-	MOV	r0, 1
+	LDI	r0, 1
 	SBCO 	r0, CONST_PRUCFG, 0x30, 4
 	// IEP configuration
 	MOV	r0, 0x111 // Enable and Define increment value to 1
@@ -117,7 +120,8 @@ INITIATIONS:
 	MOV	r1, NUM_REPETITIONS// Initial initialization jus tin case// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
 	MOV	r6, DELAYHALFMODULE
 	MOV	r7, DELAYMODULE
-	LDI	r0, 0
+	LDI	r8, 0 // Fine extra offset
+	LDI	r0, 0 // Ensure reset commands
 	
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
