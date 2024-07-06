@@ -73,7 +73,7 @@
 // r30 is reserved for output pins
 // r31 is reserved for inputs pins
 INITIATIONS:
-//	MOV r1, GPIO2_BANK | GPIO_SETDATAOUToffset  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
+///	MOV r1, GPIO2_BANK | GPIO_SETDATAOUToffset  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
 //	MOV r2, GPIO2_BANK | GPIO_CLEARDATAOUToffset // load the address we wish to cleare to r2. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
 		
 	LBCO	r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
@@ -83,14 +83,27 @@ INITIATIONS:
 
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
-	MOV	r0, OWN_RAM | OWN_RAMoffset
+	MOV	r0, OWN_RAM | OWN_RAMoffset// | OWN_RAMoffset
 	MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
 	SBBO	r0, r10, 0, 4//SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
-	//// This will make C26 point to 0x0002E000 (IET). Done by the other PRU
-	//MOV	r0, 0x0002E000// | OWN_RAMoffset // When using assembler, the PRU does not put data in the first addresses of OWN_RAM (when using c++ PRU direct programming the PRU  might use some initial addresses of OWN_RAM space
-	////MOV	r10, 0x22000+0x20// | C24add//CONST_PRUDRAM
-	//SBCO	r0, CONST_IETREG, 0, 4  // Load the base address of PRU0 Data RAM into C24
+	// Initial initializations
+	LDI	r4, 0 // zeroing
+	
+	// Initial Re-initialization for IET counter
+	// The Clock gating Register controls the state of Clock Management. 
+	//LBCO 	r0, CONST_PRUCFG, 0x10, 4                    
+	MOV 	r0, 0x24924
+	SBCO 	r0, CONST_PRUCFG, 0x10, 4 
+	//LBCO	r2, CONST_IETREG, 0, 1 //
+	//SET ocp_clk:1 or of iep_clk:0// It is important ot select the clock source to be in synch with the PRU clock. I believe it should be ocp_clk
+	LDI	r0, 1
+	SBCO 	r0, CONST_PRUCFG, 0x30, 4
+	// IEP configuration
+	MOV	r0, 0x111 // Enable and Define increment value to 1
+	SBCO	r0, CONST_IETREG, 0, 4 // Enables IET count and sets configuration
+	// Deactivate IEP compensation
+	SBCO 	r4, CONST_IETREG, 0x08, 4
 	
 	// Using cycle counter
 	MOV	r2, 0x22000
