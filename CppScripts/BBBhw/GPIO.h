@@ -41,15 +41,15 @@ class GPIO {
 //public: //Variables
 
 private:// Variables
-	bool ResetPeriodicallyTimerPRU1=false;// Disaster when used, due to all the interrupts handling time uncertainty
+	bool ResetPeriodicallyTimerPRU1=true;// Disaster when used, due to all the interrupts handling time uncertainty
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	std::atomic<bool> ManualSemaphore=false;
 	std::atomic<bool> ManualSemaphoreExtra=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=5; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
-	int NumSynchMeasAvgAux=1;//251; // Num averages to compute the time error. Better to be odd number.
-	int ExtraNumSynchMeasAvgAux=1;//301; // More averaging for computing interrupts access time
+	int NumSynchMeasAvgAux=51;//251; // Num averages to compute the time error. Better to be odd number.
+	int ExtraNumSynchMeasAvgAux=51;//301; // More averaging for computing interrupts access time
 	unsigned int NextSynchPRUcommand=5;// set initially to NextSynchPRUcorrection=0
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
 	double PRUoffsetDriftError=0;
