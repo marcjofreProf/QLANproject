@@ -145,7 +145,7 @@ CMDLOOP2:// Double verification of host sending start command
 	QBEQ	PERIODICTIMESYNCHCHECK, r0.b0, 4 // 4 command is measure IEP timer status and so a check
 PERIODICTIMESYNCHSET: // with command coded 5 means setting synch
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
-	SBCO	r10, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
+	SBCO	r7, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP	CMDLOOP
@@ -156,14 +156,14 @@ PERIODICTIMESYNCHCHECK: // with command coded 4 means chech synch only
 	JMP	CMDLOOP
 PERIODICTIMESYNCHADD: // with command coded 3 means synch by reseting the IEP timer
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
-	ADD	r0, r0, r10 // Apply correction
+	ADD	r0, r0, r7 // Apply correction
 	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample		
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP	CMDLOOP
 PERIODICTIMESYNCHSUB: // with command coded 2 means synch by reseting the IEP timer
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
-	SUB	r0, r0, r10 // Apply correction
+	SUB	r0, r0, r7 // Apply correction
 	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
