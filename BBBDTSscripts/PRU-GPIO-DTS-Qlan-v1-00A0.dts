@@ -66,18 +66,18 @@
        //		Bit 6 is 1 if you want slow rise/fall times (for long i2c buses)
         
        pinctrl-single,pins = <          
-         0x19C 0x26      // Mode 6 input pull-down
-         0x194 0x26      // Mode 6 input pull-down
-         0x198 0x26      // Mode 6 input pull-down
-         0x190 0x26      // Mode 6 input pull-down
-         0x1A4 0x26      // Mode 6 input pull-down
-         0x1AC 0x26      // Mode 6 input pull-down
-         0x038 0x26      // Mode 6 input pull-down
-         0x03C 0x26      // Mode 6 input pull-down
-         0x1A0 0x26      // Mode 6 input pull-down
-         0x1A8 0x26      // Mode 6 input pull-down
-         0x034 0x26      // Mode 6 input pull-down
-         0x030 0x26      // Mode 6 input pull-down
+         0x19C 0x2E      // Mode 6 input non-pull
+         0x194 0x2E      // Mode 6 input non-pull
+         0x198 0x2E      // Mode 6 input non-pull
+         0x190 0x2E      // Mode 6 input non-pull
+         0x1A4 0x2E      // Mode 6 input non-pull
+         0x1AC 0x2E      // Mode 6 input non-pull
+         0x038 0x2E      // Mode 6 input non-pull
+         0x03C 0x2E      // Mode 6 input non-pull
+         0x1A0 0x2E      // Mode 6 input non-pull
+         0x1A8 0x2E      // Mode 6 input non-pull
+         0x034 0x2E      // Mode 6 input non-pull
+         0x030 0x2E      // Mode 6 input non-pull
          
          0x0E0 0x05	 // Mode 5 output pull-down
          0x0E4 0x05	 // Mode 5 output pull-down
