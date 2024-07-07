@@ -265,7 +265,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html
-				//if ((this->iIterPRUcurrentTimerVal%50)==0){// Every now and then correct absolutelly, although some interrupt jitter will be present
+				//if ((this->iIterPRUcurrentTimerVal%100)==0){// Every now and then correct absolutelly, although some interrupt jitter will be present
 				//	this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
 				//	this->NextSynchPRUcorrection=static_cast<unsigned int>(static_cast<unsigned int>((static_cast<unsigned long long int>(PRUoffsetDriftError)+static_cast<unsigned long long int>(LostCounts))%iepPRUtimerRange32bits));
 				//	this->NextSynchPRUcommand=static_cast<unsigned int>(5);// Hard setting of the time
@@ -310,7 +310,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					// Computations for Synch calculation for PRU0 compensation
 					this->EstimateSynch=((static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)+0*duration_FinalInitialCountAux)/static_cast<double>(PRUclockStepPeriodNanoseconds))/((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(this->PRUcurrentTimerValOldWrap-0*this->PRUoffsetDriftErrorAppliedOldRaw));// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correction).
 					//this->EstimateSynch=1.0+this->SynchAdjconstant*(this->EstimateSynch-1.0);
-					this->EstimateSynch=1.0; // To disable synch adjustment
+					//this->EstimateSynch=1.0; // To disable synch adjustment
 					this->EstimateSynchArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynch;
 				this->ManualSemaphoreExtra=true;
 					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
@@ -326,7 +326,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					
 					// Compute error - Absolute correction				
 					this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))-this->PRUcurrentTimerValWrap;
-					this->PRUoffsetDriftError=0.0;// Deactivate error calculation
+					//this->PRUoffsetDriftError=0.0;// Deactivate error calculation
 					// Autocompensating the error with the relative frequency offset
 					if (this->EstimateSynch>0.0){
 						//this->PRUoffsetDriftError=this->PRUoffsetDriftError/this->EstimateSynch;// compensating by the relative frequency difference
