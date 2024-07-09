@@ -163,7 +163,10 @@ if [[ $is_rt_kernel -eq 0 ]]; then
 	sudo config-pin P8_45 pruout
 	sudo config-pin P8_46 pruout
 fi
-sudo nice -n -20 ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon ${1-default_arg1} ${2-default_arg2} ${3-default_arg3} &
+BcKPDarg1=${1:-$default_arg1}
+BcKPDarg2=${2:-$default_arg2}
+BcKPDarg3=${3:-$default_arg3}
+sudo nice -n -20 ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $BcKPDarg1 $BcKPDarg2 $BcKPDarg3 &
 pidAux=$(pgrep -f "BBBclockKernelPhysicalDaemon")
 sudo chrt -f -p 1 $pidAux
 
