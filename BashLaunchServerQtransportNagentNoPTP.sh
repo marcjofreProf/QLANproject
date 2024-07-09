@@ -1,5 +1,28 @@
+# Function to check for real-time kernel
+is_rt_kernel() {
+  kernel_version=$(uname -r) # Get the kernel version
+  if [[ $kernel_version =~ [[:alnum:]]*ti-rt[[:alnum:]]* ]]; then
+    echo "Real-time kernel detected"
+    return 1  # Real-time kernel detected (return 0)
+  else
+    echo "Non-real-time kernel detected"
+    return 0  # Non-real-time kernel detected (return 1)
+  fi
+}
+
+# Check for real-time kernel
+is_rt_kernel
+# Set variable based on function return value
+is_rt_kernel=$?  # $? stores the exit code of the last command (function)
+
 cleanup_on_SIGINT() {
   echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
+  # Kill potentially previously running processes
+  sudo pkill -f ptp4l
+  sudo pkill -f phc2sys
+  sudo pkill -f QtransportLayerAgentN
+  sudo pkill -f BBBclockKernelPhysicalDaemon
+  
   sudo systemctl enable --now systemd-timesyncd # start system synch
   sudo systemctl start systemd-timesyncd # start system synch
   sudo systemctl daemon-reload
@@ -22,9 +45,33 @@ sleep 1 # wait 1 second to make sure to kill the old processes
 ########################################################
 # Set realtime priority with chrt -f and priority 0
 ########################################################
-pidAux=$(pgrep -f "irq/66-TI-am335")
-#sudo chrt -f -p 1 $pidAux
-sudo renice -n -20 $pidAux
+if [[ $is_rt_kernel -eq 1 ]]; then
+  pidAux=$(pgrep -f "irq/22-TI-am335")
+  sudo renice -n -20 $pidAux
+  pidAux=$(pgrep -f "irq/22-s-TI-am3")
+  sudo renice -n -20 $pidAux
+  
+  pidAux=$(pgrep -f "irq/59-pruss_ev")
+  sudo renice -n -20 $pidAux
+  pidAux=$(pgrep -f "irq/60-pruss_ev")
+  sudo renice -n -20 $pidAux
+  pidAux=$(pgrep -f "irq/61-pruss_ev")
+  sudo renice -n -20 $pidAux
+  pidAux=$(pgrep -f "irq/62-pruss_ev")
+  sudo renice -n -20 $pidAux
+  pidAux=$(pgrep -f "irq/63-pruss_ev")
+  sudo renice -n -20 $pidAux
+  pidAux=$(pgrep -f "irq/64-pruss_ev")
+  sudo renice -n -20 $pidAux
+  pidAux=$(pgrep -f "irq/65-pruss_ev")
+  sudo renice -n -20 $pidAux
+  pidAux=$(pgrep -f "irq/66-pruss_ev")
+  sudo renice -n -20 $pidAux
+else
+  pidAux=$(pgrep -f "irq/66-TI-am335")
+  #sudo chrt -f -p 1 $pidAux
+  sudo renice -n -20 $pidAux
+fi
 ########################################################
 sudo /etc/init.d/rsyslog stop # stop logging
 sudo timedatectl set-ntp false # Stop NTP
