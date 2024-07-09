@@ -80,30 +80,32 @@ sudo /etc/init.d/rsyslog stop # stop logging
 sudo timedatectl set-ntp false # Stop NTP
 sudo systemctl stop systemd-timesyncd # stop system synch
 sudo systemctl disable systemd-timesyncd # disable system synch
-echo 'Enabling BBB pins'
-sudo config-pin P9_28 pruin
-sudo config-pin P9_29 pruin
-sudo config-pin P9_30 pruin
-sudo config-pin P9_31 pruin
-sudo config-pin P8_15 pruin
-sudo config-pin P8_16 pruin
-sudo config-pin P9_25 pruin
-sudo config-pin P9_27 pruin
-sudo config-pin P9_41 pruin
-sudo config-pin P9_91 pruin
-sudo config-pin P9_92 pruin
-sudo config-pin P8_27 pruout
-sudo config-pin P8_28 pruout
-sudo config-pin P8_29 pruout
-sudo config-pin P8_30 pruout
-sudo config-pin P8_39 pruout
-sudo config-pin P8_40 pruout
-sudo config-pin P8_41 pruout
-sudo config-pin P8_42 pruout
-sudo config-pin P8_43 pruout
-sudo config-pin P8_44 pruout
-sudo config-pin P8_45 pruout
-sudo config-pin P8_46 pruout
+if [[ $is_rt_kernel -eq 0 ]]; then
+	echo 'Enabling PRU pins'
+	sudo config-pin P9_28 pruin
+	sudo config-pin P9_29 pruin
+	sudo config-pin P9_30 pruin
+	sudo config-pin P9_31 pruin
+	sudo config-pin P8_15 pruin
+	sudo config-pin P8_16 pruin
+	sudo config-pin P9_25 pruin
+	sudo config-pin P9_27 pruin
+	sudo config-pin P9_41 pruin
+	sudo config-pin P9_91 pruin
+	sudo config-pin P9_92 pruin
+	sudo config-pin P8_27 pruout
+	sudo config-pin P8_28 pruout
+	sudo config-pin P8_29 pruout
+	sudo config-pin P8_30 pruout
+	sudo config-pin P8_39 pruout
+	sudo config-pin P8_40 pruout
+	sudo config-pin P8_41 pruout
+	sudo config-pin P8_42 pruout
+	sudo config-pin P8_43 pruout
+	sudo config-pin P8_44 pruout
+	sudo config-pin P8_45 pruout
+	sudo config-pin P8_46 pruout
+fi
 sudo ./CppScripts/QtransportLayerAgentN client 10.0.0.254 10.0.0.2 & #192.168.8.2 192.168.8.1 &
 pidAux=$(pgrep -f "QtransportLayerAgentN")
 sudo chrt -f -p 1 $pidAux

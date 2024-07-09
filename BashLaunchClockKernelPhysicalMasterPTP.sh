@@ -27,7 +27,7 @@ is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 
 cleanup_on_SIGINT() {
   echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
-  if [[ $is_rt_kernel -eq 1 ]]; then
+  if [[ $is_rt_kernel -eq 0 ]]; then
 	  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip7/pwm-7\:0/enable"
 	  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip4/pwm-4\:0/enable"
 	  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip1/pwm-1\:0/enable" 
@@ -147,29 +147,32 @@ sudo chrt -f -p 1 $pidAux
 #sudo sh -c "echo '100' >> /sys/class/pwm/pwmchip1/pwm-1\:0/period" 
 #sudo sh -c "echo '50' >> /sys/class/pwm/pwmchip1/pwm-1\:0/duty_cycle" 
 #sudo sh -c "echo '1' >> /sys/class/pwm/pwmchip1/pwm-1\:0/enable"
-echo 'Enabling PRU pins'
-sudo config-pin P9_28 pruin
-sudo config-pin P9_29 pruin
-sudo config-pin P9_30 pruin
-sudo config-pin P9_31 pruin
-sudo config-pin P8_15 pruin
-sudo config-pin P8_16 pruin
-sudo config-pin P9_25 pruin
-sudo config-pin P9_27 pruin
-sudo config-pin P9_41 pruin
-sudo config-pin P9_91 pruin
-sudo config-pin P9_92 pruin
-sudo config-pin P8_27 pruout
-sudo config-pin P8_28 pruout
-sudo config-pin P8_29 pruout
-sudo config-pin P8_30 pruout
-sudo config-pin P8_39 pruout
-sudo config-pin P8_40 pruout
-sudo config-pin P8_41 pruout
-sudo config-pin P8_42 pruout
-sudo config-pin P8_43 pruout
-sudo config-pin P8_44 pruout
-sudo config-pin P8_45 pruout
+if [[ $is_rt_kernel -eq 0 ]]; then
+	echo 'Enabling PRU pins'
+	sudo config-pin P9_28 pruin
+	sudo config-pin P9_29 pruin
+	sudo config-pin P9_30 pruin
+	sudo config-pin P9_31 pruin
+	sudo config-pin P8_15 pruin
+	sudo config-pin P8_16 pruin
+	sudo config-pin P9_25 pruin
+	sudo config-pin P9_27 pruin
+	sudo config-pin P9_41 pruin
+	sudo config-pin P9_91 pruin
+	sudo config-pin P9_92 pruin
+	sudo config-pin P8_27 pruout
+	sudo config-pin P8_28 pruout
+	sudo config-pin P8_29 pruout
+	sudo config-pin P8_30 pruout
+	sudo config-pin P8_39 pruout
+	sudo config-pin P8_40 pruout
+	sudo config-pin P8_41 pruout
+	sudo config-pin P8_42 pruout
+	sudo config-pin P8_43 pruout
+	sudo config-pin P8_44 pruout
+	sudo config-pin P8_45 pruout
+	sudo config-pin P8_46 pruout
+fi
 sudo config-pin P8_46 pruout
 sudo nice -n -20 ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon ${1-default_arg1} ${2-default_arg2} ${3-default_arg3} &
 pidAux=$(pgrep -f "BBBclockKernelPhysicalDaemon")
