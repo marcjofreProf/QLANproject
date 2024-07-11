@@ -302,7 +302,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//pru1dataMem_int[2]// Current IEP timer sample
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[2]);
-				this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
+				// Correct for interrupt handling time might add a bias in the estimation/reading
+				//this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
 				// Unwrap
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}				
@@ -405,7 +406,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		}
 		
 		// Information
-		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(8*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%(128*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
+		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%(128*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			//cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			//cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
