@@ -327,7 +327,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					
 					// Compute error - Absolute correction				
 					this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))-this->PRUcurrentTimerValWrap;
-					this->PRUoffsetDriftError=0.0;// Deactivate error calculation
+					//this->PRUoffsetDriftError=0.0;// Deactivate error calculation
 					// Autocompensating the error with the relative frequency offset
 					if (this->EstimateSynch>0.0){
 						//this->PRUoffsetDriftError=this->PRUoffsetDriftError/this->EstimateSynch;// compensating by the relative frequency difference
@@ -500,7 +500,7 @@ int GPIO::PRUsignalTimerSynch(){
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[2]);
 				// Discounting the time to enter the interrupt to measure the deviation is not a good idea because it introduces more error and besides in general de time between measurements is autocorrected for deviations.
-				this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
+				//this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
 				// Unwrap
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
