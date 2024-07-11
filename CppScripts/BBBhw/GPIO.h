@@ -206,6 +206,7 @@ private:// Variables
 	double AdjPulseSynchCoeff=1.0;
 	double AdjPulseSynchCoeffAverage=1.0;
 	double AdjPulseSynchPeriodicCorrectionCoeffAverage=1.0;
+	long double AccumulatedErrorDrift=0.0;
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
 
 public:	// Functions/Methods
