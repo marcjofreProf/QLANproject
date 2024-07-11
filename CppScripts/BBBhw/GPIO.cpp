@@ -324,7 +324,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					duration_FinalInitialCountAuxArrayAvg=DoubleMedianFilterSubArray(duration_FinalInitialCountAuxArray,NumSynchMeasAvgAux);
 					//// Compute error - Relative correction
 					this->PRUoffsetDriftError=(static_cast<double>(this->iIterPRUcurrentTimerValPass)*static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOldWrap+1*this->PRUoffsetDriftErrorAppliedOldRaw));	
-					this->PRUoffsetDriftError=0.0;// Deactivate error calculation
+					this->PRUoffsetDriftError=0.0;// Deactivate error calculation. Touching the IEP counter migt not be a good idea, pre-compensate in the signals generation
 					// Compute error - Absolute correction				
 					//this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))-this->PRUcurrentTimerValWrap;
 					//this->PRUoffsetDriftError=0.0;// Deactivate error calculation
@@ -632,11 +632,11 @@ this->ManualSemaphore=true;// Very critical to not produce measurement deviation
 this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 //this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 // Apply a slotted synch configuration (like synchronized Ethernet)
-//this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
+this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 TimePoint TimePointFutureSynch=Clock::now();
 
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-pru1dataMem_int[2]=static_cast<unsigned int>(FineSynchAdjOffVal)+static_cast<unsigned int>((static_cast<unsigned long long int>(FineSynchAdjFreqVal)*(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/TimePRU1synchPeriod))%static_cast<unsigned long long int>(SynchTrigPeriod));//static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+static_cast<long long int>(FineSynchAdjOffVal)+(static_cast<unsigned long long int>(FineSynchAdjFreqVal)*this->iIterPRUcurrentTimerVal)%static_cast<unsigned long long int>(SynchTrigPeriod));// Regular offset of trig signal//static_cast<unsigned int>(// Use it to indicate some offset for time. It is dependent for each node and channel. With respect SynchTrigPeriod sp that it can be extra or less. It has to be changing to adjust the variation as a frequency offset
+pru1dataMem_int[2]=static_cast<unsigned int>((static_cast<unsigned long long int>(FineSynchAdjOffVal)+static_cast<unsigned long long int>(this->SynchTrigPeriod/this->AdjPulseSynchPeriodicCorrectionCoeffAverage)+static_cast<unsigned long long int>(FineSynchAdjFreqVal)*(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/TimePRU1synchPeriod))%static_cast<unsigned long long int>(SynchTrigPeriod));//static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+static_cast<long long int>(FineSynchAdjOffVal)+(static_cast<unsigned long long int>(FineSynchAdjFreqVal)*this->iIterPRUcurrentTimerVal)%static_cast<unsigned long long int>(SynchTrigPeriod));// Regular offset of trig signal//static_cast<unsigned int>(// Use it to indicate some offset for time. It is dependent for each node and channel. With respect SynchTrigPeriod sp that it can be extra or less. It has to be changing to adjust the variation as a frequency offset
 pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command. Generate signals
 
