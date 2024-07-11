@@ -207,6 +207,7 @@ private:// Variables
 	double AdjPulseSynchCoeffAverage=1.0;
 	double AdjPulseSynchPeriodicCorrectionCoeffAverage=1.0;
 	long double AccumulatedErrorDrift=0.0;
+	long double AccumulatedErrorDriftAux=0.0;
 	long double SignAux=0.0;
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
 

@@ -316,7 +316,11 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				this->ManualSemaphoreExtra=true;
 					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
 					this->AdjPulseSynchPeriodicCorrectionCoeffAverage=this->EstimateSynchAvg; // Handler to this value inside the protected part
-					this->AccumulatedErrorDrift=static_cast<long double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds)*(1.0-static_cast<long double>(this->EstimateSynchAvg));
+					this->AccumulatedErrorDriftAux=this->AccumulatedErrorDrift+(static_cast<long double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds)*(1.0-static_cast<long double>(this->EstimateSynchAvg)));
+					if (this->AccumulatedErrorDriftAux>0.0){SignAux=1.0;}
+					else if (this->AccumulatedErrorDriftAux<0.0){SignAux=-1.0;}
+					else {SignAux=0.0;}
+					this->AccumulatedErrorDrift=SignAux*fmodl(abs(this->AccumulatedErrorDriftAux),static_cast<long double>(SynchTrigPeriod));
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
 				this->release();
@@ -638,10 +642,7 @@ this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 TimePoint TimePointFutureSynch=Clock::now();
 
 pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-if (AccumulatedErrorDrift>0.0){SignAux=1.0;}
-else if (AccumulatedErrorDrift<0.0){SignAux=-1.0;}
-else {SignAux=0.0;}
-pru1dataMem_int[2]=static_cast<unsigned int>(FineSynchAdjOffVal)+(static_cast<unsigned int>(static_cast<long double>(SynchTrigPeriod)+SignAux*fmodl(abs(AccumulatedErrorDrift),static_cast<long double>(SynchTrigPeriod))))+static_cast<unsigned int>((static_cast<unsigned long long int>(FineSynchAdjFreqVal)*(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/TimePRU1synchPeriod))%static_cast<unsigned long long int>(SynchTrigPeriod));//static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+static_cast<long long int>(FineSynchAdjOffVal)+(static_cast<unsigned long long int>(FineSynchAdjFreqVal)*this->iIterPRUcurrentTimerVal)%static_cast<unsigned long long int>(SynchTrigPeriod));// Regular offset of trig signal//static_cast<unsigned int>(// Use it to indicate some offset for time. It is dependent for each node and channel. With respect SynchTrigPeriod sp that it can be extra or less. It has to be changing to adjust the variation as a frequency offset
+pru1dataMem_int[2]=static_cast<unsigned int>(FineSynchAdjOffVal)+(static_cast<unsigned int>(static_cast<long double>(SynchTrigPeriod)+this->AccumulatedErrorDrift))+static_cast<unsigned int>((static_cast<unsigned long long int>(FineSynchAdjFreqVal)*(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/TimePRU1synchPeriod))%static_cast<unsigned long long int>(SynchTrigPeriod));//static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+static_cast<long long int>(FineSynchAdjOffVal)+(static_cast<unsigned long long int>(FineSynchAdjFreqVal)*this->iIterPRUcurrentTimerVal)%static_cast<unsigned long long int>(SynchTrigPeriod));// Regular offset of trig signal//static_cast<unsigned int>(// Use it to indicate some offset for time. It is dependent for each node and channel. With respect SynchTrigPeriod sp that it can be extra or less. It has to be changing to adjust the variation as a frequency offset
 pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command. Generate signals
 
