@@ -15,6 +15,9 @@ is_rt_kernel
 # Set variable based on function return value
 is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 
+# Nicenest value [-20, 20]
+NicenestPriorValue=-10
+
 cleanup_on_SIGINT() {
   echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
   # Kill potentially previously running processes
