@@ -84,10 +84,11 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 //////////////////////////////////////////////////////////////////////////
 bool CKPD::setMaxRrPriority(){// For rapidly handling interrupts
 int max_priority=sched_get_priority_max(SCHED_FIFO);
+int Nice_priority=10;
 // SCHED_RR: Round robin
 // SCHED_FIFO: First-In-First-Out
 sched_param sch_params;
-sch_params.sched_priority = max_priority;
+sch_params.sched_priority = Nice_priority;
 if (sched_setscheduler(0,SCHED_FIFO,&sch_params)==-1){
 	cout <<" Failed to set maximum real-time priority." << endl;
 	return false;
@@ -164,7 +165,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	//prussdrv_pru_enable(PRU_ClockPhys_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
-	//this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread. It stalls operation RealTime Kernel (commented, then)
+	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread. It stalls operation RealTime Kernel (commented, then)
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=ClockWatch::now();
 	// Absolute time reference	
