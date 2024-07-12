@@ -16,6 +16,9 @@ is_rt_kernel
 # Set variable based on function return value
 is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 
+# Nicenest value [-20, 20]
+NicenestPriorValue=-10
+
 cleanup_on_SIGINT() {
   echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
   # Kill potentially previously running processes
@@ -49,35 +52,35 @@ sleep 1 # wait 1 second to make sure to kill the old processes
 ########################################################
 if [[ $is_rt_kernel -eq 1 ]]; then
   pidAux=$(pgrep -f "irq/22-TI-am335")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/22-s-TI-am3")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   
   pidAux=$(pgrep -f "irq/59-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/60-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/61-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/62-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/63-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/64-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/65-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/66-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
 else
   pidAux=$(pgrep -f "irq/66-TI-am335")
   #sudo chrt -f -p 1 $pidAux
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
 fi
 
 pidAux=$(pidof -s ptp0)
 sudo chrt -f -p 1 $pidAux
-sudo renice -n -20 $pidAux
+sudo renice -n $NicenestPriorValue $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
 
@@ -99,7 +102,7 @@ sudo pmc -u -b 0 -t 1 "SET GRANDMASTER_SETTINGS_NP clockClass 248 \
 #sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
 
-sudo nice -n -20 ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
+sudo nice -n $NicenestPriorValue ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
 pidAux=$(pgrep -f "ptp4l")
 sudo chrt -f -p 1 $pidAux
 
@@ -108,7 +111,7 @@ sudo systemctl enable systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
 sudo timedatectl set-ntp true # Start NTP
-sudo nice -n -20 ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP4lConfigQLANprojectMaster.cfg & -m
+sudo nice -n $NicenestPriorValue ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP4lConfigQLANprojectMaster.cfg & -m
 pidAux=$(pgrep -f "phc2sys")
 sudo chrt -f -p 1 $pidAux
 
@@ -116,7 +119,7 @@ sudo chrt -f -p 1 $pidAux
 #sudo timedatectl set-ntp false
 #sudo systemctl stop systemd-timesyncd # stop system synch
 #sudo systemctl disable systemd-timesyncd # start system synch
-#sudo nice -n -20 ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m
+#sudo nice -n $NicenestPriorValue ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m
 #pidAux=$(pgrep -f "ph2sys")
 #sudo chrt -f -p 1 $pidAux
 
