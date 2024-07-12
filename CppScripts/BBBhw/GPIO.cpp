@@ -316,11 +316,33 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				this->ManualSemaphoreExtra=true;
 					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
 					this->AdjPulseSynchPeriodicCorrectionCoeffAverage=this->EstimateSynchAvg; // Handler to this value inside the protected part
-					this->AccumulatedErrorDriftAux=this->AccumulatedErrorDrift+(static_cast<long double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds)*(1.0-static_cast<long double>(this->EstimateSynchAvg)));
-					if (this->AccumulatedErrorDriftAux>0.0){SignAux=1.0;}
-					else if (this->AccumulatedErrorDriftAux<0.0){SignAux=-1.0;}
+					
+					
+					this->PRUoffsetDriftError=(static_cast<double>(this->iIterPRUcurrentTimerValPass)*static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOldWrap+0*this->PRUoffsetDriftErrorAppliedOldRaw));	
+					//this->PRUoffsetDriftError=0.0;// Deactivate error calculation. Touching the IEP counter migt not be a good idea, pre-compensate in the signals generation
+					// Compute error - Absolute correction				
+					this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))-this->PRUcurrentTimerValWrap;
+					//this->PRUoffsetDriftError=0.0;// Deactivate error calculation
+					// Autocompensating the error with the relative frequency offset
+					//if (this->EstimateSynch>0.0){
+					//	//this->PRUoffsetDriftError=this->PRUoffsetDriftError/this->EstimateSynch;// compensating by the relative frequency difference
+					//	this->PRUoffsetDriftError=this->PRUoffsetDriftError*this->EstimateSynch;// compensating by the relative frequency difference
+					//}
+					// Error averaging
+					if (this->PRUoffsetDriftError>0.0){SignAux=1.0;}
+					else if (this->PRUoffsetDriftError<0.0){SignAux=-1.0;}
 					else {SignAux=0.0;}
-					this->AccumulatedErrorDrift=0.0;//SignAux*fmodl(abs(this->AccumulatedErrorDriftAux),static_cast<long double>(SynchTrigPeriod));
+					
+					this->AccumulatedErrorDriftAux=SignAux*fmodl(abs(this->PRUoffsetDriftError),static_cast<long double>(SynchTrigPeriod));;
+					
+					
+					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->AccumulatedErrorDriftAux;//static_cast<double>(fmodl(static_cast<long double>(SynchTrigPeriod)/2.0+static_cast<long double>(this->PRUoffsetDriftError),static_cast<long double>(SynchTrigPeriod)))-static_cast<long double>(SynchTrigPeriod)/2.0;// protection agains large errors
+					//if (this->iIterPRUcurrentTimerVal<NumSynchMeasAvgAux){this->PRUoffsetDriftErrorAvg=this->PRUoffsetDriftError;}
+					//else{this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);}				
+					
+					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
+					
+					this->AccumulatedErrorDrift=this->PRUoffsetDriftErrorAvg;//
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
 				this->release();
@@ -328,8 +350,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					duration_FinalInitialCountAuxArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->duration_FinalInitialCountAux;
 					duration_FinalInitialCountAuxArrayAvg=DoubleMedianFilterSubArray(duration_FinalInitialCountAuxArray,NumSynchMeasAvgAux);
 					//// Compute error - Relative correction
-					this->PRUoffsetDriftError=(static_cast<double>(this->iIterPRUcurrentTimerValPass)*static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOldWrap+1*this->PRUoffsetDriftErrorAppliedOldRaw));	
-					this->PRUoffsetDriftError=0.0;// Deactivate error calculation. Touching the IEP counter migt not be a good idea, pre-compensate in the signals generation
+					//this->PRUoffsetDriftError=(static_cast<double>(this->iIterPRUcurrentTimerValPass)*static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOldWrap+0*this->PRUoffsetDriftErrorAppliedOldRaw));	
+					//this->PRUoffsetDriftError=0.0;// Deactivate error calculation. Touching the IEP counter migt not be a good idea, pre-compensate in the signals generation
 					// Compute error - Absolute correction				
 					//this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))-this->PRUcurrentTimerValWrap;
 					//this->PRUoffsetDriftError=0.0;// Deactivate error calculation
@@ -339,11 +361,11 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//	this->PRUoffsetDriftError=this->PRUoffsetDriftError*this->EstimateSynch;// compensating by the relative frequency difference
 					//}
 					// Error averaging
-					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;//static_cast<double>(fmodl(static_cast<long double>(SynchTrigPeriod)/2.0+static_cast<long double>(this->PRUoffsetDriftError),static_cast<long double>(SynchTrigPeriod)))-static_cast<long double>(SynchTrigPeriod)/2.0;// protection agains large errors
+					//this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;//static_cast<double>(fmodl(static_cast<long double>(SynchTrigPeriod)/2.0+static_cast<long double>(this->PRUoffsetDriftError),static_cast<long double>(SynchTrigPeriod)))-static_cast<long double>(SynchTrigPeriod)/2.0;// protection agains large errors
 					//if (this->iIterPRUcurrentTimerVal<NumSynchMeasAvgAux){this->PRUoffsetDriftErrorAvg=this->PRUoffsetDriftError;}
 					//else{this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);}				
 					
-					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
+					//this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
 							
 					// Estimate synch direction
 					this->EstimateSynchDirection=((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw))-((this->PRUcurrentTimerValOldWrap+0*this->PRUoffsetDriftErrorAppliedOldRaw)+((static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)+0*duration_FinalInitialCountAux)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
