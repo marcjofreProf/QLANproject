@@ -320,7 +320,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					if (this->AccumulatedErrorDriftAux>0.0){SignAux=1.0;}
 					else if (this->AccumulatedErrorDriftAux<0.0){SignAux=-1.0;}
 					else {SignAux=0.0;}
-					this->AccumulatedErrorDrift=SignAux*fmodl(abs(this->AccumulatedErrorDriftAux),static_cast<long double>(SynchTrigPeriod));
+					this->AccumulatedErrorDrift=0.0;//SignAux*fmodl(abs(this->AccumulatedErrorDriftAux),static_cast<long double>(SynchTrigPeriod));
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
 				this->release();
