@@ -321,7 +321,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//this->PRUoffsetDriftError=(static_cast<double>(this->iIterPRUcurrentTimerValPass)*static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOldWrap+0*this->PRUoffsetDriftErrorAppliedOldRaw));	
 					//this->PRUoffsetDriftError=0.0;// Deactivate error calculation. Touching the IEP counter migt not be a good idea, pre-compensate in the signals generation
 					// Compute error - Relative correction				
-					this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerValPass)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerValWrap-1*this->PRUcurrentTimerValOldWrap))*(static_cast<long double>(SynchTrigPeriod)/(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds))))*this->EstimateSynchAvg;
+					this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerValPass)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerValWrap-1*this->PRUcurrentTimerValOldWrap))*(static_cast<long double>(SynchTrigPeriod)/(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds))));
 					// Compute error - Absolute correction				
 					//this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerVal)*this->TimePRU1synchPeriod)+1.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerValWrap-0*this->PRUcurrentTimerValOldWrap))*(static_cast<long double>(SynchTrigPeriod)/(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds))));
 					
@@ -762,7 +762,11 @@ OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCount
 //this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinal.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds));
 
 // Slot the TimeTaggsLast
-this->TimeTaggsLast=static_cast<unsigned long long int>(ceil((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))/static_cast<long double>(SynchTrigPeriod))*static_cast<long double>(SynchTrigPeriod));
+//this->TimeTaggsLast=static_cast<unsigned long long int>(ceil((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))/static_cast<long double>(SynchTrigPeriod))*static_cast<long double>(SynchTrigPeriod));
+
+this->TimeTaggsLast=static_cast<unsigned long long int>(ceil((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinal.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))/static_cast<long double>(SynchTrigPeriod))*static_cast<long double>(SynchTrigPeriod));
+
+//this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinal.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds));
 
 //else{Use the latest used, so do not update
 //}
