@@ -321,7 +321,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//this->PRUoffsetDriftError=(static_cast<double>(this->iIterPRUcurrentTimerValPass)*static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOldWrap+0*this->PRUoffsetDriftErrorAppliedOldRaw));	
 					//this->PRUoffsetDriftError=0.0;// Deactivate error calculation. Touching the IEP counter migt not be a good idea, pre-compensate in the signals generation
 					// Compute error - Relative correction				
-					this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerValPass)*this->TimePRU1synchPeriod)+0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerValWrap-1*this->PRUcurrentTimerValOldWrap)));//*(static_cast<long double>(SynchTrigPeriod)/(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds))));
+					this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerValPass)*this->TimePRU1synchPeriod)+0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerValWrap-1*this->PRUcurrentTimerValOldWrap))*(static_cast<long double>(SynchTrigPeriod)/(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds))));
 					// Compute error - Absolute correction				
 					//this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerVal)*this->TimePRU1synchPeriod)+1.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerValWrap-0*this->PRUcurrentTimerValOldWrap))*(static_cast<long double>(SynchTrigPeriod)/(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds))));
 					
@@ -438,7 +438,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		}
 		
 		// Information
-		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(1*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%(128*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
+		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(128*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%(128*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			////cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			////cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			//cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
