@@ -176,9 +176,9 @@ PERIODICTIMESYNCHSUB: // with command coded 2 means synch by reseting the IEP ti
 	JMP	CMDLOOP
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	// Since there is a dead period betwen pulses (to do management), divide the period by 2
-	LSR	r7, r7, 1
+	LSR	r9, r7, 1
 	// Compute DELAY value
-	SUB	r9, r7, 4
+	SUB	r9, r9, 4
 	LSR	r9, r9, 1
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	SUB	r6, r7, 1 // Generate the value for r6
