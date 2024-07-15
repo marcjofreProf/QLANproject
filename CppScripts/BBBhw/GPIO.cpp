@@ -234,7 +234,7 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 //////////////////////////////////////////////
 struct timespec GPIO::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
-	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod)-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
+	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod);//-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentSynchPRU1future.time_since_epoch();
 	// Convert duration to desired time
 	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()-this->TimeClockMarging; // Add an offset, since the final barrier is implemented with a busy wait
@@ -273,8 +273,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//}
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
 				pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command											
-				
-				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
+				this->TimePointClockSendCommandInitial=this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
+				while(Clock::now() < this->TimePointClockSendCommandInitial);// Busy waiting
 				////this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info. Already computed in the steps before				// Important, the following line at the very beggining to reduce the command jitter				
 				prussdrv_pru_send_event(22);
 				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
@@ -292,7 +292,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					cout << "PRU1 interrupt error" << endl;
 				}							
 				
-				int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-TimePointClockCurrentSynchPRU1future).count());
+				int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-this->TimePointClockSendCommandInitial).count());
 				duration_FinalInitialCountAux=static_cast<double>(duration_FinalInitialMeasTrig);
 				
 				// Below for the triggering
