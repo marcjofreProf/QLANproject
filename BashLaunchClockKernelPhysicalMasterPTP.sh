@@ -30,11 +30,11 @@ NicenestPriorValue=-10
 
 cleanup_on_SIGINT() {
   echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
-  if [[ $is_rt_kernel -eq 0 ]]; then
-	  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip7/pwm-7\:0/enable"
-	  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip4/pwm-4\:0/enable"
-	  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip1/pwm-1\:0/enable" 
-  fi
+  #if [[ $is_rt_kernel -eq 0 ]]; then
+  #	  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip7/pwm-7\:0/enable"
+  #	  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip4/pwm-4\:0/enable"
+  #	  sudo sh -c "echo '0' >> /sys/class/pwm/pwmchip1/pwm-1\:0/enable" 
+  #fi
   # Kill potentially previously running processes
   sudo pkill -f ptp4l
   sudo pkill -f phc2sys
@@ -124,7 +124,7 @@ sudo chrt -f -p 1 $pidAux
 #sudo systemctl daemon-reload
 #sudo timedatectl set-ntp true # Start NTP
 #sudo nice -n $NicenestPriorValue ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # Important to launch phc2sys first
-#pidAux=$(pgrep -f "ph2sys")
+#pidAux=$(pgrep -f "phc2sys")
 #sudo chrt -f -p 1 $pidAux
 
 ## If synch to the RTC of the system, stop the NTP. The quality of the internal crystal/clock matters
@@ -132,7 +132,7 @@ sudo timedatectl set-ntp false
 sudo systemctl stop systemd-timesyncd # stop system synch
 sudo systemctl disable systemd-timesyncd # start system synch
 sudo nice -n $NicenestPriorValue ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # Important to launch phc2sys first
-pidAux=$(pgrep -f "ph2sys")
+pidAux=$(pgrep -f "phc2sys")
 sudo chrt -f -p 1 $pidAux
 
 #echo 'Enabling PWM for 24 MHz ref clock'
