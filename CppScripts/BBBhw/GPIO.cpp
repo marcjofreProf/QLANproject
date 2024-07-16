@@ -327,7 +327,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//this->PRUoffsetDriftError=(static_cast<double>(this->iIterPRUcurrentTimerValPass)*static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))-((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOldWrap+0*this->PRUoffsetDriftErrorAppliedOldRaw));	
 					//this->PRUoffsetDriftError=0.0;// Deactivate error calculation. Touching the IEP counter migt not be a good idea, pre-compensate in the signals generation
 					// Compute error - Relative correction				
-					this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerValPass)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerValWrap-1*this->PRUcurrentTimerValOldWrap))*(static_cast<long double>(SynchTrigPeriod)/(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds))));
+					this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerValPass)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerValWrap-1*this->PRUcurrentTimerValOldWrap))*(static_cast<long double>(SynchTrigPeriod)/static_cast<long double>(TimePRU1synchPeriod)));
 					// Compute error - Absolute correction				
 					//this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerVal)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerValWrap-0*this->PRUcurrentTimerValOldWrap))*(static_cast<long double>(SynchTrigPeriod)/(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds))));
 					
@@ -374,9 +374,9 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
 							
 					// Estimate synch direction
-					this->EstimateSynchDirection=((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw))-((this->PRUcurrentTimerValOldWrap+0*this->PRUoffsetDriftErrorAppliedOldRaw)+((static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)+0*duration_FinalInitialCountAux)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
-					EstimateSynchDirectionArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynchDirection;
-					this->EstimateSynchDirectionAvg=DoubleMedianFilterSubArray(EstimateSynchDirectionArray,NumSynchMeasAvgAux);					
+					//this->EstimateSynchDirection=((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-(this->PRUcurrentTimerValOldWrap+0*this->PRUoffsetDriftErrorAppliedOldRaw))-((static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)+0*duration_FinalInitialCountAux)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+					//EstimateSynchDirectionArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynchDirection;
+					this->EstimateSynchDirectionAvg=this->AdjPulseSynchPeriodicCorrectionCoeffAverage;//DoubleMedianFilterSubArray(EstimateSynchDirectionArray,NumSynchMeasAvgAux);					
 					
 					//// PID error computation to correct for signal PRU 1 generation													
 					//this->PIDcontrolerTimeJiterlessInterrupt();// Acting on the IEP timer produces jitter. Compute parameters for PID adjustment. Do not apply correction since the code has evolved that the signal synchronization is done in system space!!! Nevertheless, it can be applied, to correct small time differences when entering into triggering the signal, so the period of interest should be less than the overall large period and at least larger than the time to enter the interrupt for signal triggering. In this way, absolute continuous drift does not occur
@@ -451,8 +451,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 			////cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 			cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
 			////cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
-			if (this->EstimateSynchDirectionAvg>0.0){cout << "Clock EstimateSynch advancing" << endl;}
-			else if (this->EstimateSynchDirectionAvg<0.0){cout << "Clock EstimateSynch delaying" << endl;}
+			if (this->EstimateSynchDirectionAvg<1.0){cout << "Clock EstimateSynch advancing" << endl;}
+			else if (this->EstimateSynchDirectionAvg>1.0){cout << "Clock EstimateSynch delaying" << endl;}
 			else{cout << "Clock EstimateSynch neutral" << endl;}
 			////cout << "duration_FinalInitialDriftAux: " << duration_FinalInitialDriftAux << endl;
 			////cout << "this->iIterPRUcurrentTimerValPass: "<< this->iIterPRUcurrentTimerValPass << endl;
