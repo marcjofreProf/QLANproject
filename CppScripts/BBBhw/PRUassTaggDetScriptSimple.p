@@ -135,8 +135,8 @@ INITIATIONS:// This is only run once
 //	SBCO 	r7, CONST_IETREG, 0x08, 4
 	
 CMDLOOP:
-	QBBC	CMDLOOP, r31, 30	// Reception or not of the host interrupt
-	SBCO	r7.b0, C0, 0x24, 1 // Reset host interrupt	
+//	QBBC	CMDLOOP, r31, 30	// Reception or not of the host interrupt
+//	SBCO	r7.b0, C0, 0x24, 1 // Reset host interrupt	
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 1 bytes. It is the command to start
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
