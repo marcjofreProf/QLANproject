@@ -709,7 +709,7 @@ this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]
 this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
 this->TrigAuxIterCount++;
 
-//cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
+cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 //cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
 cout << "pru1dataMem_int2aux: " << pru1dataMem_int2aux << endl;
 //cout << "SynchRem: " << SynchRem << endl;
