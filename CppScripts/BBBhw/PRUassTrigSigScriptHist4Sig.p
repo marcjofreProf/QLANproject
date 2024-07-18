@@ -133,13 +133,13 @@ CMDLOOP:
 	// We remove the interrupt from the host (in case there is a reset from host, we are saved)
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
-	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 4, and 1 bytes
+	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 4, and 1 bytes
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction	
 	// Read the number of NUM_REPETITIONS from positon 0 of PRU1 DATA RAM and stored it
-	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Load number of repetitons of the signal
+	LBCO 	r1, CONST_PRUDRAM, 4, 4 // Load number of repetitons of the signal
 	LBCO	r8, CONST_PRUDRAM, 8, 4 // Load from PRU RAM position the extra delay
 	LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction or sequence signal period
-	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // We remove the command from the host (in case there is a reset from host, we are saved) 1 bytes.	
+	SBCO	r4.b0, CONST_PRUDRAM, 0, 1 // We remove the command from the host (in case there is a reset from host, we are saved) 1 bytes.	
 	//MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Here send interrupt to host to measure time
 	// Start executing	
 	QBEQ	PSEUDOSYNCH, r0.b0, 1 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
