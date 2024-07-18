@@ -327,9 +327,9 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->AdjPulseSynchPeriodicCorrectionCoeffAverage=this->EstimateSynchAvg; // Handler to this value inside the protected part					
 					
 					// Compute error - Relative correction				
-					//this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerValPass)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerVal-1*this->PRUcurrentTimerValOldWrap))/(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds)));
+					//this->PRUoffsetDriftError=static_cast<double>((-fmodl((static_cast<long double>((this->iIterPRUcurrentTimerValPass)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal-1*this->PRUcurrentTimerValOldWrap))/(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds)));
 					// Compute error - Absolute correction				
-					this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerVal)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerValWrap-0*this->PRUcurrentTimerValOldWrap)));///(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds)));
+					this->PRUoffsetDriftError=static_cast<double>((-fmodl((static_cast<long double>((this->iIterPRUcurrentTimerVal)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerValWrap-0*this->PRUcurrentTimerValOldWrap)));///(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds)));
 					
 					//this->PRUoffsetDriftError=0.0;// Deactivate error calculation
 					// Autocompensating the error with the relative frequency offset
@@ -790,7 +790,7 @@ valpAux++;// 1 times 8 bits
 
 // Reading first calibration tag and link it to the system clock
 OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
-cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl;
+//cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl;
 
 // Slot the final time - to remove interrupt jitter
 //std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(static_cast<long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinal.time_since_epoch()).count()-duration_InterruptTag)/static_cast<long double>(PRUclockStepPeriodNanoseconds))*static_cast<long double>(PRUclockStepPeriodNanoseconds)));
