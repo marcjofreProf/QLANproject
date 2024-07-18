@@ -96,8 +96,8 @@ INITIATIONS:
 	MOV 	r0, 0x24924
 	SBCO 	r0, CONST_PRUCFG, 0x10, 4 
 	//LBCO	r2, CONST_IETREG, 0, 1 //
-	//SET ocp_clk:1 or of iep_clk:0// It is important ot select the clock source to be in synch with the PRU clock. I believe it should be ocp_clk
-	LDI	r0, 1
+	//SET ocp_clk:1 or of iep_clk:0// It is important ot select the clock source to be in synch with the PRU clock. Seems that with iep_clk much better?
+	LDI	r0, 0
 	SBCO 	r0, CONST_PRUCFG, 0x30, 4
 	// IEP configuration
 	MOV	r0, 0x111 // Enable and Define increment value to 1
