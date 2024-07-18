@@ -700,8 +700,6 @@ this->TimePointClockSynchPRUfinal=Clock::now();
 // We have to define a command, compatible with the memory space of PRU0 to tell PRU1 to initiate signals
 //  PRU long execution making sure that notification interrupts do not overlap
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
-//pru1dataMem_int[1]=static_cast<unsigned int>(this->NextSynchPRUcommand); // set command computed in synch process
-//pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// Re-insert the correction for next cycle
 
 // Synch trig part
 int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSynchPRUfinal-TimePointFutureSynch).count());
@@ -1282,8 +1280,8 @@ else{
 
 int GPIO::SendTriggerSignalsSelfTest(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 // Important, the following line at the very beggining to reduce the command jitter
-pru1dataMem_int[0]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-pru1dataMem_int[1]=static_cast<unsigned int>(1); // set command
+pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
+pru1dataMem_int[0]=static_cast<unsigned int>(1); // set command
 prussdrv_pru_send_event(22);//pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals//prussdrv_pru_send_event(22);
 
 // Here there should be the instruction command to tell PRU1 to start generating signals
