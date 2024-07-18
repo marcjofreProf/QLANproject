@@ -338,11 +338,15 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//	this->PRUoffsetDriftError=this->PRUoffsetDriftError*this->EstimateSynch;// compensating by the relative frequency difference
 					//}
 					// Error averaging
-					if (this->PRUoffsetDriftError>0.0){SignAux=1.0;}
-					else if (this->PRUoffsetDriftError<0.0){SignAux=-1.0;}
-					else {SignAux=0.0;}
 					
-					// Aboslute error
+					
+					// Relative error
+					this->AccumulatedErrorDriftAux=this->PRUoffsetDriftError;
+					
+					// Absolute error
+					//if (this->PRUoffsetDriftError>0.0){SignAux=1.0;}
+					//else if (this->PRUoffsetDriftError<0.0){SignAux=-1.0;}
+					//else {SignAux=0.0;}
 					//this->AccumulatedErrorDriftAux=SignAux*fmodl(abs(this->PRUoffsetDriftError),static_cast<double>(SynchTrigPeriod));
 					
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=this->AccumulatedErrorDriftAux;//static_cast<double>(fmodl(static_cast<long double>(SynchTrigPeriod)/2.0+static_cast<long double>(this->PRUoffsetDriftError),static_cast<long double>(SynchTrigPeriod)))-static_cast<long double>(SynchTrigPeriod)/2.0;// protection agains large errors
