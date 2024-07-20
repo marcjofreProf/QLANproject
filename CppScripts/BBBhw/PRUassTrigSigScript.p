@@ -118,8 +118,8 @@ INITIATIONS:
 //	LED_OFF	// just for signaling initiations
 
 CMDLOOP:
-//	QBBC	CMDLOOP, r31, 31
-//	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
+	QBBC	CMDLOOP, r31, 31
+	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction	
