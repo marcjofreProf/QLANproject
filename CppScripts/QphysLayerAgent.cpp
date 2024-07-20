@@ -423,8 +423,7 @@ else{
 }
 this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum priority
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
-
-while (Clock::now() < this->FutureTimePoint);// Busy wait.
+//while (Clock::now() < this->FutureTimePoint);// Busy wait.
 
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 
@@ -502,7 +501,7 @@ else{
 this->acquire();
 // So that there are no segmentation faults by grabbing the CLOCK REALTIME and also this has maximum priority
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrier
-while (Clock::now() < this->FutureTimePoint);// Busy wait 
+//while (Clock::now() < this->FutureTimePoint);// Busy wait 
 
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
 
