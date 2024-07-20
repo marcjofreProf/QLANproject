@@ -633,7 +633,7 @@ TimePointClockTagPRUinitial=TimePointClockTagPRUinitial+std::chrono::nanoseconds
 //pru0dataMem_int[3]=static_cast<unsigned int>((static_cast<unsigned long long int>((static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(this->AccumulatedErrorDrift))*static_cast<long double>(static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial-TimePointClockPRUinitial).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))%static_cast<unsigned long long int>(iepPRUtimerRange32bits))))%static_cast<unsigned long long int>(2*SynchTrigPeriod));
 
 // Absolute error
-unsigned int pru0dataMem_int3aux=static_cast<unsigned int>(static_cast<unsigned long long int>((static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(this->AccumulatedErrorDrift)))%static_cast<unsigned long long int>(2*SynchTrigPeriod));
+//unsigned int pru0dataMem_int3aux=static_cast<unsigned int>(static_cast<unsigned long long int>((static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(this->AccumulatedErrorDrift)))%static_cast<unsigned long long int>(2*SynchTrigPeriod));
 pru0dataMem_int[3]=static_cast<unsigned int>(static_cast<unsigned long long int>((static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(this->AccumulatedErrorDrift)))%static_cast<unsigned long long int>(2*SynchTrigPeriod));//static_cast<unsigned int>((static_cast<unsigned long long int>((static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(this->AccumulatedErrorDrift))*static_cast<long double>(static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial-TimePointClockSendCommandFinal).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))%static_cast<unsigned long long int>(iepPRUtimerRange32bits))))%static_cast<unsigned long long int>(2*SynchTrigPeriod));
 
 TimePointClockTagPRUinitial=TimePointClockTagPRUinitial-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
@@ -652,11 +652,11 @@ retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterrupt
 //this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
 //this->TrigAuxIterCount++;
 
-cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
-//cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
-cout << "pru0dataMem_int3aux: " << pru0dataMem_int3aux << endl;
-//cout << "SynchRem: " << SynchRem << endl;
-cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
+//cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
+////cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
+//cout << "pru0dataMem_int3aux: " << pru0dataMem_int3aux << endl;
+////cout << "SynchRem: " << SynchRem << endl;
+//cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 
 this->ManualSemaphore=false;
 this->ManualSemaphoreExtra=false;
@@ -707,7 +707,7 @@ pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // 
 //pru1dataMem_int[2]=static_cast<unsigned int>(FineSynchAdjOffVal)+static_cast<unsigned int>((static_cast<unsigned long long int>((static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(this->AccumulatedErrorDrift))*static_cast<long double>(static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockPRUinitial).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))%static_cast<unsigned long long int>(iepPRUtimerRange32bits))))%static_cast<unsigned long long int>(2*SynchTrigPeriod))+static_cast<unsigned int>((static_cast<unsigned long long int>(static_cast<long double>(FineSynchAdjFreqVal)*static_cast<long double>(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod))))%static_cast<unsigned long long int>(SynchTrigPeriod));//static_cast<unsigned int>(FineSynchAdjOffVal)+static_cast<unsigned int>((static_cast<unsigned long long int>((static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(this->AccumulatedErrorDrift))*static_cast<long double>(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockPRUinitial).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod))))%static_cast<unsigned long long int>(2*SynchTrigPeriod))+static_cast<unsigned int>((static_cast<unsigned long long int>(static_cast<long double>(FineSynchAdjFreqVal)*static_cast<long double>(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod))))%static_cast<unsigned long long int>(SynchTrigPeriod));
 
 // Absolute error
-unsigned int pru1dataMem_int2aux=static_cast<unsigned int>(FineSynchAdjOffVal)+static_cast<unsigned int>(static_cast<unsigned long long int>((static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(this->AccumulatedErrorDrift)))%static_cast<unsigned long long int>(2*SynchTrigPeriod))+static_cast<unsigned int>((static_cast<unsigned long long int>(static_cast<long double>(FineSynchAdjFreqVal)*static_cast<long double>(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod))))%static_cast<unsigned long long int>(SynchTrigPeriod));
+//unsigned int pru1dataMem_int2aux=static_cast<unsigned int>(FineSynchAdjOffVal)+static_cast<unsigned int>(static_cast<unsigned long long int>((static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(this->AccumulatedErrorDrift)))%static_cast<unsigned long long int>(2*SynchTrigPeriod))+static_cast<unsigned int>((static_cast<unsigned long long int>(static_cast<long double>(FineSynchAdjFreqVal)*static_cast<long double>(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod))))%static_cast<unsigned long long int>(SynchTrigPeriod));
 
 pru1dataMem_int[2]=static_cast<unsigned int>(FineSynchAdjOffVal)+static_cast<unsigned int>(static_cast<unsigned long long int>((static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(this->AccumulatedErrorDrift)))%static_cast<unsigned long long int>(2*SynchTrigPeriod))+static_cast<unsigned int>((static_cast<unsigned long long int>(static_cast<long double>(FineSynchAdjFreqVal)*static_cast<long double>(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod))))%static_cast<unsigned long long int>(SynchTrigPeriod));
 
@@ -732,11 +732,11 @@ this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]
 this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
 this->TrigAuxIterCount++;
 
-cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
-//cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
-cout << "pru1dataMem_int2aux: " << pru1dataMem_int2aux << endl;
-//cout << "SynchRem: " << SynchRem << endl;
-cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
+//cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
+////cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
+//cout << "pru1dataMem_int2aux: " << pru1dataMem_int2aux << endl;
+////cout << "SynchRem: " << SynchRem << endl;
+//cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 
 this->ManualSemaphore=false;
 this->ManualSemaphoreExtra=false;

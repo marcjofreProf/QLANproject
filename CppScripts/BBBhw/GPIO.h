@@ -125,7 +125,7 @@ private:// Variables
 	int duration_FinalInitialMeasTrigAuxArray[MaxNumPulses]={0};
 	int duration_FinalInitialMeasTrigAuxAvg=0;
 	unsigned long long int TrigAuxIterCount=0;	
-	unsigned long TimeClockMarging=500000;// In nanoseconds
+	unsigned long TimeClockMarging=1000;// In nanoseconds
 	unsigned long long int TimeClockMargingExtra=10*TimeClockMarging;// In nanoseconds
 	unsigned long long int TimeElpasedNow_time_as_count=0;
 	// PRU
