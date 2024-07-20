@@ -84,7 +84,7 @@ private: //Variables/Instances
 	using TimePoint = std::chrono::time_point<Clock>;
 	TimePoint FutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
 	TimePoint OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
-	unsigned long long int TimeClockMarging=0;//1000;// In nanoseconds. So that we can do a busy wait to be more accurate and responsive.
+	unsigned long long int TimeClockMarging=0;//100;// In nanoseconds. So that we can do a busy wait to be more accurate and responsive. If too large, it disastabilizes the timming performance
 	// Private threads
 	bool RunThreadSimulateEmitQuBitFlag=true;
 	bool RunThreadSimulateReceiveQuBitFlag=true;
