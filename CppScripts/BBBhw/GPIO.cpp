@@ -360,9 +360,14 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					
 					// Instant absolute error
 					this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerVal)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerValWrap-0*this->PRUcurrentTimerValOldWrap)));
-					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError;					
+					if (this->AdjPulseSynchPeriodicCorrectionCoeffAverage!=0.0 and this->iIterPRUcurrentTimerVal!=0){
+						this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError/(this->AdjPulseSynchPeriodicCorrectionCoeffAverage*static_cast<double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod));	
+					}
+					else{
+						this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=0.0;
+					}				
 					
-					this->AccumulatedErrorDrift=0.0;//DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraNumSynchMeasAvgAux);					
+					this->AccumulatedErrorDrift=(this->AdjPulseSynchPeriodicCorrectionCoeffAverage*static_cast<double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod))*DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraNumSynchMeasAvgAux);
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
 				this->release();					
