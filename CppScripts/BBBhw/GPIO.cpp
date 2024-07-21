@@ -235,7 +235,11 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 //////////////////////////////////////////////
 struct timespec GPIO::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
-	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
+	//this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
+	
+	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockTagPRUinitialOld+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
+	this->TimePointClockTagPRUinitialOld=Clock::now();
+	
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentSynchPRU1future.time_since_epoch();
 	// Convert duration to desired time
 	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()-this->TimeClockMarging-(2*TimePRUcommandDelay); // Add an offset, since the final barrier is implemented with a busy wait
@@ -249,6 +253,7 @@ struct timespec GPIO::SetWhileWait(){
 int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread. It stalls operation RealTime Kernel (commented, then)
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
+	this->TimePointClockTagPRUinitialOld=this->TimePointClockCurrentSynchPRU1future;
 	unsigned int SynchRem=static_cast<int>((static_cast<long double>(iepPRUtimerRange32bits)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(iepPRUtimerRange32bits)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(SynchRem);
 	this->TimePointClockPRUinitial=this->TimePointClockCurrentSynchPRU1future;// Initial reference value
