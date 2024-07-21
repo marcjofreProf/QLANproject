@@ -127,7 +127,7 @@ private:// Variables
 	unsigned long long int TrigAuxIterCount=0;	
 	unsigned long TimeClockMarging=100;// In nanoseconds. If too large, it disastabilizes the timming performance
 	unsigned long long int TimeClockMargingExtra=10*TimeClockMarging;// In nanoseconds
-	unsigned long TimePRUcommandDelay=225000;// In nanoseconds. If too large, it disastabilizes the timming performance
+	unsigned long TimePRUcommandDelay=250000;// In nanoseconds. If too large, it disastabilizes the timming performance
 	unsigned long long int TimeElpasedNow_time_as_count=0;
 	// PRU
 	static int mem_fd;
