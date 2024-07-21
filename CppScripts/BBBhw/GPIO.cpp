@@ -655,11 +655,11 @@ retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterrupt
 //this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
 //this->TrigAuxIterCount++;
 
-cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
+//cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 ////cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
 //cout << "pru0dataMem_int3aux: " << pru0dataMem_int3aux << endl;
 ////cout << "SynchRem: " << SynchRem << endl;
-cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
+//cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 
 this->ManualSemaphore=false;
 this->ManualSemaphoreExtra=false;
@@ -737,11 +737,11 @@ this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]
 this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
 this->TrigAuxIterCount++;
 
-cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
+//cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 ////cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
 //cout << "pru1dataMem_int2aux: " << pru1dataMem_int2aux << endl;
 ////cout << "SynchRem: " << SynchRem << endl;
-cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
+//cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 
 this->ManualSemaphore=false;
 this->ManualSemaphoreExtra=false;
