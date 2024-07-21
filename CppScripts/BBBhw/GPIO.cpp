@@ -357,7 +357,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					
 					//this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
 					
-					this->AccumulatedErrorDrift=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraNumSynchMeasAvgAux);					
+					this->AccumulatedErrorDrift=0.0;//DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraNumSynchMeasAvgAux);					
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
 				this->release();					
@@ -389,7 +389,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//this->PRUoffsetDriftErrorApplied=0;// Disable IEP correction
 					//this->PRUoffsetDriftErrorAppliedRaw=0;// Disable IEP correction
 					// Re wrap for correction					
-					this->PRUoffsetDriftErrorApplied=static_cast<double>(fmodl(static_cast<long double>(this->PRUoffsetDriftErrorApplied),static_cast<long double>(iepPRUtimerRange32bits)));
+					//this->PRUoffsetDriftErrorApplied=static_cast<double>(fmodl(static_cast<long double>(this->PRUoffsetDriftErrorApplied),static_cast<long double>(iepPRUtimerRange32bits)));
 					
 					if (this->PRUoffsetDriftErrorApplied==0){
 						//pru1dataMem_int[3]=static_cast<unsigned int>(0);
