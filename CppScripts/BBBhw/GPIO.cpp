@@ -367,7 +367,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 						this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=0.0;
 					}				
 					
-					this->AccumulatedErrorDrift=(static_cast<double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))+DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraNumSynchMeasAvgAux);
+					this->AccumulatedErrorDrift=fmodl(static_cast<double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))+DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraNumSynchMeasAvgAux);
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
 				this->release();					
