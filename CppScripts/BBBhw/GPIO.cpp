@@ -360,7 +360,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					
 					// Instant absolute error
 					this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerVal)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerValWrap-0*this->PRUcurrentTimerValOldWrap)));
-					if (this->iIterPRUcurrentTimerVal!=0){
+					if (this->iIterPRUcurrentTimerVal!=0 and EstimateSynchAvg!=0.0){
 						this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=fmodl(this->PRUoffsetDriftError/((EstimateSynchAvg-1.0)*static_cast<double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)),static_cast<double>(iepPRUtimerRange32bits));	
 					}
 					else{
@@ -648,7 +648,7 @@ TimePointClockTagPRUinitial=TimePointClockTagPRUinitial+std::chrono::nanoseconds
 //unsigned int pru0dataMem_int3aux=static_cast<unsigned int>(static_cast<unsigned long long int>((static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(this->AccumulatedErrorDrift)))%static_cast<unsigned long long int>(2*SynchTrigPeriod));
 //pru0dataMem_int[3]=static_cast<unsigned int>(static_cast<unsigned long long int>((static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(this->AccumulatedErrorDrift)))%static_cast<unsigned long long int>(2*SynchTrigPeriod));//static_cast<unsigned int>((static_cast<unsigned long long int>((static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(this->AccumulatedErrorDrift))*static_cast<long double>(static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial-TimePointClockSendCommandFinal).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))%static_cast<unsigned long long int>(iepPRUtimerRange32bits))))%static_cast<unsigned long long int>(2*SynchTrigPeriod));
 
-long double InstantErrorCorr=-((this->AdjPulseSynchCoeffAverage-1.0)*(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial-TimePointClockSendCommandFinal).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))+static_cast<long double>(AccumulatedErrorDrift));
+long double InstantErrorCorr=-((this->AdjPulseSynchCoeffAverage-1.0)*(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial-(TimePointClockSendCommandFinal-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg))).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))*static_cast<long double>(AccumulatedErrorDrift));
 long double SignAux;
 if (InstantErrorCorr>0.0){SignAux=1.0;}
 else if (InstantErrorCorr<0.0){SignAux=-1.0;}
@@ -738,7 +738,7 @@ TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 
 //pru1dataMem_int[2]=static_cast<unsigned int>(FineSynchAdjOffVal)+static_cast<unsigned int>(static_cast<unsigned long long int>((static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(this->AccumulatedErrorDrift)))%static_cast<unsigned long long int>(2*SynchTrigPeriod))+static_cast<unsigned int>((static_cast<unsigned long long int>(static_cast<long double>(FineSynchAdjFreqVal)*static_cast<long double>(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod))))%static_cast<unsigned long long int>(SynchTrigPeriod));
 
-long double InstantErrorCorr=-((this->AdjPulseSynchCoeffAverage-1.0)*(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-TimePointClockSendCommandFinal).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))+static_cast<long double>(AccumulatedErrorDrift));
+long double InstantErrorCorr=-((this->AdjPulseSynchCoeffAverage-1.0)*(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch-(TimePointClockSendCommandFinal-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg))).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))*static_cast<long double>(AccumulatedErrorDrift));
 long double SignAux;
 if (InstantErrorCorr>0.0){SignAux=1.0;}
 else if (InstantErrorCorr<0.0){SignAux=-1.0;}
