@@ -87,12 +87,12 @@ private:// Variables
 	    using rep        = duration::rep;
 	    using period     = duration::period;
 	    using time_point = std::chrono::time_point<my_clock>;
-	    static constexpr bool is_steady = false;// true, false. With false, probably the corrections are abrupt, but less slots affected by misadjustments in time. True, the corrections are smooth and probably more slots affected by misadjustments in time.
+	    static constexpr bool is_steady = true;// true, false. With false, probably the corrections are abrupt, but less slots affected by misadjustments in time. True, the corrections are smooth and probably more slots affected by misadjustments in time.
 
 	    static time_point now()
 	    {
 		timespec ts;
-		if (clock_gettime(CLOCK_TAI, &ts))// CLOCK_REALTIME//CLOCK_TAI
+		if (clock_gettime(CLOCK_REALTIME, &ts))// CLOCK_REALTIME//CLOCK_TAI
 		    throw 1;
 		using sec = std::chrono::seconds;
 		return time_point{sec{ts.tv_sec}+duration{ts.tv_nsec}};
