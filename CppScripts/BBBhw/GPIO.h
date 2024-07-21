@@ -48,8 +48,8 @@ private:// Variables
 	std::atomic<bool> ManualSemaphoreExtra=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=9; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
-	int NumSynchMeasAvgAux=301; // Num averages to compute the time error. Better to be odd number.
-	int ExtraNumSynchMeasAvgAux=301; // More averaging for computing interrupts access time
+	int NumSynchMeasAvgAux=201; // Num averages to compute the time error. Better to be odd number.
+	int ExtraNumSynchMeasAvgAux=201; // More averaging for computing interrupts access time
 	unsigned int NextSynchPRUcommand=5;// set initially to NextSynchPRUcorrection=0
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
 	double PRUoffsetDriftError=0;
@@ -127,7 +127,7 @@ private:// Variables
 	unsigned long long int TrigAuxIterCount=0;	
 	unsigned long TimeClockMarging=100;// In nanoseconds. If too large, it disastabilizes the timming performance
 	unsigned long long int TimeClockMargingExtra=10*TimeClockMarging;// In nanoseconds
-	unsigned long TimePRUcommandDelay=185000;// In nanoseconds. If too large, it disastabilizes the timming performance
+	unsigned long TimePRUcommandDelay=190000;// In nanoseconds. If too large, it disastabilizes the timming performance
 	unsigned long long int TimeElpasedNow_time_as_count=0;
 	// PRU
 	static int mem_fd;
