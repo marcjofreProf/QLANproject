@@ -360,8 +360,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					
 					// Instant absolute error
 					this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerVal)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerValWrap-0*this->PRUcurrentTimerValOldWrap)));
-					if (this->iIterPRUcurrentTimerVal!=0 and EstimateSynchAvg!=0.0){
-						this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=fmodl(this->PRUoffsetDriftError/((EstimateSynchAvg-1.0)*static_cast<double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)),static_cast<double>(iepPRUtimerRange32bits));	
+					if (this->iIterPRUcurrentTimerVal!=0 and EstimateSynch!=0.0){
+						this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=fmodl(this->PRUoffsetDriftError/((EstimateSynch-1.0)*static_cast<double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)),static_cast<double>(iepPRUtimerRange32bits));	
 					}
 					else{
 						this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=0.0;
