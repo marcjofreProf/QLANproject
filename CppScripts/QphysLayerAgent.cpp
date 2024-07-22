@@ -399,6 +399,7 @@ for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this-
 this->numReqQuBits=numReqQuBitsAux;
 this->FineSynchAdjVal[0]=FineSynchAdjValAux[0];// synch trig offset
 this->FineSynchAdjVal[1]=FineSynchAdjValAux[1];// synch trig frequency
+cout << "this->FineSynchAdjVal[1]: " << this->FineSynchAdjVal[1] << endl;
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
