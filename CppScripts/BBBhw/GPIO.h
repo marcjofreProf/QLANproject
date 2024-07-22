@@ -73,14 +73,6 @@ private:// Variables
 	double EstimateSynch=1.0;
 	double EstimateSynchAvg=1.0;
 	double EstimateSynchArray[MaxNumPulses]={EstimateSynch};// They are not all set to the value, only the first one (a function in the declarator should be used to fill them in.
-	double EstimateSynchDirection=0.0;
-	double EstimateSynchDirectionAvg=0.0;
-	double EstimateSynchDirectionArray[MaxNumPulses]={0.0};
-	// PID error correction
-	//double SynchAdjconstant=1.0;// 
-	//double PIDconstant=1.0; // Maybe a little bit over 1.0 to be more aggresive
-	//double PIDintegral=0.0;// Not used
-	//double PIDderiv=0.0;	// Not used
 	// Time/synchronization management
 	struct my_clock
 	{

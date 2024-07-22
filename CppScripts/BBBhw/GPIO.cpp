@@ -321,53 +321,20 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->EstimateSynch=((static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)+0*duration_FinalInitialCountAuxArrayAvg)/static_cast<double>(PRUclockStepPeriodNanoseconds))/((this->PRUcurrentTimerVal-0*this->PRUoffsetDriftErrorAppliedRaw)-static_cast<double>(this->PRUcurrentTimerValOldWrap+0*this->PRUoffsetDriftErrorAppliedOldRaw));// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correction).
 					// Compute Synch - Absolute
 					//this->EstimateSynch=static_cast<double>(fmodl((static_cast<long double>((this->iIterPRUcurrentTimerVal)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))/(this->PRUcurrentTimerValWrap-0*this->PRUcurrentTimerValOldWrap));
-					//this->EstimateSynch=1.0+this->SynchAdjconstant*(this->EstimateSynch-1.0);
-					//this->EstimateSynch=1.0; // To disable synch adjustment
 					this->EstimateSynchArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynch;
 				this->ManualSemaphoreExtra=true;
 					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
 					this->AdjPulseSynchPeriodicCorrectionCoeffAverage=this->EstimateSynchAvg; // Handler to this value inside the protected part					
 					
 					// Compute error - Relative correction				
-					this->PRUoffsetDriftError=static_cast<double>((-fmodl((static_cast<long double>((this->iIterPRUcurrentTimerValPass)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal-1*this->PRUcurrentTimerValOldWrap))/(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds)));
+					this->PRUoffsetDriftError=static_cast<double>((-fmodl((static_cast<long double>((this->iIterPRUcurrentTimerValPass)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal-1*this->PRUcurrentTimerValOldWrap))/(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds))*static_cast<long double>(SynchTrigPeriod));
 					// Compute error - Absolute correction				
 					//this->PRUoffsetDriftError=static_cast<double>((-fmodl((static_cast<long double>((this->iIterPRUcurrentTimerVal)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerValWrap-0*this->PRUcurrentTimerValOldWrap)));///(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds)));
-					
-					//this->PRUoffsetDriftError=0.0;// Deactivate error calculation
-					// Autocompensating the error with the relative frequency offset
-					//if (this->EstimateSynch>0.0){
-					//	//this->PRUoffsetDriftError=this->PRUoffsetDriftError/this->EstimateSynch;// compensating by the relative frequency difference
-					//	this->PRUoffsetDriftError=this->PRUoffsetDriftError*this->EstimateSynch;// compensating by the relative frequency difference
-					//}
-					// Error averaging
-					
 					
 					// Relative error
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					
-					// Absolute error
-					//long double SignAux;
-					//if (this->PRUoffsetDriftError>0.0){SignAux=1.0;}
-					//else if (this->PRUoffsetDriftError<0.0){SignAux=-1.0;}
-					//else {SignAux=0.0;}
-					//this->AccumulatedErrorDriftAux=SignAux*fmodl(abs(this->PRUoffsetDriftError),static_cast<double>(SynchTrigPeriod));
-					
-					//this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=this->AccumulatedErrorDriftAux;//static_cast<double>(fmodl(static_cast<long double>(SynchTrigPeriod)/2.0+static_cast<long double>(this->PRUoffsetDriftError),static_cast<long double>(SynchTrigPeriod)))-static_cast<long double>(SynchTrigPeriod)/2.0;// protection agains large errors
-					//if (this->iIterPRUcurrentTimerVal<NumSynchMeasAvgAux){this->PRUoffsetDriftErrorAvg=this->PRUoffsetDriftError;}
-					//else{this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);}				
-					
-					//this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
-					
-					// Instant absolute error
-					//this->PRUoffsetDriftError=static_cast<double>((fmodl((static_cast<long double>((this->iIterPRUcurrentTimerVal)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))-(this->PRUcurrentTimerValWrap-0*this->PRUcurrentTimerValOldWrap)));
-					//if (this->iIterPRUcurrentTimerVal!=0 and EstimateSynchAvg!=0.0){
-					//	this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=fmodl(this->PRUoffsetDriftError/((EstimateSynchAvg-1.0)*static_cast<double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)),static_cast<double>(iepPRUtimerRange32bits));	
-					//}
-					//else{
-					//	this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=0.0;
-					//}				
-					//
-					//this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraNumSynchMeasAvgAux);
+					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraNumSynchMeasAvgAux);
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
 				this->release();					
@@ -509,10 +476,7 @@ int GPIO::PRUsignalTimerSynch(){
 					this->EstimateSynchArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynch;
 					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
 					this->AdjPulseSynchPeriodicCorrectionCoeffAverage=this->EstimateSynchAvg; // Handler to this value inside the protected part
-					// Estimate synch direction
-					this->EstimateSynchDirection=(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap)+(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
-					EstimateSynchDirectionArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynchDirection;
-					this->EstimateSynchDirectionAvg=DoubleMedianFilterSubArray(EstimateSynchDirectionArray,NumSynchMeasAvgAux);					
+					// Estimate synch direction					
 					//this->EstimateSynch=1.0; // To disable synch adjustment
 					// Error averaging
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError;
@@ -547,10 +511,6 @@ int GPIO::PRUsignalTimerSynch(){
 			//cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
 			//cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 			cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
-			//cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
-			if (this->EstimateSynchDirectionAvg>0.0){cout << "Clock EstimateSynch advancing" << endl;}
-			else if (this->EstimateSynchDirectionAvg<0.0){cout << "Clock EstimateSynch delaying" << endl;}
-			else{cout << "Clock EstimateSynch neutral" << endl;}
 			//cout << "duration_FinalInitialDriftAux: " << duration_FinalInitialDriftAux << endl;
 			//cout << "this->iIterPRUcurrentTimerValPass: "<< this->iIterPRUcurrentTimerValPass << endl;
 			//cout << "this->iIterPRUcurrentTimerValSynch: "<< this->iIterPRUcurrentTimerValSynch << endl;
@@ -608,6 +568,7 @@ retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterrupt
 //this->TrigAuxIterCount++;
 
 cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
+cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
 cout << "InstantCorr: " << InstantCorr << endl;
 ////cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
 //cout << "pru0dataMem_int3aux: " << pru0dataMem_int3aux << endl;
@@ -691,6 +652,7 @@ this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->du
 this->TrigAuxIterCount++;
 
 cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
+cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
 cout << "InstantCorr: " << InstantCorr << endl;
 ////cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
 //cout << "pru1dataMem_int2aux: " << pru1dataMem_int2aux << endl;
