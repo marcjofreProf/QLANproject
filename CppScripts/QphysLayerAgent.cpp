@@ -431,7 +431,7 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  
  //cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
- 
+ cout << "this->FineSynchAdjVal: " << this->FineSynchAdjVal << endl;
  PRUGPIO.SendTriggerSignals(this->FineSynchAdjVal);//PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of 2048
  
  /* Very slow GPIO BBB not used anymore
