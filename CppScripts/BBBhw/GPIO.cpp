@@ -747,7 +747,7 @@ TimePointFutureSynch=TimePointFutureSynch+std::chrono::nanoseconds(SynchRem);
 
 //cout << "FineSynchAdjFreqVal: " << FineSynchAdjFreqVal << endl;
 
-long double InstantCorr=static_cast<long double>(FineSynchAdjOffVal)*static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(AccumulatedErrorDrift)+static_cast<long double>(FineSynchAdjFreqVal)*static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);//*static_cast<long double>(SynchTrigPeriod);
+long double InstantCorr=static_cast<long double>(FineSynchAdjOffVal)*static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(AccumulatedErrorDrift)+static_cast<long double>(FineSynchAdjFreqVal)*static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)*static_cast<long double>(SynchTrigPeriod);
 long double SignAux;
 if (InstantCorr>0.0){SignAux=1.0;}
 else if (InstantCorr<0.0){SignAux=-1.0;}
