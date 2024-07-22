@@ -399,7 +399,7 @@ for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this-
 this->numReqQuBits=numReqQuBitsAux;
 this->FineSynchAdjVal[0]=FineSynchAdjValAux[0];// synch trig offset
 this->FineSynchAdjVal[1]=FineSynchAdjValAux[1];// synch trig frequency
-cout << "this->FineSynchAdjVal[1]: " << this->FineSynchAdjVal[1] << endl;
+//cout << "this->FineSynchAdjVal[1]: " << this->FineSynchAdjVal[1] << endl;
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
@@ -431,7 +431,7 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
  
  //cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
- cout << "this->FineSynchAdjVal: " << this->FineSynchAdjVal << endl;
+ 
  PRUGPIO.SendTriggerSignals(this->FineSynchAdjVal);//PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of 2048
  
  /* Very slow GPIO BBB not used anymore
