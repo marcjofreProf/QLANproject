@@ -659,7 +659,7 @@ long double InstantCorr=static_cast<long double>(AccumulatedErrorDrift);
 long double SignAux;
 if (InstantCorr>0.0){SignAux=1.0;}
 else if (InstantCorr<0.0){SignAux=-1.0;}
-else {InstantCorr=0.0;}
+else {SignAux=0.0;}
 InstantCorr=SignAux*fmodl(abs(InstantCorr),static_cast<long double>(SynchTrigPeriod));
 
 pru0dataMem_int[3]=static_cast<unsigned int>(static_cast<long double>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
@@ -751,7 +751,7 @@ long double InstantCorr=static_cast<long double>(FineSynchAdjOffVal)*static_cast
 long double SignAux;
 if (InstantCorr>0.0){SignAux=1.0;}
 else if (InstantCorr<0.0){SignAux=-1.0;}
-else {InstantCorr=0.0;}
+else {SignAux=0.0;}
 InstantCorr=SignAux*fmodl(abs(InstantCorr),static_cast<long double>(SynchTrigPeriod));
 
 pru1dataMem_int[2]=static_cast<unsigned int>(static_cast<long double>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
