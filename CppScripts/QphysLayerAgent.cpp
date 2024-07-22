@@ -392,7 +392,7 @@ return requestWhileWait;
 }
 
 
-int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux,int* FineSynchAdjValAux){
+int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux,double* FineSynchAdjValAux){
 this->acquire();
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}

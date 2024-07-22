@@ -95,7 +95,7 @@ private: //Variables/Instances
 	char ModeActivePassive[NumBytesPayloadBuffer] = {0};// "Active" or "Passive"
 	char IPaddresses[NumHostConnection][IPcharArrayLengthMAX] = {0};
 	int numReqQuBits=0;
-	int FineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
+	double FineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
         
 public: // Variables/Instances
 	exploringBB::GPIO PRUGPIO;
@@ -116,7 +116,7 @@ public: // Functions/Methods
 	int SendParametersAgent(char* ParamsCharArray);// The upper layer gets the information to be send
         int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node
         // General Input and Output functions
-	int SimulateEmitQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux,int* FineSynchAdjValAux);
+	int SimulateEmitQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux,double* FineSynchAdjValAux);
 	int SimulateReceiveQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux);
 	int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
 	~QPLA();  //destructor

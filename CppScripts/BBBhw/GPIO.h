@@ -48,8 +48,8 @@ private:// Variables
 	std::atomic<bool> ManualSemaphoreExtra=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=9; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
-	int NumSynchMeasAvgAux=301; // Num averages to compute the time error. Better to be odd number.
-	int ExtraNumSynchMeasAvgAux=301; // More averaging for computing interrupts access time
+	int NumSynchMeasAvgAux=51; // Num averages to compute the time error. Better to be odd number.
+	int ExtraNumSynchMeasAvgAux=51; // More averaging for computing interrupts access time
 	unsigned int NextSynchPRUcommand=5;// set initially to NextSynchPRUcorrection=0
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
 	double PRUoffsetDriftError=0;
@@ -220,7 +220,7 @@ public:	// Functions/Methods
 	int DDRdumpdata();
 	int DisablePRUs();
 	int ReadTimeStamps();// Read the detected timestaps in four channels
-	int SendTriggerSignals(int* FineSynchAdjValAux); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+	int SendTriggerSignals(double* FineSynchAdjValAux); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	int SendTriggerSignalsSelfTest();//
 	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
 	int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
