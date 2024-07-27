@@ -119,17 +119,17 @@ fi
 sleep 30 # give time to time protocols to lock
 sudo adjtimex -a --force-adjust
 
-if ! crontab -l > /dev/null 2>&1; then
+if ! sudo crontab -l > /dev/null 2>&1; then
     sudo crontab -e
 fi
 
 line_to_check="adjtimex"
-line_to_add="1 * * * * /sbin/adjtimex -a --force-adjust"
+line_to_add="1 * * * * sudo /sbin/adjtimex -a --force-adjust"
 
-crontab -l | grep -q "$line_to_check"
+sudo crontab -l | grep -q "$line_to_check"
 
 if [ $? -eq 0 ]; then
-  crontab -l | grep -v "$line_to_check" | crontab -
+  sudo crontab -l | grep -v "$line_to_check" | sudo crontab -
 fi
 
 echo "$line_to_add" | crontab -
