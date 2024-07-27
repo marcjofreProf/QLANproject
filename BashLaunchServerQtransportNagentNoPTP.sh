@@ -37,7 +37,7 @@ cleanup_on_SIGINT() {
   sudo systemctl start systemd-timesyncd # start system synch
   sudo systemctl daemon-reload
   sudo timedatectl set-ntp true # Start NTP
-  sudo hwclock --systohc
+
   exit 0
 }
 
@@ -114,6 +114,11 @@ if [[ $is_rt_kernel -eq 0 ]]; then
 	sudo config-pin P8_45 pruout
 	sudo config-pin P8_46 pruout
 fi
+
+# adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
+sleep 10 # give time to time protocols to lock
+sudo adjtimex -a
+
 sudo ./CppScripts/QtransportLayerAgentN server 10.0.0.253 10.0.0.3 & #192.168.9.2 192.168.9.1 &
 pidAux=$(pgrep -f "QtransportLayerAgentN")
 sudo chrt -f -p 1 $pidAux

@@ -99,7 +99,7 @@ sudo systemctl enable --now systemd-timesyncd # start system synch
 sudo systemctl start systemd-timesyncd # start system synch
 sudo systemctl daemon-reload
 sudo timedatectl set-ntp true
-sudo hwclock --systohc
+
 #echo 'Enabling PWM for 24 MHz ref clock'
 #sudo config-pin P8.19 pwm
 #sudo sh -c "echo '38' >> /sys/class/pwm/pwmchip7/pwm-7\:0/period"
@@ -141,6 +141,11 @@ if [[ $is_rt_kernel -eq 0 ]]; then
 	sudo config-pin P8_45 pruout
 	sudo config-pin P8_46 pruout
 fi
+
+# adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
+sleep 10 # give time to time protocols to lock
+sudo adjtimex -a
+
 BcKPDarg1=${1:-$default_arg1}
 BcKPDarg2=${2:-$default_arg2}
 BcKPDarg3=${3:-$default_arg3}

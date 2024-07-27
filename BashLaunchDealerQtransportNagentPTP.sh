@@ -93,7 +93,6 @@ sudo /etc/init.d/rsyslog stop # stop logging
 #current_time=$(date +%s)
 #current_nano=$(date +%N)
 #sudo phc_ctl /dev/ptp0 set $current_time # $current_nano # if the initial phc2sys offset is really huge. Then, run "sudo phc_ctl /dev/ptp0 set" before starting the ptp4l service, so that it has an initial time based on the RTC that is "in the ballpark" and and set "step_threshold" at least or below to 0.00002 in the config file so that it can jump to converge
-sudo hwclock --systohc
 
 # Configure SYSTEM CLOCKS: CLOCK_REALTIME and CLOCK_TAI
 # utc_offset should be 37, but seems that some slaves do not acquire it propperly, so set to zero (so TAI and UTC time will be the same)
@@ -143,6 +142,11 @@ if [[ $is_rt_kernel -eq 0 ]]; then
 	sudo config-pin P8_45 pruout
 	sudo config-pin P8_46 pruout
 fi
+
+# adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
+sleep 10 # give time to time protocols to lock
+sudo adjtimex -a
+
 sudo nice -n $NicenestPriorValue ./CppScripts/QtransportLayerAgentN dealer 10.0.0.252 10.0.0.4 & #192.168.10.2 192.168.10.1 &
 pidAux=$(pgrep -f "QtransportLayerAgentN")
 sudo chrt -f -p 1 $pidAux

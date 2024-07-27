@@ -93,7 +93,6 @@ sudo /etc/init.d/rsyslog stop # stop logging
 #current_time=$(date +%s)
 #current_nano=$(date +%N)
 #sudo phc_ctl /dev/ptp0 set $current_time # $current_nano # if the initial phc2sys offset is really huge. Then, run "sudo phc_ctl /dev/ptp0 set" before starting the ptp4l service, so that it has an initial time based on the RTC that is "in the ballpark" and and set "step_threshold" at least or below to 0.00002 in the config file so that it can jump to converge
-sudo hwclock --systohc
 
 # Configure SYSTEM CLOCKS: CLOCK_REALTIME and CLOCK_TAI
 # utc_offset should be 37, but seems that some slaves do not acquire it propperly, so set to zero (so TAI and UTC time will be the same)
@@ -115,6 +114,10 @@ sudo chrt -f -p 1 $pidAux
 sudo nice -n $NicenestPriorValue ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectSlave.cfg -m & # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
 pidAux=$(pgrep -f "phc2sys")
 sudo chrt -f -p 1 $pidAux
+
+# adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
+sleep 10 # give time to time protocols to lock
+sudo adjtimex -a
 
 read -r -p "Press Ctrl+C to kill launched processes
 " # Block operation until Ctrl+C is pressed
