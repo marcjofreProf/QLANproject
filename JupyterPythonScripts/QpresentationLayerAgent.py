@@ -86,6 +86,7 @@ class QPLA:
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
 		"""	
+		Very weird, if emitting node tries to set the time barrier, then there is a lot of jitter in the detections???
 		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrg2OpNet]),str(NumSendQubits)])
 		messageCommandAux="SimulateReceiveQubits"
 		messageTypeAux="Control"
