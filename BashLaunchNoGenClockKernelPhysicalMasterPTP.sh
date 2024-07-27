@@ -19,6 +19,13 @@ is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 # Nicenest value [-20, 20]
 NicenestPriorValue=-10
 
+# Check if adjtimex is installed using dpkg
+if dpkg -l | grep -q adjtimex; then
+    echo "adjtimex is installed."
+else
+    echo "adjtimex is not installed. sudo apt-get install adjtimex."
+fi
+
 cleanup_on_SIGINT() {
   echo "** Trapped SIGINT (Ctrl+C)! Cleaning up..."
   # Kill potentially previously running processes
