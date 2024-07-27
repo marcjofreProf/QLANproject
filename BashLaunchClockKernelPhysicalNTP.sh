@@ -143,8 +143,9 @@ if [[ $is_rt_kernel -eq 0 ]]; then
 fi
 
 # adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
-sleep 10 # give time to time protocols to lock
-sudo adjtimex -a
+sleep 30 # give time to time protocols to lock
+sudo adjtimex -a --force-adjust
+sudo adjtimex -a --force-adjust
 
 BcKPDarg1=${1:-$default_arg1}
 BcKPDarg2=${2:-$default_arg2}

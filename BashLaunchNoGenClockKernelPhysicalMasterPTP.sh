@@ -130,8 +130,9 @@ sudo chrt -f -p 1 $pidAux
 #sudo chrt -f -p 1 $pidAux
 
 # adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
-sleep 10 # give time to time protocols to lock
-sudo adjtimex -a
+sleep 30 # give time to time protocols to lock
+sudo adjtimex -a --force-adjust
+sudo adjtimex -a --force-adjust
 
 read -r -p "Press Ctrl+C to kill launched processes
 " # Block operation until Ctrl+C is pressed
