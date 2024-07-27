@@ -162,7 +162,7 @@ if ! sudo crontab -l > /dev/null 2>&1; then
 fi
 
 line_to_check="adjtimex"
-line_to_add="1 * * * * sudo /sbin/adjtimex -a --force-adjust"
+line_to_add="5 * * * * sudo /sbin/adjtimex -a --force-adjust"
 
 sudo crontab -l | grep -q "$line_to_check"
 
