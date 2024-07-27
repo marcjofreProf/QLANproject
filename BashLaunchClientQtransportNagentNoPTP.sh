@@ -134,7 +134,7 @@ if [ $? -eq 0 ]; then
   sudo crontab -l | grep -v "$line_to_check" | sudo crontab -
 fi
 
-echo "$line_to_add" | crontab -
+echo "$line_to_add" | sudo crontab -
 
 ##
 sudo ./CppScripts/QtransportLayerAgentN client 10.0.0.254 10.0.0.2 & #192.168.8.2 192.168.8.1 &

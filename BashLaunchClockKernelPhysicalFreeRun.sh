@@ -170,7 +170,7 @@ if [ $? -eq 0 ]; then
   sudo crontab -l | grep -v "$line_to_check" | sudo crontab -
 fi
 
-echo "$line_to_add" | crontab -
+echo "$line_to_add" | sudo crontab -
 
 ##
 
