@@ -118,7 +118,23 @@ fi
 # adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
 sleep 30 # give time to time protocols to lock
 sudo adjtimex -a --force-adjust
-sudo adjtimex -a --force-adjust
+
+if ! crontab -l > /dev/null 2>&1; then
+    sudo crontab -e
+fi
+
+line_to_check="adjtimex"
+line_to_add="1 * * * * /sbin/adjtimex -a --force-adjust"
+
+crontab -l | grep -q "$line_to_check"
+
+if [ $? -eq 0 ]; then
+  crontab -l | grep -v "$line_to_check" | crontab -
+fi
+
+echo "$line_to_add" | crontab -
+
+##
 
 sudo ./CppScripts/QtransportLayerAgentN client 10.0.0.254 10.0.0.2 & #192.168.8.2 192.168.8.1 &
 pidAux=$(pgrep -f "QtransportLayerAgentN")
