@@ -840,7 +840,11 @@ CenterMassVal=CenterMassVal+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(
 
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();
-cout << "QPLA::SynchHistCenterMassArray: " << SynchHistCenterMassArray << endl;
+
+cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
+cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
+cout << "QPLA::SynchHistCenterMassArray[2]: " << SynchHistCenterMassArray[2] << endl;
+
 SynchHistCenterMassArray[iCenterMass]=CenterMassVal;
 
 if (iCenterMass==(NumCalcCenterMass-1)){// Achieved number measurements to compute values
@@ -849,10 +853,12 @@ if (iCenterMass==(NumCalcCenterMass-1)){// Achieved number measurements to compu
 	adjFreqSynchNormRatiosArray[2]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[1]))/static_cast<double>(HistPeriodicityAux);
 
 	SynchCalcValuesArray[0]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment
-	SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(0.5*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // RElative frequency difference adjustment
+	SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(0.5*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // Relative frequency difference adjustment
 	SynchCalcValuesArray[2]=static_cast<double>(HistPeriodicityAux)-(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]-SynchCalcValuesArray[1])*SynchCalcValuesArray[0]); // Offset adjustment
 
-	cout << "QPLA::SynchCalcValuesArray: " << SynchCalcValuesArray << endl;
+	cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;
+	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
+	cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 }
 
 iCenterMass=(iCenterMass+1)%NumCalcCenterMass;// Update for the next value
