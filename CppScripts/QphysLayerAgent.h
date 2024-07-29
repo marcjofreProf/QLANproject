@@ -21,6 +21,9 @@ Header declaration file for Quantum physical Layer Agent
 //Qubits
 #define NumQubitsMemoryBuffer 2048//256 //2048 //4096 //8192 // In multiples of 2048. Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
 #define NumQuBitsPerRun 2048 // Really defined in GPIO.h. Max 2048
+// Synchronization
+#define HistPeriodicityAux 4096 //Period in PRU counts of the synch period/histogram
+#define NumCalcCenterMass 3 // Number of centers of mass to measure to compute the synchronization
 // String operations
 #include<string>
 #include<fstream>
@@ -96,6 +99,12 @@ private: //Variables/Instances
 	char IPaddresses[NumHostConnection][IPcharArrayLengthMAX] = {0};
 	int numReqQuBits=0;
 	double FineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
+	// Automatic calculation of synchronization
+	int iCenterMass=0; // Iterator for the indexes of the center of mass
+	double SynchHistCenterMassArray[NumCalcCenterMass]={0.0}; // Array containing the needed center of mass for the histograms of the synchronization
+	double SynchCalcValuesArray[NumCalcCenterMass]={0.0}; // Computed values for achieving synchronization protocol
+	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,0.35,0.70}; // Normalized values of frequency testing
+	double adjFreqSynchNormRatiosArray[NumCalcCenterMass]={1.0,1.0,1.0}; // adjusting Normalized ratios of frequency testing
         
 public: // Variables/Instances
 	exploringBB::GPIO PRUGPIO;
@@ -153,9 +162,11 @@ private: // Functions/Methods
 	// Particular process threads
 	bool isPotentialIpAddressStructure(const char* ipAddress);
 	int ThreadSimulateEmitQuBit();
-	int ThreadSimulateReceiveQubit();
+	int ThreadSimulateReceiveQubit();	
 	struct timespec SetFutureTimePointOtherNode();
-	struct timespec GetFutureTimePointOtherNode();	
+	struct timespec GetFutureTimePointOtherNode();
+	// Synchronization primitives
+	int HistCalcPeriodTimeTags(); // Calculate the histogram center given a period and a list of timetaggs	
 };
 
 

@@ -544,6 +544,7 @@ this->SimulateNumStoredQubitsNode[0]=PRUGPIO.RetrieveNumStoredQuBits(TimeTaggs,C
 this->RunThreadSimulateReceiveQuBitFlag=true;//enable again that this thread can again be called
 this->release();
 cout << "End Receiving Qubits" << endl;
+this->HistCalcPeriodTimeTags();
 return 0; // return 0 is for no error
 }
 
@@ -639,11 +640,10 @@ cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference
 cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
 cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
 if (SimulateNumStoredQubitsNodeAux>0){
-unsigned long long int HistPeriodicityAux=4096; // Periodicity in number of PRU counts
 unsigned long long int TimeTaggs0Aux=TimeTaggs[0];
 unsigned long long int TimeTaggsLastAux=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];
 //for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures. For long range synch testing with histogram, this could be commented
-//TimeTaggs[i]=TimeTaggs[i]-TimeTaggs0Aux+OldLastTimeTagg+HistPeriodicityAux;
+//TimeTaggs[i]=TimeTaggs[i]-TimeTaggs0Aux+OldLastTimeTagg+static_cast<unsigned long long int>(HistPeriodicityAux);
 //}
 
 TimeTaggsDetAnalytics[0]=0.0;
@@ -663,11 +663,11 @@ for (int i=0;i<(SimulateNumStoredQubitsNodeAux-1);i++){
 if (i==0){cout << "TimeTaggs[1]-TimeTaggs[0]: " << TimeTaggs[1]-TimeTaggs[0] << endl;}
 else if(i==(SimulateNumStoredQubitsNodeAux-2)){cout << "TimeTaggs[i+1]-TimeTaggs[i]: " << TimeTaggs[i+1]-TimeTaggs[i] << endl;}
 
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((HistPeriodicityAux/2+TimeTaggs[i+1]-TimeTaggs[i])%(HistPeriodicityAux)))-(double)(HistPeriodicityAux/2));
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i+1]-TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
 }
 
 for (int i=0;i<(SimulateNumStoredQubitsNodeAux-1);i++){
-TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((HistPeriodicityAux/2+TimeTaggs[i+1]-TimeTaggs[i])%(HistPeriodicityAux)))-(double)(HistPeriodicityAux/2)-TimeTaggsDetAnalytics[5],2.0);
+TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*pow(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i+1]-TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2)-TimeTaggsDetAnalytics[5],2.0);
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
@@ -771,11 +771,10 @@ cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count differenc
 cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
 cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
 cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
-unsigned long long int HistPeriodicityAux=4096; // Periodicity in number of PRU counts
 unsigned long long int TimeTaggs0Aux=TimeTaggs[0];
 unsigned long long int TimeTaggsLastAux=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];
 //for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures. For long range synch testing with histogram, this could be commented
-//TimeTaggs[i]=TimeTaggs[i]-TimeTaggs0Aux+OldLastTimeTagg+HistPeriodicityAux;
+//TimeTaggs[i]=TimeTaggs[i]-TimeTaggs0Aux+OldLastTimeTagg+static_cast<unsigned long long int>(HistPeriodicityAux);
 //}
 
 TimeTaggsDetAnalytics[7]=(double)(TimeCoincidenceTaggs[0]);
@@ -786,11 +785,11 @@ for (int iIterCoincidence=0;iIterCoincidence<(NumCoincidences-1);iIterCoincidenc
 if (iIterCoincidence==0){cout << "TimeCoincidenceTaggs[1]-TimeCoincidenceTaggs[0]: " << TimeCoincidenceTaggs[1]-TimeCoincidenceTaggs[0] << endl;}
 else if(iIterCoincidence==(NumCoincidences-2)){cout << "TimeTaggs[iIterCoincidence+1]-TimeTaggs[iIterCoincidence]: " << TimeCoincidenceTaggs[iIterCoincidence+1]-TimeCoincidenceTaggs[iIterCoincidence] << endl;}
 
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)NumCoincidences-1.0))*(((double)((HistPeriodicityAux/2+TimeCoincidenceTaggs[iIterCoincidence+1]-TimeCoincidenceTaggs[iIterCoincidence])%(HistPeriodicityAux)))-(double)(HistPeriodicityAux/2));
+TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/((double)NumCoincidences-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeCoincidenceTaggs[iIterCoincidence+1]-TimeCoincidenceTaggs[iIterCoincidence])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
 }
 
 for (int i=0;i<(SimulateNumStoredQubitsNodeAux-1);i++){
-TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)NumCoincidences-1.0))*pow(((double)((HistPeriodicityAux/2+TimeCoincidenceTaggs[iIterCoincidence+1]-TimeCoincidenceTaggs[iIterCoincidence])%(HistPeriodicityAux)))-(double)(HistPeriodicityAux/2)-TimeTaggsDetAnalytics[5],2.0);
+TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/((double)NumCoincidences-1.0))*pow(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeCoincidenceTaggs[iIterCoincidence+1]-TimeCoincidenceTaggs[iIterCoincidence])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2)-TimeTaggsDetAnalytics[5],2.0);
 }
 TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
 
@@ -819,6 +818,46 @@ this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();
 
 return SimulateNumStoredQubitsNodeAux;
+}
+
+int QPLA::HistCalcPeriodTimeTags(){
+double CenterMassVal=0.0;
+
+this->acquire();
+while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
+this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
+int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
+
+// Check that we now exceed the QuBits buffer size
+if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
+
+if (SimulateNumStoredQubitsNodeAux>0){
+
+for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
+CenterMassVal=CenterMassVal+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
+}
+}
+
+this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
+this->release();
+cout << "QPLA::SynchHistCenterMassArray: " << SynchHistCenterMassArray << endl;
+SynchHistCenterMassArray[iCenterMass]=CenterMassVal;
+
+if (iCenterMass==(NumCalcCenterMass-1)){// Achieved number measurements to compute values
+	adjFreqSynchNormRatiosArray[0]=1.0;
+	adjFreqSynchNormRatiosArray[1]=((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/static_cast<double>(HistPeriodicityAux);
+	adjFreqSynchNormRatiosArray[2]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[1]))/static_cast<double>(HistPeriodicityAux);
+
+	SynchCalcValuesArray[0]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment
+	SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(0.5*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // RElative frequency difference adjustment
+	SynchCalcValuesArray[2]=static_cast<double>(HistPeriodicityAux)-(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]-SynchCalcValuesArray[1])*SynchCalcValuesArray[0]); // Offset adjustment
+
+	cout << "QPLA::SynchCalcValuesArray: " << SynchCalcValuesArray << endl;
+}
+
+iCenterMass=(iCenterMass+1)%NumCalcCenterMass;// Update for the next value
+
+return 0; // All Ok
 }
 
 int QPLA::RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep){
