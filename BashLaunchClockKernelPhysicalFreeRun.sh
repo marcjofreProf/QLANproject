@@ -73,6 +73,13 @@ sleep 1 # wait 1 second to make sure to kill the old processes
 # Set realtime priority with chrt -f and priority 0
 ########################################################
 if [[ $is_rt_kernel -eq 1 ]]; then
+  pidAux=$(pgrep -f "irq/16-clockevent")
+  sudo renice -n $NicenestPriorValue $pidAux
+  pidAux=$(pgrep -f "irq/25-rtc0")
+  sudo renice -n $NicenestPriorValue $pidAux
+  pidAux=$(pgrep -f "irq/26-rtc0")
+  sudo renice -n $NicenestPriorValue $pidAux
+  
   pidAux=$(pgrep -f "irq/22-TI-am335")
   sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/22-s-TI-am3")
