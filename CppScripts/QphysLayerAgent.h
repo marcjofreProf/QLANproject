@@ -24,6 +24,7 @@ Header declaration file for Quantum physical Layer Agent
 // Synchronization
 #define HistPeriodicityAux 4096 //Period in PRU counts of the synch period/histogram
 #define NumCalcCenterMass 3 // Number of centers of mass to measure to compute the synchronization
+#define NumRunsPerCenterMass 5 // Minimum 2. In order to compute the difference
 // String operations
 #include<string>
 #include<fstream>
@@ -101,8 +102,10 @@ private: //Variables/Instances
 	double FineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
 	// Automatic calculation of synchronization
 	int iCenterMass=0; // Iterator for the indexes of the center of mass
-	double SynchHistCenterMassArray[NumCalcCenterMass]={0.0}; // Array containing the needed center of mass for the histograms of the synchronization
-	double SynchCalcValuesArray[NumCalcCenterMass]={0.0}; // Computed values for achieving synchronization protocol
+	int iRunCenterMass=0; // Iterator for the indexes of the center of mass
+	unsigned long long int SynchFirstTagsArray[NumCalcCenterMass][NumRunsPerCenterMass]; // To store the first tags (averaged if needed for all the tags in the run
+	double SynchHistCenterMassArray[NumCalcCenterMass]={0.0,0.0,0.0}; // Array containing the needed center of mass for the histograms of the synchronization
+	double SynchCalcValuesArray[NumCalcCenterMass]={0.0,0.0,0.0}; // Computed values for achieving synchronization protocol
 	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,0.35,0.70}; // Normalized values of frequency testing
 	double adjFreqSynchNormRatiosArray[NumCalcCenterMass]={1.0,1.0,1.0}; // adjusting Normalized ratios of frequency testing
         

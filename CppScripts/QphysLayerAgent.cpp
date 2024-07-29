@@ -821,8 +821,6 @@ return SimulateNumStoredQubitsNodeAux;
 }
 
 int QPLA::HistCalcPeriodTimeTags(){
-double CenterMassVal=0.0;
-
 this->acquire();
 while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
@@ -832,22 +830,31 @@ int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
 
 if (SimulateNumStoredQubitsNodeAux>0){
+SynchFirstTagsArray[iCenterMass][iRunCenterMass]=TimeTaggs[0];
+//for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
+//CenterMassVal=CenterMassVal+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
+//}
 
-for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
-CenterMassVal=CenterMassVal+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
-}
 }
 
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();
 
+
+if (iRunCenterMass==(NumRunsPerCenterMass-1)){
+double CenterMassVal=0.0;
+for (int i=0;i<(NumRunsPerCenterMass-1);i++){
+CenterMassVal=CenterMassVal+(1.0/((double)NumRunsPerCenterMass-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
+}
+SynchHistCenterMassArray[iCenterMass]=CenterMassVal;
+
 cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
 cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
 cout << "QPLA::SynchHistCenterMassArray[2]: " << SynchHistCenterMassArray[2] << endl;
+}
 
-SynchHistCenterMassArray[iCenterMass]=CenterMassVal;
 
-if (iCenterMass==(NumCalcCenterMass-1)){// Achieved number measurements to compute values
+if (iCenterMass==(NumCalcCenterMass-1) and iRunCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
 	adjFreqSynchNormRatiosArray[0]=1.0;
 	adjFreqSynchNormRatiosArray[1]=((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/static_cast<double>(HistPeriodicityAux);
 	adjFreqSynchNormRatiosArray[2]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[1]))/static_cast<double>(HistPeriodicityAux);
@@ -861,7 +868,11 @@ if (iCenterMass==(NumCalcCenterMass-1)){// Achieved number measurements to compu
 	cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 }
 
+if (iRunCenterMass==(NumRunsPerCenterMass-1)){
 iCenterMass=(iCenterMass+1)%NumCalcCenterMass;// Update for the next value
+}
+
+iRunCenterMass=(iRunCenterMass+1)%NumRunsPerCenterMass;// Update value
 
 return 0; // All Ok
 }
