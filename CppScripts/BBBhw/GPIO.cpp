@@ -121,7 +121,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	LOCAL_DDMinit(); // DDR (Double Data Rate): A class of memory technology used in DRAM where data is transferred on both the rising and falling edges of the clock signal, effectively doubling the data rate without increasing the clock frequency.
 	// Here we can update memory space assigned address
 	valpHolder=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM];
-	valpAuxHolder=valpHolder+4+6*NumRecords;// 6* since each deteciton also includes the channels (2 Bytes), and plus 4 since the first tag is captured at the very beggining
+	valpAuxHolder=valpHolder+4+6*NumRecords;// 6* since each detection also includes the channels (2 Bytes), and plus 4 since the first tag is captured at the very beggining
 	CalpHolder=(unsigned int*)&pru0dataMem_int[2];// First tagg captured at the very beggining
 	synchpHolder=(unsigned int*)&pru0dataMem_int[3];// Starts at 12
 	
