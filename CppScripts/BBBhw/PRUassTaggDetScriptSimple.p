@@ -50,6 +50,7 @@
 
 // r16 reserved for raising edge detection operation together with r6
 // r17 might be used for some intermediate operations
+// r18 might be used for some intermediate operations
 
 //// If using IET timer (potentially adjusted to synchronization protocols)
 // We can use Constant table pointers C26
@@ -114,6 +115,7 @@ INITIATIONS:// This is only run once
 	MOV	r14, 0xFFFFFFFF
 	MOV	r11, 0xC000C0FF // detection mask. Bits might be moved out of position
 	LDI	r17, 0
+	LDI	r18, 0
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -190,18 +192,11 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections
 	AND	r6, r6, r11 // Mask to make sure there are no other info
 	// Combining all reading pins
-	AND	r16, r16, r11 // Mask to make sure there are no other info	
-	// Faster operations and less resources but maybe dangerous
-	//LSR	r16.b3, r16.b3, 2
-	//LSR	r6.b3, r6.b3, 2
-	//OR	r16.b1, r16.b1, r16.b3// Combine the registers
-	//OR	r6.b1, r6.b1, r6.b3// Combine the registers
-	// Safer operations but mabe slower and more resources
-	//MOV	r17.b0, r16.b3
-	//MOV	r17.b1, r6.b3
-	//LSR	r17, r17, 2
-	//OR	r16.b1, r16.b1, r17.b0// Combine the registers
-	//OR	r6.b1, r6.b1, r17.b1// Combine the registers
+	AND	r16, r16, r11 // Mask to make sure there are no other info
+	LSR	r17.b1, r16.b3, 2
+	LSR	r18.b1, r6.b3, 2
+	OR	r16, r16, r17// Combine the registers
+	OR	r6, r6, r18// Combine the registers
 	// Edge detection with the pins of interest
 	NOT	r16.w0, r16.w0 // 0s converted to 1s. This step can be placed here to increase chances of detection.	
 	AND	r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge
