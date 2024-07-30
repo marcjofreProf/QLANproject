@@ -195,10 +195,10 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	AND	r16, r16, r11 // Mask to make sure there are no other info
 	AND	r6, r6, r11 // Mask to make sure there are no other info
 	// Faster operations and less resources but maybe dangerous
-	LSR	r16.b3, r16.b3, 2
-	LSR	r6.b3, r6.b3, 2
-	OR	r16.b1, r16.b1, r16.b3// Combine the registers
-	OR	r6.b1, r6.b1, r6.b3// Combine the registers
+	//LSR	r16.b3, r16.b3, 2
+	//LSR	r6.b3, r6.b3, 2
+	//OR	r16.b1, r16.b1, r16.b3// Combine the registers
+	//OR	r6.b1, r6.b1, r6.b3// Combine the registers
 	// Safer operations but mabe slower and more resources
 	//MOV	r17.b0, r16.b3
 	//MOV	r17.b1, r6.b3
