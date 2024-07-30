@@ -10,7 +10,7 @@
 #define MASKevents 0x0F // P9_28-31, which corresponds to r31 bits 0,1,2,3
 
 // Length of acquisition:
-#define RECORDS 1964 // readings and it matches in the host c++ script. Not really used because updated from cpp host
+#define RECORDS 1024 // readings and it matches in the host c++ script. Not really used because updated from cpp host
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
@@ -185,19 +185,19 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Load the value of R31 into a working register
 	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
 	// MEasuring all pins of interest
-	MOV	r16.b3, r30.b1 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. Limits the pulse rate to 50 MHz.
+	//MOV	r16.b3, r30.b1 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. Limits the pulse rate to 50 MHz.
 	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection (bits 15, 14 and 7 to 0)
-	MOV	r6.b3, r30.b1 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts
+	//MOV	r6.b3, r30.b1 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts
 	MOV	r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)	
 	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections
 	// Combining all reading pins
-	AND	r16, r16, r11 // Mask to make sure there are no other info
-	AND	r6, r6, r11 // Mask to make sure there are no other info
+	//AND	r16, r16, r11 // Mask to make sure there are no other info
+	//AND	r6, r6, r11 // Mask to make sure there are no other info
 	// Faster operations and less resources but maybe dangerous
-	LSR	r16.b3, r16.b3, 2
-	LSR	r6.b3, r6.b3, 2
-	OR	r16.b1, r16.b1, r16.b3// Combine the registers
-	OR	r6.b1, r6.b1, r6.b3// Combine the registers
+	//LSR	r16.b3, r16.b3, 2
+	//LSR	r6.b3, r6.b3, 2
+	//OR	r16.b1, r16.b1, r16.b3// Combine the registers
+	//OR	r6.b1, r6.b1, r6.b3// Combine the registers
 	// Safer operations but mabe slower and more resources
 	//MOV	r17.b0, r16.b3
 	//MOV	r17.b1, r6.b3
