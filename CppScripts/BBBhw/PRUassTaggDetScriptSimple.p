@@ -51,6 +51,7 @@
 // r16 reserved for raising edge detection operation together with r6
 // r17 might be used for some intermediate operations
 // r18 might be used for some intermediate operations
+// r19 might be used for some intermediate operations
 
 //// If using IET timer (potentially adjusted to synchronization protocols)
 // We can use Constant table pointers C26
@@ -116,6 +117,7 @@ INITIATIONS:// This is only run once
 	MOV	r11, 0xC000C0FF // detection mask. Bits might be moved out of position
 	LDI	r17, 0
 	LDI	r18, 0
+	LDI	r19, 0 
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -185,10 +187,13 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Load the value of R31 into a working register
 	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
 	// Measuring all pins of interest
-	MOV	r16.w1, r30.w0 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. Limits the pulse rate to 50 MHz. TAkes a lot of time
+	MOV	r16.w1, r30.w0 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. Limits the pulse rate to 50 MHz. Takes a lot of time and so it is skew with respect the bits from r31
 	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection (bits 15, 14 and 7 to 0)
-	MOV	r6.w1, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. Takes a lot of time
+	MOV	r6.w1, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. TAkes a lot of time and so it is skew with respect the bits from r31
 	MOV	r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)
+	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections. Soft barrier, maybe a non-useful bit has fired, but gives timeto increase the detection time
+	MOV	r19.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0), increases the windows length but improves probability of detection
+	OR	r6, r6, r19 // Combine the possibilities of reading on these bits.
 	AND	r6, r6, r11 // Mask to make sure there are no other info
 	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections	
 	// Combining all reading pins
