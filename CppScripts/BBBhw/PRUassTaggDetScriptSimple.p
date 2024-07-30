@@ -187,14 +187,19 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	MOV	r16.b2, r30.b1 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14). Limits the pulse rate to 50 MHz.
 	MOV	r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)
 	MOV	r6.b2, r30.b1 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14)
+	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections
+	// Combining all reading pins
 	AND	r16, r16, r11 // Mask to make sure there are no other info
 	AND	r6, r6, r11 // Mask to make sure there are no other info
-	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections
-	// Combining all reading pins	
-	LSR	r16.b2, r16.b2, 2
-	LSR	r6.b2, r6.b2, 2
-	OR	r16.b1, r16.b1, r16.b2// Combine the registers
-	OR	r6.b1, r6.b1, r6.b2// Combine the registers
+	//LSR	r16.b2, r16.b2, 2
+	//LSR	r6.b2, r6.b2, 2
+	//OR	r16.b1, r16.b1, r16.b2// Combine the registers
+	//OR	r6.b1, r6.b1, r6.b2// Combine the registers
+	MOV	r17.b0, r16.b2
+	MOV	r17.b1, r6.b2
+	LSR	r17, r17, 2
+	OR	r16.b1, r16.b1, r17.b0// Combine the registers
+	OR	r6.b1, r6.b1, r17.b1// Combine the registers
 	// Edge detection with the pins of interest
 	NOT	r16.w0, r16.w0 // 0s converted to 1s. This step can be placed here to increase chances of detection.	
 	AND	r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
