@@ -194,8 +194,8 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Faster operations and less resources but maybe dangerous
 	//LSR	r16.b3, r16.b3, 2
 	//LSR	r6.b3, r6.b3, 2
-	//OR	r16.b1, r16.b1, r16.b3// Combine the registers
-	//OR	r6.b1, r6.b1, r6.b3// Combine the registers
+	OR	r16.b1, r16.b1, r16.b3// Combine the registers
+	OR	r6.b1, r6.b1, r6.b3// Combine the registers
 	// Safer operations but mabe slower and more resources
 	//MOV	r17.b0, r16.b3
 	//MOV	r17.b1, r6.b3
@@ -204,9 +204,9 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	//OR	r6.b1, r6.b1, r17.b1// Combine the registers
 	// Edge detection with the pins of interest
 	NOT	r16.w0, r16.w0 // 0s converted to 1s. This step can be placed here to increase chances of detection.	
-	AND	r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
+	AND	r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge
 CHECKDET:		
-	QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 //all the b0 above can be converted to w0 to capture more channels, but then in the chennel tag recorded has to be increaed and appropiatelly handled in c++ (also the number of tags per run has to be reduced)
+	QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 //all the b0 above can be converted to w0 to capture more channels, but then in the channel tag recorded has to be increaed and appropiatelly handled in c++ (also the number of tags per run has to be reduced)
 	// If the program reaches this point, at least one of the bits is high
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
 TIMETAG:
