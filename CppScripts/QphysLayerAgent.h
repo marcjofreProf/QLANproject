@@ -19,8 +19,8 @@ Header declaration file for Quantum physical Layer Agent
 #define IPcharArrayLengthMAX 15
 #define NumHostConnection 5
 //Qubits
-#define NumQubitsMemoryBuffer 1024// 1964// In multiples of NumQuBitsPerRun. Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
-#define NumQuBitsPerRun 1024 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
+#define NumQubitsMemoryBuffer 1964// In multiples of NumQuBitsPerRun (e.g., 1964, 3928, ...). Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
+#define NumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 // Synchronization
 #define HistPeriodicityAux 4096 //Period in PRU counts of the synch period/histogram
 #define NumCalcCenterMass 3 // Number of centers of mass to measure to compute the synchronization
