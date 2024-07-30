@@ -149,7 +149,7 @@ CMDLOOP2:// Double verification of host sending start command
 DWTSTART:
 	// Re-start DWT_CYCNT
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
-//	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	// Some loadings and resets
 	LBCO	r4, CONST_PRUDRAM, 4, 4 // Load to r4 the content of CONST_PRUDRAM with offset 4, and 4 bytes. It is the number of RECORDS
 	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start
@@ -219,7 +219,7 @@ TIMETAG:
 FINISH:
 	// Faster Concatenated Checks writting	
 	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 4 // writes values of r8
-//	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	// Prepare DWT_CYCNT for next round
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
