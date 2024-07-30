@@ -19,8 +19,8 @@ Header declaration file for Quantum physical Layer Agent
 #define IPcharArrayLengthMAX 15
 #define NumHostConnection 5
 //Qubits
-#define NumQubitsMemoryBuffer 2048//256 //2048 //4096 //8192 // In multiples of 2048. Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
-#define NumQuBitsPerRun 2048 // Really defined in GPIO.h. Max 2048
+#define NumQubitsMemoryBuffer 2048// In multiples of NumQuBitsPerRun. Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
+#define NumQuBitsPerRun 1966 // Really defined in GPIO.h. Max 1966 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 // Synchronization
 #define HistPeriodicityAux 4096 //Period in PRU counts of the synch period/histogram
 #define NumCalcCenterMass 3 // Number of centers of mass to measure to compute the synchronization
@@ -50,7 +50,7 @@ class QPLA {
 private: //Variables/Instances		
 	int numberLinks=0;// Number of full duplex links directly connected to this physical quantum node
 	unsigned long long int TimeTaggs[NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections
-	unsigned char ChannelTags[NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs
+	unsigned short ChannelTags[NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs
         //int EmitLinkNumberArray[LinkNumberMAX]={60}; // Array indicating the GPIO numbers identifying the emit pins
         //int ReceiveLinkNumberArray[LinkNumberMAX]={48}; // Array indicating the GPIO numbers identifying the receive pins
         float QuBitsPerSecondVelocity[LinkNumberMAX]={1000000.0}; // Array indicating the qubits per second velocity of each emit/receive pair 

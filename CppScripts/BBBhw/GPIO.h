@@ -25,7 +25,7 @@ using std::fstream;
 #define GPIO_PATH "/sys/class/gpio/"
 #define PRUdataPATH1 "./PRUdata/"
 #define PRUdataPATH2 "../PRUdata/"
-
+#define NumQuBitsPerRun 1966 // Really defined in GPIO.h. Max 1966 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 #define MaxNumPulses	8192	// Used in the averging of time synchronization arrays
 #define PRUclockStepPeriodNanoseconds		5.00000//4.99999 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
 #define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
@@ -151,7 +151,7 @@ private:// Variables
 	//bool finPRU1;
 	// SHARED RAM to file dump
 	int iIterDump;
-	unsigned int NumRecords=2048; //2048; //Number of records per run. Max 2048. It is also defined in PRUassTaggDetScript.p and QphysLayerAgent.cpp
+	unsigned int NumRecords=NumQuBitsPerRun; //Number of records per run. Max NumQuBitsPerRun. It is also defined in PRUassTaggDetScript.p and QphysLayerAgent.h
 	unsigned int NumSynchPulses=0;
 	unsigned char* valpHolder;
 	unsigned char* valpAuxHolder;
@@ -169,7 +169,7 @@ private:// Variables
 	unsigned long long int extendedCounterPRUholder=0; // 64 bits
 	unsigned long long int extendedCounterPRUaux=0; // 64 bits
 	//unsigned char val; // 8 bits
-	unsigned char valBitsInterest=0; // 8 bits
+	unsigned short valBitsInterest=0; // 16 bits, 2 bytes
 	unsigned int valSkewCounts=0;
 	unsigned int valThresholdResetCounts=0;
 	unsigned long long int auxUnskewingFactorResetCycle=0;
@@ -216,7 +216,7 @@ public:	// Functions/Methods
 	int SendTriggerSignals(double* FineSynchAdjValAux); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	int SendTriggerSignalsSelfTest();//
 	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
-	int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
+	int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned short* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
 	int ClearStoredQuBits(); // Send the writting pointer back to the beggining - effectively clearing stored QuBits
 	// Non PRU
 	virtual int getNumber() { return number; }

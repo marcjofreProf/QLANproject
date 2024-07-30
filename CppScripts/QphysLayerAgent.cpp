@@ -432,7 +432,7 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
  
  //cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
  
- PRUGPIO.SendTriggerSignals(this->FineSynchAdjVal);//PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of 2048
+ PRUGPIO.SendTriggerSignals(this->FineSynchAdjVal);//PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of NumQuBitsPerRun
  
  /* Very slow GPIO BBB not used anymore
  // Basic Output - Generate a pulse of 1 second period
@@ -512,7 +512,7 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrie
  //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
  
  for (iIterRuns=0;iIterRuns<DetRunsCount;iIterRuns++){
-	PRUGPIO.ReadTimeStamps();//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of 2048 qubit timetags
+	PRUGPIO.ReadTimeStamps();//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
  }
  // Basic Input 
  /* Very slow GPIO BBB not used anymore
@@ -581,12 +581,12 @@ if (SimulateNumStoredQubitsNodeAux>0){
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 //cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
 //cout << "ChannelTags[i]: "<< std::bitset<8>(ChannelTags[i]) << endl;
-if (ChannelTags[i]&0x0001==1 or (ChannelTags[i]>>4)&0x0001==1){TimeTaggsDetAnalytics[0]++;}
-if ((ChannelTags[i]>>1)&0x0001==1 or (ChannelTags[i]>>5)&0x0001==1){TimeTaggsDetAnalytics[1]++;}
-if ((ChannelTags[i]>>2)&0x0001==1 or (ChannelTags[i]>>6)&0x0001==1){TimeTaggsDetAnalytics[2]++;}
-if ((ChannelTags[i]>>3)&0x0001==1 or (ChannelTags[i]>>7)&0x0001==1){TimeTaggsDetAnalytics[3]++;}
+if (ChannelTags[i]&0x0001==1 or (ChannelTags[i]>>4)&0x0001==1 or (ChannelTags[i]>>8)&0x0001==1){TimeTaggsDetAnalytics[0]++;}
+if ((ChannelTags[i]>>1)&0x0001==1 or (ChannelTags[i]>>5)&0x0001==1 or (ChannelTags[i]>>9)&0x0001==1){TimeTaggsDetAnalytics[1]++;}
+if ((ChannelTags[i]>>2)&0x0001==1 or (ChannelTags[i]>>6)&0x0001==1 or (ChannelTags[i]>>10)&0x0001==1){TimeTaggsDetAnalytics[2]++;}
+if ((ChannelTags[i]>>3)&0x0001==1 or (ChannelTags[i]>>7)&0x0001==1 or (ChannelTags[i]>>11)&0x0001==1){TimeTaggsDetAnalytics[3]++;}
 
-if (((ChannelTags[i]&0x0001)+((ChannelTags[i]>>1)&0x0001)+((ChannelTags[i]>>2)&0x0001)+((ChannelTags[i]>>3)&0x0001)+((ChannelTags[i]>>4)&0x0001)+((ChannelTags[i]>>5)&0x0001)+((ChannelTags[i]>>6)&0x0001)+((ChannelTags[i]>>7)&0x0001))>1){
+if (((ChannelTags[i]&0x0001)+((ChannelTags[i]>>1)&0x0001)+((ChannelTags[i]>>2)&0x0001)+((ChannelTags[i]>>3)&0x0001)+((ChannelTags[i]>>4)&0x0001)+((ChannelTags[i]>>5)&0x0001)+((ChannelTags[i]>>6)&0x0001)+((ChannelTags[i]>>7)&0x0001)+((ChannelTags[i]>>8)&0x0001)+((ChannelTags[i]>>9)&0x0001)+((ChannelTags[i]>>10)&0x0001)+((ChannelTags[i]>>11)&0x0001))>1){
 TimeTaggsDetAnalytics[4]=(double)TimeTaggsDetAnalytics[4]+1.0;
 }
 if (i>0){//Compute the mean value
@@ -632,7 +632,7 @@ TimeTaggsDetAnalytics[7]=0.0;
 // Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
 // Accordingly, the std wrapped count difference is stored in TimeTaggsDetAnalytics[6]
 cout << "TIMETAGGING ANALYSIS of QphysLayerAgent.h" << endl;
-cout << "When not using hist analysis, it can be changed back to 2048 NUMRECORDS in PRUassTaggDetScript.p, GPIO.h and top of QphysLayerAgent.h" << endl;
+cout << "When not using hist analysis, it can be changed back to NumQuBitsPerRun NUMRECORDS in PRUassTaggDetScript.p, GPIO.h and top of QphysLayerAgent.h" << endl;
 cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 cout << "It has to have connected only ch1 timetagger" << endl;
 cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
@@ -723,7 +723,7 @@ if ((ChannelTags[i]>>1)&0x0001==1 and (ChannelTags[i]>>5)&0x0001==1){TimeTaggsDe
 if ((ChannelTags[i]>>2)&0x0001==1 and (ChannelTags[i]>>6)&0x0001==1){TimeTaggsDetAnalytics[2]++;TimeCoincidenceTaggs[iIterCoincidence]=TimeTaggs[i];iIterCoincidence++;}
 if ((ChannelTags[i]>>3)&0x0001==1 and (ChannelTags[i]>>7)&0x0001==1){TimeTaggsDetAnalytics[3]++;TimeCoincidenceTaggs[iIterCoincidence]=TimeTaggs[i];iIterCoincidence++;}
 
-if (((ChannelTags[i]&0x0001)+((ChannelTags[i]>>1)&0x0001)+((ChannelTags[i]>>2)&0x0001)+((ChannelTags[i]>>3)&0x0001)+((ChannelTags[i]>>4)&0x0001)+((ChannelTags[i]>>5)&0x0001)+((ChannelTags[i]>>6)&0x0001)+((ChannelTags[i]>>7)&0x0001))>1){
+if (((ChannelTags[i]&0x0001)+((ChannelTags[i]>>1)&0x0001)+((ChannelTags[i]>>2)&0x0001)+((ChannelTags[i]>>3)&0x0001)+((ChannelTags[i]>>4)&0x0001)+((ChannelTags[i]>>5)&0x0001)+((ChannelTags[i]>>6)&0x0001)+((ChannelTags[i]>>7)&0x0001)+((ChannelTags[i]>>8)&0x0001)+((ChannelTags[i]>>9)&0x0001)+((ChannelTags[i]>>10)&0x0001)+((ChannelTags[i]>>11)&0x0001))>1){
 TimeTaggsDetAnalytics[4]=(double)TimeTaggsDetAnalytics[4]+1.0;
 }
 
@@ -764,7 +764,7 @@ TimeTaggsDetAnalytics[7]=(double)(TimeCoincidenceTaggs[0]);// Timetag of the fir
 // Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
 // Accordingly, the std wrapped count difference is stored in TimeTaggsDetAnalytics[6]
 cout << "COINCIDENCE ANALYSIS of QphysLayerAgent.h" << endl;
-cout << "When not using hist analysis, it can be changed back to 2048 NUMRECORDS in PRUassTaggDetScript.p, GPIO.h and top of QphysLayerAgent.h" << endl;
+cout << "When not using hist analysis, it can be changed back to NumQuBitsPerRun NUMRECORDS in PRUassTaggDetScript.p, GPIO.h and top of QphysLayerAgent.h" << endl;
 cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 cout << "It has to have connected only ch1 timetagger" << endl;
 cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;

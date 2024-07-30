@@ -10,7 +10,7 @@
 #define MASKevents 0x0F // P9_28-31, which corresponds to r31 bits 0,1,2,3
 
 // Length of acquisition:
-#define RECORDS 1024 //2048 // readings and it matches in the host c++ script
+#define RECORDS 1966 // readings and it matches in the host c++ script. Not really used because updated from cpp host
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
@@ -41,6 +41,9 @@
 // r8 reserved for cycle count final threshold reset
 // r9 reserved for offset correction
 
+// r10 is arbitrary used for operations
+
+// r11 reserved for detection pins mask
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
 // r12 reserved for 0x22000 Control register
@@ -110,6 +113,7 @@ INITIATIONS:// This is only run once
 	LDI	r8, 0
 	LDI	r9, 0
 	MOV	r14, 0xFFFFFFFF
+	MOV	r11, 0x00C0C0FF // detection mask. Bits might be moved out of position
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -178,19 +182,30 @@ FIRSTREF:
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register
 	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
-	MOV 	r16.b0, r31.b0 // This wants to be zeros for edge detection
-	NOT	r16.b0, r16.b0 // 0s converted to 1s. This step can be placed here to increase chances of detection. Limits the pulse rate to 50 MHz.
-	MOV	r6.b0, r31.b0 // Consecutive red for edge detection
-	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0 // Do not lose time with the below if there are no detections
-	AND	r6.b0, r6.b0, r16.b0 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
+	// MEasuring all pins of interest
+	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection (bits 15, 14 and 7 to 0)
+	MOV	r16.b2, r30.b1 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14). Limits the pulse rate to 50 MHz.
+	MOV	r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)
+	MOV	r6.b2, r30.b1 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14)
+	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections
+	// Combining all reading pins
+	AND	r16, r16, r11 // Mask to make sure there are no other info
+	AND	r6, r6, r11 // Mask to make sure there are no other info
+	LSR	r16.b2, r16.b2, 2
+	LSR	r6.b2, r6.b2, 2
+	OR	r16.b1, r16.b1, r16.b2// Combine the registers
+	OR	r6.b1, r6.b1, r6.b2// Combine the registers
+	// Edge detection with the pins of interest
+	NOT	r16.w0, r16.w0 // 0s converted to 1s. This step can be placed here to increase chances of detection.	
+	AND	r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
 CHECKDET:		
-	QBEQ 	WAIT_FOR_EVENT, r6.b0, 0 //all the b0 above can be converted to w0 to capture more channels, but then in the chennel tag recorded has to be increaed and appropiatelly handled in c++ (also the number of tags per run has to be reduced)
+	QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 //all the b0 above can be converted to w0 to capture more channels, but then in the chennel tag recorded has to be increaed and appropiatelly handled in c++ (also the number of tags per run has to be reduced)
 	// If the program reaches this point, at least one of the bits is high
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
 TIMETAG:
 	// Faster Concatenated Time counter and Detection channels
-	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 5 // Put contents of r5 and r6.b0 of DWT_CYCCNT into the address offset at r1.
-	ADD 	r1, r1, 5 // increment address by 5 bytes	
+	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 6 // Put contents of r5 and r6.w0 of DWT_CYCCNT into the address offset at r1.
+	ADD 	r1, r1, 6 // increment address by 6 bytes	
 	// Check to see if we still need to read more data
 	SUB 	r4, r4, 1
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished

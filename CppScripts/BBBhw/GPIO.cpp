@@ -776,7 +776,9 @@ if (streamDDRpru.is_open()){
 		extendedCounterPRU=static_cast<unsigned long long int>(static_cast<double>(extendedCounterPRUholder-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error	    
 		//////////////////////////////////////////////////////////////
 		// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
-		valBitsInterest=static_cast<unsigned char>(*valp);
+		valBitsInterest=static_cast<unsigned short>(*valp);
+		valp++;// 1 times 8 bits
+		valBitsInterest=static_cast<unsigned short>(static_cast<unsigned char>(*valp>>4))<<8;
 		valp++;// 1 times 8 bits
 		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "val: " << std::bitset<8>(val) << endl;}
 		//valBitsInterest=this->packBits(val); // we're just interested in 4 bits
@@ -1006,7 +1008,7 @@ streamDDRpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the s
 return 0; // all ok
 }
 
-int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned char* ChannelTags){
+int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned short* ChannelTags){
 /* External synch pulses not used - done with system clock calibration
 unsigned int ValueReadNumSynchPulses;
 int NumSynchPulseAvgAux=0;
