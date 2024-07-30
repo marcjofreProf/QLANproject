@@ -188,9 +188,9 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	//MOV	r6.b3, r30.b1 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts
 	MOV	r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)	
 	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections
+	//AND	r6, r6, r11 // Mask to make sure there are no other info
 	// Combining all reading pins
-	AND	r16, r16, r11 // Mask to make sure there are no other info
-	AND	r6, r6, r11 // Mask to make sure there are no other info
+	//AND	r16, r16, r11 // Mask to make sure there are no other info	
 	// Faster operations and less resources but maybe dangerous
 	//LSR	r16.b3, r16.b3, 2
 	//LSR	r6.b3, r6.b3, 2
@@ -204,7 +204,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	//OR	r6.b1, r6.b1, r17.b1// Combine the registers
 	// Edge detection with the pins of interest
 	NOT	r16.w0, r16.w0 // 0s converted to 1s. This step can be placed here to increase chances of detection.	
-	AND	r6.b0, r6.b0, r16.w0 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
+	AND	r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge// AND has to be done with the whole register, not a byte of it!!!!
 CHECKDET:		
 	QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 //all the b0 above can be converted to w0 to capture more channels, but then in the chennel tag recorded has to be increaed and appropiatelly handled in c++ (also the number of tags per run has to be reduced)
 	// If the program reaches this point, at least one of the bits is high
