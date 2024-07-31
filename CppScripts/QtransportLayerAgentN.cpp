@@ -752,6 +752,14 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			  std::thread threadGetSimulateNumStoredQubitsNodeRefAux=std::thread(&QTLAN::GetSimulateNumStoredQubitsNode,this);
 			  threadGetSimulateNumStoredQubitsNodeRefAux.detach();
 			}
+			else if (string(Payload)==string("SimulateRetrieveSynchParamsNode")){
+			  //cout << "IPorg: " << IPorg << endl;
+			  //cout << "IPdest: " << IPdest << endl;
+			  strcpy(this->IPorgAux,IPorg);
+			  strcpy(this->IPdestAux,IPdest);
+			  std::thread threadGetSimulateSynchParamsNodeRefAux=std::thread(&QTLAN::GetSimulateSynchParamsNode,this);
+			  threadGetSimulateSynchParamsNodeRefAux.detach();
+			}
 			else{
 			//discard
 			cout << "Node does not have this information: "<< Payload << endl;
@@ -898,6 +906,73 @@ sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[6]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
 sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[7]);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,":");// End Separate different Payloads with :
+strcat(ParamsCharArray,",");// Very important to end the message
+//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+  // reply immediately with a message to requester
+//cout<< "Node before second acquire" << endl;
+this->acquire();	
+//cout<< "Node after second acquire" << endl;	
+strcpy(this->SendBuffer,ParamsCharArray);
+int socket_fd_conn;
+if (string(SOCKtype)=="SOCK_DGRAM"){// Client sends on the file descriptor
+	socket_fd_conn=this->socket_fdArray[0];
+}
+else{// server sends on the socket connection
+	//cout << "socket_fd_conn" << socket_fd_conn << endl;
+	socket_fd_conn=this->new_socketArray[0];
+}      
+this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
+this->GetSimulateNumStoredQubitsNodeFlag=false;
+//cout<< "Node after send" << endl;
+this->release();
+//cout << "We get here Node GetNumStoredQubitsNode" << endl;
+return 0;
+}
+
+int QTLAN::GetSimulateSynchParamsNode() {
+//cout<< "Node before acquire" << endl;
+this->acquire();	  
+//cout<< "Node before this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
+while (this->GetSimulateNumStoredQubitsNodeFlag==true or this->QPLASimulateReceiveQuBitFlag==true){// Wait here// No other thread checking this info
+this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();
+}
+
+//cout<< "Node after this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
+this->GetSimulateNumStoredQubitsNodeFlag=true; 
+this->release();
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Compute interesting analystics on the Timetaggs and deteciton so that not all data has to be transfered thorugh sockets
+// Param 0: Equivalent period synch
+// Param 1: Relative frequency difference
+// Param 2: Synch offset
+int NumTimetaggDetSynchParams=3;
+double TimeTaggsDetSynchParams[NumTimetaggDetSynchParams]={0.0};
+int SimulateNumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetSimulateSynchParamsNode(TimeTaggsDetSynchParams);// to be developed for more than one link
+//cout << "Node return TimeTaggsDetSynchParams: " << TimeTaggsDetSynchParams << endl;
+  // Generate the message
+//cout<< "this->IPorgAux: " << this->IPorgAux << endl;
+//cout<< "this->IPdestAux: " << this->IPdestAux << endl;
+char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+strcpy(ParamsCharArray,this->IPorgAux);
+strcat(ParamsCharArray,",");
+strcat(ParamsCharArray,this->IPdestAux);
+strcat(ParamsCharArray,",");
+strcat(ParamsCharArray,"Operation");
+strcat(ParamsCharArray,",");
+strcat(ParamsCharArray,"SimulateSynchParamsNode");
+strcat(ParamsCharArray,",");
+char charNum[NumBytesBufferICPMAX] = {0};
+// Include param analytics info
+strcat(ParamsCharArray,":");// Separate different Payloads with :
+sprintf(charNum, "%.8f", TimeTaggsDetSynchParams[0]);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,":");// Separate different Payloads with :
+sprintf(charNum, "%.8f", TimeTaggsDetSynchParams[1]);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,":");// Separate different Payloads with :
+sprintf(charNum, "%.8f", TimeTaggsDetSynchParams[2]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// End Separate different Payloads with :
 strcat(ParamsCharArray,",");// Very important to end the message

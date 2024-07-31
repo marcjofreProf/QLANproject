@@ -108,6 +108,7 @@ public: // Functions
 	// Requests. They have to be in semaphore structure to avoid collisions between main and thread
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the upper Agent to send message to specific host/node	
 	int SimulateRetrieveNumStoredQubitsNode(char* IPhostReplyOpNet,char* IPhostRequestOpNet, int* ParamsIntArray,int nIntarray,double* ParamsDoubleArray,int nDoublearray); // Send to the upper layer agent how many qubits are stored, and some statistics of the detections
+	int SimulateRetrieveSynchParamsNode(char* IPhostReplyOpNet,char* IPhostRequestOpNet,double* ParamsDoubleArray,int nDoublearray); // Send to the upper layer agent how synch retrieved parameters stored in the below node
 	~QTLAH();  //destructor
 
 private: //Functions//Methods

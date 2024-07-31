@@ -1096,6 +1096,67 @@ while(isValidWhileLoopCount>0){
 return 0; // All OK
 }
 
+int QTLAH::SimulateRetrieveSynchParamsNode(char* IPhostReply,char* IPhostRequest,double* ParamsDoubleArray,int nDoublearray){ // Send to the upper layer agent how many qubits are stored
+this->RelativeNanoSleepWait((unsigned int)((unsigned int)1000*(unsigned int)WaitTimeAfterMainWhileLoop));//usleep((int)(5000*WaitTimeAfterMainWhileLoop));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes. This can be improved by sending messages to the specific node, and this node replying that has received the detection command, then this could start
+this->acquire();
+// It is a "blocking" communication between host and node, because it is many read trials for reading
+while(this->SimulateRetrieveNumStoredQubitsNodeFlag==true){//Wait, only one asking
+this->release();
+this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
+this->acquire();
+}
+this->SimulateRetrieveNumStoredQubitsNodeFlag=true;
+int isValidWhileLoopCount = 10; // Number of tries If it needs more than one trial is because the sockets are not working correctly. It is best to check for open sockets and kill the processes taking hold of them
+this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
+while(isValidWhileLoopCount>0){
+	if (isValidWhileLoopCount % 10==0){// Only try to resend the message once every 10 times
+	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+	strcpy(ParamsCharArray,IPhostReply);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,IPhostRequest);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"Control");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"InfoRequest");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"SimulateRetrieveSynchParamsNode");
+	strcat(ParamsCharArray,",");// Very important to end the message
+	//cout << "SimulateRetrieveNumStoredQubitsNode ParamsCharArray: " << ParamsCharArray << endl;
+	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+	}
+	this->release();
+	this->RelativeNanoSleepWait((unsigned int)(1000*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));//usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
+	this->acquire();
+	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
+		//cout << "We received info for SimulateRetrieveNumStoredQubitsNode" << endl;
+		ParamsDoubleArray[0]=this->TimeTaggsDetAnalytics[0];
+		ParamsDoubleArray[1]=this->TimeTaggsDetAnalytics[1];
+		ParamsDoubleArray[2]=this->TimeTaggsDetAnalytics[2];
+		
+		this->SimulateRetrieveNumStoredQubitsNodeFlag=false;
+		this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
+		this->release();			
+		isValidWhileLoopCount=0;
+	}
+	else{
+		// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+		//memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
+		ParamsDoubleArray[0]=0.0;
+		ParamsDoubleArray[1]=0.0;
+		ParamsDoubleArray[2]=0.0;
+		isValidWhileLoopCount--;
+		if (isValidWhileLoopCount<=1){// Finish at 1, so that a query message is ot send again without handling the eventual answer
+			cout << "Host did not achieve to RetrieveSynchParamsNode" << endl;
+			this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
+			this->SimulateRetrieveNumStoredQubitsNodeFlag=false;
+			this->release();
+		}
+	}
+}//while
+
+return 0; // All OK
+}
+
 int QTLAH::SendKeepAliveHeartBeatsSockets(){
 for (int i=0;i<NumSockets;i++){
 	char ParamsCharArray[NumBytesBufferICPMAX] = {0};

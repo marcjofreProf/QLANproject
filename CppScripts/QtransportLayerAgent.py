@@ -144,6 +144,9 @@ class QTLAH(_object):
 
     def SimulateRetrieveNumStoredQubitsNode(self, IPhostReplyOpNet, IPhostRequestOpNet, ParamsIntArray, ParamsDoubleArray):
         return _QtransportLayerAgent.QTLAH_SimulateRetrieveNumStoredQubitsNode(self, IPhostReplyOpNet, IPhostRequestOpNet, ParamsIntArray, ParamsDoubleArray)
+
+    def SimulateRetrieveSynchParamsNode(self, IPhostReplyOpNet, IPhostRequestOpNet, ParamsDoubleArray):
+        return _QtransportLayerAgent.QTLAH_SimulateRetrieveSynchParamsNode(self, IPhostReplyOpNet, IPhostRequestOpNet, ParamsDoubleArray)
     __swig_destroy__ = _QtransportLayerAgent.delete_QTLAH
     __del__ = lambda self: None
 QTLAH_swigregister = _QtransportLayerAgent.QTLAH_swigregister

@@ -820,6 +820,21 @@ this->release();
 return SimulateNumStoredQubitsNodeAux;
 }
 
+int QPLA::GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams){
+this->acquire();
+while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
+this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
+
+TimeTaggsDetSynchParams[0]=SynchCalcValuesArray[0];
+TimeTaggsDetSynchParams[1]=SynchCalcValuesArray[1];
+TimeTaggsDetSynchParams[2]=SynchCalcValuesArray[2];
+
+this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
+this->release();
+
+return 0; // All ok
+}
+
 int QPLA::HistCalcPeriodTimeTags(){
 this->acquire();
 while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish

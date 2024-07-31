@@ -131,6 +131,7 @@ public: // Functions/Methods
 	int SimulateEmitQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux,double* FineSynchAdjValAux);
 	int SimulateReceiveQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux);
 	int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
+	int GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams);
 	~QPLA();  //destructor
 
 private: // Functions/Methods

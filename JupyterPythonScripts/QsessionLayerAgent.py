@@ -33,8 +33,12 @@ class QSLA:
 	def SendMessageAgent(self,ParamsDescendingCharArray): # Send message to the below Agent
 		self.QTLAagent.SendMessageAgent(ParamsDescendingCharArray)
 	
+	## Methods to retrieve information from the nodes or hosts
 	def SimulateRetrieveNumStoredQubitsNode(self,IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray): # Supposing that node has received quBits, make use of them
 		self.QTLAagent.SimulateRetrieveNumStoredQubitsNode(IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray)
+	
+	def SimulateRetrieveSynchParamsNode(self,IPhostReply,IPhostRequest,ParamsFloatArray): # Supposing that node has received quBits, retrieve the synch parameters computed
+		self.QTLAagent.SimulateRetrieveSynchParamsNode(IPhostReply,IPhostRequest,ParamsFloatArray)
 	
 	def __del__(self): # Destructor of the class
 		del self.QTLAagent

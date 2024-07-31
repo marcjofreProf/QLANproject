@@ -172,6 +172,7 @@ private: // Functions/Methods
 	int QPLASimulateEmitQuBit();
 	int QPLASimulateReceiveQuBit();
 	int GetSimulateNumStoredQubitsNode();
+	int GetSimulateSynchParamsNode();
 	
 };
 
