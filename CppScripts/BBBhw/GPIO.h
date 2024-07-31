@@ -218,6 +218,8 @@ public:	// Functions/Methods
 	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
 	int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned short* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
 	int ClearStoredQuBits(); // Send the writting pointer back to the beggining - effectively clearing stored QuBits
+	// Synchronization related
+	int SetSynchDriftParams(double* AccumulatedErrorDriftParamsAux);// Method to update (or reset with 0s) the synchronization parameters of the long time drift (maybe updated periodically)
 	// Non PRU
 	virtual int getNumber() { return number; }
 	// General Input and Output Settings

@@ -367,9 +367,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(128*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%(128*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			////cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			////cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
-			//cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
+			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
 			cout << "duration_FinalInitialCountAuxArrayAvg: " << this->duration_FinalInitialCountAuxArrayAvg << endl;
-			cout << "AccumulatedErrorDrift: " << this->AccumulatedErrorDrift << endl;
 			////cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
 			////cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 			cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
@@ -682,6 +681,12 @@ return 0;// all ok
 int GPIO::SendEmulateQubits(){ // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
 
 return 0;// all ok
+}
+
+int GPIO::SetSynchDriftParams(double* AccumulatedErrorDriftParamsAux){
+AccumulatedErrorDrift=static_cast<long double>(AccumulatedErrorDriftParamsAux[0]); // For retrieved relative frequency difference from protocol
+AccumulatedErrorDriftAux=static_cast<long double>(AccumulatedErrorDriftParamsAux[1]);// For retrieved relative offset difference from protocol
+return 0; // All Ok
 }
 
 //PRU0 - Operation - getting iputs

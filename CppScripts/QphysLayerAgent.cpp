@@ -33,6 +33,7 @@ Agent script for Quantum Physical Layer
 // time points
 #define WaitTimeToFutureTimePoint 399000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
 #define UTCoffsetBarrierErrorThreshold 37000000000 // Some BBB when synch with linuxPTP have an error on the UTC offset with respect TAI. Remove this sistemic offset and announce it!
+#define SynchProciterRunsTimePoint 5000000000 // Time to wait between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
 // Mathematical calculations
 #include <cmath>
 
@@ -424,6 +425,7 @@ this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test f
 this->FineSynchAdjVal[0]=FineSynchAdjValAux[0];// synch trig offset
 this->FineSynchAdjVal[1]=FineSynchAdjValAux[1];// synch trig frequency
 //cout << "this->FineSynchAdjVal[1]: " << this->FineSynchAdjVal[1] << endl;
+// Remove previous synch values - probably not for the emitter (since calculation for synch values are done as receiver)
 // Here run the several iterations with different testing frequencies
 for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
@@ -436,6 +438,7 @@ for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 		else{
 		cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
 		}
+		this->RelativeNanoSleepWait(static_cast<unsigned int>(SynchProciterRunsTimePoint));// Give time between iterations to send qubits
 	}
 }
 this->release();
@@ -520,6 +523,14 @@ for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this-
 this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
 this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
 this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
+// Reset previous synch values to zero
+SynchCalcValuesArray[0]=0.0;
+SynchCalcValuesArray[1]=0.0;
+SynchCalcValuesArray[2]=0.0;
+double SynchParamValuesArrayAux[2];
+SynchParamValuesArrayAux[0]=SynchCalcValuesArray[1];
+SynchParamValuesArrayAux[1]=SynchCalcValuesArray[2];
+PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Reset computed values to the agent below
 // Here run the several iterations with different testing frequencies
 for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
@@ -532,8 +543,13 @@ for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 		cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 		}
 		this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
+		this->RelativeNanoSleepWait(static_cast<unsigned int>(SynchProciterRunsTimePoint));// Give time between iterations to send qubits
 	}
 }
+// Update values
+SynchParamValuesArrayAux[0]=SynchCalcValuesArray[1];
+SynchParamValuesArrayAux[1]=SynchCalcValuesArray[2];
+PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Update computed values to the agent below
 this->release();
 return 0; // return 0 is for no error
 }
