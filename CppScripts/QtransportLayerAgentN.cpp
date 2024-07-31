@@ -30,7 +30,7 @@ Agent script for Quantum transport Layer Node
 #include <arpa/inet.h>
 // Threading
 #define WaitTimeAfterMainWhileLoop 10000000 //nanoseconds
-#define usSynchProciterRunsTimePoint 20000000 // Time to wait (microseconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
+#define usSynchProciterRunsTimePoint 10000000 // Time to wait (microseconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
 #include <thread>
 // Semaphore
 #include <atomic>
@@ -873,18 +873,20 @@ return 0;
 }
 
 int QTLAN::QPLASimulateEmitSynchQuBit() {
-this->acquire();
+
 for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
+		this->acquire();
 		if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
 			this->QPLASimulateEmitQuBitFlag=true; 
 			this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitSynchQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass);
 			this->QPLASimulateEmitQuBitFlag=false;
 			usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
+		}
+		this->release();
 }
 }
-}
-this->release();
+
 return 0;
 }
 
@@ -900,18 +902,19 @@ return 0;
 }
 
 int QTLAN::QPLASimulateReceiveSynchQuBit() {
-this->acquire();
 for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
+		this->acquire();
 		if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
 			this->QPLASimulateReceiveQuBitFlag=true; 
 			this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,iCenterMass,iNumRunsPerCenterMass);
 			this->QPLASimulateReceiveQuBitFlag=false;
 			usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
 		}
+		this->release();
 }
 }
-this->release();
+
 return 0;
 }
 
