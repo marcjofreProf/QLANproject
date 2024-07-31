@@ -101,8 +101,6 @@ private: //Variables/Instances
 	int numReqQuBits=0;
 	double FineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
 	// Automatic calculation of synchronization
-	int iCenterMass=0; // Iterator for the indexes of the center of mass
-	int iRunCenterMass=0; // Iterator for the indexes of the center of mass
 	unsigned long long int SynchFirstTagsArray[NumCalcCenterMass][NumRunsPerCenterMass]; // To store the first tags (averaged if needed for all the tags in the run
 	double SynchHistCenterMassArray[NumCalcCenterMass]={0.0,0.0,0.0}; // Array containing the needed center of mass for the histograms of the synchronization
 	double SynchCalcValuesArray[NumCalcCenterMass]={0.0,0.0,0.0}; // Computed values for achieving synchronization protocol
@@ -172,7 +170,7 @@ private: // Functions/Methods
 	struct timespec SetFutureTimePointOtherNode();
 	struct timespec GetFutureTimePointOtherNode();
 	// Synchronization primitives
-	int HistCalcPeriodTimeTags(); // Calculate the histogram center given a period and a list of timetaggs	
+	int HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass); // Calculate the histogram center given a period and a list of timetaggs	
 };
 
 

@@ -427,6 +427,7 @@ this->FineSynchAdjVal[1]=FineSynchAdjValAux[1];// synch trig frequency
 // Here run the several iterations with different testing frequencies
 for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
+		this->FineSynchAdjVal[1]=FineSynchAdjValAux[1]+FreqSynchNormValuesArrayAux[iCenterMass];// update values
 		if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 		this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 		std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
@@ -519,16 +520,20 @@ for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this-
 this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
 this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
 this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
-
-if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
-this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
-std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
-threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
+// Here run the several iterations with different testing frequencies
+for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
+	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
+		if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
+		this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
+		std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
+		threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
+		}
+		else{
+		cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
+		}
+		this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
+	}
 }
-else{
-cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
-}
-
 this->release();
 return 0; // return 0 is for no error
 }
@@ -886,7 +891,7 @@ this->release();
 return 0; // All ok
 }
 
-int QPLA::HistCalcPeriodTimeTags(){
+int QPLA::HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass){
 this->acquire();
 while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
@@ -896,7 +901,7 @@ int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
 
 if (SimulateNumStoredQubitsNodeAux>0){
-SynchFirstTagsArray[iCenterMass][iRunCenterMass]=TimeTaggs[0];
+SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=TimeTaggs[0];
 //for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
 //CenterMassVal=CenterMassVal+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
 //}
@@ -907,7 +912,7 @@ this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();
 
 
-if (iRunCenterMass==(NumRunsPerCenterMass-1)){
+if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 double CenterMassVal=0.0;
 for (int i=0;i<(NumRunsPerCenterMass-1);i++){
 CenterMassVal=CenterMassVal+(1.0/((double)NumRunsPerCenterMass-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
@@ -920,7 +925,7 @@ cout << "QPLA::SynchHistCenterMassArray[2]: " << SynchHistCenterMassArray[2] << 
 }
 
 
-if (iCenterMass==(NumCalcCenterMass-1) and iRunCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
+if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
 	adjFreqSynchNormRatiosArray[0]=1.0;
 	adjFreqSynchNormRatiosArray[1]=((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/static_cast<double>(HistPeriodicityAux);
 	adjFreqSynchNormRatiosArray[2]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[1]))/static_cast<double>(HistPeriodicityAux);
@@ -933,12 +938,6 @@ if (iCenterMass==(NumCalcCenterMass-1) and iRunCenterMass==(NumRunsPerCenterMass
 	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 }
-
-if (iRunCenterMass==(NumRunsPerCenterMass-1)){
-iCenterMass=(iCenterMass+1)%NumCalcCenterMass;// Update for the next value
-}
-
-iRunCenterMass=(iRunCenterMass+1)%NumRunsPerCenterMass;// Update value
 
 return 0; // All Ok
 }
