@@ -33,7 +33,7 @@ Agent script for Quantum Physical Layer
 // time points
 #define WaitTimeToFutureTimePoint 399000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
 #define UTCoffsetBarrierErrorThreshold 37000000000 // Some BBB when synch with linuxPTP have an error on the UTC offset with respect TAI. Remove this sistemic offset and announce it!
-#define usSynchProciterRunsTimePoint 10000000 // Time to wait (microseconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
+#define usSynchProciterRunsTimePoint 20000000 // Time to wait (microseconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
 // Mathematical calculations
 #include <cmath>
 
