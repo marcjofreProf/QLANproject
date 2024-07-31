@@ -440,8 +440,7 @@ this->FineSynchAdjVal[1]=FineSynchAdjValAux[1];// synch trig frequency
 		else{		
 		cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
 		}
-		
-		usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
+		//usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
 //	}
 //}
 this->release();
@@ -548,7 +547,7 @@ if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 		cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 		}		
 		this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
-		usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
+		//usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
 		//cout << "static_cast<unsigned int>(usSynchProciterRunsTimePoint): " << static_cast<unsigned int>(usSynchProciterRunsTimePoint) << endl;
 //	}
 //}

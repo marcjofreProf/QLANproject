@@ -30,6 +30,7 @@ Agent script for Quantum transport Layer Node
 #include <arpa/inet.h>
 // Threading
 #define WaitTimeAfterMainWhileLoop 10000000 //nanoseconds
+#define usSynchProciterRunsTimePoint 10000000 // Time to wait (microseconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
 #include <thread>
 // Semaphore
 #include <atomic>
@@ -879,6 +880,7 @@ for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 			this->QPLASimulateEmitQuBitFlag=true; 
 			this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitSynchQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass);
 			this->QPLASimulateEmitQuBitFlag=false;
+			usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
 }
 }
 }
@@ -905,6 +907,7 @@ for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 			this->QPLASimulateReceiveQuBitFlag=true; 
 			this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,iCenterMass,iNumRunsPerCenterMass);
 			this->QPLASimulateReceiveQuBitFlag=false;
+			usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
 		}
 }
 }
