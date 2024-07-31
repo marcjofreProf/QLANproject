@@ -176,9 +176,9 @@ private: // Functions/Methods
 	int countQintupleComas(char* ParamsCharArray);
 	//
 	int QPLASimulateEmitQuBit();
-	int QPLASimulateEmitSynchQuBit();
+	int QPLASimulateEmitSynchQuBit(int iCenterMass,int iNumRunsPerCenterMass);
 	int QPLASimulateReceiveQuBit();
-	int QPLASimulateReceiveSynchQuBit();
+	int QPLASimulateReceiveSynchQuBit(int iCenterMass,int iNumRunsPerCenterMass);
 	int GetSimulateNumStoredQubitsNode();
 	int GetSimulateSynchParamsNode();
 	

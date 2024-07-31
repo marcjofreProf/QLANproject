@@ -805,9 +805,13 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				if(iIterQLLAIPaddr==0){strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(PayloadAux,"_"));}
 				else{strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(NULL,"_"));}
 			}
-			
-			std::thread threadSimulateEmitSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitSynchQuBit,this);
-			threadSimulateEmitSynchQuBitRefAux.detach();
+			for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
+				for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
+					std::thread threadSimulateEmitSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitSynchQuBit,this,iCenterMass,iNumRunsPerCenterMass);
+					threadSimulateEmitSynchQuBitRefAux.detach();
+					usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
+				}
+			}
 		}
 		else if (string(Command)==string("SimulateReceiveQubits")){// Read qubits to the attached node
 			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
@@ -836,9 +840,13 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				if(iIterQLLAIPaddr==0){strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(PayloadAux,"_"));}
 				else{strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(NULL,"_"));}
 			}
-			
-			std::thread threadSimulateReceiveSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveSynchQuBit,this);
-			threadSimulateReceiveSynchQuBitRefAux.detach();
+			for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
+				for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
+					std::thread threadSimulateReceiveSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveSynchQuBit,this,iCenterMass,iNumRunsPerCenterMass);
+					threadSimulateReceiveSynchQuBitRefAux.detach();
+					usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
+				}
+			}
 		}
 		else if (string(Command)==string("print")){
 			cout << "Node New Message: "<< Payload << endl;
@@ -872,20 +880,15 @@ this->release();
 return 0;
 }
 
-int QTLAN::QPLASimulateEmitSynchQuBit() {
-
-for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
-	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
-		this->acquire();
-		if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
-			this->QPLASimulateEmitQuBitFlag=true; 
-			this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitSynchQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass);
-			this->QPLASimulateEmitQuBitFlag=false;
-			usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
-		}
-		this->release();
+int QTLAN::QPLASimulateEmitSynchQuBit(int iCenterMass,int iNumRunsPerCenterMass) {
+this->acquire();
+if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
+	this->QPLASimulateEmitQuBitFlag=true; 
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitSynchQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass);
+	this->QPLASimulateEmitQuBitFlag=false;
+	
 }
-}
+this->release();
 
 return 0;
 }
@@ -901,19 +904,14 @@ this->release();
 return 0;
 }
 
-int QTLAN::QPLASimulateReceiveSynchQuBit() {
-for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
-	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
-		this->acquire();
-		if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
-			this->QPLASimulateReceiveQuBitFlag=true; 
-			this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,iCenterMass,iNumRunsPerCenterMass);
-			this->QPLASimulateReceiveQuBitFlag=false;
-			usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
-		}
-		this->release();
+int QTLAN::QPLASimulateReceiveSynchQuBit(int iCenterMass,int iNumRunsPerCenterMass) {
+this->acquire();
+if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
+	this->QPLASimulateReceiveQuBitFlag=true; 
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,iCenterMass,iNumRunsPerCenterMass);
+	this->QPLASimulateReceiveQuBitFlag=false;
 }
-}
+this->release();
 
 return 0;
 }
