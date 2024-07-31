@@ -414,8 +414,9 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux){
-
+int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass){
+this->acquire();
+if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
 //this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
@@ -426,26 +427,24 @@ this->FineSynchAdjVal[0]=FineSynchAdjValAux[0];// synch trig offset
 this->FineSynchAdjVal[1]=FineSynchAdjValAux[1];// synch trig frequency
 //cout << "this->FineSynchAdjVal[1]: " << this->FineSynchAdjVal[1] << endl;
 // Remove previous synch values - probably not for the emitter (since calculation for synch values are done as receiver)
+}
 // Here run the several iterations with different testing frequencies
-for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
-	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
-		this->FineSynchAdjVal[1]=FineSynchAdjValAux[1]+FreqSynchNormValuesArrayAux[iCenterMass];// update values
-		this->acquire();
+//for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
+//	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
+		this->FineSynchAdjVal[1]=FineSynchAdjValAux[1]+FreqSynchNormValuesArrayAux[iCenterMass];// update values		
 		if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 		this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
-		this->release();
 		std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
 		threadSimulateEmitQuBitRefAux.join();//threadSimulateEmitQuBitRefAux.detach();//threadSimulateEmitQuBitRefAux.join();//
 		}
-		else{
-		this->release();
+		else{		
 		cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
 		}
 		
 		usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
-	}
-}
-
+//	}
+//}
+this->release();
 return 0; // return 0 is for no error
 }
 
@@ -518,45 +517,49 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux){
-
-strcpy(this->ModeActivePassive,ModeActivePassiveAux);
-for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
-//this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
-this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
-this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
-this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
-// Reset previous synch values to zero
-SynchCalcValuesArray[0]=0.0;
-SynchCalcValuesArray[1]=0.0;
-SynchCalcValuesArray[2]=0.0;
-double SynchParamValuesArrayAux[2];
-SynchParamValuesArrayAux[0]=SynchCalcValuesArray[1];
-SynchParamValuesArrayAux[1]=SynchCalcValuesArray[2];
-PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Reset computed values to the agent below
+int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass){
+this->acquire();
+if (iCenterMass==0 and iNumRunsPerCenterMass==0){
+	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
+	for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
+	//this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
+	this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
+	this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
+	this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
+	// Reset previous synch values to zero
+	SynchCalcValuesArray[0]=0.0;
+	SynchCalcValuesArray[1]=0.0;
+	SynchCalcValuesArray[2]=0.0;
+	double SynchParamValuesArrayAux[2];
+	SynchParamValuesArrayAux[0]=SynchCalcValuesArray[1];
+	SynchParamValuesArrayAux[1]=SynchCalcValuesArray[2];
+	PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Reset computed values to the agent below
+}
 // Here run the several iterations with different testing frequencies
-for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
-	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
-		this->acquire();
+//for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
+//	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
+		
 		if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 		this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
-		this->release();
 		std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
 		threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
 		}
 		else{
-		this->release();
 		cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 		}		
 		this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 		usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
-		cout << "static_cast<unsigned int>(usSynchProciterRunsTimePoint): " << static_cast<unsigned int>(usSynchProciterRunsTimePoint) << endl;
-	}
-}
+		//cout << "static_cast<unsigned int>(usSynchProciterRunsTimePoint): " << static_cast<unsigned int>(usSynchProciterRunsTimePoint) << endl;
+//	}
+//}
+if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 // Update values
+double SynchParamValuesArrayAux[2];
 SynchParamValuesArrayAux[0]=-SynchCalcValuesArray[1];// minus for correction
 SynchParamValuesArrayAux[1]=-SynchCalcValuesArray[2];// minus for correction
 PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Update computed values to the agent below
+}
+this->release();
 
 return 0; // return 0 is for no error
 }

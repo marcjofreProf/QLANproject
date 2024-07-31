@@ -872,11 +872,15 @@ return 0;
 }
 
 int QTLAN::QPLASimulateEmitSynchQuBit() {
-this->acquire();	  
-if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
-	this->QPLASimulateEmitQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitSynchQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,this->QLLAFineSynchAdjVal);
-	this->QPLASimulateEmitQuBitFlag=false;
+this->acquire();
+for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
+	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
+		if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
+			this->QPLASimulateEmitQuBitFlag=true; 
+			this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitSynchQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass);
+			this->QPLASimulateEmitQuBitFlag=false;
+}
+}
 }
 this->release();
 return 0;
@@ -894,11 +898,15 @@ return 0;
 }
 
 int QTLAN::QPLASimulateReceiveSynchQuBit() {
-this->acquire();	  
-if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
-	this->QPLASimulateReceiveQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray);
-	this->QPLASimulateReceiveQuBitFlag=false;
+this->acquire();
+for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
+	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
+		if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
+			this->QPLASimulateReceiveQuBitFlag=true; 
+			this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,iCenterMass,iNumRunsPerCenterMass);
+			this->QPLASimulateReceiveQuBitFlag=false;
+		}
+}
 }
 this->release();
 return 0;
