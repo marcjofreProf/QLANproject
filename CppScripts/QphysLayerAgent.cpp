@@ -554,8 +554,9 @@ if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 // Update values
 double SynchParamValuesArrayAux[2];
-SynchParamValuesArrayAux[0]=-SynchCalcValuesArray[1];// minus for correction
-SynchParamValuesArrayAux[1]=-SynchCalcValuesArray[2];// minus for correction
+// The order below is not correct - debbug the protocol
+SynchParamValuesArrayAux[0]=-SynchCalcValuesArray[2]/static_cast<double>(HistPeriodicityAux);// minus for correction
+SynchParamValuesArrayAux[1]=-SynchCalcValuesArray[1];// minus for correction
 PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Update computed values to the agent below
 }
 this->release();

@@ -136,25 +136,25 @@ class QPLA:
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
 	
 	def SimulateRequestSynchsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRunsPerCenterMass,SynchFreqPRUarrayTest,SynchPRUoffFreqVal): # Request that host's node sends qubits to this host's node
-	NumCalcCenterMass=len(SynchFreqPRUarrayTest)
-	for iCenterMass in range(0,NumCalcCenterMass,1):
-		for iNumRunsPerCenterMass in range(0,NumRunsPerCenterMass,1):
-		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2])])
-			messageCommandAux="SimulateReceiveSynchQubits"
-			messageTypeAux="Control"
-			messageIPorg=IPhostOrgConNet
-			messageIPdest=IPhostDestConNet
-			messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-			self.QSLAagent.SendMessageAgent(messageAuxChar)
-			messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2]),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
-			messageCommandAux="SimulateSendSynchQubits"
-			messageTypeAux="Control"
-			messageIPorg=IPhostOrgOpNet
-			messageIPdest=IPhostDestOpNet
-			messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-			self.QSLAagent.SendMessageAgent(messageAuxChar)
-			
-			time.sleep(msSynchProciterRunsTimePoint)# Give time between iterations to send and receive qubits
+		NumCalcCenterMass=len(SynchFreqPRUarrayTest)
+		for iCenterMass in range(0,NumCalcCenterMass,1):
+			for iNumRunsPerCenterMass in range(0,NumRunsPerCenterMass,1):
+				messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2])])
+				messageCommandAux="SimulateReceiveSynchQubits"
+				messageTypeAux="Control"
+				messageIPorg=IPhostOrgConNet
+				messageIPdest=IPhostDestConNet
+				messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
+				self.QSLAagent.SendMessageAgent(messageAuxChar)
+				messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2]),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
+				messageCommandAux="SimulateSendSynchQubits"
+				messageTypeAux="Control"
+				messageIPorg=IPhostOrgOpNet
+				messageIPdest=IPhostDestOpNet
+				messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
+				self.QSLAagent.SendMessageAgent(messageAuxChar)
+				
+				time.sleep(msSynchProciterRunsTimePoint)# Give time between iterations to send and receive qubits
 	
 	## Methods to retrieve information from the nodes or hosts
 	def SimulateRetrieveNumStoredQubitsNode(self,IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray): # Supposing that node has received quBits, make use of them
