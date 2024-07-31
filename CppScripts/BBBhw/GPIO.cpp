@@ -566,6 +566,7 @@ retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterrupt
 //this->TrigAuxIterCount++;
 
 cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
+cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
 cout << "InstantCorr: " << InstantCorr << endl;
 ////cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
@@ -648,6 +649,7 @@ this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->du
 this->TrigAuxIterCount++;
 
 cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
+cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
 cout << "InstantCorr: " << InstantCorr << endl;
 ////cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
