@@ -932,7 +932,7 @@ return 0;
 }
 
 int QTLAN::GetSimulateSynchParamsNode() {
-//cout<< "Node before acquire" << endl;
+//cout<< "Node before GetSimulateSynchParamsNode" << endl;
 this->acquire();	  
 //cout<< "Node before this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
 while (this->GetSimulateNumStoredQubitsNodeFlag==true or this->QPLASimulateReceiveQuBitFlag==true){// Wait here// No other thread checking this info
@@ -992,9 +992,9 @@ else{// server sends on the socket connection
 }      
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
 this->GetSimulateNumStoredQubitsNodeFlag=false;
-//cout<< "Node after send" << endl;
+//cout<< "Node after GetSimulateSynchParamsNode" << endl;
 this->release();
-//cout << "We get here Node GetNumStoredQubitsNode" << endl;
+//cout << "We get here Node GetSimulateSynchParamsNode" << endl;
 return 0;
 }
 

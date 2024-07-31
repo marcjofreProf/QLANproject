@@ -829,6 +829,26 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				this->InfoSimulateNumStoredQubitsNodeFlag=true;
 				//cout << "SimulateNumStoredQubitsNode finished parsing values" << endl;		
 			}
+			else if (string(Command)==string("SimulateSynchParamsNode")){// Reply message. Expected/awaiting message
+				//cout << "We are here SimulateSynchParamsNode" << endl;
+				//cout << "Payload: " << Payload << endl;
+				int NumSubPayloads=this->countColons(Payload);
+				//cout << "NumSubPayloads: " << NumSubPayloads << endl;
+				char SubPayload[NumBytesBufferICPMAX] = {0};						
+				for (int i=0;i<(NumSubPayloads-1);i++){				
+					if (i==0){						
+						strcpy(SubPayload,strtok(Payload,":"));
+					}
+					else{
+						strcpy(SubPayload,strtok(NULL,":"));
+					}
+					this->TimeTaggsDetSynchParams[i]=stod(SubPayload);
+					//cout << "stod(SubPayload): " << stod(SubPayload) << endl;
+				}
+								
+				this->InfoSimulateNumStoredQubitsNodeFlag=true;
+				//cout << "SimulateSynchParamsNode finished parsing values" << endl;		
+			}			
 			else if (string(Command)==string("print")){
 				cout << "Host New Message: "<< Payload << endl;
 			}				
@@ -1121,7 +1141,7 @@ while(isValidWhileLoopCount>0){
 	strcat(ParamsCharArray,",");
 	strcat(ParamsCharArray,"SimulateRetrieveSynchParamsNode");
 	strcat(ParamsCharArray,",");// Very important to end the message
-	//cout << "SimulateRetrieveNumStoredQubitsNode ParamsCharArray: " << ParamsCharArray << endl;
+	//cout << "SimulateRetrieveSynchParamsNode ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 	}
 	this->release();
@@ -1129,9 +1149,9 @@ while(isValidWhileLoopCount>0){
 	this->acquire();
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
 		//cout << "We received info for SimulateRetrieveNumStoredQubitsNode" << endl;
-		ParamsDoubleArray[0]=this->TimeTaggsDetAnalytics[0];
-		ParamsDoubleArray[1]=this->TimeTaggsDetAnalytics[1];
-		ParamsDoubleArray[2]=this->TimeTaggsDetAnalytics[2];
+		ParamsDoubleArray[0]=this->TimeTaggsDetSynchParams[0];
+		ParamsDoubleArray[1]=this->TimeTaggsDetSynchParams[1];
+		ParamsDoubleArray[2]=this->TimeTaggsDetSynchParams[2];
 		
 		this->SimulateRetrieveNumStoredQubitsNodeFlag=false;
 		this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
