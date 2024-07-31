@@ -435,7 +435,7 @@ for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 		this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 		this->release();
 		std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
-		threadSimulateEmitQuBitRefAux.detach();//threadSimulateEmitQuBitRefAux.join();//
+		threadSimulateEmitQuBitRefAux.join();//threadSimulateEmitQuBitRefAux.detach();//threadSimulateEmitQuBitRefAux.join();//
 		}
 		else{
 		this->release();
@@ -542,7 +542,7 @@ for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 		this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 		this->release();
 		std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
-		threadSimulateReceiveQuBitRefAux.detach();//threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
+		threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
 		}
 		else{
 		this->release();
@@ -550,6 +550,7 @@ for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 		}		
 		this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 		usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
+		cout << "static_cast<unsigned int>(usSynchProciterRunsTimePoint): " << static_cast<unsigned int>(usSynchProciterRunsTimePoint) << endl;
 	}
 }
 // Update values
