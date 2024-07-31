@@ -33,7 +33,7 @@ Agent script for Quantum Physical Layer
 // time points
 #define WaitTimeToFutureTimePoint 399000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
 #define UTCoffsetBarrierErrorThreshold 37000000000 // Some BBB when synch with linuxPTP have an error on the UTC offset with respect TAI. Remove this sistemic offset and announce it!
-#define SynchProciterRunsTimePoint 5000000000 // Time to wait between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
+#define usSynchProciterRunsTimePoint 5000000 // Time to wait (microseconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
 // Mathematical calculations
 #include <cmath>
 
@@ -438,7 +438,7 @@ for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 		else{
 		cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
 		}
-		this->RelativeNanoSleepWait(static_cast<unsigned int>(SynchProciterRunsTimePoint));// Give time between iterations to send qubits
+		usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
 	}
 }
 this->release();
@@ -543,12 +543,12 @@ for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 		cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 		}
 		this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
-		this->RelativeNanoSleepWait(static_cast<unsigned int>(SynchProciterRunsTimePoint));// Give time between iterations to send qubits
+		usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
 	}
 }
 // Update values
-SynchParamValuesArrayAux[0]=SynchCalcValuesArray[1];
-SynchParamValuesArrayAux[1]=SynchCalcValuesArray[2];
+SynchParamValuesArrayAux[0]=-SynchCalcValuesArray[1];// minus for correction
+SynchParamValuesArrayAux[1]=-SynchCalcValuesArray[2];// minus for correction
 PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Update computed values to the agent below
 this->release();
 return 0; // return 0 is for no error
