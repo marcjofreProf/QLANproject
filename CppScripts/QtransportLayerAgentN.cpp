@@ -881,14 +881,14 @@ return 0;
 }
 
 int QTLAN::QPLASimulateEmitSynchQuBit(int iCenterMass,int iNumRunsPerCenterMass) {
-this->acquire();
+//this->acquire();
 if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateEmitQuBitFlag=true; 
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitSynchQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass);
 	this->QPLASimulateEmitQuBitFlag=false;
 	
 }
-this->release();
+//this->release();
 
 return 0;
 }
@@ -905,13 +905,13 @@ return 0;
 }
 
 int QTLAN::QPLASimulateReceiveSynchQuBit(int iCenterMass,int iNumRunsPerCenterMass) {
-this->acquire();
+//this->acquire();
 if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateReceiveQuBitFlag=true; 
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,iCenterMass,iNumRunsPerCenterMass);
 	this->QPLASimulateReceiveQuBitFlag=false;
 }
-this->release();
+//this->release();
 
 return 0;
 }
