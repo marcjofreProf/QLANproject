@@ -686,8 +686,10 @@ return 0;// all ok
 }
 
 int GPIO::SetSynchDriftParams(double* AccumulatedErrorDriftParamsAux){
+this->acquire();
 AccumulatedErrorDrift=static_cast<long double>(AccumulatedErrorDriftParamsAux[0]); // For retrieved relative frequency difference from protocol
 AccumulatedErrorDriftAux=static_cast<long double>(AccumulatedErrorDriftParamsAux[1]);// For retrieved relative offset difference from protocol
+this->release();
 return 0; // All Ok
 }
 

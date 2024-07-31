@@ -33,7 +33,7 @@ Agent script for Quantum Physical Layer
 // time points
 #define WaitTimeToFutureTimePoint 399000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
 #define UTCoffsetBarrierErrorThreshold 37000000000 // Some BBB when synch with linuxPTP have an error on the UTC offset with respect TAI. Remove this sistemic offset and announce it!
-#define usSynchProciterRunsTimePoint 20000000 // Time to wait (microseconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
+#define usSynchProciterRunsTimePoint 10000000 // Time to wait (microseconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
 // Mathematical calculations
 #include <cmath>
 
@@ -415,7 +415,7 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux){
-this->acquire();
+
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
 //this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
@@ -430,6 +430,7 @@ this->FineSynchAdjVal[1]=FineSynchAdjValAux[1];// synch trig frequency
 for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
 		this->FineSynchAdjVal[1]=FineSynchAdjValAux[1]+FreqSynchNormValuesArrayAux[iCenterMass];// update values
+		this->acquire();
 		if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 		this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 		std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
@@ -438,10 +439,10 @@ for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 		else{
 		cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
 		}
+		this->release();
 		usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
 	}
 }
-this->release();
 
 return 0; // return 0 is for no error
 }
@@ -516,7 +517,7 @@ return 0; // return 0 is for no error
 }
 
 int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux){
-this->acquire();
+
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
 //this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
@@ -534,6 +535,7 @@ PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Reset computed values t
 // Here run the several iterations with different testing frequencies
 for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
+		this->acquire();
 		if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 		this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 		std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
@@ -542,6 +544,7 @@ for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 		else{
 		cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 		}
+		this->release();
 		this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 		usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
 	}
@@ -550,7 +553,7 @@ for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 SynchParamValuesArrayAux[0]=-SynchCalcValuesArray[1];// minus for correction
 SynchParamValuesArrayAux[1]=-SynchCalcValuesArray[2];// minus for correction
 PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Update computed values to the agent below
-this->release();
+
 return 0; // return 0 is for no error
 }
 
