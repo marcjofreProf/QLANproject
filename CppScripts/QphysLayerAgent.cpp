@@ -413,6 +413,35 @@ this->release();
 return 0; // return 0 is for no error
 }
 
+int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux){
+this->acquire();
+strcpy(this->ModeActivePassive,ModeActivePassiveAux);
+for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
+//this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
+this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
+this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
+this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
+this->FineSynchAdjVal[0]=FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]=FineSynchAdjValAux[1];// synch trig frequency
+//cout << "this->FineSynchAdjVal[1]: " << this->FineSynchAdjVal[1] << endl;
+// Here run the several iterations with different testing frequencies
+for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
+	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
+		if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
+		this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
+		std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
+		threadSimulateEmitQuBitRefAux.join();//threadSimulateEmitQuBitRefAux.detach();
+		}
+		else{
+		cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
+		}
+	}
+}
+this->release();
+
+return 0; // return 0 is for no error
+}
+
 int QPLA::ThreadSimulateEmitQuBit(){
 cout << "Emiting Qubits" << endl;
 struct timespec requestWhileWait;
@@ -482,6 +511,28 @@ this->release();
 return 0; // return 0 is for no error
 }
 
+int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux){
+this->acquire();
+strcpy(this->ModeActivePassive,ModeActivePassiveAux);
+for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
+//this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
+this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
+this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
+this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
+
+if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
+this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
+std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
+threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
+}
+else{
+cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
+}
+
+this->release();
+return 0; // return 0 is for no error
+}
+
 int QPLA::ThreadSimulateReceiveQubit(){
 cout << "Receiving Qubits" << endl;
 this->acquire();
@@ -544,7 +595,7 @@ this->SimulateNumStoredQubitsNode[0]=PRUGPIO.RetrieveNumStoredQuBits(TimeTaggs,C
 this->RunThreadSimulateReceiveQuBitFlag=true;//enable again that this thread can again be called
 this->release();
 cout << "End Receiving Qubits" << endl;
-this->HistCalcPeriodTimeTags();
+
 return 0; // return 0 is for no error
 }
 

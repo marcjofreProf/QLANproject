@@ -102,6 +102,9 @@ private: // Variables/Objects
 	char QLLAIPaddresses[NumHostConnection][IPcharArrayLengthMAX] = {0};
 	int QLLAnumReqQuBits=0;
 	double QLLAFineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
+	// Synchronization test frequencies and others
+	int QLLANumRunsPerCenterMass=0;
+	double QLLAFreqSynchNormValuesArray[3]={0.0,0.35,0.70}; // Normalized values of frequency testing// Relative frequency difference normalized
 	
 public: // Functions/Methods
 	int RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep);
@@ -170,7 +173,9 @@ private: // Functions/Methods
 	int countQintupleComas(char* ParamsCharArray);
 	//
 	int QPLASimulateEmitQuBit();
+	int QPLASimulateEmitSynchQuBit();
 	int QPLASimulateReceiveQuBit();
+	int QPLASimulateReceiveSynchQuBit();
 	int GetSimulateNumStoredQubitsNode();
 	int GetSimulateSynchParamsNode();
 	

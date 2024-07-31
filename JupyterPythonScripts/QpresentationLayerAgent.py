@@ -133,7 +133,7 @@ class QPLA:
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
 	
-	def SimulateRequestSynchsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRunsPerCenterMass,SynchFreqPRUarrayTest): # Request that host's node sends qubits to this host's node		
+	def SimulateRequestSynchsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRunsPerCenterMass,SynchFreqPRUarrayTest,SynchPRUoffFreqVal): # Request that host's node sends qubits to this host's node		
 		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2])])
 		messageCommandAux="SimulateReceiveSynchQubits"
 		messageTypeAux="Control"
