@@ -33,7 +33,6 @@ Agent script for Quantum Physical Layer
 // time points
 #define WaitTimeToFutureTimePoint 399000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
 #define UTCoffsetBarrierErrorThreshold 37000000000 // Some BBB when synch with linuxPTP have an error on the UTC offset with respect TAI. Remove this sistemic offset and announce it!
-//#define usSynchProciterRunsTimePoint 10000000 // Time to wait (microseconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
 // Mathematical calculations
 #include <cmath>
 
@@ -429,20 +428,16 @@ this->FineSynchAdjVal[1]=FineSynchAdjValAux[1];// synch trig frequency
 // Remove previous synch values - probably not for the emitter (since calculation for synch values are done as receiver)
 }
 // Here run the several iterations with different testing frequencies
-//for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
-//	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
-		this->FineSynchAdjVal[1]=FineSynchAdjValAux[1]+FreqSynchNormValuesArrayAux[iCenterMass];// update values		
-		if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
-		this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
-		std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
-		threadSimulateEmitQuBitRefAux.join();//threadSimulateEmitQuBitRefAux.detach();//threadSimulateEmitQuBitRefAux.join();//
-		}
-		else{		
-		cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
-		}
-		//usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
-//	}
-//}
+this->FineSynchAdjVal[1]=FineSynchAdjValAux[1]+FreqSynchNormValuesArrayAux[iCenterMass];// update values		
+if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
+this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
+std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
+threadSimulateEmitQuBitRefAux.join();//threadSimulateEmitQuBitRefAux.detach();//threadSimulateEmitQuBitRefAux.join();//
+}
+else{		
+cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
+}
+
 this->release();
 return 0; // return 0 is for no error
 }
@@ -534,30 +529,29 @@ if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 	//SynchParamValuesArrayAux[1]=SynchCalcValuesArray[2];
 	//PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Reset computed values to the agent below
 }
-// Here run the several iterations with different testing frequencies
-//for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
-//	for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){
-		
-		if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
-		this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
-		std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
-		threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
-		}
-		else{
-		cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
-		}		
-		this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
-		//usleep(static_cast<unsigned int>(usSynchProciterRunsTimePoint));// Give time between iterations to send qubits
-		//cout << "static_cast<unsigned int>(usSynchProciterRunsTimePoint): " << static_cast<unsigned int>(usSynchProciterRunsTimePoint) << endl;
-//	}
-//}
+// Here run the several iterations with different testing frequencies	
+if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
+this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
+std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
+threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
+}
+else{
+cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
+}		
+this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
+
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
-// Update values
+// Update absolute values
+SynchCalcValuesAbsArray[0]=SynchCalcValuesAbsArray[0]+SynchCalcValuesArray[0];
+SynchCalcValuesAbsArray[1]=SynchCalcValuesAbsArray[1]+SynchCalcValuesArray[1];
+SynchCalcValuesAbsArray[2]=SynchCalcValuesAbsArray[2]+SynchCalcValuesArray[2];
+// Update relative iterative values
 double SynchParamValuesArrayAux[2];
 // The order below is not correct - debbug the protocol
 SynchParamValuesArrayAux[0]=SynchCalcValuesArray[2]/static_cast<double>(HistPeriodicityAux);// relative frequency correction
 SynchParamValuesArrayAux[1]=SynchCalcValuesArray[1];// offset correction
 PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Update computed values to the agent below
+cout << "QPLA::Synchronization parameters updated for this node" << endl;
 }
 this->release();
 
@@ -907,9 +901,9 @@ this->acquire();
 while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 
-TimeTaggsDetSynchParams[0]=SynchCalcValuesArray[0];
-TimeTaggsDetSynchParams[1]=SynchCalcValuesArray[1];
-TimeTaggsDetSynchParams[2]=SynchCalcValuesArray[2];
+TimeTaggsDetSynchParams[0]=SynchCalcValuesAbsArray[0];
+TimeTaggsDetSynchParams[1]=SynchCalcValuesAbsArray[1];
+TimeTaggsDetSynchParams[2]=SynchCalcValuesAbsArray[2];
 
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();
@@ -953,11 +947,10 @@ CenterMassValAux[i]=(((double)((static_cast<unsigned long long int>(HistPeriodic
 }
 SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));
 
-cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
-cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
-cout << "QPLA::SynchHistCenterMassArray[2]: " << SynchHistCenterMassArray[2] << endl;
+//cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
+//cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
+//cout << "QPLA::SynchHistCenterMassArray[2]: " << SynchHistCenterMassArray[2] << endl;
 }
-
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
 	adjFreqSynchNormRatiosArray[0]=1.0;
@@ -968,9 +961,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(0.5*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // Relative frequency difference adjustment
 	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]-SynchCalcValuesArray[1])*SynchCalcValuesArray[0]); // Offset adjustment
 
-	cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;
-	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
-	cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
+	//cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;
+	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
+	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 }
 
 return 0; // All Ok

@@ -30,7 +30,6 @@ Agent script for Quantum transport Layer Node
 #include <arpa/inet.h>
 // Threading
 #define WaitTimeAfterMainWhileLoop 10000000 //nanoseconds
-#define usSynchProciterRunsTimePoint 10000000 // Time to wait (microseconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
 #include <thread>
 // Semaphore
 #include <atomic>
