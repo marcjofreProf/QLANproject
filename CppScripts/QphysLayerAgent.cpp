@@ -542,7 +542,7 @@ this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 // Update absolute values
-SynchCalcValuesAbsArray[0]=SynchCalcValuesAbsArray[0]+SynchCalcValuesArray[0];
+SynchCalcValuesAbsArray[0]=0.0*SynchCalcValuesAbsArray[0]+SynchCalcValuesArray[0];
 SynchCalcValuesAbsArray[1]=SynchCalcValuesAbsArray[1]+SynchCalcValuesArray[1];
 SynchCalcValuesAbsArray[2]=SynchCalcValuesAbsArray[2]+SynchCalcValuesArray[2];
 // Update relative iterative values
