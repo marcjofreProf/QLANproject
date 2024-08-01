@@ -170,7 +170,9 @@ private: // Functions/Methods
 	struct timespec SetFutureTimePointOtherNode();
 	struct timespec GetFutureTimePointOtherNode();
 	// Synchronization primitives
-	int HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass); // Calculate the histogram center given a period and a list of timetaggs	
+	int HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass); // Calculate the histogram center given a period and a list of timetaggs
+	double DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor);
+	int DoubleBubbleSort(double* arr,int MedianFilterFactor);
 };
 
 

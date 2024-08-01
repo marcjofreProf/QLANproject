@@ -525,14 +525,14 @@ if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 	this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
 	this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
 	this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
-	// Reset previous synch values to zero
-	SynchCalcValuesArray[0]=0.0;
-	SynchCalcValuesArray[1]=0.0;
-	SynchCalcValuesArray[2]=0.0;
-	double SynchParamValuesArrayAux[2];
-	SynchParamValuesArrayAux[0]=SynchCalcValuesArray[1];
-	SynchParamValuesArrayAux[1]=SynchCalcValuesArray[2];
-	PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Reset computed values to the agent below
+	// Reset previous synch values to zero - Maybe comment it in order to do an iterative algorithm
+	//SynchCalcValuesArray[0]=0.0;
+	//SynchCalcValuesArray[1]=0.0;
+	//SynchCalcValuesArray[2]=0.0;
+	//double SynchParamValuesArrayAux[2];
+	//SynchParamValuesArrayAux[0]=SynchCalcValuesArray[1];
+	//SynchParamValuesArrayAux[1]=SynchCalcValuesArray[2];
+	//PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Reset computed values to the agent below
 }
 // Here run the several iterations with different testing frequencies
 //for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
@@ -939,11 +939,19 @@ this->release();
 
 
 if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
-double CenterMassVal=0.0;
+// Mean averaging
+//double CenterMassVal=0.0;
+//for (int i=0;i<(NumRunsPerCenterMass-1);i++){
+//CenterMassVal=CenterMassVal+(1.0/((double)NumRunsPerCenterMass-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
+//}
+//SynchHistCenterMassArray[iCenterMass]=CenterMassVal;
+
+// Median averaging
+double CenterMassValAux[NumRunsPerCenterMass-1]={0.0};
 for (int i=0;i<(NumRunsPerCenterMass-1);i++){
-CenterMassVal=CenterMassVal+(1.0/((double)NumRunsPerCenterMass-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
+CenterMassValAux[i]=(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
 }
-SynchHistCenterMassArray[iCenterMass]=CenterMassVal;
+SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));
 
 cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
 cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
@@ -1023,6 +1031,40 @@ void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
   cout << "Exception caught" << endl;
     }
     } // while
+}
+
+double QPLA::DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor){
+if (MedianFilterFactor<=1){
+	return ArrayHolderAux[0];
+}
+else{
+	// Step 1: Copy the array to a temporary array
+    double temp[MedianFilterFactor]={0.0};
+    for(int i = 0; i < MedianFilterFactor; i++) {
+        temp[i] = ArrayHolderAux[i];
+    }
+    
+    // Step 2: Sort the temporary array
+    this->DoubleBubbleSort(temp,MedianFilterFactor);
+    // If odd, middle number
+    return temp[MedianFilterFactor/2];
+}
+}
+
+// Function to implement Bubble Sort
+int QPLA::DoubleBubbleSort(double* arr,int MedianFilterFactor) {
+    double temp=0.0;
+    for (int i = 0; i < MedianFilterFactor-1; i++) {
+        for (int j = 0; j < MedianFilterFactor-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                // Swap arr[j] and arr[j+1]
+                temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+    return 0; // All ok
 }
 
 } /* namespace nsQphysLayerAgent */

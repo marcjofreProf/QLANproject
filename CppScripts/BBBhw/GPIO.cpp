@@ -691,8 +691,9 @@ return 0;// all ok
 
 int GPIO::SetSynchDriftParams(double* AccumulatedErrorDriftParamsAux){
 this->acquire();
-AccumulatedErrorDrift=static_cast<long double>(AccumulatedErrorDriftParamsAux[0]); // For retrieved relative frequency difference from protocol
-AccumulatedErrorDriftAux=static_cast<long double>(AccumulatedErrorDriftParamsAux[1]);// For retrieved relative offset difference from protocol
+// Make it iterative algorithm
+AccumulatedErrorDrift=AccumulatedErrorDrift+static_cast<long double>(AccumulatedErrorDriftParamsAux[0]); // For retrieved relative frequency difference from protocol
+AccumulatedErrorDriftAux=AccumulatedErrorDriftAux+static_cast<long double>(AccumulatedErrorDriftParamsAux[1]);// For retrieved relative offset difference from protocol
 //cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 //cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 this->release();
