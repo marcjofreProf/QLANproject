@@ -146,6 +146,8 @@ class QPLA:
 				messageIPdest=IPhostDestConNet
 				messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 				self.QSLAagent.SendMessageAgent(messageAuxChar)
+				#print(messageAuxChar)
+				
 				messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2]),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
 				messageCommandAux="SimulateSendSynchQubits"
 				messageTypeAux="Control"
@@ -153,7 +155,7 @@ class QPLA:
 				messageIPdest=IPhostDestOpNet
 				messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 				self.QSLAagent.SendMessageAgent(messageAuxChar)
-				
+				#print(messageAuxChar)
 				time.sleep(sSynchProcIterRunsTimePoint)# Give time between iterations to send and receive qubits
 	
 	## Methods to retrieve information from the nodes or hosts
