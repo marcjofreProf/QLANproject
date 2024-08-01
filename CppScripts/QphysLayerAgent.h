@@ -107,6 +107,7 @@ private: //Variables/Instances
 	double SynchCalcValuesAbsArray[NumCalcCenterMass]={0.0,0.0,0.0}; // Computed absolute values for achieving synchronization protocol, informative
 	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,0.35,0.70}; // Normalized values of frequency testing
 	double adjFreqSynchNormRatiosArray[NumCalcCenterMass]={1.0,1.0,1.0}; // adjusting Normalized ratios of frequency testing
+	double GPIOHardwareSynched=false; // Variable to monitor the hardware synch status of the GPIO process
         
 public: // Variables/Instances
 	exploringBB::GPIO PRUGPIO;
@@ -133,6 +134,7 @@ public: // Functions/Methods
 	int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass);
 	int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
 	int GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams);
+	bool GetGPIOHardwareSynchedNode();
 	~QPLA();  //destructor
 
 private: // Functions/Methods
@@ -155,7 +157,8 @@ private: // Functions/Methods
         bool m_resume() { m_state = APPLICATION_RUNNING; return true; }      
         bool m_exit() { m_state = APPLICATION_EXIT;  return false; } 
         // Payload information parameters
-        int InitParametersAgent();// Client node have some parameters to adjust to the server node        
+        int InitParametersAgent();// Client node have some parameters to adjust to the server node
+        int RegularCheckToPerform(); // Some check to do every now and then     
 	int SetSendParametersAgent(char* ParamsCharArray);// Node accumulates parameters for the other node
 	int ReadParametersAgent();// Node checks parameters from the other node
 	int NegotiateInitialParamsNode();

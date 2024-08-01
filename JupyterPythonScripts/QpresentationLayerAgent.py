@@ -15,7 +15,7 @@ import numpy as np
 
 import QsessionLayerAgent
   
-msSynchProciterRunsTimePoint=10.0 # Time to wait (seconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
+sSynchProcIterRunsTimePoint=10.0 # Time to wait (seconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
 
 class QPLA:
 	def __init__(self,ParamsDescendingCharArray,ParamsAscendingCharArray): # Constructor of this class
@@ -154,7 +154,7 @@ class QPLA:
 				messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 				self.QSLAagent.SendMessageAgent(messageAuxChar)
 				
-				time.sleep(msSynchProciterRunsTimePoint)# Give time between iterations to send and receive qubits
+				time.sleep(sSynchProcIterRunsTimePoint)# Give time between iterations to send and receive qubits
 	
 	## Methods to retrieve information from the nodes or hosts
 	def SimulateRetrieveNumStoredQubitsNode(self,IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray): # Supposing that node has received quBits, make use of them

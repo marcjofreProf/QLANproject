@@ -97,6 +97,8 @@ except __builtin__.Exception:
 
 NumBytesBufferICPMAX = _QtransportLayerAgent.NumBytesBufferICPMAX
 IPcharArrayLengthMAX = _QtransportLayerAgent.IPcharArrayLengthMAX
+NumCalcCenterMass = _QtransportLayerAgent.NumCalcCenterMass
+NumRunsPerCenterMass = _QtransportLayerAgent.NumRunsPerCenterMass
 class QTLAH(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, QTLAH, name, value)

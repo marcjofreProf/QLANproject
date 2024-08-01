@@ -383,7 +383,11 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
 		if (this->iIterPRUcurrentTimerValSynch==(2*this->NumSynchMeasAvgAux)){
-			cout << "Synchronized, ready to proceed..." << endl;
+			cout << "Hardware synchronized, now procedding with the network synchronization managed by hosts..." << endl;
+			// Update HardwareSynchStatus			
+			this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
+			HardwareSynchStatus=true;
+			this->release();			
 		}
 	}// end while
 
@@ -698,6 +702,14 @@ AccumulatedErrorDriftAux=AccumulatedErrorDriftAux+static_cast<long double>(Accum
 //cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 this->release();
 return 0; // All Ok
+}
+
+bool GPIO::GetHardwareSynchStatus(){// Provide information to the above agents
+bool HardwareSynchStatusAux=false;
+this->acquire();
+HardwareSynchStatusAux=HardwareSynchStatus;
+this->release();
+return HardwareSynchStatusAux; // All Ok
 }
 
 //PRU0 - Operation - getting iputs

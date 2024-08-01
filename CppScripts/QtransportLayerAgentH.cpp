@@ -36,6 +36,8 @@ Agent script for Quantum transport Layer Host
 // Payload messages
 #define NumBytesPayloadBuffer 1000
 #define NumParamMessagesMax 20
+// Synchronizaton network
+#define usSynchProcIterRunsTimePoint 10000000 // Time to wait (seconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
 
 using namespace std;
 
@@ -848,6 +850,11 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 								
 				this->InfoSimulateNumStoredQubitsNodeFlag=true;
 				//cout << "SimulateSynchParamsNode finished parsing values" << endl;		
+			}
+			else if (string(Command)==string("HardwareSynchNode")){
+				// If received is because node is hardware synched
+				GPIOnodeHardwareSynched=true;
+				cout << "Node hardware synched. Proceed with the network synchronization..." << endl;
 			}			
 			else if (string(Command)==string("print")){
 				cout << "Host New Message: "<< Payload << endl;
@@ -1197,6 +1204,33 @@ for (int i=0;i<NumSockets;i++){
 return 0; // all ok
 }
 
+int QTLAH::PeriodicRequestSynchsHost(){
+//def SimulateRequestSynchsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRunsPerCenterMass,SynchFreqPRUarrayTest,SynchPRUoffFreqVal):
+for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes){// For each connected node to be synch with
+	for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
+		for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){	
+/*messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2])])
+			messageCommandAux="SimulateReceiveSynchQubits"
+			messageTypeAux="Control"
+			messageIPorg=IPhostOrgConNet
+			messageIPdest=IPhostDestConNet
+			messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
+			this->SendMessageAgent(messageAuxChar)
+			messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2]),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
+			messageCommandAux="SimulateSendSynchQubits"
+			messageTypeAux="Control"
+			messageIPorg=IPhostOrgOpNet
+			messageIPdest=IPhostDestOpNet
+			messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
+			this->SendMessageAgent(messageAuxChar)
+*/			
+			usleep(usSynchProcIterRunsTimePoint);// Give time between iterations to send and receive qubits
+		}
+	}
+}
+return 0; // all ok
+}			
+				
 ///////////////////////////////////////////////////////////////////
 QTLAH::~QTLAH() {
 	// destructor

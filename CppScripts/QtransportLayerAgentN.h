@@ -105,6 +105,7 @@ private: // Variables/Objects
 	// Synchronization test frequencies and others
 	int QLLANumRunsPerCenterMass=0;
 	double QLLAFreqSynchNormValuesArray[3]={0.0,0.35,0.70}; // Normalized values of frequency testing// Relative frequency difference normalized
+	bool GPIOnodeHardwareSynched=false;// Indicates if the node is hardware PRU synchronized. 
 	
 public: // Functions/Methods
 	int RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep);
@@ -133,6 +134,7 @@ public: // Functions/Methods
         int UpdateSocketsInformation(); // Update information to where the sockets are pointing to
         // Process and execute requests
 	int ProcessNewMessage();
+	int RegularCheckToPerform();
 	// Payload information parameters
 	int SendParametersAgent();// The upper layer gets the information to be send
         int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node

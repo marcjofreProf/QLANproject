@@ -624,6 +624,14 @@ cout << "End Receiving Qubits" << endl;
 return 0; // return 0 is for no error
 }
 
+bool QPLA::GetGPIOHardwareSynchedNode(){
+bool GPIOHardwareSynchedAux=false;
+this->acquire();
+GPIOHardwareSynchedAux=GPIOHardwareSynched;// Update value
+this->release();
+return GPIOHardwareSynchedAux;
+}
+
 int QPLA::GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics){
 this->acquire();
 while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
@@ -1002,6 +1010,14 @@ this->release();
 return 0;// All OK
 }
 
+int QPLA::RegularCheckToPerform(){
+if (GPIOHardwareSynched==false){// Only until it is synched
+	GPIOHardwareSynched=PRUGPIO.GetHardwareSynchStatus();// Since only transportN agent can send messages to host, then it is ersponsibility of transportN to also check for this and then send message to host
+}
+
+return 0; // All ok
+}
+
 void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
 
  this->NegotiateInitialParamsNode();
@@ -1012,6 +1028,7 @@ void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
    try {
    	this->acquire();// Wait semaphore until it can proceed
     	this->ReadParametersAgent(); // Reads messages from above layer
+    	this->RegularCheckToPerform();// Every now and then some checks have to happen    	
         this->release(); // Release the semaphore 
         this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
     }

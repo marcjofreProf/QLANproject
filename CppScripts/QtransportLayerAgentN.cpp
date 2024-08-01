@@ -1094,6 +1094,29 @@ clock_nanosleep(CLOCK_TAI, 0, &ts, NULL); //
 return 0; // All ok
 }
 
+int QTLAN::RegularCheckToPerform(){
+if (GPIOnodeHardwareSynched==false){// Only until node is hardware synched
+	GPIOnodeHardwareSynched=this->QNLAagent.QLLAagent.QPLAagent.GetGPIOHardwareSynchedNode();// Since only transportN agent can send messages to host, then it is ersponsibility of transportN to also check for this and then send message to host
+	if (GPIOnodeHardwareSynched==true){// The instance that the node is hardware synched send message to host
+		// Send mesage to host with this information, so that the network synchronization can happen
+		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+		strcpy(ParamsCharArray,this->IPaddressesSockets[1]);// Origin, this node
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,this->IPaddressesSockets[0]);// Destination, the host fo this node
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"Operation");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"HardwareSynchNode");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"true");
+		strcat(ParamsCharArray,",");// Very important to end the message
+		//cout << "SimulateRetrieveNumStoredQubitsNode ParamsCharArray: " << ParamsCharArray << endl;
+		this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest	
+	}
+}
+return 0; // All ok
+}
+
 QTLAN::~QTLAN() {
 // destructor
 	this->StopICPconnections(this->ParamArgc);
@@ -1189,12 +1212,13 @@ int main(int argc, char const * argv[]){
  	QTLANagent.acquire();
  	QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
  	QTLANagent.SendParametersAgent(); // Send Parameters information stored
+ 	QTLANagent.RegularCheckToPerform();// Every now and then some checks have to happen  
        switch(QTLANagent.getState()) {
            case QTLAN::APPLICATION_RUNNING: {               
                // Do Some Work
                QTLANagent.ProcessNewMessage();
                //while(QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard)>0);// Make sure to remove all pending mesages in the socket
-               QTLANagent.m_pause(); // After procesing the request, pass to paused state
+               QTLANagent.m_pause(); // After procesing the request, pass to paused state. It is when receiving new messages that it turn into start (running again)
                break;
            }
            case QTLAN::APPLICATION_PAUSED: {

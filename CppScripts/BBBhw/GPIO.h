@@ -203,6 +203,8 @@ private:// Variables
 	long double AccumulatedErrorDrift=0.0; // For retrieved relative frequency difference from protocol
 	long double AccumulatedErrorDriftAux=0.0;// For retrieved relative offset difference from protocol
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
+	// Information and status
+	bool HardwareSynchStatus=false; // Turn to true when hardware synchronized with the PRU clock
 
 public:	// Functions/Methods
 	GPIO(int number); //constructor will export the pin	
@@ -220,6 +222,7 @@ public:	// Functions/Methods
 	int ClearStoredQuBits(); // Send the writting pointer back to the beggining - effectively clearing stored QuBits
 	// Synchronization related
 	int SetSynchDriftParams(double* AccumulatedErrorDriftParamsAux);// Method to update (or reset with 0s) the synchronization parameters of the long time drift (maybe updated periodically)
+	bool GetHardwareSynchStatus();// To provide information to the above agent when asked
 	// Non PRU
 	virtual int getNumber() { return number; }
 	// General Input and Output Settings
