@@ -19,9 +19,6 @@ Header declaration file for Quantum transport Layer Agent Node
 // Payload messages
 #define NumBytesPayloadBuffer 1000
 #define NumHostConnection 5
-// Synchronization protocol
-#define NumCalcCenterMass 3 // Number of centers of mass to measure to compute the synchronization
-#define NumRunsPerCenterMass 5 // Minimum 2. In order to compute the difference
 //
 #include<string>
 #include<fstream>

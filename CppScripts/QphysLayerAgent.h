@@ -24,7 +24,7 @@ Header declaration file for Quantum physical Layer Agent
 // Synchronization
 #define HistPeriodicityAux 4096 //Period in PRU counts of the synch period/histogram
 #define NumCalcCenterMass 3 // Number of centers of mass to measure to compute the synchronization
-#define NumRunsPerCenterMass 5 // Minimum 2. In order to compute the difference
+#define NumRunsPerCenterMass 6 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 // String operations
 #include<string>
 #include<fstream>
