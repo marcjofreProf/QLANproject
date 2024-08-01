@@ -1209,14 +1209,54 @@ int QTLAH::PeriodicRequestSynchsHost(){
 for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes){// For each connected node to be synch with
 	for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 		for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){	
-/*messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2])])
+/*messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),
+str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2])])
 			messageCommandAux="SimulateReceiveSynchQubits"
 			messageTypeAux="Control"
 			messageIPorg=IPhostOrgConNet
 			messageIPdest=IPhostDestConNet
 			messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-			this->SendMessageAgent(messageAuxChar)
-			messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2]),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
+*/
+			char charNumAux1[NumBytesBufferICPMAX] = {0};
+			char messagePayloadAux1[NumBytesBufferICPMAX] = {0};
+			strcpy(messagePayloadAux1,"Active");
+			strcat(messagePayloadAux1,";");
+			strcat(messagePayloadAux1,this->IPaddressesSockets[3+iConnHostsNodes]);
+			strcat(messagePayloadAux1,"_");
+			strcat(messagePayloadAux1,";");
+			sprintf(charNumAux1, "%d", NumRunsPerCenterMass);
+			strcat(messagePayloadAux1,charNumAux1);
+			strcat(messagePayloadAux1,";");
+			sprintf(charNumAux1, "%d", iCenterMass);
+			strcat(messagePayloadAux1,charNumAux1);
+			strcat(messagePayloadAux1,";");
+			sprintf(charNumAux1, "%d", iNumRunsPerCenterMass);
+			strcat(messagePayloadAux1,charNumAux1);
+			strcat(messagePayloadAux1,";");
+			sprintf(charNumAux1, "%4f", QTLAHFreqSynchNormValuesArray[0]);
+			strcat(messagePayloadAux1,charNumAux1);
+			strcat(messagePayloadAux1,";");
+			sprintf(charNumAux1, "%4f", QTLAHFreqSynchNormValuesArray[1]);
+			strcat(messagePayloadAux1,charNumAux1);
+			strcat(messagePayloadAux1,";");
+			sprintf(charNumAux1, "%4f", QTLAHFreqSynchNormValuesArray[2]);
+			strcat(messagePayloadAux1,charNumAux1);
+			strcat(messagePayloadAux1,";");
+			
+			char ParamsCharArray1[NumBytesBufferICPMAX] = {0};
+			strcpy(ParamsCharArray1,this->IPaddressesSockets[0]);// Destination, the attached node ConNet
+			strcat(ParamsCharArray1,",");
+			strcat(ParamsCharArray1,this->IPaddressesSockets[1]);// Origin, this host ConNet
+			strcat(ParamsCharArray1,",");
+			strcat(ParamsCharArray1,"Control");// Because is for the nodes
+			strcat(ParamsCharArray1,",");
+			strcat(ParamsCharArray1,"SimulateReceiveSynchQubits");
+			strcat(ParamsCharArray1,",");
+			strcat(ParamsCharArray1,messagePayloadAux1);
+			strcat(ParamsCharArray1,",");// Very important to end the message		
+			this->SendMessageAgent(ParamsCharArray1);
+			/*messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),
+			str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2]),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
 			messageCommandAux="SimulateSendSynchQubits"
 			messageTypeAux="Control"
 			messageIPorg=IPhostOrgOpNet
@@ -1224,6 +1264,52 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes){//
 			messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 			this->SendMessageAgent(messageAuxChar)
 */			
+			
+			char charNumAux2[NumBytesBufferICPMAX] = {0};
+			char messagePayloadAux2[NumBytesBufferICPMAX] = {0};
+			strcpy(messagePayloadAux2,"Passive");
+			strcat(messagePayloadAux2,";");
+			strcat(messagePayloadAux2,this->IPaddressesSockets[2]);
+			strcat(messagePayloadAux2,"_");
+			strcat(messagePayloadAux2,";");
+			sprintf(charNumAux2, "%d", NumRunsPerCenterMass);
+			strcat(messagePayloadAux2,charNumAux2);
+			strcat(messagePayloadAux2,";");
+			sprintf(charNumAux2, "%d", iCenterMass);
+			strcat(messagePayloadAux2,charNumAux2);
+			strcat(messagePayloadAux2,";");
+			sprintf(charNumAux2, "%d", iNumRunsPerCenterMass);
+			strcat(messagePayloadAux2,charNumAux2);
+			strcat(messagePayloadAux2,";");
+			sprintf(charNumAux2, "%4f", 0.0);// Zero added offset since we are not testing
+			strcat(messagePayloadAux2,charNumAux2);
+			strcat(messagePayloadAux2,";");
+			sprintf(charNumAux2, "%4f", 0.0);// Zero added relative frequency difference offset since we are not testing
+			strcat(messagePayloadAux2,charNumAux2);
+			strcat(messagePayloadAux2,";");
+			sprintf(charNumAux2, "%4f", QTLAHFreqSynchNormValuesArray[0]);
+			strcat(messagePayloadAux2,charNumAux2);
+			strcat(messagePayloadAux2,";");
+			sprintf(charNumAux2, "%4f", QTLAHFreqSynchNormValuesArray[1]);
+			strcat(messagePayloadAux2,charNumAux2);
+			strcat(messagePayloadAux2,";");
+			sprintf(charNumAux2, "%4f", QTLAHFreqSynchNormValuesArray[2]);
+			strcat(messagePayloadAux2,charNumAux2);
+			strcat(messagePayloadAux2,";");
+			
+			char ParamsCharArray2[NumBytesBufferICPMAX] = {0};
+			strcpy(ParamsCharArray2,this->IPaddressesSockets[3+iConnHostsNodes]);// Destination, the other host OpNet
+			strcat(ParamsCharArray2,",");
+			strcat(ParamsCharArray2,this->IPaddressesSockets[2]);// Origin, this host OpNet
+			strcat(ParamsCharArray2,",");
+			strcat(ParamsCharArray2,"Control");// Because is for the nodes
+			strcat(ParamsCharArray2,",");
+			strcat(ParamsCharArray2,"SimulateSendSynchQubits");
+			strcat(ParamsCharArray2,",");
+			strcat(ParamsCharArray2,messagePayloadAux2);
+			strcat(ParamsCharArray2,",");// Very important to end the message		
+			this->SendMessageAgent(ParamsCharArray2);
+			
 			usleep(usSynchProcIterRunsTimePoint);// Give time between iterations to send and receive qubits
 		}
 	}
