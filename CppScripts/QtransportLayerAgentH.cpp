@@ -680,54 +680,67 @@ return 0; // All ok
 }
 
 int QTLAH::RegularCheckToPerform(){
-// First thing to do is to know if the node below is PRU hardware synch
-if (GPIOnodeHardwareSynched==false){// Ask the node
-	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-	strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,this->IPaddressesSockets[1]);
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"Control");
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"HardwareSynchNode");
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"none");
-	strcat(ParamsCharArray,",");// Very important to end the message
-	//cout << "SendKeepAliveHeartBeatsSockets ParamsCharArray: " << ParamsCharArray << endl;
-	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
+	// First thing to do is to know if the node below is PRU hardware synch
+	if (GPIOnodeHardwareSynched==false){// Ask the node
+		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+		strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,this->IPaddressesSockets[1]);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"Control");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"HardwareSynchNode");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"none");
+		strcat(ParamsCharArray,",");// Very important to end the message
+		//cout << "SendKeepAliveHeartBeatsSockets ParamsCharArray: " << ParamsCharArray << endl;
+		this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+	}
+
+	// Second thing to do is to network synchronize the below node, when at least the node is PRU hardware synch
+	if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false){
+	cout << "Host synching node to the network!" << endl;
+
+	char argsPayloadAux[NumBytesBufferICPMAX] = {0};
+	for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
+		if (iConnHostsNodes==0){strcpy(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
+		else{strcat(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
+		strcat(argsPayloadAux,",");
+	}
+	/*this->release();
+	this->WaitUntilActiveActionFree(argsPayloadAux,NumConnectedHosts);
+	this->acquire();
+	this->PeriodicRequestSynchsHost();
+
+	if (InitialNetworkSynchPass<1){//the very first time, two rounds are needed to achieve a reasonable network synchronization
+		GPIOnodeNetworkSynched=false;// Do not Update value as synched
+		InitialNetworkSynchPass=InitialNetworkSynchPass+1;
+	}
+	else{
+		GPIOnodeNetworkSynched=true;// Update value as synched
+	}
+
+	this->release();
+	this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
+	this->acquire();*/
+	cout << "Host synched node to the network!" << endl;
+
+	}
+
+	iIterNetworkSynchcurrentTimerVal=iIterNetworkSynchcurrentTimerVal+1; // Update value
+
+	if (iIterNetworkSynchcurrentTimerVal>MaxiIterNetworkSynchcurrentTimerVal){// Every some iterations re-synch the node thorugh the network
+		GPIOnodeNetworkSynched=false;// Update value as synched
+		iIterNetworkSynchcurrentTimerVal=0;// Reset value
+		cout << "Host will re-synch node to the network!" << endl;
+	}
+
+	// Other task to perform at some point or regularly
+	
+	iIterPeriodicTimerVal=0;// Reset variable
 }
-
-// Second thing to do is to network synchronize the below node, when at least the node is PRU hardware synch
-if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false){
-cout << "Host synching node to the network!" << endl;
-
-char argsPayloadAux[NumBytesBufferICPMAX] = {0};
-for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
-	if (iConnHostsNodes==0){strcpy(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
-	else{strcat(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
-	strcat(argsPayloadAux,",");
-}
-this->release();
-this->WaitUntilActiveActionFree(argsPayloadAux,NumConnectedHosts);
-this->acquire();
-this->PeriodicRequestSynchsHost();
-		
-GPIOnodeNetworkSynched=true;// Update value as synched
-this->release();
-this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
-this->acquire();
-cout << "Host synched node to the network!" << endl;
-
-}
-iIterNetworkSynchcurrentTimerVal=iIterNetworkSynchcurrentTimerVal+1; // Update value
-if (iIterNetworkSynchcurrentTimerVal>MaxiIterNetworkSynchcurrentTimerVal){// Every some iterations re-synch the node thorugh the network
-	GPIOnodeNetworkSynched=false;// Update value as synched
-	iIterNetworkSynchcurrentTimerVal=0;// Reset value
-	cout << "Host will re-synch node to the network!" << endl;
-}
-
-// Other task to perform at some point or regularly
-
+iIterPeriodicTimerVal++;
 return 0; // all ok
 }
 

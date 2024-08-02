@@ -105,7 +105,9 @@ private: // Variables/Objects
 	// Synchronization test frequencies and others
 	int QLLANumRunsPerCenterMass=0;
 	double QLLAFreqSynchNormValuesArray[3]={0.0,0.35,0.70}; // Normalized values of frequency testing// Relative frequency difference normalized
-	bool GPIOnodeHardwareSynched=false;// Indicates if the node is hardware PRU synchronized. 
+	bool GPIOnodeHardwareSynched=false;// Indicates if the node is hardware PRU synchronized.
+	unsigned long long int iIterPeriodicTimerVal=0; // Variable to keep track of number of passes thorugh periodic checks
+	unsigned long long int MaxiIterPeriodicTimerVal=1000; // Max number of passes so that it enters the periodic checks
 	
 public: // Functions/Methods
 	int RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep);

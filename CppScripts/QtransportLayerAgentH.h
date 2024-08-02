@@ -94,12 +94,15 @@ private: // Variables/Objects
 	};
 	using Clock = my_clock;//
 	// Synchronization parameters
+	int InitialNetworkSynchPass=0; // Variable to control that at least two rounds of network synchronization are performed the very first time
 	unsigned long long int iIterNetworkSynchcurrentTimerVal=0;// Variable to count how many time has passed since last network synchronization
-	unsigned long long int MaxiIterNetworkSynchcurrentTimerVal=3600000; // Counter value to reset network synchronization
+	unsigned long long int MaxiIterNetworkSynchcurrentTimerVal=3600; // Counter value to reset network synchronization, which is actually multiplied by the variable MaxiIterPeriodicTimerVal
 	bool GPIOnodeHardwareSynched=false;// VAriable to know the hardware synch status of the node below. Actually, do not let many operations and controls to happen until this variable is set to true.
 	bool GPIOnodeNetworkSynched=false;// VAriable to know the network synch status of the node below. Periodically turn to false, to proceed again with network synchronization
 	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0,0.35,0.70}; // Normalized values of frequency testing// Relative frequency difference normalized
 	// Scheduler status
+	unsigned long long int iIterPeriodicTimerVal=0; // Variable to keep track of number of passes thorugh periodic checks
+	unsigned long long int MaxiIterPeriodicTimerVal=1000; // Max number of passes so that it enters the periodic checks
 	int IterHostsActiveActionsFreeStatus=0;// 0: Not asked this question; 1: Question asked; 2: All questions received; -1: Abort and reset all
 	int ReWaitsAnswersHostsActiveActionsFree=0;// Counter to know how many times waited to have all the responses
 	int MaxReWaitsAnswersHostsActiveActionsFree=10; // Maximum number of times to wait to collect all answers

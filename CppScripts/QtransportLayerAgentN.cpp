@@ -1129,25 +1129,31 @@ return 0; // All ok
 }
 
 int QTLAN::RegularCheckToPerform(){
-if (GPIOnodeHardwareSynched==false){// Only until node is hardware synched
-	GPIOnodeHardwareSynched=this->QNLAagent.QLLAagent.QPLAagent.GetGPIOHardwareSynchedNode();// Since only transportN agent can send messages to host, then it is ersponsibility of transportN to also check for this and then send message to host
-	if (GPIOnodeHardwareSynched==true){// The instance that the node is hardware synched send message to host
-		// Send mesage to host with this information, so that the network synchronization can happen
-		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-		strcpy(ParamsCharArray,this->IPaddressesSockets[0]);// Destination, the host fo this node
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,this->IPaddressesSockets[1]);// Origin, this node
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"Operation");
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"HardwareSynchNode");
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"true");
-		strcat(ParamsCharArray,",");// Very important to end the message
-		//cout << "SimulateRetrieveNumStoredQubitsNode ParamsCharArray: " << ParamsCharArray << endl;
-		this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest	
+if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
+	if (GPIOnodeHardwareSynched==false){// Only until node is hardware synched
+		GPIOnodeHardwareSynched=this->QNLAagent.QLLAagent.QPLAagent.GetGPIOHardwareSynchedNode();// Since only transportN agent can send messages to host, then it is ersponsibility of transportN to also check for this and then send message to host
+		/* Host will ask
+		if (GPIOnodeHardwareSynched==true){// The instance that the node is hardware synched send message to host
+			// Send mesage to host with this information, so that the network synchronization can happen
+			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+			strcpy(ParamsCharArray,this->IPaddressesSockets[0]);// Destination, the host fo this node
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,this->IPaddressesSockets[1]);// Origin, this node
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"Operation");
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"HardwareSynchNode");
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"true");
+			strcat(ParamsCharArray,",");// Very important to end the message
+			//cout << "SimulateRetrieveNumStoredQubitsNode ParamsCharArray: " << ParamsCharArray << endl;
+			this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest	
+		}*/
 	}
+	iIterPeriodicTimerVal=0;// Reset variable
 }
+iIterPeriodicTimerVal++;
+
 return 0; // All ok
 }
 
