@@ -1264,21 +1264,52 @@ for (int i=0;i<NumSockets;i++){
 return 0; // all ok
 }
 
-int QTLAH::SequencerAreYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux){
-if (IterHostsActiveActionsFreeStatus==0){this->SendAreYouFreeRequestToParticularHosts(NumInterestIPaddressesAux,interestIPaddressesSocketsAux);}
-else if (IterHostsActiveActionsFreeStatus==1){this->AcumulateAnswersYouFreeRequestToParticularHosts(NumInterestIPaddressesAux,interestIPaddressesSocketsAux);}
-else if (IterHostsActiveActionsFreeStatus==2){this->CheckReceivedAnswersYouFreeRequestToParticularHosts(NumInterestIPaddressesAux,interestIPaddressesSocketsAux);}
-else{this->UnBlockYouFreeRequestToParticularHosts(NumInterestIPaddressesAux,interestIPaddressesSocketsAux);}
+int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
+this->acquire();
+while (HostsActiveActionsFree[0]==false){// Wait here// No other thread checking this info
+this->release();this->RelativeNanoSleepWait((unsigned int)(150*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();
+}
+
+this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+
+while(IterHostsActiveActionsFreeStatus!=0){
+this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+}
+
+this->release();
+return 0; // All ok
+}
+
+int QTLAH::UnBlockActiveActionFree(char* ParamsCharArrayArg, int nChararray){
+this->acquire();
+this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+this->release();
+return 0; // All ok
+}
+
+int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
+if (IterHostsActiveActionsFreeStatus==0){this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);}
+else if (IterHostsActiveActionsFreeStatus==1){this->AcumulateAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);}
+else if (IterHostsActiveActionsFreeStatus==2){this->CheckReceivedAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);}
+else{this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);}
 
 return 0; // All Ok
 }
 
-int QTLAH::SendAreYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux){
+int QTLAH::SendAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 // Three-step handshake
 // First block the current host
 HostsActiveActionsFree[0]=false;// This host blocked
 NumAnswersOtherHostsActiveActionsFree=0;// Reset the number of answers received
 ReWaitsAnswersHostsActiveActionsFree=0; // Reset the counter
+
+int NumInterestIPaddressesAux=nChararray;
+char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
+for (int i=0;i<NumInterestIPaddressesAux;i++){
+	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArg,","));}
+	else{strcpy(interestIPaddressesSocketsAux[i],strtok(NULL,","));}
+}
+
 char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 // Send requests
 for (int i=0;i<NumInterestIPaddressesAux;i++){	
@@ -1299,7 +1330,14 @@ IterHostsActiveActionsFreeStatus=1;
 return 0; // All ok
 }
 
-int QTLAH::AcumulateAnswersYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux){
+int QTLAH::AcumulateAnswersYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
+int NumInterestIPaddressesAux=nChararray;
+char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
+for (int i=0;i<NumInterestIPaddressesAux;i++){
+	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArg,","));}
+	else{strcpy(interestIPaddressesSocketsAux[i],strtok(NULL,","));}
+}
+
 //IterHostsActiveActionsFreeStatus 0: Not asked this question; 1: Question asked; 2: All questions received; -1: Abort and reset all
 if (NumAnswersOtherHostsActiveActionsFree==NumInterestIPaddressesAux){
 	IterHostsActiveActionsFreeStatus=2;
@@ -1316,10 +1354,18 @@ else{// Too many round, kill the process of blocking other hosts
 return 0; // All ok
 }
 
-bool QTLAH::CheckReceivedAnswersYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux){
+bool QTLAH::CheckReceivedAnswersYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 // Check result of the request to all other hosts
 bool CheckAllOthersFreeAux=false;
 int SumCheckAllOthersFree=0;
+
+int NumInterestIPaddressesAux=nChararray;
+char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
+for (int i=0;i<NumInterestIPaddressesAux;i++){
+	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArg,","));}
+	else{strcpy(interestIPaddressesSocketsAux[i],strtok(NULL,","));}
+}
+
 for (int i=0;i<NumInterestIPaddressesAux;i++){
 	if (HostsActiveActionsFree[1+i]==true){
 		SumCheckAllOthersFree=SumCheckAllOthersFree+1;
@@ -1369,7 +1415,14 @@ else{ // If some are unavailable, unblock them all
 return false; // all ok
 }
 
-int QTLAH::UnBlockYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux){
+int QTLAH::UnBlockYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
+int NumInterestIPaddressesAux=nChararray;
+char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
+for (int i=0;i<NumInterestIPaddressesAux;i++){
+	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArg,","));}
+	else{strcpy(interestIPaddressesSocketsAux[i],strtok(NULL,","));}
+}
+
 char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 for (int i=0;i<NumInterestIPaddressesAux;i++){
 	strcpy(ParamsCharArray,interestIPaddressesSocketsAux[i]);

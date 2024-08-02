@@ -10,11 +10,14 @@
 #####################################################
 
 import os, sys
+import time
 import numpy as np
 pathScriptBelowAgentScript='./../CppScripts/'
 sys.path.append(pathScriptBelowAgentScript)
 
 import QtransportLayerAgent
+
+sActiveActionProcTimePoint=5.0 # Time to wait (seconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
 
 class QSLA:
 	def __init__(self,ParamsDescendingCharArray,ParamsAscendingCharArray): # Constructor of this class
@@ -30,8 +33,17 @@ class QSLA:
 	def InitAgentProcess(self,): # Pass to the below agent
 		self.QTLAagent.InitAgentProcess()
 	
+	# Methods to the host
 	def SendMessageAgent(self,ParamsDescendingCharArray): # Send message to the below Agent
 		self.QTLAagent.SendMessageAgent(ParamsDescendingCharArray)
+	
+	def WaitUntilActiveActionFree(self,ParamsCharArrayArg,nChararray):
+		self.QTLAagent.WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray)
+	
+	def UnBlockActiveActionFree(self,ParamsCharArrayArg,nChararray):
+		time.sleep(sActiveActionProcTimePoint)# Give time between iterations to send and receive qubits
+		self.QTLAagent.UnBlockActiveActionFree(ParamsCharArrayArg,nChararray)
+		time.sleep(sActiveActionProcTimePoint)# Give time between iterations to send and receive qubits
 	
 	## Methods to retrieve information from the nodes or hosts
 	def SimulateRetrieveNumStoredQubitsNode(self,IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray): # Supposing that node has received quBits, make use of them

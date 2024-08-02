@@ -124,6 +124,10 @@ public: // Functions
 	int SendMessageAgent(char* ParamsDescendingCharArray); // Passing message from the upper Agent to send message to specific host/node	
 	int SimulateRetrieveNumStoredQubitsNode(char* IPhostReplyOpNet,char* IPhostRequestOpNet, int* ParamsIntArray,int nIntarray,double* ParamsDoubleArray,int nDoublearray); // Send to the upper layer agent how many qubits are stored, and some statistics of the detections
 	int SimulateRetrieveSynchParamsNode(char* IPhostReplyOpNet,char* IPhostRequestOpNet,double* ParamsDoubleArray,int nDoublearray); // Send to the upper layer agent how synch retrieved parameters stored in the below node
+	// Task scheduler
+	int WaitUntilActiveActionFree(char* ParamsCharArray, int nChararray);
+	int UnBlockActiveActionFree(char* ParamsCharArray, int nChararray);
+	// Destructor
 	~QTLAH();  //destructor
 
 private: //Functions//Methods
@@ -163,11 +167,11 @@ private: //Functions//Methods
 	// Synchronization network related
 	int PeriodicRequestSynchsHost();// Executes when commanded the mechanisms for synchronizing the network
 	// Host scheduler
-	int SequencerAreYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux); // Sequencer of the different steps to ask for availability to other hosts
-	int SendAreYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux);// Ask all other hosts if free, while setting this host as not free
-	int AcumulateAnswersYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux);// Accumulates the answers from the requested hosts
-	bool CheckReceivedAnswersYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux);// If all host of interest free, return true, otherwise return false
-	int UnBlockYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux);// IUnblock the previously block hosts
+	int SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray); // Sequencer of the different steps to ask for availability to other hosts
+	int SendAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray);// Ask all other hosts if free, while setting this host as not free
+	int AcumulateAnswersYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray);// Accumulates the answers from the requested hosts
+	bool CheckReceivedAnswersYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray);// If all host of interest free, return true, otherwise return false
+	int UnBlockYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray);// IUnblock the previously block hosts
 
 };
 

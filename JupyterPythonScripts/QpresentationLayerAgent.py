@@ -49,7 +49,10 @@ class QPLA:
 	def SendMessageAgent(self,ParamsDescendingCharArray): # Send message to the below Agent
 		self.QSLAagent.SendMessageAgent(ParamsDescendingCharArray)
 	# Active actions that use the nodes, so they have to be blocked when the node is in use
-	def SimulateRequestQubitsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRequestedQubits,SynchPRUoffFreqVal): # Request that host's node sends qubits to this host's node		
+	def SimulateRequestQubitsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRequestedQubits,SynchPRUoffFreqVal): # Request that host's node sends qubits to this host's node
+		argsPayloadList=[IPhostDestOpNet]
+		argsPayloadAux=self.ListCharArrayParser(argsPayloadList)
+		self.QSLAagent.WaitUntilActiveActionFree(argsPayloadAux,len(argsPayloadList))	
 		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRequestedQubits)])
 		messageCommandAux="SimulateReceiveQubits"
 		messageTypeAux="Control"
@@ -63,9 +66,14 @@ class QPLA:
 		messageIPorg=IPhostOrgOpNet
 		messageIPdest=IPhostDestOpNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-		self.QSLAagent.SendMessageAgent(messageAuxChar)	
+		self.QSLAagent.SendMessageAgent(messageAuxChar)
+		
+		self.QSLAagent.UnBlockActiveActionFree(argsPayloadAux,len(argsPayloadList))
 	
 	def SimulateSendEntangledQubitsHost(self,IPhostDest1OpNet,IPhostOrg1OpNet,IPhostDest2OpNet,IPhostOrg2OpNet,IPnodeDestConNet,IPhostOrgConNet,NumSendQubits,SynchPRUoffFreqVal): # Request that the other nodes of the specified hosts get ready to receive entangled qubits from the dealer's node
+		argsPayloadList=[IPhostDest1OpNet,IPhostDest2OpNet]
+		argsPayloadAux=self.ListCharArrayParser(argsPayloadList)
+		self.QSLAagent.WaitUntilActiveActionFree(argsPayloadAux,len(argsPayloadList))
 		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostOrg1OpNet]),str(NumSendQubits)])
 		messageCommandAux="SimulateReceiveQubits"
 		messageTypeAux="Control"
@@ -112,7 +120,12 @@ class QPLA:
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
 		"""
 		
+		self.QSLAagent.UnBlockActiveActionFree(argsPayloadAux,len(argsPayloadList))
+		
 	def SimulateRequestMultipleNodesQubitsHost(self,IPhostDest1OpNet,IPhostOrg1OpNet,IPhostDest2OpNet,IPhostOrg2OpNet,IPnodeDestConNet,IPhostOrgConNet,NumSendQubits,SynchPRUoffFreqVal1,SynchPRUoffFreqVal2): # Request other nodes to send to this node qubits
+		argsPayloadList=[IPhostDest1OpNet,IPhostDest2OpNet]
+		argsPayloadAux=self.ListCharArrayParser(argsPayloadList)
+		self.QSLAagent.WaitUntilActiveActionFree(argsPayloadAux,len(argsPayloadList))
 		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrg2OpNet]),str(NumSendQubits),str(SynchPRUoffFreqVal2[0]),str(SynchPRUoffFreqVal2[1])])
 		messageCommandAux="SimulateSendQubits"
 		messageTypeAux="Control"
@@ -134,8 +147,14 @@ class QPLA:
 		messageIPdest=IPnodeDestConNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
+		
+		self.QSLAagent.UnBlockActiveActionFree(argsPayloadAux,len(argsPayloadList))
 	
 	def SimulateRequestSynchsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRunsPerCenterMass,SynchFreqPRUarrayTest,SynchPRUoffFreqVal): # Request that host's node sends qubits to this host's node
+		argsPayloadList=[IPhostDest1OpNet]
+		argsPayloadAux=self.ListCharArrayParser(argsPayloadList)
+		self.QSLAagent.WaitUntilActiveActionFree(argsPayloadAux,len(argsPayloadList))
+		
 		NumCalcCenterMass=len(SynchFreqPRUarrayTest)
 		for iCenterMass in range(0,NumCalcCenterMass,1):
 			for iNumRunsPerCenterMass in range(0,NumRunsPerCenterMass,1):
@@ -157,6 +176,8 @@ class QPLA:
 				self.QSLAagent.SendMessageAgent(messageAuxChar)
 				#print(messageAuxChar)
 				time.sleep(sSynchProcIterRunsTimePoint)# Give time between iterations to send and receive qubits
+		
+		self.QSLAagent.UnBlockActiveActionFree(argsPayloadAux,len(argsPayloadList))
 	
 	## Methods to retrieve information from the nodes or hosts, and are passive actions
 	def SimulateRetrieveNumStoredQubitsNode(self,IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray): # Supposing that node has received quBits, make use of them
