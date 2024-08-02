@@ -1264,11 +1264,21 @@ for (int i=0;i<NumSockets;i++){
 return 0; // all ok
 }
 
+int QTLAH::SequencerAreYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux){
+if (IterHostsActiveActionsFreeStatus==0){this->SendAreYouFreeRequestToParticularHosts(NumInterestIPaddressesAux,interestIPaddressesSocketsAux);}
+else if (IterHostsActiveActionsFreeStatus==1){this->AcumulateAnswersYouFreeRequestToParticularHosts(NumInterestIPaddressesAux,interestIPaddressesSocketsAux);}
+else if (IterHostsActiveActionsFreeStatus==2){this->CheckReceivedAnswersYouFreeRequestToParticularHosts(NumInterestIPaddressesAux,interestIPaddressesSocketsAux);}
+else{this->UnBlockYouFreeRequestToParticularHosts(NumInterestIPaddressesAux,interestIPaddressesSocketsAux);}
+
+return 0; // All Ok
+}
+
 int QTLAH::SendAreYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux){
 // Three-step handshake
 // First block the current host
 HostsActiveActionsFree[0]=false;// This host blocked
 NumAnswersOtherHostsActiveActionsFree=0;// Reset the number of answers received
+ReWaitsAnswersHostsActiveActionsFree=0; // Reset the counter
 char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 // Send requests
 for (int i=0;i<NumInterestIPaddressesAux;i++){	
@@ -1285,16 +1295,22 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){
 	//cout << "HostAreYouFree ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 }
-
+IterHostsActiveActionsFreeStatus=1;
 return 0; // All ok
 }
 
 int QTLAH::AcumulateAnswersYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux){
+//IterHostsActiveActionsFreeStatus 0: Not asked this question; 1: Question asked; 2: All questions received; -1: Abort and reset all
 if (NumAnswersOtherHostsActiveActionsFree==NumInterestIPaddressesAux){
-
+	IterHostsActiveActionsFreeStatus=2;
+	ReWaitsAnswersHostsActiveActionsFree=0;// Reset the counter
 }
-else{
-
+else if (ReWaitsAnswersHostsActiveActionsFree<MaxReWaitsAnswersHostsActiveActionsFree){// Increment the wait counter
+	ReWaitsAnswersHostsActiveActionsFree=ReWaitsAnswersHostsActiveActionsFree+1;// Update the counter
+}
+else{// Too many round, kill the process of blocking other hosts
+	IterHostsActiveActionsFreeStatus=-1;
+	ReWaitsAnswersHostsActiveActionsFree=0;// Reset the counter
 }
 
 return 0; // All ok
@@ -1327,6 +1343,7 @@ if (CheckAllOthersFreeAux==true){
 		//cout << "HostAreYouFree ParamsCharArray: " << ParamsCharArray << endl;
 		this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 	}
+	IterHostsActiveActionsFreeStatus=0;// reset process
 	return true;
 }
 else{ // If some are unavailable, unblock them all
@@ -1345,6 +1362,7 @@ else{ // If some are unavailable, unblock them all
 		this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 	}
 	HostsActiveActionsFree[0]=true;// This host unblocked
+	IterHostsActiveActionsFreeStatus=0;// reset process
 	return false;
 }
 
@@ -1368,6 +1386,7 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 }
 HostsActiveActionsFree[0]=true;// This host unblocked
+IterHostsActiveActionsFreeStatus=0;// reset process
 return 0; // All ok
 }
 

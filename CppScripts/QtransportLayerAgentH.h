@@ -97,6 +97,9 @@ private: // Variables/Objects
 	bool GPIOnodeHardwareSynched=false;// VAriable to know the hardware synch status of the node below. Actually, do not let many operations and controls to happen until this variable is set to true.
 	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0,0.35,0.70}; // Normalized values of frequency testing// Relative frequency difference normalized
 	// Scheduler status
+	int IterHostsActiveActionsFreeStatus=0;// 0: Not asked this question; 1: Question asked; 2: All questions received; -1: Abort and reset all
+	int ReWaitsAnswersHostsActiveActionsFree=0;// Counter to know how many times waited to have all the responses
+	int MaxReWaitsAnswersHostsActiveActionsFree=10; // Maximum number of times to wait to collect all answers
 	bool HostsActiveActionsFree[1+NumConnectedHosts]={true}; // Indicate if the hosts are currently free to perform active actions. Index 0 is the host itself, the other indexes are the other remote hosts in the order of IPaddressesSockets starting from position 2
 	int NumAnswersOtherHostsActiveActionsFree=0;// Counter of the number of answers from other hosts proceessed
 	char InfoRemoteHostActiveActions[2][IPcharArrayLengthMAX]={"\0","\0"}; // Two parameters indicating current active blocking host and status
@@ -160,6 +163,7 @@ private: //Functions//Methods
 	// Synchronization network related
 	int PeriodicRequestSynchsHost();// Executes when commanded the mechanisms for synchronizing the network
 	// Host scheduler
+	int SequencerAreYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux); // Sequencer of the different steps to ask for availability to other hosts
 	int SendAreYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux);// Ask all other hosts if free, while setting this host as not free
 	int AcumulateAnswersYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux);// Accumulates the answers from the requested hosts
 	bool CheckReceivedAnswersYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux);// If all host of interest free, return true, otherwise return false
