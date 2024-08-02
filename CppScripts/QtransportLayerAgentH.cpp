@@ -680,7 +680,24 @@ return 0; // All ok
 }
 
 int QTLAH::RegularCheckToPerform(){
-// First thing to do is to network synchronize the below node, when at least the node is PRU hardware synch
+// First thing to do is to know if the node below is PRU hardware synch
+if (GPIOnodeHardwareSynched==false){// Ask the node
+	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+	strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,this->IPaddressesSockets[1]);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"Control");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"HardwareSynchNode");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"none");
+	strcat(ParamsCharArray,",");// Very important to end the message
+	//cout << "SendKeepAliveHeartBeatsSockets ParamsCharArray: " << ParamsCharArray << endl;
+	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+}
+
+// Second thing to do is to network synchronize the below node, when at least the node is PRU hardware synch
 if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false){
 cout << "Host synching node to the network!" << endl;
 
@@ -888,9 +905,16 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				//cout << "SimulateSynchParamsNode finished parsing values" << endl;		
 			}
 			else if (string(Command)==string("HardwareSynchNode")){
-				// If received is because node is hardware synched
-				GPIOnodeHardwareSynched=true;
-				cout << "Node hardware synched. Proceed with the network synchronization..." << endl;
+				if (string(Payload)==string("true")){
+					// If received is because node is hardware synched
+					GPIOnodeHardwareSynched=true;
+					cout << "Node hardware synched. Proceed with the network synchronization..." << endl;
+				}
+				else{
+					// If received is because node is NOT hardware synched
+					GPIOnodeHardwareSynched=false;
+					cout << "Node hardware NOT synched..." << endl;
+				}
 			}
 			else if (string(Command)==string("HostAreYouFree")){// Operations regarding availability request by other hosts
 				// Different operation with respect the host that has sent the request				
