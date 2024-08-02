@@ -109,6 +109,7 @@ private: // Variables/Objects
 	bool HostsActiveActionsFree[1+NumConnectedHosts]={true}; // Indicate if the hosts are currently free to perform active actions. Index 0 is the host itself, the other indexes are the other remote hosts in the order of IPaddressesSockets starting from position 2
 	int NumAnswersOtherHostsActiveActionsFree=0;// Counter of the number of answers from other hosts proceessed
 	char InfoRemoteHostActiveActions[2][IPcharArrayLengthMAX]={"\0","\0"}; // Two parameters indicating current active blocking host and status
+	bool AchievedAttentionParticularHosts=false;// Indicates that we have got the attenation of the hosts
 
 public: // Functions
 	// Management
