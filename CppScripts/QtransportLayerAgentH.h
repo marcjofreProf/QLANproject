@@ -105,7 +105,7 @@ private: // Variables/Objects
 	unsigned long long int MaxiIterPeriodicTimerVal=1000; // Max number of passes so that it enters the periodic checks
 	int IterHostsActiveActionsFreeStatus=0;// 0: Not asked this question; 1: Question asked; 2: All questions received; -1: Abort and reset all
 	int ReWaitsAnswersHostsActiveActionsFree=0;// Counter to know how many times waited to have all the responses
-	int MaxReWaitsAnswersHostsActiveActionsFree=10; // Maximum number of times to wait to collect all answers
+	int MaxReWaitsAnswersHostsActiveActionsFree=30; // Maximum number of times to wait to collect all answers
 	bool HostsActiveActionsFree[1+NumConnectedHosts]={true}; // Indicate if the hosts are currently free to perform active actions. Index 0 is the host itself, the other indexes are the other remote hosts in the order of IPaddressesSockets starting from position 2
 	int NumAnswersOtherHostsActiveActionsFree=0;// Counter of the number of answers from other hosts proceessed
 	char InfoRemoteHostActiveActions[2][IPcharArrayLengthMAX]={"\0","\0"}; // Two parameters indicating current active blocking host and status
@@ -131,8 +131,8 @@ public: // Functions
 	int SimulateRetrieveNumStoredQubitsNode(char* IPhostReplyOpNet,char* IPhostRequestOpNet, int* ParamsIntArray,int nIntarray,double* ParamsDoubleArray,int nDoublearray); // Send to the upper layer agent how many qubits are stored, and some statistics of the detections
 	int SimulateRetrieveSynchParamsNode(char* IPhostReplyOpNet,char* IPhostRequestOpNet,double* ParamsDoubleArray,int nDoublearray); // Send to the upper layer agent how synch retrieved parameters stored in the below node
 	// Task scheduler
-	int WaitUntilActiveActionFree(char* ParamsCharArray, int nChararray);
-	int UnBlockActiveActionFree(char* ParamsCharArray, int nChararray);
+	int WaitUntilActiveActionFreePreLock(char* ParamsCharArray, int nChararray);
+	int UnBlockActiveActionFreePreLock(char* ParamsCharArray, int nChararray);
 	// Destructor
 	~QTLAH();  //destructor
 
@@ -174,6 +174,8 @@ private: //Functions//Methods
 	int RegularCheckToPerform(); // Sort of a scheduler
 	int PeriodicRequestSynchsHost();// Executes when commanded the mechanisms for synchronizing the network
 	// Host scheduler
+	int WaitUntilActiveActionFree(char* ParamsCharArray, int nChararray);
+	int UnBlockActiveActionFree(char* ParamsCharArray, int nChararray);
 	int SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray); // Sequencer of the different steps to ask for availability to other hosts
 	int SendAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray);// Ask all other hosts if free, while setting this host as not free
 	int AcumulateAnswersYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray);// Accumulates the answers from the requested hosts

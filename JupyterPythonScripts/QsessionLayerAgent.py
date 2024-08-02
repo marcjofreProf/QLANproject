@@ -37,12 +37,12 @@ class QSLA:
 	def SendMessageAgent(self,ParamsDescendingCharArray): # Send message to the below Agent
 		self.QTLAagent.SendMessageAgent(ParamsDescendingCharArray)
 	
-	def WaitUntilActiveActionFree(self,ParamsCharArrayArg,nChararray):
-		self.QTLAagent.WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray)
+	def WaitUntilActiveActionFreePreLock(self,ParamsCharArrayArg,nChararray):
+		self.QTLAagent.WaitUntilActiveActionFreePreLock(ParamsCharArrayArg,nChararray)
 	
-	def UnBlockActiveActionFree(self,ParamsCharArrayArg,nChararray):
+	def UnBlockActiveActionFreePreLock(self,ParamsCharArrayArg,nChararray):
 		time.sleep(sActiveActionProcTimePoint)# Give time between iterations to send and receive qubits
-		self.QTLAagent.UnBlockActiveActionFree(ParamsCharArrayArg,nChararray)
+		self.QTLAagent.UnBlockActiveActionFreePreLock(ParamsCharArrayArg,nChararray)
 		time.sleep(sActiveActionProcTimePoint)# Give time between iterations to send and receive qubits
 	
 	## Methods to retrieve information from the nodes or hosts

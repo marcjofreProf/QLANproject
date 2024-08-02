@@ -694,37 +694,39 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 		strcat(ParamsCharArray,",");
 		strcat(ParamsCharArray,"none");
 		strcat(ParamsCharArray,",");// Very important to end the message
-		//cout << "SendKeepAliveHeartBeatsSockets ParamsCharArray: " << ParamsCharArray << endl;
+		//cout << "Host sent HardwareSynchNode" << endl;
 		this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 	}
 
 	// Second thing to do is to network synchronize the below node, when at least the node is PRU hardware synch
-	if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false){
-	cout << "Host synching node to the network!" << endl;
+	//cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
+	//cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
+	//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+	if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false and HostsActiveActionsFree[0]==true){
+		cout << "Host synching node to the network!" << endl;
 
-	char argsPayloadAux[NumBytesBufferICPMAX] = {0};
-	for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
-		if (iConnHostsNodes==0){strcpy(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
-		else{strcat(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
-		strcat(argsPayloadAux,",");
-	}
-	/*this->release();
-	this->WaitUntilActiveActionFree(argsPayloadAux,NumConnectedHosts);
-	this->acquire();
-	this->PeriodicRequestSynchsHost();
-
-	if (InitialNetworkSynchPass<1){//the very first time, two rounds are needed to achieve a reasonable network synchronization
-		GPIOnodeNetworkSynched=false;// Do not Update value as synched
-		InitialNetworkSynchPass=InitialNetworkSynchPass+1;
-	}
-	else{
-		GPIOnodeNetworkSynched=true;// Update value as synched
-	}
-
-	this->release();
-	this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
-	this->acquire();*/
-	cout << "Host synched node to the network!" << endl;
+		char argsPayloadAux[NumBytesBufferICPMAX] = {0};
+		for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
+			if (iConnHostsNodes==0){strcpy(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
+			else{strcat(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
+			strcat(argsPayloadAux,",");
+		}
+		cout << "argsPayloadAux: " << argsPayloadAux << endl;
+		this->WaitUntilActiveActionFree(argsPayloadAux,NumConnectedHosts);
+		
+		this->PeriodicRequestSynchsHost();
+		
+		if (InitialNetworkSynchPass<1){//the very first time, two rounds are needed to achieve a reasonable network synchronization
+			GPIOnodeNetworkSynched=false;// Do not Update value as synched
+			InitialNetworkSynchPass=InitialNetworkSynchPass+1;
+		}
+		else{
+			GPIOnodeNetworkSynched=true;// Update value as synched
+		}
+		
+		this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
+		iIterNetworkSynchcurrentTimerVal=0;// Reset value
+		cout << "Host synched node to the network!" << endl;
 
 	}
 
@@ -1342,34 +1344,77 @@ for (int i=0;i<NumSockets;i++){
 return 0; // all ok
 }
 
-int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
+int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){
 this->acquire();
 while (HostsActiveActionsFree[0]==false and GPIOnodeHardwareSynched==false){// Wait here// No other thread checking this info
 this->release();this->RelativeNanoSleepWait((unsigned int)(150*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();
 }
+//this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
+this->release();
+return 0; // all ok;
+
+}
+
+int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 
 this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 
 while(IterHostsActiveActionsFreeStatus!=0){
-this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+	cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+	cout << "this->getState(): " << this->getState() << endl;
+	if(this->getState()==0) {
+		this->ProcessNewMessage();
+		this->m_pause(); // After procesing the request, pass to paused state
+		cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+		this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+		cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+	}
+	this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few nanoseconds for other processes to enter
 }
 
+return 0; // All ok
+}
+
+int QTLAH::UnBlockActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){
+this->acquire();
+this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);
 this->release();
 return 0; // All ok
 }
 
 int QTLAH::UnBlockActiveActionFree(char* ParamsCharArrayArg, int nChararray){
-this->acquire();
+
 this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-this->release();
+
 return 0; // All ok
 }
 
 int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
-if (IterHostsActiveActionsFreeStatus==0){this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);}
-else if (IterHostsActiveActionsFreeStatus==1){this->AcumulateAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);}
-else if (IterHostsActiveActionsFreeStatus==2){this->CheckReceivedAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);}
-else{this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);}
+cout << "SequencerAreYouFreeRequestToParticularHosts Step 0" << endl;
+this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);// To reset, just in case
+cout << "SequencerAreYouFreeRequestToParticularHosts Step 1" << endl;
+if (IterHostsActiveActionsFreeStatus==0){
+cout << "SequencerAreYouFreeRequestToParticularHosts Step 2" << endl;
+this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+cout << "SequencerAreYouFreeRequestToParticularHosts Step 3" << endl;
+}
+else if (IterHostsActiveActionsFreeStatus==1){
+cout << "SequencerAreYouFreeRequestToParticularHosts Step 4" << endl;
+this->AcumulateAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+cout << "SequencerAreYouFreeRequestToParticularHosts Step 5" << endl;
+}
+else if (IterHostsActiveActionsFreeStatus==2){
+cout << "SequencerAreYouFreeRequestToParticularHosts Step 6" << endl;
+this->CheckReceivedAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+cout << "SequencerAreYouFreeRequestToParticularHosts Step 7" << endl;
+}
+else{
+cout << "SequencerAreYouFreeRequestToParticularHosts Step 8" << endl;
+this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+cout << "SequencerAreYouFreeRequestToParticularHosts Step 9" << endl;
+}
+
 
 return 0; // All Ok
 }
@@ -1377,15 +1422,26 @@ return 0; // All Ok
 int QTLAH::SendAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 // Three-step handshake
 // First block the current host
+cout << "SendAreYouFreeRequestToParticularHosts 1: " << endl;
 HostsActiveActionsFree[0]=false;// This host blocked
+cout << "SendAreYouFreeRequestToParticularHosts 2: " << endl;
 NumAnswersOtherHostsActiveActionsFree=0;// Reset the number of answers received
+cout << "SendAreYouFreeRequestToParticularHosts 3: " << endl;
 ReWaitsAnswersHostsActiveActionsFree=0; // Reset the counter
+cout << "SendAreYouFreeRequestToParticularHosts 4: " << endl;
 
 int NumInterestIPaddressesAux=nChararray;
+cout << "NumInterestIPaddressesAux: " << NumInterestIPaddressesAux << endl;
 char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
+char ParamsCharArrayArgAux[NumBytesBufferICPMAX] = {0};
+strcpy(ParamsCharArrayArgAux,ParamsCharArrayArg);
 for (int i=0;i<NumInterestIPaddressesAux;i++){
-	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArg,","));}
+	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArgAux,","));}
 	else{strcpy(interestIPaddressesSocketsAux[i],strtok(NULL,","));}
+}
+
+for (int i=0;i<NumInterestIPaddressesAux;i++){
+	cout << "interestIPaddressesSocketsAux[i]: " << interestIPaddressesSocketsAux[i] << endl;
 }
 
 char ParamsCharArray[NumBytesBufferICPMAX] = {0};
@@ -1401,7 +1457,7 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){
 	strcat(ParamsCharArray,",");
 	strcat(ParamsCharArray,"Preventive");
 	strcat(ParamsCharArray,",");// Very important to end the message
-	//cout << "HostAreYouFree ParamsCharArray: " << ParamsCharArray << endl;
+	cout << "HostAreYouFree Preventive ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 }
 IterHostsActiveActionsFreeStatus=1;
@@ -1410,21 +1466,28 @@ return 0; // All ok
 
 int QTLAH::AcumulateAnswersYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 int NumInterestIPaddressesAux=nChararray;
+cout << "NumInterestIPaddressesAux: " << NumInterestIPaddressesAux << endl;
 char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
+char ParamsCharArrayArgAux[NumBytesBufferICPMAX] = {0};
+strcpy(ParamsCharArrayArgAux,ParamsCharArrayArg);
 for (int i=0;i<NumInterestIPaddressesAux;i++){
-	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArg,","));}
+	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArgAux,","));}
 	else{strcpy(interestIPaddressesSocketsAux[i],strtok(NULL,","));}
 }
 
+for (int i=0;i<NumInterestIPaddressesAux;i++){
+	cout << "interestIPaddressesSocketsAux[i]: " << interestIPaddressesSocketsAux[i] << endl;
+}
+
 //IterHostsActiveActionsFreeStatus 0: Not asked this question; 1: Question asked; 2: All questions received; -1: Abort and reset all
-if (NumAnswersOtherHostsActiveActionsFree==NumInterestIPaddressesAux){
+if (NumAnswersOtherHostsActiveActionsFree>=NumInterestIPaddressesAux){
 	IterHostsActiveActionsFreeStatus=2;
 	ReWaitsAnswersHostsActiveActionsFree=0;// Reset the counter
 }
 else if (ReWaitsAnswersHostsActiveActionsFree<MaxReWaitsAnswersHostsActiveActionsFree){// Increment the wait counter
 	ReWaitsAnswersHostsActiveActionsFree=ReWaitsAnswersHostsActiveActionsFree+1;// Update the counter
 }
-else{// Too many round, kill the process of blocking other hosts
+else{// Too many rounds, kill the process of blocking other hosts
 	IterHostsActiveActionsFreeStatus=-1;
 	ReWaitsAnswersHostsActiveActionsFree=0;// Reset the counter
 }
@@ -1439,8 +1502,10 @@ int SumCheckAllOthersFree=0;
 
 int NumInterestIPaddressesAux=nChararray;
 char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
+char ParamsCharArrayArgAux[NumBytesBufferICPMAX] = {0};
+strcpy(ParamsCharArrayArgAux,ParamsCharArrayArg);
 for (int i=0;i<NumInterestIPaddressesAux;i++){
-	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArg,","));}
+	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArgAux,","));}
 	else{strcpy(interestIPaddressesSocketsAux[i],strtok(NULL,","));}
 }
 
@@ -1495,12 +1560,17 @@ return false; // all ok
 
 int QTLAH::UnBlockYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 int NumInterestIPaddressesAux=nChararray;
+cout << "NumInterestIPaddressesAux: " << NumInterestIPaddressesAux << endl;
 char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
+char ParamsCharArrayArgAux[NumBytesBufferICPMAX] = {0};
+strcpy(ParamsCharArrayArgAux,ParamsCharArrayArg);
 for (int i=0;i<NumInterestIPaddressesAux;i++){
-	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArg,","));}
+	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArgAux,","));}
 	else{strcpy(interestIPaddressesSocketsAux[i],strtok(NULL,","));}
 }
-
+for (int i=0;i<NumInterestIPaddressesAux;i++){
+	cout << "interestIPaddressesSocketsAux[i]: " << interestIPaddressesSocketsAux[i] << endl;
+}
 char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 for (int i=0;i<NumInterestIPaddressesAux;i++){
 	strcpy(ParamsCharArray,interestIPaddressesSocketsAux[i]);
@@ -1513,7 +1583,7 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){
 	strcat(ParamsCharArray,",");
 	strcat(ParamsCharArray,"UnBlock");
 	strcat(ParamsCharArray,",");// Very important to end the message
-	//cout << "HostAreYouFree ParamsCharArray: " << ParamsCharArray << endl;
+	cout << "HostAreYouFree UnBlock ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 }
 HostsActiveActionsFree[0]=true;// This host unblocked
@@ -1522,22 +1592,14 @@ return 0; // All ok
 }
 
 int QTLAH::PeriodicRequestSynchsHost(){
-//def SimulateRequestSynchsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRunsPerCenterMass,SynchFreqPRUarrayTest,SynchPRUoffFreqVal):
-for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes){// For each connected node to be synch with
+
+char charNumAux[NumBytesBufferICPMAX] = {0};
+char messagePayloadAux[NumBytesBufferICPMAX] = {0};
+char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){// For each connected node to be synch with
 	for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
-		for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){	
-/*messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),
-str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2])])
-			messageCommandAux="SimulateReceiveSynchQubits"
-			messageTypeAux="Control"
-			messageIPorg=IPhostOrgConNet
-			messageIPdest=IPhostDestConNet
-			messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-*/
-			char charNumAux[NumBytesBufferICPMAX] = {0};
-			char messagePayloadAux[NumBytesBufferICPMAX] = {0};
-			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-			
+		for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){			
+			// First message
 			strcpy(messagePayloadAux,"Active");
 			strcat(messagePayloadAux,";");
 			strcat(messagePayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);
@@ -1560,7 +1622,8 @@ str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTe
 			strcat(messagePayloadAux,";");
 			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[2]);
 			strcat(messagePayloadAux,charNumAux);
-			strcat(messagePayloadAux,";");		
+			strcat(messagePayloadAux,";");
+			cout << "PeriodicRequestSynchsHost messagePayloadAux: " << messagePayloadAux << endl;	
 			
 			strcpy(ParamsCharArray,this->IPaddressesSockets[0]);// Destination, the attached node ConNet
 			strcat(ParamsCharArray,",");
@@ -1572,17 +1635,11 @@ str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTe
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,messagePayloadAux);
 			strcat(ParamsCharArray,",");// Very important to end the message		
-			this->SendMessageAgent(ParamsCharArray);
-			/*messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),
-			str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2]),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
-			messageCommandAux="SimulateSendSynchQubits"
-			messageTypeAux="Control"
-			messageIPorg=IPhostOrgOpNet
-			messageIPdest=IPhostDestOpNet
-			messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-			this->SendMessageAgent(messageAuxChar)
-*/			
+			//this->ICPdiscoverSend(ParamsCharArray);// Without acquire/release
+			//this->SendMessageAgent(ParamsCharArray);// With acquire/release
+			cout << "PeriodicRequestSynchsHost ParamsCharArray: " << ParamsCharArray << endl;
 			
+			// Second message
 			strcpy(messagePayloadAux,"Passive");
 			strcat(messagePayloadAux,";");
 			strcat(messagePayloadAux,this->IPaddressesSockets[2]);
@@ -1623,9 +1680,10 @@ str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTe
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,messagePayloadAux);
 			strcat(ParamsCharArray,",");// Very important to end the message		
-			this->SendMessageAgent(ParamsCharArray);
-			
-			usleep(usSynchProcIterRunsTimePoint);// Give time between iterations to send and receive qubits
+			//this->ICPdiscoverSend(ParamsCharArray);// Without acquire/release
+			//this->SendMessageAgent(ParamsCharArray);// With acquire/release
+			cout << "PeriodicRequestSynchsHost ParamsCharArray: " << ParamsCharArray << endl;
+			//usleep(usSynchProcIterRunsTimePoint);// Give time between iterations to send and receive qubits
 		}
 	}
 }

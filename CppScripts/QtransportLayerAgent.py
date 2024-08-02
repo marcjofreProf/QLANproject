@@ -151,11 +151,11 @@ class QTLAH(_object):
     def SimulateRetrieveSynchParamsNode(self, IPhostReplyOpNet, IPhostRequestOpNet, ParamsDoubleArray):
         return _QtransportLayerAgent.QTLAH_SimulateRetrieveSynchParamsNode(self, IPhostReplyOpNet, IPhostRequestOpNet, ParamsDoubleArray)
 
-    def WaitUntilActiveActionFree(self, ParamsCharArray, nChararray):
-        return _QtransportLayerAgent.QTLAH_WaitUntilActiveActionFree(self, ParamsCharArray, nChararray)
+    def WaitUntilActiveActionFreePreLock(self, ParamsCharArray, nChararray):
+        return _QtransportLayerAgent.QTLAH_WaitUntilActiveActionFreePreLock(self, ParamsCharArray, nChararray)
 
-    def UnBlockActiveActionFree(self, ParamsCharArray, nChararray):
-        return _QtransportLayerAgent.QTLAH_UnBlockActiveActionFree(self, ParamsCharArray, nChararray)
+    def UnBlockActiveActionFreePreLock(self, ParamsCharArray, nChararray):
+        return _QtransportLayerAgent.QTLAH_UnBlockActiveActionFreePreLock(self, ParamsCharArray, nChararray)
     __swig_destroy__ = _QtransportLayerAgent.delete_QTLAH
     __del__ = lambda self: None
 QTLAH_swigregister = _QtransportLayerAgent.QTLAH_swigregister

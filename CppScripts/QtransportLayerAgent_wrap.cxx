@@ -4378,7 +4378,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_QTLAH_WaitUntilActiveActionFree(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_QTLAH_WaitUntilActiveActionFreePreLock(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -4395,23 +4395,23 @@ SWIGINTERN PyObject *_wrap_QTLAH_WaitUntilActiveActionFree(PyObject *SWIGUNUSEDP
   PyObject * obj2 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:QTLAH_WaitUntilActiveActionFree",&obj0,&obj1,&obj2)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOO:QTLAH_WaitUntilActiveActionFreePreLock",&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_WaitUntilActiveActionFree" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_WaitUntilActiveActionFreePreLock" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
   }
   arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
   res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "QTLAH_WaitUntilActiveActionFree" "', argument " "2"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "QTLAH_WaitUntilActiveActionFreePreLock" "', argument " "2"" of type '" "char *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
   ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "QTLAH_WaitUntilActiveActionFree" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "QTLAH_WaitUntilActiveActionFreePreLock" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = static_cast< int >(val3);
-  result = (int)(arg1)->WaitUntilActiveActionFree(arg2,arg3);
+  result = (int)(arg1)->WaitUntilActiveActionFreePreLock(arg2,arg3);
   resultobj = SWIG_From_int(static_cast< int >(result));
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -4421,7 +4421,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_QTLAH_UnBlockActiveActionFree(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_QTLAH_UnBlockActiveActionFreePreLock(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   nsQtransportLayerAgentH::QTLAH *arg1 = (nsQtransportLayerAgentH::QTLAH *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -4438,23 +4438,23 @@ SWIGINTERN PyObject *_wrap_QTLAH_UnBlockActiveActionFree(PyObject *SWIGUNUSEDPAR
   PyObject * obj2 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:QTLAH_UnBlockActiveActionFree",&obj0,&obj1,&obj2)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOO:QTLAH_UnBlockActiveActionFreePreLock",&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_nsQtransportLayerAgentH__QTLAH, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_UnBlockActiveActionFree" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "QTLAH_UnBlockActiveActionFreePreLock" "', argument " "1"" of type '" "nsQtransportLayerAgentH::QTLAH *""'"); 
   }
   arg1 = reinterpret_cast< nsQtransportLayerAgentH::QTLAH * >(argp1);
   res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "QTLAH_UnBlockActiveActionFree" "', argument " "2"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "QTLAH_UnBlockActiveActionFreePreLock" "', argument " "2"" of type '" "char *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
   ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "QTLAH_UnBlockActiveActionFree" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "QTLAH_UnBlockActiveActionFreePreLock" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = static_cast< int >(val3);
-  result = (int)(arg1)->UnBlockActiveActionFree(arg2,arg3);
+  result = (int)(arg1)->UnBlockActiveActionFreePreLock(arg2,arg3);
   resultobj = SWIG_From_int(static_cast< int >(result));
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -4507,8 +4507,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "QTLAH_SendMessageAgent", _wrap_QTLAH_SendMessageAgent, METH_VARARGS, NULL},
 	 { "QTLAH_SimulateRetrieveNumStoredQubitsNode", _wrap_QTLAH_SimulateRetrieveNumStoredQubitsNode, METH_VARARGS, NULL},
 	 { "QTLAH_SimulateRetrieveSynchParamsNode", _wrap_QTLAH_SimulateRetrieveSynchParamsNode, METH_VARARGS, NULL},
-	 { "QTLAH_WaitUntilActiveActionFree", _wrap_QTLAH_WaitUntilActiveActionFree, METH_VARARGS, NULL},
-	 { "QTLAH_UnBlockActiveActionFree", _wrap_QTLAH_UnBlockActiveActionFree, METH_VARARGS, NULL},
+	 { "QTLAH_WaitUntilActiveActionFreePreLock", _wrap_QTLAH_WaitUntilActiveActionFreePreLock, METH_VARARGS, NULL},
+	 { "QTLAH_UnBlockActiveActionFreePreLock", _wrap_QTLAH_UnBlockActiveActionFreePreLock, METH_VARARGS, NULL},
 	 { "delete_QTLAH", _wrap_delete_QTLAH, METH_VARARGS, NULL},
 	 { "QTLAH_swigregister", QTLAH_swigregister, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
