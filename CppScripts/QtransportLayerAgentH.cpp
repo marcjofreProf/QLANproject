@@ -855,7 +855,67 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				// If received is because node is hardware synched
 				GPIOnodeHardwareSynched=true;
 				cout << "Node hardware synched. Proceed with the network synchronization..." << endl;
-			}			
+			}
+			else if (string(Command)==string("HostAreYouFree")){// Operations regarding availability request by other hosts
+				// Different operation with respect the host that has sent the request				
+				if (string(InfoRemoteHostActiveActions[0])==string(IPorg)){// Is the message from the current active host?
+					if (string(Payload)==string("Block")){// Confirm block
+						strcpy(InfoRemoteHostActiveActions[1],"Block");// Set status to Preventive
+					}
+					else{// Unblock
+						strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
+						strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
+						HostsActiveActionsFree[0]=true; // Set the host as free
+					}
+				}
+				else{// Either the message is not from the current active hosts or there is no active host, or it is a response for this host
+					if (string(Payload)==string("true") or string(Payload)==string("false")){// Response from another host
+						if (string(Payload)==string("true")){					HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]="true";}
+						else{HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]="false";}
+						NumAnswersOtherHostsActiveActionsFree=NumAnswersOtherHostsActiveActionsFree+1;// Update value
+					}
+					else if (HostsActiveActionsFree[0]==true and string(Payload)==string("Preventive")){// Preventive block
+						strcpy(InfoRemoteHostActiveActions[0],IPorg);// Copy the identification of the host
+						strcpy(InfoRemoteHostActiveActions[1],"Preventive");// Set status to Preventive
+						HostsActiveActionsFree[0]=false; // Set the host as not free
+						// Respond with message saying that available
+						char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+						strcpy(ParamsCharArray,IPorg);// Send to what was the origin
+						strcat(ParamsCharArray,",");
+						strcat(ParamsCharArray,IPdest);// From what was the origin
+						strcat(ParamsCharArray,",");
+						strcat(ParamsCharArray,Type);
+						strcat(ParamsCharArray,",");
+						strcat(ParamsCharArray,Command);
+						strcat(ParamsCharArray,",");
+						strcat(ParamsCharArray,"true");
+						strcat(ParamsCharArray,",");// Very important to end the message
+						//cout << "Operation Message forward ParamsCharArray: " << ParamsCharArray << endl;	
+						this->ICPdiscoverSend(ParamsCharArray);
+					}
+					else if (HostsActiveActionsFree[0]==false and string(Payload)==string("Preventive")){// Not free. Respond that not free
+						// Respond with message saying that not available
+						// Respond with message saying that available
+						char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+						strcpy(ParamsCharArray,IPorg);// Send to what was the origin
+						strcat(ParamsCharArray,",");
+						strcat(ParamsCharArray,IPdest);// From what was the origin
+						strcat(ParamsCharArray,",");
+						strcat(ParamsCharArray,Type);
+						strcat(ParamsCharArray,",");
+						strcat(ParamsCharArray,Command);
+						strcat(ParamsCharArray,",");
+						strcat(ParamsCharArray,"false");
+						strcat(ParamsCharArray,",");// Very important to end the message
+						//cout << "Operation Message forward ParamsCharArray: " << ParamsCharArray << endl;	
+						this->ICPdiscoverSend(ParamsCharArray);
+					}
+					else{// Non of the above, which is a malfunction
+						cout << "Host HostAreYouFree not handled!" << endl;
+					}
+				}
+			
+			}
 			else if (string(Command)==string("print")){
 				cout << "Host New Message: "<< Payload << endl;
 			}				
@@ -1204,6 +1264,113 @@ for (int i=0;i<NumSockets;i++){
 return 0; // all ok
 }
 
+int QTLAH::SendAreYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux){
+// Three-step handshake
+// First block the current host
+HostsActiveActionsFree[0]=false;// This host blocked
+NumAnswersOtherHostsActiveActionsFree=0;// Reset the number of answers received
+char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+// Send requests
+for (int i=0;i<NumInterestIPaddressesAux;i++){	
+	strcpy(ParamsCharArray,interestIPaddressesSocketsAux[i]);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,this->IPaddressesSockets[2]);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"Operation");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"HostAreYouFree");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"Preventive");
+	strcat(ParamsCharArray,",");// Very important to end the message
+	//cout << "HostAreYouFree ParamsCharArray: " << ParamsCharArray << endl;
+	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+}
+
+return 0; // All ok
+}
+
+int QTLAH::AcumulateAnswersYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux){
+if (NumAnswersOtherHostsActiveActionsFree==NumInterestIPaddressesAux){
+
+}
+else{
+
+}
+
+return 0; // All ok
+}
+
+bool QTLAH::CheckReceivedAnswersYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux){
+// Check result of the request to all other hosts
+bool CheckAllOthersFreeAux=false;
+int SumCheckAllOthersFree=0;
+for (int i=0;i<NumInterestIPaddressesAux;i++){
+	if (HostsActiveActionsFree[1+i]==true){
+		SumCheckAllOthersFree=SumCheckAllOthersFree+1;
+	}
+}
+if (SumCheckAllOthersFree==NumInterestIPaddressesAux){CheckAllOthersFreeAux=true;}
+char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+// If all available, block them all
+if (CheckAllOthersFreeAux==true){
+	for (int i=0;i<NumInterestIPaddressesAux;i++){
+		strcpy(ParamsCharArray,interestIPaddressesSocketsAux[i]);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,this->IPaddressesSockets[2]);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"Operation");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"HostAreYouFree");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"Block");
+		strcat(ParamsCharArray,",");// Very important to end the message
+		//cout << "HostAreYouFree ParamsCharArray: " << ParamsCharArray << endl;
+		this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+	}
+	return true;
+}
+else{ // If some are unavailable, unblock them all
+	for (int i=0;i<NumInterestIPaddressesAux;i++){
+		strcpy(ParamsCharArray,interestIPaddressesSocketsAux[i]);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,this->IPaddressesSockets[2]);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"Operation");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"HostAreYouFree");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"UnBlock");
+		strcat(ParamsCharArray,",");// Very important to end the message
+		//cout << "HostAreYouFree ParamsCharArray: " << ParamsCharArray << endl;
+		this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+	}
+	HostsActiveActionsFree[0]=true;// This host unblocked
+	return false;
+}
+
+return false; // all ok
+}
+
+int QTLAH::UnBlockYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux){
+char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+for (int i=0;i<NumInterestIPaddressesAux;i++){
+	strcpy(ParamsCharArray,interestIPaddressesSocketsAux[i]);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,this->IPaddressesSockets[2]);
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"Operation");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"HostAreYouFree");
+	strcat(ParamsCharArray,",");
+	strcat(ParamsCharArray,"UnBlock");
+	strcat(ParamsCharArray,",");// Very important to end the message
+	//cout << "HostAreYouFree ParamsCharArray: " << ParamsCharArray << endl;
+	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+}
+HostsActiveActionsFree[0]=true;// This host unblocked
+return 0; // All ok
+}
+
 int QTLAH::PeriodicRequestSynchsHost(){
 //def SimulateRequestSynchsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRunsPerCenterMass,SynchFreqPRUarrayTest,SynchPRUoffFreqVal):
 for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes){// For each connected node to be synch with
@@ -1217,44 +1384,45 @@ str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTe
 			messageIPdest=IPhostDestConNet
 			messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 */
-			char charNumAux1[NumBytesBufferICPMAX] = {0};
-			char messagePayloadAux1[NumBytesBufferICPMAX] = {0};
-			strcpy(messagePayloadAux1,"Active");
-			strcat(messagePayloadAux1,";");
-			strcat(messagePayloadAux1,this->IPaddressesSockets[3+iConnHostsNodes]);
-			strcat(messagePayloadAux1,"_");
-			strcat(messagePayloadAux1,";");
-			sprintf(charNumAux1, "%d", NumRunsPerCenterMass);
-			strcat(messagePayloadAux1,charNumAux1);
-			strcat(messagePayloadAux1,";");
-			sprintf(charNumAux1, "%d", iCenterMass);
-			strcat(messagePayloadAux1,charNumAux1);
-			strcat(messagePayloadAux1,";");
-			sprintf(charNumAux1, "%d", iNumRunsPerCenterMass);
-			strcat(messagePayloadAux1,charNumAux1);
-			strcat(messagePayloadAux1,";");
-			sprintf(charNumAux1, "%4f", QTLAHFreqSynchNormValuesArray[0]);
-			strcat(messagePayloadAux1,charNumAux1);
-			strcat(messagePayloadAux1,";");
-			sprintf(charNumAux1, "%4f", QTLAHFreqSynchNormValuesArray[1]);
-			strcat(messagePayloadAux1,charNumAux1);
-			strcat(messagePayloadAux1,";");
-			sprintf(charNumAux1, "%4f", QTLAHFreqSynchNormValuesArray[2]);
-			strcat(messagePayloadAux1,charNumAux1);
-			strcat(messagePayloadAux1,";");
+			char charNumAux[NumBytesBufferICPMAX] = {0};
+			char messagePayloadAux[NumBytesBufferICPMAX] = {0};
+			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 			
-			char ParamsCharArray1[NumBytesBufferICPMAX] = {0};
-			strcpy(ParamsCharArray1,this->IPaddressesSockets[0]);// Destination, the attached node ConNet
-			strcat(ParamsCharArray1,",");
-			strcat(ParamsCharArray1,this->IPaddressesSockets[1]);// Origin, this host ConNet
-			strcat(ParamsCharArray1,",");
-			strcat(ParamsCharArray1,"Control");// Because is for the nodes
-			strcat(ParamsCharArray1,",");
-			strcat(ParamsCharArray1,"SimulateReceiveSynchQubits");
-			strcat(ParamsCharArray1,",");
-			strcat(ParamsCharArray1,messagePayloadAux1);
-			strcat(ParamsCharArray1,",");// Very important to end the message		
-			this->SendMessageAgent(ParamsCharArray1);
+			strcpy(messagePayloadAux,"Active");
+			strcat(messagePayloadAux,";");
+			strcat(messagePayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);
+			strcat(messagePayloadAux,"_");
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%d", NumRunsPerCenterMass);
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%d", iCenterMass);
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%d", iNumRunsPerCenterMass);
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[0]);
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[1]);
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[2]);
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");		
+			
+			strcpy(ParamsCharArray,this->IPaddressesSockets[0]);// Destination, the attached node ConNet
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,this->IPaddressesSockets[1]);// Origin, this host ConNet
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"Control");// Because is for the nodes
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"SimulateReceiveSynchQubits");
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,messagePayloadAux);
+			strcat(ParamsCharArray,",");// Very important to end the message		
+			this->SendMessageAgent(ParamsCharArray);
 			/*messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),
 			str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2]),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
 			messageCommandAux="SimulateSendSynchQubits"
@@ -1265,50 +1433,47 @@ str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTe
 			this->SendMessageAgent(messageAuxChar)
 */			
 			
-			char charNumAux2[NumBytesBufferICPMAX] = {0};
-			char messagePayloadAux2[NumBytesBufferICPMAX] = {0};
-			strcpy(messagePayloadAux2,"Passive");
-			strcat(messagePayloadAux2,";");
-			strcat(messagePayloadAux2,this->IPaddressesSockets[2]);
-			strcat(messagePayloadAux2,"_");
-			strcat(messagePayloadAux2,";");
-			sprintf(charNumAux2, "%d", NumRunsPerCenterMass);
-			strcat(messagePayloadAux2,charNumAux2);
-			strcat(messagePayloadAux2,";");
-			sprintf(charNumAux2, "%d", iCenterMass);
-			strcat(messagePayloadAux2,charNumAux2);
-			strcat(messagePayloadAux2,";");
-			sprintf(charNumAux2, "%d", iNumRunsPerCenterMass);
-			strcat(messagePayloadAux2,charNumAux2);
-			strcat(messagePayloadAux2,";");
-			sprintf(charNumAux2, "%4f", 0.0);// Zero added offset since we are not testing
-			strcat(messagePayloadAux2,charNumAux2);
-			strcat(messagePayloadAux2,";");
-			sprintf(charNumAux2, "%4f", 0.0);// Zero added relative frequency difference offset since we are not testing
-			strcat(messagePayloadAux2,charNumAux2);
-			strcat(messagePayloadAux2,";");
-			sprintf(charNumAux2, "%4f", QTLAHFreqSynchNormValuesArray[0]);
-			strcat(messagePayloadAux2,charNumAux2);
-			strcat(messagePayloadAux2,";");
-			sprintf(charNumAux2, "%4f", QTLAHFreqSynchNormValuesArray[1]);
-			strcat(messagePayloadAux2,charNumAux2);
-			strcat(messagePayloadAux2,";");
-			sprintf(charNumAux2, "%4f", QTLAHFreqSynchNormValuesArray[2]);
-			strcat(messagePayloadAux2,charNumAux2);
-			strcat(messagePayloadAux2,";");
+			strcpy(messagePayloadAux,"Passive");
+			strcat(messagePayloadAux,";");
+			strcat(messagePayloadAux,this->IPaddressesSockets[2]);
+			strcat(messagePayloadAux,"_");
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%d", NumRunsPerCenterMass);
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%d", iCenterMass);
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%d", iNumRunsPerCenterMass);
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%4f", 0.0);// Zero added offset since we are not testing
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%4f", 0.0);// Zero added relative frequency difference offset since we are not testing
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[0]);
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[1]);
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[2]);
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
 			
-			char ParamsCharArray2[NumBytesBufferICPMAX] = {0};
-			strcpy(ParamsCharArray2,this->IPaddressesSockets[3+iConnHostsNodes]);// Destination, the other host OpNet
-			strcat(ParamsCharArray2,",");
-			strcat(ParamsCharArray2,this->IPaddressesSockets[2]);// Origin, this host OpNet
-			strcat(ParamsCharArray2,",");
-			strcat(ParamsCharArray2,"Control");// Because is for the nodes
-			strcat(ParamsCharArray2,",");
-			strcat(ParamsCharArray2,"SimulateSendSynchQubits");
-			strcat(ParamsCharArray2,",");
-			strcat(ParamsCharArray2,messagePayloadAux2);
-			strcat(ParamsCharArray2,",");// Very important to end the message		
-			this->SendMessageAgent(ParamsCharArray2);
+			strcpy(ParamsCharArray,this->IPaddressesSockets[3+iConnHostsNodes]);// Destination, the other host OpNet
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,this->IPaddressesSockets[2]);// Origin, this host OpNet
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"Control");// Because is for the nodes
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"SimulateSendSynchQubits");
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,messagePayloadAux);
+			strcat(ParamsCharArray,",");// Very important to end the message		
+			this->SendMessageAgent(ParamsCharArray);
 			
 			usleep(usSynchProcIterRunsTimePoint);// Give time between iterations to send and receive qubits
 		}

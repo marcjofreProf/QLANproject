@@ -48,7 +48,7 @@ class QPLA:
 	
 	def SendMessageAgent(self,ParamsDescendingCharArray): # Send message to the below Agent
 		self.QSLAagent.SendMessageAgent(ParamsDescendingCharArray)
-	
+	# Active actions that use the nodes, so they have to be blocked when the node is in use
 	def SimulateRequestQubitsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRequestedQubits,SynchPRUoffFreqVal): # Request that host's node sends qubits to this host's node		
 		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRequestedQubits)])
 		messageCommandAux="SimulateReceiveQubits"
@@ -158,7 +158,7 @@ class QPLA:
 				#print(messageAuxChar)
 				time.sleep(sSynchProcIterRunsTimePoint)# Give time between iterations to send and receive qubits
 	
-	## Methods to retrieve information from the nodes or hosts
+	## Methods to retrieve information from the nodes or hosts, and are passive actions
 	def SimulateRetrieveNumStoredQubitsNode(self,IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray): # Supposing that node has received quBits, make use of them
 		self.QSLAagent.SimulateRetrieveNumStoredQubitsNode(IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray)
 	

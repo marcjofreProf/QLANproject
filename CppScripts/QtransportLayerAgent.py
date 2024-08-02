@@ -97,6 +97,7 @@ except __builtin__.Exception:
 
 NumBytesBufferICPMAX = _QtransportLayerAgent.NumBytesBufferICPMAX
 IPcharArrayLengthMAX = _QtransportLayerAgent.IPcharArrayLengthMAX
+NumConnectedHosts = _QtransportLayerAgent.NumConnectedHosts
 NumCalcCenterMass = _QtransportLayerAgent.NumCalcCenterMass
 NumRunsPerCenterMass = _QtransportLayerAgent.NumRunsPerCenterMass
 class QTLAH(_object):

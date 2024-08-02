@@ -13,7 +13,8 @@ Header declaration file for Quantum transport Layer Agent Host
 // ICP connections
 #define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 #define IPcharArrayLengthMAX 15
-// Network synchronization
+// Network hosts
+#define NumConnectedHosts 2// Number of connected hosts (not counting this one)
 // Synchronization
 #define NumCalcCenterMass 3 // Number of centers of mass to measure to compute the synchronization
 #define NumRunsPerCenterMass 6 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
@@ -44,7 +45,6 @@ public: // Variables/Objects
 	int numberSessions=0;
 private: // Variables/Objects	
 	ApplicationState m_state;
-	int NumConnectedHosts=2;// Number of connected hosts (not counting this one)
 	char IPaddressesSockets[5][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks
 	// IPaddressesSockets[0]: IP node attached ConNet
 	// IPaddressesSockets[1]: IP host attached ConNet
@@ -96,6 +96,10 @@ private: // Variables/Objects
 	// Synchronization parameters
 	bool GPIOnodeHardwareSynched=false;// VAriable to know the hardware synch status of the node below. Actually, do not let many operations and controls to happen until this variable is set to true.
 	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0,0.35,0.70}; // Normalized values of frequency testing// Relative frequency difference normalized
+	// Scheduler status
+	bool HostsActiveActionsFree[1+NumConnectedHosts]={true}; // Indicate if the hosts are currently free to perform active actions. Index 0 is the host itself, the other indexes are the other remote hosts in the order of IPaddressesSockets starting from position 2
+	int NumAnswersOtherHostsActiveActionsFree=0;// Counter of the number of answers from other hosts proceessed
+	char InfoRemoteHostActiveActions[2][IPcharArrayLengthMAX]={"\0","\0"}; // Two parameters indicating current active blocking host and status
 
 public: // Functions
 	// Management
@@ -155,6 +159,11 @@ private: //Functions//Methods
 	int countQuadrupleUnderscores(char* ParamsCharArray);
 	// Synchronization network related
 	int PeriodicRequestSynchsHost();// Executes when commanded the mechanisms for synchronizing the network
+	// Host scheduler
+	int SendAreYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux);// Ask all other hosts if free, while setting this host as not free
+	int AcumulateAnswersYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux);// Accumulates the answers from the requested hosts
+	bool CheckReceivedAnswersYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux);// If all host of interest free, return true, otherwise return false
+	int UnBlockYouFreeRequestToParticularHosts(int NumInterestIPaddressesAux, char** interestIPaddressesSocketsAux);// IUnblock the previously block hosts
 
 };
 
