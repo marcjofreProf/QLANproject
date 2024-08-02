@@ -1607,7 +1607,7 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[2]);
 			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");
-			cout << "PeriodicRequestSynchsHost messagePayloadAux: " << messagePayloadAux << endl;	
+			//cout << "PeriodicRequestSynchsHost messagePayloadAux: " << messagePayloadAux << endl;	
 			
 			strcpy(ParamsCharArray,this->IPaddressesSockets[0]);// Destination, the attached node ConNet
 			strcat(ParamsCharArray,",");
@@ -1674,11 +1674,11 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			for (int i=0;i<numForstEquivalentToSleep;i++){
 				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 				//cout << "this->getState(): " << this->getState() << endl;
-				if(this->getState()==0 ) {
+				if(this->getState()==0) {
 					this->ProcessNewMessage();
 					this->m_pause(); // After procesing the request, pass to paused state
 				}
-				this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few nanoseconds for other processes to enter
+				this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 			}
 		}
 	}
