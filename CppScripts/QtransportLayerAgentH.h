@@ -94,7 +94,10 @@ private: // Variables/Objects
 	};
 	using Clock = my_clock;//
 	// Synchronization parameters
+	unsigned long long int iIterNetworkSynchcurrentTimerVal=0;// Variable to count how many time has passed since last network synchronization
+	unsigned long long int MaxiIterNetworkSynchcurrentTimerVal=3600000; // Counter value to reset network synchronization
 	bool GPIOnodeHardwareSynched=false;// VAriable to know the hardware synch status of the node below. Actually, do not let many operations and controls to happen until this variable is set to true.
+	bool GPIOnodeNetworkSynched=false;// VAriable to know the network synch status of the node below. Periodically turn to false, to proceed again with network synchronization
 	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0,0.35,0.70}; // Normalized values of frequency testing// Relative frequency difference normalized
 	// Scheduler status
 	int IterHostsActiveActionsFreeStatus=0;// 0: Not asked this question; 1: Question asked; 2: All questions received; -1: Abort and reset all
@@ -165,6 +168,7 @@ private: //Functions//Methods
 	int countDoubleUnderscores(char* ParamsCharArray);
 	int countQuadrupleUnderscores(char* ParamsCharArray);
 	// Synchronization network related
+	int RegularCheckToPerform(); // Sort of a scheduler
 	int PeriodicRequestSynchsHost();// Executes when commanded the mechanisms for synchronizing the network
 	// Host scheduler
 	int SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray); // Sequencer of the different steps to ask for availability to other hosts

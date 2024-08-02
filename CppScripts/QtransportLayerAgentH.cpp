@@ -679,6 +679,41 @@ clock_nanosleep(CLOCK_TAI, 0, &ts, NULL); //
 return 0; // All ok
 }
 
+int QTLAH::RegularCheckToPerform(){
+// First thing to do is to network synchronize the below node, when at least the node is PRU hardware synch
+if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false){
+cout << "Host synching node to the network!" << endl;
+
+char argsPayloadAux[NumBytesBufferICPMAX] = {0};
+for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
+	if (iConnHostsNodes==0){strcpy(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
+	else{strcat(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
+	strcat(argsPayloadAux,",");
+}
+this->release();
+this->WaitUntilActiveActionFree(argsPayloadAux,NumConnectedHosts);
+this->acquire();
+this->PeriodicRequestSynchsHost();
+		
+GPIOnodeNetworkSynched=true;// Update value as synched
+this->release();
+this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
+this->acquire();
+cout << "Host synched node to the network!" << endl;
+
+}
+iIterNetworkSynchcurrentTimerVal=iIterNetworkSynchcurrentTimerVal+1; // Update value
+if (iIterNetworkSynchcurrentTimerVal>MaxiIterNetworkSynchcurrentTimerVal){// Every some iterations re-synch the node thorugh the network
+	GPIOnodeNetworkSynched=false;// Update value as synched
+	iIterNetworkSynchcurrentTimerVal=0;// Reset value
+	cout << "Host will re-synch node to the network!" << endl;
+}
+
+// Other task to perform at some point or regularly
+
+return 0; // all ok
+}
+
 void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  // One of the firsts things to do for a host is to initialize ICP socket connection with it host or with its attached nodes.
  this->InitiateICPconnections(); // Very important that they work. Otherwise the rest go wrong
@@ -708,6 +743,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
     	// Code that might throw an exception
  	// Check if there are need messages or actions to be done by the node 	
  	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+ 	this->RegularCheckToPerform();// Every now and then some checks have to happen
        switch(this->getState()) {
            case QTLAH::APPLICATION_RUNNING: {               
                // Do Some Work
@@ -862,7 +898,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 					if (string(Payload)==string("Block")){// Confirm block
 						strcpy(InfoRemoteHostActiveActions[1],"Block");// Set status to Preventive
 					}
-					else{// Unblock
+					else{// UnBlock
 						strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
 						strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
 						HostsActiveActionsFree[0]=true; // Set the host as free
@@ -874,7 +910,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 						else{HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]="false";}
 						NumAnswersOtherHostsActiveActionsFree=NumAnswersOtherHostsActiveActionsFree+1;// Update value
 					}
-					else if (HostsActiveActionsFree[0]==true and string(Payload)==string("Preventive")){// Preventive block
+					else if (HostsActiveActionsFree[0]==true and string(Payload)==string("Preventive") and GPIOnodeHardwareSynched==true){// Preventive block
 						strcpy(InfoRemoteHostActiveActions[0],IPorg);// Copy the identification of the host
 						strcpy(InfoRemoteHostActiveActions[1],"Preventive");// Set status to Preventive
 						HostsActiveActionsFree[0]=false; // Set the host as not free
@@ -909,6 +945,11 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 						strcat(ParamsCharArray,",");// Very important to end the message
 						//cout << "Operation Message forward ParamsCharArray: " << ParamsCharArray << endl;	
 						this->ICPdiscoverSend(ParamsCharArray);
+					}
+					else if (string(Payload)==string("UnBlock")){// Apparently not needed, but just in case
+						strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
+						strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
+						HostsActiveActionsFree[0]=true; // Set the host as free
 					}
 					else{// Non of the above, which is a malfunction
 						cout << "Host HostAreYouFree not handled!" << endl;
@@ -1266,7 +1307,7 @@ return 0; // all ok
 
 int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 this->acquire();
-while (HostsActiveActionsFree[0]==false){// Wait here// No other thread checking this info
+while (HostsActiveActionsFree[0]==false and GPIOnodeHardwareSynched==false){// Wait here// No other thread checking this info
 this->release();this->RelativeNanoSleepWait((unsigned int)(150*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();
 }
 
