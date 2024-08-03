@@ -750,7 +750,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 			iIterNetworkSynchcurrentTimerVal=0;// Reset value
 			cout << "Host " << this->IPaddressesSockets[2] << " synched node " << this->IPaddressesSockets[0] << " to the network!" << endl;
 			// Give the oportuny to other host to synch their nodes, so that the same host does not re-start a synchronizaiton, even when completing the CycleSynchNetworkDone
-			int numForstEquivalentToSleep=1500;//1000: Equivalent to 10 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
+			int numForstEquivalentToSleep=1000;//1000: Equivalent to 10 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
 			for (int i=0;i<numForstEquivalentToSleep;i++){
 				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 				//cout << "this->getState(): " << this->getState() << endl;
