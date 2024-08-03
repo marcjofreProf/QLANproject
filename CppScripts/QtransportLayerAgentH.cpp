@@ -736,17 +736,6 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 			this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
 			iIterNetworkSynchcurrentTimerVal=0;// Reset value
 			cout << "Host synched node to the network!" << endl;
-			// Give time to the other connected nodes to iterate their synch network
-			int numForstEquivalentToSleep=1000;//1000: Equivalent to 10 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
-			for (int i=0;i<numForstEquivalentToSleep;i++){
-				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
-				//cout << "this->getState(): " << this->getState() << endl;
-				if(this->getState()==0) {
-					this->ProcessNewMessage();
-					this->m_pause(); // After procesing the request, pass to paused state
-				}
-				this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
-			}
 		}
 	}
 	else{
