@@ -560,9 +560,9 @@ SynchCalcValuesAbsArray[0]=0.0*SynchCalcValuesAbsArray[0]+SynchCalcValuesArray[0
 SynchCalcValuesAbsArray[1]=SynchCalcValuesAbsArray[1]+SynchCalcValuesArray[1];
 SynchCalcValuesAbsArray[2]=SynchCalcValuesAbsArray[2]+SynchCalcValuesArray[2];
 
-cout << "QPLA::SynchCalcValuesAbsArray[0]: " << SynchCalcValuesAbsArray[0] << endl;
-cout << "QPLA::SynchCalcValuesAbsArray[1]: " << SynchCalcValuesAbsArray[1] << endl;
-cout << "QPLA::SynchCalcValuesAbsArray[2]: " << SynchCalcValuesAbsArray[2] << endl;
+//cout << "QPLA::SynchCalcValuesAbsArray[0]: " << SynchCalcValuesAbsArray[0] << endl;
+//cout << "QPLA::SynchCalcValuesAbsArray[1]: " << SynchCalcValuesAbsArray[1] << endl;
+//cout << "QPLA::SynchCalcValuesAbsArray[2]: " << SynchCalcValuesAbsArray[2] << endl;
 	
 // Update relative iterative values
 double SynchParamValuesArrayAux[2];

@@ -1673,6 +1673,12 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[2]);
 			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%4f", 0.0);// Zero added offset since we are not testing
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%4f", 0.0);// Zero added relative frequency difference offset since we are not testing
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
 			//cout << "PeriodicRequestSynchsHost messagePayloadAux: " << messagePayloadAux << endl;	
 			
 			strcpy(ParamsCharArray,this->IPaddressesSockets[0]);// Destination, the attached node ConNet
@@ -1703,13 +1709,7 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			strcat(messagePayloadAux,";");
 			sprintf(charNumAux, "%d", iNumRunsPerCenterMass);
 			strcat(messagePayloadAux,charNumAux);
-			strcat(messagePayloadAux,";");
-			sprintf(charNumAux, "%4f", 0.0);// Zero added offset since we are not testing
-			strcat(messagePayloadAux,charNumAux);
-			strcat(messagePayloadAux,";");
-			sprintf(charNumAux, "%4f", 0.0);// Zero added relative frequency difference offset since we are not testing
-			strcat(messagePayloadAux,charNumAux);
-			strcat(messagePayloadAux,";");
+			strcat(messagePayloadAux,";");			
 			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[0]);
 			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");
@@ -1717,6 +1717,12 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");
 			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[2]);
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%4f", 0.0);// Zero added offset since we are not testing
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%4f", 0.0);// Zero added relative frequency difference offset since we are not testing
 			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");
 			

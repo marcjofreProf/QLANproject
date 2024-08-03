@@ -835,15 +835,15 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			// Check if proper decoding
-			cout << "this->QLLAModeActivePassive: " << this->QLLAModeActivePassive << endl;
-			cout << "this->QLLANumRunsPerCenterMass: " << this->QLLANumRunsPerCenterMass << endl;
-			cout << "iCenterMass: " << iCenterMass << endl;
-			cout << "iNumRunsPerCenterMass: " << iNumRunsPerCenterMass << endl;
-			cout << "QLLAFreqSynchNormValuesArray[0]: " << QLLAFreqSynchNormValuesArray[0] << endl;
-			cout << "QLLAFreqSynchNormValuesArray[1]: " << QLLAFreqSynchNormValuesArray[1] << endl;
-			cout << "QLLAFreqSynchNormValuesArray[2]: " << QLLAFreqSynchNormValuesArray[2] << endl;
-			cout << "this->QLLAFineSynchAdjVal[0]: " << this->QLLAFineSynchAdjVal[0] << endl;
-			cout << "this->QLLAFineSynchAdjVal[1]: " << this->QLLAFineSynchAdjVal[1] << endl;
+			//cout << "this->QLLAModeActivePassive: " << this->QLLAModeActivePassive << endl;
+			//cout << "this->QLLANumRunsPerCenterMass: " << this->QLLANumRunsPerCenterMass << endl;
+			//cout << "iCenterMass: " << iCenterMass << endl;
+			//cout << "iNumRunsPerCenterMass: " << iNumRunsPerCenterMass << endl;
+			//cout << "QLLAFreqSynchNormValuesArray[0]: " << QLLAFreqSynchNormValuesArray[0] << endl;
+			//cout << "QLLAFreqSynchNormValuesArray[1]: " << QLLAFreqSynchNormValuesArray[1] << endl;
+			//cout << "QLLAFreqSynchNormValuesArray[2]: " << QLLAFreqSynchNormValuesArray[2] << endl;
+			//cout << "this->QLLAFineSynchAdjVal[0]: " << this->QLLAFineSynchAdjVal[0] << endl;
+			//cout << "this->QLLAFineSynchAdjVal[1]: " << this->QLLAFineSynchAdjVal[1] << endl;
 			int numUnderScores=countUnderscores(PayloadAux);
 			for (int iIterQLLAIPaddr=0;iIterQLLAIPaddr<numUnderScores;iIterQLLAIPaddr++){
 				if(iIterQLLAIPaddr==0){strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(PayloadAux,"_"));}
