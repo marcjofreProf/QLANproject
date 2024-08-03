@@ -702,10 +702,8 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 	//cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
 	//cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 	//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
-	if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false and HostsActiveActionsFree[0]==true and (numHolderOtherNodesSynchNetwork%(NumConnectedHosts+1))==0){
-		numHolderOtherNodesSynchNetwork=1;// Reset value to make it fair to other nodes to iterate through network synchronization
-		cout << "Host " << this->IPaddressesSockets[2] << " synching node " << this->IPaddressesSockets[0] << " to the network!" << endl;
-
+	//cout << "Host " << this->IPaddressesSockets[2] << " numHolderOtherNodesSynchNetwork: " << numHolderOtherNodesSynchNetwork << endl;
+	if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false and HostsActiveActionsFree[0]==true and CycleSynchNetworkDone==false){
 		char argsPayloadAux[NumBytesBufferICPMAX] = {0};
 		// Block all connected nodes
 		for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
@@ -722,12 +720,21 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 		
 		//cout << "argsPayloadAux: " << argsPayloadAux << endl;		
 		if (AchievedAttentionParticularHosts==true){
+			cout << "Host " << this->IPaddressesSockets[2] << " synching node " << this->IPaddressesSockets[0] << " to the network!" << endl;
 			this->PeriodicRequestSynchsHost();
-			iIterNetworkSynchScan=(iIterNetworkSynchScan+1)%NumConnectedHosts;// Iterates/scans thorugh the different connected nodes
+			numHolderOtherNodesSynchNetwork++; // Update value
+
+			CycleSynchNetworkDone=true;
+			
+			if (numHolderOtherNodesSynchNetwork==(NumConnectedHosts+1)){// All connected nodes and this host's node have been netwrok synch, so we can reset the synch cycle 
+				CycleSynchNetworkDone=false;
+				numHolderOtherNodesSynchNetwork=0;// reset value
+			}
 			
 			if (InitialNetworkSynchPass<1){//the very first time, two rounds are needed to achieve a reasonable network synchronization
 				GPIOnodeNetworkSynched=false;// Do not Update value as synched
 				InitialNetworkSynchPass=InitialNetworkSynchPass+1;
+				cout << "Host " << this->IPaddressesSockets[2] << " first initial synch process completed...executing second process..." << endl; 
 			}
 			else{
 				GPIOnodeNetworkSynched=true;// Update value as synched
@@ -736,6 +743,17 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 			this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
 			iIterNetworkSynchcurrentTimerVal=0;// Reset value
 			cout << "Host " << this->IPaddressesSockets[2] << " synched node " << this->IPaddressesSockets[0] << " to the network!" << endl;
+			// Give the oportuny to other host to synch their nodes, so that the same host does not re-start a synchronizaiton, even when completing the CycleSynchNetworkDone
+			int numForstEquivalentToSleep=1000;//1000: Equivalent to 10 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
+			for (int i=0;i<numForstEquivalentToSleep;i++){
+				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+				//cout << "this->getState(): " << this->getState() << endl;
+				if(this->getState()==0) {
+					this->ProcessNewMessage();
+					this->m_pause(); // After procesing the request, pass to paused state
+				}
+				this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+			}
 		}
 	}
 	else{
@@ -1153,11 +1171,15 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		    // Just to keep track of things
 		    if (string(Command)==string("SimulateSendSynchQubits")){// Count how many order of synch network from other hosts received
 		    	numHolderOtherNodesSendSynchQubits++;
-		    	//cout << "Another node " << IPorg << " requesting synch qubits!" << endl;
+		    	//cout << "Another node " << IPorg << " requesting synch qubits! " << "numHolderOtherNodesSendSynchQubits: " << numHolderOtherNodesSendSynchQubits << endl;
 		    	if (numHolderOtherNodesSendSynchQubits>=(NumCalcCenterMass*NumRunsPerCenterMass)){
 		    		numHolderOtherNodesSendSynchQubits=0;// reset value
 		    		numHolderOtherNodesSynchNetwork++;// Count the number of other nodes that run network synch
-		    		cout << "Another node " << IPorg << " synched!" << endl;
+		    		cout << "Another pair of nodes " << IPorg << " and " << IPdest << " synch iteration completed!" << endl;
+		    		if (numHolderOtherNodesSynchNetwork==(NumConnectedHosts+1)){// All connected nodes and this host's node have been netwrok synch, so we can reset the synch cycle 
+					CycleSynchNetworkDone=false;
+					numHolderOtherNodesSynchNetwork=0;// reset value
+				}
 		    	}
 		    }		    
 		}  
@@ -1372,7 +1394,9 @@ this->acquire();
 while (HostsActiveActionsFree[0]==false and GPIOnodeHardwareSynched==false){// Wait here// No other thread checking this info
 this->release();this->RelativeNanoSleepWait((unsigned int)(150*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();
 }
+this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 while(AchievedAttentionParticularHosts==false){
+	cout << "WaitUntilActiveActionFreePreLock: Host " << this->IPaddressesSockets[2] << " retrying to capture the attention of other involved hosts..." << endl;
 	this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 }
 this->release();
@@ -1690,7 +1714,7 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			
 			// Instead of a simple sleep, which would block the operation (specially processing new messages)
 			// usleep(usSynchProcIterRunsTimePoint);// Give time between iterations to send and receive qubits
-			int numForstEquivalentToSleep=10;//1000: Equivalent to 10 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
+			int numForstEquivalentToSleep=1000;//1000: Equivalent to 10 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
 			for (int i=0;i<numForstEquivalentToSleep;i++){
 				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 				//cout << "this->getState(): " << this->getState() << endl;

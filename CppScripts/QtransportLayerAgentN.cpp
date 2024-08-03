@@ -840,8 +840,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				if(iIterQLLAIPaddr==0){strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(PayloadAux,"_"));}
 				else{strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(NULL,"_"));}
 			}
-			//std::thread threadSimulateEmitSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitSynchQuBit,this,iCenterMass,iNumRunsPerCenterMass);
-			//threadSimulateEmitSynchQuBitRefAux.detach();
+			std::thread threadSimulateEmitSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitSynchQuBit,this,iCenterMass,iNumRunsPerCenterMass);
+			threadSimulateEmitSynchQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("SimulateReceiveQubits")){// Read qubits to the attached node
 			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
