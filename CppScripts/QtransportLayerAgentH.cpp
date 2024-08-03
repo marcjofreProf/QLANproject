@@ -721,8 +721,14 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 		//cout << "argsPayloadAux: " << argsPayloadAux << endl;		
 		if (AchievedAttentionParticularHosts==true){
 			cout << "Host " << this->IPaddressesSockets[2] << " synching node " << this->IPaddressesSockets[0] << " to the network!" << endl;
-			this->PeriodicRequestSynchsHost();
-			numHolderOtherNodesSynchNetwork++; // Update value
+			if (FastInitialFakeSkipNetworkSynchFlag==true){ // Fake the initial synchronization step
+				numHolderOtherNodesSynchNetwork=NumConnectedHosts+1;
+				cout << "Host " << this->IPaddressesSockets[2] << " skipping network synchronziation!!! to be deactivated..." << endl;
+			}
+			else{
+				this->PeriodicRequestSynchsHost();
+				numHolderOtherNodesSynchNetwork++; // Update value
+			}
 
 			CycleSynchNetworkDone=true;
 			
@@ -744,7 +750,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 			iIterNetworkSynchcurrentTimerVal=0;// Reset value
 			cout << "Host " << this->IPaddressesSockets[2] << " synched node " << this->IPaddressesSockets[0] << " to the network!" << endl;
 			// Give the oportuny to other host to synch their nodes, so that the same host does not re-start a synchronizaiton, even when completing the CycleSynchNetworkDone
-			int numForstEquivalentToSleep=1000;//1000: Equivalent to 10 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
+			int numForstEquivalentToSleep=1500;//1000: Equivalent to 10 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
 			for (int i=0;i<numForstEquivalentToSleep;i++){
 				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 				//cout << "this->getState(): " << this->getState() << endl;
@@ -1170,9 +1176,25 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
 		    // Just to keep track of things
 		    if (string(Command)==string("SimulateSendSynchQubits")){// Count how many order of synch network from other hosts received
+		    	// First way of counting
 		    	numHolderOtherNodesSendSynchQubits++;
 		    	//cout << "Another node " << IPorg << " requesting synch qubits! " << "numHolderOtherNodesSendSynchQubits: " << numHolderOtherNodesSendSynchQubits << endl;
-		    	if (numHolderOtherNodesSendSynchQubits>=(NumCalcCenterMass*NumRunsPerCenterMass)){
+		    	// Second way of counting for superior resilence and avoid being blocked
+		    	// PArtially decoding the Payload with the information of the current iterators of the network synching process
+		    	char PayloadAux[NumBytesBufferICPMAX] = {0}; // Copy the Payload to not correct it when reading with strtok
+			strcpy(PayloadAux,Payload);	
+		    	strtok(PayloadAux,";");// skip content//strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
+			//char PayloadAuxAux[NumBytesPayloadBuffer]={0};
+			strtok(NULL,";");// skip content//strcpy(PayloadAux,strtok(NULL,";"));
+			strtok(NULL,";");// skip content //this->QLLANumRunsPerCenterMass=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			int iCenterMassAux=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			int iNumRunsPerCenterMassAux=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			//this->QLLAFreqSynchNormValuesArray[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			//this->QLLAFreqSynchNormValuesArray[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			//this->QLLAFreqSynchNormValuesArray[2]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			//this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			//this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+		    	if (numHolderOtherNodesSendSynchQubits>=(NumCalcCenterMass*NumRunsPerCenterMass) or (iCenterMassAux==(NumCalcCenterMass-1) and iNumRunsPerCenterMassAux==(NumRunsPerCenterMass-1))){
 		    		numHolderOtherNodesSendSynchQubits=0;// reset value
 		    		numHolderOtherNodesSynchNetwork++;// Count the number of other nodes that run network synch
 		    		cout << "Another pair of nodes " << IPorg << " and " << IPdest << " synch iteration completed!" << endl;

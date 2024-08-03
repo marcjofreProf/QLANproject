@@ -969,9 +969,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(0.5*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // Relative frequency difference adjustment
 	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]-SynchCalcValuesArray[1])*SynchCalcValuesArray[0]); // Offset adjustment
 
-	//cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;
-	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
-	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
+	cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;
+	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
+	cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 }
 
 return 0; // All Ok

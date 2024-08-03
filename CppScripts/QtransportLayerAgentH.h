@@ -93,15 +93,16 @@ private: // Variables/Objects
 	    }
 	};
 	using Clock = my_clock;//
-	// Synchronization parameters
+	// Synchronization network parameters
+	bool FastInitialFakeSkipNetworkSynchFlag=false; // Variable that when activated, skips the initial network synchronization steps
 	int InitialNetworkSynchPass=0; // Variable to control that at least two rounds of network synchronization are performed the very first time
 	int numHolderOtherNodesSynchNetwork=0; // Variable to keep track if the other connected nodes have iterated thorugh the network synch
 	bool CycleSynchNetworkDone=false; // Variable to keep track if this host has been network synchronized in this cycle round of network sincronizxations
 	int numHolderOtherNodesSendSynchQubits=0; // Variable to count number of consecutive SendSynchQubits request
 	unsigned long long int iIterNetworkSynchcurrentTimerVal=0;// Variable to count how many time has passed since last network synchronization
-	unsigned long long int MaxiIterNetworkSynchcurrentTimerVal=3600; // Counter value to reset network synchronization, which is actually multiplied by the variable MaxiIterPeriodicTimerVal
-	bool GPIOnodeHardwareSynched=false;// VAriable to know the hardware synch status of the node below. Actually, do not let many operations and controls to happen until this variable is set to true.
-	bool GPIOnodeNetworkSynched=false;// VAriable to know the network synch status of the node below. Periodically turn to false, to proceed again with network synchronization
+	unsigned long long int MaxiIterNetworkSynchcurrentTimerVal=21600; // Counter value to reset network synchronization, which is actually multiplied by the variable MaxiIterPeriodicTimerVal. E.g, every 6 hours
+	bool GPIOnodeHardwareSynched=false;// Variable to know the hardware synch status of the node below. Actually, do not let many operations and controls to happen until this variable is set to true.
+	bool GPIOnodeNetworkSynched=false;// Variable to know the network synch status of the node below. Periodically turn to false, to proceed again with network synchronization
 	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0,0.35,0.70}; // Normalized values of frequency testing// Relative frequency difference normalized
 	// Scheduler status
 	unsigned long long int iIterPeriodicTimerVal=0; // Variable to keep track of number of passes thorugh periodic checks
