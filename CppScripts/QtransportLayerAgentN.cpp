@@ -822,7 +822,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			threadSimulateEmitQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("SimulateSendSynchQubits")){// Send qubits to the requesting host
-			cout << "Node SimulateSendSynchQubits Payload: "<< Payload << endl;
+			//cout << "Node SimulateSendSynchQubits Payload: "<< Payload << endl;
 			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
 			char PayloadAux[NumBytesPayloadBuffer]={0};
 			strcpy(PayloadAux,strtok(NULL,";"));
