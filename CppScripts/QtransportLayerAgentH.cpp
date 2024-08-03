@@ -702,7 +702,8 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 	//cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
 	//cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 	//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
-	if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false and HostsActiveActionsFree[0]==true){
+	if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false and HostsActiveActionsFree[0]==true and (numHolderOtherNodesSynchNetwork%NumConnectedHosts)==0){
+		numHolderOtherNodesSynchNetwork=0;// Reset value to make it fair to other nodes to iterate thorugh network synchronization
 		cout << "Host synching node to the network!" << endl;
 
 		char argsPayloadAux[NumBytesBufferICPMAX] = {0};
@@ -956,7 +957,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				// Different operation with respect the host that has sent the request				
 				if (string(InfoRemoteHostActiveActions[0])==string(IPorg)){// Is the message from the current active host?
 					if (string(Payload)==string("Block")){// Confirm block
-						strcpy(InfoRemoteHostActiveActions[1],"Block");// Set status to Block
+						strcpy(InfoRemoteHostActiveActions[1],"Block");// Set status to Block						
 					}
 					else{// UnBlock
 						strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
@@ -1159,6 +1160,10 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		    strcpy(this->SendBuffer,ParamsCharArray);
 		    int socket_fd_conn=this->socket_fdArray[0];  // the host always acts as client to the node, so it needs the socket descriptor (it applies both to TCP and UDP)
 		    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
+		    // Just to keep track of things
+		    if (string(Command)==string("HostAreYouFree") and string(Payload)==string("Block")){// Count how many order of synch network from other hosts received
+		    	numHolderOtherNodesSynchNetwork++;// Count the number of other nodes that run network synch
+		    }
 		}  
 	}
 	else if(string(Type)==string("KeepAlive")){

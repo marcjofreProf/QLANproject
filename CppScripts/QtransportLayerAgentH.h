@@ -96,6 +96,7 @@ private: // Variables/Objects
 	// Synchronization parameters
 	int InitialNetworkSynchPass=0; // Variable to control that at least two rounds of network synchronization are performed the very first time
 	int iIterNetworkSynchScan=0; // Variable to execute network synchronization thorugh thte different nodes one at a time
+	int numHolderOtherNodesSynchNetwork=0; // Variable to keep track if the other connected nodes have iterated thorugh the network synch
 	unsigned long long int iIterNetworkSynchcurrentTimerVal=0;// Variable to count how many time has passed since last network synchronization
 	unsigned long long int MaxiIterNetworkSynchcurrentTimerVal=3600; // Counter value to reset network synchronization, which is actually multiplied by the variable MaxiIterPeriodicTimerVal
 	bool GPIOnodeHardwareSynched=false;// VAriable to know the hardware synch status of the node below. Actually, do not let many operations and controls to happen until this variable is set to true.
