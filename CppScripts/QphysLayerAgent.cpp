@@ -541,6 +541,20 @@ cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
+// Check if nan values, then convert them to 0 and inform thorugh the terminal
+if (std::isnan(SynchCalcValuesArray[0])){
+SynchCalcValuesArray[0]=0.0;
+cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
+}
+if (std::isnan(SynchCalcValuesArray[1])){
+SynchCalcValuesArray[1]=0.0;
+cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
+}
+if (std::isnan(SynchCalcValuesArray[2])){
+SynchCalcValuesArray[2]=0.0;
+cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
+}
+
 // Update absolute values - The actual values applied and show in the Host
 SynchCalcValuesAbsArray[0]=0.0*SynchCalcValuesAbsArray[0]+SynchCalcValuesArray[0];
 SynchCalcValuesAbsArray[1]=SynchCalcValuesAbsArray[1]+SynchCalcValuesArray[1];
