@@ -541,10 +541,15 @@ cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
-// Update absolute values
+// Update absolute values - The actual values applied and show in the Host
 SynchCalcValuesAbsArray[0]=0.0*SynchCalcValuesAbsArray[0]+SynchCalcValuesArray[0];
 SynchCalcValuesAbsArray[1]=SynchCalcValuesAbsArray[1]+SynchCalcValuesArray[1];
 SynchCalcValuesAbsArray[2]=SynchCalcValuesAbsArray[2]+SynchCalcValuesArray[2];
+
+cout << "QPLA::SynchCalcValuesAbsArray[0]: " << SynchCalcValuesAbsArray[0] << endl;
+cout << "QPLA::SynchCalcValuesAbsArray[1]: " << SynchCalcValuesAbsArray[1] << endl;
+cout << "QPLA::SynchCalcValuesAbsArray[2]: " << SynchCalcValuesAbsArray[2] << endl;
+	
 // Update relative iterative values
 double SynchParamValuesArrayAux[2];
 // The order below is not correct - debbug the protocol
@@ -969,9 +974,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(0.5*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // Relative frequency difference adjustment
 	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]-SynchCalcValuesArray[1])*SynchCalcValuesArray[0]); // Offset adjustment
 
-	cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;
-	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
-	cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
+	//cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;
+	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
+	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 }
 
 return 0; // All Ok
