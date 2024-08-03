@@ -704,21 +704,21 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 	//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
 	if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false and HostsActiveActionsFree[0]==true and (numHolderOtherNodesSynchNetwork%(NumConnectedHosts+1))==0){
 		numHolderOtherNodesSynchNetwork=1;// Reset value to make it fair to other nodes to iterate through network synchronization
-		cout << "Host synching node to the network!" << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " synching node to the network!" << endl;
 
 		char argsPayloadAux[NumBytesBufferICPMAX] = {0};
 		// Block all connected nodes
-		//for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
-		//	if (iConnHostsNodes==0){strcpy(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
-		//	else{strcat(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
-		//	strcat(argsPayloadAux,",");
-		//}
-		//this->WaitUntilActiveActionFree(argsPayloadAux,NumConnectedHosts);
+		for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
+			if (iConnHostsNodes==0){strcpy(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
+			else{strcat(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
+			strcat(argsPayloadAux,",");
+		}
+		this->WaitUntilActiveActionFree(argsPayloadAux,NumConnectedHosts);
 		
 		// Block only the two participating nodes in each iteration
-		strcpy(argsPayloadAux,this->IPaddressesSockets[3+iIterNetworkSynchScan]);
-		strcat(argsPayloadAux,",");
-		this->WaitUntilActiveActionFree(argsPayloadAux,1);
+		//strcpy(argsPayloadAux,this->IPaddressesSockets[3+iIterNetworkSynchScan]);
+		//strcat(argsPayloadAux,",");
+		//this->WaitUntilActiveActionFree(argsPayloadAux,1);
 		
 		//cout << "argsPayloadAux: " << argsPayloadAux << endl;		
 		if (AchievedAttentionParticularHosts==true){
@@ -735,7 +735,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 			
 			this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
 			iIterNetworkSynchcurrentTimerVal=0;// Reset value
-			cout << "Host synched node to the network!" << endl;
+			cout << "Host " << this->IPaddressesSockets[2] << " synched node to the network!" << endl;
 		}
 	}
 	else{
@@ -746,7 +746,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 		GPIOnodeHardwareSynched=false;// Update value as not synched
 		GPIOnodeNetworkSynched=false;// Update value as not synched
 		iIterNetworkSynchcurrentTimerVal=0;// Reset value
-		cout << "Host will re-synch node to the network!" << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " will re-synch node to the network!" << endl;
 	}
 
 	// Other task to perform at some point or regularly
@@ -934,12 +934,12 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				if (string(Payload)==string("true")){
 					// If received is because node is hardware synched
 					GPIOnodeHardwareSynched=true;
-					cout << "Node hardware synched. Proceed with the network synchronization..." << endl;
+					cout << "Node " << this->IPaddressesSockets[0] << " hardware synched. Proceed with the network synchronization..." << endl;
 				}
 				else{
 					// If received is because node is NOT hardware synched
 					GPIOnodeHardwareSynched=false;
-					cout << "Node hardware NOT synched..." << endl;
+					cout << "Node " << this->IPaddressesSockets[0] << " hardware NOT synched..." << endl;
 				}
 			}
 			else if (string(Command)==string("HostAreYouFree")){// Operations regarding availability request by other hosts
