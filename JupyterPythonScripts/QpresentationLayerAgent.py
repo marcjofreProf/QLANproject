@@ -151,7 +151,7 @@ class QPLA:
 		self.QSLAagent.UnBlockActiveActionFreePreLock(argsPayloadAux,len(argsPayloadList))
 	
 	def SimulateRequestSynchsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRunsPerCenterMass,SynchFreqPRUarrayTest,SynchPRUoffFreqVal): # Request that host's node sends qubits to this host's node
-		argsPayloadList=[IPhostDest1OpNet]
+		argsPayloadList=[IPhostDestOpNet]
 		argsPayloadAux=self.ListCharArrayParser(argsPayloadList)
 		self.QSLAagent.WaitUntilActiveActionFreePreLock(argsPayloadAux,len(argsPayloadList))
 		
