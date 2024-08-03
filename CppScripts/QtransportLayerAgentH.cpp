@@ -706,15 +706,23 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 		cout << "Host synching node to the network!" << endl;
 
 		char argsPayloadAux[NumBytesBufferICPMAX] = {0};
-		for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
-			if (iConnHostsNodes==0){strcpy(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
-			else{strcat(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
-			strcat(argsPayloadAux,",");
-		}
-		//cout << "argsPayloadAux: " << argsPayloadAux << endl;
-		this->WaitUntilActiveActionFree(argsPayloadAux,NumConnectedHosts);
+		// Block all connected nodes
+		//for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
+		//	if (iConnHostsNodes==0){strcpy(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
+		//	else{strcat(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
+		//	strcat(argsPayloadAux,",");
+		//}
+		//this->WaitUntilActiveActionFree(argsPayloadAux,NumConnectedHosts);
+		
+		// Block only the two participating nodes in each iteration
+		strcpy(argsPayloadAux,this->IPaddressesSockets[3+iIterNetworkSynchScan]);
+		strcat(argsPayloadAux,",");
+		this->WaitUntilActiveActionFree(argsPayloadAux,1);
+		
+		//cout << "argsPayloadAux: " << argsPayloadAux << endl;		
 		if (AchievedAttentionParticularHosts==true){
 			this->PeriodicRequestSynchsHost();
+			iIterNetworkSynchScan=(iIterNetworkSynchScan+1)%NumConnectedHosts;// Iterates/scans thorugh the different connected nodes
 			
 			if (InitialNetworkSynchPass<1){//the very first time, two rounds are needed to achieve a reasonable network synchronization
 				GPIOnodeNetworkSynched=false;// Do not Update value as synched
@@ -727,6 +735,17 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 			this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
 			iIterNetworkSynchcurrentTimerVal=0;// Reset value
 			cout << "Host synched node to the network!" << endl;
+			// Give time to the other connected nodes to iterate their synch network
+			int numForstEquivalentToSleep=1000;//1000: Equivalent to 10 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
+			for (int i=0;i<numForstEquivalentToSleep;i++){
+				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+				//cout << "this->getState(): " << this->getState() << endl;
+				if(this->getState()==0) {
+					this->ProcessNewMessage();
+					this->m_pause(); // After procesing the request, pass to paused state
+				}
+				this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+			}
 		}
 	}
 	else{
