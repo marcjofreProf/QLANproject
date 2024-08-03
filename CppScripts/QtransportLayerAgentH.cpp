@@ -704,7 +704,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 	//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
 	if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false and HostsActiveActionsFree[0]==true and (numHolderOtherNodesSynchNetwork%(NumConnectedHosts+1))==0){
 		numHolderOtherNodesSynchNetwork=1;// Reset value to make it fair to other nodes to iterate through network synchronization
-		cout << "Host " << this->IPaddressesSockets[2] << " synching node to the network!" << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " synching node " << this->IPaddressesSockets[0] << " to the network!" << endl;
 
 		char argsPayloadAux[NumBytesBufferICPMAX] = {0};
 		// Block all connected nodes
@@ -735,7 +735,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 			
 			this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
 			iIterNetworkSynchcurrentTimerVal=0;// Reset value
-			cout << "Host " << this->IPaddressesSockets[2] << " synched node to the network!" << endl;
+			cout << "Host " << this->IPaddressesSockets[2] << " synched node " << this->IPaddressesSockets[0] << " to the network!" << endl;
 		}
 	}
 	else{
