@@ -1153,10 +1153,11 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		    // Just to keep track of things
 		    if (string(Command)==string("SimulateSendSynchQubits")){// Count how many order of synch network from other hosts received
 		    	numHolderOtherNodesSendSynchQubits++;
-		    	if (numHolderOtherNodesSendSynchQubits==(NumCalcCenterMass*NumRunsPerCenterMass)){
+		    	//cout << "Another node " << IPorg << " requesting synch qubits!" << endl;
+		    	if (numHolderOtherNodesSendSynchQubits>=(NumCalcCenterMass*NumRunsPerCenterMass)){
 		    		numHolderOtherNodesSendSynchQubits=0;// reset value
 		    		numHolderOtherNodesSynchNetwork++;// Count the number of other nodes that run network synch
-		    		cout << "Another node synched!" << endl;
+		    		cout << "Another node " << IPorg << " synched!" << endl;
 		    	}
 		    }		    
 		}  
@@ -1689,7 +1690,7 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			
 			// Instead of a simple sleep, which would block the operation (specially processing new messages)
 			// usleep(usSynchProcIterRunsTimePoint);// Give time between iterations to send and receive qubits
-			int numForstEquivalentToSleep=1000;//1000: Equivalent to 10 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
+			int numForstEquivalentToSleep=10;//1000: Equivalent to 10 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
 			for (int i=0;i<numForstEquivalentToSleep;i++){
 				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 				//cout << "this->getState(): " << this->getState() << endl;
