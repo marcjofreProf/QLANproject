@@ -1013,8 +1013,9 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 						strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
 						HostsActiveActionsFree[0]=true; // Set the host as free
 					}
-					else{// Non of the above, which is a malfunction
+					else{// Non of the above, which is a malfunction						
 						cout << "Host HostAreYouFree not handled!" << endl;
+						cout << "IPdest: " << IPdest << ", IPorg: " << IPorg << ", Type: " << Type << ", Command: " << Command << " , Payload: " << Payload << endl;
 					}
 				}
 			
@@ -1161,9 +1162,14 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		    int socket_fd_conn=this->socket_fdArray[0];  // the host always acts as client to the node, so it needs the socket descriptor (it applies both to TCP and UDP)
 		    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
 		    // Just to keep track of things
-		    if (string(Command)==string("HostAreYouFree") and string(Payload)==string("Block")){// Count how many order of synch network from other hosts received
-		    	numHolderOtherNodesSynchNetwork++;// Count the number of other nodes that run network synch
-		    }
+		    if (string(Command)==string("SimulateSendSynchQubits")){// Count how many order of synch network from other hosts received
+		    	numHolderOtherNodesSendSynchQubits++;
+		    	if (numHolderOtherNodesSendSynchQubits==(NumCalcCenterMass*NumRunsPerCenterMass)){
+		    		numHolderOtherNodesSendSynchQubits=0;// reset value
+		    		numHolderOtherNodesSynchNetwork++;// Count the number of other nodes that run network synch
+		    		cout << "Another node synched!" << endl;
+		    	}
+		    }		    
 		}  
 	}
 	else if(string(Type)==string("KeepAlive")){
