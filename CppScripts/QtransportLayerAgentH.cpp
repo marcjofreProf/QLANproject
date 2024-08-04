@@ -1453,6 +1453,7 @@ int QTLAH::UnBlockActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararr
 this->acquire();
 this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);
 this->release();
+this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Give some time to relax things
 return 0; // All ok
 }
 
