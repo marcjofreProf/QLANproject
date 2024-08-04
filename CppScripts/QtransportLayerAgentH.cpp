@@ -1413,7 +1413,7 @@ return 0; // all ok
 
 int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){
 this->acquire();
-while (HostsActiveActionsFree[0]==false and GPIOnodeHardwareSynched==false){// Wait here// No other thread checking this info
+while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
 this->release();this->RelativeNanoSleepWait((unsigned int)(150*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();
 }
 this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
