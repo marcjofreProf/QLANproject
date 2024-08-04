@@ -1443,7 +1443,7 @@ while(IterHostsActiveActionsFreeStatus!=0){
 	else{
 		this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 	}
-	this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few nanoseconds for other processes to enter
+	this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 }
 //cout << "Finished WaitUntilActiveActionFree" << endl;
 return 0; // All ok
@@ -1467,6 +1467,7 @@ return 0; // All ok
 int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 if (IterHostsActiveActionsFreeStatus==0){
 this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);// To reset, just in case
+this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 }
 else if (IterHostsActiveActionsFreeStatus==1){
@@ -1477,6 +1478,7 @@ AchievedAttentionParticularHosts=this->CheckReceivedAnswersYouFreeRequestToParti
 }
 else{
 this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 }
 
 
