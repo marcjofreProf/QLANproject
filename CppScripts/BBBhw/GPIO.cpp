@@ -1006,7 +1006,7 @@ return 0; // all ok
 unsigned short GPIO::packBits(unsigned short value) {
     // Isolate bits 1, 2, 3, and 5 and shift them to their new positions
     unsigned short byte0 = value & 0x0F; // Byte 0 stays in position 0
-    unsigned short byte1 = (value & 0xF0) >> 4; // Byte 1 shifts to the right for bit positions
+    unsigned short byte1 = (value & 0xF0) >> 4; // Byte 1 shifts to the right four bit positions (the interesting ones)
 
     // Combine the bytes into a single unsigned short
     return byte0 | byte1;
