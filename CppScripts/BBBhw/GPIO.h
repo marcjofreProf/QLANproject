@@ -153,12 +153,12 @@ private:// Variables
 	int iIterDump;
 	unsigned int NumRecords=NumQuBitsPerRun; //Number of records per run. Max NumQuBitsPerRun. It is also defined in PRUassTaggDetScript.p and QphysLayerAgent.h
 	unsigned int NumSynchPulses=0;
-	unsigned char* valpHolder;
-	unsigned char* valpAuxHolder;
+	unsigned short* valpHolder;
+	unsigned short* valpAuxHolder;
 	unsigned int* CalpHolder; // 32 bits
 	unsigned int* synchpHolder; // 32 bits
-	unsigned char* valp; // 8 bits
-	unsigned char* valpAux; // 8 bits
+	unsigned short* valp; // 16 bits
+	unsigned short* valpAux; // 16 bits
 	unsigned int* synchp; // 32 bits
 	unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquition run
 	unsigned int valOverflowCycleCountPRU=0; // 32 bits

@@ -120,7 +120,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
         // Initialize DDM
 	LOCAL_DDMinit(); // DDR (Double Data Rate): A class of memory technology used in DRAM where data is transferred on both the rising and falling edges of the clock signal, effectively doubling the data rate without increasing the clock frequency.
 	// Here we can update memory space assigned address
-	valpHolder=(unsigned char*)&sharedMem_int[OFFSET_SHAREDRAM];
+	valpHolder=(unsigned short*)&sharedMem_int[OFFSET_SHAREDRAM];
 	valpAuxHolder=valpHolder+4+6*NumRecords;// 6* since each detection also includes the channels (2 Bytes) and 4 bytes for 32 bits counter, and plus 4 since the first tag is captured at the very beggining
 	CalpHolder=(unsigned int*)&pru0dataMem_int[2];// First tagg captured at the very beggining
 	synchpHolder=(unsigned int*)&pru0dataMem_int[3];// Starts at 12
@@ -724,14 +724,20 @@ valpAux=valpAuxHolder;
 // The shared memory space has 12KB=12×1024bytes=12×1024×8bits=98304bits.
 //Doing numbers, we can store up to 2456 captures. To be in the safe side, we can do 2048 captures
 
+// When unsgined char
+//valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
+//valpAux++;// 1 times 8 bits
+//valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<8;
+//valpAux++;// 1 times 8 bits
+//valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<16;
+//valpAux++;// 1 times 8 bits
+//valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<24;
+//valpAux++;// 1 times 8 bits
+// When unsigned short
 valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
-valpAux++;// 1 times 8 bits
-valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<8;
-valpAux++;// 1 times 8 bits
+valpAux++;// 1 times 16 bits
 valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<16;
-valpAux++;// 1 times 8 bits
-valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<24;
-valpAux++;// 1 times 8 bits
+valpAux++;// 1 times 16 bits
 //cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
 //////////////////////////////////////////////////////////////////////////////
 
@@ -788,14 +794,20 @@ if (streamDDRpru.is_open()){
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	for (iIterDump=0; iIterDump<NumRecords; iIterDump++){
 		// First 32 bits is the DWT_CYCCNT of the PRU
+		// When unsigned char
+		//valCycleCountPRU=static_cast<unsigned int>(*valp);
+		//valp++;// 1 times 8 bits
+		//valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<8;
+		//valp++;// 1 times 8 bits
+		//valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
+		//valp++;// 1 times 8 bits
+		//valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
+		//valp++;// 1 times 8 bits
+		// When unsigned short
 		valCycleCountPRU=static_cast<unsigned int>(*valp);
-		valp++;// 1 times 8 bits
-		valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<8;
-		valp++;// 1 times 8 bits
+		valp++;// 1 times 16 bits
 		valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
-		valp++;// 1 times 8 bits
-		valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
-		valp++;// 1 times 8 bits
+		valp++;// 1 times 16 bits
 		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
 		// Mount the extended counter value
 		extendedCounterPRUholder=static_cast<unsigned long long int>(valCycleCountPRU);//extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
@@ -804,12 +816,16 @@ if (streamDDRpru.is_open()){
 		extendedCounterPRU=static_cast<unsigned long long int>(static_cast<double>(extendedCounterPRUholder-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error	    
 		//////////////////////////////////////////////////////////////
 		// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
+		// When unsigned char
+		//valBitsInterest=static_cast<unsigned short>(*valp);
+		//valp++;// 1 times 8 bits
+		//valBitsInterest=static_cast<unsigned short>(static_cast<unsigned char>(*valp>>4))<<8;
+		//valp++;// 1 times 8 bits
+		// When unsigned short
 		valBitsInterest=static_cast<unsigned short>(*valp);
-		valp++;// 1 times 8 bits
-		valBitsInterest=static_cast<unsigned short>(static_cast<unsigned char>(*valp>>4))<<8;
-		valp++;// 1 times 8 bits
+		valp++;// 1 times 16 bits
+		valBitsInterest=this->packBits(valBitsInterest); // we're just interested in 12 bits which we have to re-order
 		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "val: " << std::bitset<8>(val) << endl;}
-		//valBitsInterest=this->packBits(val); // we're just interested in 12 bits which we have to re-order
 		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}	
 		//fprintf(outfile, "%d\n", val);
 		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
