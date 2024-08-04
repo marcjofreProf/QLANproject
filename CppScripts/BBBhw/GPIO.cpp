@@ -809,7 +809,7 @@ if (streamDDRpru.is_open()){
 		valBitsInterest=static_cast<unsigned short>(static_cast<unsigned char>(*valp>>4))<<8;
 		valp++;// 1 times 8 bits
 		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "val: " << std::bitset<8>(val) << endl;}
-		//valBitsInterest=this->packBits(val); // we're just interested in 4 bits
+		//valBitsInterest=this->packBits(val); // we're just interested in 12 bits which we have to re-order
 		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}	
 		//fprintf(outfile, "%d\n", val);
 		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
@@ -986,16 +986,14 @@ return 0; // all ok
 }
 */
 
-// Function to pack bits 1, 2, 3, and 5 of an unsigned int into a single byte
-unsigned char GPIO::packBits(unsigned char value) {
+// Function to pack bits 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15 of an unsigned int into the lower values
+unsigned short GPIO::packBits(unsigned short value) {
     // Isolate bits 1, 2, 3, and 5 and shift them to their new positions
-    unsigned char bit1 = (value >> 1) & 0x01; // Bit 0 stays in position 0
-    unsigned char bit2 = (value >> 1) & 0x02; // Bit 2 shifts to position 1
-    unsigned char bit3 = (value >> 1) & 0x04; // Bit 3 shifts to position 2
-    unsigned char bit5 = (value >> 2) & 0x08; // Bit 5 shifts to position 3, skipping the original position of bit 4
+    unsigned short byte0 = value & 0x0F; // Byte 0 stays in position 0
+    unsigned short byte1 = (value & 0xF0) >> 4; // Byte 1 shifts to the right for bit positions
 
-    // Combine the bits into a single byte
-    return bit1 | bit2 | bit3 | bit5;
+    // Combine the bytes into a single unsigned short
+    return byte0 | byte1;
 }
 
 int GPIO::ClearStoredQuBits(){

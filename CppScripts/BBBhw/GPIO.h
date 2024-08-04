@@ -270,7 +270,7 @@ private: // Functions/Methods
 	int PRUsignalTimerSynchJitterLessInterrupt();// Tries to avoid interrupt jitter (might not be completely absolute time
 	int PIDcontrolerTimeJiterlessInterrupt();
 	// Data processing
-	unsigned char packBits(unsigned char value);
+	unsigned short packBits(unsigned short value);
 	// Non-PRU
 	int write(string path, string filename, string value);
 	int write(string path, string filename, int value);
