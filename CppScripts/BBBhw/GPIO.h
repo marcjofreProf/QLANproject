@@ -26,6 +26,7 @@ using std::fstream;
 #define PRUdataPATH1 "./PRUdata/"
 #define PRUdataPATH2 "../PRUdata/"
 #define NumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
+#define MaxNumQuBitsMemStored 10*NumQuBitsPerRun // Maximum size of the array for memory storing qubits (timetaggs and channels)
 #define MaxNumPulses	8192	// Used in the averging of time synchronization arrays
 #define PRUclockStepPeriodNanoseconds		5.00000//4.99999 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
 #define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
@@ -41,6 +42,7 @@ class GPIO {
 //public: //Variables
 
 private:// Variables
+	bool SlowMemoryPermanentStorageFlag=false; // Variable when true they are stored in a file (slower due to writting and reading) ; otherwise it uses array memory to store qubits (much faster)
 	bool ResetPeriodicallyTimerPRU1=true;// Disaster when used, due to all the interrupts handling time uncertainty
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
@@ -118,9 +120,9 @@ private:// Variables
 	int duration_FinalInitialMeasTrigAuxArray[MaxNumPulses]={0};
 	int duration_FinalInitialMeasTrigAuxAvg=0;
 	unsigned long long int TrigAuxIterCount=0;	
-	unsigned long TimeClockMarging=100;// In nanoseconds. If too large, it disastabilizes the timming performance
+	unsigned long TimeClockMarging=1000;// In nanoseconds. If too large, it disastabilizes the timming performance
 	unsigned long long int TimeClockMargingExtra=10*TimeClockMarging;// In nanoseconds
-	unsigned long TimePRUcommandDelay=200000;// In nanoseconds. If too large, it disastabilizes the timming performance
+	unsigned long TimePRUcommandDelay=5000;// In nanoseconds. If too large, it disastabilizes the timming performance
 	unsigned long long int TimeElpasedNow_time_as_count=0;
 	// PRU
 	static int mem_fd;
@@ -131,7 +133,7 @@ private:// Variables
 	long long int valCarryOnCycleCountPRU=0; // 64 bits
 	// PRU timetagger
 	int retInterruptsPRU0;
-	int WaitTimeInterruptPRU0=8000000; //up to 20000000 with Simple TTG. In microseconds. Although the longer the more innacurraccy in the synch routine
+	int WaitTimeInterruptPRU0=5000000; //up to 20000000 with Simple TTG. In microseconds. Although the longer the more innacurraccy in the synch routine
 	//TimePoint TimePointClockNowPRU0;
 	//unsigned long long int TimeNow_time_as_countPRU0;	
 	//TimePoint FutureTimePointPRU0;
@@ -141,7 +143,7 @@ private:// Variables
 	// PRU Signal
 	unsigned int NumberRepetitionsSignal=32768;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	int retInterruptsPRU1;
-	int WaitTimeInterruptPRU1=8000000; // In microseconds. Signal generation
+	int WaitTimeInterruptPRU1=5000000; // In microseconds. Signal generation
 	//int WaitTimeToFutureTimePointPRU1=1000;// The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s, not more otherwise the synch calculation error overflows as well and things go bad.
 	//TimePoint TimePointClockNowPRU1;
 	//unsigned long long int TimeNow_time_as_countPRU1;	
@@ -174,6 +176,10 @@ private:// Variables
 	unsigned int valThresholdResetCounts=0;
 	unsigned long long int auxUnskewingFactorResetCycle=0;
 	unsigned int AfterCountsThreshold=0;
+	// Memory storage
+	int TotalCurrentNumRecords=0; ////Variable to hold the number of currently stroed records in memory
+	unsigned long long int TimeTaggsStored[MaxNumQuBitsMemStored]={0};
+	unsigned short ChannelTagsStored[MaxNumQuBitsMemStored]={0};
 	//FILE* outfile;
 	fstream streamDDRpru;
 	fstream streamSynchpru;

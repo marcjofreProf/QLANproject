@@ -89,21 +89,22 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
 	
-    	// Open file where temporally are stored timetaggs	
-	streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
-	if (!streamDDRpru.is_open()) {
-		streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
+	if (SlowMemoryPermanentStorageFlag){
+	    	// Open file where temporally are stored timetaggs	
+		streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
 		if (!streamDDRpru.is_open()) {
-	        	cout << "Failed to open the streamDDRpru file." << endl;
-	        }
-        }
-        
-        if (streamDDRpru.is_open()){
-		streamDDRpru.close();	
-		//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+			streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
+			if (!streamDDRpru.is_open()) {
+				cout << "Failed to open the streamDDRpru file." << endl;
+			}
+		}
+		
+		if (streamDDRpru.is_open()){
+			streamDDRpru.close();	
+			//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		}
 	}
-	
-	//// Open file where temporally are stored synch	
+	//// Open file where temporally are stored synch - Not used	
 	//streamSynchpru.open(string(PRUdataPATH1) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
 	//if (!streamSynchpru.is_open()) {
 	//	streamSynchpru.open(string(PRUdataPATH2) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
@@ -789,20 +790,59 @@ this->TimeTaggsLast=static_cast<unsigned long long int>(ceil((static_cast<long d
 //}
 
 
-// Reading TimeTaggs
-if (streamDDRpru.is_open()){
-	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	for (iIterDump=0; iIterDump<NumRecords; iIterDump++){
-		// First 32 bits is the DWT_CYCCNT of the PRU
-		// When unsigned char
-		//valCycleCountPRU=static_cast<unsigned int>(*valp);
-		//valp++;// 1 times 8 bits
-		//valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<8;
-		//valp++;// 1 times 8 bits
-		//valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
-		//valp++;// 1 times 8 bits
-		//valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
-		//valp++;// 1 times 8 bits
+if (SlowMemoryPermanentStorageFlag==true){
+	// Reading TimeTaggs
+	if (streamDDRpru.is_open()){
+		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		for (iIterDump=0; iIterDump<NumRecords; iIterDump++){
+			// First 32 bits is the DWT_CYCCNT of the PRU
+			// When unsigned char
+			//valCycleCountPRU=static_cast<unsigned int>(*valp);
+			//valp++;// 1 times 8 bits
+			//valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<8;
+			//valp++;// 1 times 8 bits
+			//valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
+			//valp++;// 1 times 8 bits
+			//valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
+			//valp++;// 1 times 8 bits
+			// When unsigned short
+			valCycleCountPRU=static_cast<unsigned int>(*valp);
+			valp++;// 1 times 16 bits
+			valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
+			valp++;// 1 times 16 bits
+			//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
+			// Mount the extended counter value
+			extendedCounterPRUholder=static_cast<unsigned long long int>(valCycleCountPRU);//extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
+			//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
+			// Apply system clock corrections
+			extendedCounterPRU=static_cast<unsigned long long int>(static_cast<double>(extendedCounterPRUholder-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error	    
+			//////////////////////////////////////////////////////////////
+			// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
+			// When unsigned char
+			//valBitsInterest=static_cast<unsigned short>(*valp);
+			//valp++;// 1 times 8 bits
+			//valBitsInterest=static_cast<unsigned short>(static_cast<unsigned char>(*valp>>4))<<8;
+			//valp++;// 1 times 8 bits
+			// When unsigned short
+			valBitsInterest=static_cast<unsigned short>(*valp);
+			valp++;// 1 times 16 bits
+			valBitsInterest=this->packBits(valBitsInterest); // we're just interested in 12 bits which we have to re-order
+			//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "val: " << std::bitset<8>(val) << endl;}
+			//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}	
+			//fprintf(outfile, "%d\n", val);
+			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+			streamDDRpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
+			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+			streamDDRpru.write(reinterpret_cast<const char*>(&valBitsInterest), sizeof(valBitsInterest));
+			//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
+		}
+	}
+	else{
+		cout << "DDRdumpdata streamDDRpru is not open!" << endl;
+	}
+}
+else{//Allocation in memory array
+	for (iIterDump=0; iIterDump<NumRecords; iIterDump++){		
 		// When unsigned short
 		valCycleCountPRU=static_cast<unsigned int>(*valp);
 		valp++;// 1 times 16 bits
@@ -813,30 +853,14 @@ if (streamDDRpru.is_open()){
 		extendedCounterPRUholder=static_cast<unsigned long long int>(valCycleCountPRU);//extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
 		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
 		// Apply system clock corrections
-		extendedCounterPRU=static_cast<unsigned long long int>(static_cast<double>(extendedCounterPRUholder-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error	    
-		//////////////////////////////////////////////////////////////
-		// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
-		// When unsigned char
-		//valBitsInterest=static_cast<unsigned short>(*valp);
-		//valp++;// 1 times 8 bits
-		//valBitsInterest=static_cast<unsigned short>(static_cast<unsigned char>(*valp>>4))<<8;
-		//valp++;// 1 times 8 bits
+		TimeTaggsStored[TotalCurrentNumRecords]=static_cast<unsigned long long int>(static_cast<double>(extendedCounterPRUholder-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error	    
+		//////////////////////////////////////////////////////////////		
 		// When unsigned short
-		valBitsInterest=static_cast<unsigned short>(*valp);
+		ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
 		valp++;// 1 times 16 bits
-		valBitsInterest=this->packBits(valBitsInterest); // we're just interested in 12 bits which we have to re-order
-		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "val: " << std::bitset<8>(val) << endl;}
-		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}	
-		//fprintf(outfile, "%d\n", val);
-		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		streamDDRpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
-		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		streamDDRpru.write(reinterpret_cast<const char*>(&valBitsInterest), sizeof(valBitsInterest));
-		//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
+		if (TotalCurrentNumRecords<(MaxNumQuBitsMemStored-1)){TotalCurrentNumRecords++;}//Variable to hold the number of currently stroed records in memory
+		else{cout << "GPIO::We have reach the maximum number of qubits storage" << endl;}
 	}
-}
-else{
-	cout << "DDRdumpdata streamDDRpru is not open!" << endl;
 }
 
 // Notify lost of track of counts due to timer overflow
@@ -1013,171 +1037,185 @@ unsigned short GPIO::packBits(unsigned short value) {
 }
 
 int GPIO::ClearStoredQuBits(){
-// Timetagging data
-if (streamDDRpru.is_open()){
-	streamDDRpru.close();	
-	//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-}
-
-streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
-if (!streamDDRpru.is_open()) {
-	streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
-	if (!streamDDRpru.is_open()) {
-        	cout << "Failed to re-open the streamDDRpru file." << endl;
-        	return -1;
-        }
-}
-streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-streamDDRpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
-
-//// Synch data
-//if (streamSynchpru.is_open()){
-//	streamSynchpru.close();	
-//	//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-//}
-//
-//streamSynchpru.open(string(PRUdataPATH1) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
-//if (!streamSynchpru.is_open()) {
-//	streamSynchpru.open(string(PRUdataPATH2) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
-//	if (!streamSynchpru.is_open()) {
-//        	cout << "Failed to re-open the streamSynchpru file." << endl;
-//        	return -1;
-//        }
-//}
-//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-//streamSynchpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
-
-return 0; // all ok
-}
-
-int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned short* ChannelTags){
-/* External synch pulses not used - done with system clock calibration
-unsigned int ValueReadNumSynchPulses;
-int NumSynchPulseAvgAux=0;
-	// Synch taggs
-	if (streamSynchpru.is_open()){
-		streamSynchpru.close();	
-		//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	}
-
-	streamSynchpru.open(string(PRUdataPATH1) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content	
-	if (!streamSynchpru.is_open()) {
-		streamSynchpru.open(string(PRUdataPATH2) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content
-		if (!streamSynchpru.is_open()) {
-			cout << "Failed to re-open the streamSynchpru file." << endl;
-			return -1;
-		}
-	}
-	streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-
-	if (streamSynchpru.is_open()){
-		streamSynchpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
-		int lineCount = 0;		
-		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		while (streamSynchpru.read(reinterpret_cast<char*>(&ValueReadNumSynchPulses), sizeof(ValueReadNumSynchPulses)) and lineCount<MaxNumPulses){		
-			for (int iIter=0;iIter<ValueReadNumSynchPulses;iIter++){
-				//cout << "GPIO::ValueReadNumSynchPulses: " << ValueReadNumSynchPulses << endl;
-				streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations				
-			    	streamSynchpru.read(reinterpret_cast<char*>(&SynchPulsesTags[lineCount]), sizeof(SynchPulsesTags[lineCount]));
-			    	lineCount++; // Increment line count for each line read			    	    
-		    	}
-		    	streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		}
-		NumSynchPulsesRed=lineCount;		
-		if (NumSynchPulsesRed>1){//At least two points (two cycles separated by one cycle in between), we can generate a calibration curve
-			//unsigned long long int CoeffSynchAdjAux0=1;
-			double CoeffSynchAdjAux1=0.0;// Number theoretical counts given the number of cycles
-			double CoeffSynchAdjAux2=0.0;// PRU counting
-			double CoeffSynchAdjAux3=0.0;// Number theoretical counts given the number of cycles
-			//double CoeffSynchAdjAux4=0.0;// Number theoretical counts given the number of cycles
-			for (int iIter=0;iIter<(NumSynchPulsesRed-1);iIter++){
-				//CoeffSynchAdjAux0=(unsigned long long int)(((double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj); // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
-				//CoeffSynchAdjAux1=(double)(CoeffSynchAdjAux0)*PeriodCountsPulseAdj;//((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
-				// It makes a lot of difference to compute the pulse synchs fixed from the first pulse tagg rather than against the last one!!!!!
-				CoeffSynchAdjAux1=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj;//(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
-				CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter]);
-				//if (CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])/CoeffSynchAdjAux4-(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter+0])/CoeffSynchAdjAux3;}
-				if (CoeffSynchAdjAux2>0.0){CoeffSynchAdjAux3=CoeffSynchAdjAux1/CoeffSynchAdjAux2;}
-				if (CoeffSynchAdjAux1>0.0 and CoeffSynchAdjAux2>0.0){// and CoeffSynchAdjAux4!=0.0){
-					//SynPulse detect anomalies
-					if (CoeffSynchAdjAux3>1.11 or CoeffSynchAdjAux3<0.99){
-						cout << "Synch pulse anomaly CoeffSynchAdjAux3: " << CoeffSynchAdjAux3 << endl;
-					}
-					AdjPulseSynchCoeffArray[NumSynchPulseAvgAux]=1.0+this->SynchAdjconstant*(CoeffSynchAdjAux3-1.0);//sqrt(CoeffSynchAdjAux3);//AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);					
-					//cout << "AdjPulseSynchCoeffArray[NumAvgAux]: " << AdjPulseSynchCoeffArray[NumAvgAux] << endl;
-					SynchPulsesTagsUsed[NumSynchPulseAvgAux]=SynchPulsesTags[iIter+1];
-					NumSynchPulseAvgAux++;
-				}
-			}
-			//cout << "PeriodCountsPulseAdj: " << PeriodCountsPulseAdj << endl;
-			//cout << "Last CoeffSynchAdjAux0: " << CoeffSynchAdjAux0 << endl;
-			//cout << "Last CoeffSynchAdjAux1: " << CoeffSynchAdjAux1 << endl;
-			cout << "Last CoeffSynchAdjAux2: " << CoeffSynchAdjAux2 << endl;
-			cout << "Last CoeffSynchAdjAux3: " << CoeffSynchAdjAux3 << endl;
-			//cout << "Last CoeffSynchAdjAux4: " << CoeffSynchAdjAux4 << endl;
-			if (NumSynchPulseAvgAux>0){
-				AdjPulseSynchCoeffAverage=this->DoubleMeanFilterSubArray(AdjPulseSynchCoeffArray,NumSynchPulseAvgAux);//this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumSynchPulseAvgAux);
-				cout << "AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
-			}// Mean average//this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumAvgAux);//Median AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
-			else{AdjPulseSynchCoeffAverage=1.0;}// Reset
-			//cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
-		}
-		else if(this->ResetPeriodicallyTimerPRU1){ // Using the estimation from the re-synchronization function		
-			this->AdjPulseSynchCoeff=this->AdjPulseSynchCoeffAverage;
-			cout << "Applying re-synch estimated AdjPulseSynchCoeffAverage!" << endl;
-			cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
-		}
-		else{
-			AdjPulseSynchCoeffAverage=1.0;
-			cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
-		}
-		if (NumSynchPulsesRed>=MaxNumPulses){cout << "Too many pulses stored, increase buffer size or reduce number pulses: " << NumSynchPulsesRed << endl;}
-	    	//else if (NumSynchPulsesRed==0){cout << "RetrieveNumStoredQuBits: No Synch pulses present!" << endl;}
-	    	//cout << "GPIO: NumSynchPulsesRed: " << NumSynchPulsesRed << endl;
-	}
-	else{
-		cout << "RetrieveNumStoredQuBits: BBB streamSynchpru is not open!" << endl;
-	return -1;
-	}
-*/
-	// Detection tags
+if (SlowMemoryPermanentStorageFlag==true){
+	// Timetagging data
 	if (streamDDRpru.is_open()){
 		streamDDRpru.close();	
 		//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 	}
 
-	streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content	
+	streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
 	if (!streamDDRpru.is_open()) {
-		streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content
+		streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
 		if (!streamDDRpru.is_open()) {
 			cout << "Failed to re-open the streamDDRpru file." << endl;
 			return -1;
 		}
 	}
 	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	streamDDRpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
 
-	if (streamDDRpru.is_open()){
-		streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
-		int lineCount = 0;
-		unsigned long long int ValueReadTest;
+	//// Synch data
+	//if (streamSynchpru.is_open()){
+	//	streamSynchpru.close();	
+	//	//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	//}
+	//
+	//streamSynchpru.open(string(PRUdataPATH1) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
+	//if (!streamSynchpru.is_open()) {
+	//	streamSynchpru.open(string(PRUdataPATH2) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content
+	//	if (!streamSynchpru.is_open()) {
+	//        	cout << "Failed to re-open the streamSynchpru file." << endl;
+	//        	return -1;
+	//        }
+	//}
+	//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+	//streamSynchpru.seekp(0, std::ios::beg); // the put (writing) pointer back to the start!
+}
+else{
+	TotalCurrentNumRecords=0;
+}
+
+return 0; // all ok
+}
+
+int GPIO::RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned short* ChannelTags){
+if (SlowMemoryPermanentStorageFlag==true){
+	/* External synch pulses not used - done with system clock calibration
+	unsigned int ValueReadNumSynchPulses;
+	int NumSynchPulseAvgAux=0;
+		// Synch taggs
+		if (streamSynchpru.is_open()){
+			streamSynchpru.close();	
+			//streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		}
+
+		streamSynchpru.open(string(PRUdataPATH1) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content	
+		if (!streamSynchpru.is_open()) {
+			streamSynchpru.open(string(PRUdataPATH2) + string("SynchTimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content
+			if (!streamSynchpru.is_open()) {
+				cout << "Failed to re-open the streamSynchpru file." << endl;
+				return -1;
+			}
+		}
+		streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+
+		if (streamSynchpru.is_open()){
+			streamSynchpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
+			int lineCount = 0;		
+			streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+			while (streamSynchpru.read(reinterpret_cast<char*>(&ValueReadNumSynchPulses), sizeof(ValueReadNumSynchPulses)) and lineCount<MaxNumPulses){		
+				for (int iIter=0;iIter<ValueReadNumSynchPulses;iIter++){
+					//cout << "GPIO::ValueReadNumSynchPulses: " << ValueReadNumSynchPulses << endl;
+					streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations				
+				    	streamSynchpru.read(reinterpret_cast<char*>(&SynchPulsesTags[lineCount]), sizeof(SynchPulsesTags[lineCount]));
+				    	lineCount++; // Increment line count for each line read			    	    
+			    	}
+			    	streamSynchpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+			}
+			NumSynchPulsesRed=lineCount;		
+			if (NumSynchPulsesRed>1){//At least two points (two cycles separated by one cycle in between), we can generate a calibration curve
+				//unsigned long long int CoeffSynchAdjAux0=1;
+				double CoeffSynchAdjAux1=0.0;// Number theoretical counts given the number of cycles
+				double CoeffSynchAdjAux2=0.0;// PRU counting
+				double CoeffSynchAdjAux3=0.0;// Number theoretical counts given the number of cycles
+				//double CoeffSynchAdjAux4=0.0;// Number theoretical counts given the number of cycles
+				for (int iIter=0;iIter<(NumSynchPulsesRed-1);iIter++){
+					//CoeffSynchAdjAux0=(unsigned long long int)(((double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj); // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
+					//CoeffSynchAdjAux1=(double)(CoeffSynchAdjAux0)*PeriodCountsPulseAdj;//((double)((SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter])/((unsigned long long int)(PeriodCountsPulseAdj))));
+					// It makes a lot of difference to compute the pulse synchs fixed from the first pulse tagg rather than against the last one!!!!!
+					CoeffSynchAdjAux1=(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj;//(double)((unsigned long long int)(((double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter])+PeriodCountsPulseAdj/2.0)/PeriodCountsPulseAdj))*PeriodCountsPulseAdj; // Distill how many pulse synch periods passes...1, 2, 3....To round ot the nearest integer value add half of the dividend to the divisor
+					CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[1*iIter]);
+					//if (CoeffSynchAdjAux3!=0.0 and CoeffSynchAdjAux4!=0.0){CoeffSynchAdjAux2=(double)(SynchPulsesTags[iIter+2]-SynchPulsesTags[iIter+1])/CoeffSynchAdjAux4-(double)(SynchPulsesTags[iIter+1]-SynchPulsesTags[iIter+0])/CoeffSynchAdjAux3;}
+					if (CoeffSynchAdjAux2>0.0){CoeffSynchAdjAux3=CoeffSynchAdjAux1/CoeffSynchAdjAux2;}
+					if (CoeffSynchAdjAux1>0.0 and CoeffSynchAdjAux2>0.0){// and CoeffSynchAdjAux4!=0.0){
+						//SynPulse detect anomalies
+						if (CoeffSynchAdjAux3>1.11 or CoeffSynchAdjAux3<0.99){
+							cout << "Synch pulse anomaly CoeffSynchAdjAux3: " << CoeffSynchAdjAux3 << endl;
+						}
+						AdjPulseSynchCoeffArray[NumSynchPulseAvgAux]=1.0+this->SynchAdjconstant*(CoeffSynchAdjAux3-1.0);//sqrt(CoeffSynchAdjAux3);//AdjPulseSynchCoeff+(CoeffSynchAdjAux2/CoeffSynchAdjAux1);					
+						//cout << "AdjPulseSynchCoeffArray[NumAvgAux]: " << AdjPulseSynchCoeffArray[NumAvgAux] << endl;
+						SynchPulsesTagsUsed[NumSynchPulseAvgAux]=SynchPulsesTags[iIter+1];
+						NumSynchPulseAvgAux++;
+					}
+				}
+				//cout << "PeriodCountsPulseAdj: " << PeriodCountsPulseAdj << endl;
+				//cout << "Last CoeffSynchAdjAux0: " << CoeffSynchAdjAux0 << endl;
+				//cout << "Last CoeffSynchAdjAux1: " << CoeffSynchAdjAux1 << endl;
+				cout << "Last CoeffSynchAdjAux2: " << CoeffSynchAdjAux2 << endl;
+				cout << "Last CoeffSynchAdjAux3: " << CoeffSynchAdjAux3 << endl;
+				//cout << "Last CoeffSynchAdjAux4: " << CoeffSynchAdjAux4 << endl;
+				if (NumSynchPulseAvgAux>0){
+					AdjPulseSynchCoeffAverage=this->DoubleMeanFilterSubArray(AdjPulseSynchCoeffArray,NumSynchPulseAvgAux);//this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumSynchPulseAvgAux);
+					cout << "AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
+				}// Mean average//this->DoubleMedianFilterSubArray(AdjPulseSynchCoeffArray,NumAvgAux);//Median AdjPulseSynchCoeff/((double)(NumAvgAux));}// Average
+				else{AdjPulseSynchCoeffAverage=1.0;}// Reset
+				//cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
+			}
+			else if(this->ResetPeriodicallyTimerPRU1){ // Using the estimation from the re-synchronization function		
+				this->AdjPulseSynchCoeff=this->AdjPulseSynchCoeffAverage;
+				cout << "Applying re-synch estimated AdjPulseSynchCoeffAverage!" << endl;
+				cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
+			}
+			else{
+				AdjPulseSynchCoeffAverage=1.0;
+				cout << "GPIO: AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
+			}
+			if (NumSynchPulsesRed>=MaxNumPulses){cout << "Too many pulses stored, increase buffer size or reduce number pulses: " << NumSynchPulsesRed << endl;}
+		    	//else if (NumSynchPulsesRed==0){cout << "RetrieveNumStoredQuBits: No Synch pulses present!" << endl;}
+		    	//cout << "GPIO: NumSynchPulsesRed: " << NumSynchPulsesRed << endl;
+		}
+		else{
+			cout << "RetrieveNumStoredQuBits: BBB streamSynchpru is not open!" << endl;
+		return -1;
+		}
+	*/
+		// Detection tags
+		if (streamDDRpru.is_open()){
+			streamDDRpru.close();	
+			//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		}
+
+		streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content	
+		if (!streamDDRpru.is_open()) {
+			streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content
+			if (!streamDDRpru.is_open()) {
+				cout << "Failed to re-open the streamDDRpru file." << endl;
+				return -1;
+			}
+		}
 		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		int iIterMovAdjPulseSynchCoeff=0;
-		while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
-		    TimeTaggs[lineCount]=static_cast<unsigned long long int>(ValueReadTest);		    
-		    ////////////////////////////////////////////////////////////////////////////////
-		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
-	    	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
-	    	    //cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
-	    	    lineCount++; // Increment line count for each line read
-	    	    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
-	    	    }
-	    	if (lineCount==0){cout << "RetrieveNumStoredQuBits: No timetaggs present!" << endl;}
-		return lineCount;
+
+		if (streamDDRpru.is_open()){
+			streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
+			int lineCount = 0;
+			unsigned long long int ValueReadTest;
+			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+			int iIterMovAdjPulseSynchCoeff=0;
+			while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
+			    TimeTaggs[lineCount]=static_cast<unsigned long long int>(ValueReadTest);		    
+			    ////////////////////////////////////////////////////////////////////////////////
+			    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
+		    	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
+		    	    //cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
+		    	    lineCount++; // Increment line count for each line read
+		    	    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
+		    	    }
+		    	if (lineCount==0){cout << "RetrieveNumStoredQuBits: No timetaggs present!" << endl;}
+			return lineCount;
+		}
+		else{
+			cout << "RetrieveNumStoredQuBits: BBB streamDDRpru is not open!" << endl;
+		return -1;
 	}
-	else{
-		cout << "RetrieveNumStoredQuBits: BBB streamDDRpru is not open!" << endl;
-	return -1;
+}
+else{// Memory allocation
+	for (int i=0; i<TotalCurrentNumRecords;i++){
+		TimeTaggs[i]=TimeTaggsStored[i];
+		ChannelTags[i]=ChannelTagsStored[i];
+	}
+	return TotalCurrentNumRecords;
 }
 
 }
@@ -1629,7 +1667,7 @@ GPIO::~GPIO() {
 	//if(munmap(pru_int, PRU_LEN)) {
 	//	cout << "GPIO destructor: munmap failed" << endl;
 	//}
-	streamDDRpru.close();
+	if (SlowMemoryPermanentStorageFlag==true){streamDDRpru.close();}
 	//streamSynchpru.close(); //Not used
 }
 

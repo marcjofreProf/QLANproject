@@ -41,9 +41,9 @@ class QSLA:
 		self.QTLAagent.WaitUntilActiveActionFreePreLock(ParamsCharArrayArg,nChararray)
 	
 	def UnBlockActiveActionFreePreLock(self,ParamsCharArrayArg,nChararray):
-		time.sleep(sActiveActionProcTimePoint)# Give time between iterations to send and receive qubits
+		#time.sleep(sActiveActionProcTimePoint)# Give time between iterations to send and receive qubits
 		self.QTLAagent.UnBlockActiveActionFreePreLock(ParamsCharArrayArg,nChararray)
-		time.sleep(sActiveActionProcTimePoint)# Give time between iterations to send and receive qubits
+		#time.sleep(sActiveActionProcTimePoint)# Give time between iterations to send and receive qubits
 	
 	## Methods to retrieve information from the nodes or hosts
 	def SimulateRetrieveNumStoredQubitsNode(self,IPhostReply,IPhostRequest,ParamsIntArray,ParamsFloatArray): # Supposing that node has received quBits, make use of them
