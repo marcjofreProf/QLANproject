@@ -391,7 +391,6 @@ requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 return requestWhileWait;
 }
 
-
 int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux,double* FineSynchAdjValAux){
 this->acquire();
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);

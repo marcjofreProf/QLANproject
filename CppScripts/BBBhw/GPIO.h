@@ -52,7 +52,7 @@ private:// Variables
 	long long int LostCounts=9; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
 	long long int ApproxInterruptTime=5000; // Typical time of interrupt time duration
 	int NumSynchMeasAvgAux=101; // Num averages to compute the time error. Better to be odd number.
-	int ExtraNumSynchMeasAvgAux=101; // More averaging for computing interrupts access time
+	int ExtraNumSynchMeasAvgAux=101; // More averaging for computing interrupts access time. VEry critical
 	unsigned int NextSynchPRUcommand=5;// set initially to NextSynchPRUcorrection=0
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
 	double PRUoffsetDriftError=0;
@@ -104,7 +104,7 @@ private:// Variables
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockSendCommandFinal=std::chrono::time_point<Clock>();// For synch purposes
 	//TimePoint TimePointClockSendCommandInitial=std::chrono::time_point<Clock>();// For synch purposes
-	TimePoint TimePointClockPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes. Not used
+	//TimePoint TimePointClockPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes. Not used
 	//TimePoint TimePointClockSynchPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes. Not used
 	TimePoint TimePointClockSynchPRUfinal=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint TimePointClockTagPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
@@ -114,13 +114,16 @@ private:// Variables
 	//int duration_FinalInitialDriftAuxArray[MaxNumPulses]={0};// For absolute drift purposes
 	//int duration_FinalInitialDriftAuxArrayAvg=0;// For absolute drift purposes
 	double duration_FinalInitialCountAux=0.0;
-	double duration_FinalInitialCountAuxArray[MaxNumPulses]={0.0};
 	double duration_FinalInitialCountAuxArrayAvg=0.0;
 	//int duration_FinalInitialMeasTrigAux=0;
 	int duration_FinalInitialMeasTrigAuxArray[MaxNumPulses]={0};
 	int duration_FinalInitialMeasTrigAuxAvg=0;
-	unsigned long long int TrigAuxIterCount=0;	
-	unsigned long TimeClockMarging=100;// In nanoseconds. If too large, it disastabilizes the timming performance
+	unsigned long long int TrigAuxIterCount=0;
+	// Trigger Signal and Timetagging methods
+	unsigned int SynchRem=0;
+	long double SignAuxInstantCorr=0;
+	long double InstantCorr=0.0;	
+	unsigned long TimeClockMarging=100;// In nanoseconds. If too large, it disastabilizes the timming performance. It has to be smaller than the SynchTrigPeriod
 	unsigned long long int TimeClockMargingExtra=10*TimeClockMarging;// In nanoseconds
 	unsigned long TimePRUcommandDelay=250000;// In nanoseconds. If too large, it disastabilizes the timming performance. VEry important parameter!!! When duration_FinalInitialMeasTrigAuxAvg properly set then is around 4000
 	unsigned long long int TimeElpasedNow_time_as_count=0;
@@ -205,7 +208,6 @@ private:// Variables
 	double PeriodCountsPulseAdj=(((1.0/(double)(PulseFreq))*1e9)/((double)(PRUclockStepPeriodNanoseconds)));// Not used
 	double AdjPulseSynchCoeff=1.0;
 	double AdjPulseSynchCoeffAverage=1.0;
-	double AdjPulseSynchPeriodicCorrectionCoeffAverage=1.0;
 	long double AccumulatedErrorDrift=0.0; // For retrieved relative frequency difference from protocol
 	long double AccumulatedErrorDriftAux=0.0;// For retrieved relative offset difference from protocol
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
