@@ -569,19 +569,19 @@ retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterrupt
 //this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 //this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
 //this->TrigAuxIterCount++;
-/*
-cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
-long double AccumulatedErrorDriftEvolved=static_cast<long double>(256.0*AccumulatedErrorDrift)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
-cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
-cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
+
+//cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
+//long double AccumulatedErrorDriftEvolved=static_cast<long double>(256.0*AccumulatedErrorDrift)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
+//cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
+//cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
-cout << "InstantCorr: " << InstantCorr << endl;
+//cout << "InstantCorr: " << InstantCorr << endl;
 ////cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
 //cout << "pru0dataMem_int3aux: " << pru0dataMem_int3aux << endl;
 ////cout << "SynchRem: " << SynchRem << endl;
 cout << "this->AdjPulseSynchCoeffAverage: " << this->AdjPulseSynchCoeffAverage << endl;
 cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
-*/
+
 this->ManualSemaphore=false;
 this->ManualSemaphoreExtra=false;
 this->release();
@@ -654,19 +654,19 @@ int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<st
 this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
 this->TrigAuxIterCount++;
-/*
-cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
-long double AccumulatedErrorDriftEvolved=static_cast<long double>(256.0*AccumulatedErrorDrift)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
-cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
-cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
+
+//cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
+//long double AccumulatedErrorDriftEvolved=static_cast<long double>(256.0*AccumulatedErrorDrift)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointFutureSynch.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
+//cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
+//cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
-cout << "InstantCorr: " << InstantCorr << endl;
+//cout << "InstantCorr: " << InstantCorr << endl;
 ////cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
 //cout << "pru1dataMem_int2aux: " << pru1dataMem_int2aux << endl;
 ////cout << "SynchRem: " << SynchRem << endl;
 cout << "this->AdjPulseSynchCoeffAverage: " << this->AdjPulseSynchCoeffAverage << endl;
 cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
-*/
+
 this->ManualSemaphore=false;
 this->ManualSemaphoreExtra=false;
 this->release();
@@ -842,7 +842,7 @@ if (SlowMemoryPermanentStorageFlag==true){
 	}
 }
 else{//Allocation in memory array
-	for (iIterDump=0; iIterDump<NumRecords; iIterDump++){		
+	for (iIterDump=0; iIterDump<NumRecords; iIterDump++){
 		// When unsigned short
 		valCycleCountPRU=static_cast<unsigned int>(*valp);
 		valp++;// 1 times 16 bits
