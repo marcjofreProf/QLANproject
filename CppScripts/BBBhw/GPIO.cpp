@@ -582,6 +582,8 @@ cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
 cout << "this->AdjPulseSynchCoeffAverage: " << this->AdjPulseSynchCoeffAverage << endl;
 cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 
+// Important check to do
+if (duration_FinalInitialMeasTrigAuxAvg>5000){cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay!" << endl;}
 this->ManualSemaphore=false;
 this->ManualSemaphoreExtra=false;
 this->release();
@@ -667,6 +669,8 @@ cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
 cout << "this->AdjPulseSynchCoeffAverage: " << this->AdjPulseSynchCoeffAverage << endl;
 cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 
+// Important check to do
+if (duration_FinalInitialMeasTrigAuxAvg>5000){cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay!" << endl;}
 this->ManualSemaphore=false;
 this->ManualSemaphoreExtra=false;
 this->release();
