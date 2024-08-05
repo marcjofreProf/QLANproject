@@ -234,6 +234,17 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 //this->valueSemaphore.fetch_add(1,std::memory_order_release);
 }
 //////////////////////////////////////////////
+struct timespec GPIO::CoincidenceSetWhileWait(){
+	struct timespec requestCoincidenceWhileWaitAux;	
+	auto duration_since_epochFutureTimePointAux=QPLAFutureTimePoint.time_since_epoch();
+	// Convert duration to desired time
+	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePointAux).count(); // Add an offset, since the final barrier is implemented with a busy wait
+
+	requestCoincidenceWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
+	requestCoincidenceWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
+	return requestCoincidenceWhileWaitAux;
+}
+
 struct timespec GPIO::SetWhileWait(){
 	struct timespec requestWhileWaitAux;
 	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(this->TimePRU1synchPeriod);
@@ -522,8 +533,10 @@ int GPIO::PRUsignalTimerSynch(){
 return 0; // All ok
 }
 
-int GPIO::ReadTimeStamps(){// Read the detected timestaps in four channels
+int GPIO::ReadTimeStamps(unsigned long long int QPLAFutureTimePointNumber){// Read the detected timestaps in four channels
 /////////////
+std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
+this->QPLAFutureTimePoint=Clock::time_point(duration_back);
 //while (this->ManualSemaphoreExtra);// Wait until periodic synch method finishes
 while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->ManualSemaphoreExtra=true;
@@ -534,6 +547,8 @@ this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;// Acquire this value for
 pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and it is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures
 // Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
+requestCoincidenceWhileWait=CoincidenceSetWhileWait();
+clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestCoincidenceWhileWait,NULL); // Synch barrier. So that SendTriggerSignals and ReadTimeStamps of the different nodes coincide
 
 // From this point below, the timming is very critical to have long time synchronziation stability!!!!
 this->TimePointClockTagPRUinitial=Clock::now()+std::chrono::nanoseconds(2*TimePRUcommandDelay);// Crucial to make the link between PRU clock and system clock (already well synchronized). Two memory mapping to PRU
@@ -603,7 +618,9 @@ this->DDRdumpdata(); // Store to file
 return 0;// all ok
 }
 
-int GPIO::SendTriggerSignals(double* FineSynchAdjValAux){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+int GPIO::SendTriggerSignals(double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
+this->QPLAFutureTimePoint=Clock::time_point(duration_back);
 this->FineSynchAdjOffVal=FineSynchAdjValAux[0];// Synch trig offset
 this->FineSynchAdjFreqVal=FineSynchAdjValAux[1]; // Synch trig frequency
 while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
@@ -618,6 +635,8 @@ pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate 
 
 pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 // Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
+requestCoincidenceWhileWait=CoincidenceSetWhileWait();
+clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestCoincidenceWhileWait,NULL); // Synch barrier. So that SendTriggerSignals and ReadTimeStamps of the different nodes coincide
 
 // From this point below, the timming is very critical to have long time synchronziation stability!!!!
 this->TimePointClockTagPRUinitial=Clock::now()+std::chrono::nanoseconds(2*TimePRUcommandDelay);// Since two memory mapping to PRU memory

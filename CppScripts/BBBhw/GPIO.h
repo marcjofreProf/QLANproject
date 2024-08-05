@@ -101,6 +101,7 @@ private:// Variables
 	unsigned long long int TimePRU1synchPeriod=500000000;// In nanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
 	unsigned long long int iepPRUtimerRange32bits=4294967296;
 	struct timespec requestWhileWait;
+	struct timespec requestCoincidenceWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockSendCommandFinal=std::chrono::time_point<Clock>();// For synch purposes
 	//TimePoint TimePointClockSendCommandInitial=std::chrono::time_point<Clock>();// For synch purposes
@@ -109,6 +110,7 @@ private:// Variables
 	TimePoint TimePointClockSynchPRUfinal=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint TimePointClockTagPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint TimePointClockTagPRUfinal=std::chrono::time_point<Clock>();// For absolute drift purposes
+	TimePoint QPLAFutureTimePoint=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
 	//TimePoint TimePointClockTagPRUinitialOld=std::chrono::time_point<Clock>();// For absolute drift purposes. Not used
 	//int duration_FinalInitialDriftAux=0;// For absolute drift purposes	
 	//int duration_FinalInitialDriftAuxArray[MaxNumPulses]={0};// For absolute drift purposes
@@ -222,8 +224,8 @@ public:	// Functions/Methods
 	int LOCAL_DDMinit();
 	int DDRdumpdata();
 	int DisablePRUs();
-	int ReadTimeStamps();// Read the detected timestaps in four channels
-	int SendTriggerSignals(double* FineSynchAdjValAux); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+	int ReadTimeStamps(unsigned long long int QPLAFutureTimePointNumber);// Read the detected timestaps in four channels
+	int SendTriggerSignals(double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	int SendTriggerSignalsSelfTest();//
 	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
 	int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned short* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
@@ -274,6 +276,7 @@ private: // Functions/Methods
 	void release();
 	// PRU synchronization
 	struct timespec SetWhileWait();
+	struct timespec CoincidenceSetWhileWait();
 	int PRUsignalTimerSynch(); // Periodic synchronizaton of the timer to control the generated signals
 	int PRUsignalTimerSynchJitterLessInterrupt();// Tries to avoid interrupt jitter (might not be completely absolute time
 	int PIDcontrolerTimeJiterlessInterrupt();

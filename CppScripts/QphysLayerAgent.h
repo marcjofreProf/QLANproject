@@ -89,6 +89,7 @@ private: //Variables/Instances
 	TimePoint FutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
 	TimePoint OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
 	unsigned long long int TimeClockMarging=0;//100;// In nanoseconds. So that we can do a busy wait to be more accurate and responsive. If too large, it disastabilizes the timming performance
+	unsigned long long int TimePointMarginGPIOTrigTagQubits=500000; // Margin so that Trig signals and timestamps in GPI always coincide
 	// Private threads
 	bool RunThreadSimulateEmitQuBitFlag=true;
 	bool RunThreadSimulateReceiveQuBitFlag=true;
