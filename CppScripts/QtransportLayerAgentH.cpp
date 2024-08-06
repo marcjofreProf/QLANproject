@@ -1431,6 +1431,9 @@ this->acquire();
 while(AchievedAttentionParticularHosts==false){
 	while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
 		this->release();
+		cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+		cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
+		cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 		cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization and availability of other hosts to proceed with the request!" << endl;
 		this->RelativeNanoSleepWait((unsigned long long int)(1000*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 		this->acquire();
