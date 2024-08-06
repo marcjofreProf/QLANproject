@@ -1048,6 +1048,10 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 						strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
 						AchievedAttentionParticularHosts=false;// Indicates that we have got NOT the attenation of the hosts
 					}
+					else if (string(Payload)==string("Block") and string(IPorg)!=string(InfoRemoteHostActiveActions[0])){// Apparently not needed, but just in case
+						//Do not act on Block petitions from other hosts since another active petition has been already proceesses
+						
+					}
 					else{// Non of the above, which is a malfunction						
 						cout << "Host HostAreYouFree not handled!" << endl;
 						cout << "IPdest: " << IPdest << ", IPorg: " << IPorg << ", Type: " << Type << ", Command: " << Command << " , Payload: " << Payload << endl;
@@ -1438,14 +1442,14 @@ this->acquire();
 while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
 this->release();
 cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization and availability of other hosts to proceed with the request!" << endl;
-this->RelativeNanoSleepWait((unsigned long long int)(15000*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 this->acquire();
 }
 this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 while(AchievedAttentionParticularHosts==false){
 	this->release();
 	cout << "WaitUntilActiveActionFreePreLock: Host " << this->IPaddressesSockets[2] << " retrying to capture the attention of other involved hosts..." << endl;
-	this->RelativeNanoSleepWait((unsigned long long int)(15000*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+	this->RelativeNanoSleepWait((unsigned long long int)(5000*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 	this->acquire();
 	this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 }

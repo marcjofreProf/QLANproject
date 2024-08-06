@@ -337,12 +337,16 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					
 					// Compute error - Relative correction				
 					this->PRUoffsetDriftError=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal-1*this->PRUcurrentTimerValOldWrap))/static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(SynchTrigPeriod));
-					// Compute error - Absolute correction				
-					//this->PRUoffsetDriftError=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal))/static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(SynchTrigPeriod));
-					
 					// Relative error
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
+					
+					// Compute error - Absolute corrected error
+					this->PRUoffsetDriftErrorAbs=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal*this->EstimateSynchAvg))/static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(SynchTrigPeriod))-PRUoffsetDriftErrorAvg; // Substract the relative error
+					// Absolute corrected error
+					this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
+					this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,NumSynchMeasAvgAux);
+					
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
 				this->release();					
@@ -580,19 +584,20 @@ retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterrupt
 //this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 //this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
 //this->TrigAuxIterCount++;
-/*
+
 //cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 //long double AccumulatedErrorDriftEvolved=static_cast<long double>(256.0*AccumulatedErrorDrift)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
 //cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
 //cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
+cout << "PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << endl;
 //cout << "InstantCorr: " << InstantCorr << endl;
 ////cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
 //cout << "pru0dataMem_int3aux: " << pru0dataMem_int3aux << endl;
 ////cout << "SynchRem: " << SynchRem << endl;
 cout << "this->AdjPulseSynchCoeffAverage: " << this->AdjPulseSynchCoeffAverage << endl;
 cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
-*/
+
 // Important check to do
 if (duration_FinalInitialMeasTrigAuxAvg>5000){cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay!" << endl;}
 this->ManualSemaphore=false;
@@ -672,19 +677,20 @@ retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterrupt
 //this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 //this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
 //this->TrigAuxIterCount++;
-/*
+
 //cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 //long double AccumulatedErrorDriftEvolved=static_cast<long double>(256.0*AccumulatedErrorDrift)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
 //cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
 //cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
+cout << "PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << endl;
 //cout << "InstantCorr: " << InstantCorr << endl;
 ////cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
 //cout << "pru1dataMem_int2aux: " << pru1dataMem_int2aux << endl;
 ////cout << "SynchRem: " << SynchRem << endl;
 cout << "this->AdjPulseSynchCoeffAverage: " << this->AdjPulseSynchCoeffAverage << endl;
 cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
-*/
+
 // Important check to do
 if (duration_FinalInitialMeasTrigAuxAvg>5000){cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay!" << endl;}
 this->ManualSemaphore=false;

@@ -55,9 +55,15 @@ private:// Variables
 	int ExtraNumSynchMeasAvgAux=101; // More averaging for computing interrupts access time. VEry critical
 	unsigned int NextSynchPRUcommand=5;// set initially to NextSynchPRUcorrection=0
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
+	// Relative error
 	double PRUoffsetDriftError=0;
 	double PRUoffsetDriftErrorArray[MaxNumPulses]={0};
 	double PRUoffsetDriftErrorAvg=0.0;
+	// Absolute corrected error
+	double PRUoffsetDriftErrorAbs=0;
+	double PRUoffsetDriftErrorAbsArray[MaxNumPulses]={0};
+	double PRUoffsetDriftErrorAbsAvg=0.0;
+	// Others
 	double PRUoffsetDriftErrorLast=0;
 	double PRUoffsetDriftErrorIntegral=0;
 	double PRUoffsetDriftErrorDerivative=0;
