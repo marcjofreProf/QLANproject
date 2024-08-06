@@ -445,6 +445,7 @@ int QPLA::ThreadSimulateEmitQuBit(){
 cout << "Emiting Qubits" << endl;
 struct timespec requestWhileWait;
 if (string(this->ModeActivePassive)==string("Active")){
+	this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// For sure we can clear OtherClientNodeFutureTimePoint, just to ensure resilence
 	requestWhileWait=this->SetFutureTimePointOtherNode();
 }
 else{
@@ -488,7 +489,6 @@ PRUGPIO.SendTriggerSignals(this->FineSynchAdjVal,TimePointFuture_time_as_count);
  }
  */
 this->RunThreadSimulateEmitQuBitFlag=true;//enable again that this thread can again be called. It is okey since it entered a block semaphore part and then no other sempahored part will run until this one finishes. At the same time, returning to true at this point allows the read to not go out of scope and losing this flag parameter
-this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// Make sure to reset Tiem points
  this->release();
  
  //cout << "Qubit emitted" << endl;
@@ -592,6 +592,7 @@ int DetRunsCount = NumQubitsMemoryBuffer/NumQuBitsPerRun;
 //cout << "DetRunsCount: " << DetRunsCount << endl;
 struct timespec requestWhileWait;
 if (string(this->ModeActivePassive)==string("Active")){
+	this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// For sure we can clear OtherClientNodeFutureTimePoint, just to ensure resilence
 	requestWhileWait=this->SetFutureTimePointOtherNode();
 }
 else{
@@ -644,7 +645,6 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);
 
 this->SimulateNumStoredQubitsNode[0]=PRUGPIO.RetrieveNumStoredQuBits(TimeTaggs,ChannelTags);//PRUGPIO->RetrieveNumStoredQuBits(TimeTaggs,ChannelTags);
 this->RunThreadSimulateReceiveQuBitFlag=true;//enable again that this thread can again be called
-this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();// Make sure to reset Tiem points
 this->release();
 cout << "End Receiving Qubits" << endl;
 
