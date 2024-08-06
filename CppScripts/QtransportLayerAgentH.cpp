@@ -1451,18 +1451,13 @@ this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray)
 cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 while(IterHostsActiveActionsFreeStatus!=0){
 	cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
-	if(IterHostsActiveActionsFreeStatus==1) {
-		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
-		if(this->getState()==0){
-			this->ProcessNewMessage();
-			this->m_pause(); // After procesing the request, pass to paused state
-			this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-			//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
-		}
+	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+	if(this->getState()==0){
+		this->ProcessNewMessage();
+		this->m_pause(); // After procesing the request, pass to paused state
+		//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 	}
-	else{
-		this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-	}
+	this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 	this->RelativeNanoSleepWait((unsigned long long int)(15*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 }
 //cout << "Finished WaitUntilActiveActionFree" << endl;
@@ -1561,7 +1556,7 @@ else{// Too many rounds, kill the process of blocking other hosts
 	ReWaitsAnswersHostsActiveActionsFree=0;// Reset the counter
 }
 
-cout << "ReWaitsAnswersHostsActiveActionsFree: " << ReWaitsAnswersHostsActiveActionsFree << endl;
+//cout << "ReWaitsAnswersHostsActiveActionsFree: " << ReWaitsAnswersHostsActiveActionsFree << endl;
 return 0; // All ok
 }
 
