@@ -342,7 +342,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
 					
 					// Compute error - Absolute corrected error
-					this->PRUoffsetDriftErrorAbs=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal*this->EstimateSynchAvg))/static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(SynchTrigPeriod))-PRUoffsetDriftErrorAvg; // Substract the relative error
+					this->PRUoffsetDriftErrorAbs=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal))/static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(SynchTrigPeriod))-this->PRUoffsetDriftError; // Substract the relative error
 					// Absolute corrected error
 					this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
 					this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,NumSynchMeasAvgAux);
