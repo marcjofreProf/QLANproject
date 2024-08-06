@@ -94,7 +94,7 @@ private: // Variables/Objects
 	};
 	using Clock = my_clock;//
 	// Synchronization network parameters
-	bool FastInitialFakeSkipNetworkSynchFlag=false; // Variable that when activated, skips the initial network synchronization steps
+	bool FastInitialFakeSkipNetworkSynchFlag=true; // Variable that when activated, skips the initial network synchronization steps
 	int InitialNetworkSynchPass=0; // Variable to control that at least two rounds of network synchronization are performed the very first time
 	int numHolderOtherNodesSynchNetwork=0; // Variable to keep track if the other connected nodes have iterated thorugh the network synch
 	bool CycleSynchNetworkDone=false; // Variable to keep track if this host has been network synchronized in this cycle round of network sincronizxations

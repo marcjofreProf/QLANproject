@@ -737,7 +737,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 				numHolderOtherNodesSynchNetwork=0;// reset value
 			}
 			
-			if (InitialNetworkSynchPass<1){//the very first time, two rounds are needed to achieve a reasonable network synchronization
+			if (InitialNetworkSynchPass<0){//the very first time, two rounds are needed to achieve a reasonable network synchronization
 				GPIOnodeNetworkSynched=false;// Do not Update value as synched
 				InitialNetworkSynchPass=InitialNetworkSynchPass+1;
 				cout << "Host " << this->IPaddressesSockets[2] << " first initial synch process completed...executing second process..." << endl; 
@@ -1514,7 +1514,6 @@ int QTLAH::SendAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int 
 HostsActiveActionsFree[0]=false;// This host blocked
 NumAnswersOtherHostsActiveActionsFree=0;// Reset the number of answers received
 ReWaitsAnswersHostsActiveActionsFree=0; // Reset the counter
-
 strcpy(InfoRemoteHostActiveActions[0],this->IPaddressesSockets[2]);// Clear active host
 strcpy(InfoRemoteHostActiveActions[1],"Block");// SEt to Block
 
