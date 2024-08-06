@@ -1553,7 +1553,7 @@ if (NumAnswersOtherHostsActiveActionsFree>=NumInterestIPaddressesAux){
 	ReWaitsAnswersHostsActiveActionsFree=0;// Reset the counter
 }
 else if (ReWaitsAnswersHostsActiveActionsFree<MaxReWaitsAnswersHostsActiveActionsFree){// Increment the wait counter
-	ReWaitsAnswersHostsActiveActionsFree=ReWaitsAnswersHostsActiveActionsFree+1;// Update the counter
+	ReWaitsAnswersHostsActiveActionsFree++;// Update the counter
 }
 else{// Too many rounds, kill the process of blocking other hosts	
 	this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
@@ -1561,6 +1561,7 @@ else{// Too many rounds, kill the process of blocking other hosts
 	ReWaitsAnswersHostsActiveActionsFree=0;// Reset the counter
 }
 
+cout << "ReWaitsAnswersHostsActiveActionsFree: " << ReWaitsAnswersHostsActiveActionsFree << endl;
 return 0; // All ok
 }
 
