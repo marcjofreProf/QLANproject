@@ -670,7 +670,7 @@ if (string(SOCKtype)=="SOCK_STREAM"){
     return 0; // All OK
 }
 
-int QTLAH::RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep){
+int QTLAH::RelativeNanoSleepWait(unsigned long long int TimeNanoSecondsSleep){
 struct timespec ts;
 ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
 ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
@@ -737,7 +737,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 				numHolderOtherNodesSynchNetwork=0;// reset value
 			}
 			
-			if (InitialNetworkSynchPass<0){//the very first time, two rounds are needed to achieve a reasonable network synchronization
+			if (InitialNetworkSynchPass<1){//the very first time, two rounds are needed to achieve a reasonable network synchronization
 				GPIOnodeNetworkSynched=false;// Do not Update value as synched
 				InitialNetworkSynchPass=InitialNetworkSynchPass+1;
 				cout << "Host " << this->IPaddressesSockets[2] << " first initial synch process completed...executing second process..." << endl; 
@@ -758,7 +758,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 					this->ProcessNewMessage();
 					this->m_pause(); // After procesing the request, pass to paused state
 				}
-				this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+				this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 			}
 		}
 	}
@@ -857,7 +857,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
         //if (signalReceivedFlag.load()){this->~QTLAH();}// Destroy the instance
         //cout << "(int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)): " << (int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)) << endl;
         //usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
-        this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few nanoseconds for other processes to enter
+        this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few nanoseconds for other processes to enter
     }
     catch (const std::exception& e) {
 	// Handle the exception
@@ -1286,12 +1286,12 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
 }
 
 int QTLAH::SimulateRetrieveNumStoredQubitsNode(char* IPhostReply,char* IPhostRequest, int* ParamsIntArray,int nIntarray,double* ParamsDoubleArray,int nDoublearray){ // Send to the upper layer agent how many qubits are stored
-this->RelativeNanoSleepWait((unsigned int)((unsigned int)1000*(unsigned int)WaitTimeAfterMainWhileLoop));//usleep((int)(5000*WaitTimeAfterMainWhileLoop));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes. This can be improved by sending messages to the specific node, and this node replying that has received the detection command, then this could start
+this->RelativeNanoSleepWait((unsigned long long int)(1000*(unsigned long long int)(WaitTimeAfterMainWhileLoop)));//usleep((int)(5000*WaitTimeAfterMainWhileLoop));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes. This can be improved by sending messages to the specific node, and this node replying that has received the detection command, then this could start
 this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 while(this->SimulateRetrieveNumStoredQubitsNodeFlag==true){//Wait, only one asking
 this->release();
-this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
+this->RelativeNanoSleepWait((unsigned long long int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
 this->acquire();
 }
 this->SimulateRetrieveNumStoredQubitsNodeFlag=true;
@@ -1314,7 +1314,7 @@ while(isValidWhileLoopCount>0){
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 	}
 	this->release();
-	this->RelativeNanoSleepWait((unsigned int)(1000*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));//usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
+	this->RelativeNanoSleepWait((unsigned long long int)(1000*(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));//usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
 	this->acquire();
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
 		//cout << "We received info for SimulateRetrieveNumStoredQubitsNode" << endl;
@@ -1351,12 +1351,12 @@ return 0; // All OK
 }
 
 int QTLAH::SimulateRetrieveSynchParamsNode(char* IPhostReply,char* IPhostRequest,double* ParamsDoubleArray,int nDoublearray){ // Send to the upper layer agent how many qubits are stored
-this->RelativeNanoSleepWait((unsigned int)((unsigned int)1000*(unsigned int)WaitTimeAfterMainWhileLoop));//usleep((int)(5000*WaitTimeAfterMainWhileLoop));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes. This can be improved by sending messages to the specific node, and this node replying that has received the detection command, then this could start
+this->RelativeNanoSleepWait((unsigned long long int)(1000*(unsigned long long int)(WaitTimeAfterMainWhileLoop)));//usleep((int)(5000*WaitTimeAfterMainWhileLoop));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes. This can be improved by sending messages to the specific node, and this node replying that has received the detection command, then this could start
 this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 while(this->SimulateRetrieveNumStoredQubitsNodeFlag==true){//Wait, only one asking
 this->release();
-this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
+this->RelativeNanoSleepWait((unsigned long long int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
 this->acquire();
 }
 this->SimulateRetrieveNumStoredQubitsNodeFlag=true;
@@ -1379,7 +1379,7 @@ while(isValidWhileLoopCount>0){
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 	}
 	this->release();
-	this->RelativeNanoSleepWait((unsigned int)(1000*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));//usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
+	this->RelativeNanoSleepWait((unsigned long long int)(1000*(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));//usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
 	this->acquire();
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
 		//cout << "We received info for SimulateRetrieveNumStoredQubitsNode" << endl;
@@ -1436,12 +1436,13 @@ this->acquire();
 while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
 this->release();
 cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization and availability of other hosts to proceed with the request!" << endl;
-this->RelativeNanoSleepWait((unsigned int)(150*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
+this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 this->acquire();
 }
 this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 while(AchievedAttentionParticularHosts==false){
 	cout << "WaitUntilActiveActionFreePreLock: Host " << this->IPaddressesSockets[2] << " retrying to capture the attention of other involved hosts..." << endl;
+	this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 	this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 }
 this->release();
@@ -1466,7 +1467,7 @@ while(IterHostsActiveActionsFreeStatus!=0){
 	else{
 		this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 	}
-	this->RelativeNanoSleepWait((unsigned int)(150*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+	this->RelativeNanoSleepWait((unsigned long long int)(150*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 }
 //cout << "Finished WaitUntilActiveActionFree" << endl;
 return 0; // All ok
@@ -1476,7 +1477,7 @@ int QTLAH::UnBlockActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararr
 this->acquire();
 this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);
 this->release();
-//this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Give some time to relax things
+//this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Give some time to relax things
 return 0; // All ok
 }
 
@@ -1490,7 +1491,7 @@ return 0; // All ok
 int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 if (IterHostsActiveActionsFreeStatus==0){
 this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);// To reset, just in case
-this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 }
 else if (IterHostsActiveActionsFreeStatus==1){
@@ -1501,7 +1502,7 @@ AchievedAttentionParticularHosts=this->CheckReceivedAnswersYouFreeRequestToParti
 }
 else{
 this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 }
 
 
@@ -1798,7 +1799,7 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 					this->ProcessNewMessage();
 					this->m_pause(); // After procesing the request, pass to paused state
 				}
-				this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+				this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 			}
 		}
 	}
