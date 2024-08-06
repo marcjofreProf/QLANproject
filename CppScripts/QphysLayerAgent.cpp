@@ -352,6 +352,11 @@ while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && 
 	this->RelativeNanoSleepWait((unsigned int)(0.1*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//Maybe some sleep to reduce CPU consumption	
 	this->acquire();
 	};
+if (MaxWhileRound<=0){
+this->OtherClientNodeFutureTimePoint=Clock::now();
+cout << "QPLA could not obtain in time the TimePoint from the other node" << endl;
+}// Provide a TimePoint to avoid blocking issues
+this->FutureTimePoint=this->OtherClientNodeFutureTimePoint;
 // Check that there are no accumulated TimePoints sent later (and hence that we are picking the latest one - not from a failed previous iteration) eventhough we have detected a TimePoint
 int MaxWhileRoundCheck=500;
 while(this->OtherClientNodeFutureTimePoint!=std::chrono::time_point<Clock>() and MaxWhileRoundCheck>0){
@@ -360,12 +365,6 @@ while(this->OtherClientNodeFutureTimePoint!=std::chrono::time_point<Clock>() and
 	this->RelativeNanoSleepWait((unsigned int)(0.1*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//Maybe some sleep to reduce CPU consumption	
 	this->acquire();
 	};
-//
-if (MaxWhileRound<=0){
-this->OtherClientNodeFutureTimePoint=Clock::now();
-cout << "QPLA could not obtain in time the TimePoint from the other node" << endl;
-}// Provide a TimePoint to avoid blocking issues
-this->FutureTimePoint=this->OtherClientNodeFutureTimePoint;
 // Reset the ClientNodeFutureTimePoint
 this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 this->release();
