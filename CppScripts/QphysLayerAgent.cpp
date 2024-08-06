@@ -227,7 +227,7 @@ if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){thi
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread	
 	std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(strtoull(ValuesCharArray[iHeaders],NULL,10)));
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
-	//cout << "OtherClientNodeFutureTimePoint: " << static_cast<unsigned long long int>(strtoull(ValuesCharArray[iHeaders],NULL,10)) << endl;
+	cout << "OtherClientNodeFutureTimePoint: " << static_cast<unsigned long long int>(strtoull(ValuesCharArray[iHeaders],NULL,10)) << endl;
 	// Debugging
 	//TimePoint TimePointClockNow=Clock::now();
 	//auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
@@ -314,6 +314,7 @@ unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cas
 
 // Tell to the other nodes
 char ParamsCharArray[NumBytesPayloadBuffer] = {0};
+char charNum[NumBytesPayloadBuffer] = {0};
 for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){// Iterate over the different nodes to tell
 	if (isPotentialIpAddressStructure(IPaddresses[iIterIPaddr])){
 		// Mount the Parameters message for the other node
@@ -321,14 +322,13 @@ for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){// Iterate o
 		else{strcat(ParamsCharArray,"IPdest_");} // Continues the ParamsCharArray, so use strcat
 		strcat(ParamsCharArray,IPaddresses[iIterIPaddr]);// Indicate the address to send the Future time Point
 		strcat(ParamsCharArray,"_");// Add underscore separator
-		strcat(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Continues the ParamsCharArray, so use strcat
-		char charNum[NumBytesPayloadBuffer] = {0}; 
+		strcat(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Continues the ParamsCharArray, so use strcat		 
 		sprintf(charNum, "%llu", TimePointFuture_time_as_count);//%llu: unsigned long long int
 		strcat(ParamsCharArray,charNum);
 		strcat(ParamsCharArray,"_"); // Final _
 	}
 } // end for to the different addresses to send the params information
-//cout << "QPLA::ParamsCharArray: " << ParamsCharArray << endl;
+cout << "QPLA::ParamsCharArray: " << ParamsCharArray << endl;
 this->acquire();
 this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 this->release();
