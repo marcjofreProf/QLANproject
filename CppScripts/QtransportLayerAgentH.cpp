@@ -791,6 +791,7 @@ if (iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer){// Try to unblock itself
 	strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
 	HostsActiveActionsFree[0]=true; // Set the host as free
 	iIterPeriodicBlockTimer=0;
+	AchievedAttentionParticularHosts=false;// Indicates that we have got NOT the attenation of the hosts
 	cout << "Host" << this->IPaddressesSockets[2] << " will unblock itself since to much time blocked" << endl;
 }
 	
@@ -1042,6 +1043,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 						strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
 						strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
 						HostsActiveActionsFree[0]=true; // Set the host as free
+						strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
+						AchievedAttentionParticularHosts=false;// Indicates that we have got NOT the attenation of the hosts
 					}
 					else{// Non of the above, which is a malfunction						
 						cout << "Host HostAreYouFree not handled!" << endl;
@@ -1512,6 +1515,9 @@ HostsActiveActionsFree[0]=false;// This host blocked
 NumAnswersOtherHostsActiveActionsFree=0;// Reset the number of answers received
 ReWaitsAnswersHostsActiveActionsFree=0; // Reset the counter
 
+strcpy(InfoRemoteHostActiveActions[0],this->IPaddressesSockets[2]);// Clear active host
+strcpy(InfoRemoteHostActiveActions[1],"Block");// SEt to Block
+
 int NumInterestIPaddressesAux=nChararray;
 
 char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
@@ -1625,8 +1631,11 @@ else{ // If some are unavailable, unblock them all
 		//cout << "HostAreYouFree ParamsCharArray: " << ParamsCharArray << endl;
 		this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 	}
+	strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
+	strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
 	HostsActiveActionsFree[0]=true;// This host unblocked
 	IterHostsActiveActionsFreeStatus=0;// reset process
+	AchievedAttentionParticularHosts=false;// Indicates that we have got NOT the attenation of the hosts
 	return false;
 }
 
@@ -1673,7 +1682,8 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){
 	//cout << "HostAreYouFree UnBlock ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 }*/
-
+strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
+strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
 HostsActiveActionsFree[0]=true;// This host unblocked
 IterHostsActiveActionsFreeStatus=0;// reset process
 AchievedAttentionParticularHosts=false;// Indicates that we have got NOT the attenation of the hosts
