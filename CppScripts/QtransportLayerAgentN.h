@@ -99,7 +99,7 @@ private: // Variables/Objects
 	// Variables to pass to below agents
 	// QLLA agent
 	char QLLAModeActivePassive[NumBytesPayloadBuffer] = {0};// "Active" or "Passive"
-	char QLLAIPaddresses[NumHostConnection][IPcharArrayLengthMAX] = {0};
+	char QLLAIPaddresses[NumBytesBufferICPMAX] = {0}; // IP addresses to send TimePoint barrier; separated by "_"
 	int QLLAnumReqQuBits=0;
 	double QLLAFineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
 	// Synchronization test frequencies and others

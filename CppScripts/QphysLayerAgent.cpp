@@ -25,7 +25,6 @@ Agent script for Quantum Physical Layer
 #define NumBytesPayloadBuffer 1000
 #define NumParamMessagesMax 20
 #define IPcharArrayLengthMAX 15
-#define NumHostConnection 5
 // Threads
 #include <thread>
 // Semaphore
@@ -182,6 +181,18 @@ bool QPLA::isPotentialIpAddressStructure(const char* ipAddress) {
   return dots == 3 && digitCount > 0 && digitCount <= 3; // Check for 4 octets
 }
 
+int QPLA::countUnderscores(char* ParamsCharArray) {
+  int underscoreCount = 0;
+
+  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+    if (ParamsCharArray[i] == '_') {
+      underscoreCount++;
+    }
+  }
+
+  return underscoreCount;
+}
+
 int QPLA::ProcessNewParameters(){
 char ParamsCharArray[NumBytesPayloadBuffer]={0};
 char HeaderCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
@@ -315,18 +326,25 @@ unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cas
 // Tell to the other nodes
 char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 char charNum[NumBytesPayloadBuffer] = {0};
-for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){// Iterate over the different nodes to tell
-	if (isPotentialIpAddressStructure(IPaddresses[iIterIPaddr])){
-		// Mount the Parameters message for the other node
-		if (iIterIPaddr==0){strcpy(ParamsCharArray,"IPdest_");} // Initiates the ParamsCharArray, so use strcpy
-		else{strcat(ParamsCharArray,"IPdest_");} // Continues the ParamsCharArray, so use strcat
-		strcat(ParamsCharArray,IPaddresses[iIterIPaddr]);// Indicate the address to send the Future time Point
-		strcat(ParamsCharArray,"_");// Add underscore separator
-		strcat(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Continues the ParamsCharArray, so use strcat		 
-		sprintf(charNum, "%llu", TimePointFuture_time_as_count);//%llu: unsigned long long int
-		strcat(ParamsCharArray,charNum);
-		strcat(ParamsCharArray,"_"); // Final _
+
+int numUnderScores=countUnderscores(this->IPaddressesTimePointBarrier); // Which means the number of IP addresses to send the Time Point barrier
+char IPaddressesTimePointBarrierAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
+strcpy(IPaddressesTimePointBarrierAux,IPaddressesTimePointBarrier);
+for (int iIterIPaddr=0;iIterIPaddr<numUnderScores;iIterIPaddr++){// Iterate over the different nodes to tell
+	// Mount the Parameters message for the other node
+	if (iIterIPaddr==0){
+		strcpy(ParamsCharArray,"IPdest_");// Initiates the ParamsCharArray, so use strcpy
+		strcat(ParamsCharArray,strtok(IPaddressesTimePointBarrierAux,"_"));// Indicate the address to send the Future time Point
+	} 
+	else{
+		strcat(ParamsCharArray,"IPdest_");// Continues the ParamsCharArray, so use strcat
+		strcat(ParamsCharArray,strtok(NULL,"_"));// Indicate the address to send the Future time Point
 	}
+	strcat(ParamsCharArray,"_");// Add underscore separator
+	strcat(ParamsCharArray,"OtherClientNodeFutureTimePoint_"); // Continues the ParamsCharArray, so use strcat		 
+	sprintf(charNum, "%llu", TimePointFuture_time_as_count);//%llu: unsigned long long int
+	strcat(ParamsCharArray,charNum);
+	strcat(ParamsCharArray,"_"); // Final _
 } // end for to the different addresses to send the params information
 cout << "QPLA::ParamsCharArray: " << ParamsCharArray << endl;
 this->acquire();
@@ -391,10 +409,10 @@ requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 return requestWhileWait;
 }
 
-int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux,double* FineSynchAdjValAux){
+int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int numReqQuBitsAux,double* FineSynchAdjValAux){
 this->acquire();
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
-for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
+strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 this->numReqQuBits=numReqQuBitsAux;
 this->FineSynchAdjVal[0]=FineSynchAdjValAux[0];// synch trig offset
 this->FineSynchAdjVal[1]=FineSynchAdjValAux[1];// synch trig frequency
@@ -412,11 +430,11 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass){
+int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass){
 this->acquire();
 if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
-for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
+strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 //this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
 this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
 this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
@@ -497,10 +515,10 @@ cout << "End Emiting Qubits" << endl;
  return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux){
+int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int numReqQuBitsAux){
 this->acquire();
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
-for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
+strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 this->numReqQuBits=numReqQuBitsAux;
 if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
@@ -514,11 +532,12 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass){
+int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass){
 this->acquire();
 if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
-	for (int iIterIPaddr=0;iIterIPaddr<NumHostConnection;iIterIPaddr++){strcpy(this->IPaddresses[iIterIPaddr],IPaddressesAux[iIterIPaddr]);}
+	strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
+				
 	//this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
 	this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
 	this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.

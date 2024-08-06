@@ -18,6 +18,8 @@ Header declaration file for Quantum physical Layer Agent
 #define NumBytesPayloadBuffer 1000
 #define IPcharArrayLengthMAX 15
 #define NumHostConnection 5
+// ICP connections
+#define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 //Qubits
 #define NumQubitsMemoryBuffer 1964// In multiples of NumQuBitsPerRun (e.g., 1964, 3928, ...). Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
 #define NumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
@@ -98,7 +100,7 @@ private: //Variables/Instances
 	unsigned long long int OldLastTimeTagg=0;
 	// Above agents passed values to this agent
 	char ModeActivePassive[NumBytesPayloadBuffer] = {0};// "Active" or "Passive"
-	char IPaddresses[NumHostConnection][IPcharArrayLengthMAX] = {0};
+	char IPaddressesTimePointBarrier[NumBytesBufferICPMAX] = {0};// List of IP addresses separated by "_" to send the Time Point BArrier to
 	int numReqQuBits=0;
 	double FineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
 	// Automatic calculation of synchronization
@@ -129,10 +131,10 @@ public: // Functions/Methods
 	int SendParametersAgent(char* ParamsCharArray);// The upper layer gets the information to be send
         int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node
         // General Input and Output functions
-	int SimulateEmitQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux,double* FineSynchAdjValAux);
-	int SimulateEmitSynchQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
-	int SimulateReceiveQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int numReqQuBitsAux);
-	int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,const char (&IPaddressesAux)[NumHostConnection][IPcharArrayLengthMAX],int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass);
+	int SimulateEmitQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int numReqQuBitsAux,double* FineSynchAdjValAux);
+	int SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
+	int SimulateReceiveQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int numReqQuBitsAux);
+	int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass);
 	int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
 	int GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams);
 	bool GetGPIOHardwareSynchedNode();
@@ -166,6 +168,7 @@ private: // Functions/Methods
 	int ProcessNewParameters();// Process the parameters
 	int countDoubleColons(char* ParamsCharArray);
 	int countDoubleUnderscores(char* ParamsCharArray);
+	int countUnderscores(char* ParamsCharArray);
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 	// Particular process threads

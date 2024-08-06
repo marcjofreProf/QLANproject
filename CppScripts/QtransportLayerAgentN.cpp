@@ -807,17 +807,12 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			//cout << "Node Payload: "<< Payload << endl;
 			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
 			char PayloadAux[NumBytesPayloadBuffer]={0};
-			strcpy(PayloadAux,strtok(NULL,";"));
+			strcpy(this->QLLAIPaddresses,strtok(NULL,";"));
 			this->QLLAnumReqQuBits=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			//cout << "this->QLLAFineSynchAdjVal[1]: " << this->QLLAFineSynchAdjVal[1] << endl;
-			int numUnderScores=countUnderscores(PayloadAux);
-			for (int iIterQLLAIPaddr=0;iIterQLLAIPaddr<numUnderScores;iIterQLLAIPaddr++){
-				if(iIterQLLAIPaddr==0){strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(PayloadAux,"_"));}
-				else{strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(NULL,"_"));}
-			}
-			
+						
 			std::thread threadSimulateEmitQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitQuBit,this);
 			threadSimulateEmitQuBitRefAux.detach();
 		}
@@ -825,7 +820,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			//cout << "Node SimulateSendSynchQubits Payload: "<< Payload << endl;
 			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
 			char PayloadAux[NumBytesPayloadBuffer]={0};
-			strcpy(PayloadAux,strtok(NULL,";"));
+			strcpy(this->QLLAIPaddresses,strtok(NULL,";"));
 			this->QLLANumRunsPerCenterMass=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			int iCenterMass=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			int iNumRunsPerCenterMass=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
@@ -844,24 +839,15 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			//cout << "QLLAFreqSynchNormValuesArray[2]: " << QLLAFreqSynchNormValuesArray[2] << endl;
 			//cout << "this->QLLAFineSynchAdjVal[0]: " << this->QLLAFineSynchAdjVal[0] << endl;
 			//cout << "this->QLLAFineSynchAdjVal[1]: " << this->QLLAFineSynchAdjVal[1] << endl;
-			int numUnderScores=countUnderscores(PayloadAux);
-			for (int iIterQLLAIPaddr=0;iIterQLLAIPaddr<numUnderScores;iIterQLLAIPaddr++){
-				if(iIterQLLAIPaddr==0){strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(PayloadAux,"_"));}
-				else{strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(NULL,"_"));}
-			}
+			
 			std::thread threadSimulateEmitSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitSynchQuBit,this,iCenterMass,iNumRunsPerCenterMass);
 			threadSimulateEmitSynchQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("SimulateReceiveQubits")){// Read qubits to the attached node
 			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
 			char PayloadAux[NumBytesPayloadBuffer]={0};
-			strcpy(PayloadAux,strtok(NULL,";"));
+			strcpy(this->QLLAIPaddresses,strtok(NULL,";"));
 			this->QLLAnumReqQuBits=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
-			int numUnderScores=countUnderscores(PayloadAux);
-			for (int iIterQLLAIPaddr=0;iIterQLLAIPaddr<numUnderScores;iIterQLLAIPaddr++){
-				if(iIterQLLAIPaddr==0){strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(PayloadAux,"_"));}
-				else{strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(NULL,"_"));}
-			}
 			
 			std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveQuBit,this);
 			threadSimulateReceiveQuBitRefAux.detach();
@@ -869,18 +855,14 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		else if (string(Command)==string("SimulateReceiveSynchQubits")){// Read qubits to the attached node
 			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
 			char PayloadAux[NumBytesPayloadBuffer]={0};
-			strcpy(PayloadAux,strtok(NULL,";"));
+			strcpy(this->QLLAIPaddresses,strtok(NULL,";"));
 			this->QLLANumRunsPerCenterMass=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			int iCenterMass=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			int iNumRunsPerCenterMass=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFreqSynchNormValuesArray[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFreqSynchNormValuesArray[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFreqSynchNormValuesArray[2]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
-			int numUnderScores=countUnderscores(PayloadAux);
-			for (int iIterQLLAIPaddr=0;iIterQLLAIPaddr<numUnderScores;iIterQLLAIPaddr++){
-				if(iIterQLLAIPaddr==0){strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(PayloadAux,"_"));}
-				else{strcpy(this->QLLAIPaddresses[iIterQLLAIPaddr],strtok(NULL,"_"));}
-			}			
+						
 			std::thread threadSimulateReceiveSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveSynchQuBit,this,iCenterMass,iNumRunsPerCenterMass);
 			threadSimulateReceiveSynchQuBitRefAux.detach();
 		}
