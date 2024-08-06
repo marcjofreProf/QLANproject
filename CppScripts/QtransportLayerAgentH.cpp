@@ -1442,14 +1442,14 @@ this->acquire();
 while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
 this->release();
 cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization and availability of other hosts to proceed with the request!" << endl;
-this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+this->RelativeNanoSleepWait((unsigned long long int)(1000*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 this->acquire();
 }
 this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 while(AchievedAttentionParticularHosts==false){
 	this->release();
 	cout << "WaitUntilActiveActionFreePreLock: Host " << this->IPaddressesSockets[2] << " retrying to capture the attention of other involved hosts..." << endl;
-	this->RelativeNanoSleepWait((unsigned long long int)(5000*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+	this->RelativeNanoSleepWait((unsigned long long int)(1000*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 	this->acquire();
 	this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 }
@@ -1475,7 +1475,7 @@ while(IterHostsActiveActionsFreeStatus!=0){
 	else{
 		this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 	}
-	this->RelativeNanoSleepWait((unsigned long long int)(150*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+	this->RelativeNanoSleepWait((unsigned long long int)(15*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 }
 //cout << "Finished WaitUntilActiveActionFree" << endl;
 return 0; // All ok
@@ -1651,6 +1651,12 @@ return false; // all ok
 }
 
 int QTLAH::UnBlockYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
+strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
+strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
+HostsActiveActionsFree[0]=true;// This host unblocked
+IterHostsActiveActionsFreeStatus=0;// reset process
+AchievedAttentionParticularHosts=false;// Indicates that we have got NOT the attenation of the hosts
+
 int NumInterestIPaddressesAux=nChararray;
 char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
 char ParamsCharArrayArgAux[NumBytesBufferICPMAX] = {0};
@@ -1690,11 +1696,17 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){
 	//cout << "HostAreYouFree UnBlock ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 }*/
-strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
-strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
-HostsActiveActionsFree[0]=true;// This host unblocked
-IterHostsActiveActionsFreeStatus=0;// reset process
-AchievedAttentionParticularHosts=false;// Indicates that we have got NOT the attenation of the hosts
+
+int numForstEquivalentToSleep=100;//100: Equivalent to 1 seconds# give time to other hosts
+for (int i=0;i<numForstEquivalentToSleep;i++){
+	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+	//cout << "this->getState(): " << this->getState() << endl;
+	if(this->getState()==0) {
+		this->ProcessNewMessage();
+		this->m_pause(); // After procesing the request, pass to paused state
+	}
+	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+}
 return 0; // All ok
 }
 
