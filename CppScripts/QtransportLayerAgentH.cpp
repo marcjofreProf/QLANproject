@@ -1429,6 +1429,9 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 this->acquire();
 
 while(AchievedAttentionParticularHosts==false){
+	cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+	cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
+	cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 	while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
 		this->release();
 		cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
