@@ -774,24 +774,26 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 	}
 
 	// Other task to perform at some point or regularly
-	// Check if there is a permanent Block at this node
-	if (string(InfoRemoteHostActiveActions[1])==string("Block")){
-		iIterPeriodicBlockTimer++; // Counter to acknowledge how much time it has been consecutively blocked
-	}
-	else
-	{
-		iIterPeriodicBlockTimer=0; // Reset value
-	}
-	if (iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer){// Try to unblock itself
-		strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
-		strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
-		HostsActiveActionsFree[0]=true; // Set the host as free
-		iIterPeriodicBlockTimer=0;
-		cout << "Host" << this->IPaddressesSockets[2] << " will unblock itself since to much time blocked" << endl;
-	}
+	
 	
 	iIterPeriodicTimerVal=0;// Reset variable
 }
+// Check if there is a permanent Block at this node
+if (string(InfoRemoteHostActiveActions[1])==string("Block")){
+	iIterPeriodicBlockTimer++; // Counter to acknowledge how much time it has been consecutively blocked
+}
+else
+{
+	iIterPeriodicBlockTimer=0; // Reset value
+}
+if (iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer){// Try to unblock itself
+	strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
+	strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
+	HostsActiveActionsFree[0]=true; // Set the host as free
+	iIterPeriodicBlockTimer=0;
+	cout << "Host" << this->IPaddressesSockets[2] << " will unblock itself since to much time blocked" << endl;
+}
+	
 iIterPeriodicTimerVal++;
 return 0; // all ok
 }
@@ -1461,7 +1463,7 @@ while(IterHostsActiveActionsFreeStatus!=0){
 	else{
 		this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 	}
-	this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+	this->RelativeNanoSleepWait((unsigned int)(150*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 }
 //cout << "Finished WaitUntilActiveActionFree" << endl;
 return 0; // All ok
@@ -1656,7 +1658,7 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){
 	//cout << "HostAreYouFree UnBlock ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 }
-// Just dobule send the message of unblock to make sure the involved hosts received
+/*// Just dobule send the message of unblock to make sure the involved hosts received
 for (int i=0;i<NumInterestIPaddressesAux;i++){
 	strcpy(ParamsCharArray,interestIPaddressesSocketsAux[i]);
 	strcat(ParamsCharArray,",");
@@ -1670,7 +1672,7 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){
 	strcat(ParamsCharArray,",");// Very important to end the message
 	//cout << "HostAreYouFree UnBlock ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
-}
+}*/
 
 HostsActiveActionsFree[0]=true;// This host unblocked
 IterHostsActiveActionsFreeStatus=0;// reset process
