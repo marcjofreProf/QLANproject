@@ -754,6 +754,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 			for (int i=0;i<numForstEquivalentToSleep;i++){
 				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 				//cout << "this->getState(): " << this->getState() << endl;
+				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 				if(this->getState()==0) {
 					this->ProcessNewMessage();
 					this->m_pause(); // After procesing the request, pass to paused state
@@ -1450,11 +1451,14 @@ while(IterHostsActiveActionsFreeStatus!=0){
 	//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 	//cout << "this->getState(): " << this->getState() << endl;
-	if(this->getState()==0 and IterHostsActiveActionsFreeStatus==1) {
-		this->ProcessNewMessage();
-		this->m_pause(); // After procesing the request, pass to paused state
-		this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-		//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+	if(IterHostsActiveActionsFreeStatus==1) {
+		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+		if(this->getState()==0){
+			this->ProcessNewMessage();
+			this->m_pause(); // After procesing the request, pass to paused state
+			this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+			//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+		}
 	}
 	else{
 		this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
@@ -1650,6 +1654,7 @@ int numForstEquivalentToSleep=100;//100: Equivalent to 1 seconds# give time to o
 for (int i=0;i<numForstEquivalentToSleep;i++){
 	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 	//cout << "this->getState(): " << this->getState() << endl;
+	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 	if(this->getState()==0) {
 		this->ProcessNewMessage();
 		this->m_pause(); // After procesing the request, pass to paused state
@@ -1764,6 +1769,7 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			for (int i=0;i<numForstEquivalentToSleep;i++){
 				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 				//cout << "this->getState(): " << this->getState() << endl;
+				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 				if(this->getState()==0) {
 					this->ProcessNewMessage();
 					this->m_pause(); // After procesing the request, pass to paused state
