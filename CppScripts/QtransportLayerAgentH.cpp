@@ -988,7 +988,9 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				// Different operation with respect the host that has sent the request				
 				if (string(InfoRemoteHostActiveActions[0])==string(IPorg)){// Is the message from the current active host?
 					if (string(Payload)==string("Block")){// Confirm block
-						strcpy(InfoRemoteHostActiveActions[1],"Block");// Set status to Block						
+						strcpy(InfoRemoteHostActiveActions[0],IPorg);// Copy the identification of the host
+						strcpy(InfoRemoteHostActiveActions[1],"Block");// Set status to Preventive
+						HostsActiveActionsFree[0]=false; // Set the host as not free						
 					}
 					else{// UnBlock
 						strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
@@ -1022,7 +1024,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 						//cout << "Operation HostAreYouFree Preventive" << endl;	
 						this->ICPdiscoverSend(ParamsCharArray);
 					}
-					else if ((HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false) and string(Payload)==string("Preventive")){// Not free. Respond that not free (either because not free, or not finalized with synchronizations)
+					else if ((HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false) and (string(Payload)==string("Preventive") or string(Payload)==string("Block"))){// Not free. Respond that not free (either because not free, or not finalized with synchronizations)
 						// Respond with message saying that not available
 						// Respond with message saying that available
 						char ParamsCharArray[NumBytesBufferICPMAX] = {0};
