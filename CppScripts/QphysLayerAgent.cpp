@@ -343,7 +343,7 @@ return requestWhileWait;
 
 struct timespec QPLA::GetFutureTimePointOtherNode(){
 struct timespec requestWhileWait;
-int MaxWhileRound=1000;
+int MaxWhileRound=1500;
 // Wait to receive the FutureTimePoint from other node
 this->acquire();
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
@@ -353,8 +353,8 @@ while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && 
 	this->acquire();
 	};
 // Check that there are no accumulated TimePoints sent later (and hence that we are picking the latest one - not from a failed previous iteration) eventhough we have detected a TimePoint
-int MaxWhileRoundCheck=5000;
-while(this->OtherClientNodeFutureTimePoint!=std::chrono::time_point<Clock>() && MaxWhileRoundCheck>0){
+int MaxWhileRoundCheck=500;
+while(this->OtherClientNodeFutureTimePoint!=std::chrono::time_point<Clock>() and MaxWhileRoundCheck>0){
 	this->release();
 	MaxWhileRoundCheck--;	
 	this->RelativeNanoSleepWait((unsigned int)(0.1*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//Maybe some sleep to reduce CPU consumption	
