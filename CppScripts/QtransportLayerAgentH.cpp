@@ -1436,13 +1436,15 @@ this->acquire();
 while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
 this->release();
 cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization and availability of other hosts to proceed with the request!" << endl;
-this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+this->RelativeNanoSleepWait((unsigned long long int)(15000*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 this->acquire();
 }
 this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 while(AchievedAttentionParticularHosts==false){
+	this->release();
 	cout << "WaitUntilActiveActionFreePreLock: Host " << this->IPaddressesSockets[2] << " retrying to capture the attention of other involved hosts..." << endl;
-	this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+	this->RelativeNanoSleepWait((unsigned long long int)(15000*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+	this->acquire();
 	this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 }
 this->release();
