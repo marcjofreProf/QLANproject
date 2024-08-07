@@ -100,7 +100,7 @@ private: // Variables/Objects
 	bool CycleSynchNetworkDone=false; // Variable to keep track if this host has been network synchronized in this cycle round of network sincronizxations
 	int numHolderOtherNodesSendSynchQubits=0; // Variable to count number of consecutive SendSynchQubits request
 	unsigned long long int iIterNetworkSynchcurrentTimerVal=0;// Variable to count how many time has passed since last network synchronization
-	unsigned long long int MaxiIterNetworkSynchcurrentTimerVal=21600; // Counter value to reset network synchronization, which is actually multiplied by the variable MaxiIterPeriodicTimerVal. E.g, every 6 hours
+	unsigned long long int MaxiIterNetworkSynchcurrentTimerVal=2160; // Counter value to reset network synchronization, which is actually multiplied by the variable MaxiIterPeriodicTimerVal. E.g, every 6 hours
 	unsigned long long int iIterPeriodicBlockTimer=0; // Counter of how much passes th ehost is constantly block. If larger than MaxiIterPeriodicBlockTimer, unblock itself
 	unsigned long long int MaxiIterPeriodicBlockTimer=3600000; // Counter of how much passes the host is constantly block. If larger than , unblock itself
 	bool GPIOnodeHardwareSynched=false;// Variable to know the hardware synch status of the node below. Actually, do not let many operations and controls to happen until this variable is set to true.

@@ -705,7 +705,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 	//cout << "Host " << this->IPaddressesSockets[2] << " numHolderOtherNodesSynchNetwork: " << numHolderOtherNodesSynchNetwork << endl;
 	if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false and HostsActiveActionsFree[0]==true and CycleSynchNetworkDone==false){
 		char argsPayloadAux[NumBytesBufferICPMAX] = {0};
-		// Block all connected nodes
+		// Try to block all connected nodes
 		for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			if (iConnHostsNodes==0){strcpy(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
 			else{strcat(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
@@ -763,10 +763,10 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 		}
 	}
 	else{
-		iIterNetworkSynchcurrentTimerVal=iIterNetworkSynchcurrentTimerVal+1; // Update value
+		iIterNetworkSynchcurrentTimerVal++; // Update value
 	}
 
-	if (iIterNetworkSynchcurrentTimerVal>MaxiIterNetworkSynchcurrentTimerVal){// Every some iterations re-synch the node thorugh the network
+	if (iIterNetworkSynchcurrentTimerVal>MaxiIterNetworkSynchcurrentTimerVal and HostsActiveActionsFree[0]==true){// Every some iterations re-synch the node thorugh the network
 		GPIOnodeHardwareSynched=false;// Update value as not synched
 		GPIOnodeNetworkSynched=false;// Update value as not synched
 		iIterNetworkSynchcurrentTimerVal=0;// Reset value
@@ -1659,8 +1659,7 @@ for (int i=0;i<numForstEquivalentToSleep;i++){
 return 0; // All ok
 }
 
-int QTLAH::PeriodicRequestSynchsHost(){
-
+int QTLAH::PeriodicRequestSynchsHost(){// Execute automatically the network synchronization from this host node to all other connected hosts nodes
 char charNumAux[NumBytesBufferICPMAX] = {0};
 char messagePayloadAux[NumBytesBufferICPMAX] = {0};
 char ParamsCharArray[NumBytesBufferICPMAX] = {0};

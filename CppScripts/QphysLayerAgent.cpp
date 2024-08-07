@@ -361,7 +361,7 @@ return requestWhileWait;
 
 struct timespec QPLA::GetFutureTimePointOtherNode(){
 struct timespec requestWhileWait;
-int MaxWhileRound=1500;
+int MaxWhileRound=3000;// Amount of check to receive the other node Time Point Barrier
 // Wait to receive the FutureTimePoint from other node
 this->acquire();
 while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
