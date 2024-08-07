@@ -995,9 +995,9 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				}
 				else{// Either the message is not from the current active hosts or there is no active host, or it is a response for this host
 					if (string(Payload)==string("true") or string(Payload)==string("false")){// Response from another host
-						if (string(Payload)==string("true")){					HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]="true";}
-						else{HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]="false";}
-						NumAnswersOtherHostsActiveActionsFree=NumAnswersOtherHostsActiveActionsFree+1;// Update value
+						if (string(Payload)==string("true")){					HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]=false;}// Mark it as Block
+						else{HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]=true;}
+						NumAnswersOtherHostsActiveActionsFree++;// Update value
 						//cout << "Response HostAreYouFree: " << IPorg << ", " << Payload << endl;
 					}
 					else if (HostsActiveActionsFree[0]==true and string(Payload)==string("Block") and GPIOnodeHardwareSynched==true){// Block
@@ -1575,14 +1575,18 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){
 }
 
 for (int i=0;i<NumInterestIPaddressesAux;i++){
-	if (HostsActiveActionsFree[1+i]==true){
-		SumCheckAllOthersFree=SumCheckAllOthersFree+1;
+	if (HostsActiveActionsFree[1+i]==false){
+		SumCheckAllOthersFree++;
 	}
 }
 //cout << "SumCheckAllOthersFree: " << SumCheckAllOthersFree << endl;
 
 if (SumCheckAllOthersFree>=NumInterestIPaddressesAux){CheckAllOthersFreeAux=true;}
-char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+
+for (int i=0;i<NumInterestIPaddressesAux;i++){// Reset values
+	HostsActiveActionsFree[1+i]=true;
+}
+
 // If all available, block them all
 if (CheckAllOthersFreeAux==true){
 	IterHostsActiveActionsFreeStatus=0;// reset process
