@@ -1602,7 +1602,16 @@ return false; // all ok
 }
 
 int QTLAH::UnBlockYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
-this->RelativeNanoSleepWait((unsigned long long int)(100*(unsigned long long int)(WaitTimeAfterMainWhileLoop)));// Wait a few time still blocking hosts to act
+int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
+for (int i=0;i<numForstEquivalentToSleep;i++){
+	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+	//cout << "this->getState(): " << this->getState() << endl;
+	if(this->getState()==0) {
+		this->ProcessNewMessage();
+		this->m_pause(); // After procesing the request, pass to paused state
+	}
+	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+}
 
 strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
 strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
@@ -1650,7 +1659,7 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 }*/
 
-int numForstEquivalentToSleep=100;//100: Equivalent to 1 seconds# give time to other hosts to enter
+numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
 for (int i=0;i<numForstEquivalentToSleep;i++){
 	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 	//cout << "this->getState(): " << this->getState() << endl;
