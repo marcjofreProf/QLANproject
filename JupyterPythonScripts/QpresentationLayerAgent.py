@@ -64,7 +64,7 @@ class QPLA:
 	# Active actions that use the nodes, so they have to be blocked when the node is in use (blocked from the above agent)
 	def SimulateRequestQubitsHost(self,IPhostDestOpNet,IPhostOrgOpNet,IPhostDestConNet,IPhostOrgConNet,NumRequestedQubits,SynchPRUoffFreqVal): # Request that host's node sends qubits to this host's node
 		# For SimulateReceiveQubits, the messagePayload consist of indicating (separated by;) whether the node will be "Active" or "Passive" on sending the TimePoint Barrier, a list of IP identifying the Node/s (separated by "_") that will emit qubits in this specific rounds, a list of IPs (separated by "_") to send the TimePoint Barrier if this receiving node was to be "active" and a NumRequestedQubits
-		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestConNet]),self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRequestedQubits)])
+		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRequestedQubits)])
 		messageCommandAux="SimulateReceiveQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrgConNet
@@ -83,14 +83,14 @@ class QPLA:
 		
 	def SimulateSendEntangledQubitsHost(self,IPhostDest1OpNet,IPhostOrg1OpNet,IPhostDest2OpNet,IPhostOrg2OpNet,IPnodeDestConNet,IPhostOrgConNet,NumSendQubits,SynchPRUoffFreqVal): # Request that the other nodes of the specified hosts get ready to receive entangled qubits from the dealer's node
 		if (self.BiValueIteratorVal==1):#Alternate who is active
-			messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPnodeDestConNet]),self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostOrg1OpNet]),str(NumSendQubits)])
+			messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostOrg2OpNet]),self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostOrg1OpNet]),str(NumSendQubits)])
 			messageCommandAux="SimulateReceiveQubits"
 			messageTypeAux="Control"
 			messageIPorg=IPhostOrg2OpNet
 			messageIPdest=IPhostDest2OpNet
 			messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 			self.QSLAagent.SendMessageAgent(messageAuxChar)		
-			messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPnodeDestConNet]),self.UnderScoreListCharArrayParser([IPhostDest2OpNet,IPhostOrg2OpNet]),str(NumSendQubits)])
+			messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrg1OpNet]),self.UnderScoreListCharArrayParser([IPhostDest2OpNet,IPhostOrg2OpNet]),str(NumSendQubits)])
 			messageCommandAux="SimulateReceiveQubits"
 			messageTypeAux="Control"
 			messageIPorg=IPhostOrg1OpNet
@@ -98,7 +98,7 @@ class QPLA:
 			messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 			self.QSLAagent.SendMessageAgent(messageAuxChar)
 		else:
-			messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPnodeDestConNet]),self.UnderScoreListCharArrayParser([IPhostDest2OpNet,IPhostOrg2OpNet]),str(NumSendQubits)])
+			messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostOrg1OpNet]),self.UnderScoreListCharArrayParser([IPhostDest2OpNet,IPhostOrg2OpNet]),str(NumSendQubits)])
 			messageCommandAux="SimulateReceiveQubits"
 			messageTypeAux="Control"
 			messageIPorg=IPhostOrg1OpNet
@@ -106,7 +106,7 @@ class QPLA:
 			messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 			self.QSLAagent.SendMessageAgent(messageAuxChar)
 			
-			messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPnodeDestConNet]),self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostOrg1OpNet]),str(NumSendQubits)])
+			messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrg2OpNet]),self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostOrg1OpNet]),str(NumSendQubits)])
 			messageCommandAux="SimulateReceiveQubits"
 			messageTypeAux="Control"
 			messageIPorg=IPhostOrg2OpNet
@@ -124,27 +124,6 @@ class QPLA:
 		self.BiValueIteratorVal=int(np.mod(self.BiValueIteratorVal+1,2))# Alternate who is active sender
 		"""	
 		Very weird, if emitting node tries to set the time barrier, then there is a lot of jitter in the detections??? Maybe it has been corrected because now the TimePoint Barrier is only sent to the specific nodes needing it (instead of braodcasting to all nodes)
-		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrg2OpNet]),str(NumSendQubits)])
-		messageCommandAux="SimulateReceiveQubits"
-		messageTypeAux="Control"
-		messageIPorg=IPhostOrg2OpNet
-		messageIPdest=IPhostDest2OpNet
-		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-		self.QSLAagent.SendMessageAgent(messageAuxChar)		
-		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrg1OpNet]),str(NumSendQubits)])
-		messageCommandAux="SimulateReceiveQubits"
-		messageTypeAux="Control"
-		messageIPorg=IPhostOrg1OpNet
-		messageIPdest=IPhostDest1OpNet
-		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-		self.QSLAagent.SendMessageAgent(messageAuxChar)
-		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostDest2OpNet]),str(NumSendQubits),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
-		messageCommandAux="SimulateSendQubits"
-		messageTypeAux="Control"
-		messageIPorg=IPhostOrgConNet
-		messageIPdest=IPnodeDestConNet
-		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
-		self.QSLAagent.SendMessageAgent(messageAuxChar)
 		"""
 				
 	def SimulateRequestMultipleNodesQubitsHost(self,IPhostDest1OpNet,IPhostOrg1OpNet,IPhostDest2OpNet,IPhostOrg2OpNet,IPnodeDestConNet,IPnodeDest1ConNet,IPnodeDest2ConNet,IPhostOrgConNet,NumSendQubits,SynchPRUoffFreqVal1,SynchPRUoffFreqVal2): # Request other nodes to send to this node qubits
@@ -164,7 +143,7 @@ class QPLA:
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
 		
-		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDest1ConNet,IPhostDest2ConNet]),self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostDest2OpNet]),str(NumSendQubits)])
+		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostOrg1OpNet,IPhostOrg2OpNet]),self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostDest2OpNet]),str(NumSendQubits)])
 		messageCommandAux="SimulateReceiveQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrgConNet
@@ -176,7 +155,7 @@ class QPLA:
 		NumCalcCenterMass=len(SynchFreqPRUarrayTest)
 		for iCenterMass in range(0,NumCalcCenterMass,1):
 			for iNumRunsPerCenterMass in range(0,NumRunsPerCenterMass,1):
-				messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2])])
+				messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2])])
 				messageCommandAux="SimulateReceiveSynchQubits"
 				messageTypeAux="Control"
 				messageIPorg=IPhostOrgConNet
