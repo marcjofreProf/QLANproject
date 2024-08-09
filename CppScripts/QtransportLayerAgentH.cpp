@@ -1682,6 +1682,9 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			// First message
 			strcpy(messagePayloadAux,"Active");
 			strcat(messagePayloadAux,";");
+			strcat(messagePayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);// Ip OPnet of the emitter
+			strcat(messagePayloadAux,"_");
+			strcat(messagePayloadAux,";");				
 			strcat(messagePayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);
 			strcat(messagePayloadAux,"_");
 			strcat(messagePayloadAux,";");
