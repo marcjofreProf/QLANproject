@@ -51,6 +51,8 @@ namespace nsQphysLayerAgent {
 class QPLA {
 private: //Variables/Instances		
 	int numberLinks=0;// Number of full duplex links directly connected to this physical quantum node
+	unsigned long long int RawTimeTaggs[NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections raw
+	unsigned short RawChannelTags[NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs raw
 	unsigned long long int TimeTaggs[NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections
 	unsigned short ChannelTags[NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs
         //int EmitLinkNumberArray[LinkNumberMAX]={60}; // Array indicating the GPIO numbers identifying the emit pins
@@ -111,6 +113,14 @@ private: //Variables/Instances
 	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,0.35,0.70}; // Normalized values of frequency testing
 	double adjFreqSynchNormRatiosArray[NumCalcCenterMass]={1.0,1.0,1.0}; // adjusting Normalized ratios of frequency testing
 	double GPIOHardwareSynched=false; // Variable to monitor the hardware synch status of the GPIO process
+	char CurrentEmitIP[NumBytesBufferICPMAX]={0}; // Current IP (maybe more than one) identifier who will emit qubits
+	int CurrentNumIdentifiedEmitIP=0; // Variable to keep track of the number of identified IPs emitting to this node
+	char LinkIdentificationArray[LinkNumberMAX][IPcharArrayLengthMAX]={0}; // To track details of each specific link
+	bool ApplyProcQubitsSmallTimeOffsetContinuousCorrection=true; // Since we know that (after correcting for relative frequency difference and time offset) the tags should coincide with the initial value of the periodicity where the signals are sent
+	unsigned long long int SmallOffsetDriftPerLink[LinkNumberMAX]={0,0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
+	// Filtering qubits
+	bool ApplyRawQubitFilteringFlag=true;// Variable to select or unselect the filtering of raw qubits
+	long long int FilteringAcceptWindowSize=200; // Equivalent to around 3 times the time jitter
         
 public: // Variables/Instances
 	exploringBB::GPIO PRUGPIO;
@@ -133,8 +143,8 @@ public: // Functions/Methods
         // General Input and Output functions
 	int SimulateEmitQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int numReqQuBitsAux,double* FineSynchAdjValAux);
 	int SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
-	int SimulateReceiveQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int numReqQuBitsAux);
-	int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass);
+	int SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitIPAux,char* IPaddressesAux,int numReqQuBitsAux);
+	int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitIPAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass);
 	int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
 	int GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams);
 	bool GetGPIOHardwareSynchedNode();
@@ -181,6 +191,8 @@ private: // Functions/Methods
 	int HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass); // Calculate the histogram center given a period and a list of timetaggs
 	double DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor);
 	int DoubleBubbleSort(double* arr,int MedianFilterFactor);
+	// QuBits Filtering methods
+	int LinearRegressionQuBitFilter();// Try to filter signal from dark counts (noise) using a linear estimation
 };
 
 

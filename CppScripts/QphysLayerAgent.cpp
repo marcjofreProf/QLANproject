@@ -515,9 +515,35 @@ cout << "End Emiting Qubits" << endl;
  return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int numReqQuBitsAux){
+int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitIPAux, char* IPaddressesAux,int numReqQuBitsAux){
 this->acquire();
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
+strcpy(this->CurrentEmitIP,CurrentEmitIPAux);
+// Store the potential IP identification of the emitters
+int CurrentSpecificLink=-1;//
+int numCurrentEmitIP=countUnderscores(this->CurrentEmitIP); // Which means the number of IP addresses that currently will send qubits
+char CurrentEmitIPAuxAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
+strcpy(CurrentEmitIPAuxAux,CurrentEmitIP);
+char SpecificCurrentEmitIPAuxAux[IPcharArrayLengthMAX]={0};
+for (int j=0;j<numCurrentEmitIP;j++){
+	if (j==0){strcpy(SpecificCurrentEmitIPAuxAux,strtok(CurrentEmitIPAuxAux,"_"));}
+	else{strcpy(SpecificCurrentEmitIPAuxAux,strtok(NULL,"_"));}
+	for (int i=0;i<CurrentNumIdentifiedEmitIP;i++){
+		if (string(LinkIdentificationArray[i])==string(SpecificCurrentEmitIPAuxAux)){// IP already present
+			CurrentSpecificLink=i;
+		}
+	}
+	if (CurrentSpecificLink<0){// Not previously identified, so stored them if possible
+		if ((CurrentNumIdentifiedEmitIP+1)<=LinkNumberMAX){
+			strcpy(LinkIdentificationArray[CurrentNumIdentifiedEmitIP],SpecificCurrentEmitIPAuxAux);// Update value
+			CurrentNumIdentifiedEmitIP++;
+		}
+		else{// Mal function we should not be here
+			cout << "QPLA::Number of identified emitters to this node has exceeded the expected value!!!" << endl;
+		}
+	}
+}
+///
 strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 this->numReqQuBits=numReqQuBitsAux;
 if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
@@ -532,12 +558,37 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass){
+int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitIPAux, char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass){
 this->acquire();
 if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
-	strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
-				
+	strcpy(this->CurrentEmitIP,CurrentEmitIPAux);
+	// Store the potential IP identification of the emitters
+	int CurrentSpecificLink=-1;//
+	int numCurrentEmitIP=countUnderscores(this->CurrentEmitIP); // Which means the number of IP addresses that currently will send qubits
+	char CurrentEmitIPAuxAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
+	strcpy(CurrentEmitIPAuxAux,CurrentEmitIP);
+	char SpecificCurrentEmitIPAuxAux[IPcharArrayLengthMAX]={0};
+	for (int j=0;j<numCurrentEmitIP;j++){
+		if (j==0){strcpy(SpecificCurrentEmitIPAuxAux,strtok(CurrentEmitIPAuxAux,"_"));}
+		else{strcpy(SpecificCurrentEmitIPAuxAux,strtok(NULL,"_"));}
+		for (int i=0;i<CurrentNumIdentifiedEmitIP;i++){
+			if (string(LinkIdentificationArray[i])==string(SpecificCurrentEmitIPAuxAux)){// IP already present
+				CurrentSpecificLink=i;
+			}
+		}
+		if (CurrentSpecificLink<0){// Not previously identified, so stored them if possible
+			if ((CurrentNumIdentifiedEmitIP+1)<=LinkNumberMAX){
+				strcpy(LinkIdentificationArray[CurrentNumIdentifiedEmitIP],SpecificCurrentEmitIPAuxAux);// Update value
+				CurrentNumIdentifiedEmitIP++;
+			}
+			else{// Mal function we should not be here
+				cout << "QPLA::Number of identified emitters to this node has exceeded the expected value!!!" << endl;
+			}
+		}
+	}
+	///
+	strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);				
 	//this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
 	this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
 	this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
@@ -662,7 +713,7 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);
  }
  */
 
-this->SimulateNumStoredQubitsNode[0]=PRUGPIO.RetrieveNumStoredQuBits(TimeTaggs,ChannelTags);//PRUGPIO->RetrieveNumStoredQuBits(TimeTaggs,ChannelTags);
+this->LinearRegressionQuBitFilter();// Retrieve raw detected qubits and channel tags
 this->RunThreadSimulateReceiveQuBitFlag=true;//enable again that this thread can again be called
 this->release();
 cout << "End Receiving Qubits" << endl;
@@ -682,7 +733,7 @@ int QPLA::GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics){
 this->acquire();
 while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
-int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
+int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];// Number of qubits to process
 TimeTaggsDetAnalytics[0]=0.0;
 TimeTaggsDetAnalytics[1]=0.0;
 TimeTaggsDetAnalytics[2]=0.0;
@@ -706,6 +757,33 @@ TimeTaggsDetAnalytics[7]=0.0;
 
 // Check that we now exceed the QuBits buffer size
 if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
+
+// Apply the small offset drift correction
+if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
+	// Identify the specific link
+	int CurrentSpecificLink=-1;// 
+	for (int i=0;i<CurrentNumIdentifiedEmitIP;i++){
+		if (string(LinkIdentificationArray[i])==string(CurrentEmitIP)){// IP already present
+			CurrentSpecificLink=i;
+		}
+	}
+	if (CurrentSpecificLink>-1){// The specific identificaiton IP is present	
+		// First compute the relative new time offset from last iteration
+		long double SmallOffsetDriftAux=0.0;
+		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
+			SmallOffsetDriftAux+=static_cast<long double>(TimeTaggs[i]%HistPeriodicityAux)/static_cast<long double>(HistPeriodicityAux);
+		}
+		// Update new value
+		SmallOffsetDriftPerLink[CurrentSpecificLink]+=SmallOffsetDriftAux;
+		
+		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
+			TimeTaggs[i]=TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);
+		}
+	}
+	else{// Mal function we should not be here
+		cout << "QPLA::The Emitter nodes have not been previously identified, so no small offset drift correciton applied" << endl;
+	}
+}
 
 if (SimulateNumStoredQubitsNodeAux>0){
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
@@ -1019,6 +1097,71 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 }
+
+return 0; // All Ok
+}
+
+int QPLA::LinearRegressionQuBitFilter(){
+//this->acquire(); It is already within an acquire/release
+if (ApplyRawQubitFilteringFlag==true){	
+	int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawTimeTaggs,RawChannelTags); // Get raw values
+	unsigned long long int NormInitialTimeTaggsVal=RawTimeTaggs[0];
+	// Normalize values to work with more plausible values
+	for (int i=0;i<RawNumStoredQubits;i++){
+		RawTimeTaggs[i]=RawTimeTaggs[i]-NormInitialTimeTaggsVal;
+	}
+	// If the SNR is not well above 20 dB or 30dB, this methods perform really bad
+	// Estimate the x values for the linear regression from the y values (RawTimeTaggs)
+	unsigned long long int xEstimateRawTimeTaggs[RawNumStoredQubits]={0}; // Timetaggs of the detections raw
+	for (int i=0;i<RawNumStoredQubits;i++){
+		xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/HistPeriodicityAux)*HistPeriodicityAux;
+	}
+
+	// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
+	long double y_mean = 0.0;
+        for (int i=0; i < RawNumStoredQubits; i++) {
+	    y_mean += static_cast<long double>(RawTimeTaggs[i])/static_cast<long double>(RawNumStoredQubits);
+        }
+	long double x_mean = (static_cast<long double>(RawNumStoredQubits) - 1.0) / 2.0; // Assuming x values start from 0
+	unsigned long long int EstInterceptVal = static_cast<unsigned long long int>(y_mean - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1
+	cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
+		
+	// Re-escale the xEstimated values with the intercept point
+	for (int i=0;i<RawNumStoredQubits;i++){
+		xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i]+EstInterceptVal;
+	}
+		
+	int FilteredNumStoredQubits=0;
+	// Filter out detections not falling within the defined detection window and calculated signal positions
+	
+	for (int i=0;i<RawNumStoredQubits;i++){
+		if (abs(static_cast<long long int>(RawTimeTaggs[i])-static_cast<long long int>(xEstimateRawTimeTaggs[i]))<FilteringAcceptWindowSize){// Within acceptance window
+			TimeTaggs[FilteredNumStoredQubits]=RawTimeTaggs[i];
+			ChannelTags[FilteredNumStoredQubits]=RawChannelTags[i];
+			FilteredNumStoredQubits++;
+		}
+	}
+	
+	// Compute quality of estimation, related to the SNR
+	double EstimatedSNRqubitsRatio=static_cast<double>(FilteredNumStoredQubits)/static_cast<double>(RawNumStoredQubits);// in dB
+	
+
+	if (EstimatedSNRqubitsRatio>0.01){ // 0.01 equivalent to 20 dB// Bad SNR
+		cout << "QPLA::LinearRegressionQuBitFilter does not have enough SNR (>20 dB) to perform good when filtering raw qubits!!!" << endl;
+	}
+	
+	// Un-normalize values to have absolute values
+	for (int i=0;i<RawNumStoredQubits;i++){
+		TimeTaggs[i]=TimeTaggs[i]+NormInitialTimeTaggsVal;
+	}
+	
+	// Update final values
+	this->SimulateNumStoredQubitsNode[0]=FilteredNumStoredQubits; // Update value
+}
+else{ // Do not apply filtering
+	this->SimulateNumStoredQubitsNode[0]=PRUGPIO.RetrieveNumStoredQuBits(TimeTaggs,ChannelTags); // Get raw values
+}
+//this->release(); It is already within an acquire/release
 
 return 0; // All Ok
 }
