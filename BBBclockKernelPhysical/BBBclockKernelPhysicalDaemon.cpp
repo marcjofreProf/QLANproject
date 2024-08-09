@@ -227,6 +227,10 @@ this->duration_FinalInitialDriftAuxArrayAvg = this->RatioAverageFactorClockQuart
 }
 }
 
+if (this->duration_FinalInitialDriftAuxArrayAvg>5000){
+	cout << "Time for pre processing the time barrier is too long " << this->duration_FinalInitialDriftAuxArrayAvg << " ...adjust TimeClockMarging!" << endl;
+}
+
 this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 
 // Compute error
