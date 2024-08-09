@@ -73,7 +73,7 @@ class QPLA:
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
 		
 		# For SimulateSendQubits, the messagePayload consist of indicating (separated by;) whether the node will be "Active" or "Passive" on sending the TimePoint Barrier (typically a Send node will be "Passive"), a list of IPs (separated by "_") to send the TimePoint Barrier if this receiving node was to be "active" and a NumRequestedQubits, an added offset value when sending qubits (typically 0.0) and an added relative frequency difference when sending qubits (typically 0.0)
-				messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),str(NumRequestedQubits),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
+		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),str(NumRequestedQubits),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
 		messageCommandAux="SimulateSendQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrgOpNet

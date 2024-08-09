@@ -723,7 +723,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 			cout << "Host " << this->IPaddressesSockets[2] << " synching node " << this->IPaddressesSockets[0] << " to the network!" << endl;
 			if (FastInitialFakeSkipNetworkSynchFlag==true){ // Fake the initial synchronization step
 				numHolderOtherNodesSynchNetwork=NumConnectedHosts+1;
-				cout << "Host " << this->IPaddressesSockets[2] << " skipping network synchronziation!!! to be deactivated..." << endl;
+				cout << "Host " << this->IPaddressesSockets[2] << " skipping network synchronization!!! to be deactivated..." << endl;
 			}
 			else{
 				this->PeriodicRequestSynchsHost();

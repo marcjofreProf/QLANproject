@@ -543,6 +543,8 @@ for (int j=0;j<numCurrentEmitIP;j++){
 		}
 	}
 }
+cout << "LinkIdentificationArray[0]: " << LinkIdentificationArray[0] << endl;
+cout << "LinkIdentificationArray[1]: " << LinkIdentificationArray[1] << endl;
 ///
 strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 this->numReqQuBits=numReqQuBitsAux;
@@ -760,14 +762,29 @@ if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubit
 
 // Apply the small offset drift correction
 if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
-	// Identify the specific link
-	int CurrentSpecificLink=-1;// 
-	for (int i=0;i<CurrentNumIdentifiedEmitIP;i++){
-		if (string(LinkIdentificationArray[i])==string(CurrentEmitIP)){// IP already present
-			CurrentSpecificLink=i;
+	// Identify the specific link - For the time being only implemented for one-to-one link (otherwise it has to be develop...)
+	int CurrentSpecificLink=-1;//
+	int numIPmatchesAux=0;
+	int numCurrentEmitIP=countUnderscores(this->CurrentEmitIP); // Which means the number of IP addresses that currently will send qubits
+	char CurrentEmitIPAuxAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
+	strcpy(CurrentEmitIPAuxAux,CurrentEmitIP);
+	char SpecificCurrentEmitIPAuxAux[IPcharArrayLengthMAX]={0};
+	for (int j=0;j<numCurrentEmitIP;j++){
+		if (j==0){strcpy(SpecificCurrentEmitIPAuxAux,strtok(CurrentEmitIPAuxAux,"_"));}
+		else{strcpy(SpecificCurrentEmitIPAuxAux,strtok(NULL,"_"));}
+		for (int i=0;i<CurrentNumIdentifiedEmitIP;i++){
+			if (string(LinkIdentificationArray[i])==string(SpecificCurrentEmitIPAuxAux)){// IP already present
+				CurrentSpecificLink=i;
+				numIPmatchesAux++;
+			}
 		}
 	}
-	if (CurrentSpecificLink>-1){// The specific identificaiton IP is present	
+	
+	if (numIPmatchesAux>1){// For the time being only implemented for one-to-one link (otherwise it has to be develop...)
+		cout << "QPLA::Multiple emitter nodes identified, so develop to correct small offset drift for each specific link...to be develop!!!" << endl;
+	}
+	
+	if (CurrentSpecificLink>-1){// The specific identification IP is present	
 		// First compute the relative new time offset from last iteration
 		long double SmallOffsetDriftAux=0.0;
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
