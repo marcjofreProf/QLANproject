@@ -1177,6 +1177,7 @@ if (ApplyRawQubitFilteringFlag==true){
 }
 else{ // Do not apply filtering
 	this->SimulateNumStoredQubitsNode[0]=PRUGPIO.RetrieveNumStoredQuBits(TimeTaggs,ChannelTags); // Get raw values
+	cout << "QPLA::Not applying ApplyRawQubitFilteringFlag...to be activated" << endl;
 }
 //this->release(); It is already within an acquire/release
 

@@ -119,7 +119,7 @@ private: //Variables/Instances
 	bool ApplyProcQubitsSmallTimeOffsetContinuousCorrection=true; // Since we know that (after correcting for relative frequency difference and time offset) the tags should coincide with the initial value of the periodicity where the signals are sent
 	unsigned long long int SmallOffsetDriftPerLink[LinkNumberMAX]={0,0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
 	// Filtering qubits
-	bool ApplyRawQubitFilteringFlag=true;// Variable to select or unselect the filtering of raw qubits
+	bool ApplyRawQubitFilteringFlag=false;// Variable to select or unselect the filtering of raw qubits
 	long long int FilteringAcceptWindowSize=200; // Equivalent to around 3 times the time jitter
         
 public: // Variables/Instances
