@@ -543,8 +543,8 @@ for (int j=0;j<numCurrentEmitIP;j++){
 		}
 	}
 }
-cout << "LinkIdentificationArray[0]: " << LinkIdentificationArray[0] << endl;
-cout << "LinkIdentificationArray[1]: " << LinkIdentificationArray[1] << endl;
+//cout << "LinkIdentificationArray[0]: " << LinkIdentificationArray[0] << endl;
+//cout << "LinkIdentificationArray[1]: " << LinkIdentificationArray[1] << endl;
 ///
 strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 this->numReqQuBits=numReqQuBitsAux;
@@ -792,14 +792,19 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		}
 		// Update new value
 		SmallOffsetDriftPerLink[CurrentSpecificLink]+=SmallOffsetDriftAux;
+		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
 		
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 			TimeTaggs[i]=TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);
 		}
 	}
 	else{// Mal function we should not be here
-		cout << "QPLA::The Emitter nodes have not been previously identified, so no small offset drift correciton applied" << endl;
+		cout << "QPLA::The Emitter nodes have not been previously identified, so no small offset drift correction applied" << endl;
 	}
+}
+else
+{
+	cout << "QPLA::Not applying ApplyProcQubitsSmallTimeOffsetContinuousCorrection small drift offset correction...to be activated..." << endl;
 }
 
 if (SimulateNumStoredQubitsNodeAux>0){
@@ -1136,10 +1141,11 @@ if (ApplyRawQubitFilteringFlag==true){
 
 	// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
 	long double y_mean = 0.0;
+	long double x_mean = 0.0;
         for (int i=0; i < RawNumStoredQubits; i++) {
 	    y_mean += static_cast<long double>(RawTimeTaggs[i])/static_cast<long double>(RawNumStoredQubits);
+	    x_mean += static_cast<long double>(xEstimateRawTimeTaggs[i])/static_cast<long double>(RawNumStoredQubits);
         }
-	long double x_mean = (static_cast<long double>(RawNumStoredQubits) - 1.0) / 2.0; // Assuming x values start from 0
 	unsigned long long int EstInterceptVal = static_cast<unsigned long long int>(y_mean - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1
 	cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
 		
