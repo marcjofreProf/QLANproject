@@ -784,11 +784,19 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		cout << "QPLA::Multiple emitter nodes identified, so develop to correct small offset drift for each specific link...to be develop!!!" << endl;
 	}
 	
-	if (CurrentSpecificLink>-1){// The specific identification IP is present	
+	if (CurrentSpecificLink>-1){// The specific identification IP is present
+		// If it is the first time, annotate the reltive time offset with respect HostPeriodicityAux
+		if (NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]==false){
+			ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=0;// Reset value
+			SmallOffsetDriftPerLink[CurrentSpecificLink]=0.0;
+			for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
+				ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]+=static_cast<double>(TimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
+			}
+		}	
 		// First compute the relative new time offset from last iteration
-		long double SmallOffsetDriftAux=0.0;
+		double SmallOffsetDriftAux=0.0;
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-			SmallOffsetDriftAux+=static_cast<long double>(TimeTaggs[i]%HistPeriodicityAux)/static_cast<long double>(HistPeriodicityAux);
+			SmallOffsetDriftAux+=static_cast<double>((TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]))%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
 		}
 		// Update new value
 		SmallOffsetDriftPerLink[CurrentSpecificLink]+=SmallOffsetDriftAux;
