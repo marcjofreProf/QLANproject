@@ -1166,20 +1166,27 @@ if (ApplyRawQubitFilteringFlag==true){
 	// If the SNR is not well above 20 dB or 30dB, this methods perform really bad
 	// Estimate the x values for the linear regression from the y values (RawTimeTaggs)
 	unsigned long long int xEstimateRawTimeTaggs[RawNumStoredQubits]={0}; // Timetaggs of the detections raw
-	unsigned long long int RoundingAux;
+	long long int RoundingAux;
 	for (int i=0;i<RawNumStoredQubits;i++){
-		if (i==0){
-			RoundingAux=RawTimeTaggs[i]%(HistPeriodicityAux-1);
-			if (RoundingAux>=((HistPeriodicityAux-1)/2)){RoundingAux=1;}
+		/*if (i==0){
+			RoundingAux=(HistPeriodicityAux/2+RawTimeTaggs[i])%HistPeriodicityAux-HistPeriodicityAux/2;
+			if (RoundingAux>=(HistPeriodicityAux/4)){RoundingAux=1;}
+			else if (RoundingAux<=(-HistPeriodicityAux/4)){RoundingAux=-1;}
 			else{RoundingAux=0;}
-			xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/(HistPeriodicityAux-1)+RoundingAux)*(HistPeriodicityAux-1);
+			xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/HistPeriodicityAux+RoundingAux)*HistPeriodicityAux;
 		}
 		else{
-			RoundingAux=(RawTimeTaggs[i]-RawTimeTaggs[i-1])%(HistPeriodicityAux-1);
-			if (RoundingAux>=((HistPeriodicityAux-1)/2)){RoundingAux=1;}
+			RoundingAux=(HistPeriodicityAux/2+RawTimeTaggs[i]-RawTimeTaggs[i-1])%HistPeriodicityAux-HistPeriodicityAux/2;
+			if (RoundingAux>=(HistPeriodicityAux/4)){RoundingAux=1;}
+			else if (RoundingAux<=(-HistPeriodicityAux/4)){RoundingAux=-1;}
 			else{RoundingAux=0;}
-			xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i-1]+((RawTimeTaggs[i]-RawTimeTaggs[i-1])/(HistPeriodicityAux-1)+RoundingAux)*(HistPeriodicityAux-1);
-		}		
+			xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i-1]+((RawTimeTaggs[i]-RawTimeTaggs[i-1])/HistPeriodicityAux+RoundingAux)*HistPeriodicityAux;
+		}*/
+		RoundingAux=(HistPeriodicityAux/2+RawTimeTaggs[i])%HistPeriodicityAux-HistPeriodicityAux/2;
+		if (RoundingAux>=(HistPeriodicityAux/4)){RoundingAux=1;}
+		else if (RoundingAux<=(-HistPeriodicityAux/4)){RoundingAux=-1;}
+		else{RoundingAux=0;}
+		xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/HistPeriodicityAux+RoundingAux)*HistPeriodicityAux;		
 	}
 
 	// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
