@@ -788,7 +788,7 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		// If it is the first time, annotate the relative time offset with respect HostPeriodicityAux
 		if (NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]==false){
 			ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=0.0;// Reset value
-			SmallOffsetDriftPerLink[CurrentSpecificLink]=0.0;
+			SmallOffsetDriftPerLink[CurrentSpecificLink]=0.0;// Reset value
 			for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 				ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>(TimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
 			}
@@ -801,7 +801,7 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		}
 		// Update new value
 		SmallOffsetDriftPerLink[CurrentSpecificLink]+=SmallOffsetDriftAux;
-		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
+		cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLink] " << SmallOffsetDriftPerLink[CurrentSpecificLink] << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
 		
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 			TimeTaggs[i]=TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);
@@ -1155,6 +1155,8 @@ if (ApplyRawQubitFilteringFlag==true){
 	    y_mean += static_cast<long double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<long double>(RawNumStoredQubits);
 	    x_mean += static_cast<long double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux)/static_cast<long double>(RawNumStoredQubits);
         }
+        cout << "QPLA::y_mean: " << y_mean << endl;
+        cout << "QPLA::x_mean: " << x_mean << endl;
 	unsigned long long int EstInterceptVal = static_cast<unsigned long long int>(y_mean - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1
 	cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
 		
