@@ -789,15 +789,29 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		if (NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]==false){
 			ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=0.0;// Reset value
 			SmallOffsetDriftPerLink[CurrentSpecificLink]=0.0;// Reset value
+			//double ReferencePointSmallOffsetDriftPerLinkArrayAux[SimulateNumStoredQubitsNodeAux]={0.0};
 			//for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-			//	ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>(TimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
+			//// Mean average, not very resilence with glitches (Eventhough filtered in Liner Regression)
+			////	ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>(TimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
+			// Median averaging
+			//ReferencePointSmallOffsetDriftPerLinkArrayAux[i]=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
 			//}
+			//ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=DoubleMedianFilterSubArray(ReferencePointSmallOffsetDriftPerLinkArrayAux,SimulateNumStoredQubitsNodeAux);// Median averaging
 			NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=true;// Update value, so that it is not run again
 		}	
 		// First compute the relative new time offset from last iteration
 		double SmallOffsetDriftAux=0.0;
+		double SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0.0};
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-			SmallOffsetDriftAux+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>((TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]))%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
+			// Mean averaging, not very resilent with glitches, eventhough filtered in liner regression
+			//SmallOffsetDriftAux+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>((TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]))%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
+			// Median averaging
+			SmallOffsetDriftArrayAux[i]=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
+		}
+		SmallOffsetDriftAux=DoubleMedianFilterSubArray(SmallOffsetDriftArrayAux,SimulateNumStoredQubitsNodeAux); // Median averaging
+		
+		if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/4.0)){// Large step
+			cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << ". Potentially lost track of timetaggs from previous runs!!!" << endl;
 		}
 		// Update new value
 		SmallOffsetDriftPerLink[CurrentSpecificLink]+=SmallOffsetDriftAux;
@@ -816,6 +830,7 @@ else
 	cout << "QPLA::Not applying ApplyProcQubitsSmallTimeOffsetContinuousCorrection small drift offset correction...to be activated..." << endl;
 }
 
+// Generally mean averaging can be used since outliers (either noise or glitches) have been removed in LinearRegressionQuBitFilter
 if (SimulateNumStoredQubitsNodeAux>0){
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 //cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
@@ -1080,15 +1095,22 @@ while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSi
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 
-// Check that we now exceed the QuBits buffer size
+// Check that we not exceed the QuBits buffer size
 if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
 
 if (SimulateNumStoredQubitsNodeAux>0){
-SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=TimeTaggs[0];
+// Single value
+SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=TimeTaggs[0]; // Considering only the first timetagg. Might not be very resilence with noise
+
+// Mean averaging
 //for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
 //CenterMassVal=CenterMassVal+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
 //}
-
+// Median averaging
+for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
+	SynchFirstTagsArrayAux[i]=TimeTaggs[i]%static_cast<unsigned long long int>(HistPeriodicityAux);
+}
+SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=ULLIMedianFilterSubArray(SynchFirstTagsArrayAux,SimulateNumStoredQubitsNodeAux);
 }
 
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
@@ -1149,12 +1171,19 @@ if (ApplyRawQubitFilteringFlag==true){
 	}
 
 	// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
-	long double y_mean = 0.0;
-	long double x_mean = 0.0;
+	double y_mean = 0.0;
+	double x_mean = 0.0;
+	double y_meanArray[RawNumStoredQubits]={0.0};
+	double x_meanArray[RawNumStoredQubits]={0.0};
         for (int i=0; i < RawNumStoredQubits; i++) {
-	    y_mean += static_cast<long double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<long double>(RawNumStoredQubits);
-	    x_mean += static_cast<long double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux)/static_cast<long double>(RawNumStoredQubits);
+            y_meanArray[i]=static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux);
+            x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
+            // We cannot use mean averaging since there might be outliers
+	    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
+	    //x_mean += static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
         }
+        y_mean=DoubleMedianFilterSubArray(y_meanArray,RawNumStoredQubits); // Median average
+        x_mean=DoubleMedianFilterSubArray(x_meanArray,RawNumStoredQubits); // Median average. Not really needed x_mean
         cout << "QPLA::y_mean: " << y_mean << endl;
         cout << "QPLA::x_mean: " << x_mean << endl;
 	unsigned long long int EstInterceptVal = static_cast<unsigned long long int>(y_mean - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1
@@ -1287,6 +1316,40 @@ else{
 // Function to implement Bubble Sort
 int QPLA::DoubleBubbleSort(double* arr,int MedianFilterFactor) {
     double temp=0.0;
+    for (int i = 0; i < MedianFilterFactor-1; i++) {
+        for (int j = 0; j < MedianFilterFactor-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                // Swap arr[j] and arr[j+1]
+                temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+    return 0; // All ok
+}
+
+unsigned long long int QPLA::ULLIMedianFilterSubArray(unsigned long long int* ArrayHolderAux,int MedianFilterFactor){
+if (MedianFilterFactor<=1){
+	return ArrayHolderAux[0];
+}
+else{
+	// Step 1: Copy the array to a temporary array
+    unsigned long long int temp[MedianFilterFactor]={0};
+    for(int i = 0; i < MedianFilterFactor; i++) {
+        temp[i] = ArrayHolderAux[i];
+    }
+    
+    // Step 2: Sort the temporary array
+    this->ULLIBubbleSort(temp,MedianFilterFactor);
+    // If odd, middle number
+    return temp[MedianFilterFactor/2];
+}
+}
+
+// Function to implement Bubble Sort
+int QPLA::ULLIBubbleSort(unsigned long long int* arr,int MedianFilterFactor) {
+    unsigned long long int temp=0;
     for (int i = 0; i < MedianFilterFactor-1; i++) {
         for (int j = 0; j < MedianFilterFactor-i-1; j++) {
             if (arr[j] > arr[j+1]) {

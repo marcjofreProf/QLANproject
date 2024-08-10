@@ -106,6 +106,7 @@ private: //Variables/Instances
 	int numReqQuBits=0;
 	double FineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
 	// Automatic calculation of synchronization
+	unsigned long long int SynchFirstTagsArrayAux[NumQubitsMemoryBuffer]={0}; // Holder to perform median computing
 	unsigned long long int SynchFirstTagsArray[NumCalcCenterMass][NumRunsPerCenterMass]; // To store the first tags (averaged if needed for all the tags in the run
 	double SynchHistCenterMassArray[NumCalcCenterMass]={0.0,0.0,0.0}; // Array containing the needed center of mass for the histograms of the synchronization
 	double SynchCalcValuesArray[NumCalcCenterMass]={0.0,0.0,0.0}; // Computed values for achieving synchronization protocol
@@ -122,7 +123,7 @@ private: //Variables/Instances
 	// Filtering qubits
 	bool NonInitialReferencePointSmallOffsetDriftPerLink[LinkNumberMAX]={false,false}; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
 	// Filtering qubits
-	bool ApplyRawQubitFilteringFlag=true;// Variable to select or unselect the filtering of raw qubits
+	bool ApplyRawQubitFilteringFlag=false;// Variable to select or unselect the filtering of raw qubits
 	long long int FilteringAcceptWindowSize=500; // Equivalent to around 3 times the time jitter
         
 public: // Variables/Instances
@@ -194,6 +195,8 @@ private: // Functions/Methods
 	int HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass); // Calculate the histogram center given a period and a list of timetaggs
 	double DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor);
 	int DoubleBubbleSort(double* arr,int MedianFilterFactor);
+	unsigned long long int ULLIMedianFilterSubArray(unsigned long long int* ArrayHolderAux,int MedianFilterFactor);
+	int ULLIBubbleSort(unsigned long long int* arr,int MedianFilterFactor);
 	// QuBits Filtering methods
 	int LinearRegressionQuBitFilter();// Try to filter signal from dark counts (noise) using a linear estimation
 };
