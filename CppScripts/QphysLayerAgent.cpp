@@ -792,6 +792,7 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 			for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 				ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>(TimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
 			}
+			NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=true;// Update value, so that it is not run again
 		}	
 		// First compute the relative new time offset from last iteration
 		double SmallOffsetDriftAux=0.0;
