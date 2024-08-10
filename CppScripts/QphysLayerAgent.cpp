@@ -1186,7 +1186,7 @@ if (ApplyRawQubitFilteringFlag==true){
 		if (RoundingAux>=(HistPeriodicityAux/4)){RoundingAux=1;}
 		else if (RoundingAux<=(-HistPeriodicityAux/4)){RoundingAux=-1;}
 		else{RoundingAux=0;}
-		xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/HistPeriodicityAux+RoundingAux)*HistPeriodicityAux;		
+		xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/(HistPeriodicityAux-1)+RoundingAux)*(HistPeriodicityAux-1);		
 	}
 
 	// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
