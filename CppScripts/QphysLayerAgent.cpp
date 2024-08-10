@@ -811,7 +811,7 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		SmallOffsetDriftAux=DoubleMedianFilterSubArray(SmallOffsetDriftArrayAux,SimulateNumStoredQubitsNodeAux); // Median averaging
 		
 		if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/4.0)){// Large step
-			cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << ". Potentially lost track of timetaggs from previous runs!!!" << endl;
+			cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
 		}
 		// Update new value
 		SmallOffsetDriftPerLink[CurrentSpecificLink]+=SmallOffsetDriftAux;
@@ -1179,14 +1179,14 @@ if (ApplyRawQubitFilteringFlag==true){
 	double x_mean = 0.0;
 	double y_meanArray[RawNumStoredQubits]={0.0};
 	//double x_meanArray[RawNumStoredQubits]={0.0};
-        for (int i=0; i < RawNumStoredQubits; i++) {
-            y_meanArray[i]=static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux);
+        for (int i=0; i < (RawNumStoredQubits-1); i++) {
+            y_meanArray[i]=static_cast<double>((RawTimeTaggs[i+1]-RawTimeTaggs[i])%HistPeriodicityAux);
             //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
             // We cannot use mean averaging since there might be outliers
 	    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
 	    //x_mean += static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
         }
-        y_mean=DoubleMedianFilterSubArray(y_meanArray,RawNumStoredQubits); // Median average
+        y_mean=DoubleMedianFilterSubArray(y_meanArray,(RawNumStoredQubits-1)); // Median average
         //x_mean=DoubleMedianFilterSubArray(x_meanArray,RawNumStoredQubits); // Median average. Not really needed x_mean
         cout << "QPLA::y_mean: " << y_mean << endl;
         //cout << "QPLA::x_mean: " << x_mean << endl;
@@ -1214,6 +1214,13 @@ if (ApplyRawQubitFilteringFlag==true){
 
 	if (EstimatedSNRqubitsRatio>0.1){ // 0.1 equivalent to 10 dB// < Bad SNR
 		cout << "QPLA::LinearRegressionQuBitFilter EstimatedSNRqubitsRatio " << EstimatedSNRqubitsRatio << " does not have enough SNR (>10 dB) to perform good when filtering raw qubits!!!" << endl;
+		cout << "QPLA::Not filtering outlier qubits!!!" << endl;
+		FilteredNumStoredQubits=0;// Reset value
+		for (int i=0;i<RawNumStoredQubits;i++){
+			TimeTaggs[FilteredNumStoredQubits]=RawTimeTaggs[i];
+			ChannelTags[FilteredNumStoredQubits]=RawChannelTags[i];
+			FilteredNumStoredQubits++;
+		}
 	}
 	
 	// Un-normalize values to have absolute values
