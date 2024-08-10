@@ -789,9 +789,9 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		if (NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]==false){
 			ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=0.0;// Reset value
 			SmallOffsetDriftPerLink[CurrentSpecificLink]=0.0;// Reset value
-			for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-				ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>(TimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
-			}
+			//for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
+			//	ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>(TimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
+			//}
 			NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=true;// Update value, so that it is not run again
 		}	
 		// First compute the relative new time offset from last iteration
@@ -1177,15 +1177,14 @@ if (ApplyRawQubitFilteringFlag==true){
 	}
 	
 	// Compute quality of estimation, related to the SNR
-	double EstimatedSNRqubitsRatio=static_cast<double>(FilteredNumStoredQubits)/static_cast<double>(RawNumStoredQubits);// in dB
-	
+	double EstimatedSNRqubitsRatio=static_cast<double>(FilteredNumStoredQubits)/static_cast<double>(RawNumStoredQubits);// in linear	
 
-	if (EstimatedSNRqubitsRatio>0.01){ // 0.01 equivalent to 20 dB// Bad SNR
-		cout << "QPLA::LinearRegressionQuBitFilter does not have enough SNR (>20 dB) to perform good when filtering raw qubits!!!" << endl;
+	if (EstimatedSNRqubitsRatio>0.01){ // 0.01 equivalent to 20 dB// < Bad SNR
+		cout << "QPLA::LinearRegressionQuBitFilter EstimatedSNRqubitsRatio " << EstimatedSNRqubitsRatio << " does not have enough SNR (>20 dB) to perform good when filtering raw qubits!!!" << endl;
 	}
 	
 	// Un-normalize values to have absolute values
-	for (int i=0;i<RawNumStoredQubits;i++){
+	for (int i=0;i<FilteredNumStoredQubits;i++){
 		TimeTaggs[i]=TimeTaggs[i]+NormInitialTimeTaggsVal;
 	}
 	
