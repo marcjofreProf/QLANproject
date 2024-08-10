@@ -1166,12 +1166,19 @@ if (ApplyRawQubitFilteringFlag==true){
 	// If the SNR is not well above 20 dB or 30dB, this methods perform really bad
 	// Estimate the x values for the linear regression from the y values (RawTimeTaggs)
 	unsigned long long int xEstimateRawTimeTaggs[RawNumStoredQubits]={0}; // Timetaggs of the detections raw
+	unsigned long long int RoundingAux;
 	for (int i=0;i<RawNumStoredQubits;i++){
 		if (i==0){
-			xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/HistPeriodicityAux)*HistPeriodicityAux;
+			RoundingAux=RawTimeTaggs[i]%(HistPeriodicityAux-1);
+			if (RoundingAux>=((HistPeriodicityAux-1)/2)){RoundingAux=1;}
+			else{RoundingAux=0;}
+			xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/(HistPeriodicityAux-1)+RoundingAux)*(HistPeriodicityAux-1);
 		}
 		else{
-			xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i-1]+((RawTimeTaggs[i]-RawTimeTaggs[i-1])/HistPeriodicityAux)*HistPeriodicityAux;
+			RoundingAux=(RawTimeTaggs[i]-RawTimeTaggs[i-1])%(HistPeriodicityAux-1);
+			if (RoundingAux>=((HistPeriodicityAux-1)/2)){RoundingAux=1;}
+			else{RoundingAux=0;}
+			xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i-1]+((RawTimeTaggs[i]-RawTimeTaggs[i-1])/(HistPeriodicityAux-1)+RoundingAux)*(HistPeriodicityAux-1);
 		}		
 	}
 
