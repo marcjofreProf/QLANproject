@@ -785,18 +785,18 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 	}
 	
 	if (CurrentSpecificLink>-1){// The specific identification IP is present
-		// If it is the first time, annotate the reltive time offset with respect HostPeriodicityAux
+		// If it is the first time, annotate the relative time offset with respect HostPeriodicityAux
 		if (NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]==false){
-			ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=0;// Reset value
+			ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=0.0;// Reset value
 			SmallOffsetDriftPerLink[CurrentSpecificLink]=0.0;
 			for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-				ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]+=static_cast<double>(TimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
+				ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>(TimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
 			}
 		}	
 		// First compute the relative new time offset from last iteration
 		double SmallOffsetDriftAux=0.0;
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-			SmallOffsetDriftAux+=static_cast<double>((TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]))%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
+			SmallOffsetDriftAux+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>((TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]))%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
 		}
 		// Update new value
 		SmallOffsetDriftPerLink[CurrentSpecificLink]+=SmallOffsetDriftAux;
@@ -1151,8 +1151,8 @@ if (ApplyRawQubitFilteringFlag==true){
 	long double y_mean = 0.0;
 	long double x_mean = 0.0;
         for (int i=0; i < RawNumStoredQubits; i++) {
-	    y_mean += static_cast<long double>(RawTimeTaggs[i])/static_cast<long double>(RawNumStoredQubits);
-	    x_mean += static_cast<long double>(xEstimateRawTimeTaggs[i])/static_cast<long double>(RawNumStoredQubits);
+	    y_mean += static_cast<long double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<long double>(RawNumStoredQubits);
+	    x_mean += static_cast<long double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux)/static_cast<long double>(RawNumStoredQubits);
         }
 	unsigned long long int EstInterceptVal = static_cast<unsigned long long int>(y_mean - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1
 	cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
