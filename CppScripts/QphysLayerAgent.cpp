@@ -1160,9 +1160,9 @@ if (ApplyRawQubitFilteringFlag==true){
 	int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawTimeTaggs,RawChannelTags); // Get raw values
 	unsigned long long int NormInitialTimeTaggsVal=RawTimeTaggs[0];
 	// Normalize values to work with more plausible values
-	for (int i=0;i<RawNumStoredQubits;i++){
-		RawTimeTaggs[i]=RawTimeTaggs[i]-NormInitialTimeTaggsVal;
-	}
+	//for (int i=0;i<RawNumStoredQubits;i++){
+	//	RawTimeTaggs[i]=RawTimeTaggs[i]-NormInitialTimeTaggsVal;
+	//}
 	// If the SNR is not well above 20 dB or 30dB, this methods perform really bad
 	// Estimate the x values for the linear regression from the y values (RawTimeTaggs)
 	unsigned long long int xEstimateRawTimeTaggs[RawNumStoredQubits]={0}; // Timetaggs of the detections raw
@@ -1239,9 +1239,9 @@ if (ApplyRawQubitFilteringFlag==true){
 	}
 	
 	// Un-normalize values to have absolute values
-	for (int i=0;i<FilteredNumStoredQubits;i++){
-		TimeTaggs[i]=TimeTaggs[i]+NormInitialTimeTaggsVal;
-	}
+	//for (int i=0;i<FilteredNumStoredQubits;i++){
+	//	TimeTaggs[i]=TimeTaggs[i]+NormInitialTimeTaggsVal;
+	//}
 	
 	// Update final values
 	this->SimulateNumStoredQubitsNode[0]=FilteredNumStoredQubits; // Update value
