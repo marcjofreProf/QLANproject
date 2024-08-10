@@ -1168,10 +1168,18 @@ if (ApplyRawQubitFilteringFlag==true){
 	unsigned long long int xEstimateRawTimeTaggs[RawNumStoredQubits]={0}; // Timetaggs of the detections raw
 	unsigned long long int RoundingAux;
 	for (int i=0;i<RawNumStoredQubits;i++){
-		RoundingAux=RawTimeTaggs[i]%HistPeriodicityAux;
-		if (RoundingAux>=(HistPeriodicityAux/2)){RoundingAux=1;}
-		else{RoundingAux=0;}
-		xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/HistPeriodicityAux+RoundingAux)*HistPeriodicityAux;
+		if (i==0){
+			RoundingAux=RawTimeTaggs[i]%HistPeriodicityAux;
+			if (RoundingAux>=(HistPeriodicityAux/2)){RoundingAux=1;}
+			else{RoundingAux=0;}
+			xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/HistPeriodicityAux+RoundingAux)*HistPeriodicityAux;
+		}
+		else{
+			RoundingAux=(RawTimeTaggs[i]-RawTimeTaggs[i-1])%HistPeriodicityAux;
+			if (RoundingAux>=(HistPeriodicityAux/2)){RoundingAux=1;}
+			else{RoundingAux=0;}
+			xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i-1]+((RawTimeTaggs[i]-RawTimeTaggs[i-1])/HistPeriodicityAux+RoundingAux)*HistPeriodicityAux;
+		}		
 	}
 
 	// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
