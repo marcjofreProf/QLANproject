@@ -1180,7 +1180,7 @@ if (ApplyRawQubitFilteringFlag==true){
 	double y_meanArray[RawNumStoredQubits]={0.0};
 	//double x_meanArray[RawNumStoredQubits]={0.0};
         for (int i=0; i < (RawNumStoredQubits-1); i++) {
-            y_meanArray[i]=static_cast<double>((RawTimeTaggs[i+1]-RawTimeTaggs[i])%HistPeriodicityAux);
+            y_meanArray[i]=static_cast<double>((HistPeriodicityAux/2+RawTimeTaggs[i+1]-RawTimeTaggs[i])%HistPeriodicityAux)-HistPeriodicityAux/2.0;
             //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
             // We cannot use mean averaging since there might be outliers
 	    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
