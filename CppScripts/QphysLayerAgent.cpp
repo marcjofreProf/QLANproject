@@ -1160,9 +1160,9 @@ if (ApplyRawQubitFilteringFlag==true){
 	int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawTimeTaggs,RawChannelTags); // Get raw values
 	unsigned long long int NormInitialTimeTaggsVal=RawTimeTaggs[0];
 	// Normalize values to work with more plausible values
-	for (int i=0;i<RawNumStoredQubits;i++){
-		RawTimeTaggs[i]=RawTimeTaggs[i]-NormInitialTimeTaggsVal;
-	}
+	//for (int i=0;i<RawNumStoredQubits;i++){
+	//	RawTimeTaggs[i]=RawTimeTaggs[i]-NormInitialTimeTaggsVal;
+	//}
 	// If the SNR is not well above 20 dB or 30dB, this methods perform really bad
 	// Estimate the x values for the linear regression from the y values (RawTimeTaggs)
 	unsigned long long int xEstimateRawTimeTaggs[RawNumStoredQubits]={0}; // Timetaggs of the detections raw
@@ -1174,18 +1174,18 @@ if (ApplyRawQubitFilteringFlag==true){
 	double y_mean = 0.0;
 	double x_mean = 0.0;
 	double y_meanArray[RawNumStoredQubits]={0.0};
-	double x_meanArray[RawNumStoredQubits]={0.0};
+	//double x_meanArray[RawNumStoredQubits]={0.0};
         for (int i=0; i < RawNumStoredQubits; i++) {
             y_meanArray[i]=static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux);
-            x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
+            //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
             // We cannot use mean averaging since there might be outliers
 	    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
 	    //x_mean += static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
         }
         y_mean=DoubleMedianFilterSubArray(y_meanArray,RawNumStoredQubits); // Median average
-        x_mean=DoubleMedianFilterSubArray(x_meanArray,RawNumStoredQubits); // Median average. Not really needed x_mean
+        //x_mean=DoubleMedianFilterSubArray(x_meanArray,RawNumStoredQubits); // Median average. Not really needed x_mean
         cout << "QPLA::y_mean: " << y_mean << endl;
-        cout << "QPLA::x_mean: " << x_mean << endl;
+        //cout << "QPLA::x_mean: " << x_mean << endl;
 	unsigned long long int EstInterceptVal = static_cast<unsigned long long int>(y_mean - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1
 	cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
 		
@@ -1208,14 +1208,14 @@ if (ApplyRawQubitFilteringFlag==true){
 	// Compute quality of estimation, related to the SNR
 	double EstimatedSNRqubitsRatio=static_cast<double>(FilteredNumStoredQubits)/static_cast<double>(RawNumStoredQubits);// in linear	
 
-	if (EstimatedSNRqubitsRatio>0.01){ // 0.01 equivalent to 20 dB// < Bad SNR
+	if (EstimatedSNRqubitsRatio>0.1){ // 0.1 equivalent to 10 dB// < Bad SNR
 		cout << "QPLA::LinearRegressionQuBitFilter EstimatedSNRqubitsRatio " << EstimatedSNRqubitsRatio << " does not have enough SNR (>20 dB) to perform good when filtering raw qubits!!!" << endl;
 	}
 	
 	// Un-normalize values to have absolute values
-	for (int i=0;i<FilteredNumStoredQubits;i++){
-		TimeTaggs[i]=TimeTaggs[i]+NormInitialTimeTaggsVal;
-	}
+	//for (int i=0;i<FilteredNumStoredQubits;i++){
+	//	TimeTaggs[i]=TimeTaggs[i]+NormInitialTimeTaggsVal;
+	//}
 	
 	// Update final values
 	this->SimulateNumStoredQubitsNode[0]=FilteredNumStoredQubits; // Update value
