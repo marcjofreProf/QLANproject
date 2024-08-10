@@ -1166,8 +1166,12 @@ if (ApplyRawQubitFilteringFlag==true){
 	// If the SNR is not well above 20 dB or 30dB, this methods perform really bad
 	// Estimate the x values for the linear regression from the y values (RawTimeTaggs)
 	unsigned long long int xEstimateRawTimeTaggs[RawNumStoredQubits]={0}; // Timetaggs of the detections raw
+	unsigned long long int RoundingAux;
 	for (int i=0;i<RawNumStoredQubits;i++){
-		xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/HistPeriodicityAux)*HistPeriodicityAux;
+		RoundingAux=RawTimeTaggs[i]%HistPeriodicityAux;
+		if (RoundingAux>=(HistPeriodicityAux/2)){RoundingAux=1;}
+		else{RoundingAux=0;}
+		xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/HistPeriodicityAux+RoundingAux)*HistPeriodicityAux;
 	}
 
 	// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
@@ -1206,10 +1210,10 @@ if (ApplyRawQubitFilteringFlag==true){
 	}
 	
 	// Compute quality of estimation, related to the SNR
-	double EstimatedSNRqubitsRatio=static_cast<double>(FilteredNumStoredQubits)/static_cast<double>(RawNumStoredQubits);// in linear	
+	double EstimatedSNRqubitsRatio=1.0-static_cast<double>(FilteredNumStoredQubits)/static_cast<double>(RawNumStoredQubits);// in linear	
 
 	if (EstimatedSNRqubitsRatio>0.1){ // 0.1 equivalent to 10 dB// < Bad SNR
-		cout << "QPLA::LinearRegressionQuBitFilter EstimatedSNRqubitsRatio " << EstimatedSNRqubitsRatio << " does not have enough SNR (>20 dB) to perform good when filtering raw qubits!!!" << endl;
+		cout << "QPLA::LinearRegressionQuBitFilter EstimatedSNRqubitsRatio " << EstimatedSNRqubitsRatio << " does not have enough SNR (>10 dB) to perform good when filtering raw qubits!!!" << endl;
 	}
 	
 	// Un-normalize values to have absolute values
