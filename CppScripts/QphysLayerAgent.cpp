@@ -844,7 +844,7 @@ else
 }
 
 // Generally mean averaging can be used since outliers (either noise or glitches) have been removed in LinearRegressionQuBitFilter
-if (SimulateNumStoredQubitsNodeAux>0){
+if (SimulateNumStoredQubitsNodeAux>1){
 for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 //cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
 //cout << "ChannelTags[i]: "<< std::bitset<8>(ChannelTags[i]) << endl;
@@ -906,7 +906,7 @@ cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count differenc
 cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
 cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
 cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
-if (SimulateNumStoredQubitsNodeAux>0){
+if (SimulateNumStoredQubitsNodeAux>1){
 unsigned long long int TimeTaggs0Aux=TimeTaggs[0];
 unsigned long long int TimeTaggsLastAux=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];
 //for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures. For long range synch testing with histogram, this could be commented
@@ -978,7 +978,7 @@ TimeTaggsDetAnalytics[4]=0.0;
 TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
 TimeTaggsDetAnalytics[7]=0.0;
-if (SimulateNumStoredQubitsNodeAux>0){
+if (SimulateNumStoredQubitsNodeAux>1){
 int iIterCoincidence=0;
 unsigned long long int TimeCoincidenceTaggs[NumQubitsMemoryBuffer]={0}; // Coincidence Timetaggs of the detections
 
