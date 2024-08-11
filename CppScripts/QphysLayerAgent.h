@@ -125,6 +125,7 @@ private: //Variables/Instances
 	// Filtering qubits
 	bool ApplyRawQubitFilteringFlag=false;// Variable to select or unselect the filtering of raw qubits
 	long long int FilteringAcceptWindowSize=500; // Equivalent to around 3 times the time jitter
+	bool UseAllTagsForEstimation=false; // When false, use only the first tag, when true it uses all tags of the run
         
 public: // Variables/Instances
 	exploringBB::GPIO PRUGPIO;

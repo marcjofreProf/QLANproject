@@ -789,26 +789,37 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		if (NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]==false){
 			ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=0.0;// Reset value
 			SmallOffsetDriftPerLink[CurrentSpecificLink]=0.0;// Reset value
-			//double ReferencePointSmallOffsetDriftPerLinkArrayAux[SimulateNumStoredQubitsNodeAux]={0.0};
-			//for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-			//// Mean average, not very resilence with glitches (Eventhough filtered in Liner Regression)
-			////	ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>(TimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
-			// Median averaging
-			//ReferencePointSmallOffsetDriftPerLinkArrayAux[i]=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
+			//if (UseAllTagsForEstimation){
+				//double ReferencePointSmallOffsetDriftPerLinkArrayAux[SimulateNumStoredQubitsNodeAux]={0.0};
+				//for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
+				//// Mean average, not very resilence with glitches (Eventhough filtered in Liner Regression)
+				////	ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>(TimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
+				// Median averaging
+				//ReferencePointSmallOffsetDriftPerLinkArrayAux[i]=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
+				//}
+				//ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=DoubleMedianFilterSubArray(ReferencePointSmallOffsetDriftPerLinkArrayAux,SimulateNumStoredQubitsNodeAux);// Median averaging
 			//}
-			//ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=DoubleMedianFilterSubArray(ReferencePointSmallOffsetDriftPerLinkArrayAux,SimulateNumStoredQubitsNodeAux);// Median averaging
+			//else{
+			//	ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[0]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
+			//}
 			NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=true;// Update value, so that it is not run again
 		}	
 		// First compute the relative new time offset from last iteration
 		double SmallOffsetDriftAux=0.0;
-		double SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0.0};
-		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-			// Mean averaging, not very resilent with glitches, eventhough filtered in liner regression
-			//SmallOffsetDriftAux+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>((TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]))%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
-			// Median averaging
-			SmallOffsetDriftArrayAux[i]=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
+		if (UseAllTagsForEstimation){
+			double SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0.0};
+			for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
+				// Mean averaging, not very resilent with glitches, eventhough filtered in liner regression
+				//SmallOffsetDriftAux+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>((TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]))%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
+				// Median averaging
+				SmallOffsetDriftArrayAux[i]=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
+			}
+			SmallOffsetDriftAux=DoubleMedianFilterSubArray(SmallOffsetDriftArrayAux,SimulateNumStoredQubitsNodeAux); // Median averaging
 		}
-		SmallOffsetDriftAux=DoubleMedianFilterSubArray(SmallOffsetDriftArrayAux,SimulateNumStoredQubitsNodeAux); // Median averaging
+		else{
+			SmallOffsetDriftAux=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[0])-static_cast<long double>(ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
+			cout << "QPLA::Using only first timetag for small offset correction!...to be deactivated" << endl;
+		}
 		
 		if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/4.0)){// Large step
 			cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
@@ -1101,18 +1112,22 @@ int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
 
 if (SimulateNumStoredQubitsNodeAux>0){
-// Single value
-SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=TimeTaggs[0]; // Considering only the first timetagg. Might not be very resilence with noise
-
-// Mean averaging
-//for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
-//CenterMassVal=CenterMassVal+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
-//}
-// Median averaging
-for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
-	SynchFirstTagsArrayAux[i]=TimeTaggs[i]%static_cast<unsigned long long int>(HistPeriodicityAux);
+if (UseAllTagsForEstimation){
+	// Mean averaging
+	//for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
+	//CenterMassVal=CenterMassVal+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
+	//}
+	// Median averaging
+	for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
+		SynchFirstTagsArrayAux[i]=TimeTaggs[i]%static_cast<unsigned long long int>(HistPeriodicityAux);
+	}
+	SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=ULLIMedianFilterSubArray(SynchFirstTagsArrayAux,SimulateNumStoredQubitsNodeAux);
 }
-SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=ULLIMedianFilterSubArray(SynchFirstTagsArrayAux,SimulateNumStoredQubitsNodeAux);
+else{
+	// Single value
+	SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=TimeTaggs[0]; // Considering only the first timetagg. Might not be very resilence with noise
+	cout << "QPLA::Using only first timetag for network synch computations!...to be deactivated" << endl;
+}
 }
 
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
