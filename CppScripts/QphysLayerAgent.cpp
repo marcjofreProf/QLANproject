@@ -812,12 +812,12 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 				// Mean averaging, not very resilent with glitches, eventhough filtered in liner regression
 				//SmallOffsetDriftAux+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>((TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]))%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
 				// Median averaging
-				SmallOffsetDriftArrayAux[i]=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
+				SmallOffsetDriftArrayAux[i]=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
 			}
 			SmallOffsetDriftAux=DoubleMedianFilterSubArray(SmallOffsetDriftArrayAux,SimulateNumStoredQubitsNodeAux); // Median averaging
 		}
 		else{
-			SmallOffsetDriftAux=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[0])-static_cast<long double>(ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
+			SmallOffsetDriftAux=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[0])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
 			cout << "QPLA::Using only first timetag for small offset correction!...to be deactivated" << endl;
 		}
 		
@@ -827,11 +827,11 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		// Update new value, just for monitoring of the wander
 		SmallOffsetDriftPerLink[CurrentSpecificLink]+=SmallOffsetDriftAux;
 		
-		//cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLink] " << SmallOffsetDriftPerLink[CurrentSpecificLink] << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
+		cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLink] " << SmallOffsetDriftPerLink[CurrentSpecificLink] << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
 		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
 		
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-			TimeTaggs[i]=TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftAux);//static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);
+			TimeTaggs[i]=TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);//static_cast<unsigned long long int>(SmallOffsetDriftAux);//static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);
 		}
 	}
 	else{// Mal function we should not be here
