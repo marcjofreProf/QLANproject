@@ -1199,11 +1199,11 @@ if (ApplyRawQubitFilteringFlag==true){
 			else{RoundingAux=0;}
 			xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i-1]+((RawTimeTaggs[i]-RawTimeTaggs[i-1])/HistPeriodicityAux+RoundingAux)*HistPeriodicityAux;
 		}*/
-		RoundingAux=(HistPeriodicityAux/2+RawTimeTaggs[i])%HistPeriodicityAux-HistPeriodicityAux/2;
-		if (RoundingAux>=(HistPeriodicityAux/4)){RoundingAux=1;}
-		else if (RoundingAux<=(-HistPeriodicityAux/4)){RoundingAux=-1;}
-		else{RoundingAux=0;}
-		xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/HistPeriodicityAux+RoundingAux)*HistPeriodicityAux;		
+		//RoundingAux=(HistPeriodicityAux/2+RawTimeTaggs[i])%HistPeriodicityAux-HistPeriodicityAux/2;
+		//if (RoundingAux>=(HistPeriodicityAux/4)){RoundingAux=1;}
+		//else if (RoundingAux<=(-HistPeriodicityAux/4)){RoundingAux=-1;}
+		//else{RoundingAux=0;}
+		xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/HistPeriodicityAux)*HistPeriodicityAux;		
 	}
 
 	// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
@@ -1222,7 +1222,7 @@ if (ApplyRawQubitFilteringFlag==true){
         //y_mean=DoubleMedianFilterSubArray(y_meanArray,(RawNumStoredQubits-1)); // Median average
         // Absolute
         for (int i=0; i < RawNumStoredQubits; i++) {
-            y_meanArray[i]=static_cast<double>((HistPeriodicityAux/2+RawTimeTaggs[i])%HistPeriodicityAux)-HistPeriodicityAux/2.0;
+            y_meanArray[i]=static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux);
             //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
             // We cannot use mean averaging since there might be outliers
 	    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);

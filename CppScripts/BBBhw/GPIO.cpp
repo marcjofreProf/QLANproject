@@ -816,77 +816,42 @@ this->TimeTaggsLast=static_cast<unsigned long long int>(ceil((static_cast<long d
 //	}
 //}
 
-
+for (iIterDump=0; iIterDump<NumRecords; iIterDump++){
+	// When unsigned short
+	valCycleCountPRU=static_cast<unsigned int>(*valp);
+	valp++;// 1 times 16 bits
+	valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
+	valp++;// 1 times 16 bits
+	//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
+	// Mount the extended counter value
+	extendedCounterPRUholder=static_cast<unsigned long long int>(valCycleCountPRU);//extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
+	//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
+	// Apply system clock corrections
+	TimeTaggsStored[TotalCurrentNumRecords]=static_cast<unsigned long long int>(static_cast<double>(extendedCounterPRUholder-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error	    
+	//////////////////////////////////////////////////////////////		
+	// When unsigned short
+	ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
+	valp++;// 1 times 16 bits
+	if (TotalCurrentNumRecords<(MaxNumQuBitsMemStored-1)){TotalCurrentNumRecords++;}//Variable to hold the number of currently stroed records in memory
+	else{cout << "GPIO::We have reach the maximum number of qubits storage" << endl;}
+}
+// Correct the detected qubits relative frequency difference (due to the sender node)
+PRUdetCorrRelFreq();
+	
 if (SlowMemoryPermanentStorageFlag==true){
 	// Reading TimeTaggs
 	if (streamDDRpru.is_open()){
 		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 		for (iIterDump=0; iIterDump<NumRecords; iIterDump++){
-			// First 32 bits is the DWT_CYCCNT of the PRU
-			// When unsigned char
-			//valCycleCountPRU=static_cast<unsigned int>(*valp);
-			//valp++;// 1 times 8 bits
-			//valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<8;
-			//valp++;// 1 times 8 bits
-			//valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
-			//valp++;// 1 times 8 bits
-			//valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<24;
-			//valp++;// 1 times 8 bits
-			// When unsigned short
-			valCycleCountPRU=static_cast<unsigned int>(*valp);
-			valp++;// 1 times 16 bits
-			valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
-			valp++;// 1 times 16 bits
-			//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
-			// Mount the extended counter value
-			extendedCounterPRUholder=static_cast<unsigned long long int>(valCycleCountPRU);//extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
-			//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
-			// Apply system clock corrections
-			extendedCounterPRU=static_cast<unsigned long long int>(static_cast<double>(extendedCounterPRUholder-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error	    
-			//////////////////////////////////////////////////////////////
-			// Then, the last 32 bits is the channels detected. Equivalent to a 63 bit register at 5ns per clock equates to thousands of years before overflow :)
-			// When unsigned char
-			//valBitsInterest=static_cast<unsigned short>(*valp);
-			//valp++;// 1 times 8 bits
-			//valBitsInterest=static_cast<unsigned short>(static_cast<unsigned char>(*valp>>4))<<8;
-			//valp++;// 1 times 8 bits
-			// When unsigned short
-			valBitsInterest=static_cast<unsigned short>(*valp);
-			valp++;// 1 times 16 bits
-			valBitsInterest=this->packBits(valBitsInterest); // we're just interested in 12 bits which we have to re-order
-			//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "val: " << std::bitset<8>(val) << endl;}
-			//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valBitsInterest: " << std::bitset<16>(valBitsInterest) << endl;}	
-			//fprintf(outfile, "%d\n", val);
 			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-			streamDDRpru.write(reinterpret_cast<const char*>(&extendedCounterPRU), sizeof(extendedCounterPRU));
+			streamDDRpru.write(reinterpret_cast<const char*>(&TimeTaggsStored[iIterDump]), sizeof(TimeTaggsStored[iIterDump]));
 			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-			streamDDRpru.write(reinterpret_cast<const char*>(&valBitsInterest), sizeof(valBitsInterest));
+			streamDDRpru.write(reinterpret_cast<const char*>(&ChannelTagsStored[iIterDump]), sizeof(ChannelTagsStored[iIterDump]));
 			//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
 		}
 	}
 	else{
 		cout << "DDRdumpdata streamDDRpru is not open!" << endl;
-	}
-}
-else{//Allocation in memory array
-	for (iIterDump=0; iIterDump<NumRecords; iIterDump++){
-		// When unsigned short
-		valCycleCountPRU=static_cast<unsigned int>(*valp);
-		valp++;// 1 times 16 bits
-		valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
-		valp++;// 1 times 16 bits
-		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
-		// Mount the extended counter value
-		extendedCounterPRUholder=static_cast<unsigned long long int>(valCycleCountPRU);//extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
-		//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
-		// Apply system clock corrections
-		TimeTaggsStored[TotalCurrentNumRecords]=static_cast<unsigned long long int>(static_cast<double>(extendedCounterPRUholder-OldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error	    
-		//////////////////////////////////////////////////////////////		
-		// When unsigned short
-		ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
-		valp++;// 1 times 16 bits
-		if (TotalCurrentNumRecords<(MaxNumQuBitsMemStored-1)){TotalCurrentNumRecords++;}//Variable to hold the number of currently stroed records in memory
-		else{cout << "GPIO::We have reach the maximum number of qubits storage" << endl;}
 	}
 }
 
@@ -1052,6 +1017,42 @@ this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU-(AboveThresoldCycleC
 return 0; // all ok
 }
 */
+
+int GPIO::PRUdetCorrRelFreq(){
+unsigned long long int InitialTimeTaggsStored=TimeTaggsStored[0];// Normalize to the first timetag, which is a strong reference
+for (int i=0;i<TotalCurrentNumRecords;i++){
+	TimeTaggsStored[i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggsStored[i])-static_cast<long long int>(InitialTimeTaggsStored));
+}
+double SlopeDetTagsAux=1.0;
+
+if (SlopeDetTagsAux<=0.0){
+	cout << "GPIO::PRUdetCorrRelFreq wrong computation of the SlopeDetTagsAux " << SlopeDetTagsAux << ". Not applying the correction..." << endl;
+}
+
+// Calculate the "x" values
+long long int xAux[MaxNumQuBitsMemStored]={0};
+for (int i=0;i<TotalCurrentNumRecords;i++){
+	xAux[i]=(static_cast<long long int>(TimeTaggsStored[i])/static_cast<long long int>(SynchTrigPeriod))*static_cast<long long int>(SynchTrigPeriod);
+}
+
+// Compute the candidate slope
+int iAux=0;
+for (int i=0;i<(TotalCurrentNumRecords-TagsSeparationDetRelFreq);i++){
+	if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
+		SlopeDetTagsAuxArray[iAux]=static_cast<double>(static_cast<long long int>(TimeTaggsStored[i+TagsSeparationDetRelFreq])-static_cast<long long int>(TimeTaggsStored[i]))/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
+		iAux++;
+	}
+}
+
+SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
+cout << "GPIO::SlopeDetTagsAux: " << SlopeDetTagsAux << endl;
+// Un-normalize
+for (int i=0;i<TotalCurrentNumRecords;i++){
+	TimeTaggsStored[i]=static_cast<unsigned long long int>((1.0/SlopeDetTagsAux)*static_cast<double>(TimeTaggsStored[i]))+InitialTimeTaggsStored;
+}
+
+return 0; // All ok
+}
 
 // Function to pack bits 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15 of an unsigned int into the lower values
 unsigned short GPIO::packBits(unsigned short value) {

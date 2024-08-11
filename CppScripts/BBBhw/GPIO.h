@@ -188,7 +188,7 @@ private:// Variables
 	unsigned long long int auxUnskewingFactorResetCycle=0;
 	unsigned int AfterCountsThreshold=0;
 	// Memory storage
-	int TotalCurrentNumRecords=0; ////Variable to hold the number of currently stroed records in memory
+	int TotalCurrentNumRecords=0; ////Variable to hold the number of currently stored records in memory
 	unsigned long long int TimeTaggsStored[MaxNumQuBitsMemStored]={0};
 	unsigned short ChannelTagsStored[MaxNumQuBitsMemStored]={0};
 	//FILE* outfile;
@@ -219,6 +219,9 @@ private:// Variables
 	long double AccumulatedErrorDrift=0.0; // For retrieved relative frequency difference from protocol
 	long double AccumulatedErrorDriftAux=0.0;// For retrieved relative offset difference from protocol
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
+	// Correct Qubits relative frequency difference due to the sender
+	int TagsSeparationDetRelFreq=10; // Number of index separation to compute the slope of disadjustment in order to have accuraccy
+	double SlopeDetTagsAuxArray[MaxNumQuBitsMemStored]={0.0}; // Array in order to do the computations
 	// Information and status
 	bool HardwareSynchStatus=false; // Turn to true when hardware synchronized with the PRU clock
 
@@ -286,6 +289,7 @@ private: // Functions/Methods
 	int PRUsignalTimerSynch(); // Periodic synchronizaton of the timer to control the generated signals
 	int PRUsignalTimerSynchJitterLessInterrupt();// Tries to avoid interrupt jitter (might not be completely absolute time
 	int PIDcontrolerTimeJiterlessInterrupt();
+	int PRUdetCorrRelFreq();// Correct the detections relative frequency difference 
 	// Data processing
 	unsigned short packBits(unsigned short value);
 	// Non-PRU

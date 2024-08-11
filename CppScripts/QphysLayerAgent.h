@@ -124,7 +124,7 @@ private: //Variables/Instances
 	bool NonInitialReferencePointSmallOffsetDriftPerLink[LinkNumberMAX]={false,false}; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
 	// Filtering qubits
 	bool ApplyRawQubitFilteringFlag=false;// Variable to select or unselect the filtering of raw qubits
-	long long int FilteringAcceptWindowSize=500; // Equivalent to around 3 times the time jitter
+	long long int FilteringAcceptWindowSize=250; // Equivalent to around 3 times the time jitter
 	bool UseAllTagsForEstimation=false; // When false, use only the first tag, when true it uses all tags of the run
         
 public: // Variables/Instances
