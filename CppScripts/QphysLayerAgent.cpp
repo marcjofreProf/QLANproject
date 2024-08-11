@@ -814,9 +814,9 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 			cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
 		}
 		// Update new value
-		SmallOffsetDriftPerLink[CurrentSpecificLink]+=SmallOffsetDriftAux;
+		//SmallOffsetDriftPerLink[CurrentSpecificLink]+=SmallOffsetDriftAux;
 		
-		cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLink] " << SmallOffsetDriftPerLink[CurrentSpecificLink] << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
+		//cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLink] " << SmallOffsetDriftPerLink[CurrentSpecificLink] << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
 		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
 		
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
