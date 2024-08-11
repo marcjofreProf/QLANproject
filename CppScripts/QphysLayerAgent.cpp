@@ -831,7 +831,7 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
 		
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-			TimeTaggs[i]=TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);//static_cast<unsigned long long int>(SmallOffsetDriftAux);//static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);
+			TimeTaggs[i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[i])-static_cast<long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]));//static_cast<long long int>(SmallOffsetDriftAux);//static_cast<long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);
 		}
 	}
 	else{// Mal function we should not be here
