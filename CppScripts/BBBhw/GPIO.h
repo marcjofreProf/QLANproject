@@ -42,8 +42,8 @@ class GPIO {
 //public: //Variables
 
 private:// Variables
-	bool SlowMemoryPermanentStorageFlag=false; // Variable when true they are stored in a file (slower due to writting and reading) ; otherwise it uses array memory to store qubits (much faster)
-	bool ResetPeriodicallyTimerPRU1=true;// Disaster when used, due to all the interrupts handling time uncertainty
+	bool SlowMemoryPermanentStorageFlag=true; // Variable when true they are stored in a file (slower due to writting and reading) ; otherwise it uses array memory to store qubits (much faster)
+	bool ResetPeriodicallyTimerPRU1=true;// Avoiding interrupts
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	std::atomic<bool> ManualSemaphore=false;
