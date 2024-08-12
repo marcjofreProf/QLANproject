@@ -1019,9 +1019,11 @@ return 0; // all ok
 */
 
 int GPIO::PRUdetCorrRelFreq(){
-unsigned long long int InitialTimeTaggsStored=TimeTaggsStored[0];// Normalize to the first timetag, which is a strong reference
+unsigned long long int ULLIInitialTimeTaggsStored=TimeTaggsStored[0];// Normalize to the first timetag, which is a strong reference
+long long int LLIInitialTimeTaggsStored=static_cast<long long int>(TimeTaggsStored[0]);
+long long int LLITimeTaggsStored[TotalCurrentNumRecords]={0};
 for (int i=0;i<TotalCurrentNumRecords;i++){
-	TimeTaggsStored[i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggsStored[i])-static_cast<long long int>(InitialTimeTaggsStored));
+	LLITimeTaggsStored[i]=static_cast<long long int>(TimeTaggsStored[i])-LLIInitialTimeTaggsStored;
 }
 double SlopeDetTagsAux=1.0;
 
@@ -1031,15 +1033,16 @@ if (SlopeDetTagsAux<=0.0){
 
 // Calculate the "x" values
 long long int xAux[MaxNumQuBitsMemStored]={0};
+long long int LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
 for (int i=0;i<TotalCurrentNumRecords;i++){
-	xAux[i]=(static_cast<long long int>(TimeTaggsStored[i])/static_cast<long long int>(SynchTrigPeriod))*static_cast<long long int>(SynchTrigPeriod);
+	xAux[i]=(LLITimeTaggsStored[i]/LLISynchTrigPeriod)*LLISynchTrigPeriod;
 }
 
 // Compute the candidate slope
 int iAux=0;
 for (int i=0;i<(TotalCurrentNumRecords-TagsSeparationDetRelFreq);i++){
 	if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
-		SlopeDetTagsAuxArray[iAux]=static_cast<double>(static_cast<long long int>(TimeTaggsStored[i+TagsSeparationDetRelFreq])-static_cast<long long int>(TimeTaggsStored[i]))/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
+		SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggsStored[i+TagsSeparationDetRelFreq]-LLITimeTaggsStored[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
 		iAux++;
 	}
 }
@@ -1048,7 +1051,7 @@ SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
 cout << "GPIO::SlopeDetTagsAux: " << SlopeDetTagsAux << endl;
 // Un-normalize
 for (int i=0;i<TotalCurrentNumRecords;i++){
-	TimeTaggsStored[i]=static_cast<unsigned long long int>((1.0/SlopeDetTagsAux)*static_cast<double>(TimeTaggsStored[i]))+InitialTimeTaggsStored;
+	TimeTaggsStored[i]=static_cast<unsigned long long int>((1.0/SlopeDetTagsAux)*static_cast<double>(LLITimeTaggsStored[i]))+ULLIInitialTimeTaggsStored;
 }
 
 return 0; // All ok

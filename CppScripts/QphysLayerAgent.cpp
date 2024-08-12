@@ -552,6 +552,7 @@ if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there 
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
 threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
+this->SmallDriftContinuousCorrection();// Run after threadSimulateReceiveQuBitRefAux
 }
 else{
 cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
@@ -731,34 +732,16 @@ this->release();
 return GPIOHardwareSynchedAux;
 }
 
-int QPLA::GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics){
-this->acquire();
-while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
-this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
+int QPLA::SmallDriftContinuousCorrection(){
+
 int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];// Number of qubits to process
-TimeTaggsDetAnalytics[0]=0.0;
-TimeTaggsDetAnalytics[1]=0.0;
-TimeTaggsDetAnalytics[2]=0.0;
-TimeTaggsDetAnalytics[3]=0.0;
-TimeTaggsDetAnalytics[4]=0.0;
-TimeTaggsDetAnalytics[5]=0.0;
-TimeTaggsDetAnalytics[6]=0.0;
-TimeTaggsDetAnalytics[7]=0.0;
-// General computations - might be overriden by the below activated particular analysis
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Compute interesting analytics on the TIMETAGGS and detection so that not all data has to be transfered through sockets
-// It has to have double precision so that statistics are useful
-// Param 0: Num detections channel 1
-// Param 1: Num detections channel 2
-// Param 2: Num detections channel 3
-// Param 3: Num detections channel 4
-// Param 4: Multidetection events
-// Param 5: Mean time difference between tags
-// Param 6: std time difference between tags
-// Param 7: time value first count tags
 
 // Check that we now exceed the QuBits buffer size
 if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
+else if (SimulateNumStoredQubitsNodeAux==1){
+cout << "QPLA::SmallDriftContinuousCorrection not executing since 0 qubits detected!" << endl;
+return 0;
+}
 
 // Apply the small offset drift correction
 if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
@@ -808,11 +791,12 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		double SmallOffsetDriftAux=0.0;
 		if (UseAllTagsForEstimation){
 			double SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0.0};
+			long double ldSmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]);
 			for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 				// Mean averaging, not very resilent with glitches, eventhough filtered in liner regression
 				//SmallOffsetDriftAux+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>((TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]))%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
 				// Median averaging
-				SmallOffsetDriftArrayAux[i]=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
+				SmallOffsetDriftArrayAux[i]=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-ldSmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink,HistPeriodicityAux)-HistPeriodicityAux/2.0);
 			}
 			SmallOffsetDriftAux=DoubleMedianFilterSubArray(SmallOffsetDriftArrayAux,SimulateNumStoredQubitsNodeAux); // Median averaging
 		}
@@ -830,8 +814,9 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLink] " << SmallOffsetDriftPerLink[CurrentSpecificLink] << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
 		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
 		
+		long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-			TimeTaggs[i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[i])-static_cast<long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]));//static_cast<long long int>(SmallOffsetDriftAux);//static_cast<long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);
+			TimeTaggs[i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
 		}
 	}
 	else{// Mal function we should not be here
@@ -842,6 +827,38 @@ else
 {
 	cout << "QPLA::Not applying ApplyProcQubitsSmallTimeOffsetContinuousCorrection small drift offset correction...to be activated..." << endl;
 }
+
+return 0; // All Ok
+}
+
+int QPLA::GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics){
+this->acquire();
+while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
+this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
+int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];// Number of qubits to process
+TimeTaggsDetAnalytics[0]=0.0;
+TimeTaggsDetAnalytics[1]=0.0;
+TimeTaggsDetAnalytics[2]=0.0;
+TimeTaggsDetAnalytics[3]=0.0;
+TimeTaggsDetAnalytics[4]=0.0;
+TimeTaggsDetAnalytics[5]=0.0;
+TimeTaggsDetAnalytics[6]=0.0;
+TimeTaggsDetAnalytics[7]=0.0;
+// General computations - might be overriden by the below activated particular analysis
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Compute interesting analytics on the TIMETAGGS and detection so that not all data has to be transfered through sockets
+// It has to have double precision so that statistics are useful
+// Param 0: Num detections channel 1
+// Param 1: Num detections channel 2
+// Param 2: Num detections channel 3
+// Param 3: Num detections channel 4
+// Param 4: Multidetection events
+// Param 5: Mean time difference between tags
+// Param 6: std time difference between tags
+// Param 7: time value first count tags
+
+// Check that we now exceed the QuBits buffer size
+if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
 
 // Generally mean averaging can be used since outliers (either noise or glitches) have been removed in LinearRegressionQuBitFilter
 if (SimulateNumStoredQubitsNodeAux>1){

@@ -194,6 +194,7 @@ private: // Functions/Methods
 	struct timespec GetFutureTimePointOtherNode();
 	// Synchronization primitives
 	int HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass); // Calculate the histogram center given a period and a list of timetaggs
+	int SmallDriftContinuousCorrection();// Methods to keep track of the small offset correction at each measurement (but not in the network synch)
 	double DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor);
 	int DoubleBubbleSort(double* arr,int MedianFilterFactor);
 	unsigned long long int ULLIMedianFilterSubArray(unsigned long long int* ArrayHolderAux,int MedianFilterFactor);

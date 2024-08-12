@@ -1620,6 +1620,10 @@ IterHostsActiveActionsFreeStatus=0;// reset process
 AchievedAttentionParticularHosts=false;// Indicates that we have got NOT the attention of the hosts
 
 int NumInterestIPaddressesAux=nChararray;
+for (int i=0;i<NumInterestIPaddressesAux;i++){// Reset values
+	HostsActiveActionsFree[1+i]=true;
+}
+
 char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
 char ParamsCharArrayArgAux[NumBytesBufferICPMAX] = {0};
 strcpy(ParamsCharArrayArgAux,ParamsCharArrayArg);
