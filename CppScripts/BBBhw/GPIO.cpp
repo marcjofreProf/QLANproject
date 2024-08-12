@@ -1048,7 +1048,7 @@ for (int i=0;i<(TotalCurrentNumRecords-TagsSeparationDetRelFreq);i++){
 }
 
 SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
-cout << "GPIO::SlopeDetTagsAux: " << SlopeDetTagsAux << endl;
+//cout << "GPIO::SlopeDetTagsAux: " << SlopeDetTagsAux << endl;
 // Un-normalize
 for (int i=0;i<TotalCurrentNumRecords;i++){
 	TimeTaggsStored[i]=static_cast<unsigned long long int>((1.0/SlopeDetTagsAux)*static_cast<double>(LLITimeTaggsStored[i]))+ULLIInitialTimeTaggsStored;

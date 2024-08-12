@@ -811,8 +811,8 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		// Update new value, just for monitoring of the wander
 		SmallOffsetDriftPerLink[CurrentSpecificLink]+=SmallOffsetDriftAux;
 		
-		cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLink] " << SmallOffsetDriftPerLink[CurrentSpecificLink] << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
-		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
+		//cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLink] " << SmallOffsetDriftPerLink[CurrentSpecificLink] << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
+		//cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
 		
 		long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
@@ -1247,10 +1247,10 @@ if (ApplyRawQubitFilteringFlag==true){
         }
         y_mean=DoubleMedianFilterSubArray(y_meanArray,RawNumStoredQubits); // Median average
         //x_mean=DoubleMedianFilterSubArray(x_meanArray,RawNumStoredQubits); // Median average. Not really needed x_mean
-        cout << "QPLA::y_mean: " << y_mean << endl;
+        //cout << "QPLA::y_mean: " << y_mean << endl;
         //cout << "QPLA::x_mean: " << x_mean << endl;
 	unsigned long long int EstInterceptVal = static_cast<unsigned long long int>(y_mean - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1
-	cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
+	//cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
 		
 	// Re-escale the xEstimated values with the intercept point
 	for (int i=0;i<RawNumStoredQubits;i++){
