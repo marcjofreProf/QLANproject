@@ -552,7 +552,7 @@ if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there 
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
 threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
-//this->SmallDriftContinuousCorrection();// Run after threadSimulateReceiveQuBitRefAux
+this->SmallDriftContinuousCorrection();// Run after threadSimulateReceiveQuBitRefAux
 }
 else{
 cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
@@ -644,11 +644,11 @@ SynchCalcValuesAbsArray[2]=SynchCalcValuesAbsArray[2]+SynchCalcValuesArray[2];
 double SynchParamValuesArrayAux[2];
 // The order below is not correct - debbug the protocol
 // when using the 0.5* factor
-//SynchParamValuesArrayAux[0]=SynchCalcValuesArray[2]/static_cast<double>(HistPeriodicityAux);// relative frequency correction
-//SynchParamValuesArrayAux[1]=SynchCalcValuesArray[1];// offset correction
-// When not using the 0.5* factor
 SynchParamValuesArrayAux[0]=SynchCalcValuesArray[2]/static_cast<double>(HistPeriodicityAux);// relative frequency correction
-SynchParamValuesArrayAux[1]=SynchCalcValuesArray[1]*static_cast<double>(HistPeriodicityAux);// offset correction
+SynchParamValuesArrayAux[1]=SynchCalcValuesArray[1];// offset correction
+// When not using the 0.5* factor
+//SynchParamValuesArrayAux[0]=SynchCalcValuesArray[2]/static_cast<double>(HistPeriodicityAux);// relative frequency correction
+//SynchParamValuesArrayAux[1]=SynchCalcValuesArray[1]*static_cast<double>(HistPeriodicityAux);// offset correction
 PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Update computed values to the agent below
 cout << "QPLA::Synchronization parameters updated for this node" << endl;
 }
@@ -815,8 +815,8 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		// Update new value, just for monitoring of the wander
 		SmallOffsetDriftPerLink[CurrentSpecificLink]+=SmallOffsetDriftAux;
 		
-		cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLink] " << SmallOffsetDriftPerLink[CurrentSpecificLink] << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
-		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
+		//cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLink] " << SmallOffsetDriftPerLink[CurrentSpecificLink] << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
+		//cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
 		
 		long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
@@ -1183,8 +1183,8 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 
 	SynchCalcValuesArray[0]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment
 	// For offset adjustment, it is weird: when using 0.5* it sorts of zeros the value, while with 1.0* it get a value....
-	//SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(0.5*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // Relative frequency difference adjustment
-	SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(1.0*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // Relative frequency difference adjustment
+	SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(0.5*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // Relative frequency difference adjustment
+	//SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(1.0*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // Relative frequency difference adjustment
 	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]-SynchCalcValuesArray[1])*SynchCalcValuesArray[0]); // Offset adjustment
 
 	//cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;
