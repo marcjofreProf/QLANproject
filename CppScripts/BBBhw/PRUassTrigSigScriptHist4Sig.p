@@ -210,12 +210,12 @@ FINETIMEOFFSETADJLOOP:
 //	QBEQ	SIGNALON1, r0.b0, 2 // Coincides with a 2
 //	QBEQ	SIGNALON1, r0.b0, 1 // Coincides with a 1
 //	QBEQ	SIGNALON1, r0.b0, 0 // Coincides with a 0
-SIGNALON1:	
+SIGNALON1:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
 	MOV	r30.b0, 0x11 // Double channels 1. write to magic r30 output byte 0
 	MOV	r5, r9
-//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	LDI	r4, 0 // Intentionally one more in order to fine adjust to the period (the even signal does not have this extra one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 	MOV	r30.b0, 0x00 // All off
 SIGNALON1DEL:
 	SUB	r5, r5, 1
@@ -224,8 +224,8 @@ SIGNALON1DEL:
 SIGNALON2:
 	MOV	r30.b0, 0x00 // All off
 	MOV	r5, r9
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 SIGNALON2DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON2DEL, r5, 0
@@ -233,9 +233,9 @@ SIGNALON2DEL:
 SIGNALON3:
 	MOV	r30.b0, 0x22 // Double channels 2. write to magic r30 output byte 0
 	MOV	r5, r9
-//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	LDI	r4, 0 // Intentionally one more in order to fine adjust to the period (the even signal does not have this extra one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 	MOV	r30.b0, 0x00 // All off
 SIGNALON3DEL:
 	SUB	r5, r5, 1
@@ -244,8 +244,8 @@ SIGNALON3DEL:
 SIGNALON4:
 	MOV	r30.b0, 0x00 // All off
 	MOV	r5, r9
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 SIGNALON4DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON4DEL, r5, 0
@@ -253,9 +253,9 @@ SIGNALON4DEL:
 SIGNALON5:
 	MOV	r30.b0, 0x44 // Double channels 3. write to magic r30 output byte 0
 	MOV	r5, r9
-//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	LDI	r4, 0 // Intentionally one more in order to fine adjust to the period (the even signal does not have this extra one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 	MOV	r30.b0, 0x00 // All off
 SIGNALON5DEL:
 	SUB	r5, r5, 1
@@ -264,8 +264,8 @@ SIGNALON5DEL:
 SIGNALON6:
 	MOV	r30.b0, 0x00 // All off
 	MOV	r5, r9
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 SIGNALON6DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON6DEL, r5, 0
@@ -273,9 +273,9 @@ SIGNALON6DEL:
 SIGNALON7:
 	MOV	r30.b0, 0x88 // Double channels 4. write to magic r30 output byte 0
 	MOV	r5, r9
-//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
-//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular ot the last one)
+	LDI	r4, 0 // Intentionally one more in order to fine adjust to the period (the even signal does not have this extra one)
+	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+//	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 	MOV	r30.b0, 0x00 // All off
 SIGNALON7DEL:
 	SUB	r5, r5, 1

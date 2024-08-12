@@ -104,7 +104,7 @@ private:// Variables
 	double SynchTrigPeriod=4096; //For slotted analysis. It has to match to the histogram analysis
 	double FineSynchAdjOffVal=0;// Value provided by user space to adjust the triggering of the signals - offset
 	double FineSynchAdjFreqVal=0;// Value provided by user space to adjust the triggering of the signals - frequency
-	unsigned long long int TimePRU1synchPeriod=500000000;// In nanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
+	unsigned long long int TimePRU1synchPeriod=500000000;// In nanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. Also, the sorter the more error in the correct estimation, since there has not elapsed enough time to compute a tendency (it also happens with PRUdetCorrRelFreq() method whre a separation TagsSeparationDetRelFreq is inserted). The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
 	unsigned long long int iepPRUtimerRange32bits=4294967296;
 	struct timespec requestWhileWait;
 	struct timespec requestCoincidenceWhileWait;

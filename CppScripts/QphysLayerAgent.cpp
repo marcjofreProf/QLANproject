@@ -636,15 +636,19 @@ SynchCalcValuesAbsArray[0]=0.0*SynchCalcValuesAbsArray[0]+SynchCalcValuesArray[0
 SynchCalcValuesAbsArray[1]=SynchCalcValuesAbsArray[1]+SynchCalcValuesArray[1];
 SynchCalcValuesAbsArray[2]=SynchCalcValuesAbsArray[2]+SynchCalcValuesArray[2];
 
-//cout << "QPLA::SynchCalcValuesAbsArray[0]: " << SynchCalcValuesAbsArray[0] << endl;
-//cout << "QPLA::SynchCalcValuesAbsArray[1]: " << SynchCalcValuesAbsArray[1] << endl;
-//cout << "QPLA::SynchCalcValuesAbsArray[2]: " << SynchCalcValuesAbsArray[2] << endl;
+cout << "QPLA::SynchCalcValuesAbsArray[0]: " << SynchCalcValuesAbsArray[0] << endl;
+cout << "QPLA::SynchCalcValuesAbsArray[1]: " << SynchCalcValuesAbsArray[1] << endl;
+cout << "QPLA::SynchCalcValuesAbsArray[2]: " << SynchCalcValuesAbsArray[2] << endl;
 	
 // Update relative iterative values
 double SynchParamValuesArrayAux[2];
 // The order below is not correct - debbug the protocol
-SynchParamValuesArrayAux[0]=SynchCalcValuesArray[2]/static_cast<double>(HistPeriodicityAux);// relative frequency correction
-SynchParamValuesArrayAux[1]=SynchCalcValuesArray[1];// offset correction
+// when using the 0.5* factor
+//SynchParamValuesArrayAux[0]=SynchCalcValuesArray[2]/static_cast<double>(HistPeriodicityAux);// relative frequency correction
+//SynchParamValuesArrayAux[1]=SynchCalcValuesArray[1];// offset correction
+// When not using the 0.5* factor
+SynchParamValuesArrayAux[0]=SynchCalcValuesArray[1];// relative frequency correction
+SynchParamValuesArrayAux[1]=SynchCalcValuesArray[2];// offset correction
 PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Update computed values to the agent below
 cout << "QPLA::Synchronization parameters updated for this node" << endl;
 }
@@ -811,8 +815,8 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		// Update new value, just for monitoring of the wander
 		SmallOffsetDriftPerLink[CurrentSpecificLink]+=SmallOffsetDriftAux;
 		
-		//cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLink] " << SmallOffsetDriftPerLink[CurrentSpecificLink] << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
-		//cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
+		cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLink] " << SmallOffsetDriftPerLink[CurrentSpecificLink] << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
+		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
 		
 		long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
@@ -1120,9 +1124,9 @@ return 0; // All ok
 }
 
 int QPLA::HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass){
-this->acquire();
-while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
-this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
+//this->acquire();
+//while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
+//this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 
 // Check that we not exceed the QuBits buffer size
@@ -1135,10 +1139,11 @@ if (UseAllTagsForEstimation){
 	//CenterMassVal=CenterMassVal+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
 	//}
 	// Median averaging
-	for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
-		SynchFirstTagsArrayAux[i]=TimeTaggs[i]%static_cast<unsigned long long int>(HistPeriodicityAux);
+	long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
+	for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
+		SynchFirstTagsArrayAux[i]=TimeTaggs[i]%LLIHistPeriodicityAux;
 	}
-	SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=ULLIMedianFilterSubArray(SynchFirstTagsArrayAux,SimulateNumStoredQubitsNodeAux);
+	SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,SimulateNumStoredQubitsNodeAux);
 }
 else{
 	// Single value
@@ -1147,9 +1152,8 @@ else{
 }
 }
 
-this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
-this->release();
-
+//this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
+//this->release();
 
 if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 // Mean averaging
@@ -1161,8 +1165,9 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 
 // Median averaging
 double CenterMassValAux[NumRunsPerCenterMass-1]={0.0};
+long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
 for (int i=0;i<(NumRunsPerCenterMass-1);i++){
-CenterMassValAux[i]=(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
+CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityAux/2+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-(LLIHistPeriodicityAux/2));
 }
 SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));
 
@@ -1177,7 +1182,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	adjFreqSynchNormRatiosArray[2]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[1]))/static_cast<double>(HistPeriodicityAux);
 
 	SynchCalcValuesArray[0]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment
-	SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(0.5*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // Relative frequency difference adjustment
+	// For offset adjustment, it is weird: when using 0.5* it sorts of zeros the value, while with 1.0* it get a value....
+	//SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(0.5*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // Relative frequency difference adjustment
+	SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(1.0*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // Relative frequency difference adjustment
 	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]-SynchCalcValuesArray[1])*SynchCalcValuesArray[0]); // Offset adjustment
 
 	//cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;
@@ -1200,7 +1207,8 @@ if (ApplyRawQubitFilteringFlag==true){
 	// If the SNR is not well above 20 dB or 30dB, this methods perform really bad
 	// Estimate the x values for the linear regression from the y values (RawTimeTaggs)
 	unsigned long long int xEstimateRawTimeTaggs[RawNumStoredQubits]={0}; // Timetaggs of the detections raw
-	long long int RoundingAux;
+	//long long int RoundingAux;
+	unsigned long long int ULLIHistPeriodicityAux=static_cast<unsigned long long int>(HistPeriodicityAux);
 	for (int i=0;i<RawNumStoredQubits;i++){
 		/*if (i==0){
 			RoundingAux=(HistPeriodicityAux/2+RawTimeTaggs[i])%HistPeriodicityAux-HistPeriodicityAux/2;
@@ -1220,7 +1228,7 @@ if (ApplyRawQubitFilteringFlag==true){
 		//if (RoundingAux>=(HistPeriodicityAux/4)){RoundingAux=1;}
 		//else if (RoundingAux<=(-HistPeriodicityAux/4)){RoundingAux=-1;}
 		//else{RoundingAux=0;}
-		xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/HistPeriodicityAux)*HistPeriodicityAux;		
+		xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/ULLIHistPeriodicityAux)*ULLIHistPeriodicityAux;		
 	}
 
 	// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
@@ -1239,7 +1247,7 @@ if (ApplyRawQubitFilteringFlag==true){
         //y_mean=DoubleMedianFilterSubArray(y_meanArray,(RawNumStoredQubits-1)); // Median average
         // Absolute
         for (int i=0; i < RawNumStoredQubits; i++) {
-            y_meanArray[i]=static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux);
+            y_meanArray[i]=static_cast<double>(RawTimeTaggs[i]%ULLIHistPeriodicityAux);
             //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
             // We cannot use mean averaging since there might be outliers
 	    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
@@ -1420,6 +1428,40 @@ else{
 // Function to implement Bubble Sort
 int QPLA::ULLIBubbleSort(unsigned long long int* arr,int MedianFilterFactor) {
     unsigned long long int temp=0;
+    for (int i = 0; i < MedianFilterFactor-1; i++) {
+        for (int j = 0; j < MedianFilterFactor-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                // Swap arr[j] and arr[j+1]
+                temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+    return 0; // All ok
+}
+
+long long int QPLA::LLIMedianFilterSubArray(long long int* ArrayHolderAux,int MedianFilterFactor){
+if (MedianFilterFactor<=1){
+	return ArrayHolderAux[0];
+}
+else{
+	// Step 1: Copy the array to a temporary array
+    long long int temp[MedianFilterFactor]={0};
+    for(int i = 0; i < MedianFilterFactor; i++) {
+        temp[i] = ArrayHolderAux[i];
+    }
+    
+    // Step 2: Sort the temporary array
+    this->LLIBubbleSort(temp,MedianFilterFactor);
+    // If odd, middle number
+    return temp[MedianFilterFactor/2];
+}
+}
+
+// Function to implement Bubble Sort
+int QPLA::LLIBubbleSort(long long int* arr,int MedianFilterFactor) {
+    long long int temp=0;
     for (int i = 0; i < MedianFilterFactor-1; i++) {
         for (int j = 0; j < MedianFilterFactor-i-1; j++) {
             if (arr[j] > arr[j+1]) {
