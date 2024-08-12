@@ -552,7 +552,7 @@ if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there 
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
 threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
-this->SmallDriftContinuousCorrection();// Run after threadSimulateReceiveQuBitRefAux
+//this->SmallDriftContinuousCorrection();// Run after threadSimulateReceiveQuBitRefAux
 }
 else{
 cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
