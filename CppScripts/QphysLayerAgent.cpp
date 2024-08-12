@@ -636,9 +636,9 @@ SynchCalcValuesAbsArray[0]=0.0*SynchCalcValuesAbsArray[0]+SynchCalcValuesArray[0
 SynchCalcValuesAbsArray[1]=SynchCalcValuesAbsArray[1]+SynchCalcValuesArray[1];
 SynchCalcValuesAbsArray[2]=SynchCalcValuesAbsArray[2]+SynchCalcValuesArray[2];
 
-cout << "QPLA::SynchCalcValuesAbsArray[0]: " << SynchCalcValuesAbsArray[0] << endl;
-cout << "QPLA::SynchCalcValuesAbsArray[1]: " << SynchCalcValuesAbsArray[1] << endl;
-cout << "QPLA::SynchCalcValuesAbsArray[2]: " << SynchCalcValuesAbsArray[2] << endl;
+//cout << "QPLA::SynchCalcValuesAbsArray[0]: " << SynchCalcValuesAbsArray[0] << endl;
+//cout << "QPLA::SynchCalcValuesAbsArray[1]: " << SynchCalcValuesAbsArray[1] << endl;
+//cout << "QPLA::SynchCalcValuesAbsArray[2]: " << SynchCalcValuesAbsArray[2] << endl;
 	
 // Update relative iterative values
 double SynchParamValuesArrayAux[2];
@@ -647,8 +647,8 @@ double SynchParamValuesArrayAux[2];
 //SynchParamValuesArrayAux[0]=SynchCalcValuesArray[2]/static_cast<double>(HistPeriodicityAux);// relative frequency correction
 //SynchParamValuesArrayAux[1]=SynchCalcValuesArray[1];// offset correction
 // When not using the 0.5* factor
-SynchParamValuesArrayAux[0]=SynchCalcValuesArray[1];// relative frequency correction
-SynchParamValuesArrayAux[1]=SynchCalcValuesArray[2];// offset correction
+SynchParamValuesArrayAux[0]=SynchCalcValuesArray[2]/static_cast<double>(HistPeriodicityAux);// relative frequency correction
+SynchParamValuesArrayAux[1]=SynchCalcValuesArray[1]*static_cast<double>(HistPeriodicityAux);// offset correction
 PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Update computed values to the agent below
 cout << "QPLA::Synchronization parameters updated for this node" << endl;
 }
