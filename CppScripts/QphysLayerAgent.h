@@ -184,6 +184,7 @@ private: // Functions/Methods
 	int countDoubleColons(char* ParamsCharArray);
 	int countDoubleUnderscores(char* ParamsCharArray);
 	int countUnderscores(char* ParamsCharArray);
+	int PurgeExtraordinaryTimePointsNodes();
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 	// Particular process threads

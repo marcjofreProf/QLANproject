@@ -364,7 +364,7 @@ struct timespec requestWhileWait;
 int MaxWhileRound=1500;// Amount of check to receive the other node Time Point Barrier
 // Wait to receive the FutureTimePoint from other node
 this->acquire();
-while(MaxWhileRound>0){// to make sure to purge any other TimePoint //this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
+while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
 	this->release();
 	MaxWhileRound--;	
 	this->RelativeNanoSleepWait((unsigned int)(0.1*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//Maybe some sleep to reduce CPU consumption	
@@ -407,6 +407,19 @@ requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
 requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
 ///////////////////////////////////
 return requestWhileWait;
+}
+
+int QPLA::PurgeExtraordinaryTimePointsNodes(){
+int MaxWhileRound=3000;// Amount of check to receive the other node Time Point Barrier
+// Wait to receive the FutureTimePoint from other node
+this->acquire();
+while(MaxWhileRound>0){// Make sure to purge remaining Time Points from other nodes
+	this->release();
+	MaxWhileRound--;	
+	this->RelativeNanoSleepWait((unsigned int)(0.1*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//Maybe some sleep to reduce CPU consumption	
+	this->acquire();
+	};
+return 0; // All ok
 }
 
 int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int numReqQuBitsAux,double* FineSynchAdjValAux){
@@ -506,6 +519,7 @@ PRUGPIO.SendTriggerSignals(this->FineSynchAdjVal,TimePointFuture_time_as_count);
 	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);
  }
  */
+this->PurgeExtraordinaryTimePointsNodes();
 this->RunThreadSimulateEmitQuBitFlag=true;//enable again that this thread can again be called. It is okey since it entered a block semaphore part and then no other sempahored part will run until this one finishes. At the same time, returning to true at this point allows the read to not go out of scope and losing this flag parameter
  this->release();
  
@@ -721,6 +735,7 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);
  */
 
 this->LinearRegressionQuBitFilter();// Retrieve raw detected qubits and channel tags
+this->PurgeExtraordinaryTimePointsNodes();
 this->RunThreadSimulateReceiveQuBitFlag=true;//enable again that this thread can again be called
 this->release();
 cout << "End Receiving Qubits" << endl;
