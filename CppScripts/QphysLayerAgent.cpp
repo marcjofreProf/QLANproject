@@ -410,7 +410,7 @@ return requestWhileWait;
 }
 
 int QPLA::PurgeExtraordinaryTimePointsNodes(){
-int MaxWhileRound=3000;// Amount of check to receive the other node Time Point Barrier
+int MaxWhileRound=1500;// Amount of check to receive the other node Time Point Barrier
 // Wait to receive the FutureTimePoint from other node
 this->acquire();
 while(MaxWhileRound>0){// Make sure to purge remaining Time Points from other nodes
@@ -418,7 +418,9 @@ while(MaxWhileRound>0){// Make sure to purge remaining Time Points from other no
 	MaxWhileRound--;	
 	this->RelativeNanoSleepWait((unsigned int)(0.1*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//Maybe some sleep to reduce CPU consumption	
 	this->acquire();
-	};
+};
+// Reset the ClientNodeFutureTimePoint
+this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 return 0; // All ok
 }
 
