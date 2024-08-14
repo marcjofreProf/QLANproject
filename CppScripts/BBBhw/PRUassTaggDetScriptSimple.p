@@ -191,9 +191,11 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection (bits 15, 14 and 7 to 0)
 	MOV	r6.w1, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. TAkes a lot of time and so it is skew with respect the bits from r31
 	MOV	r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)
-	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections. Soft barrier, maybe a non-useful bit has fired, but gives timeto increase the detection time
-	MOV	r19.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0), increases the windows length but improves probability of detection
-	OR	r6, r6, r19 // Combine the possibilities of reading on these bits.
+//	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections. Soft barrier, maybe a non-useful bit has fired, but gives timeto increase the detection time
+	// The two lines below augment, if needed, the readings on the general r31 bits - altough it produces skews
+//	MOV	r19.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0), increases the windows length but improves probability of detection
+//	OR	r6, r6, r19 // Combine the possibilities of reading on these bits.
+	//
 	AND	r6, r6, r11 // Mask to make sure there are no other info
 	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections	
 	// Combining all reading pins

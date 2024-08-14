@@ -116,6 +116,7 @@ private: //Variables/Instances
 	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,0.35,0.70}; // Normalized values of frequency testing
 	double adjFreqSynchNormRatiosArray[NumCalcCenterMass]={1.0,1.0,1.0}; // adjusting Normalized ratios of frequency testing
 	double SynchNetworkParamsLink[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send
+	double CurrentSynchNetworkParamsLink[3]={0.0}; //Stores currently the network synch values of interest given the link in use
 	double GPIOHardwareSynched=false; // Variable to monitor the hardware synch status of the GPIO process
 	char CurrentEmitReceiveIP[NumBytesBufferICPMAX]={0}; // Current IP (maybe more than one) identifier who will emit (for receiver function) or receive (for emit function) qubits
 	int CurrentNumIdentifiedEmitIP=0; // Variable to keep track of the number of identified IPs emitting to this node
@@ -151,8 +152,8 @@ public: // Functions/Methods
         // General Input and Output functions
 	int SimulateEmitQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double* FineSynchAdjValAux);
 	int SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
-	int SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux);
-	int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass);
+	int SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double* FineSynchAdjValAux);
+	int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
 	int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
 	int GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams);
 	bool GetGPIOHardwareSynchedNode();

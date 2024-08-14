@@ -433,8 +433,8 @@ strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 this->numReqQuBits=numReqQuBitsAux;
 // Adjust the network synchronization values
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=SynchNetworkParamsLink[CurrentSpecificLink][0]+FineSynchAdjValAux[0];// synch trig offset
-this->FineSynchAdjVal[1]=SynchNetworkParamsLink[CurrentSpecificLink][1]+FineSynchAdjValAux[1];// synch trig frequency
+this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0]+FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1]+FineSynchAdjValAux[1];// synch trig frequency
 }
 //cout << "this->FineSynchAdjVal[1]: " << this->FineSynchAdjVal[1] << endl;
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
@@ -467,8 +467,8 @@ this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test f
 // Here run the several iterations with different testing frequencies
 // Adjust the network synchronization values
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=SynchNetworkParamsLink[CurrentSpecificLink][0]+FineSynchAdjValAux[0];// synch trig offset
-this->FineSynchAdjVal[1]=SynchNetworkParamsLink[CurrentSpecificLink][1]+FineSynchAdjValAux[1]+FreqSynchNormValuesArrayAux[iCenterMass];// synch trig frequency
+this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0]+FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1]+FineSynchAdjValAux[1]+FreqSynchNormValuesArrayAux[iCenterMass];// synch trig frequency
 }		
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
@@ -541,7 +541,7 @@ cout << "End Emiting Qubits" << endl;
  return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux){
+int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,double* FineSynchAdjValAux){
 this->acquire();
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
@@ -553,8 +553,8 @@ strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 this->numReqQuBits=numReqQuBitsAux;
 // Adjust the network synchronization values
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];//+FineSynchAdjValAux[0];// synch trig offset
-this->FineSynchAdjVal[1]=SynchNetworkParamsLink[CurrentSpecificLink][1];//+FineSynchAdjValAux[1];// synch trig frequency
+this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0]+FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1]+FineSynchAdjValAux[1];// synch trig frequency
 }
 if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
@@ -569,7 +569,7 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass){
+int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass){
 this->acquire();
 if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
@@ -592,8 +592,8 @@ if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 // Here run the several iterations with different testing frequencies
 // Adjust the network synchronization values
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];//+FineSynchAdjValAux[0];// synch trig offset
-this->FineSynchAdjVal[1]=SynchNetworkParamsLink[CurrentSpecificLink][1];//+FineSynchAdjValAux[1];// synch trig frequency
+this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0]+FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1]+FineSynchAdjValAux[1];// synch trig frequency
 }
 if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
@@ -669,7 +669,19 @@ for (int j=0;j<numCurrentEmitReceiveIP;j++){
 		}
 	}
 	if (numIPmatchesAux>1){// For the time being only implemented for one-to-one link (otherwise it has to be develop...)
-		cout << "QPLA::Multiple emitter nodes identified, so develop to correct small offset drift for each specific link...to be develop!!!" << endl;
+		cout << "QPLA::Multiple emitter/receivers nodes identified, so develop to correct small offset drift for each specific link...to be develop!!!" << endl;
+	}
+	
+	// Update the holder values that need to be passed depending on the current link of interest
+	if (CurrentSpecificLink>=0){
+		CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];
+		CurrentSynchNetworkParamsLink[1]=SynchNetworkParamsLink[CurrentSpecificLink][1];
+		CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLink][2];
+	}
+	else{
+		CurrentSynchNetworkParamsLink[0]=0.0;
+		CurrentSynchNetworkParamsLink[1]=0.0;
+		CurrentSynchNetworkParamsLink[2]=0.0;
 	}
 }
 return 0; // All ok
@@ -1111,9 +1123,9 @@ while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSi
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 
 if (CurrentSpecificLink>=0){
-TimeTaggsDetSynchParams[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];
-TimeTaggsDetSynchParams[1]=SynchNetworkParamsLink[CurrentSpecificLink][1];
-TimeTaggsDetSynchParams[2]=SynchNetworkParamsLink[CurrentSpecificLink][2];
+TimeTaggsDetSynchParams[0]=CurrentSynchNetworkParamsLink[0];
+TimeTaggsDetSynchParams[1]=CurrentSynchNetworkParamsLink[1];
+TimeTaggsDetSynchParams[2]=CurrentSynchNetworkParamsLink[2];
 }
 else{
 TimeTaggsDetSynchParams[0]=0.0;
