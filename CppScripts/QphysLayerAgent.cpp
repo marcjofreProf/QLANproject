@@ -904,8 +904,8 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		// Update new value, just for monitoring of the wander
 		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;
 		
-		//cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << endl;
-		//cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << endl;
+		cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP] << endl;
+		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP] << endl;
 		
 		long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long long int>(SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]);
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
