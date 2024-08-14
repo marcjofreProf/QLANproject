@@ -899,13 +899,13 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		}
 		
 		if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/4.0)){// Large step
-			cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
+			cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP] << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
 		}
 		// Update new value, just for monitoring of the wander
 		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;
 		
-		cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP] << endl;
-		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP] << endl;
+		//cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP] << endl;
+		//cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP] << endl;
 		
 		long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long long int>(SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]);
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
