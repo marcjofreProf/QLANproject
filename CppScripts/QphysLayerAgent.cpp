@@ -912,8 +912,8 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		// Update new value, just for monitoring of the wander
 		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;
 		
-		//cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP] << endl;
-		//cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP] << endl;
+		cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP] << endl;
+		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP] << endl;
 		
 		long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long long int>(SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]);
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
@@ -1211,9 +1211,9 @@ while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSi
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 
 if (CurrentSpecificLink>=0){
-TimeTaggsDetSynchParams[0]=CurrentSynchNetworkParamsLink[0];
-TimeTaggsDetSynchParams[1]=CurrentSynchNetworkParamsLink[1];
-TimeTaggsDetSynchParams[2]=CurrentSynchNetworkParamsLink[2];
+TimeTaggsDetSynchParams[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];
+TimeTaggsDetSynchParams[1]=SynchNetworkParamsLink[CurrentSpecificLink][1];
+TimeTaggsDetSynchParams[2]=SynchNetworkParamsLink[CurrentSpecificLink][2];
 }
 else{
 TimeTaggsDetSynchParams[0]=0.0;
