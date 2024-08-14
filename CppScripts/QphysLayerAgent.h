@@ -115,7 +115,7 @@ private: //Variables/Instances
 	double SynchCalcValuesAbsArray[NumCalcCenterMass]={0.0,0.0,0.0}; // Computed absolute values for achieving synchronization protocol, informative
 	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,0.35,0.70}; // Normalized values of frequency testing
 	double adjFreqSynchNormRatiosArray[NumCalcCenterMass]={1.0,1.0,1.0}; // adjusting Normalized ratios of frequency testing
-	double SynchNetworkParamsLink[LinkNumberMAX][2]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send
+	double SynchNetworkParamsLink[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send
 	double GPIOHardwareSynched=false; // Variable to monitor the hardware synch status of the GPIO process
 	char CurrentEmitReceiveIP[NumBytesBufferICPMAX]={0}; // Current IP (maybe more than one) identifier who will emit (for receiver function) or receive (for emit function) qubits
 	int CurrentNumIdentifiedEmitIP=0; // Variable to keep track of the number of identified IPs emitting to this node

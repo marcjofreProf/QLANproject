@@ -1110,9 +1110,16 @@ this->acquire();
 while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 
-TimeTaggsDetSynchParams[0]=SynchCalcValuesAbsArray[0];
-TimeTaggsDetSynchParams[1]=SynchCalcValuesAbsArray[1];
-TimeTaggsDetSynchParams[2]=SynchCalcValuesAbsArray[2];
+if (CurrentSpecificLink>=0){
+TimeTaggsDetSynchParams[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];
+TimeTaggsDetSynchParams[1]=SynchNetworkParamsLink[CurrentSpecificLink][1];
+TimeTaggsDetSynchParams[2]=SynchNetworkParamsLink[CurrentSpecificLink][2];
+}
+else{
+TimeTaggsDetSynchParams[0]=0.0;
+TimeTaggsDetSynchParams[1]=0.0;
+TimeTaggsDetSynchParams[2]=0.0;
+}
 
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();
@@ -1201,6 +1208,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	if (CurrentSpecificLink>=0){
 		SynchNetworkParamsLink[CurrentSpecificLink][0]+=SynchCalcValuesArray[1];// Offset
 		SynchNetworkParamsLink[CurrentSpecificLink][1]+=SynchCalcValuesArray[2];// Relative frequency difference
+		SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 	}
 }
 
