@@ -707,6 +707,7 @@ char ListSeparatedUnOrderedCurrentEmitReceiveIP[numCurrentEmitReceiveIP][IPcharA
 strcpy(ListUnOrderedCurrentEmitReceiveIP,this->CurrentEmitReceiveIP);// To not destroy array
 unsigned long long int ListUnOrderedIPnum[numCurrentEmitReceiveIP]; // Declaration
 unsigned long long int ListOrderedIPnum[numCurrentEmitReceiveIP]; // Declaration
+cout << "QPLA::ListUnOrderedCurrentEmitReceiveIP: " << ListUnOrderedCurrentEmitReceiveIP << endl;
 for (int i=0;i<numCurrentEmitReceiveIP;i++){
 	if (i==0){
 		strcpy(ListSeparatedUnOrderedCurrentEmitReceiveIP[i],strtok(ListUnOrderedCurrentEmitReceiveIP,"_"));		
@@ -717,6 +718,7 @@ for (int i=0;i<numCurrentEmitReceiveIP;i++){
 	cout << "ListSeparatedUnOrderedCurrentEmitReceiveIP[i]: " << ListSeparatedUnOrderedCurrentEmitReceiveIP[i] << endl;
 	ListUnOrderedIPnum[i]=this->IPtoNumber(ListSeparatedUnOrderedCurrentEmitReceiveIP[i]);
 	ListOrderedIPnum[i]=ListUnOrderedIPnum[i];// Just copy them
+	cout << "ListOrderedIPnum[i]: " << ListOrderedIPnum[i] << endl;
 }
 
 this->ULLIBubbleSort(ListOrderedIPnum,numCurrentEmitReceiveIP); // Order the numbers
