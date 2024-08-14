@@ -700,14 +700,14 @@ for (int j=0;j<numCurrentEmitReceiveIP;j++){
 	//}
 
 // For holding multiple IP links
-cout << "numCurrentEmitReceiveIP: " << numCurrentEmitReceiveIP << endl;
+//cout << "numCurrentEmitReceiveIP: " << numCurrentEmitReceiveIP << endl;
 // First always order the list of IPs involved (which are separated by "_")
 char ListUnOrderedCurrentEmitReceiveIP[NumBytesBufferICPMAX];
 char ListSeparatedUnOrderedCurrentEmitReceiveIP[numCurrentEmitReceiveIP][IPcharArrayLengthMAX];
 strcpy(ListUnOrderedCurrentEmitReceiveIP,this->CurrentEmitReceiveIP);// To not destroy array
 unsigned long long int ListUnOrderedIPnum[numCurrentEmitReceiveIP]; // Declaration
 unsigned long long int ListOrderedIPnum[numCurrentEmitReceiveIP]; // Declaration
-cout << "QPLA::ListUnOrderedCurrentEmitReceiveIP: " << ListUnOrderedCurrentEmitReceiveIP << endl;
+//cout << "QPLA::ListUnOrderedCurrentEmitReceiveIP: " << ListUnOrderedCurrentEmitReceiveIP << endl;
 for (int i=0;i<numCurrentEmitReceiveIP;i++){
 	if (i==0){
 		strcpy(ListSeparatedUnOrderedCurrentEmitReceiveIP[i],strtok(ListUnOrderedCurrentEmitReceiveIP,"_"));		
@@ -715,19 +715,15 @@ for (int i=0;i<numCurrentEmitReceiveIP;i++){
 	else{
 		strcpy(ListSeparatedUnOrderedCurrentEmitReceiveIP[i],strtok(NULL,"_"));
 	}
-	cout << "ListSeparatedUnOrderedCurrentEmitReceiveIP[i]: " << ListSeparatedUnOrderedCurrentEmitReceiveIP[i] << endl;
+	//cout << "ListSeparatedUnOrderedCurrentEmitReceiveIP[i]: " << ListSeparatedUnOrderedCurrentEmitReceiveIP[i] << endl;
 }
 for (int i=0;i<numCurrentEmitReceiveIP;i++){// Separated for because inside there is another strok that would block things
 	ListUnOrderedIPnum[i]=this->IPtoNumber(ListSeparatedUnOrderedCurrentEmitReceiveIP[i]);
 	ListOrderedIPnum[i]=ListUnOrderedIPnum[i];// Just copy them
-	cout << "ListOrderedIPnum[i]: " << ListOrderedIPnum[i] << endl;
+	//cout << "ListOrderedIPnum[i]: " << ListOrderedIPnum[i] << endl;
 }
 
 this->ULLIBubbleSort(ListOrderedIPnum,numCurrentEmitReceiveIP); // Order the numbers
-
-for (int i=0;i<numCurrentEmitReceiveIP;i++){
-	cout << "QPLA::ListOrderedIPnum[i]: " << ListOrderedIPnum[i] << endl;
-}
 
 char ListOrderedCurrentEmitReceiveIP[NumBytesBufferICPMAX];
 int jIndexMatch=0;// Reset
@@ -745,7 +741,7 @@ for (int i=0;i<numCurrentEmitReceiveIP;i++){
 	strcat(ListOrderedCurrentEmitReceiveIP,"_");// Separator
 }
 
-cout << "ListOrderedCurrentEmitReceiveIP: " << ListOrderedCurrentEmitReceiveIP << endl;
+//cout << "ListOrderedCurrentEmitReceiveIP: " << ListOrderedCurrentEmitReceiveIP << endl;
 
 CurrentSpecificLinkMultiple=-1;// Reset value
 // Then check if this entry exists
@@ -764,7 +760,7 @@ if (CurrentSpecificLinkMultiple<0){
 		CurrentNumIdentifiedMultipleIP++;		
 	}
 	else{// Mal function we should not be here
-		cout << "QPLA::Number of identified multiple combinatoins of emitters/receivers to this node has exceeded the expected value!!!" << endl;
+		cout << "QPLA::Number of identified multiple combinations of emitters/receivers to this node has exceeded the expected value!!!" << endl;
 	}
 }
 
