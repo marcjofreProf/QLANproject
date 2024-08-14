@@ -716,6 +716,8 @@ for (int i=0;i<numCurrentEmitReceiveIP;i++){
 		strcpy(ListSeparatedUnOrderedCurrentEmitReceiveIP[i],strtok(NULL,"_"));
 	}
 	cout << "ListSeparatedUnOrderedCurrentEmitReceiveIP[i]: " << ListSeparatedUnOrderedCurrentEmitReceiveIP[i] << endl;
+}
+for (int i=0;i<numCurrentEmitReceiveIP;i++){// Separated for because inside there is another strok that would block things
 	ListUnOrderedIPnum[i]=this->IPtoNumber(ListSeparatedUnOrderedCurrentEmitReceiveIP[i]);
 	ListOrderedIPnum[i]=ListUnOrderedIPnum[i];// Just copy them
 	cout << "ListOrderedIPnum[i]: " << ListOrderedIPnum[i] << endl;
