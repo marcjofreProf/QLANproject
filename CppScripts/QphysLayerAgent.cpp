@@ -424,13 +424,16 @@ this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 return 0; // All ok
 }
 
-int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int numReqQuBitsAux,double* FineSynchAdjValAux){
+int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double* FineSynchAdjValAux){
 this->acquire();
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
+strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
+this->RetrieveOtherEmiterReceiverMethod();
 strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 this->numReqQuBits=numReqQuBitsAux;
-this->FineSynchAdjVal[0]=FineSynchAdjValAux[0];// synch trig offset
-this->FineSynchAdjVal[1]=FineSynchAdjValAux[1];// synch trig frequency
+// Adjust the network synchronization values
+this->FineSynchAdjVal[0]=SynchNetworkParamsLink[CurrentSpecificLink][0]+FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]=SynchNetworkParamsLink[CurrentSpecificLink][1]+FineSynchAdjValAux[1];// synch trig frequency
 //cout << "this->FineSynchAdjVal[1]: " << this->FineSynchAdjVal[1] << endl;
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
@@ -445,22 +448,25 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass){
+int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass){
 this->acquire();
 if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
+strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
+this->RetrieveOtherEmiterReceiverMethod();
 strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 //this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
 this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
 this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
 this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
-this->FineSynchAdjVal[0]=FineSynchAdjValAux[0];// synch trig offset
-this->FineSynchAdjVal[1]=FineSynchAdjValAux[1];// synch trig frequency
 //cout << "this->FineSynchAdjVal[1]: " << this->FineSynchAdjVal[1] << endl;
 // Remove previous synch values - probably not for the emitter (since calculation for synch values are done as receiver)
 }
 // Here run the several iterations with different testing frequencies
-this->FineSynchAdjVal[1]=FineSynchAdjValAux[1]+FreqSynchNormValuesArrayAux[iCenterMass];// update values		
+// Adjust the network synchronization values
+this->FineSynchAdjVal[0]=SynchNetworkParamsLink[CurrentSpecificLink][0]+FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]=SynchNetworkParamsLink[CurrentSpecificLink][1]+FineSynchAdjValAux[1]+FreqSynchNormValuesArrayAux[iCenterMass];// synch trig frequency
+		
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
@@ -497,6 +503,7 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
 unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin 
+
 PRUGPIO.SendTriggerSignals(this->FineSynchAdjVal,TimePointFuture_time_as_count);//PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of NumQuBitsPerRun
  
  /* Very slow GPIO BBB not used anymore
@@ -531,39 +538,19 @@ cout << "End Emiting Qubits" << endl;
  return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitIPAux, char* IPaddressesAux,int numReqQuBitsAux){
+int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux){
 this->acquire();
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
-strcpy(this->CurrentEmitIP,CurrentEmitIPAux);
-// Store the potential IP identification of the emitters
-int CurrentSpecificLink=-1;//
-int numCurrentEmitIP=countUnderscores(this->CurrentEmitIP); // Which means the number of IP addresses that currently will send qubits
-char CurrentEmitIPAuxAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
-strcpy(CurrentEmitIPAuxAux,CurrentEmitIP);
-char SpecificCurrentEmitIPAuxAux[IPcharArrayLengthMAX]={0};
-for (int j=0;j<numCurrentEmitIP;j++){
-	if (j==0){strcpy(SpecificCurrentEmitIPAuxAux,strtok(CurrentEmitIPAuxAux,"_"));}
-	else{strcpy(SpecificCurrentEmitIPAuxAux,strtok(NULL,"_"));}
-	for (int i=0;i<CurrentNumIdentifiedEmitIP;i++){
-		if (string(LinkIdentificationArray[i])==string(SpecificCurrentEmitIPAuxAux)){// IP already present
-			CurrentSpecificLink=i;
-		}
-	}
-	if (CurrentSpecificLink<0){// Not previously identified, so stored them if possible
-		if ((CurrentNumIdentifiedEmitIP+1)<=LinkNumberMAX){
-			strcpy(LinkIdentificationArray[CurrentNumIdentifiedEmitIP],SpecificCurrentEmitIPAuxAux);// Update value
-			CurrentNumIdentifiedEmitIP++;
-		}
-		else{// Mal function we should not be here
-			cout << "QPLA::Number of identified emitters to this node has exceeded the expected value!!!" << endl;
-		}
-	}
-}
+strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
+this->RetrieveOtherEmiterReceiverMethod();
 //cout << "LinkIdentificationArray[0]: " << LinkIdentificationArray[0] << endl;
 //cout << "LinkIdentificationArray[1]: " << LinkIdentificationArray[1] << endl;
 ///
 strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 this->numReqQuBits=numReqQuBitsAux;
+// Adjust the network synchronization values
+this->FineSynchAdjVal[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];//+FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]=SynchNetworkParamsLink[CurrentSpecificLink][1];//+FineSynchAdjValAux[1];// synch trig frequency
 if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
@@ -577,36 +564,12 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitIPAux, char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass){
+int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass){
 this->acquire();
 if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
-	strcpy(this->CurrentEmitIP,CurrentEmitIPAux);
-	// Store the potential IP identification of the emitters
-	int CurrentSpecificLink=-1;//
-	int numCurrentEmitIP=countUnderscores(this->CurrentEmitIP); // Which means the number of IP addresses that currently will send qubits
-	char CurrentEmitIPAuxAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
-	strcpy(CurrentEmitIPAuxAux,CurrentEmitIP);
-	char SpecificCurrentEmitIPAuxAux[IPcharArrayLengthMAX]={0};
-	for (int j=0;j<numCurrentEmitIP;j++){
-		if (j==0){strcpy(SpecificCurrentEmitIPAuxAux,strtok(CurrentEmitIPAuxAux,"_"));}
-		else{strcpy(SpecificCurrentEmitIPAuxAux,strtok(NULL,"_"));}
-		for (int i=0;i<CurrentNumIdentifiedEmitIP;i++){
-			if (string(LinkIdentificationArray[i])==string(SpecificCurrentEmitIPAuxAux)){// IP already present
-				CurrentSpecificLink=i;
-			}
-		}
-		if (CurrentSpecificLink<0){// Not previously identified, so stored them if possible
-			if ((CurrentNumIdentifiedEmitIP+1)<=LinkNumberMAX){
-				strcpy(LinkIdentificationArray[CurrentNumIdentifiedEmitIP],SpecificCurrentEmitIPAuxAux);// Update value
-				CurrentNumIdentifiedEmitIP++;
-			}
-			else{// Mal function we should not be here
-				cout << "QPLA::Number of identified emitters to this node has exceeded the expected value!!!" << endl;
-			}
-		}
-	}
-	///
+	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
+	this->RetrieveOtherEmiterReceiverMethod();
 	strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);				
 	//this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
 	this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
@@ -621,7 +584,10 @@ if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 	//SynchParamValuesArrayAux[1]=SynchCalcValuesArray[2];
 	//PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Reset computed values to the agent below
 }
-// Here run the several iterations with different testing frequencies	
+// Here run the several iterations with different testing frequencies
+// Adjust the network synchronization values
+this->FineSynchAdjVal[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];//+FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]=SynchNetworkParamsLink[CurrentSpecificLink][1];//+FineSynchAdjValAux[1];// synch trig frequency
 if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
@@ -656,21 +622,50 @@ SynchCalcValuesAbsArray[2]=SynchCalcValuesAbsArray[2]+SynchCalcValuesArray[2];
 //cout << "QPLA::SynchCalcValuesAbsArray[1]: " << SynchCalcValuesAbsArray[1] << endl;
 //cout << "QPLA::SynchCalcValuesAbsArray[2]: " << SynchCalcValuesAbsArray[2] << endl;
 	
-// Update relative iterative values
-double SynchParamValuesArrayAux[2];
+// Update relative iterative values - Done for each Sending or Reading dependent on the specific link
+//double SynchParamValuesArrayAux[2];
 // The order below is not correct - debbug the protocol
-// when using the 0.5* factor
-SynchParamValuesArrayAux[0]=SynchCalcValuesArray[2]/static_cast<double>(HistPeriodicityAux);// relative frequency correction
-SynchParamValuesArrayAux[1]=SynchCalcValuesArray[1];// offset correction
-// When not using the 0.5* factor
-//SynchParamValuesArrayAux[0]=SynchCalcValuesArray[2]/static_cast<double>(HistPeriodicityAux);// relative frequency correction
-//SynchParamValuesArrayAux[1]=SynchCalcValuesArray[1]*static_cast<double>(HistPeriodicityAux);// offset correction
-PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Update computed values to the agent below
+//SynchParamValuesArrayAux[0]=SynchCalcValuesArray[2];// relative frequency correction
+//SynchParamValuesArrayAux[1]=SynchCalcValuesArray[1];// offset correction - dependent on link
+//PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Update computed values to the agent below
 cout << "QPLA::Synchronization parameters updated for this node" << endl;
 }
 this->release();
 
 return 0; // return 0 is for no error
+}
+
+int QPLA::RetrieveOtherEmiterReceiverMethod(){// Stores and retrieves the current other emiter receiver
+// Store the potential IP identification of the emitters (for Receive) and receivers for (Emit) - in order to identify the link
+CurrentSpecificLink=-1;// Reset value
+int numIPmatchesAux=0;
+int numCurrentEmitReceiveIP=countUnderscores(this->CurrentEmitReceiveIP); // Which means the number of IP addresses that currently will send/receive qubits
+char CurrentEmitReceiveIPAuxAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
+strcpy(CurrentEmitReceiveIPAuxAux,CurrentEmitReceiveIP);
+char SpecificCurrentEmitReceiveIPAuxAux[IPcharArrayLengthMAX]={0};
+for (int j=0;j<numCurrentEmitReceiveIP;j++){
+	if (j==0){strcpy(SpecificCurrentEmitReceiveIPAuxAux,strtok(CurrentEmitReceiveIPAuxAux,"_"));}
+	else{strcpy(SpecificCurrentEmitReceiveIPAuxAux,strtok(NULL,"_"));}
+	for (int i=0;i<CurrentNumIdentifiedEmitIP;i++){
+		if (string(LinkIdentificationArray[i])==string(SpecificCurrentEmitReceiveIPAuxAux)){// IP already present
+			CurrentSpecificLink=i;
+			numIPmatchesAux++;
+		}
+	}
+	if (CurrentSpecificLink<0){// Not previously identified, so stored them if possible
+		if ((CurrentNumIdentifiedEmitIP+1)<=LinkNumberMAX){
+			strcpy(LinkIdentificationArray[CurrentNumIdentifiedEmitIP],SpecificCurrentEmitReceiveIPAuxAux);// Update value
+			CurrentNumIdentifiedEmitIP++;
+		}
+		else{// Mal function we should not be here
+			cout << "QPLA::Number of identified emitters to this node has exceeded the expected value!!!" << endl;
+		}
+	}
+	if (numIPmatchesAux>1){// For the time being only implemented for one-to-one link (otherwise it has to be develop...)
+		cout << "QPLA::Multiple emitter nodes identified, so develop to correct small offset drift for each specific link...to be develop!!!" << endl;
+	}
+}
+return 0; // All ok
 }
 
 int QPLA::ThreadSimulateReceiveQubit(){
@@ -708,7 +703,7 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrie
 // Convert duration to desired time
 unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin
  for (iIterRuns=0;iIterRuns<DetRunsCount;iIterRuns++){	
-	PRUGPIO.ReadTimeStamps(TimePointFuture_time_as_count);//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
+	PRUGPIO.ReadTimeStamps(this->FineSynchAdjVal,TimePointFuture_time_as_count);//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
  }
  // Basic Input 
  /* Very slow GPIO BBB not used anymore
@@ -765,29 +760,7 @@ return 0;
 }
 
 // Apply the small offset drift correction
-if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
-	// Identify the specific link - For the time being only implemented for one-to-one link (otherwise it has to be develop...)
-	int CurrentSpecificLink=-1;//
-	int numIPmatchesAux=0;
-	int numCurrentEmitIP=countUnderscores(this->CurrentEmitIP); // Which means the number of IP addresses that currently will send qubits
-	char CurrentEmitIPAuxAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
-	strcpy(CurrentEmitIPAuxAux,CurrentEmitIP);
-	char SpecificCurrentEmitIPAuxAux[IPcharArrayLengthMAX]={0};
-	for (int j=0;j<numCurrentEmitIP;j++){
-		if (j==0){strcpy(SpecificCurrentEmitIPAuxAux,strtok(CurrentEmitIPAuxAux,"_"));}
-		else{strcpy(SpecificCurrentEmitIPAuxAux,strtok(NULL,"_"));}
-		for (int i=0;i<CurrentNumIdentifiedEmitIP;i++){
-			if (string(LinkIdentificationArray[i])==string(SpecificCurrentEmitIPAuxAux)){// IP already present
-				CurrentSpecificLink=i;
-				numIPmatchesAux++;
-			}
-		}
-	}
-	
-	if (numIPmatchesAux>1){// For the time being only implemented for one-to-one link (otherwise it has to be develop...)
-		cout << "QPLA::Multiple emitter nodes identified, so develop to correct small offset drift for each specific link...to be develop!!!" << endl;
-	}
-	
+if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){	
 	if (CurrentSpecificLink>-1){// The specific identification IP is present
 		// If it is the first time, annotate the relative time offset with respect HostPeriodicityAux
 		if (NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]==false){
@@ -1169,6 +1142,11 @@ else{
 }
 }
 
+// If the first iteration, since no extra relative frequency difference added, store the values, for at the end compute the offset, at least within theHistPeriodicityAux
+if (iCenterMass==0){
+	SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass];
+}
+
 //this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 //this->release();
 
@@ -1198,15 +1176,25 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	adjFreqSynchNormRatiosArray[1]=((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/static_cast<double>(HistPeriodicityAux);
 	adjFreqSynchNormRatiosArray[2]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[1]))/static_cast<double>(HistPeriodicityAux);
 
-	SynchCalcValuesArray[0]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment
-	// For offset adjustment, it is weird: when using 0.5* it sorts of zeros the value, while with 1.0* it get a value....
-	SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(0.5*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // Relative frequency difference adjustment
-	//SynchCalcValuesArray[1]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(1.0*SynchCalcValuesArray[0])-adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]); // Relative frequency difference adjustment
-	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]-SynchCalcValuesArray[1])*SynchCalcValuesArray[0]); // Offset adjustment
-
+	SynchCalcValuesArray[0]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment	
+	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])*SynchCalcValuesArray[0])/static_cast<double>(HistPeriodicityAux);  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)	
+	
+	double SynchCalcValuesArrayAux[NumRunsPerCenterMass]={0.0};
+	double DHistPeriodicityAux=static_cast<double>(HistPeriodicityAux);
+	for (int i=0;i<NumRunsPerCenterMass;i++){
+		SynchCalcValuesArrayAux[i]=fmod(static_cast<double>(SynchFirstTagsArrayOffsetCalc[i])+SynchCalcValuesArray[2]*DHistPeriodicityAux,DHistPeriodicityAux)/DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+	}
+	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
+	
 	//cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
+	
+	// Identify the specific link and store/update iteratively the values
+	if (CurrentSpecificLink>=0){
+		SynchNetworkParamsLink[CurrentSpecificLink][0]+=SynchCalcValuesArray[1];// Offset
+		SynchNetworkParamsLink[CurrentSpecificLink][1]+=SynchCalcValuesArray[2];// Relative frequency difference
+	}
 }
 
 return 0; // All Ok

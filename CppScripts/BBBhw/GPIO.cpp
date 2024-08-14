@@ -538,10 +538,12 @@ int GPIO::PRUsignalTimerSynch(){
 return 0; // All ok
 }
 
-int GPIO::ReadTimeStamps(unsigned long long int QPLAFutureTimePointNumber){// Read the detected timestaps in four channels
+int GPIO::ReadTimeStamps(double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber){// Read the detected timestaps in four channels
 /////////////
 std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 this->QPLAFutureTimePoint=Clock::time_point(duration_back);
+AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
+AccumulatedErrorDrift=FineSynchAdjValAux[1]; // Synch trig frequency
 //while (this->ManualSemaphoreExtra);// Wait until periodic synch method finishes
 while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->ManualSemaphoreExtra=true;
@@ -560,7 +562,7 @@ this->TimePointClockTagPRUinitial=Clock::now()+std::chrono::nanoseconds(2*TimePR
 SynchRem=static_cast<int>((static_cast<long double>(1.5*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));// For time stamping it waits 1.5 
 TimePointClockTagPRUinitial=TimePointClockTagPRUinitial+std::chrono::nanoseconds(SynchRem);
 
-InstantCorr=static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(256.0*AccumulatedErrorDrift)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod))+static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
+InstantCorr=static_cast<long double>(AccumulatedErrorDriftAux)*static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(256.0*AccumulatedErrorDrift)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod))+static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
 
 if (InstantCorr>0.0){SignAuxInstantCorr=1.0;}
 else if (InstantCorr<0.0){SignAuxInstantCorr=-1.0;}
@@ -627,8 +629,8 @@ return 0;// all ok
 int GPIO::SendTriggerSignals(double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 this->QPLAFutureTimePoint=Clock::time_point(duration_back);
-this->FineSynchAdjOffVal=FineSynchAdjValAux[0];// Synch trig offset
-this->FineSynchAdjFreqVal=FineSynchAdjValAux[1]; // Synch trig frequency
+AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
+AccumulatedErrorDrift=FineSynchAdjValAux[1]; // Synch trig frequency
 while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->ManualSemaphoreExtra=true;
 this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
@@ -650,7 +652,7 @@ this->TimePointClockTagPRUinitial=Clock::now()+std::chrono::nanoseconds(2*TimePR
 SynchRem=static_cast<int>((static_cast<long double>(1.5*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 this->TimePointClockTagPRUinitial=this->TimePointClockTagPRUinitial+std::chrono::nanoseconds(SynchRem);
 
-InstantCorr=static_cast<long double>(FineSynchAdjOffVal)*static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(256.0*AccumulatedErrorDrift)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod))+static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod))+static_cast<long double>(256.0*FineSynchAdjFreqVal)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
+InstantCorr=static_cast<long double>(FineSynchAdjOffVal)*static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(AccumulatedErrorDriftAux)*static_cast<long double>(SynchTrigPeriod)+static_cast<long double>(256.0*AccumulatedErrorDrift)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod))+static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod))+static_cast<long double>(256.0*FineSynchAdjFreqVal)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
 
 if (InstantCorr>0.0){SignAuxInstantCorr=1.0;}
 else if (InstantCorr<0.0){SignAuxInstantCorr=-1.0;}
@@ -721,7 +723,7 @@ int GPIO::SendEmulateQubits(){ // Emulates sending 2 entangled qubits through th
 return 0;// all ok
 }
 
-int GPIO::SetSynchDriftParams(double* AccumulatedErrorDriftParamsAux){
+int GPIO::SetSynchDriftParams(double* AccumulatedErrorDriftParamsAux){// Not Used
 this->acquire();
 // Make it iterative algorithm
 AccumulatedErrorDrift=AccumulatedErrorDrift+static_cast<long double>(AccumulatedErrorDriftParamsAux[0]); // For retrieved relative frequency difference from protocol
@@ -750,7 +752,7 @@ valpAux=valpAuxHolder;
 //synchp=synchpHolder;
 //for each capture bursts, at the beggining is stored the overflow counter of 32 bits. From there, each capture consists of 32 bits of the DWT_CYCCNT register and 8 bits of the channels detected (40 bits per detection tag).
 // The shared memory space has 12KB=12×1024bytes=12×1024×8bits=98304bits.
-//Doing numbers, we can store up to 2456 captures. To be in the safe side, we can do 2048 captures
+//Doing numbers, we can store up to 1966 captures. To be in the safe side, we can do 1964 captures
 
 // When unsgined char
 //valThresholdResetCounts=static_cast<unsigned int>(*valpAux);

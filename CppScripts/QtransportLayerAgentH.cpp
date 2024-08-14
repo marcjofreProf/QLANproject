@@ -1735,6 +1735,9 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			// Second message
 			strcpy(messagePayloadAux,"Passive");
 			strcat(messagePayloadAux,";");
+			strcat(messagePayloadAux,this->IPaddressesSockets[2]);// IP of the receiver
+			strcat(messagePayloadAux,"_");
+			strcat(messagePayloadAux,";");
 			strcat(messagePayloadAux,this->IPaddressesSockets[2]);
 			strcat(messagePayloadAux,"_");
 			strcat(messagePayloadAux,";");

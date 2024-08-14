@@ -106,15 +106,18 @@ private: //Variables/Instances
 	int numReqQuBits=0;
 	double FineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
 	// Automatic calculation of synchronization
+	int CurrentSpecificLink=-1; // Identifies th eindex of the other emiter/receiver
 	long long int SynchFirstTagsArrayAux[NumQubitsMemoryBuffer]={0}; // Holder to perform median computing
 	long long int SynchFirstTagsArray[NumCalcCenterMass][NumRunsPerCenterMass]; // To store the first tags (averaged if needed for all the tags in the run
+	long long int SynchFirstTagsArrayOffsetCalc[NumRunsPerCenterMass]; // To momentally store the first iteration of the synch which has no extra relative frequency edifferencew
 	double SynchHistCenterMassArray[NumCalcCenterMass]={0.0,0.0,0.0}; // Array containing the needed center of mass for the histograms of the synchronization
 	double SynchCalcValuesArray[NumCalcCenterMass]={0.0,0.0,0.0}; // Computed values for achieving synchronization protocol
 	double SynchCalcValuesAbsArray[NumCalcCenterMass]={0.0,0.0,0.0}; // Computed absolute values for achieving synchronization protocol, informative
 	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,0.35,0.70}; // Normalized values of frequency testing
 	double adjFreqSynchNormRatiosArray[NumCalcCenterMass]={1.0,1.0,1.0}; // adjusting Normalized ratios of frequency testing
+	double SynchNetworkParamsLink[LinkNumberMAX][2]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send
 	double GPIOHardwareSynched=false; // Variable to monitor the hardware synch status of the GPIO process
-	char CurrentEmitIP[NumBytesBufferICPMAX]={0}; // Current IP (maybe more than one) identifier who will emit qubits
+	char CurrentEmitReceiveIP[NumBytesBufferICPMAX]={0}; // Current IP (maybe more than one) identifier who will emit (for receiver function) or receive (for emit function) qubits
 	int CurrentNumIdentifiedEmitIP=0; // Variable to keep track of the number of identified IPs emitting to this node
 	char LinkIdentificationArray[LinkNumberMAX][IPcharArrayLengthMAX]={0}; // To track details of each specific link
 	bool ApplyProcQubitsSmallTimeOffsetContinuousCorrection=true; // Since we know that (after correcting for relative frequency difference and time offset) the tags should coincide with the initial value of the periodicity where the signals are sent
@@ -146,10 +149,10 @@ public: // Functions/Methods
 	int SendParametersAgent(char* ParamsCharArray);// The upper layer gets the information to be send
         int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node
         // General Input and Output functions
-	int SimulateEmitQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int numReqQuBitsAux,double* FineSynchAdjValAux);
-	int SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
-	int SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitIPAux,char* IPaddressesAux,int numReqQuBitsAux);
-	int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitIPAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass);
+	int SimulateEmitQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double* FineSynchAdjValAux);
+	int SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
+	int SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux);
+	int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,int iCenterMass,int iNumRunsPerCenterMass);
 	int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
 	int GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams);
 	bool GetGPIOHardwareSynchedNode();
@@ -194,6 +197,7 @@ private: // Functions/Methods
 	struct timespec SetFutureTimePointOtherNode();
 	struct timespec GetFutureTimePointOtherNode();
 	// Synchronization primitives
+	int RetrieveOtherEmiterReceiverMethod();// Stores and retrieves the current other emiter receiver
 	int HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass); // Calculate the histogram center given a period and a list of timetaggs
 	int SmallDriftContinuousCorrection();// Methods to keep track of the small offset correction at each measurement (but not in the network synch)
 	double DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor);
