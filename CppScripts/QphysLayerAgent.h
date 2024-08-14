@@ -107,6 +107,10 @@ private: //Variables/Instances
 	double FineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
 	// Automatic calculation of synchronization
 	int CurrentSpecificLink=-1; // Identifies th eindex of the other emiter/receiver
+	int CurrentSpecificLinkMultiple=-1; // Identifies the index of the other emiter/receiver links when multiple present
+	char ListCombinationSpecificLink[1ULL<<LinkNumberMAX-1][NumBytesBufferICPMAX]; // Stores the list of detected links and combinations in an ordered way
+	int numSpecificLinkmatches=0; // Identifies if multiple links used currently
+	int CurrentSpecificLinkMultipleIndices[1ULL<<LinkNumberMAX-1]={0}; // Array containing the indices CurrentSpecificLink when involving multiple links. The different combinaion of links is 2⁽NumberLinks)-1; the minus 1 since the not using any link is not contemplated
 	long long int SynchFirstTagsArrayAux[NumQubitsMemoryBuffer]={0}; // Holder to perform median computing
 	long long int SynchFirstTagsArray[NumCalcCenterMass][NumRunsPerCenterMass]; // To store the first tags (averaged if needed for all the tags in the run
 	long long int SynchFirstTagsArrayOffsetCalc[NumRunsPerCenterMass]; // To momentally store the first iteration of the synch which has no extra relative frequency edifferencew
@@ -119,13 +123,15 @@ private: //Variables/Instances
 	double CurrentSynchNetworkParamsLink[3]={0.0}; //Stores currently the network synch values of interest given the link in use
 	double GPIOHardwareSynched=false; // Variable to monitor the hardware synch status of the GPIO process
 	char CurrentEmitReceiveIP[NumBytesBufferICPMAX]={0}; // Current IP (maybe more than one) identifier who will emit (for receiver function) or receive (for emit function) qubits
-	int CurrentNumIdentifiedEmitIP=0; // Variable to keep track of the number of identified IPs emitting to this node
+	int CurrentNumIdentifiedEmitReceiveIP=0; // Variable to keep track of the number of identified IPs emitting/receiving to this node
+	int CurrentNumIdentifiedMultipleIP=0; // Variable to keep track of the number of identified multiple links to this node
 	char LinkIdentificationArray[LinkNumberMAX][IPcharArrayLengthMAX]={0}; // To track details of each specific link
 	bool ApplyProcQubitsSmallTimeOffsetContinuousCorrection=true; // Since we know that (after correcting for relative frequency difference and time offset) the tags should coincide with the initial value of the periodicity where the signals are sent
-	double SmallOffsetDriftPerLink[LinkNumberMAX]={0,0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
-	double ReferencePointSmallOffsetDriftPerLink[LinkNumberMAX]={0,0}; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
+	// the following arrays are initialized to zero in the Agent creator
+	double SmallOffsetDriftPerLink[1ULL<<LinkNumberMAX-1]={0.0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
+	double ReferencePointSmallOffsetDriftPerLink[1ULL<<LinkNumberMAX-1]={0.0}; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
 	// Filtering qubits
-	bool NonInitialReferencePointSmallOffsetDriftPerLink[LinkNumberMAX]={false,false}; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
+	bool NonInitialReferencePointSmallOffsetDriftPerLink[1ULL<<LinkNumberMAX-1]={false}; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
 	// Filtering qubits
 	bool ApplyRawQubitFilteringFlag=true;// Variable to select or unselect the filtering of raw qubits
 	long long int FilteringAcceptWindowSize=250; // Equivalent to around 3 times the time jitter
@@ -198,6 +204,7 @@ private: // Functions/Methods
 	struct timespec SetFutureTimePointOtherNode();
 	struct timespec GetFutureTimePointOtherNode();
 	// Synchronization primitives
+	unsigned long long int IPtoNumber(char* IPaddressAux);
 	int RetrieveOtherEmiterReceiverMethod();// Stores and retrieves the current other emiter receiver
 	int HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass); // Calculate the histogram center given a period and a list of timetaggs
 	int SmallDriftContinuousCorrection();// Methods to keep track of the small offset correction at each measurement (but not in the network synch)

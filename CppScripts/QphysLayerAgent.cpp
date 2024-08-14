@@ -59,6 +59,14 @@ QPLA::QPLA() {// Constructor
 	outGPIO->streamOutOpen();
 	outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);*/
 	// Synchronized "slotted" emission
+	// Initialize some arrays at the beggining
+	int CombinationLinksNumAux=static_cast<unsigned int>(1ULL<<LinkNumberMAX-1);
+	for (int i=0;i<CombinationLinksNumAux;i++){
+		SmallOffsetDriftPerLink[i]=0.0; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
+		ReferencePointSmallOffsetDriftPerLink[i]=0.0; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
+		// Filtering qubits
+		NonInitialReferencePointSmallOffsetDriftPerLink[i]=false; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
+	}
 	
 }
 
@@ -642,10 +650,24 @@ this->release();
 return 0; // return 0 is for no error
 }
 
+unsigned long long int QPLA::IPtoNumber(char* IPaddressAux){
+unsigned long long int IPnumberAux=0;
+unsigned long long int OctetNumAux=0;
+char IPaddressAuxHolder[IPcharArrayLengthMAX];
+strcpy(IPaddressAuxHolder,IPaddressAux); // to not destroy the information
+for (int i=0;i<4;i++){
+	if (i==0){OctetNumAux=static_cast<unsigned long long int>(atoi(strtok(IPaddressAuxHolder,".")));}
+	else{OctetNumAux=static_cast<unsigned long long int>(atoi(strtok(NULL,".")));}
+	IPnumberAux+=OctetNumAux<<(8*(4-i-1));
+}
+
+return IPnumberAux;
+}
+
 int QPLA::RetrieveOtherEmiterReceiverMethod(){// Stores and retrieves the current other emiter receiver
 // Store the potential IP identification of the emitters (for Receive) and receivers for (Emit) - in order to identify the link
 CurrentSpecificLink=-1;// Reset value
-int numIPmatchesAux=0;
+numSpecificLinkmatches=0; // Reset value
 int numCurrentEmitReceiveIP=countUnderscores(this->CurrentEmitReceiveIP); // Which means the number of IP addresses that currently will send/receive qubits
 char CurrentEmitReceiveIPAuxAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
 strcpy(CurrentEmitReceiveIPAuxAux,CurrentEmitReceiveIP);
@@ -653,36 +675,107 @@ char SpecificCurrentEmitReceiveIPAuxAux[IPcharArrayLengthMAX]={0};
 for (int j=0;j<numCurrentEmitReceiveIP;j++){
 	if (j==0){strcpy(SpecificCurrentEmitReceiveIPAuxAux,strtok(CurrentEmitReceiveIPAuxAux,"_"));}
 	else{strcpy(SpecificCurrentEmitReceiveIPAuxAux,strtok(NULL,"_"));}
-	for (int i=0;i<CurrentNumIdentifiedEmitIP;i++){
+	for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
 		if (string(LinkIdentificationArray[i])==string(SpecificCurrentEmitReceiveIPAuxAux)){// IP already present
 			CurrentSpecificLink=i;
-			numIPmatchesAux++;
+			CurrentSpecificLinkMultipleIndices[numSpecificLinkmatches]=i; // For multiple links at the same time
+			numSpecificLinkmatches++;
 		}
 	}
 	if (CurrentSpecificLink<0){// Not previously identified, so stored them if possible
-		if ((CurrentNumIdentifiedEmitIP+1)<=LinkNumberMAX){
-			strcpy(LinkIdentificationArray[CurrentNumIdentifiedEmitIP],SpecificCurrentEmitReceiveIPAuxAux);// Update value
-			CurrentNumIdentifiedEmitIP++;
+		if ((CurrentNumIdentifiedEmitReceiveIP+1)<=LinkNumberMAX){
+			strcpy(LinkIdentificationArray[CurrentNumIdentifiedEmitReceiveIP],SpecificCurrentEmitReceiveIPAuxAux);// Update value
+			CurrentSpecificLink=CurrentNumIdentifiedEmitReceiveIP;
+			CurrentNumIdentifiedEmitReceiveIP++;
 		}
 		else{// Mal function we should not be here
-			cout << "QPLA::Number of identified emitters to this node has exceeded the expected value!!!" << endl;
+			cout << "QPLA::Number of identified emitters/receivers to this node has exceeded the expected value!!!" << endl;
 		}
-	}
-	if (numIPmatchesAux>1){// For the time being only implemented for one-to-one link (otherwise it has to be develop...)
-		cout << "QPLA::Multiple emitter/receivers nodes identified, so develop to correct small offset drift for each specific link...to be develop!!!" << endl;
-	}
-	
-	// Update the holder values that need to be passed depending on the current link of interest
-	if (CurrentSpecificLink>=0){
-		CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];
-		CurrentSynchNetworkParamsLink[1]=SynchNetworkParamsLink[CurrentSpecificLink][1];
-		CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLink][2];
+	}	
+}
+
+// Develop for multiple links
+//if (numSpecificLinkmatches>1){// For the time being only implemented for one-to-one link (otherwise it has to be develop...)
+	//	cout << "QPLA::Multiple emitter/receivers nodes identified, so develop to correct small offset drift for each specific link...to be develop!!!" << endl;
+	//}
+
+// For holding multiple IP links
+// First always order the list of IPs involved (which are separated by "_")
+char ListUnOrderedCurrentEmitReceiveIP[NumBytesBufferICPMAX];
+char ListSeparatedUnOrderedCurrentEmitReceiveIP[numCurrentEmitReceiveIP][IPcharArrayLengthMAX];
+strcpy(ListUnOrderedCurrentEmitReceiveIP,this->CurrentEmitReceiveIP);// To not destroy array
+unsigned long long int ListUnOrderedIPnum[numCurrentEmitReceiveIP]; // Declaration
+unsigned long long int ListOrderedIPnum[numCurrentEmitReceiveIP]; // Declaration
+for (int i=0;i<numCurrentEmitReceiveIP;i++){
+	if (i==0){
+		strcpy(ListSeparatedUnOrderedCurrentEmitReceiveIP[i],strtok(ListUnOrderedCurrentEmitReceiveIP,"_"));		
 	}
 	else{
-		CurrentSynchNetworkParamsLink[0]=0.0;
-		CurrentSynchNetworkParamsLink[1]=0.0;
-		CurrentSynchNetworkParamsLink[2]=0.0;
+		strcpy(ListSeparatedUnOrderedCurrentEmitReceiveIP[i],strtok(NULL,"_"));
 	}
+	ListUnOrderedIPnum[i]=this->IPtoNumber(ListSeparatedUnOrderedCurrentEmitReceiveIP[i]);
+	ListOrderedIPnum[i]=ListUnOrderedIPnum[i];// Just copy them
+}
+
+this->ULLIBubbleSort(ListOrderedIPnum,numCurrentEmitReceiveIP); // Order the numbers
+
+char ListOrderedCurrentEmitReceiveIP[NumBytesBufferICPMAX];
+int jIndexMatch=0;// Reset
+for (int i=0;i<numCurrentEmitReceiveIP;i++){
+	jIndexMatch=0;// Reset
+	for (int j=0;j<numCurrentEmitReceiveIP;j++){// Search the index matching
+		if (ListOrderedIPnum[i]==ListUnOrderedIPnum[j]){jIndexMatch=j;}
+	}
+	if (i==0){
+		strcpy(ListOrderedCurrentEmitReceiveIP,ListSeparatedUnOrderedCurrentEmitReceiveIP[jIndexMatch]);
+	}
+	else{
+		strcat(ListOrderedCurrentEmitReceiveIP,ListSeparatedUnOrderedCurrentEmitReceiveIP[jIndexMatch]);
+	}
+	strcat(ListOrderedCurrentEmitReceiveIP,"_");// Separator
+}
+
+CurrentSpecificLinkMultiple=-1;// Reset value
+// Then check if this entry exists
+for (int i=0;i<CurrentNumIdentifiedMultipleIP;i++){
+	if (string(ListCombinationSpecificLink[i])==string(ListOrderedCurrentEmitReceiveIP)){
+		CurrentSpecificLinkMultiple=i;
+	}
+
+}
+// If exists, just return the index identifying it; if it does not exists store it and return the index identifying it
+int CombinationLinksNumAux=static_cast<unsigned int>(1ULL<<LinkNumberMAX-1);
+if (CurrentSpecificLinkMultiple<0){
+	if ((CurrentNumIdentifiedMultipleIP+1)<=CombinationLinksNumAux){
+		strcpy(ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP],ListOrderedCurrentEmitReceiveIP);// Update value
+		CurrentSpecificLinkMultiple=CurrentNumIdentifiedMultipleIP;
+		CurrentNumIdentifiedMultipleIP++;		
+	}
+	else{// Mal function we should not be here
+		cout << "QPLA::Number of identified multiple combinatoins of emitters/receivers to this node has exceeded the expected value!!!" << endl;
+	}
+}
+
+// Update the holder values that need to be passed depending on the current link of interest
+if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){
+	CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];
+	CurrentSynchNetworkParamsLink[1]=SynchNetworkParamsLink[CurrentSpecificLink][1];
+	CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLink][2];
+}
+else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){
+	CurrentSynchNetworkParamsLink[0]=0.0; // Reset values
+	CurrentSynchNetworkParamsLink[1]=0.0; // Reset values
+	CurrentSynchNetworkParamsLink[2]=0.0; // Reset values
+	for (int i=0;i<numSpecificLinkmatches; i++){// Use the average of the different involved links
+		CurrentSynchNetworkParamsLink[0]+=(1.0/static_cast<double>(numSpecificLinkmatches))*SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[i]][0];
+		CurrentSynchNetworkParamsLink[1]+=(1.0/static_cast<double>(numSpecificLinkmatches))*SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[i]][1];
+		CurrentSynchNetworkParamsLink[2]+=(1.0/static_cast<double>(numSpecificLinkmatches))*SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[i]][2];
+	}
+}
+else{
+	CurrentSynchNetworkParamsLink[0]=0.0;
+	CurrentSynchNetworkParamsLink[1]=0.0;
+	CurrentSynchNetworkParamsLink[2]=0.0;
 }
 return 0; // All ok
 }
@@ -780,41 +873,28 @@ return 0;
 
 // Apply the small offset drift correction
 if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){	
-	if (CurrentSpecificLink>-1){// The specific identification IP is present
+	if (CurrentSpecificLinkMultiple>-1){// The specific identification IP is present
 		// If it is the first time, annotate the relative time offset with respect HostPeriodicityAux
-		if (NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]==false){
-			ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=0.0;// Reset value
-			SmallOffsetDriftPerLink[CurrentSpecificLink]=0.0;// Reset value
-			//if (UseAllTagsForEstimation){
-				//double ReferencePointSmallOffsetDriftPerLinkArrayAux[SimulateNumStoredQubitsNodeAux]={0.0};
-				//for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-				//// Mean average, not very resilence with glitches (Eventhough filtered in Liner Regression)
-				////	ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>(TimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
-				// Median averaging
-				//ReferencePointSmallOffsetDriftPerLinkArrayAux[i]=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
-				//}
-				//ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=DoubleMedianFilterSubArray(ReferencePointSmallOffsetDriftPerLinkArrayAux,SimulateNumStoredQubitsNodeAux);// Median averaging
-			//}
-			//else{
-			//	ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[0]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
-			//}
-			NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]=true;// Update value, so that it is not run again
+		ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=0.0;// Reset value. ReferencePointSmallOffset could be used to allocate multiple channels separated by time
+		if (NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]==false){			
+			SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=0.0;// Reset value
+			NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=true;// Update value, so that it is not run again
 		}	
 		// First compute the relative new time offset from last iteration
 		double SmallOffsetDriftAux=0.0;
+		long double ldSmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]);
 		if (UseAllTagsForEstimation){
-			double SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0.0};
-			long double ldSmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]);
+			double SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0.0};			
 			for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 				// Mean averaging, not very resilent with glitches, eventhough filtered in liner regression
-				//SmallOffsetDriftAux+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>((TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]))%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
+				//SmallOffsetDriftAux+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>((TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]))%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
 				// Median averaging
 				SmallOffsetDriftArrayAux[i]=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-ldSmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink,HistPeriodicityAux)-HistPeriodicityAux/2.0);
 			}
 			SmallOffsetDriftAux=DoubleMedianFilterSubArray(SmallOffsetDriftArrayAux,SimulateNumStoredQubitsNodeAux); // Median averaging
 		}
 		else{
-			SmallOffsetDriftAux=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[0])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLink]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLink]),HistPeriodicityAux)-HistPeriodicityAux/2.0);
+			SmallOffsetDriftAux=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[0])-ldSmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink,HistPeriodicityAux)-HistPeriodicityAux/2.0);
 			cout << "QPLA::Using only first timetag for small offset correction!...to be deactivated" << endl;
 		}
 		
@@ -822,12 +902,12 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 			cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
 		}
 		// Update new value, just for monitoring of the wander
-		SmallOffsetDriftPerLink[CurrentSpecificLink]+=SmallOffsetDriftAux;
+		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;
 		
-		//cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLink] " << SmallOffsetDriftPerLink[CurrentSpecificLink] << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
-		//cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << LinkIdentificationArray[CurrentSpecificLink] << endl;
+		//cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << endl;
+		//cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << endl;
 		
-		long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long long int>(SmallOffsetDriftPerLink[CurrentSpecificLink]);
+		long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long long int>(SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]);
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 			TimeTaggs[i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
 		}
