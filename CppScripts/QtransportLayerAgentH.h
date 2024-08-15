@@ -94,7 +94,7 @@ private: // Variables/Objects
 	};
 	using Clock = my_clock;//
 	// Synchronization network parameters
-	bool FastInitialFakeSkipNetworkSynchFlag=true; // Variable that when activated, skips the initial network synchronization steps
+	bool FastInitialFakeSkipNetworkSynchFlag=false; // Variable that when activated, skips the initial network synchronization steps
 	int InitialNetworkSynchPass=0; // Variable to control that at least two rounds of network synchronization are performed the very first time
 	int numHolderOtherNodesSynchNetwork=0; // Variable to keep track if the other connected nodes have iterated thorugh the network synch
 	bool CycleSynchNetworkDone=false; // Variable to keep track if this host has been network synchronized in this cycle round of network sincronizxations
@@ -112,9 +112,10 @@ private: // Variables/Objects
 	int IterHostsActiveActionsFreeStatus=0;// 0: Not asked this question; 1: Question asked; 2: All questions received; -1: Abort and reset all
 	int ReWaitsAnswersHostsActiveActionsFree=0;// Counter to know how many times waited to have all the responses
 	int MaxReWaitsAnswersHostsActiveActionsFree=30; // Maximum number of times to wait to collect all answers
+	// Some parameters are initialized to zero in the constructor
 	bool HostsActiveActionsFree[1+NumConnectedHosts]={true}; // Indicate if the hosts are currently free to perform active actions. Index 0 is the host itself, the other indexes are the other remote hosts in the order of IPaddressesSockets starting from position 2
 	int NumAnswersOtherHostsActiveActionsFree=0;// Counter of the number of answers from other hosts proceessed
-	char InfoRemoteHostActiveActions[2][IPcharArrayLengthMAX]={"\0","\0"}; // Two parameters indicating current active blocking host and status
+	char InfoRemoteHostActiveActions[2][IPcharArrayLengthMAX]={"\0"}; // Two parameters indicating current active blocking host and status of this hosts
 	bool AchievedAttentionParticularHosts=false;// Indicates that we have got the attenation of the hosts
 
 public: // Functions

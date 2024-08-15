@@ -755,6 +755,7 @@ for (int i=0;i<CurrentNumIdentifiedMultipleIP;i++){
 
 }
 cout << "QPLA::CurrentSpecificLinkMultiple: " << CurrentSpecificLinkMultiple << endl;
+cout << "QPLA::CurrentNumIdentifiedMultipleIP: " << CurrentNumIdentifiedMultipleIP << endl;
 // If exists, just return the index identifying it; if it does not exists store it and return the index identifying it
 int CombinationLinksNumAux=static_cast<unsigned int>(1ULL<<LinkNumberMAX-1);
 if (CurrentSpecificLinkMultiple<0){
@@ -767,7 +768,8 @@ if (CurrentSpecificLinkMultiple<0){
 		cout << "QPLA::Number of identified multiple combinations of emitters/receivers to this node has exceeded the expected value!!!" << endl;
 	}
 }
-
+cout << "QPLA::CurrentSpecificLinkMultiple: " << CurrentSpecificLinkMultiple << endl;
+cout << "QPLA::CurrentNumIdentifiedMultipleIP: " << CurrentNumIdentifiedMultipleIP << endl;
 // Update the holder values that need to be passed depending on the current link of interest
 if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){
 	CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];
