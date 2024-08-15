@@ -690,7 +690,7 @@ for (int j=0;j<numCurrentEmitReceiveIP;j++){
 		}
 	}	
 }
-cout << "QPLA::CurrentSpecificLink: " << CurrentSpecificLink << endl;
+//cout << "QPLA::CurrentSpecificLink: " << CurrentSpecificLink << endl;
 // Develop for multiple links
 //if (numSpecificLinkmatches>1){// For the time being only implemented for one-to-one link (otherwise it has to be develop...)
 	//	cout << "QPLA::Multiple emitter/receivers nodes identified, so develop to correct small offset drift for each specific link...to be develop!!!" << endl;
@@ -741,21 +741,21 @@ for (int i=0;i<numCurrentEmitReceiveIP;i++){
 	strcat(ListOrderedCurrentEmitReceiveIP,"_");// Separator
 }
 
-cout << "ListOrderedCurrentEmitReceiveIP: " << ListOrderedCurrentEmitReceiveIP << endl;
+//cout << "ListOrderedCurrentEmitReceiveIP: " << ListOrderedCurrentEmitReceiveIP << endl;
 
 CurrentSpecificLinkMultiple=-1;// Reset value
 // Then check if this entry exists
-cout << "ListOrderedCurrentEmitReceiveIP: " << ListOrderedCurrentEmitReceiveIP << endl;
+//cout << "ListOrderedCurrentEmitReceiveIP: " << ListOrderedCurrentEmitReceiveIP << endl;
 for (int i=0;i<CurrentNumIdentifiedMultipleIP;i++){
-	cout << "ListCombinationSpecificLink[i]: " << ListCombinationSpecificLink[i] << endl;
+	//cout << "ListCombinationSpecificLink[i]: " << ListCombinationSpecificLink[i] << endl;
 	if (string(ListCombinationSpecificLink[i])==string(ListOrderedCurrentEmitReceiveIP)){
 		CurrentSpecificLinkMultiple=i;
 		break;
 	}
 
 }
-cout << "QPLA::CurrentSpecificLinkMultiple: " << CurrentSpecificLinkMultiple << endl;
-cout << "QPLA::CurrentNumIdentifiedMultipleIP: " << CurrentNumIdentifiedMultipleIP << endl;
+//cout << "QPLA::CurrentSpecificLinkMultiple: " << CurrentSpecificLinkMultiple << endl;
+//cout << "QPLA::CurrentNumIdentifiedMultipleIP: " << CurrentNumIdentifiedMultipleIP << endl;
 // If exists, just return the index identifying it; if it does not exists store it and return the index identifying it
 int CombinationLinksNumAux=static_cast<int>((1LL<<LinkNumberMAX)-1);
 if (CurrentSpecificLinkMultiple<0){
@@ -768,9 +768,9 @@ if (CurrentSpecificLinkMultiple<0){
 		cout << "QPLA::Number of identified multiple combinations of emitters/receivers to this node has exceeded the expected value!!!" << endl;
 	}
 }
-cout << "QPLA::CombinationLinksNumAux: " << CombinationLinksNumAux << endl;
-cout << "QPLA::CurrentSpecificLinkMultiple: " << CurrentSpecificLinkMultiple << endl;
-cout << "QPLA::CurrentNumIdentifiedMultipleIP: " << CurrentNumIdentifiedMultipleIP << endl;
+//cout << "QPLA::CombinationLinksNumAux: " << CombinationLinksNumAux << endl;
+//cout << "QPLA::CurrentSpecificLinkMultiple: " << CurrentSpecificLinkMultiple << endl;
+//cout << "QPLA::CurrentNumIdentifiedMultipleIP: " << CurrentNumIdentifiedMultipleIP << endl;
 // Update the holder values that need to be passed depending on the current link of interest
 if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){
 	CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];
