@@ -1427,8 +1427,9 @@ return 0; // all ok
 
 int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){
 this->acquire();
-
-while(AchievedAttentionParticularHosts==false){
+bool FirstPassAux=true;
+while(AchievedAttentionParticularHosts==false or FirstPassAux==true){
+	FirstPassAux=false;// First pass is compulsory, since it might be true AchievedAttentionParticularHosts, but because of another process
 	while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
 		this->release();
 		//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
@@ -1606,7 +1607,7 @@ return false; // all ok
 }
 
 int QTLAH::UnBlockYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
-int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
+int numForstEquivalentToSleep=1500;//1000: Equivalent to 1 seconds# give time to other hosts to enter
 for (int i=0;i<numForstEquivalentToSleep;i++){
 	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 	//cout << "this->getState(): " << this->getState() << endl;
