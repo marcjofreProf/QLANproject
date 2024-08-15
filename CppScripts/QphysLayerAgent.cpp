@@ -60,7 +60,7 @@ QPLA::QPLA() {// Constructor
 	outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);*/
 	// Synchronized "slotted" emission
 	// Initialize some arrays at the beggining
-	int CombinationLinksNumAux=static_cast<int>((1ULL<<LinkNumberMAX)-1);
+	int CombinationLinksNumAux=static_cast<int>((1LL<<LinkNumberMAX)-1);
 	for (int i=0;i<CombinationLinksNumAux;i++){
 		SmallOffsetDriftPerLink[i]=0.0; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
 		ReferencePointSmallOffsetDriftPerLink[i]=0.0; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
@@ -757,7 +757,7 @@ for (int i=0;i<CurrentNumIdentifiedMultipleIP;i++){
 cout << "QPLA::CurrentSpecificLinkMultiple: " << CurrentSpecificLinkMultiple << endl;
 cout << "QPLA::CurrentNumIdentifiedMultipleIP: " << CurrentNumIdentifiedMultipleIP << endl;
 // If exists, just return the index identifying it; if it does not exists store it and return the index identifying it
-int CombinationLinksNumAux=static_cast<int>((1ULL<<LinkNumberMAX)-1);
+int CombinationLinksNumAux=static_cast<int>((1LL<<LinkNumberMAX)-1);
 if (CurrentSpecificLinkMultiple<0){
 	if ((CurrentNumIdentifiedMultipleIP+1)<=CombinationLinksNumAux){
 		strcpy(ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP],ListOrderedCurrentEmitReceiveIP);// Update value
