@@ -418,7 +418,7 @@ return requestWhileWait;
 }
 
 int QPLA::PurgeExtraordinaryTimePointsNodes(){
-int MaxWhileRound=1500;// Amount of check to receive the other node Time Point Barrier
+int MaxWhileRound=500;// Amount of check to receive the other node Time Point Barrier
 // Wait to receive the FutureTimePoint from other node
 this->acquire();
 while(MaxWhileRound>0){// Make sure to purge remaining Time Points from other nodes
@@ -460,7 +460,6 @@ return 0; // return 0 is for no error
 
 int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass){
 this->acquire();
-if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
 this->RetrieveOtherEmiterReceiverMethod();
@@ -471,7 +470,6 @@ this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test 
 this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
 //cout << "this->FineSynchAdjVal[1]: " << this->FineSynchAdjVal[1] << endl;
 // Remove previous synch values - probably not for the emitter (since calculation for synch values are done as receiver)
-}
 // Here run the several iterations with different testing frequencies
 // Adjust the network synchronization values
 if (CurrentSpecificLink>=0){
@@ -579,15 +577,15 @@ return 0; // return 0 is for no error
 
 int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass){
 this->acquire();
-if (iCenterMass==0 and iNumRunsPerCenterMass==0){
-	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
-	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
-	this->RetrieveOtherEmiterReceiverMethod();
-	strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);				
-	//this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
-	this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
-	this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
-	this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
+strcpy(this->ModeActivePassive,ModeActivePassiveAux);
+strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
+this->RetrieveOtherEmiterReceiverMethod();
+strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);				
+//this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
+this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
+this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
+this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
+//if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 	// Reset previous synch values to zero - Maybe comment it in order to do an iterative algorithm
 	//SynchCalcValuesArray[0]=0.0;
 	//SynchCalcValuesArray[1]=0.0;
@@ -595,8 +593,7 @@ if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 	//double SynchParamValuesArrayAux[2];
 	//SynchParamValuesArrayAux[0]=SynchCalcValuesArray[1];
 	//SynchParamValuesArrayAux[1]=SynchCalcValuesArray[2];
-	//PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Reset computed values to the agent below
-}
+//}
 // Here run the several iterations with different testing frequencies
 // Adjust the network synchronization values
 if (CurrentSpecificLink>=0){
