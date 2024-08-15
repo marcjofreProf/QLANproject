@@ -378,7 +378,7 @@ while(MaxWhileRound>0){// Make sure we take the last one sent this->OtherClientN
 	this->RelativeNanoSleepWait((unsigned int)(0.1*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//Maybe some sleep to reduce CPU consumption	
 	this->acquire();
 	};
-if (MaxWhileRound<=0 and this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>()){
+if (this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>()){//MaxWhileRound<=0){
 this->OtherClientNodeFutureTimePoint=Clock::now();
 cout << "QPLA could not obtain in time the TimePoint from the other node" << endl;
 }// Provide a TimePoint to avoid blocking issues
