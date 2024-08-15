@@ -690,7 +690,7 @@ for (int j=0;j<numCurrentEmitReceiveIP;j++){
 		}
 	}	
 }
-
+cout << "QPLA::CurrentSpecificLink: " << CurrentSpecificLink << endl;
 // Develop for multiple links
 //if (numSpecificLinkmatches>1){// For the time being only implemented for one-to-one link (otherwise it has to be develop...)
 	//	cout << "QPLA::Multiple emitter/receivers nodes identified, so develop to correct small offset drift for each specific link...to be develop!!!" << endl;
@@ -741,7 +741,7 @@ for (int i=0;i<numCurrentEmitReceiveIP;i++){
 	strcat(ListOrderedCurrentEmitReceiveIP,"_");// Separator
 }
 
-//cout << "ListOrderedCurrentEmitReceiveIP: " << ListOrderedCurrentEmitReceiveIP << endl;
+cout << "ListOrderedCurrentEmitReceiveIP: " << ListOrderedCurrentEmitReceiveIP << endl;
 
 CurrentSpecificLinkMultiple=-1;// Reset value
 // Then check if this entry exists
@@ -754,6 +754,7 @@ for (int i=0;i<CurrentNumIdentifiedMultipleIP;i++){
 	}
 
 }
+cout << "QPLA::CurrentSpecificLinkMultiple: " << CurrentSpecificLinkMultiple << endl;
 // If exists, just return the index identifying it; if it does not exists store it and return the index identifying it
 int CombinationLinksNumAux=static_cast<unsigned int>(1ULL<<LinkNumberMAX-1);
 if (CurrentSpecificLinkMultiple<0){
