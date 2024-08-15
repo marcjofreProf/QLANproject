@@ -108,7 +108,7 @@ private: //Variables/Instances
 	// Automatic calculation of synchronization
 	int CurrentSpecificLink=-1; // Identifies th eindex of the other emiter/receiver
 	int CurrentSpecificLinkMultiple=-1; // Identifies the index of the other emiter/receiver links when multiple present
-	char ListCombinationSpecificLink[1ULL<<LinkNumberMAX-1][NumBytesBufferICPMAX]; // Stores the list of detected links and combinations in an ordered way
+	char ListCombinationSpecificLink[1ULL<<LinkNumberMAX-1][NumBytesPayloadBuffer]; // Stores the list of detected links and combinations in an ordered way
 	int numSpecificLinkmatches=0; // Identifies if multiple links used currently
 	int CurrentSpecificLinkMultipleIndices[1ULL<<LinkNumberMAX-1]={0}; // Array containing the indices CurrentSpecificLink when involving multiple links. The different combinaion of links is 2⁽NumberLinks)-1; the minus 1 since the not using any link is not contemplated
 	long long int SynchFirstTagsArrayAux[NumQubitsMemoryBuffer]={0}; // Holder to perform median computing

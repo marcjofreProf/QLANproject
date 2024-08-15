@@ -369,10 +369,10 @@ return requestWhileWait;
 
 struct timespec QPLA::GetFutureTimePointOtherNode(){
 struct timespec requestWhileWait;
-int MaxWhileRound=1500;// Amount of check to receive the other node Time Point Barrier
+int MaxWhileRound=1000;// Amount of check to receive the other node Time Point Barrier
 // Wait to receive the FutureTimePoint from other node
 this->acquire();
-while(this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
+while(MaxWhileRound>0){// Make sure we take the last one sent this->OtherClientNodeFutureTimePoint==std::chrono::time_point<Clock>() && MaxWhileRound>0){
 	this->release();
 	MaxWhileRound--;	
 	this->RelativeNanoSleepWait((unsigned int)(0.1*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//Maybe some sleep to reduce CPU consumption	
@@ -702,9 +702,12 @@ for (int j=0;j<numCurrentEmitReceiveIP;j++){
 // For holding multiple IP links
 //cout << "numCurrentEmitReceiveIP: " << numCurrentEmitReceiveIP << endl;
 // First always order the list of IPs involved (which are separated by "_")
-char ListUnOrderedCurrentEmitReceiveIP[NumBytesBufferICPMAX];
+char ListUnOrderedCurrentEmitReceiveIP[NumBytesPayloadBuffer];
 char ListSeparatedUnOrderedCurrentEmitReceiveIP[numCurrentEmitReceiveIP][IPcharArrayLengthMAX];
-strcpy(ListUnOrderedCurrentEmitReceiveIP,this->CurrentEmitReceiveIP);// To not destroy array
+if ((sizeof(ListUnOrderedCurrentEmitReceiveIP)-1)<strlen(this->CurrentEmitReceiveIP)){// List of IP for th elink to large, just copying part of it
+cout << "QPLA::CurrentEmitReceiveIP list of IP is too large...just copying part of it!!!" << endl;
+}
+strncpy(ListUnOrderedCurrentEmitReceiveIP,this->CurrentEmitReceiveIP,sizeof(ListUnOrderedCurrentEmitReceiveIP)-1);// To not destroy array. Just copy until the maximum amount of size of the array
 unsigned long long int ListUnOrderedIPnum[numCurrentEmitReceiveIP]; // Declaration
 unsigned long long int ListOrderedIPnum[numCurrentEmitReceiveIP]; // Declaration
 //cout << "QPLA::ListUnOrderedCurrentEmitReceiveIP: " << ListUnOrderedCurrentEmitReceiveIP << endl;
@@ -725,12 +728,12 @@ for (int i=0;i<numCurrentEmitReceiveIP;i++){// Separated for because inside ther
 
 this->ULLIBubbleSort(ListOrderedIPnum,numCurrentEmitReceiveIP); // Order the numbers
 
-char ListOrderedCurrentEmitReceiveIP[NumBytesBufferICPMAX];
+char ListOrderedCurrentEmitReceiveIP[NumBytesPayloadBuffer];
 int jIndexMatch=0;// Reset
 for (int i=0;i<numCurrentEmitReceiveIP;i++){
 	jIndexMatch=0;// Reset
 	for (int j=0;j<numCurrentEmitReceiveIP;j++){// Search the index matching
-		if (ListOrderedIPnum[i]==ListUnOrderedIPnum[j]){jIndexMatch=j;}
+		if (ListOrderedIPnum[i]==ListUnOrderedIPnum[j]){jIndexMatch=j;break;}
 	}
 	if (i==0){
 		strcpy(ListOrderedCurrentEmitReceiveIP,ListSeparatedUnOrderedCurrentEmitReceiveIP[jIndexMatch]);
@@ -745,9 +748,12 @@ for (int i=0;i<numCurrentEmitReceiveIP;i++){
 
 CurrentSpecificLinkMultiple=-1;// Reset value
 // Then check if this entry exists
+cout << "ListOrderedCurrentEmitReceiveIP: " << ListOrderedCurrentEmitReceiveIP << endl;
 for (int i=0;i<CurrentNumIdentifiedMultipleIP;i++){
+	cout << "ListCombinationSpecificLink[i]: " << ListCombinationSpecificLink[i] << endl;
 	if (string(ListCombinationSpecificLink[i])==string(ListOrderedCurrentEmitReceiveIP)){
 		CurrentSpecificLinkMultiple=i;
+		break;
 	}
 
 }
