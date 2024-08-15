@@ -768,6 +768,7 @@ if (CurrentSpecificLinkMultiple<0){
 		cout << "QPLA::Number of identified multiple combinations of emitters/receivers to this node has exceeded the expected value!!!" << endl;
 	}
 }
+cout << "QPLA::CombinationLinksNumAux: " << CombinationLinksNumAux << endl;
 cout << "QPLA::CurrentSpecificLinkMultiple: " << CurrentSpecificLinkMultiple << endl;
 cout << "QPLA::CurrentNumIdentifiedMultipleIP: " << CurrentNumIdentifiedMultipleIP << endl;
 // Update the holder values that need to be passed depending on the current link of interest
