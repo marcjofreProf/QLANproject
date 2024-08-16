@@ -732,7 +732,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 
 			CycleSynchNetworkDone=true;
 			
-			if (numHolderOtherNodesSynchNetwork==(NumConnectedHosts+1)){// All connected nodes and this host's node have been netwrok synch, so we can reset the synch cycle 
+			if (numHolderOtherNodesSynchNetwork==(NumConnectedHosts+1)){// All connected nodes and this host's node have been network synch, so we can reset the synch cycle 
 				CycleSynchNetworkDone=false;
 				numHolderOtherNodesSynchNetwork=0;// reset value
 			}
@@ -766,10 +766,11 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 		iIterNetworkSynchcurrentTimerVal++; // Update value
 	}
 
-	if (iIterNetworkSynchcurrentTimerVal>MaxiIterNetworkSynchcurrentTimerVal and HostsActiveActionsFree[0]==true){// Every some iterations re-synch the node thorugh the network
+	if (iIterNetworkSynchcurrentTimerVal>MaxiIterNetworkSynchcurrentTimerVal and HostsActiveActionsFree[0]==true and string(InfoRemoteHostActiveActions[1])!=string("Block")){// Every some iterations re-synch the node through the network
 		GPIOnodeHardwareSynched=false;// Update value as not synched
 		GPIOnodeNetworkSynched=false;// Update value as not synched
 		iIterNetworkSynchcurrentTimerVal=0;// Reset value
+		CycleSynchNetworkDone=false;// Reset value
 		cout << "Host " << this->IPaddressesSockets[2] << " will re-synch node to the network!" << endl;
 	}
 
@@ -779,7 +780,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 	iIterPeriodicTimerVal=0;// Reset variable
 }
 // Check if there is a permanent Block at this node
-if (string(InfoRemoteHostActiveActions[1])==string("Block")){
+if (string(InfoRemoteHostActiveActions[1])==string("Block") or HostsActiveActionsFree[0]==false){
 	iIterPeriodicBlockTimer++; // Counter to acknowledge how much time it has been consecutively blocked
 }
 else
@@ -792,6 +793,7 @@ if (iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer){// Try to unblock itself
 	HostsActiveActionsFree[0]=true; // Set the host as free
 	iIterPeriodicBlockTimer=0;
 	AchievedAttentionParticularHosts=false;// Indicates that we have got NOT the attenation of the hosts
+	// Send unblock signals
 	cout << "Host" << this->IPaddressesSockets[2] << " will unblock itself since to much time blocked" << endl;
 }
 	
