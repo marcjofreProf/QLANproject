@@ -1028,7 +1028,6 @@ TimeTaggsDetAnalytics[7]=0.0;
 cout << "TIMETAGGING ANALYSIS of QphysLayerAgent.h" << endl;
 cout << "When not using hist analysis, it can be changed back to NumQuBitsPerRun NUMRECORDS in PRUassTaggDetScript.p, GPIO.h and top of QphysLayerAgent.h" << endl;
 cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
-cout << "It has to have connected only ch1 timetagger" << endl;
 cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
 cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
 cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
@@ -1160,7 +1159,6 @@ TimeTaggsDetAnalytics[7]=(double)(TimeCoincidenceTaggs[0]);// Timetag of the fir
 cout << "COINCIDENCE ANALYSIS of QphysLayerAgent.h" << endl;
 cout << "When not using hist analysis, it can be changed back to NumQuBitsPerRun NUMRECORDS in PRUassTaggDetScript.p, GPIO.h and top of QphysLayerAgent.h" << endl;
 cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
-cout << "It has to have connected only ch1 timetagger" << endl;
 cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
 cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
 cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
