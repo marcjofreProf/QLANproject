@@ -764,7 +764,9 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 	}
 
 	// Other task to perform at some point or regularly
-	
+	cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
 	
 	iIterPeriodicTimerVal=0;// Reset variable
 }
@@ -785,7 +787,7 @@ if (iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer){// Try to unblock itself
 	// Send unblock signals
 	cout << "Host" << this->IPaddressesSockets[2] << " will unblock itself since to much time blocked" << endl;
 }
-	
+
 iIterPeriodicTimerVal++;
 return 0; // all ok
 }
