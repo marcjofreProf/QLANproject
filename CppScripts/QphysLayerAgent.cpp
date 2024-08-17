@@ -1293,12 +1293,16 @@ SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAu
 }
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
+	/*// when using multiple frequencies
 	adjFreqSynchNormRatiosArray[0]=1.0;
 	adjFreqSynchNormRatiosArray[1]=((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/static_cast<double>(HistPeriodicityAux);
 	adjFreqSynchNormRatiosArray[2]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[1]))/static_cast<double>(HistPeriodicityAux);
 
 	SynchCalcValuesArray[0]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment	
-	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[2]-(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2])*SynchCalcValuesArray[0])/static_cast<double>(SynchCalcValuesArray[0]);  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)	
+	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[2]-(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2])*SynchCalcValuesArray[0])/static_cast<double>(SynchCalcValuesArray[0]);  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)*/
+	// When using the base frequency to synchronize
+	SynchCalcValuesArray[0]=static_cast<double>(HistPeriodicityAux);//(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment	
+	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])*SynchCalcValuesArray[0])/static_cast<double>(SynchCalcValuesArray[0]);  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)	
 	
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass]={0.0};
 	double DHistPeriodicityAux=static_cast<double>(HistPeriodicityAux);

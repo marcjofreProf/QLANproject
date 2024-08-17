@@ -15,6 +15,8 @@ Header declaration file for Quantum transport Layer Agent Node
 #define NumSocketsMax 1
 #define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 #define IPcharArrayLengthMAX 15
+// Synchronization
+#define NumCalcCenterMass 1 //3 // Number of centers of mass to measure to compute the synchronization
 
 // Payload messages
 #define NumBytesPayloadBuffer 1000
@@ -105,7 +107,7 @@ private: // Variables/Objects
 	double QLLAFineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
 	// Synchronization test frequencies and others
 	int QLLANumRunsPerCenterMass=0;
-	double QLLAFreqSynchNormValuesArray[3]={0.0,0.35,0.70}; // Normalized values of frequency testing// Relative frequency difference normalized
+	double QLLAFreqSynchNormValuesArray[NumCalcCenterMass]={0.0};//,0.35,0.70}; // Normalized values of frequency testing// Relative frequency difference normalized
 	bool GPIOnodeHardwareSynched=false;// Indicates if the node is hardware PRU synchronized.
 	unsigned long long int iIterPeriodicTimerVal=0; // Variable to keep track of number of passes thorugh periodic checks
 	unsigned long long int MaxiIterPeriodicTimerVal=2000; // Max number of passes so that it enters the periodic checks

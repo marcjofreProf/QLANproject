@@ -1723,15 +1723,11 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			sprintf(charNumAux, "%d", iNumRunsPerCenterMass);
 			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");
-			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[0]);
-			strcat(messagePayloadAux,charNumAux);
-			strcat(messagePayloadAux,";");
-			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[1]);
-			strcat(messagePayloadAux,charNumAux);
-			strcat(messagePayloadAux,";");
-			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[2]);
-			strcat(messagePayloadAux,charNumAux);
-			strcat(messagePayloadAux,";");
+			for (int i=0;i<NumCalcCenterMass;i++){
+				sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[i]);
+				strcat(messagePayloadAux,charNumAux);
+				strcat(messagePayloadAux,";");
+			}
 			sprintf(charNumAux, "%4f", 0.0);// Zero added offset since we are not testing
 			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");
@@ -1772,15 +1768,11 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			sprintf(charNumAux, "%d", iNumRunsPerCenterMass);
 			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");			
-			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[0]);
-			strcat(messagePayloadAux,charNumAux);
-			strcat(messagePayloadAux,";");
-			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[1]);
-			strcat(messagePayloadAux,charNumAux);
-			strcat(messagePayloadAux,";");
-			sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[2]);
-			strcat(messagePayloadAux,charNumAux);
-			strcat(messagePayloadAux,";");
+			for (int i=0;i<NumCalcCenterMass;i++){
+				sprintf(charNumAux, "%4f", QTLAHFreqSynchNormValuesArray[i]);
+				strcat(messagePayloadAux,charNumAux);
+				strcat(messagePayloadAux,";");
+			}
 			sprintf(charNumAux, "%4f", 0.0);// Zero added offset since we are not testing
 			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");

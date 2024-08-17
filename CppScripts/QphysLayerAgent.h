@@ -25,7 +25,7 @@ Header declaration file for Quantum physical Layer Agent
 #define NumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 // Synchronization
 #define HistPeriodicityAux 4096 //Period in PRU counts of the synch period/histogram
-#define NumCalcCenterMass 3 // Number of centers of mass to measure to compute the synchronization
+#define NumCalcCenterMass 1//3 // Number of centers of mass to measure to compute the synchronization
 #define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 // String operations
 #include<string>
@@ -114,11 +114,11 @@ private: //Variables/Instances
 	long long int SynchFirstTagsArrayAux[NumQubitsMemoryBuffer]={0}; // Holder to perform median computing
 	long long int SynchFirstTagsArray[NumCalcCenterMass][NumRunsPerCenterMass]; // To store the first tags (averaged if needed for all the tags in the run
 	long long int SynchFirstTagsArrayOffsetCalc[NumRunsPerCenterMass]; // To momentally store the first iteration of the synch which has no extra relative frequency edifferencew
-	double SynchHistCenterMassArray[NumCalcCenterMass]={0.0,0.0,0.0}; // Array containing the needed center of mass for the histograms of the synchronization
-	double SynchCalcValuesArray[NumCalcCenterMass]={0.0,0.0,0.0}; // Computed values for achieving synchronization protocol
-	double SynchCalcValuesAbsArray[NumCalcCenterMass]={0.0,0.0,0.0}; // Computed absolute values for achieving synchronization protocol, informative
-	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,0.35,0.70}; // Normalized values of frequency testing
-	double adjFreqSynchNormRatiosArray[NumCalcCenterMass]={1.0,1.0,1.0}; // adjusting Normalized ratios of frequency testing
+	double SynchHistCenterMassArray[NumCalcCenterMass]={0.0};//,0.0,0.0}; // Array containing the needed center of mass for the histograms of the synchronization
+	double SynchCalcValuesArray[3]={0.0,0.0,0.0}; // Computed values for achieving synchronization protocol
+	double SynchCalcValuesAbsArray[3]={0.0,0.0,0.0}; // Computed absolute values for achieving synchronization protocol, informative
+	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0};//,0.35,0.70}; // Normalized values of frequency testing
+	double adjFreqSynchNormRatiosArray[NumCalcCenterMass]={1.0};//,1.0,1.0}; // adjusting Normalized ratios of frequency testing
 	double SynchNetworkParamsLink[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send
 	double CurrentSynchNetworkParamsLink[3]={0.0}; //Stores currently the network synch values of interest given the link in use
 	double GPIOHardwareSynched=false; // Variable to monitor the hardware synch status of the GPIO process
