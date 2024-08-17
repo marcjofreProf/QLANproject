@@ -1705,7 +1705,7 @@ char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){// For each connected node to be synch with
 	for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 		for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){			
-			// First message
+			// First message - Receive Qubits
 			strcpy(messagePayloadAux,"Active");
 			strcat(messagePayloadAux,";");
 			strcat(messagePayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);// Ip OPnet of the emitter
@@ -1713,6 +1713,9 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			strcat(messagePayloadAux,";");				
 			strcat(messagePayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);
 			strcat(messagePayloadAux,"_");
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%d", this->NumQuBitsPerRunAux);
+			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");
 			sprintf(charNumAux, "%d", NumRunsPerCenterMass);
 			strcat(messagePayloadAux,charNumAux);
@@ -1753,7 +1756,7 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			//this->SendMessageAgent(ParamsCharArray);// With acquire/release
 			//cout << "PeriodicRequestSynchsHost ParamsCharArray: " << ParamsCharArray << endl;
 			
-			// Second message
+			// Second message - Send QuBits
 			strcpy(messagePayloadAux,"Passive");
 			strcat(messagePayloadAux,";");
 			strcat(messagePayloadAux,this->IPaddressesSockets[2]);// IP of the receiver
@@ -1761,6 +1764,9 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			strcat(messagePayloadAux,";");
 			strcat(messagePayloadAux,this->IPaddressesSockets[2]);
 			strcat(messagePayloadAux,"_");
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%d", this->NumberRepetitionsSignalAux);
+			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");
 			sprintf(charNumAux, "%d", NumRunsPerCenterMass);
 			strcat(messagePayloadAux,charNumAux);

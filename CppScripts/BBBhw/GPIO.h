@@ -25,8 +25,8 @@ using std::fstream;
 #define GPIO_PATH "/sys/class/gpio/"
 #define PRUdataPATH1 "./PRUdata/"
 #define PRUdataPATH2 "../PRUdata/"
-#define NumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
-#define MaxNumQuBitsMemStored 10*NumQuBitsPerRun // Maximum size of the array for memory storing qubits (timetaggs and channels)
+#define MaxNumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
+#define MaxNumQuBitsMemStored 10*MaxNumQuBitsPerRun // Maximum size of the array for memory storing qubits (timetaggs and channels)
 #define MaxNumPulses	8192	// Used in the averging of time synchronization arrays
 #define PRUclockStepPeriodNanoseconds		5.00000//4.99999 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
 #define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
@@ -153,6 +153,7 @@ private:// Variables
 	//bool finPRU0;
 	// PRU Signal
 	unsigned int NumberRepetitionsSignal=32768;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
+	unsigned int NumQuBitsPerRun=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=5000000; // In microseconds. Signal generation
 	//int WaitTimeToFutureTimePointPRU1=1000;// The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s, not more otherwise the synch calculation error overflows as well and things go bad.
@@ -164,7 +165,6 @@ private:// Variables
 	//bool finPRU1;
 	// SHARED RAM to file dump
 	int iIterDump;
-	unsigned int NumRecords=NumQuBitsPerRun; //Number of records per run. Max NumQuBitsPerRun. It is also defined in PRUassTaggDetScript.p and QphysLayerAgent.h
 	unsigned int NumSynchPulses=0;
 	unsigned short* valpHolder;
 	unsigned short* valpAuxHolder;
@@ -233,8 +233,8 @@ public:	// Functions/Methods
 	int LOCAL_DDMinit();
 	int DDRdumpdata();
 	int DisablePRUs();
-	int ReadTimeStamps(double SynchTrigPeriodAux,double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber);// Read the detected timestaps in four channels
-	int SendTriggerSignals(double SynchTrigPeriodAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+	int ReadTimeStamps(double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux,double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber);// Read the detected timestaps in four channels
+	int SendTriggerSignals(double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	int SendTriggerSignalsSelfTest();//
 	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
 	int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned short* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits

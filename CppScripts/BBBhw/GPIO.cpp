@@ -122,7 +122,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	LOCAL_DDMinit(); // DDR (Double Data Rate): A class of memory technology used in DRAM where data is transferred on both the rising and falling edges of the clock signal, effectively doubling the data rate without increasing the clock frequency.
 	// Here we can update memory space assigned address
 	valpHolder=(unsigned short*)&sharedMem_int[OFFSET_SHAREDRAM];
-	valpAuxHolder=valpHolder+4+6*NumRecords;// 6* since each detection also includes the channels (2 Bytes) and 4 bytes for 32 bits counter, and plus 4 since the first tag is captured at the very beggining
+	valpAuxHolder=valpHolder+4+6*NumQuBitsPerRun;// 6* since each detection also includes the channels (2 Bytes) and 4 bytes for 32 bits counter, and plus 4 since the first tag is captured at the very beggining
 	CalpHolder=(unsigned int*)&pru0dataMem_int[2];// First tagg captured at the very beggining
 	synchpHolder=(unsigned int*)&pru0dataMem_int[3];// Starts at 12
 	
@@ -131,7 +131,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	    // Execute program
 	    // Load and execute the PRU program on the PRU0
 	pru0dataMem_int[0]=static_cast<unsigned int>(0); // set no command
-	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures, with overflow clock
+	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures, with overflow clock
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru0dataMem_int[3]=static_cast<unsigned int>(0);
 	//if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
@@ -538,11 +538,13 @@ int GPIO::PRUsignalTimerSynch(){
 return 0; // All ok
 }
 
-int GPIO::ReadTimeStamps(double SynchTrigPeriodAux, double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber){// Read the detected timestaps in four channels
+int GPIO::ReadTimeStamps(double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux, double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber){// Read the detected timestaps in four channels
 /////////////
 std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 this->QPLAFutureTimePoint=Clock::time_point(duration_back);
 SynchTrigPeriod=SynchTrigPeriodAux;// Histogram/Period value
+NumQuBitsPerRun=NumQuBitsPerRunAux;
+valpAuxHolder=valpHolder+4+6*NumQuBitsPerRun;// 6* since each detection also includes the channels (2 Bytes) and 4 bytes for 32 bits counter, and plus 4 since the first tag is captured at the very beggining
 AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
 AccumulatedErrorDrift=FineSynchAdjValAux[1]; // Synch trig frequency
 //while (this->ManualSemaphoreExtra);// Wait until periodic synch method finishes
@@ -553,7 +555,7 @@ this->acquire();// Very critical to not produce measurement deviations when asse
 this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;// Acquire this value for the this tag reading set
 ///////////
 pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and it is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
-pru0dataMem_int[1]=static_cast<unsigned int>(this->NumRecords); // set number captures
+pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures
 // Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
 requestCoincidenceWhileWait=CoincidenceSetWhileWait();
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestCoincidenceWhileWait,NULL); // Synch barrier. So that SendTriggerSignals and ReadTimeStamps of the different nodes coincide
@@ -627,10 +629,11 @@ this->DDRdumpdata(); // Store to file
 return 0;// all ok
 }
 
-int GPIO::SendTriggerSignals(double SynchTrigPeriodAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+int GPIO::SendTriggerSignals(double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 this->QPLAFutureTimePoint=Clock::time_point(duration_back);
 SynchTrigPeriod=SynchTrigPeriodAux;// Histogram/Period value
+NumberRepetitionsSignal=static_cast<unsigned int>(NumberRepetitionsSignalAux);// Number of repetitions to send signals
 AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
 AccumulatedErrorDrift=FineSynchAdjValAux[1]; // Synch trig frequency
 while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
@@ -820,7 +823,7 @@ this->TimeTaggsLast=static_cast<unsigned long long int>(ceil((static_cast<long d
 //	}
 //}
 
-for (iIterDump=0; iIterDump<NumRecords; iIterDump++){
+for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 	// When unsigned short
 	valCycleCountPRU=static_cast<unsigned int>(*valp);
 	valp++;// 1 times 16 bits
@@ -846,7 +849,7 @@ if (SlowMemoryPermanentStorageFlag==true){
 	// Reading TimeTaggs
 	if (streamDDRpru.is_open()){
 		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		for (iIterDump=0; iIterDump<NumRecords; iIterDump++){
+		for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 			streamDDRpru.write(reinterpret_cast<const char*>(&TimeTaggsStored[iIterDump]), sizeof(TimeTaggsStored[iIterDump]));
 			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations

@@ -440,7 +440,7 @@ strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
 this->RetrieveOtherEmiterReceiverMethod();
 strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
-this->numReqQuBits=numReqQuBitsAux;
+this->NumberRepetitionsSignal=numReqQuBitsAux;
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
@@ -461,12 +461,13 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass){
+int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass){
 this->acquire();
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
 this->RetrieveOtherEmiterReceiverMethod();
 strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
+this->NumberRepetitionsSignal=numReqQuBitsAux;
 //this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
 this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
 this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
@@ -517,7 +518,7 @@ auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
 unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin 
 
-PRUGPIO.SendTriggerSignals(this->HistPeriodicityAux,this->FineSynchAdjVal,TimePointFuture_time_as_count);//PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of NumQuBitsPerRun
+PRUGPIO.SendTriggerSignals(this->HistPeriodicityAux,static_cast<unsigned int>(NumberRepetitionsSignal),this->FineSynchAdjVal,TimePointFuture_time_as_count);//PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of NumQuBitsPerRun
  
  /* Very slow GPIO BBB not used anymore
  // Basic Output - Generate a pulse of 1 second period
@@ -560,7 +561,7 @@ this->RetrieveOtherEmiterReceiverMethod();
 //cout << "LinkIdentificationArray[1]: " << LinkIdentificationArray[1] << endl;
 ///
 strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
-this->numReqQuBits=numReqQuBitsAux;
+this->NumQuBitsPerRun=numReqQuBitsAux;
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
@@ -580,12 +581,13 @@ this->release();
 return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass){
+int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass){
 this->acquire();
 strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
 this->RetrieveOtherEmiterReceiverMethod();
-strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);				
+strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
+this->NumQuBitsPerRun=numReqQuBitsAux;				
 //this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
 this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
 this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
@@ -836,7 +838,7 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrie
 // Convert duration to desired time
 unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin
  for (iIterRuns=0;iIterRuns<DetRunsCount;iIterRuns++){	
-	PRUGPIO.ReadTimeStamps(this->HistPeriodicityAux,this->FineSynchAdjVal,TimePointFuture_time_as_count);//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
+	PRUGPIO.ReadTimeStamps(this->HistPeriodicityAux,static_cast<unsigned int>(NumQuBitsPerRun),this->FineSynchAdjVal,TimePointFuture_time_as_count);//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
  }
  // Basic Input 
  /* Very slow GPIO BBB not used anymore
