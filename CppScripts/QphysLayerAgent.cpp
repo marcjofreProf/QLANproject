@@ -915,7 +915,7 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 			cout << "QPLA::Using only first timetag for small offset correction!...to be deactivated" << endl;
 		}
 		
-		if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/4.0)){// Large step
+		if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/3.0)){// Large step
 			cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP] << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
 		}
 		// Update new value, just for monitoring of the wander

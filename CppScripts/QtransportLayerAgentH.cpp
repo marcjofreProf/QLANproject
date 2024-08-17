@@ -67,7 +67,12 @@ strcpy(this->IPaddressesSockets[4],strtok(NULL,","));
 //cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
 //cout << "SCmode[0]: "<< this->SCmode[0] << endl;
 //cout << "SCmode[1]: "<< this->SCmode[1] << endl;
-
+// Initialize some values
+for (int i=0;i<(NumConnectedHosts+1);i++){
+	HostsActiveActionsFree[i]=true; // Indicate if the hosts are currently free to perform active actions. Index 0 is the host itself, the other indexes are the other remote hosts in the order of IPaddressesSockets starting from position 2	
+}
+strcpy(InfoRemoteHostActiveActions[0],"\0");
+strcpy(InfoRemoteHostActiveActions[1],"\0");
 }
 
 /*
@@ -761,15 +766,42 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 		iIterNetworkSynchcurrentTimerVal=0;// Reset value
 		CycleSynchNetworkDone=false;// Reset value
 		cout << "Host " << this->IPaddressesSockets[2] << " will re-synch node to the network!" << endl;
+		// Some information of interest
+		// InfoRemoteHostActiveActions should never contain information when HostsActiveActionsFree[0] is true (or 1)
+		//cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+		//cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
+		//cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
 	}
 
 	// Other task to perform at some point or regularly
-	cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
-	cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
-	cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
+	//cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+	//cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
+	//cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
 	
 	iIterPeriodicTimerVal=0;// Reset variable
 }
+/////////////////////////////////////////////////////////////////////////////
+// Check if there is a malfunction with the blocks
+int OtherHostsActiveActionsFreeAux=0;
+for (int i=0;i<NumConnectedHosts;i++){
+	if (HostsActiveActionsFree[1+i]==false){
+	OtherHostsActiveActionsFreeAux++;
+	}
+}
+if (HostsActiveActionsFree[0]==true and (string(InfoRemoteHostActiveActions[0])!=string("\0") or string(InfoRemoteHostActiveActions[1])!=string("\0") or AchievedAttentionParticularHosts==true or OtherHostsActiveActionsFreeAux>0)){
+	cout << "Host " << this->IPaddressesSockets[2] << " scheduler blocking malfunction!!!...trying to correct it..." << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
+	strcpy(InfoRemoteHostActiveActions[0],"\0");
+	strcpy(InfoRemoteHostActiveActions[1],"\0");
+	cout << "Host " << this->IPaddressesSockets[2] << " AchievedAttentionParticularHosts: " << AchievedAttentionParticularHosts << endl;
+	AchievedAttentionParticularHosts=false;
+	for (int i=0;i<NumConnectedHosts;i++){
+	cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[1+i]: " << HostsActiveActionsFree[1+i] << endl;
+	HostsActiveActionsFree[1+i]=true;
+	}
+}
+////////////////////////////////////////////////////////////////////////////
 // Check if there is a permanent Block at this node
 if (string(InfoRemoteHostActiveActions[1])==string("Block") or HostsActiveActionsFree[0]==false){
 	iIterPeriodicBlockTimer++; // Counter to acknowledge how much time it has been consecutively blocked
