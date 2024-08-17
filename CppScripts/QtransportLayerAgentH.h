@@ -94,8 +94,9 @@ private: // Variables/Objects
 	};
 	using Clock = my_clock;//
 	// Synchronization network parameters
+	double HistPeriodicityAuxAux=4096.0;// Histogram value by default to perform network synchronization
 	bool FastInitialFakeSkipNetworkSynchFlag=false; // Variable that when activated, skips the initial network synchronization steps
-	int InitialNetworkSynchPass=0; // Variable to control that at least two rounds of network synchronization are performed the very first time
+	int InitialNetworkSynchPass=1; // Variable to control that at least two rounds of network synchronization are performed the very first time (when set to 0). If set to 1, then a single initial pass
 	int numHolderOtherNodesSynchNetwork=0; // Variable to keep track if the other connected nodes have iterated thorugh the network synch
 	bool CycleSynchNetworkDone=false; // Variable to keep track if this host has been network synchronized in this cycle round of network sincronizxations
 	int numHolderOtherNodesSendSynchQubits=0; // Variable to count number of consecutive SendSynchQubits request

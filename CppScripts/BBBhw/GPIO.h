@@ -233,8 +233,8 @@ public:	// Functions/Methods
 	int LOCAL_DDMinit();
 	int DDRdumpdata();
 	int DisablePRUs();
-	int ReadTimeStamps(double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber);// Read the detected timestaps in four channels
-	int SendTriggerSignals(double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+	int ReadTimeStamps(double SynchTrigPeriodAux,double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber);// Read the detected timestaps in four channels
+	int SendTriggerSignals(double SynchTrigPeriodAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	int SendTriggerSignalsSelfTest();//
 	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
 	int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned short* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits

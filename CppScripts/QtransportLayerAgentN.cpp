@@ -809,11 +809,12 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcpy(this->QPLLACurrentEmitReceiveIP,strtok(NULL,";"));
 			strcpy(this->QLLAIPaddresses,strtok(NULL,";"));
 			this->QLLAnumReqQuBits=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			double HistPeriodicityAuxAux=atof(strtok(NULL,";"));//Period in PRU counts of the synch period/histogram
 			this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			//cout << "this->QLLAFineSynchAdjVal[1]: " << this->QLLAFineSynchAdjVal[1] << endl;
 						
-			std::thread threadSimulateEmitQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitQuBit,this);
+			std::thread threadSimulateEmitQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitQuBit,this,HistPeriodicityAuxAux);
 			threadSimulateEmitQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("SimulateSendSynchQubits")){// Send qubits to the requesting host
@@ -827,10 +828,11 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			for (int i=0;i<NumCalcCenterMass;i++){
 				this->QLLAFreqSynchNormValuesArray[i]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			}
+			double HistPeriodicityAuxAux=atof(strtok(NULL,";"));//Period in PRU counts of the synch period/histogram
 			this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			
-			std::thread threadSimulateEmitSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitSynchQuBit,this,iCenterMass,iNumRunsPerCenterMass);
+			std::thread threadSimulateEmitSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitSynchQuBit,this,HistPeriodicityAuxAux,iCenterMass,iNumRunsPerCenterMass);
 			threadSimulateEmitSynchQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("SimulateReceiveQubits")){// Read qubits to the attached node
@@ -839,10 +841,11 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			//char PayloadAux[NumBytesPayloadBuffer]={0};
 			strcpy(this->QLLAIPaddresses,strtok(NULL,";"));
 			this->QLLAnumReqQuBits=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			double HistPeriodicityAuxAux=atof(strtok(NULL,";"));//Period in PRU counts of the synch period/histogram
 			this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			
-			std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveQuBit,this);
+			std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveQuBit,this,HistPeriodicityAuxAux);
 			threadSimulateReceiveQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("SimulateReceiveSynchQubits")){// Read qubits to the attached node
@@ -852,14 +855,15 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcpy(this->QLLAIPaddresses,strtok(NULL,";"));
 			this->QLLANumRunsPerCenterMass=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			int iCenterMass=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
-			int iNumRunsPerCenterMass=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			int iNumRunsPerCenterMass=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer			
 			for (int i=0;i<NumCalcCenterMass;i++){
 				this->QLLAFreqSynchNormValuesArray[i]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			}
+			double HistPeriodicityAuxAux=atof(strtok(NULL,";"));//Period in PRU counts of the synch period/histogram
 			this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 						
-			std::thread threadSimulateReceiveSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveSynchQuBit,this,iCenterMass,iNumRunsPerCenterMass);
+			std::thread threadSimulateReceiveSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveSynchQuBit,this,HistPeriodicityAuxAux,iCenterMass,iNumRunsPerCenterMass);
 			threadSimulateReceiveSynchQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("print")){
@@ -883,22 +887,22 @@ memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 return 0; // All OK
 }
 
-int QTLAN::QPLASimulateEmitQuBit() {
+int QTLAN::QPLASimulateEmitQuBit(double HistPeriodicityAuxAux) {
 this->acquire();	  
 if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateEmitQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLAFineSynchAdjVal);
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal);
 	this->QPLASimulateEmitQuBitFlag=false;
 }
 this->release();
 return 0;
 }
 
-int QTLAN::QPLASimulateEmitSynchQuBit(int iCenterMass,int iNumRunsPerCenterMass) {
+int QTLAN::QPLASimulateEmitSynchQuBit(double HistPeriodicityAuxAux,int iCenterMass,int iNumRunsPerCenterMass) {
 this->acquire();
 if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateEmitQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitSynchQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass);
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitSynchQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass);
 	this->QPLASimulateEmitQuBitFlag=false;
 	
 }
@@ -907,22 +911,22 @@ this->release();
 return 0;
 }
 
-int QTLAN::QPLASimulateReceiveQuBit() {
+int QTLAN::QPLASimulateReceiveQuBit(double HistPeriodicityAuxAux) {
 this->acquire();	  
 if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateReceiveQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLAFineSynchAdjVal);
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal);
 	this->QPLASimulateReceiveQuBitFlag=false;
 }
 this->release();
 return 0;
 }
 
-int QTLAN::QPLASimulateReceiveSynchQuBit(int iCenterMass,int iNumRunsPerCenterMass) {
+int QTLAN::QPLASimulateReceiveSynchQuBit(double HistPeriodicityAuxAux,int iCenterMass,int iNumRunsPerCenterMass) {
 this->acquire();
 if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateReceiveQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass);
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass);
 	this->QPLASimulateReceiveQuBitFlag=false;
 }
 this->release();

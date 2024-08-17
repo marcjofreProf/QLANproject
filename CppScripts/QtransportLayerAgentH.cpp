@@ -744,7 +744,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 			
 			if (InitialNetworkSynchPass<1){//the very first time, two rounds are needed to achieve a reasonable network synchronization
 				GPIOnodeNetworkSynched=false;// Do not Update value as synched
-				InitialNetworkSynchPass=InitialNetworkSynchPass+1;
+				InitialNetworkSynchPass++;
 				cout << "Host " << this->IPaddressesSockets[2] << " first initial synch process completed...executing second process..." << endl; 
 			}
 			else{
@@ -1728,6 +1728,9 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 				strcat(messagePayloadAux,charNumAux);
 				strcat(messagePayloadAux,";");
 			}
+			sprintf(charNumAux, "%4f", this->HistPeriodicityAuxAux);// Histogram period for network synchronziation
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
 			sprintf(charNumAux, "%4f", 0.0);// Zero added offset since we are not testing
 			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");
@@ -1773,6 +1776,9 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 				strcat(messagePayloadAux,charNumAux);
 				strcat(messagePayloadAux,";");
 			}
+			sprintf(charNumAux, "%4f", this->HistPeriodicityAuxAux);// Histogram period for network synchronziation
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
 			sprintf(charNumAux, "%4f", 0.0);// Zero added offset since we are not testing
 			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");

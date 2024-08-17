@@ -179,10 +179,10 @@ private: // Functions/Methods
 	int countUnderscores(char* ParamsCharArray);
 	int countQintupleComas(char* ParamsCharArray);
 	//
-	int QPLASimulateEmitQuBit();
-	int QPLASimulateEmitSynchQuBit(int iCenterMass,int iNumRunsPerCenterMass);
-	int QPLASimulateReceiveQuBit();
-	int QPLASimulateReceiveSynchQuBit(int iCenterMass,int iNumRunsPerCenterMass);
+	int QPLASimulateEmitQuBit(double HistPeriodicityAuxAux);
+	int QPLASimulateEmitSynchQuBit(double HistPeriodicityAuxAux,int iCenterMass,int iNumRunsPerCenterMass);
+	int QPLASimulateReceiveQuBit(double HistPeriodicityAuxAux);
+	int QPLASimulateReceiveSynchQuBit(double HistPeriodicityAuxAux,int iCenterMass,int iNumRunsPerCenterMass);
 	int GetSimulateNumStoredQubitsNode();
 	int GetSimulateSynchParamsNode();
 	

@@ -24,7 +24,6 @@ Header declaration file for Quantum physical Layer Agent
 #define NumQubitsMemoryBuffer 1964// In multiples of NumQuBitsPerRun (e.g., 1964, 3928, ...). Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
 #define NumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 // Synchronization
-#define HistPeriodicityAux 4096 //Period in PRU counts of the synch period/histogram
 #define NumCalcCenterMass 1//3 // Number of centers of mass to measure to compute the synchronization
 #define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 // String operations
@@ -106,6 +105,7 @@ private: //Variables/Instances
 	int numReqQuBits=0;
 	double FineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
 	// Automatic calculation of synchronization
+	double HistPeriodicityAux=4096.0; //Value indicated by upper agents (and uploaded to GPIO)//Period in PRU counts of the synch period/histogram
 	int CurrentSpecificLink=-1; // Identifies th eindex of the other emiter/receiver
 	int CurrentSpecificLinkMultiple=-1; // Identifies the index of the other emiter/receiver links when multiple present
 	char ListCombinationSpecificLink[(1LL<<LinkNumberMAX)-1][NumBytesPayloadBuffer]; // Stores the list of detected links and combinations in an ordered way
@@ -156,10 +156,10 @@ public: // Functions/Methods
 	int SendParametersAgent(char* ParamsCharArray);// The upper layer gets the information to be send
         int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node
         // General Input and Output functions
-	int SimulateEmitQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double* FineSynchAdjValAux);
-	int SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
-	int SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double* FineSynchAdjValAux);
-	int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
+	int SimulateEmitQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux);
+	int SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
+	int SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux);
+	int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
 	int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
 	int GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams);
 	bool GetGPIOHardwareSynchedNode();
