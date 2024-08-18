@@ -946,7 +946,12 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		
 		// Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
 		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;// Just for monitoring purposes
-		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+		long long int SignAuxInstantCorr=0;
+		if (SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]>0){SignAuxInstantCorr=1;}
+		else if (SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]<0){SignAuxInstantCorr=-1;}
+		else {SignAuxInstantCorr=0;}
+		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=SignAuxInstantCorr*(abs(SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux);
+		//SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
 	}
 	else{// Mal function we should not be here
 		cout << "QPLA::The Emitter nodes have not been previously identified, so no small offset drift correction applied" << endl;
