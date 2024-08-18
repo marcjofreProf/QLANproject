@@ -829,8 +829,12 @@ for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 	// When unsigned short
 	//valCycleCountPRU=static_cast<unsigned int>(0);// Reset value
 	valCycleCountPRUAux1=static_cast<unsigned int>(*valp) & 0x00FF;
+	cout << "GPIO::DDRdumpdata::static_cast<unsigned int>(*valp): " << static_cast<unsigned int>(*valp) << endl;
+	cout << "GPIO::DDRdumpdata::valCycleCountPRUAux1: " << valCycleCountPRUAux1 << endl;
 	valp++;// 1 times 16 bits
 	valCycleCountPRUAux2=((static_cast<unsigned int>(*valp))<<16) & 0xFF00;
+	cout << "GPIO::DDRdumpdata::static_cast<unsigned int>(*valp): " << static_cast<unsigned int>(*valp) << endl;
+	cout << "GPIO::DDRdumpdata::valCycleCountPRUAux2: " << valCycleCountPRUAux2 << endl;
 	valCycleCountPRU=valCycleCountPRUAux1 | valCycleCountPRUAux2;
 	valp++;// 1 times 16 bits
 	//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
@@ -850,7 +854,8 @@ for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 // Checks of proper values handling
 unsigned long long int CheckValueAux=static_cast<unsigned long long int>((static_cast<long long int>(SynchTrigPeriod/2.0)+static_cast<long long int>(TimeTaggsStored[0]))%static_cast<long long int>(SynchTrigPeriod)-static_cast<long long int>(SynchTrigPeriod/2.0));
 cout << "GPIO::DDRdumpdata::CheckValueAux: "<< CheckValueAux << endl;
-cout << "GPIO::SynchTrigPeriod: " << SynchTrigPeriod << endl;
+cout << "GPIO::DDRdumpdata::SynchTrigPeriod: " << SynchTrigPeriod << endl;
+cout << "GPIO::DDRdumpdata::NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
 ///////////////////////////////////////////////
 // Correct the detected qubits relative frequency difference (due to the sender node)
 PRUdetCorrRelFreq();
