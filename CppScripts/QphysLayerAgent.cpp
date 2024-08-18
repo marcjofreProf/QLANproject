@@ -1445,7 +1445,7 @@ if (ApplyRawQubitFilteringFlag==true){
 	// Checks of proper values handling
 	long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
 	long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2);
-	unsigned long long int CheckValueAux=static_cast<unsigned long long int>((LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
+	long long int CheckValueAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
 	cout << "QPLA::LinearRegressionQuBitFilter::CheckValueAux: "<< CheckValueAux << endl;
 	////////////////////////////////////////
 }
