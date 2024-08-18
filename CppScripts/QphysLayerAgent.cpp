@@ -898,28 +898,27 @@ return 0;
 if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){	
 	if (CurrentSpecificLinkMultiple>-1){// The specific identification IP is present
 		// If it is the first time, annotate the relative time offset with respect HostPeriodicityAux
-		ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=0.0;// Reset value. ReferencePointSmallOffset could be used to allocate multiple channels separated by time
+		ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=0;// Reset value. ReferencePointSmallOffset could be used to allocate multiple channels separated by time
 		if (NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]==false){			
-			SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=0.0;// Reset value
+			SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=0;// Reset value
 			NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=true;// Update value, so that it is not run again
 		}	
 		// First compute the relative new time offset from last iteration
-		double SmallOffsetDriftAux=0.0;
-		long double ldSmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]);
-		long double ldHistPeriodicityAux=static_cast<long double>(HistPeriodicityAux);	
-		long double ldHistPeriodicityHalfAux=static_cast<long double>(HistPeriodicityAux/2.0);
+		long long int SmallOffsetDriftAux=0;
+		long long int SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple];
+		long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);	
+		long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
 		if (UseAllTagsForEstimation){
-			double SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0.0};				
+			long long int SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0};				
 			for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 				// Mean averaging, not very resilent with glitches, eventhough filtered in liner regression
-				//SmallOffsetDriftAux+=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[i])-static_cast<long double>(SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]),HistPeriodicityAux)-HistPeriodicityAux/2.0)/static_cast<double>(SimulateNumStoredQubitsNodeAux);//static_cast<double>((TimeTaggs[i]-static_cast<unsigned long long int>(SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]))%HistPeriodicityAux)/static_cast<double>(SimulateNumStoredQubitsNodeAux);
 				// Median averaging
-				SmallOffsetDriftArrayAux[i]=static_cast<double>(fmodl(ldHistPeriodicityHalfAux+static_cast<long double>(TimeTaggs[i])-ldSmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink,ldHistPeriodicityAux)-ldHistPeriodicityHalfAux);//-ldSmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink
+				SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
 			}
-			SmallOffsetDriftAux=DoubleMedianFilterSubArray(SmallOffsetDriftArrayAux,SimulateNumStoredQubitsNodeAux); // Median averaging
+			SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,SimulateNumStoredQubitsNodeAux); // Median averaging
 		}
 		else{
-			SmallOffsetDriftAux=static_cast<double>(fmodl(ldHistPeriodicityHalfAux+static_cast<long double>(TimeTaggs[0])-ldSmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink,ldHistPeriodicityAux)-ldHistPeriodicityHalfAux);//
+			SmallOffsetDriftAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
 			cout << "QPLA::Using only first timetag for small offset correction!...to be deactivated" << endl;
 		}
 						
@@ -927,14 +926,14 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
 		//////////////////////////////////////////
 		// Checks of proper values handling
-		long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
-		long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2);
+		//long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
+		//long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2);
 		long long int CheckValueAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
 		cout << "QPLA::SmallDriftContinuousCorrection::CheckValueAux: "<< CheckValueAux << endl;
-		cout << "QPLA::ldSmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink: " << ldSmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink << endl;
+		cout << "QPLA::SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink: " << SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink << endl;
 		////////////////////////////////////////
 		
-		long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long long int>(SmallOffsetDriftAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]);
+		long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple];
 		//long long int LLISmallOffsetDriftAux=static_cast<long long int>(SmallOffsetDriftAux);
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 			TimeTaggs[i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
@@ -946,8 +945,8 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		}
 		
 		// Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
-		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+=0.0;//SmallOffsetDriftAux;// Just for monitoring purposes
-		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=0.0;//static_cast<double>(fmod(HistPeriodicityAux/2.0+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple],HistPeriodicityAux)-HistPeriodicityAux/2.0);
+		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+=0;//SmallOffsetDriftAux;// Just for monitoring purposes
+		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=0;//static_cast<double>(fmod(HistPeriodicityAux/2.0+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple],HistPeriodicityAux)-HistPeriodicityAux/2.0);
 	}
 	else{// Mal function we should not be here
 		cout << "QPLA::The Emitter nodes have not been previously identified, so no small offset drift correction applied" << endl;
