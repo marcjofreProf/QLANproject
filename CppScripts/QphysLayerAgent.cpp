@@ -1256,21 +1256,21 @@ int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
 
 if (SimulateNumStoredQubitsNodeAux>0){
+long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
 if (UseAllTagsForEstimation){
 	// Mean averaging
 	//for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
 	//CenterMassVal=CenterMassVal+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
 	//}
 	// Median averaging
-	long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
 	for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-		SynchFirstTagsArrayAux[i]=TimeTaggs[i]%LLIHistPeriodicityAux;
+		SynchFirstTagsArrayAux[i]=static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
 	}
 	SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,SimulateNumStoredQubitsNodeAux);
 }
 else{
 	// Single value
-	SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=TimeTaggs[0]; // Considering only the first timetagg. Might not be very resilence with noise
+	SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux; // Considering only the first timetagg. Might not be very resilence with noise
 	cout << "QPLA::Using only first timetag for network synch computations!...to be deactivated" << endl;
 }
 }
