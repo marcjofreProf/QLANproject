@@ -1440,6 +1440,14 @@ if (ApplyRawQubitFilteringFlag==true){
 	
 	// Update final values
 	this->SimulateNumStoredQubitsNode[0]=FilteredNumStoredQubits; // Update value
+	
+	//////////////////////////////////////////
+	// Checks of proper values handling
+	long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
+	long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2);
+	unsigned long long int CheckValueAux=static_cast<unsigned long long int>((LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
+	cout << "QPLA::LinearRegressionQuBitFilter::CheckValueAux: "<< CheckValueAux << endl;
+	////////////////////////////////////////
 }
 else{ // Do not apply filtering
 	this->SimulateNumStoredQubitsNode[0]=PRUGPIO.RetrieveNumStoredQuBits(TimeTaggs,ChannelTags); // Get raw values

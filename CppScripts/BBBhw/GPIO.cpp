@@ -825,10 +825,10 @@ this->TimeTaggsLast=static_cast<unsigned long long int>(ceil((static_cast<long d
 long long int LLIOldLastTimeTagg=static_cast<long long int>(OldLastTimeTagg);
 for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 	// When unsigned short
-	valCycleCountPRU=static_cast<unsigned int>(0);// Reset value
-	valCycleCountPRU=static_cast<unsigned int>(*valp);
+	//valCycleCountPRU=static_cast<unsigned int>(0);// Reset value
+	valCycleCountPRU=static_cast<unsigned int>(*valp) & 0x00FF;
 	valp++;// 1 times 16 bits
-	valCycleCountPRU=valCycleCountPRU | (static_cast<unsigned int>(*valp))<<16;
+	valCycleCountPRU=valCycleCountPRU | (((static_cast<unsigned int>(*valp))<<16) & 0xFF00);
 	valp++;// 1 times 16 bits
 	//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
 	// Mount the extended counter value
@@ -843,6 +843,12 @@ for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 	if (TotalCurrentNumRecords<(MaxNumQuBitsMemStored-1)){TotalCurrentNumRecords++;}//Variable to hold the number of currently stroed records in memory
 	else{cout << "GPIO::We have reach the maximum number of qubits storage" << endl;}
 }
+////////////////////////////////////////////
+// Checks of proper values handling
+unsigned long long int CheckValueAux=static_cast<unsigned long long int>((static_cast<long long int>(SynchTrigPeriod/2.0)+static_cast<long long int>(TimeTaggsStored[0]))%static_cast<long long int>(SynchTrigPeriod)-static_cast<long long int>(SynchTrigPeriod/2.0));
+cout << "GPIO::DDRdumpdata::CheckValueAux: "<< CheckValueAux << endl;
+cout << "GPIO::SynchTrigPeriod: " << SynchTrigPeriod << endl;
+///////////////////////////////////////////////
 // Correct the detected qubits relative frequency difference (due to the sender node)
 PRUdetCorrRelFreq();
 	
@@ -1062,6 +1068,11 @@ for (int i=0;i<TotalCurrentNumRecords;i++){
 	TimeTaggsStored[i]=static_cast<unsigned long long int>((1.0/SlopeDetTagsAux)*static_cast<double>(LLITimeTaggsStored[i]))+ULLIInitialTimeTaggsStored;
 }
 
+//////////////////////////////////////////
+// Checks of proper values handling
+unsigned long long int CheckValueAux=static_cast<unsigned long long int>((static_cast<long long int>(SynchTrigPeriod/2.0)+static_cast<long long int>(TimeTaggsStored[0]))%static_cast<long long int>(SynchTrigPeriod)-static_cast<long long int>(SynchTrigPeriod/2.0));
+cout << "GPIO::PRUdetCorrRelFreq::CheckValueAux: "<< CheckValueAux << endl;
+////////////////////////////////////////
 return 0; // All ok
 }
 
