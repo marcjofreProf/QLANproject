@@ -922,15 +922,15 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 			cout << "QPLA::Using only first timetag for small offset correction!...to be deactivated" << endl;
 		}
 						
-		cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
-		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
+		//cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
+		//cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
 		//////////////////////////////////////////
 		// Checks of proper values handling
 		//long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
 		//long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2);
-		long long int CheckValueAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
-		cout << "QPLA::SmallDriftContinuousCorrection::CheckValueAux: "<< CheckValueAux << endl;
-		cout << "QPLA::SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink: " << SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink << endl;
+		//long long int CheckValueAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+		//cout << "QPLA::SmallDriftContinuousCorrection::CheckValueAux: "<< CheckValueAux << endl;
+		//cout << "QPLA::SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink: " << SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink << endl;
 		////////////////////////////////////////
 		
 		long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple];
@@ -945,8 +945,8 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		}
 		
 		// Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
-		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+=0;//SmallOffsetDriftAux;// Just for monitoring purposes
-		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=0;//static_cast<double>(fmod(HistPeriodicityAux/2.0+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple],HistPeriodicityAux)-HistPeriodicityAux/2.0);
+		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;// Just for monitoring purposes
+		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
 	}
 	else{// Mal function we should not be here
 		cout << "QPLA::The Emitter nodes have not been previously identified, so no small offset drift correction applied" << endl;
@@ -1045,7 +1045,6 @@ TimeTaggsDetAnalytics[7]=0.0;
 // Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
 // Accordingly, the std wrapped count difference is stored in TimeTaggsDetAnalytics[6]
 cout << "TIMETAGGING ANALYSIS of QphysLayerAgent.h" << endl;
-cout << "When not using hist analysis, it can be changed back to NumQuBitsPerRun NUMRECORDS in PRUassTaggDetScript.p, GPIO.h and top of QphysLayerAgent.h" << endl;
 cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
 cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
@@ -1176,7 +1175,6 @@ TimeTaggsDetAnalytics[7]=(double)(TimeCoincidenceTaggs[0]);// Timetag of the fir
 // Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
 // Accordingly, the std wrapped count difference is stored in TimeTaggsDetAnalytics[6]
 cout << "COINCIDENCE ANALYSIS of QphysLayerAgent.h" << endl;
-cout << "When not using hist analysis, it can be changed back to NumQuBitsPerRun NUMRECORDS in PRUassTaggDetScript.p, GPIO.h and top of QphysLayerAgent.h" << endl;
 cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
 cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
@@ -1450,10 +1448,10 @@ if (ApplyRawQubitFilteringFlag==true){
 	
 	//////////////////////////////////////////
 	// Checks of proper values handling
-	long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
-	long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2);
-	long long int CheckValueAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
-	cout << "QPLA::LinearRegressionQuBitFilter::CheckValueAux: "<< CheckValueAux << endl;
+	//long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
+	//long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2);
+	//long long int CheckValueAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+	//cout << "QPLA::LinearRegressionQuBitFilter::CheckValueAux: "<< CheckValueAux << endl;
 	////////////////////////////////////////
 }
 else{ // Do not apply filtering

@@ -852,10 +852,10 @@ for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 }
 ////////////////////////////////////////////
 // Checks of proper values handling
-long long int CheckValueAux=(static_cast<long long int>(SynchTrigPeriod/2.0)+static_cast<long long int>(TimeTaggsStored[0]))%static_cast<long long int>(SynchTrigPeriod)-static_cast<long long int>(SynchTrigPeriod/2.0);
-cout << "GPIO::DDRdumpdata::CheckValueAux: "<< CheckValueAux << endl;
-cout << "GPIO::DDRdumpdata::SynchTrigPeriod: " << SynchTrigPeriod << endl;
-cout << "GPIO::DDRdumpdata::NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
+//long long int CheckValueAux=(static_cast<long long int>(SynchTrigPeriod/2.0)+static_cast<long long int>(TimeTaggsStored[0]))%static_cast<long long int>(SynchTrigPeriod)-static_cast<long long int>(SynchTrigPeriod/2.0);
+//cout << "GPIO::DDRdumpdata::CheckValueAux: "<< CheckValueAux << endl;
+//cout << "GPIO::DDRdumpdata::SynchTrigPeriod: " << SynchTrigPeriod << endl;
+//cout << "GPIO::DDRdumpdata::NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
 ///////////////////////////////////////////////
 // Correct the detected qubits relative frequency difference (due to the sender node)
 PRUdetCorrRelFreq();
@@ -1078,8 +1078,8 @@ for (int i=0;i<TotalCurrentNumRecords;i++){
 
 //////////////////////////////////////////
 // Checks of proper values handling
-long long int CheckValueAux=(static_cast<long long int>(SynchTrigPeriod/2.0)+static_cast<long long int>(TimeTaggsStored[0]))%static_cast<long long int>(SynchTrigPeriod)-static_cast<long long int>(SynchTrigPeriod/2.0);
-cout << "GPIO::PRUdetCorrRelFreq::CheckValueAux: "<< CheckValueAux << endl;
+//long long int CheckValueAux=(static_cast<long long int>(SynchTrigPeriod/2.0)+static_cast<long long int>(TimeTaggsStored[0]))%static_cast<long long int>(SynchTrigPeriod)-static_cast<long long int>(SynchTrigPeriod/2.0);
+//cout << "GPIO::PRUdetCorrRelFreq::CheckValueAux: "<< CheckValueAux << endl;
 ////////////////////////////////////////
 return 0; // All ok
 }
