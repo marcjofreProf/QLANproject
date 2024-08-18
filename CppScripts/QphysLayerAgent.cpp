@@ -931,6 +931,14 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
 			TimeTaggs[i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
 		}
+		
+		//////////////////////////////////////////
+		// Checks of proper values handling
+		long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
+		long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2);
+		long long int CheckValueAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+		cout << "QPLA::SmallDriftContinuousCorrection::CheckValueAux: "<< CheckValueAux << endl;
+		////////////////////////////////////////
 				
 		if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/4.0)){// Large step
 			cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
@@ -938,7 +946,7 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		}
 		
 		// Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
-		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;// Just for monitoring purposes
+		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+=0.0;//SmallOffsetDriftAux;// Just for monitoring purposes
 		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=static_cast<double>(fmod(HistPeriodicityAux/2.0+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple],HistPeriodicityAux)-HistPeriodicityAux/2.0);
 	}
 	else{// Mal function we should not be here
