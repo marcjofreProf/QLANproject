@@ -828,11 +828,11 @@ unsigned int valCycleCountPRUAux2;
 for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 	// When unsigned short
 	//valCycleCountPRU=static_cast<unsigned int>(0);// Reset value
-	valCycleCountPRUAux1=static_cast<unsigned int>(*valp) & 0x00FF;
+	valCycleCountPRUAux1=static_cast<unsigned int>(*valp) & 0x0000FFFF;
 	cout << "GPIO::DDRdumpdata::static_cast<unsigned int>(*valp): " << static_cast<unsigned int>(*valp) << endl;
 	cout << "GPIO::DDRdumpdata::valCycleCountPRUAux1: " << valCycleCountPRUAux1 << endl;
 	valp++;// 1 times 16 bits
-	valCycleCountPRUAux2=((static_cast<unsigned int>(*valp))<<16) & 0xFF00;
+	valCycleCountPRUAux2=((static_cast<unsigned int>(*valp))<<16) & 0xFFFF0000;
 	cout << "GPIO::DDRdumpdata::static_cast<unsigned int>(*valp): " << static_cast<unsigned int>(*valp) << endl;
 	cout << "GPIO::DDRdumpdata::valCycleCountPRUAux2: " << valCycleCountPRUAux2 << endl;
 	valCycleCountPRU=valCycleCountPRUAux1 | valCycleCountPRUAux2;
@@ -1087,8 +1087,8 @@ return 0; // All ok
 // Function to pack bits 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15 of an unsigned int into the lower values
 unsigned short GPIO::packBits(unsigned short value) {
     // Isolate bits 1, 2, 3, and 5 and shift them to their new positions
-    unsigned short byte0 = value & 0x0F; // Byte 0 stays in position 0
-    unsigned short byte1 = (value & 0xF0) >> 4; // Byte 1 shifts to the right four bit positions (the interesting ones)
+    unsigned short byte0 = value & 0x00FF; // Byte 0 stays in position 0
+    unsigned short byte1 = (value >> 4) & 0x0F00; // Byte 1 shifts to the right four bit positions (the interesting ones)
 
     // Combine the bytes into a single unsigned short
     return byte0 | byte1;
