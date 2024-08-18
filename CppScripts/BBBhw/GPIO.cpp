@@ -823,12 +823,15 @@ this->TimeTaggsLast=static_cast<unsigned long long int>(ceil((static_cast<long d
 //	}
 //}
 long long int LLIOldLastTimeTagg=static_cast<long long int>(OldLastTimeTagg);
+unsigned int valCycleCountPRUAux1;
+unsigned int valCycleCountPRUAux2;
 for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 	// When unsigned short
 	//valCycleCountPRU=static_cast<unsigned int>(0);// Reset value
-	valCycleCountPRU=static_cast<unsigned int>(*valp) & 0x00FF;
+	valCycleCountPRUAux1=static_cast<unsigned int>(*valp) & 0x00FF;
 	valp++;// 1 times 16 bits
-	valCycleCountPRU=valCycleCountPRU | (((static_cast<unsigned int>(*valp))<<16) & 0xFF00);
+	valCycleCountPRUAux2=((static_cast<unsigned int>(*valp))<<16) & 0xFF00;
+	valCycleCountPRU=valCycleCountPRUAux1 | valCycleCountPRUAux2;
 	valp++;// 1 times 16 bits
 	//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "valCycleCountPRU: " << valCycleCountPRU << endl;}
 	// Mount the extended counter value
