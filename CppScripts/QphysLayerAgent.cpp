@@ -922,11 +922,9 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 			SmallOffsetDriftAux=static_cast<double>(fmodl(HistPeriodicityAux/2.0+static_cast<long double>(TimeTaggs[0])-ldSmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink,HistPeriodicityAux)-HistPeriodicityAux/2.0);//
 			cout << "QPLA::Using only first timetag for small offset correction!...to be deactivated" << endl;
 		}
-		
-		
-				
-		//cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
-		//cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
+						
+		cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
+		cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
 		
 		long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=static_cast<long long int>(SmallOffsetDriftAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]);
 		//long long int LLISmallOffsetDriftAux=static_cast<long long int>(SmallOffsetDriftAux);
@@ -939,8 +937,9 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 			cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
 		}
 		
-		// Update new value, just for monitoring of the wander - last value
-		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=SmallOffsetDriftAux;// Just for monitoring purposes
+		// Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
+		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;// Just for monitoring purposes
+		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=static_cast<double>(fmod(HistPeriodicityAux/2.0+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple],HistPeriodicityAux)-HistPeriodicityAux/2.0);
 	}
 	else{// Mal function we should not be here
 		cout << "QPLA::The Emitter nodes have not been previously identified, so no small offset drift correction applied" << endl;

@@ -173,7 +173,7 @@ private:// Variables
 	unsigned short* valp; // 16 bits
 	unsigned short* valpAux; // 16 bits
 	unsigned int* synchp; // 32 bits
-	unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquition run
+	unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquisition run
 	unsigned int valOverflowCycleCountPRU=0; // 32 bits
 	unsigned int valOverflowCycleCountPRUold=0; // 32 bits
 	int AboveThresoldCycleCountPRUCompValue=8;//Value adjusted experimentally when PRU clock goes aboe 0x80000000. Not used
