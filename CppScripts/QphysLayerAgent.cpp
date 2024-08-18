@@ -1376,7 +1376,7 @@ if (ApplyRawQubitFilteringFlag==true){
 
 	// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
 	double y_mean = 0.0;
-	double x_mean = 0.0;
+	//double x_mean = 0.0;
 	double y_meanArray[RawNumStoredQubits]={0.0};
 	//double x_meanArray[RawNumStoredQubits]={0.0};
 	// Relative
@@ -1400,7 +1400,7 @@ if (ApplyRawQubitFilteringFlag==true){
         //x_mean=DoubleMedianFilterSubArray(x_meanArray,RawNumStoredQubits); // Median average. Not really needed x_mean
         //cout << "QPLA::y_mean: " << y_mean << endl;
         //cout << "QPLA::x_mean: " << x_mean << endl;
-	unsigned long long int EstInterceptVal = static_cast<unsigned long long int>(y_mean - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1
+	unsigned long long int EstInterceptVal = static_cast<unsigned long long int>(y_mean);// - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1
 	//cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
 		
 	// Re-escale the xEstimated values with the intercept point
