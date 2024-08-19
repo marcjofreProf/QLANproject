@@ -1499,7 +1499,7 @@ while(IterHostsActiveActionsFreeStatus!=0){
 		//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 	}
 	this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-	//this->RelativeNanoSleepWait((unsigned long long int)(15*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+	this->RelativeNanoSleepWait((unsigned long long int)(15*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 }
 //cout << "Finished WaitUntilActiveActionFree" << endl;
 return 0; // All ok
@@ -1594,7 +1594,7 @@ else if (ReWaitsAnswersHostsActiveActionsFree<MaxReWaitsAnswersHostsActiveAction
 	ReWaitsAnswersHostsActiveActionsFree++;// Update the counter
 }
 else{// Too many rounds, kill the process of blocking other hosts	
-	cout << "Host " << this->IPaddressesSockets[2] << " too many iterations waiting for Block requests...aborting block request" << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " too many iterations waiting for Block requests answers from other nodes...aborting block request!" << endl;
 	this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 	IterHostsActiveActionsFreeStatus=0;
 	ReWaitsAnswersHostsActiveActionsFree=0;// Reset the counter

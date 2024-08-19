@@ -978,28 +978,28 @@ sprintf(charNum, "%d", SimulateNumStoredQubitsNode);//
 strcat(ParamsCharArray,charNum);
 // Include param analytics info
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[0]);
+sprintf(charNum, "%.16f", TimeTaggsDetAnalytics[0]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[1]);
+sprintf(charNum, "%.16f", TimeTaggsDetAnalytics[1]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[2]);
+sprintf(charNum, "%.16f", TimeTaggsDetAnalytics[2]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[3]);
+sprintf(charNum, "%.16f", TimeTaggsDetAnalytics[3]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[4]);
+sprintf(charNum, "%.16f", TimeTaggsDetAnalytics[4]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[5]);
+sprintf(charNum, "%.16f", TimeTaggsDetAnalytics[5]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[6]);
+sprintf(charNum, "%.16f", TimeTaggsDetAnalytics[6]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
-sprintf(charNum, "%.8f", TimeTaggsDetAnalytics[7]);
+sprintf(charNum, "%.16f", TimeTaggsDetAnalytics[7]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// End Separate different Payloads with :
 strcat(ParamsCharArray,",");// Very important to end the message
