@@ -1076,10 +1076,10 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			
 			}
 			else if (string(Command)==string("print")){
-				cout << "Host New Message: "<< Payload << endl;
+				cout << "Host " << this->IPaddressesSockets[2] << " New Message: "<< Payload << endl;
 			}				
 			else{
-				cout << "Host does not have this Operational message: "<< Command << endl;
+				cout << "Host " << this->IPaddressesSockets[2] << " does not have this Operational message: "<< Command << endl;
 			}			
 		}
 		else if (string(IPdest)!=string(this->IPaddressesSockets[1]) and string(IPdest)!=string(this->IPaddressesSockets[2])){// Message not for this host, forward it			
@@ -1467,7 +1467,19 @@ while(AchievedAttentionParticularHosts==false or FirstPassAux==true){
 		this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 		this->acquire();
 	}
-	this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
+	int numForstEquivalentToSleep=2000;//1000: Equivalent to 1 seconds# give time to other hosts to enter
+	for (int i=0;i<numForstEquivalentToSleep;i++){
+		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+		//cout << "this->getState(): " << this->getState() << endl;
+		if(this->getState()==0) {
+			this->ProcessNewMessage();
+			this->m_pause(); // After procesing the request, pass to paused state
+		}
+		this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+	}
+	if (string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){
+		this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
+	}
 }
 this->release();
 return 0; // all ok;
@@ -1487,7 +1499,7 @@ while(IterHostsActiveActionsFreeStatus!=0){
 		//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 	}
 	this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-	this->RelativeNanoSleepWait((unsigned long long int)(15*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+	//this->RelativeNanoSleepWait((unsigned long long int)(15*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 }
 //cout << "Finished WaitUntilActiveActionFree" << endl;
 return 0; // All ok
@@ -1582,6 +1594,7 @@ else if (ReWaitsAnswersHostsActiveActionsFree<MaxReWaitsAnswersHostsActiveAction
 	ReWaitsAnswersHostsActiveActionsFree++;// Update the counter
 }
 else{// Too many rounds, kill the process of blocking other hosts	
+	cout << "Host " << this->IPaddressesSockets[2] << " too many iterations waiting for Block requests...aborting block request" << endl;
 	this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 	IterHostsActiveActionsFreeStatus=0;
 	ReWaitsAnswersHostsActiveActionsFree=0;// Reset the counter
@@ -1626,8 +1639,9 @@ if (CheckAllOthersFreeAux==true){
 	return true;
 }
 else{ // If some are unavailable, unblock them all
+	cout << "Host " << this->IPaddressesSockets[2] << " did not obtain Block attention of all requested Hosts...aborting block" << endl;
 	this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-	IterHostsActiveActionsFreeStatus=0;// reset process
+	IterHostsActiveActionsFreeStatus=0;// reset process	
 	return false;
 }
 
