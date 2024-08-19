@@ -444,9 +444,15 @@ this->NumberRepetitionsSignal=numReqQuBitsAux;
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0]+FineSynchAdjValAux[0];// synch trig offset
-this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1]+FineSynchAdjValAux[1];// synch trig frequency
+this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
+this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
 }
+else{
+this->FineSynchAdjVal[0]=0.0;// synch trig offset
+this->FineSynchAdjVal[1]=0.0;// synch trig frequ
+}
+this->FineSynchAdjVal[0]+=FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]+=FineSynchAdjValAux[1];// synch trig frequency
 //cout << "this->FineSynchAdjVal[1]: " << this->FineSynchAdjVal[1] << endl;
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
@@ -478,9 +484,15 @@ this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test f
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0]+FineSynchAdjValAux[0];// synch trig offset
-this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1]+FineSynchAdjValAux[1]+FreqSynchNormValuesArrayAux[iCenterMass];// synch trig frequency
-}		
+this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
+this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
+}
+else{
+this->FineSynchAdjVal[0]=0.0;// synch trig offset
+this->FineSynchAdjVal[1]=0.0;// synch trig frequ
+}
+this->FineSynchAdjVal[0]+=FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]+=FineSynchAdjValAux[1]+FreqSynchNormValuesArrayAux[iCenterMass];// synch trig frequency
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
@@ -565,9 +577,15 @@ this->NumQuBitsPerRun=numReqQuBitsAux;
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0]+FineSynchAdjValAux[0];// synch trig offset
-this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1]+FineSynchAdjValAux[1];// synch trig frequency
+this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
+this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
 }
+else{
+this->FineSynchAdjVal[0]=0.0;// synch trig offset
+this->FineSynchAdjVal[1]=0.0;// synch trig frequ
+}
+this->FineSynchAdjVal[0]+=FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]+=FineSynchAdjValAux[1];// synch trig frequency
 if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
@@ -605,9 +623,15 @@ this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test f
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0]+FineSynchAdjValAux[0];// synch trig offset
-this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1]+FineSynchAdjValAux[1];// synch trig frequency
+this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
+this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
 }
+else{
+this->FineSynchAdjVal[0]=0.0;// synch trig offset
+this->FineSynchAdjVal[1]=0.0;// synch trig frequ
+}
+this->FineSynchAdjVal[0]+=FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]+=FineSynchAdjValAux[1];// synch trig frequency
 if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
