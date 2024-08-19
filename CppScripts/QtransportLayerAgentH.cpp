@@ -813,6 +813,8 @@ else
 if (iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer){// Try to unblock itself
 	// Send unblock signals
 	cout << "Host" << this->IPaddressesSockets[2] << " will unblock itself since to much time blocked" << endl;
+	strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
+	strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
 	int nChararray=NumConnectedHosts;
 	char ParamsCharArrayArg[NumBytesBufferICPMAX];
 	for (int i=0;i<NumConnectedHosts;i++){
@@ -1649,7 +1651,7 @@ return false; // all ok
 }
 
 int QTLAH::UnBlockYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
-//if (string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){// This is the blocking host so proceed to unblock
+if (string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){// This is the blocking host so proceed to unblock
 int numForstEquivalentToSleep=500;//1000: Equivalent to 1 seconds# give time to other hosts to enter
 for (int i=0;i<numForstEquivalentToSleep;i++){
 	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
@@ -1671,10 +1673,10 @@ int NumInterestIPaddressesAux=nChararray;
 for (int i=0;i<NumInterestIPaddressesAux;i++){// Reset values
 	HostsActiveActionsFree[1+i]=true;
 }
-//}
+}
 
 // Only host who care will take action with the UnBlock message below
-//int NumInterestIPaddressesAux=nChararray;
+int NumInterestIPaddressesAux=nChararray;
 char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
 char ParamsCharArrayArgAux[NumBytesBufferICPMAX] = {0};
 strcpy(ParamsCharArrayArgAux,ParamsCharArrayArg);
@@ -1698,7 +1700,7 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){
 	//cout << "HostAreYouFree UnBlock ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 }
-//int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
+int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
 for (int i=0;i<numForstEquivalentToSleep;i++){
 	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 	//cout << "this->getState(): " << this->getState() << endl;
