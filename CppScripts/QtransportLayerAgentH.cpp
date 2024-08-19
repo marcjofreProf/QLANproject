@@ -1467,7 +1467,7 @@ while(AchievedAttentionParticularHosts==false or FirstPassAux==true){
 		this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 		this->acquire();
 	}
-	int numForstEquivalentToSleep=2000;//1000: Equivalent to 1 seconds# give time to other hosts to enter
+	int numForstEquivalentToSleep=500;//1000: Equivalent to 1 seconds# give time to other hosts to enter
 	for (int i=0;i<numForstEquivalentToSleep;i++){
 		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 		//cout << "this->getState(): " << this->getState() << endl;
