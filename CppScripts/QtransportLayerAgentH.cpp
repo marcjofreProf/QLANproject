@@ -1499,7 +1499,7 @@ while(IterHostsActiveActionsFreeStatus!=0){
 		//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 	}
 	this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-	this->RelativeNanoSleepWait((unsigned long long int)(15*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+	this->RelativeNanoSleepWait((unsigned long long int)(5*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 }
 //cout << "Finished WaitUntilActiveActionFree" << endl;
 return 0; // All ok
