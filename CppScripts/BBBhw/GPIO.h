@@ -128,9 +128,9 @@ private:// Variables
 	int duration_FinalInitialMeasTrigAuxAvg=0;
 	unsigned long long int TrigAuxIterCount=0;
 	// Trigger Signal and Timetagging methods
-	unsigned int SynchRem=0;
-	long double SignAuxInstantCorr=0;
-	long double InstantCorr=0.0;	
+	int SynchRem=0;
+	long long int SignAuxInstantCorr=0;
+	long long int InstantCorr=0.0;	
 	unsigned long TimeClockMarging=100;// In nanoseconds. If too large, it disastabilizes the timming performance. It has to be smaller than the SynchTrigPeriod
 	unsigned long long int TimeClockMargingExtra=10*TimeClockMarging;// In nanoseconds
 	unsigned long TimePRUcommandDelay=250000;// In nanoseconds. If too large, it disastabilizes the timming performance. VEry important parameter!!! When duration_FinalInitialMeasTrigAuxAvg properly set then is around 4000
@@ -206,7 +206,7 @@ private:// Variables
 	int togglePeriod;  //default 100ms
 	int toggleNumber;  //default -1 (infinite)
 	// Testing with periodic histogram signal
-	unsigned long long int ULLIEpochReOffset=344800000000000000;// Amount to remove to timetaggs so that thier numbers are not so high and difficult to handle by other agents
+	unsigned long long int ULLIEpochReOffset=344810000000000000;// Amount to remove to timetaggs so that thier numbers are not so high and difficult to handle by other agents (value adjusted August 2024)
 	unsigned long long int OldLastTimeTagg=0;
 	unsigned long long int TimeTaggsLast=0;
 	unsigned long long int TimeTaggsInit=0;
