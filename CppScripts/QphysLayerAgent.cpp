@@ -1305,7 +1305,7 @@ if (SimulateNumStoredQubitsNodeAux>0){
 	}
 	else{
 		// Single value
-		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=static_cast<long long int>(TimeTaggs[0]);//%LLIHistPeriodicityAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux; // Considering only the first timetagg. Might not be very resilence with noise
+		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux; // Considering only the first timetagg. Might not be very resilence with noise
 		cout << "QPLA::Using only first timetag for network synch computations!...to be deactivated" << endl;
 	}
 }
