@@ -171,10 +171,6 @@ PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of star
 PSEUDOSYNCHLOOP:
 	SUB	r0, r0, 1
 	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
-FIRSTREF:	
-	// Store a calibration timetagg
-	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
-	SBCO	r5, CONST_PRUDRAM, 8, 4// Calibration time tag (together with the acumulated synchronization error)
 FINETIMEOFFSETADJ:
 	MOV	r0, r9 // For security work with register r0
 	LSR	r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
@@ -182,6 +178,10 @@ FINETIMEOFFSETADJ:
 FINETIMEOFFSETADJLOOP:
 	SUB	r0, r0, 1
 	QBNE	FINETIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
+FIRSTREF:	
+	// Store a calibration timetagg
+	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
+	SBCO	r5, CONST_PRUDRAM, 8, 4// Calibration time tag (together with the acumulated synchronization error)
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register
 	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
