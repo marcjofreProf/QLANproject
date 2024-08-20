@@ -484,8 +484,8 @@ this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test f
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
-this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
+this->FineSynchAdjVal[0]=0.0*CurrentSynchNetworkParamsLink[0];// synch trig offset
+this->FineSynchAdjVal[1]=0.0*CurrentSynchNetworkParamsLink[1];// synch trig frequency
 }
 else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
@@ -577,8 +577,8 @@ this->NumQuBitsPerRun=numReqQuBitsAux;
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
-this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
+this->FineSynchAdjVal[0]=0.0*CurrentSynchNetworkParamsLink[0];// synch trig offset
+this->FineSynchAdjVal[1]=0.0*CurrentSynchNetworkParamsLink[1];// synch trig frequency
 }
 else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
