@@ -642,38 +642,8 @@ cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 }		
 this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 
-if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
-// Check if nan values, then convert them to 0 and inform thorugh the terminal
-if (std::isnan(SynchCalcValuesArray[0])){
-SynchCalcValuesArray[0]=0.0;
-cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
-}
-if (std::isnan(SynchCalcValuesArray[1])){
-SynchCalcValuesArray[1]=0.0;
-cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
-}
-if (std::isnan(SynchCalcValuesArray[2])){
-SynchCalcValuesArray[2]=0.0;
-cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
-}
-
-// Update absolute values - The actual values applied and show in the Host
-SynchCalcValuesAbsArray[0]=0.0*SynchCalcValuesAbsArray[0]+SynchCalcValuesArray[0];
-SynchCalcValuesAbsArray[1]=0.0*SynchCalcValuesAbsArray[1]+SynchCalcValuesArray[1];
-SynchCalcValuesAbsArray[2]=0.0*SynchCalcValuesAbsArray[2]+SynchCalcValuesArray[2];
-
-//cout << "QPLA::SynchCalcValuesAbsArray[0]: " << SynchCalcValuesAbsArray[0] << endl;
-//cout << "QPLA::SynchCalcValuesAbsArray[1]: " << SynchCalcValuesAbsArray[1] << endl;
-//cout << "QPLA::SynchCalcValuesAbsArray[2]: " << SynchCalcValuesAbsArray[2] << endl;
-	
-// Update relative iterative values - Done for each Sending or Reading dependent on the specific link
-//double SynchParamValuesArrayAux[2];
-// The order below is not correct - debbug the protocol
-//SynchParamValuesArrayAux[0]=SynchCalcValuesArray[2];// relative frequency correction
-//SynchParamValuesArrayAux[1]=SynchCalcValuesArray[1];// offset correction - dependent on link
-//PRUGPIO.SetSynchDriftParams(SynchParamValuesArrayAux);// Update computed values to the agent below
 cout << "QPLA::Synchronization parameters updated for this node" << endl;
-}
+
 this->release();
 
 return 0; // return 0 is for no error
@@ -1187,6 +1157,7 @@ if (SimulateNumStoredQubitsNodeAux>0){
 		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux; // Considering only the first timetagg. Might not be very resilence with noise
 		cout << "QPLA::Using only first timetag for network synch computations!...to be deactivated" << endl;
 	}
+	cout << "QPLA::SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]: " << SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass] << endl;
 }
 
 // If the first iteration, since no extra relative frequency difference added, store the values, for at the end compute the offset, at least within theHistPeriodicityAux
@@ -1214,7 +1185,7 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	}
 	SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));
 
-	//cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
+	cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
 	//cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
 	//cout << "QPLA::SynchHistCenterMassArray[2]: " << SynchHistCenterMassArray[2] << endl;
 }
@@ -1233,9 +1204,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)	
 	
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass]={0.0};
-	double DHistPeriodicityAux=static_cast<double>(HistPeriodicityAux);
+	long double DLHistPeriodicityAux=static_cast<long double>(HistPeriodicityAux);
 	for (int i=0;i<NumRunsPerCenterMass;i++){
-		SynchCalcValuesArrayAux[i]=fmod(static_cast<double>(SynchFirstTagsArrayOffsetCalc[i])+SynchCalcValuesArray[2]*DHistPeriodicityAux,DHistPeriodicityAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		SynchCalcValuesArrayAux[i]=static_cast<double>(fmodl(static_cast<long double>(SynchFirstTagsArrayOffsetCalc[i])+static_cast<long double>(SynchCalcValuesArray[2])*DLHistPeriodicityAux,DLHistPeriodicityAux));// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
 	
@@ -1243,6 +1214,19 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	
+	// Check if nan values, then convert them to 0 and inform thorugh the terminal
+	if (std::isnan(SynchCalcValuesArray[0])){
+	SynchCalcValuesArray[0]=0.0;
+	cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
+	}
+	if (std::isnan(SynchCalcValuesArray[1])){
+	SynchCalcValuesArray[1]=0.0;
+	cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
+	}
+	if (std::isnan(SynchCalcValuesArray[2])){
+	SynchCalcValuesArray[2]=0.0;
+	cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
+	}
 	// Identify the specific link and store/update iteratively the values
 	if (CurrentSpecificLink>=0){
 		SynchNetworkParamsLink[CurrentSpecificLink][0]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1];// Offset
