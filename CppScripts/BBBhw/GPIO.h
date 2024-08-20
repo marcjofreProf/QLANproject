@@ -126,9 +126,9 @@ private:// Variables
 	int duration_FinalInitialMeasTrigAuxAvg=0;
 	unsigned long long int TrigAuxIterCount=0;
 	// Trigger Signal and Timetagging methods
-	unsigned int SynchRem=0;
-	long double SignAuxInstantCorr=0;
-	long double InstantCorr=0.0;	
+	int SynchRem=0;
+	long long int SignAuxInstantCorr=0;
+	long long int InstantCorr=0.0;	
 	unsigned long TimeClockMarging=100;// In nanoseconds. If too large, it disastabilizes the timming performance. It has to be smaller than the SynchTrigPeriod
 	unsigned long long int TimeClockMargingExtra=10*TimeClockMarging;// In nanoseconds
 	unsigned long TimePRUcommandDelay=250000;// In nanoseconds. If too large, it disastabilizes the timming performance. VEry important parameter!!! When duration_FinalInitialMeasTrigAuxAvg properly set then is around 4000
