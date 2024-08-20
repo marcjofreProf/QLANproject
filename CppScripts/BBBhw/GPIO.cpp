@@ -590,7 +590,7 @@ retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterrupt
 //this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 //this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
 //this->TrigAuxIterCount++;
-/*
+
 //cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 //long double AccumulatedErrorDriftEvolved=static_cast<long double>(256.0*AccumulatedErrorDrift)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
 //cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
@@ -603,7 +603,7 @@ cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
 ////cout << "SynchRem: " << SynchRem << endl;
 cout << "this->AdjPulseSynchCoeffAverage: " << this->AdjPulseSynchCoeffAverage << endl;
 cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
-*/
+
 // Important check to do
 if (duration_FinalInitialMeasTrigAuxAvg>5000){cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay!" << endl;}
 this->ManualSemaphore=false;
@@ -685,7 +685,7 @@ retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterrupt
 //this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 //this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
 //this->TrigAuxIterCount++;
-/*
+
 //cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 //long double AccumulatedErrorDriftEvolved=static_cast<long double>(256.0*AccumulatedErrorDrift)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
 //cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
@@ -698,7 +698,7 @@ cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
 ////cout << "SynchRem: " << SynchRem << endl;
 cout << "this->AdjPulseSynchCoeffAverage: " << this->AdjPulseSynchCoeffAverage << endl;
 cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
-*/
+
 // Important check to do
 if (duration_FinalInitialMeasTrigAuxAvg>5000){cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay!" << endl;}
 this->ManualSemaphore=false;
@@ -781,15 +781,13 @@ OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCount
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl;
 
 // Slot the TimeTaggsLast
-this->TimeTaggsLast=static_cast<unsigned long long int>(ceil((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinal.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))/static_cast<long double>(SynchTrigPeriod))*static_cast<long double>(SynchTrigPeriod));
+//this->TimeTaggsLast=static_cast<unsigned long long int>(ceil((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinal.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))/static_cast<long double>(SynchTrigPeriod))*static_cast<long double>(SynchTrigPeriod));
 
-/*
 // Since PRUclockStepPeriodNanoseconds and SynchTrigPeriod are whole numbers (+1 because it supossedly runs a whole period in the assembler code)
 this->TimeTaggsLast=static_cast<unsigned long long int>(((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUfinal.time_since_epoch()).count())/static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds))/static_cast<unsigned long long int>(SynchTrigPeriod)+1)*static_cast<unsigned long long int>(SynchTrigPeriod));
 
 //Furthermore, remove some time from epoch - in multiples of the SynchTrigPeriod, so it is easier to handle in the above agents
 this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsLast)-static_cast<long long int>((this->ULLIEpochReOffset/static_cast<unsigned long long int>(SynchTrigPeriod))*static_cast<unsigned long long int>(SynchTrigPeriod)));
-*/
 
 long long int LLIOldLastTimeTagg=static_cast<long long int>(OldLastTimeTagg);
 unsigned int valCycleCountPRUAux1;
