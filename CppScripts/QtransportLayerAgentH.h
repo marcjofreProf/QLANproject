@@ -97,14 +97,14 @@ private: // Variables/Objects
 	double HistPeriodicityAuxAux=4096.0;// Histogram value by default to perform network synchronization
 	int NumberRepetitionsSignalAux=32768;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	int NumQuBitsPerRunAux=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
-	bool FastInitialFakeSkipNetworkSynchFlag=true; // Variable that when activated, skips the initial network synchronization steps
+	bool FastInitialFakeSkipNetworkSynchFlag=false; // Variable that when activated, skips the initial network synchronization steps
 	int InitialNetworkSynchPass=1; // Variable to control that at least two rounds of network synchronization are performed the very first time (when set to 0). If set to 1, then a single initial pass
 	int numHolderOtherNodesSynchNetwork=0; // Variable to keep track if the other connected nodes have iterated thorugh the network synch
 	bool CycleSynchNetworkDone=false; // Variable to keep track if this host has been network synchronized in this cycle round of network sincronizxations
 	int numHolderOtherNodesSendSynchQubits=0; // Variable to count number of consecutive SendSynchQubits request
 	unsigned long long int iIterNetworkSynchcurrentTimerVal=0;// Variable to count how many time has passed since last network synchronization
 	unsigned long long int MaxiIterNetworkSynchcurrentTimerVal=2160; //20;//2160; // Counter value to reset network synchronization, which is actually multiplied by the variable MaxiIterPeriodicTimerVal. E.g, every 6 hours
-	unsigned long long int iIterPeriodicBlockTimer=0; // Counter of how much passes th ehost is constantly block. If larger than MaxiIterPeriodicBlockTimer, unblock itself
+	unsigned long long int iIterPeriodicBlockTimer=0; // Counter of how much passes the host is constantly block. If larger than MaxiIterPeriodicBlockTimer, unblock itself
 	unsigned long long int MaxiIterPeriodicBlockTimer=3600000; //100000;//3600000; // Counter of how much passes the host is constantly block. If larger than , unblock itself
 	bool GPIOnodeHardwareSynched=false;// Variable to know the hardware synch status of the node below. Actually, do not let many operations and controls to happen until this variable is set to true.
 	bool GPIOnodeNetworkSynched=false;// Variable to know the network synch status of the node below. Periodically turn to false, to proceed again with network synchronization
