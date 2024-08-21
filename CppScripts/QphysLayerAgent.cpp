@@ -1066,6 +1066,7 @@ TimeTaggsDetAnalytics[6]=0.0;
 TimeTaggsDetAnalytics[7]=0.0;
 
 TimeTaggsDetAnalytics[7]=static_cast<double>(TimeTaggs[0]);
+cout << "QPLA::TimeTaggs[0]: " << TimeTaggs[0] << endl;
 
 TimeTaggsDetAnalytics[5]=0.0;
 TimeTaggsDetAnalytics[6]=0.0;
