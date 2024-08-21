@@ -1223,6 +1223,11 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
 	//cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
 	//cout << "QPLA::SynchHistCenterMassArray[2]: " << SynchHistCenterMassArray[2] << endl;
+	
+	// Analysis
+	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
+		cout << "(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])/LLIHistPeriodicityAux: " << (SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])/LLIHistPeriodicityAux << endl;
+	}
 }
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
