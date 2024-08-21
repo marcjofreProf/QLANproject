@@ -15,7 +15,7 @@ import numpy as np
 
 import QsessionLayerAgent
   
-sSynchProcIterRunsTimePoint=10.0 # Time to wait (seconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
+sSynchProcIterRunsTimePoint=25.0 # Time to wait (seconds) between iterations of the synch mechanisms to allow time to send and receive the necessary qubits
 
 class QPLA:
 	def __init__(self,ParamsDescendingCharArray,ParamsAscendingCharArray): # Constructor of this class

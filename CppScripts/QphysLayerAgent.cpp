@@ -463,12 +463,14 @@ else{
 cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
 }
 this->release();
+/*
 cout << "ModeActivePassive: " << ModeActivePassive << endl;
 cout << "CurrentSpecificLink: " << CurrentSpecificLink << endl;
 cout << "NumberRepetitionsSignal: " << NumberRepetitionsSignal << endl;
 cout << "HistPeriodicityAux: " << HistPeriodicityAux << endl;
 cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
 cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
+*/
 return 0; // return 0 is for no error
 }
 
@@ -508,6 +510,7 @@ cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
 }
 
 this->release();
+/*
 cout << "ModeActivePassive: " << ModeActivePassive << endl;
 cout << "CurrentSpecificLink: " << CurrentSpecificLink << endl;
 cout << "NumberRepetitionsSignal: " << NumberRepetitionsSignal << endl;
@@ -517,6 +520,7 @@ cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
 cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
 cout << "iCenterMass: " << iCenterMass << endl;
 cout << "iNumRunsPerCenterMass: " << iNumRunsPerCenterMass << endl;
+*/
 return 0; // return 0 is for no error
 }
 
@@ -610,13 +614,14 @@ else{
 cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 }
 this->release();
+/*
 cout << "ModeActivePassive: " << ModeActivePassive << endl;
 cout << "CurrentSpecificLink: " << CurrentSpecificLink << endl;
 cout << "NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
 cout << "HistPeriodicityAux: " << HistPeriodicityAux << endl;
 cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
 cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
-
+*/
 // Axiliar network synch tests
 //this->HistCalcPeriodTimeTags(iCenterMassAuxiliarTest,iNumRunsPerCenterMassAuxiliarTest);// Compute synch values
 //cout << "iCenterMassAuxiliarTest: " << iCenterMassAuxiliarTest << endl;
@@ -671,6 +676,7 @@ this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch
 cout << "QPLA::Synchronization parameters updated for this node" << endl;
 
 this->release();
+/*
 cout << "ModeActivePassive: " << ModeActivePassive << endl;
 cout << "CurrentSpecificLink: " << CurrentSpecificLink << endl;
 cout << "NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
@@ -680,6 +686,7 @@ cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
 cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
 cout << "iCenterMass: " << iCenterMass << endl;
 cout << "iNumRunsPerCenterMass: " << iNumRunsPerCenterMass << endl;
+*/
 return 0; // return 0 is for no error
 }
 
@@ -1189,7 +1196,7 @@ if (SimulateNumStoredQubitsNodeAux>0){
 	}
 	else{
 		// Single value
-		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=static_cast<long long int>(TimeTaggs[0]);//static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux; // Considering only the first timetagg. Might not be very resilence with noise
+		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux; // Considering only the first timetagg. Might not be very resilence with noise
 		cout << "QPLA::Using only first timetag for network synch computations!...to be deactivated" << endl;
 	}
 	cout << "QPLA::SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]: " << SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass] << endl;
@@ -1225,9 +1232,9 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	//cout << "QPLA::SynchHistCenterMassArray[2]: " << SynchHistCenterMassArray[2] << endl;
 	
 	// Analysis
-	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
-		cout << "(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])/LLIHistPeriodicityAux: " << (SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])/LLIHistPeriodicityAux << endl;
-	}
+	//for (int i=0;i<(NumRunsPerCenterMass-1);i++){
+	//	cout << "(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])/LLIHistPeriodicityAux: " << (SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])/LLIHistPeriodicityAux << endl;
+	//}
 }
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
