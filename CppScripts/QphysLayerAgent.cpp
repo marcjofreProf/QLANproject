@@ -616,6 +616,12 @@ cout << "NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
 cout << "HistPeriodicityAux: " << HistPeriodicityAux << endl;
 cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
 cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
+
+// Axiliar network synch tests
+this->HistCalcPeriodTimeTags(iCenterMassAuxiliarTest,iNumRunsPerCenterMassAuxiliarTest);// Compute synch values
+cout << "iCenterMassAuxiliarTest: " << iCenterMassAuxiliarTest << endl;
+cout << "iNumRunsPerCenterMassAuxiliarTest: " << iNumRunsPerCenterMassAuxiliarTest << endl;
+iNumRunsPerCenterMassAuxiliarTest=(iNumRunsPerCenterMassAuxiliarTest+1)%4;
 return 0; // return 0 is for no error
 }
 
