@@ -104,7 +104,7 @@ private: //Variables/Instances
 	// Above agents passed values to this agent
 	char ModeActivePassive[NumBytesPayloadBuffer] = {0};// "Active" or "Passive"
 	char IPaddressesTimePointBarrier[NumBytesBufferICPMAX] = {0};// List of IP addresses separated by "_" to send the Time Point BArrier to
-	double FineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
+	double FineSynchAdjVal[2]={0.0};// Adjust synch trig offset and frequency
 	// Automatic calculation of synchronization
 	double HistPeriodicityAux=4096.0; //Value indicated by upper agents (and uploaded to GPIO)//Period in PRU counts of the synch period/histogram
 	int CurrentSpecificLink=-1; // Identifies th eindex of the other emiter/receiver

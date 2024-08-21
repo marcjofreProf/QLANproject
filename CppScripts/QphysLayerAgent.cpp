@@ -496,8 +496,8 @@ else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
 this->FineSynchAdjVal[1]=0.0;// synch trig frequ
 }
-this->FineSynchAdjVal[0]+=FineSynchAdjValAux[0];// synch trig offset
-this->FineSynchAdjVal[1]+=FineSynchAdjValAux[1]+FreqSynchNormValuesArray[iCenterMass];// synch trig frequency
+this->FineSynchAdjVal[0]=FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]=FineSynchAdjValAux[1]+FreqSynchNormValuesArray[iCenterMass];// synch trig frequency
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
