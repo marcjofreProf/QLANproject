@@ -595,10 +595,6 @@ this->SmallDriftContinuousCorrection();// Run after threadSimulateReceiveQuBitRe
 else{
 cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 }
-// Testing
-int iCenterMass=0;
-int iNumRunsPerCenterMass=0;
-this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 this->release();
 return 0; // return 0 is for no error
 }
