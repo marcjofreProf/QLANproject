@@ -481,8 +481,8 @@ strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 this->NumberRepetitionsSignal=numReqQuBitsAux;
 //this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
 this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
-this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
-this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
+//this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
+//this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
 //cout << "this->FineSynchAdjVal[1]: " << this->FineSynchAdjVal[1] << endl;
 // Remove previous synch values - probably not for the emitter (since calculation for synch values are done as receiver)
 // Here run the several iterations with different testing frequencies
@@ -512,6 +512,7 @@ cout << "ModeActivePassive: " << ModeActivePassive << endl;
 cout << "CurrentSpecificLink: " << CurrentSpecificLink << endl;
 cout << "NumberRepetitionsSignal: " << NumberRepetitionsSignal << endl;
 cout << "HistPeriodicityAux: " << HistPeriodicityAux << endl;
+cout << "FreqSynchNormValuesArray[0]: " << FreqSynchNormValuesArray[0] << endl;
 cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
 cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[0] << endl;
 cout << "iCenterMass: " << iCenterMass << endl;
@@ -627,8 +628,8 @@ strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 this->NumQuBitsPerRun=numReqQuBitsAux;				
 //this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
 this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
-this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
-this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
+//this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
+//this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
 //if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 	// Reset previous synch values to zero - Maybe comment it in order to do an iterative algorithm
 	//SynchCalcValuesArray[0]=0.0;
@@ -668,6 +669,7 @@ cout << "ModeActivePassive: " << ModeActivePassive << endl;
 cout << "CurrentSpecificLink: " << CurrentSpecificLink << endl;
 cout << "NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
 cout << "HistPeriodicityAux: " << HistPeriodicityAux << endl;
+cout << "FreqSynchNormValuesArray[0]: " << FreqSynchNormValuesArray[0] << endl;
 cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
 cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[0] << endl;
 cout << "iCenterMass: " << iCenterMass << endl;
