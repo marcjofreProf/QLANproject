@@ -468,7 +468,7 @@ cout << "CurrentSpecificLink: " << CurrentSpecificLink << endl;
 cout << "NumberRepetitionsSignal: " << NumberRepetitionsSignal << endl;
 cout << "HistPeriodicityAux: " << HistPeriodicityAux << endl;
 cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
-cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[0] << endl;
+cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
 return 0; // return 0 is for no error
 }
 
@@ -496,8 +496,8 @@ else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
 this->FineSynchAdjVal[1]=0.0;// synch trig frequ
 }
-this->FineSynchAdjVal[0]=FineSynchAdjValAux[0];// synch trig offset
-this->FineSynchAdjVal[1]=FineSynchAdjValAux[1]+FreqSynchNormValuesArray[iCenterMass];// synch trig frequency
+this->FineSynchAdjVal[0]+=FineSynchAdjValAux[0];// synch trig offset
+this->FineSynchAdjVal[1]+=FineSynchAdjValAux[1]+FreqSynchNormValuesArray[iCenterMass];// synch trig frequency
 if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
@@ -514,7 +514,7 @@ cout << "NumberRepetitionsSignal: " << NumberRepetitionsSignal << endl;
 cout << "HistPeriodicityAux: " << HistPeriodicityAux << endl;
 cout << "FreqSynchNormValuesArray[0]: " << FreqSynchNormValuesArray[0] << endl;
 cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
-cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[0] << endl;
+cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
 cout << "iCenterMass: " << iCenterMass << endl;
 cout << "iNumRunsPerCenterMass: " << iNumRunsPerCenterMass << endl;
 return 0; // return 0 is for no error
@@ -615,7 +615,7 @@ cout << "CurrentSpecificLink: " << CurrentSpecificLink << endl;
 cout << "NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
 cout << "HistPeriodicityAux: " << HistPeriodicityAux << endl;
 cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
-cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[0] << endl;
+cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
 return 0; // return 0 is for no error
 }
 
@@ -671,7 +671,7 @@ cout << "NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
 cout << "HistPeriodicityAux: " << HistPeriodicityAux << endl;
 cout << "FreqSynchNormValuesArray[0]: " << FreqSynchNormValuesArray[0] << endl;
 cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
-cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[0] << endl;
+cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
 cout << "iCenterMass: " << iCenterMass << endl;
 cout << "iNumRunsPerCenterMass: " << iNumRunsPerCenterMass << endl;
 return 0; // return 0 is for no error
