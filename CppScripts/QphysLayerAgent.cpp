@@ -1244,10 +1244,17 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	SynchCalcValuesArray[0]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment	
 	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[2]-(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2])*SynchCalcValuesArray[0])/static_cast<double>(SynchCalcValuesArray[0]);  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)*/
 	// When using the base frequency to synchronize
-	double ArbAdjFactor=1.0; // Arbitrary factor. 7.5 when the time between synch network measures is 10 seconds. More or less is 64 (as in the GPIO.cpp) / measure time interval which is around 10 seconds
 	adjFreqSynchNormRatiosArray[0]=1.0;
 	SynchCalcValuesArray[0]=static_cast<double>(HistPeriodicityAux);//(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment	
-	SynchCalcValuesArray[2]=ArbAdjFactor*(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)	
+	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)	
+	// Weird behaviour, where the rel freq adjustment changes if different measurement itme intervals.
+	// Maybe, the adjustment frequency has to be always positive
+	if (SynchCalcValuesArray[2]>0.0 or SynchCalcValuesArray[2]<0.0){
+		SynchCalcValuesArray[2]=1.0-abs(SynchCalcValuesArray[2]);
+	}
+	else{
+		SynchCalcValuesArray[2]=0.0;
+	}
 	
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass]={0.0};
 	long double DLHistPeriodicityAux=static_cast<long double>(HistPeriodicityAux);
