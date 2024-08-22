@@ -1257,7 +1257,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	//	SynchCalcValuesArray[2]=0.0;
 	//}
 	double SynchNetAdj=64.0/10.0;
-	SynchCalcValuesArray[2]=SynchNetAdj*SynchCalcValuesArray[2];
+	SynchCalcValuesArray[2]=SynchNetAdj*abs(SynchCalcValuesArray[2]);
 	
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass]={0.0};
 	long double DLHistPeriodicityAux=static_cast<long double>(HistPeriodicityAux);
