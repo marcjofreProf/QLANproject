@@ -1248,6 +1248,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	SynchCalcValuesArray[0]=static_cast<double>(HistPeriodicityAux);//(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment	
 	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)	
 	// Weird behaviour, where the rel freq adjustment changes if different measurement itme intervals.
+	// Something related to time is moving...
 	// Maybe SynchNetAdj=7.5; // Which corresponds more or less the GPIO factor 64.0 divided by the measurement interval time (around 10 seconds)
 	// Maybe, the adjustment frequency has to be always positive
 	//if (SynchCalcValuesArray[2]>0.0 or SynchCalcValuesArray[2]<0.0){
@@ -1257,7 +1258,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	//	SynchCalcValuesArray[2]=0.0;
 	//}
 	double SynchNetAdj=64.0/10.0;
-	SynchCalcValuesArray[2]=SynchNetAdj*abs(SynchCalcValuesArray[2]);
+	SynchCalcValuesArray[2]=-SynchNetAdj*(SynchCalcValuesArray[2]);
 	
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass]={0.0};
 	long double DLHistPeriodicityAux=static_cast<long double>(HistPeriodicityAux);
