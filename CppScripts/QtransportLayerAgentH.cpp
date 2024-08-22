@@ -1469,7 +1469,7 @@ while(AchievedAttentionParticularHosts==false or FirstPassAux==true){
 		this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 		this->acquire();
 	}
-	int numForstEquivalentToSleep=500;//1000: Equivalent to 1 seconds# give time to other hosts to enter
+	int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
 	for (int i=0;i<numForstEquivalentToSleep;i++){
 		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 		//cout << "this->getState(): " << this->getState() << endl;
@@ -1652,7 +1652,7 @@ return false; // all ok
 
 int QTLAH::UnBlockYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 if (string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){// This is the blocking host so proceed to unblock
-int numForstEquivalentToSleep=500;//1000: Equivalent to 1 seconds# give time to other hosts to enter
+int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
 for (int i=0;i<numForstEquivalentToSleep;i++){
 	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 	//cout << "this->getState(): " << this->getState() << endl;
@@ -1824,7 +1824,7 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			
 			// Instead of a simple sleep, which would block the operation (specially processing new messages)
 			// usleep(usSynchProcIterRunsTimePoint);// Give time between iterations to send and receive qubits
-			int numForstEquivalentToSleep=10000;//1000: Equivalent to 1 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
+			int numForstEquivalentToSleep=1000;//100: Equivalent to 1 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
 			for (int i=0;i<numForstEquivalentToSleep;i++){
 				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 				//cout << "this->getState(): " << this->getState() << endl;
