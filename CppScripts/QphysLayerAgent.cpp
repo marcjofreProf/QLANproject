@@ -673,8 +673,6 @@ cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 }		
 this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 
-cout << "QPLA::Synchronization parameters updated for this node" << endl;
-
 this->release();
 /*
 cout << "ModeActivePassive: " << ModeActivePassive << endl;
@@ -1246,9 +1244,10 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	SynchCalcValuesArray[0]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment	
 	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[2]-(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2])*SynchCalcValuesArray[0])/static_cast<double>(SynchCalcValuesArray[0]);  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)*/
 	// When using the base frequency to synchronize
+	double ArbAdjFactor=7.5; // Arbitrary factor. 7.5 when the time between synch network measures is 10 seconds
 	adjFreqSynchNormRatiosArray[0]=1.0;
 	SynchCalcValuesArray[0]=static_cast<double>(HistPeriodicityAux);//(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment	
-	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)	
+	SynchCalcValuesArray[2]=ArbAdjFactor*(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)	
 	
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass]={0.0};
 	long double DLHistPeriodicityAux=static_cast<long double>(HistPeriodicityAux);
@@ -1280,6 +1279,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency difference
 		SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 	}
+	cout << "QPLA::Synchronization parameters updated for this node" << endl;
 }
 
 return 0; // All Ok
