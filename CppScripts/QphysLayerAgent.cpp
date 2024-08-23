@@ -444,8 +444,8 @@ this->NumberRepetitionsSignal=numReqQuBitsAux;
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=-CurrentSynchNetworkParamsLink[0];// synch trig offset
-this->FineSynchAdjVal[1]=-CurrentSynchNetworkParamsLink[1];// synch trig frequency
+this->FineSynchAdjVal[0]=-0.5*CurrentSynchNetworkParamsLink[0];// synch trig offset - in the other direction and only half so that the other node also has to compensate a bit
+this->FineSynchAdjVal[1]=-0.5*CurrentSynchNetworkParamsLink[1];// synch trig frequency - in the other direction and only half so that the other node also has to compensate a bit
 }
 else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
@@ -496,8 +496,8 @@ else{
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=-CurrentSynchNetworkParamsLink[0];// synch trig offset
-this->FineSynchAdjVal[1]=-CurrentSynchNetworkParamsLink[1];// synch trig frequency
+this->FineSynchAdjVal[0]=-0.5*CurrentSynchNetworkParamsLink[0];// synch trig offset - in the other direction and only half so that the other node also has to compensate a bit
+this->FineSynchAdjVal[1]=-0.5*CurrentSynchNetworkParamsLink[1];// synch trig frequency - in the other direction and only half so that the other node also has to compensate a bit
 }
 else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
