@@ -497,7 +497,7 @@ else{
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
 this->FineSynchAdjVal[0]=-0.0*CurrentSynchNetworkParamsLink[0];// synch trig offset - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter, just a very slight percentage of any other current adjustment
-this->FineSynchAdjVal[1]=-0.05;//-0.0*CurrentSynchNetworkParamsLink[1];// synch trig frequency - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter, just a very slight percentage of any other current adjustment
+this->FineSynchAdjVal[1]=-0.0*CurrentSynchNetworkParamsLink[1];// synch trig frequency - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter, just a very slight percentage of any other current adjustment
 }
 else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
@@ -1295,7 +1295,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		//}
 	}
 	
-	SynchCalcValuesArray[2]=SynchNetAdj*(SynchCalcValuesArray[2])+0.05;//0.05 slight rel offset
+	SynchCalcValuesArray[2]=SynchNetAdj*(SynchCalcValuesArray[2]);
 			
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	
