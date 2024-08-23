@@ -1177,9 +1177,9 @@ while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSi
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 
 if (CurrentSpecificLink>=0){
-TimeTaggsDetSynchParams[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];
-TimeTaggsDetSynchParams[1]=SynchNetworkParamsLink[CurrentSpecificLink][1];
-TimeTaggsDetSynchParams[2]=SynchNetworkParamsLink[CurrentSpecificLink][2];
+TimeTaggsDetSynchParams[0]=SynchNetworkParamsLink[CurrentSpecificLink][0]/static_cast<double>(HistPeriodicityAux);
+TimeTaggsDetSynchParams[1]=SynchNetworkParamsLink[CurrentSpecificLink][1]/static_cast<double>(HistPeriodicityAux);
+TimeTaggsDetSynchParams[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]/static_cast<double>(HistPeriodicityAux);
 }
 else{
 TimeTaggsDetSynchParams[0]=0.0;
