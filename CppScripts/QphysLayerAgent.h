@@ -117,7 +117,7 @@ private: //Variables/Instances
 	long long int SynchFirstTagsArrayOffsetCalc[NumRunsPerCenterMass]; // To momentally store the first iteration of the synch which has no extra relative frequency edifferencew
 	double SynchHistCenterMassArray[NumCalcCenterMass]={0.0};//,0.0,0.0}; // Array containing the needed center of mass for the histograms of the synchronization
 	double SynchCalcValuesArray[3]={0.0,0.0,0.0}; // Computed values for achieving synchronization protocol
-	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0};//,0.35,0.70}; // Normalized values of frequency testing
+	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,0.35,0.70}; // Normalized values of frequency testing
 	double adjFreqSynchNormRatiosArray[NumCalcCenterMass]={1.0};//,1.0,1.0}; // adjusting Normalized ratios of frequency testing
 	double SynchNetworkParamsLink[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send
 	double CurrentSynchNetworkParamsLink[3]={0.0}; //Stores currently the network synch values of interest given the link in use
