@@ -671,8 +671,8 @@ else{
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
-this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
+this->FineSynchAdjVal[0]=0.0*CurrentSynchNetworkParamsLink[0];// synch trig offset
+this->FineSynchAdjVal[1]=0.0*CurrentSynchNetworkParamsLink[1];// synch trig frequency
 }
 else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
@@ -1337,7 +1337,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		else{
 			SynchNetworkParamsLink[CurrentSpecificLink][0]=SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1];// Offset difference
 		}*/
-		SynchNetworkParamsLink[CurrentSpecificLink][0]=SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1];// Offset difference
+		SynchNetworkParamsLink[CurrentSpecificLink][0]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1];// Offset difference
 		/*// Let the other node also correct
 		if ((SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2])>0.5){
 			SynchNetworkParamsLink[CurrentSpecificLink][1]=0.5;
@@ -1350,7 +1350,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		else{
 			SynchNetworkParamsLink[CurrentSpecificLink][1]=SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency difference
 		}*/
-		SynchNetworkParamsLink[CurrentSpecificLink][1]=SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
+		SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 		SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 	}
 	cout << "QPLA::Synchronization parameters updated for this node" << endl;
