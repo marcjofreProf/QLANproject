@@ -515,17 +515,24 @@ cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
 }
 
 this->release();
-
+/*
 cout << "ModeActivePassive: " << ModeActivePassive << endl;
 cout << "CurrentSpecificLink: " << CurrentSpecificLink << endl;
 cout << "NumberRepetitionsSignal: " << NumberRepetitionsSignal << endl;
 cout << "HistPeriodicityAux: " << HistPeriodicityAux << endl;
-cout << "FreqSynchNormValuesArray[0]: " << FreqSynchNormValuesArray[0] << endl;
+if (NumCalcCenterMass>1){
+	cout << "FreqSynchNormValuesArray[0]: " << FreqSynchNormValuesArray[0] << endl;
+	cout << "FreqSynchNormValuesArray[1]: " << FreqSynchNormValuesArray[1] << endl;
+	cout << "FreqSynchNormValuesArray[2]: " << FreqSynchNormValuesArray[2] << endl;
+}
+else{
+	cout << "FreqSynchNormValuesArray[0]: " << FreqSynchNormValuesArray[0] << endl;
+}< endl;
 cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
 cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
 cout << "iCenterMass: " << iCenterMass << endl;
 cout << "iNumRunsPerCenterMass: " << iNumRunsPerCenterMass << endl;
-
+*/
 return 0; // return 0 is for no error
 }
 
@@ -684,17 +691,24 @@ cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 
 this->release();
-
+/*
 cout << "ModeActivePassive: " << ModeActivePassive << endl;
 cout << "CurrentSpecificLink: " << CurrentSpecificLink << endl;
 cout << "NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
 cout << "HistPeriodicityAux: " << HistPeriodicityAux << endl;
-cout << "FreqSynchNormValuesArray[0]: " << FreqSynchNormValuesArray[0] << endl;
+if (NumCalcCenterMass>1){
+	cout << "FreqSynchNormValuesArray[0]: " << FreqSynchNormValuesArray[0] << endl;
+	cout << "FreqSynchNormValuesArray[1]: " << FreqSynchNormValuesArray[1] << endl;
+	cout << "FreqSynchNormValuesArray[2]: " << FreqSynchNormValuesArray[2] << endl;
+}
+else{
+	cout << "FreqSynchNormValuesArray[0]: " << FreqSynchNormValuesArray[0] << endl;
+}
 cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
 cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
 cout << "iCenterMass: " << iCenterMass << endl;
 cout << "iNumRunsPerCenterMass: " << iNumRunsPerCenterMass << endl;
-
+*/
 return 0; // return 0 is for no error
 }
 
