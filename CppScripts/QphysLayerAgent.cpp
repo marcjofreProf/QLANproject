@@ -838,18 +838,18 @@ if (CurrentSpecificLinkMultiple<0){
 //cout << "QPLA::CurrentNumIdentifiedMultipleIP: " << CurrentNumIdentifiedMultipleIP << endl;
 // Update the holder values that need to be passed depending on the current link of interest
 if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){
-	CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];
-	CurrentSynchNetworkParamsLink[1]=SynchNetworkParamsLink[CurrentSpecificLink][1];
-	CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLink][2];
+	CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0]/static_cast<double>(HistPeriodicityAux);
+	CurrentSynchNetworkParamsLink[1]=SynchNetworkParamsLink[CurrentSpecificLink][1]/static_cast<double>(HistPeriodicityAux);
+	CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]/static_cast<double>(HistPeriodicityAux);
 }
 else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){
 	CurrentSynchNetworkParamsLink[0]=0.0; // Reset values
 	CurrentSynchNetworkParamsLink[1]=0.0; // Reset values
 	CurrentSynchNetworkParamsLink[2]=0.0; // Reset values
 	for (int i=0;i<numSpecificLinkmatches; i++){// Use the average of the different involved links
-		CurrentSynchNetworkParamsLink[0]+=(1.0/static_cast<double>(numSpecificLinkmatches))*SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[i]][0];
-		CurrentSynchNetworkParamsLink[1]+=(1.0/static_cast<double>(numSpecificLinkmatches))*SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[i]][1];
-		CurrentSynchNetworkParamsLink[2]+=(1.0/static_cast<double>(numSpecificLinkmatches))*SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[i]][2];
+		CurrentSynchNetworkParamsLink[0]+=(1.0/static_cast<double>(numSpecificLinkmatches))*SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[i]][0]/static_cast<double>(HistPeriodicityAux);
+		CurrentSynchNetworkParamsLink[1]+=(1.0/static_cast<double>(numSpecificLinkmatches))*SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[i]][1]/static_cast<double>(HistPeriodicityAux);
+		CurrentSynchNetworkParamsLink[2]+=(1.0/static_cast<double>(numSpecificLinkmatches))*SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[i]][2]/static_cast<double>(HistPeriodicityAux);
 	}
 }
 else{
@@ -1260,7 +1260,7 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 }
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
-	double SynchNetAdj=64.0/30.0; // Adjustment value consisting of the 64.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
+	double SynchNetAdj=(64.0/30.0)*static_cast<double>(HistPeriodicityAux); // Adjustment value consisting of the 64.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
 	if (NumCalcCenterMass>1){// when using multiple frequencies - Much more precise, but more time
 		adjFreqSynchNormRatiosArray[0]=1.0;
 		adjFreqSynchNormRatiosArray[1]=1.0;//((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/static_cast<double>(HistPeriodicityAux);
@@ -1269,9 +1269,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchCalcValuesArray[0]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment	
 		
 		double SynchCalcValuesArraySel[NumCalcCenterMass];
-		SynchCalcValuesArraySel[0]=-(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])*SynchCalcValuesArray[0])/static_cast<double>(SynchCalcValuesArray[0]);  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)
-		SynchCalcValuesArraySel[1]=-(SynchHistCenterMassArray[1]-(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1])*SynchCalcValuesArray[0])/static_cast<double>(SynchCalcValuesArray[0]);  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)
-		SynchCalcValuesArraySel[2]=-(SynchHistCenterMassArray[2]-(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2])*SynchCalcValuesArray[0])/static_cast<double>(SynchCalcValuesArray[0]);  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)
+		SynchCalcValuesArraySel[0]=(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])*SynchCalcValuesArray[0])/static_cast<double>(SynchCalcValuesArray[0]);  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)
+		SynchCalcValuesArraySel[1]=(SynchHistCenterMassArray[1]-(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1])*SynchCalcValuesArray[0])/static_cast<double>(SynchCalcValuesArray[0]);  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)
+		SynchCalcValuesArraySel[2]=(SynchHistCenterMassArray[2]-(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2])*SynchCalcValuesArray[0])/static_cast<double>(SynchCalcValuesArray[0]);  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)
 		
 		//cout << "QPLA::SynchCalcValuesArraySel[0]: " << SynchCalcValuesArraySel[0] << endl;
 		//cout << "QPLA::SynchCalcValuesArraySel[1]: " << SynchCalcValuesArraySel[1] << endl;
@@ -1282,7 +1282,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	else{	// When using the base frequency to synchronize
 		adjFreqSynchNormRatiosArray[0]=1.0;
 		SynchCalcValuesArray[0]=static_cast<double>(HistPeriodicityAux);//(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]); //Period adjustment	
-		SynchCalcValuesArray[2]=-(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)	
+		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-(adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)	
 		// Weird behaviour, where the rel freq adjustment changes if different measurement itme intervals.
 		// Something related to time is moving...
 		// Maybe SynchNetAdj=7.5; // Which corresponds more or less the GPIO factor 64.0 divided by the measurement interval time (around 10 seconds)
@@ -1302,7 +1302,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass]={0.0};
 	long double DLHistPeriodicityAux=static_cast<long double>(HistPeriodicityAux);
 	for (int i=0;i<NumRunsPerCenterMass;i++){
-		SynchCalcValuesArrayAux[i]=-static_cast<double>(fmodl(static_cast<long double>(SynchFirstTagsArrayOffsetCalc[i])+static_cast<long double>(SynchCalcValuesArray[2])*DLHistPeriodicityAux,DLHistPeriodicityAux));// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		SynchCalcValuesArrayAux[i]=static_cast<double>(fmodl(static_cast<long double>(SynchFirstTagsArrayOffsetCalc[i])+static_cast<long double>(SynchCalcValuesArray[2]),DLHistPeriodicityAux));// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
 	
