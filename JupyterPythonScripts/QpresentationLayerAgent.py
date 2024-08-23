@@ -157,12 +157,14 @@ class QPLA:
 		ReceiveSynchPRUoffFreqVal=0.0*SynchPRUoffFreqVal	
 		NumCalcCenterMass=len(SynchFreqPRUarrayTest)
 		for iCenterMass in range(0,NumCalcCenterMass,1):
-			for iNumRunsPerCenterMass in range(0,NumRunsPerCenterMass,1):
-				# With three values of frequency test for network synchronization
-				#messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRequestedQubitsReceive),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2]),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
+			for iNumRunsPerCenterMass in range(0,NumRunsPerCenterMass,1):				
+				if (len(SynchFreqPRUarrayTest)>1):
+					# With three values of frequency test for network synchronization
+					messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRequestedQubitsReceive),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2]),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
+				else:
+					# With one value of frequency test for network synchronization
+					messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRequestedQubitsReceive),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(PeriodSignalHistVal),str(ReceiveSynchPRUoffFreqVal[0]),str(ReceiveSynchPRUoffFreqVal[1])])
 				
-				# With one value of frequency test for network synchronization
-				messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRequestedQubitsReceive),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(PeriodSignalHistVal),str(ReceiveSynchPRUoffFreqVal[0]),str(ReceiveSynchPRUoffFreqVal[1])])
 				messageCommandAux="SimulateReceiveSynchQubits"
 				messageTypeAux="Control"
 				messageIPorg=IPhostOrgConNet
@@ -171,11 +173,13 @@ class QPLA:
 				self.QSLAagent.SendMessageAgent(messageAuxChar)
 				#print(messageAuxChar)
 				
-				# With three values of frequency test for network synchronization
-				#messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),str(NumRequestedQubitsSend),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2]),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
+				if (len(SynchFreqPRUarrayTest)>1):
+					# With three values of frequency test for network synchronization
+					messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),str(NumRequestedQubitsSend),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2]),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
+				else:
+					# With one value of frequency test for network synchronization
+					messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),str(NumRequestedQubitsSend),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
 				
-				# With one value of frequency test for network synchronization
-				messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),str(NumRequestedQubitsSend),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
 				messageCommandAux="SimulateSendSynchQubits"
 				messageTypeAux="Control"
 				messageIPorg=IPhostOrgOpNet
