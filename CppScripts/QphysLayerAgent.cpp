@@ -1260,7 +1260,7 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 }
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
-	double SynchNetAdj=64.0/10.0; // Adjustment value consisting of the 64.0 of the GPIO and divided by the time measurement interval (around 10 seconds)
+	double SynchNetAdj=64.0/30.0; // Adjustment value consisting of the 64.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
 	if (NumCalcCenterMass>1){// when using multiple frequencies - Much more precise, but more time
 		adjFreqSynchNormRatiosArray[0]=1.0;
 		adjFreqSynchNormRatiosArray[1]=1.0;//((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/static_cast<double>(HistPeriodicityAux);
@@ -1295,9 +1295,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		//}
 	}
 	
-	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
+	SynchCalcValuesArray[2]=SynchNetAdj*(SynchCalcValuesArray[2]);
 	
-	//SynchCalcValuesArray[2]=SynchNetAdj*(SynchCalcValuesArray[2]);
+	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass]={0.0};
 	long double DLHistPeriodicityAux=static_cast<long double>(HistPeriodicityAux);
