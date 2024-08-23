@@ -482,9 +482,14 @@ this->RetrieveOtherEmiterReceiverMethod();
 strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 this->NumberRepetitionsSignal=numReqQuBitsAux;
 //this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
-this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
-//this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
-//this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
+if (NumCalcCenterMass>1){
+	this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
+	this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
+	this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
+}
+else{
+	this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
+}
 //cout << "this->FineSynchAdjVal[1]: " << this->FineSynchAdjVal[1] << endl;
 // Remove previous synch values - probably not for the emitter (since calculation for synch values are done as receiver)
 // Here run the several iterations with different testing frequencies
@@ -510,7 +515,7 @@ cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
 }
 
 this->release();
-/*
+
 cout << "ModeActivePassive: " << ModeActivePassive << endl;
 cout << "CurrentSpecificLink: " << CurrentSpecificLink << endl;
 cout << "NumberRepetitionsSignal: " << NumberRepetitionsSignal << endl;
@@ -520,7 +525,7 @@ cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
 cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
 cout << "iCenterMass: " << iCenterMass << endl;
 cout << "iNumRunsPerCenterMass: " << iNumRunsPerCenterMass << endl;
-*/
+
 return 0; // return 0 is for no error
 }
 
@@ -638,9 +643,14 @@ this->RetrieveOtherEmiterReceiverMethod();
 strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 this->NumQuBitsPerRun=numReqQuBitsAux;				
 //this->NumRunsPerCenterMass=NumRunsPerCenterMassAux; hardcoded value
-this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
-//this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
-//this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
+if (NumCalcCenterMass>1){
+	this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
+	this->FreqSynchNormValuesArray[1]=FreqSynchNormValuesArrayAux[1];// second test frequency norm.
+	this->FreqSynchNormValuesArray[2]=FreqSynchNormValuesArrayAux[2];// third test frequency norm.
+}
+else{
+	this->FreqSynchNormValuesArray[0]=FreqSynchNormValuesArrayAux[0];// first test frequency norm.
+}
 //if (iCenterMass==0 and iNumRunsPerCenterMass==0){
 	// Reset previous synch values to zero - Maybe comment it in order to do an iterative algorithm
 	//SynchCalcValuesArray[0]=0.0;
@@ -674,7 +684,7 @@ cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 
 this->release();
-/*
+
 cout << "ModeActivePassive: " << ModeActivePassive << endl;
 cout << "CurrentSpecificLink: " << CurrentSpecificLink << endl;
 cout << "NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
@@ -684,7 +694,7 @@ cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
 cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
 cout << "iCenterMass: " << iCenterMass << endl;
 cout << "iNumRunsPerCenterMass: " << iNumRunsPerCenterMass << endl;
-*/
+
 return 0; // return 0 is for no error
 }
 
