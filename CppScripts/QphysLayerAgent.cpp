@@ -444,8 +444,8 @@ this->NumberRepetitionsSignal=numReqQuBitsAux;
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=0.0*CurrentSynchNetworkParamsLink[0];// synch trig offset
-this->FineSynchAdjVal[1]=0.0*CurrentSynchNetworkParamsLink[1];// synch trig frequency
+this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
+this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
 }
 else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
@@ -496,8 +496,8 @@ else{
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=0.0*CurrentSynchNetworkParamsLink[0];// synch trig offset
-this->FineSynchAdjVal[1]=0.0*CurrentSynchNetworkParamsLink[1];// synch trig frequency
+this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
+this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
 }
 else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
@@ -671,8 +671,8 @@ else{
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=0.0*CurrentSynchNetworkParamsLink[0];// synch trig offset
-this->FineSynchAdjVal[1]=0.0*CurrentSynchNetworkParamsLink[1];// synch trig frequency
+this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
+this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
 }
 else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
@@ -1273,9 +1273,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchCalcValuesArraySel[1]=-(SynchHistCenterMassArray[1]-(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1])*SynchCalcValuesArray[0])/static_cast<double>(SynchCalcValuesArray[0]);  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)
 		SynchCalcValuesArraySel[2]=-(SynchHistCenterMassArray[2]-(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2])*SynchCalcValuesArray[0])/static_cast<double>(SynchCalcValuesArray[0]);  // Relative frequency difference adjustment (so it is already a correction, since in GPIO a positive value will make a delay so equivalent to negative compesation)
 		
-		cout << "QPLA::SynchCalcValuesArraySel[0]: " << SynchCalcValuesArraySel[0] << endl;
-		cout << "QPLA::SynchCalcValuesArraySel[1]: " << SynchCalcValuesArraySel[1] << endl;
-		cout << "QPLA::SynchCalcValuesArraySel[2]: " << SynchCalcValuesArraySel[2] << endl;
+		//cout << "QPLA::SynchCalcValuesArraySel[0]: " << SynchCalcValuesArraySel[0] << endl;
+		//cout << "QPLA::SynchCalcValuesArraySel[1]: " << SynchCalcValuesArraySel[1] << endl;
+		//cout << "QPLA::SynchCalcValuesArraySel[2]: " << SynchCalcValuesArraySel[2] << endl;
 		
 		SynchCalcValuesArray[2]=DoubleMedianFilterSubArray(SynchCalcValuesArraySel,NumCalcCenterMass);
 	}	
@@ -1295,12 +1295,14 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		//}
 	}
 	
-	SynchCalcValuesArray[2]=SynchNetAdj*(SynchCalcValuesArray[2]);
+	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
+	
+	//SynchCalcValuesArray[2]=SynchNetAdj*(SynchCalcValuesArray[2]);
 	
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass]={0.0};
 	long double DLHistPeriodicityAux=static_cast<long double>(HistPeriodicityAux);
 	for (int i=0;i<NumRunsPerCenterMass;i++){
-		SynchCalcValuesArrayAux[i]=-static_cast<double>(fmodl(static_cast<long double>(SynchFirstTagsArrayOffsetCalc[i])+0.0*static_cast<long double>(SynchCalcValuesArray[2])*DLHistPeriodicityAux,DLHistPeriodicityAux));// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		SynchCalcValuesArrayAux[i]=-static_cast<double>(fmodl(static_cast<long double>(SynchFirstTagsArrayOffsetCalc[i])+static_cast<long double>(SynchCalcValuesArray[2])*DLHistPeriodicityAux,DLHistPeriodicityAux));// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
 	
@@ -1323,8 +1325,8 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	}
 	// Identify the specific link and store/update iteratively the values
 	if (CurrentSpecificLink>=0){
-		SynchNetworkParamsLink[CurrentSpecificLink][0]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1];// Offset
-		SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency difference
+		SynchNetworkParamsLink[CurrentSpecificLink][0]=SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1];// Offset
+		SynchNetworkParamsLink[CurrentSpecificLink][1]=SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency difference
 		SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 	}
 	cout << "QPLA::Synchronization parameters updated for this node" << endl;

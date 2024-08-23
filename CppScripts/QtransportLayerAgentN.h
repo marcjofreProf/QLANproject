@@ -16,7 +16,7 @@ Header declaration file for Quantum transport Layer Agent Node
 #define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 #define IPcharArrayLengthMAX 15
 // Synchronization
-#define NumCalcCenterMass 3 // Number of centers of mass to measure to compute the synchronization
+#define NumCalcCenterMass 1//3 // Number of centers of mass to measure to compute the synchronization
 
 // Payload messages
 #define NumBytesPayloadBuffer 1000
