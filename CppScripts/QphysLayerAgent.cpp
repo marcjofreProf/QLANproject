@@ -837,26 +837,26 @@ if (CurrentSpecificLinkMultiple<0){
 //cout << "QPLA::CurrentSpecificLinkMultiple: " << CurrentSpecificLinkMultiple << endl;
 //cout << "QPLA::CurrentNumIdentifiedMultipleIP: " << CurrentNumIdentifiedMultipleIP << endl;
 // Update the holder values that need to be passed depending on the current link of interest
-if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){
+if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to RequestQubits Node to node or SendEntangled. The receiver always performs correction, so does not matter for the sender since they are zeroed
 	// For receiver correction
 	CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0]/static_cast<double>(HistPeriodicityAux);
 	CurrentSynchNetworkParamsLink[1]=SynchNetworkParamsLink[CurrentSpecificLink][1]/static_cast<double>(HistPeriodicityAux);
 	CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]/static_cast<double>(HistPeriodicityAux);
-	//For emitter correction
-	CurrentExtraSynchNetworkParamsLink[0]=0.0;//SynchNetworkParamsLink[CurrentSpecificLink][0]/static_cast<double>(HistPeriodicityAux);
-	CurrentExtraSynchNetworkParamsLink[1]=0.0;//SynchNetworkParamsLink[CurrentSpecificLink][1]/static_cast<double>(HistPeriodicityAux);
-	CurrentExtraSynchNetworkParamsLink[2]=0.0;//SynchNetworkParamsLink[CurrentSpecificLink][2]/static_cast<double>(HistPeriodicityAux);
+	//For emitter correction - No correction, since it is taking place at the receiver
+	CurrentExtraSynchNetworkParamsLink[0]=0.0;
+	CurrentExtraSynchNetworkParamsLink[1]=0.0;
+	CurrentExtraSynchNetworkParamsLink[2]=0.0;
 }
-else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){
+else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
 	// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for deteciton to use another story is if compensating for emitter
-	// For receiver correction
-	CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0]/static_cast<double>(HistPeriodicityAux);
-	CurrentSynchNetworkParamsLink[1]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1]/static_cast<double>(HistPeriodicityAux);
-	CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][2]/static_cast<double>(HistPeriodicityAux);
+	// For receiver correction - Correction has to take place at the emitter, where the first IP identifies the single receiver
+	CurrentSynchNetworkParamsLink[0]=0.0;//SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0]/static_cast<double>(HistPeriodicityAux);
+	CurrentSynchNetworkParamsLink[1]=0.0;//SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1]/static_cast<double>(HistPeriodicityAux);
+	CurrentSynchNetworkParamsLink[2]=0.0;//SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][2]/static_cast<double>(HistPeriodicityAux);
 	//For emitter correction - to be develop
-	CurrentExtraSynchNetworkParamsLink[0]=0.0;//SynchNetworkParamsLink[CurrentSpecificLink][0]/static_cast<double>(HistPeriodicityAux);
-	CurrentExtraSynchNetworkParamsLink[1]=0.0;//SynchNetworkParamsLink[CurrentSpecificLink][1]/static_cast<double>(HistPeriodicityAux);
-	CurrentExtraSynchNetworkParamsLink[2]=0.0;//SynchNetworkParamsLink[CurrentSpecificLink][2]/static_cast<double>(HistPeriodicityAux);
+	CurrentExtraSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0]/static_cast<double>(HistPeriodicityAux);
+	CurrentExtraSynchNetworkParamsLink[1]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1]/static_cast<double>(HistPeriodicityAux);
+	CurrentExtraSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][2]/static_cast<double>(HistPeriodicityAux);
 	
 }
 else{

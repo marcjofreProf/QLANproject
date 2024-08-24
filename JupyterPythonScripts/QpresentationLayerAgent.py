@@ -115,7 +115,9 @@ class QPLA:
 			messageIPdest=IPhostDest2OpNet
 			messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 			self.QSLAagent.SendMessageAgent(messageAuxChar)	
-		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostDest2OpNet]),self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostDest2OpNet]),str(NumRequestedQubitsSend),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
+		
+		# For identifying instead of the reciever, only identify the sender - since no network correction has to take place
+		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrg1OpNet]),self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostDest2OpNet]),str(NumRequestedQubitsSend),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1])])
 		messageCommandAux="SimulateSendQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrgConNet
@@ -130,14 +132,16 @@ class QPLA:
 				
 	def SimulateRequestMultipleNodesQubitsHost(self,IPhostDest1OpNet,IPhostOrg1OpNet,IPhostDest2OpNet,IPhostOrg2OpNet,IPnodeDestConNet,IPnodeDest1ConNet,IPnodeDest2ConNet,IPhostOrgConNet,NumRequestedQubitsSend,NumRequestedQubitsReceive,PeriodSignalHistVal,SynchPRUoffFreqVal1,SynchPRUoffFreqVal2): # Request other nodes to send to this node qubits
 		ReceiveSynchPRUoffFreqVal=0.0*SynchPRUoffFreqVal
-		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrg2OpNet]),self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostOrg2OpNet]),str(NumRequestedQubitsSend),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal2[0]),str(SynchPRUoffFreqVal2[1])])
+		# For the list of IP for the correction, it is very important the order, first the destination and then the other sender
+		
+		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostDest2OpNet,IPhostOrg1OpNet]),self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostOrg2OpNet]),str(NumRequestedQubitsSend),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal2[0]),str(SynchPRUoffFreqVal2[1])])
 		messageCommandAux="SimulateSendQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrg2OpNet
 		messageIPdest=IPhostDest2OpNet
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)		
-		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrg1OpNet]),self.UnderScoreListCharArrayParser([IPhostDest2OpNet,IPhostOrg1OpNet]),str(NumRequestedQubitsSend),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal1[0]),str(SynchPRUoffFreqVal1[1])])
+		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostOrg2OpNet]),self.UnderScoreListCharArrayParser([IPhostDest2OpNet,IPhostOrg1OpNet]),str(NumRequestedQubitsSend),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal1[0]),str(SynchPRUoffFreqVal1[1])])
 		messageCommandAux="SimulateSendQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrg1OpNet
