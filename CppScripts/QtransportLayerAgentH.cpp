@@ -1459,13 +1459,20 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 this->acquire();
 bool FirstPassAux=true;
 while(AchievedAttentionParticularHosts==false or FirstPassAux==true){
+	if (FirstPassAux==false){
+		cout << "Host " << this->IPaddressesSockets[2] << " trying to get attention from other involved hosts!" << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[1]: " << HostsActiveActionsFree[1] << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
+	}
 	FirstPassAux=false;// First pass is compulsory, since it might be true AchievedAttentionParticularHosts, but because of another process
 	while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
 		this->release();
 		//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
 		//cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
 		//cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
-		//cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization and availability of other hosts to proceed with the request!" << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization and availability of other hosts to proceed with the request!" << endl;
 		this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 		this->acquire();
 	}

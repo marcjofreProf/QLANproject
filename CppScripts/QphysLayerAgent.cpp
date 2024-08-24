@@ -444,8 +444,8 @@ this->NumberRepetitionsSignal=numReqQuBitsAux;
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=-0.0*CurrentSynchNetworkParamsLink[0];// synch trig offset - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter
-this->FineSynchAdjVal[1]=-0.0*CurrentSynchNetworkParamsLink[1];// synch trig frequency - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter
+this->FineSynchAdjVal[0]=-CurrentExtraSynchNetworkParamsLink[0];// synch trig offset - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter
+this->FineSynchAdjVal[1]=-CurrentExtraSynchNetworkParamsLink[1];// synch trig frequency - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter
 }
 else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
@@ -496,8 +496,8 @@ else{
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=-0.0*CurrentSynchNetworkParamsLink[0];// synch trig offset - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter, just a very slight percentage of any other current adjustment
-this->FineSynchAdjVal[1]=-0.0*CurrentSynchNetworkParamsLink[1];// synch trig frequency - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter, just a very slight percentage of any other current adjustment
+this->FineSynchAdjVal[0]=-0.0*CurrentExtraSynchNetworkParamsLink[0];// synch trig offset - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter, just a very slight percentage of any other current adjustment
+this->FineSynchAdjVal[1]=-0.0*CurrentExtraSynchNetworkParamsLink[1];// synch trig frequency - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter, just a very slight percentage of any other current adjustment
 }
 else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
@@ -838,24 +838,35 @@ if (CurrentSpecificLinkMultiple<0){
 //cout << "QPLA::CurrentNumIdentifiedMultipleIP: " << CurrentNumIdentifiedMultipleIP << endl;
 // Update the holder values that need to be passed depending on the current link of interest
 if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){
+	// For receiver correction
 	CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0]/static_cast<double>(HistPeriodicityAux);
 	CurrentSynchNetworkParamsLink[1]=SynchNetworkParamsLink[CurrentSpecificLink][1]/static_cast<double>(HistPeriodicityAux);
 	CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]/static_cast<double>(HistPeriodicityAux);
+	//For emitter correction
+	CurrentExtraSynchNetworkParamsLink[0]=0.0;//SynchNetworkParamsLink[CurrentSpecificLink][0]/static_cast<double>(HistPeriodicityAux);
+	CurrentExtraSynchNetworkParamsLink[1]=0.0;//SynchNetworkParamsLink[CurrentSpecificLink][1]/static_cast<double>(HistPeriodicityAux);
+	CurrentExtraSynchNetworkParamsLink[2]=0.0;//SynchNetworkParamsLink[CurrentSpecificLink][2]/static_cast<double>(HistPeriodicityAux);
 }
 else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){
-	CurrentSynchNetworkParamsLink[0]=0.0; // Reset values
-	CurrentSynchNetworkParamsLink[1]=0.0; // Reset values
-	CurrentSynchNetworkParamsLink[2]=0.0; // Reset values
-	for (int i=0;i<numSpecificLinkmatches; i++){// Use the average of the different involved links
-		CurrentSynchNetworkParamsLink[0]+=(1.0/static_cast<double>(numSpecificLinkmatches))*SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[i]][0]/static_cast<double>(HistPeriodicityAux);
-		CurrentSynchNetworkParamsLink[1]+=(1.0/static_cast<double>(numSpecificLinkmatches))*SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[i]][1]/static_cast<double>(HistPeriodicityAux);
-		CurrentSynchNetworkParamsLink[2]+=(1.0/static_cast<double>(numSpecificLinkmatches))*SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[i]][2]/static_cast<double>(HistPeriodicityAux);
-	}
+	// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for deteciton to use another story is if compensating for emitter
+	// For receiver correction
+	CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0]/static_cast<double>(HistPeriodicityAux);
+	CurrentSynchNetworkParamsLink[1]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1]/static_cast<double>(HistPeriodicityAux);
+	CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][2]/static_cast<double>(HistPeriodicityAux);
+	//For emitter correction - to be develop
+	CurrentExtraSynchNetworkParamsLink[0]=0.0;//SynchNetworkParamsLink[CurrentSpecificLink][0]/static_cast<double>(HistPeriodicityAux);
+	CurrentExtraSynchNetworkParamsLink[1]=0.0;//SynchNetworkParamsLink[CurrentSpecificLink][1]/static_cast<double>(HistPeriodicityAux);
+	CurrentExtraSynchNetworkParamsLink[2]=0.0;//SynchNetworkParamsLink[CurrentSpecificLink][2]/static_cast<double>(HistPeriodicityAux);
+	
 }
 else{
 	CurrentSynchNetworkParamsLink[0]=0.0;
 	CurrentSynchNetworkParamsLink[1]=0.0;
 	CurrentSynchNetworkParamsLink[2]=0.0;
+	
+	CurrentExtraSynchNetworkParamsLink[0]=0.0; // Reset values
+	CurrentExtraSynchNetworkParamsLink[1]=0.0; // Reset values
+	CurrentExtraSynchNetworkParamsLink[2]=0.0; // Reset values
 }
 return 0; // All ok
 }
