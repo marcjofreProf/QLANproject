@@ -1188,9 +1188,9 @@ while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSi
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 
 if (CurrentSpecificLink>=0){
-TimeTaggsDetSynchParams[0]=SynchNetworkParamsLink[CurrentSpecificLink][0]/static_cast<double>(HistPeriodicityAux);
-TimeTaggsDetSynchParams[1]=SynchNetworkParamsLink[CurrentSpecificLink][1]/static_cast<double>(HistPeriodicityAux);
-TimeTaggsDetSynchParams[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]/static_cast<double>(HistPeriodicityAux);
+TimeTaggsDetSynchParams[0]=SynchNetworkParamsLink[CurrentSpecificLink][0]/static_cast<double>(HistPeriodicityAux); // Offset
+TimeTaggsDetSynchParams[1]=SynchNetworkParamsLink[CurrentSpecificLink][1]/static_cast<double>(HistPeriodicityAux); // Relative frequency difference
+TimeTaggsDetSynchParams[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]; // Period in which it was calculated
 }
 else{
 TimeTaggsDetSynchParams[0]=0.0;
@@ -1279,7 +1279,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		adjFreqSynchNormRatiosArray[1]=((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
 		adjFreqSynchNormRatiosArray[2]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[1]))/dHistPeriodicityAux;
 
-		SynchCalcValuesArray[0]=((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0]))*dHistPeriodicityAux; //Period adjustment	
+		SynchCalcValuesArray[0]=((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])); //Period adjustment	
 		
 		// Adjustment of the coefficient into hardware
 		cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;	
