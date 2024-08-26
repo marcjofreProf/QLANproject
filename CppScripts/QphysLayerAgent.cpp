@@ -1286,20 +1286,34 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		cout << "QPLA::adjFreqSynchNormRatiosArray[0]: " << adjFreqSynchNormRatiosArray[0] << endl;
 		cout << "QPLA::adjFreqSynchNormRatiosArray[1]: " << adjFreqSynchNormRatiosArray[1] << endl;
 		cout << "QPLA::adjFreqSynchNormRatiosArray[2]: " << adjFreqSynchNormRatiosArray[2] << endl;
+		
+		double SynchCalcValuesArrayFreqAux[NumCalcCenterMass];
+		SynchCalcValuesArrayFreqAux[0]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		
+		SynchCalcValuesArray[2]=DoubleMedianFilterSubArray(SynchCalcValuesArrayFreqAux,NumCalcCenterMass); // Relative Frequency adjustment
+		
+		cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
+		cout << "QPLA::SynchCalcValuesArrayFreqAux[0]: " << SynchCalcValuesArrayFreqAux[0] << endl;
+		cout << "QPLA::SynchCalcValuesArrayFreqAux[1]: " << SynchCalcValuesArrayFreqAux[1] << endl;
+		cout << "QPLA::SynchCalcValuesArrayFreqAux[2]: " << SynchCalcValuesArrayFreqAux[2] << endl;
 	}	
 	else{	// When using the base frequency to synchronize
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//Period adjustment
-	}		
-	SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
-	
+		
+		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+	}
+		
 	SynchCalcValuesArray[2]=SynchNetTransHardwareAdj*SynchNetAdj*(SynchCalcValuesArray[2]);
 			
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	
-	double SynchCalcValuesArrayAux[NumRunsPerCenterMass]={0.0};
-	long double DLHistPeriodicityAux=static_cast<long double>(HistPeriodicityAux);
+	long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
+	long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
+	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];
 	for (int i=0;i<NumRunsPerCenterMass;i++){
-		SynchCalcValuesArrayAux[i]=static_cast<double>(fmodl(static_cast<long double>(SynchFirstTagsArrayOffsetCalc[i])+static_cast<long double>(SynchCalcValuesArray[2]),DLHistPeriodicityAux));// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		SynchCalcValuesArrayAux[i]=static_cast<double>((LLIHistPeriodicityHalfAux+SynchFirstTagsArrayOffsetCalc[i]-0*static_cast<long long int>(SynchCalcValuesArray[2]/(SynchNetTransHardwareAdj*SynchNetAdj)))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
 	
