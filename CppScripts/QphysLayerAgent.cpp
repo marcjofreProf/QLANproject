@@ -1213,9 +1213,12 @@ int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
 // Check that we not exceed the QuBits buffer size
 if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
 
-if (SimulateNumStoredQubitsNodeAux>0){
-	long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
-	long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
+long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
+long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
+double dHistPeriodicityAux=static_cast<double>(HistPeriodicityAux);
+double dHistPeriodicityHalfAux=static_cast<double>(HistPeriodicityAux/2.0);
+	
+if (SimulateNumStoredQubitsNodeAux>0){	
 	if (UseAllTagsForEstimation){
 		// Mean averaging
 		//for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
@@ -1252,9 +1255,7 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	//SynchHistCenterMassArray[iCenterMass]=CenterMassVal;
 
 	// Median averaging
-	double CenterMassValAux[NumRunsPerCenterMass-1]={0.0};
-	long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
-	long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
+	double CenterMassValAux[NumRunsPerCenterMass-1]={0.0};	
 	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
 		CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
 	}
@@ -1271,7 +1272,6 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 }
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
-	double dHistPeriodicityAux=static_cast<double>(HistPeriodicityAux);
 	double SynchNetAdj=(64.0/30.0)*dHistPeriodicityAux; // Adjustment value consisting of the 64.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
 	double SynchNetTransHardwareAdj=1.0;// Coeeficient to correctly adjust the hardware coefficient transformation 64.0
 	if (NumCalcCenterMass>1){// when using multiple frequencies - Much more precise, but more time
@@ -1288,9 +1288,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		cout << "QPLA::adjFreqSynchNormRatiosArray[2]: " << adjFreqSynchNormRatiosArray[2] << endl;
 		
 		double SynchCalcValuesArrayFreqAux[NumCalcCenterMass];
-		SynchCalcValuesArrayFreqAux[0]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
-		SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
-		SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[0]=(fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[1]=(fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[2]=(fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/SynchCalcValuesArray[0]; // Relative Frequency adjustment
 		
 		SynchCalcValuesArray[2]=DoubleMedianFilterSubArray(SynchCalcValuesArrayFreqAux,NumCalcCenterMass); // Relative Frequency adjustment
 		
@@ -1309,8 +1309,6 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 			
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	
-	long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
-	long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];
 	for (int i=0;i<NumRunsPerCenterMass;i++){
 		SynchCalcValuesArrayAux[i]=-static_cast<double>((LLIHistPeriodicityHalfAux+SynchFirstTagsArrayOffsetCalc[i]-static_cast<long long int>(SynchCalcValuesArray[2]/(SynchNetTransHardwareAdj*SynchNetAdj)))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
