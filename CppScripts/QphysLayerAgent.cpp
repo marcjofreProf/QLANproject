@@ -1268,9 +1268,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		cout << "QPLA::adjFreqSynchNormRatiosArray[2]: " << adjFreqSynchNormRatiosArray[2] << endl;
 		
 		double SynchCalcValuesArrayFreqAux[NumCalcCenterMass];
-		SynchCalcValuesArrayFreqAux[0]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
-		SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
-		SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[0]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]-FreqSynchNormValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]-FreqSynchNormValuesArray[1]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]-FreqSynchNormValuesArray[2]; // Relative Frequency adjustment
 		
 		/*cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
 		cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
@@ -1326,7 +1326,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	else{	// When using the base frequency to synchronize
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//Period adjustment
 		
-		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]+FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]+FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]-FreqSynchNormValuesArray[0]; // Relative Frequency adjustment
 	}
 		
 	SynchCalcValuesArray[2]=SynchNetTransHardwareAdj*SynchNetAdj*SynchCalcValuesArray[2];
