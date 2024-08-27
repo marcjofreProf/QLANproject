@@ -60,7 +60,7 @@ QPLA::QPLA() {// Constructor
 	outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);*/
 	// Synchronized "slotted" emission
 	// Initialize some arrays at the beggining
-	int CombinationLinksNumAux=static_cast<int>((1LL<<LinkNumberMAX)-1);
+	int CombinationLinksNumAux=static_cast<int>(2*((1LL<<LinkNumberMAX)-1));
 	for (int i=0;i<CombinationLinksNumAux;i++){
 		SmallOffsetDriftPerLink[i]=0.0; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
 		ReferencePointSmallOffsetDriftPerLink[i]=0.0; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
@@ -258,33 +258,6 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoi
 	//unsigned int time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epoch).count(); // Convert 
 	//cout << "time_as_count: " << time_as_count << endl;
 }
-/*
-else if (string(HeaderCharArray[iHeaders])==string("ClearOtherClientNodeFutureTimePoint")){//CLear this node OtherClientNodeFutureTimePoints to avoid having a non-zero value eventhough the other node has finished transmitting and this one for some reason could no execute it
-//if (this->threadEmitQuBitRefAux.joinable()){
-	
-	//cout << "Check block release Process New Parameters" << endl;	
-	//if (this->threadEmitQuBitRefAux.joinable()){
-	//this->release();
-	//	this->threadEmitQuBitRefAux.join();
-	//this->acquire();
-	//}
-	char NewMessageParamsCharArray[NumBytesPayloadBuffer] = {0};
-	strcpy(NewMessageParamsCharArray,"JoinOtherClientNodeThread_0_"); // Initiates the ParamsCharArray, so use strcpy
-this->SetSendParametersAgent(NewMessageParamsCharArray);// Send parameter to the other node
-	this->RunThreadEmitQuBitFlag=true;
-	// Reset the ClientNodeFutureTimePoint
-	this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
-}
-else if (string(HeaderCharArray[iHeaders])==string("JoinOtherClientNodeThread")){
-	//cout << "JoinOtherClientNodeThread" << endl;
-	this->RunThreadReceiveQuBitFlag=true;
-	//if (this->threadReceiveQuBitRefAux.joinable()){
-	//this->release();
-	//this->threadReceiveQuBitRefAux.join();
-	//this->acquire();
-	//}
-}
-*/
 else{// discard
 }
 }
@@ -822,7 +795,7 @@ for (int i=0;i<CurrentNumIdentifiedMultipleIP;i++){
 //cout << "QPLA::CurrentSpecificLinkMultiple: " << CurrentSpecificLinkMultiple << endl;
 //cout << "QPLA::CurrentNumIdentifiedMultipleIP: " << CurrentNumIdentifiedMultipleIP << endl;
 // If exists, just return the index identifying it; if it does not exists store it and return the index identifying it
-int CombinationLinksNumAux=static_cast<int>((1LL<<LinkNumberMAX)-1);
+int CombinationLinksNumAux=static_cast<int>(2*((1LL<<LinkNumberMAX)-1));
 if (CurrentSpecificLinkMultiple<0){
 	if ((CurrentNumIdentifiedMultipleIP+1)<=CombinationLinksNumAux){
 		strcpy(ListCombinationSpecificLink[CurrentNumIdentifiedMultipleIP],ListOrderedCurrentEmitReceiveIP);// Update value
@@ -1327,7 +1300,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]+FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
 	}
 		
-	SynchCalcValuesArray[2]=SynchNetTransHardwareAdj*SynchNetAdj*(SynchCalcValuesArray[2]);
+	SynchCalcValuesArray[2]=SynchNetTransHardwareAdj*SynchNetAdj*SynchCalcValuesArray[2];
 			
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	
