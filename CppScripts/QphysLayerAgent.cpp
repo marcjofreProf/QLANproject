@@ -1230,7 +1230,7 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	// Median averaging
 	double CenterMassValAux[NumRunsPerCenterMass-1]={0.0};	
 	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
-		CenterMassValAux[i]=static_cast<double>(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]);//static_cast<double>(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]);//static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
+		CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);//static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
 	}
 	SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));
 
@@ -1242,6 +1242,13 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	//for (int i=0;i<(NumRunsPerCenterMass-1);i++){
 	//	cout << "(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])/LLIHistPeriodicityAux: " << (SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])/LLIHistPeriodicityAux << endl;
 	//}
+	
+	// compute the std to select the most effective
+	SynchFirstTagsArrayStd[iCenterMass]=0.0; // Reset value
+	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
+		SynchFirstTagsArrayStd[iCenterMass]+=pow(SynchHistCenterMassArray[iCenterMass]-static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux),2);
+	}
+	SynchFirstTagsArrayStd[iCenterMass]=sqrt(SynchFirstTagsArrayStd[iCenterMass]/static_cast<double>(NumRunsPerCenterMass-1));
 }
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
@@ -1261,11 +1268,11 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		cout << "QPLA::adjFreqSynchNormRatiosArray[2]: " << adjFreqSynchNormRatiosArray[2] << endl;
 		
 		double SynchCalcValuesArrayFreqAux[NumCalcCenterMass];
-		SynchCalcValuesArrayFreqAux[0]=(fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/SynchCalcValuesArray[0]; // Relative Frequency adjustment
-		SynchCalcValuesArrayFreqAux[1]=(fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/SynchCalcValuesArray[0]; // Relative Frequency adjustment
-		SynchCalcValuesArrayFreqAux[2]=(fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[0]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
 		
-		cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
+		/*cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
 		cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
 		cout << "QPLA::SynchHistCenterMassArray[2]: " << SynchHistCenterMassArray[2] << endl;
 		
@@ -1286,13 +1293,35 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux: " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux << endl;
 		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux: " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]+FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux << endl;
 		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux: " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux << endl;
-		
-		SynchCalcValuesArray[2]=DoubleMedianFilterSubArray(SynchCalcValuesArrayFreqAux,NumCalcCenterMass); // Relative Frequency adjustment
-		
-		cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
+		*/
+				
 		cout << "QPLA::SynchCalcValuesArrayFreqAux[0]: " << SynchCalcValuesArrayFreqAux[0] << endl;
 		cout << "QPLA::SynchCalcValuesArrayFreqAux[1]: " << SynchCalcValuesArrayFreqAux[1] << endl;
 		cout << "QPLA::SynchCalcValuesArrayFreqAux[2]: " << SynchCalcValuesArrayFreqAux[2] << endl;
+		
+		cout << "QPLA::SynchFirstTagsArrayStd[0]: " << SynchFirstTagsArrayStd[0] << endl;
+		cout << "QPLA::SynchFirstTagsArrayStd[1]: " << SynchFirstTagsArrayStd[1] << endl;
+		cout << "QPLA::SynchFirstTagsArrayStd[2]: " << SynchFirstTagsArrayStd[2] << endl;
+		// SElect based on media - maybe not good enough		
+		//SynchCalcValuesArray[2]=DoubleMedianFilterSubArray(SynchCalcValuesArrayFreqAux,NumCalcCenterMass); // Relative Frequency adjustment
+		
+		//Select based on minimum std
+		double SynchFirstTagsArrayStdAux=SynchFirstTagsArrayStd[0];
+		int SynchFirstTagsArrayStdMinIndex=0;
+		
+		if (SynchFirstTagsArrayStd[1]<SynchFirstTagsArrayStdAux){
+			SynchFirstTagsArrayStdAux=SynchFirstTagsArrayStd[1];
+			SynchFirstTagsArrayStdMinIndex=1;
+		}
+		
+		if (SynchFirstTagsArrayStd[2]<SynchFirstTagsArrayStdAux){
+			SynchFirstTagsArrayStdAux=SynchFirstTagsArrayStd[2];
+			SynchFirstTagsArrayStdMinIndex=2;
+		}
+		
+		SynchCalcValuesArray[2]=SynchCalcValuesArrayFreqAux[SynchFirstTagsArrayStdMinIndex];
+		
+		cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	}	
 	else{	// When using the base frequency to synchronize
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//Period adjustment

@@ -108,7 +108,7 @@ private: // Variables/Objects
 	unsigned long long int MaxiIterPeriodicBlockTimer=3600000; //100000;//3600000; // Counter of how much passes the host is constantly block. If larger than , unblock itself
 	bool GPIOnodeHardwareSynched=false;// Variable to know the hardware synch status of the node below. Actually, do not let many operations and controls to happen until this variable is set to true.
 	bool GPIOnodeNetworkSynched=false;// Variable to know the network synch status of the node below. Periodically turn to false, to proceed again with network synchronization
-	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0,-0.25,0.25}; // Normalized values of frequency testing// Relative frequency difference normalized
+	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0,-0.1,0.1}; // Normalized values of frequency testing// Relative frequency difference normalized
 	// Scheduler status
 	unsigned long long int iIterPeriodicTimerVal=0; // Variable to keep track of number of passes thorugh periodic checks
 	unsigned long long int MaxiIterPeriodicTimerVal=1000; // Max number of passes so that it enters the periodic checks
