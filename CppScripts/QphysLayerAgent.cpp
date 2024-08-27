@@ -1288,9 +1288,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		cout << "QPLA::adjFreqSynchNormRatiosArray[2]: " << adjFreqSynchNormRatiosArray[2] << endl;
 		
 		double SynchCalcValuesArrayFreqAux[NumCalcCenterMass];
-		SynchCalcValuesArrayFreqAux[0]=(fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/SynchCalcValuesArray[0]; // Relative Frequency adjustment
-		SynchCalcValuesArrayFreqAux[1]=(fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/SynchCalcValuesArray[0]; // Relative Frequency adjustment
-		SynchCalcValuesArrayFreqAux[2]=(fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[0]=(fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]+FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[1]=(fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]+FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[2]=(fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]+FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/SynchCalcValuesArray[0]; // Relative Frequency adjustment
 		
 		cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
 		cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
@@ -1302,17 +1302,17 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		cout << "QPLA::FreqSynchNormValuesArray[1]: " << FreqSynchNormValuesArray[1] << endl;
 		cout << "QPLA::FreqSynchNormValuesArray[2]: " << FreqSynchNormValuesArray[2] << endl;
 		
-		cout << "QPLA::dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0]: " << dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0] << endl;
-		cout << "QPLA::dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]: " << dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0] << endl;
-		cout << "QPLA::dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]: " << dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0] << endl;
+		cout << "QPLA::dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]+FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0]: " << dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]+FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0] << endl;
+		cout << "QPLA::dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]+FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]: " << dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]+FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0] << endl;
+		cout << "QPLA::dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]+FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]: " << dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]+FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0] << endl;
 		
-		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0],dHistPeriodicityAux): " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0],dHistPeriodicityAux) << endl;
-		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0],dHistPeriodicityAux): " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0],dHistPeriodicityAux) << endl;
-		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0],dHistPeriodicityAux): " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0],dHistPeriodicityAux) << endl;
+		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]+FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0],dHistPeriodicityAux): " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]+FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0],dHistPeriodicityAux) << endl;
+		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]+FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0],dHistPeriodicityAux): " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]+FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0],dHistPeriodicityAux) << endl;
+		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]+FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0],dHistPeriodicityAux): " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]+FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0],dHistPeriodicityAux) << endl;
 		
-		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux: " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux << endl;
-		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux: " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]-FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux << endl;
-		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux: " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]-FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux << endl;
+		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]+FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux: " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[0]+FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux << endl;
+		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]+FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux: " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[1]+FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux << endl;
+		cout << "QPLA::fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]+FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux: " << fmod(dHistPeriodicityHalfAux+SynchHistCenterMassArray[2]+FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0],dHistPeriodicityAux)-dHistPeriodicityHalfAux << endl;
 		
 		SynchCalcValuesArray[2]=DoubleMedianFilterSubArray(SynchCalcValuesArrayFreqAux,NumCalcCenterMass); // Relative Frequency adjustment
 		
@@ -1324,7 +1324,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	else{	// When using the base frequency to synchronize
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//Period adjustment
 		
-		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]+FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0]; // Relative Frequency adjustment
 	}
 		
 	SynchCalcValuesArray[2]=SynchNetTransHardwareAdj*SynchNetAdj*(SynchCalcValuesArray[2]);
