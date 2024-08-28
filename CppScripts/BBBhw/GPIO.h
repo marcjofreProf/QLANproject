@@ -236,7 +236,7 @@ public:	// Functions/Methods
 	int SendTriggerSignals(double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	int SendTriggerSignalsSelfTest();//
 	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
-	int RetrieveNumStoredQuBits(unsigned long long int* TimeTaggs, unsigned short* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
+	int RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned long long int* TimeTaggs, unsigned short* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
 	int ClearStoredQuBits(); // Send the writting pointer back to the beggining - effectively clearing stored QuBits
 	// Synchronization related
 	int SetSynchDriftParams(double* AccumulatedErrorDriftParamsAux);// Method to update (or reset with 0s) the synchronization parameters of the long time drift (maybe updated periodically)

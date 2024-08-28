@@ -1190,7 +1190,10 @@ long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAu
 long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
 double dHistPeriodicityAux=static_cast<double>(HistPeriodicityAux);
 double dHistPeriodicityHalfAux=static_cast<double>(HistPeriodicityAux/2.0);
-	
+
+// Store the information of the start of the detection
+SynchTimeTaggRef[iCenterMass][iNumRunsPerCenterMass]=static_cast<long long int>(RawLastTimeTaggRef[0]);
+
 if (SimulateNumStoredQubitsNodeAux>0){	
 	if (UseAllTagsForEstimation){
 		// Mean averaging
@@ -1259,9 +1262,28 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 }
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
-	double SynchNetAdj=(64.0/30.0)*dHistPeriodicityAux; // Adjustment value consisting of the 64.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
-	double SynchNetTransHardwareAdj=1.0;// Coeeficient to correctly adjust the hardware coefficient transformation 64.0
+	long long int SynchTimeTaggRefMedianArrayAux[NumCalcCenterMass];
+	long long int SynchTimeTaggRefMedianArrayAuxAux[NumRunsPerCenterMass-1];
+	double SynchTimeTaggRefMedianAux=0.0;// AVerage values of the time interval between measurements
 	if (NumCalcCenterMass>1){// when using multiple frequencies - Much more precise, but more time
+		// Compute the average time between measurements
+		for (int i=0;i<(NumRunsPerCenterMass-1);i++){
+			SynchTimeTaggRefMedianArrayAuxAux[i]=SynchTimeTaggRef[0][i+1]-SynchTimeTaggRef[0][i];
+		}
+		SynchTimeTaggRefMedianArrayAux[0]=LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
+		for (int i=0;i<(NumRunsPerCenterMass-1);i++){
+			SynchTimeTaggRefMedianArrayAuxAux[i]=SynchTimeTaggRef[1][i+1]-SynchTimeTaggRef[1][i];
+		}
+		SynchTimeTaggRefMedianArrayAux[1]=LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
+		for (int i=0;i<(NumRunsPerCenterMass-1);i++){
+			SynchTimeTaggRefMedianArrayAuxAux[i]=SynchTimeTaggRef[2][i+1]-SynchTimeTaggRef[2][i];
+		}
+		SynchTimeTaggRefMedianArrayAux[2]=LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
+		
+		long long int SynchTimeTaggRefMedianArrayAuxAuxAux=LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAux,NumCalcCenterMass);
+		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAuxAuxAux)*(1e-9);// Conversion to seconds
+		
+		// Compute realted to frequency
 		adjFreqSynchNormRatiosArray[0]=1.0;
 		adjFreqSynchNormRatiosArray[1]=((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
 		adjFreqSynchNormRatiosArray[2]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[1]))/dHistPeriodicityAux;
@@ -1331,14 +1353,24 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	}	
 	else{	// When using the base frequency to synchronize
+		// Compute the average time between measurements
+		for (int i=0;i<(NumRunsPerCenterMass-1);i++){
+			SynchTimeTaggRefMedianArrayAuxAux[i]=SynchTimeTaggRef[0][i+1]-SynchTimeTaggRef[0][i];
+		}
+		SynchTimeTaggRefMedianArrayAux[0]=LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
+		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAux[0])*(1e-9);// Conversion to seconds
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//Period adjustment
 		
 		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]+FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];//+FreqSynchNormValuesArray[0]; // Relative Frequency adjustment
 	}
-		
+	
+	double SynchNetAdj=(64.0/SynchTimeTaggRefMedianAux)*dHistPeriodicityAux; // Adjustment value consisting of the 64.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
+	double SynchNetTransHardwareAdj=1.0;// Coeeficient to correctly adjust the hardware coefficient transformation 64.0
+	
 	SynchCalcValuesArray[2]=SynchNetTransHardwareAdj*SynchNetAdj*SynchCalcValuesArray[2];
 			
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
+	cout << "QPLA::SynchTimeTaggRefMedianAux: " << SynchTimeTaggRefMedianAux << endl;
 	
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];
 	for (int i=0;i<NumRunsPerCenterMass;i++){
@@ -1363,7 +1395,13 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	SynchCalcValuesArray[2]=0.0;
 	cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
 	}
+		
+	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
+	cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
+	cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;
+	
 	// Identify the specific link and store/update iteratively the values
+	
 	if (CurrentSpecificLink>=0){
 		/*// Let the other node also correct
 		if ((SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1])>(0.5*SynchCalcValuesArray[0])){
@@ -1402,7 +1440,7 @@ return 0; // All Ok
 int QPLA::LinearRegressionQuBitFilter(){
 //this->acquire(); It is already within an acquire/release
 if (ApplyRawQubitFilteringFlag==true){	
-	int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawTimeTaggs,RawChannelTags); // Get raw values
+	int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,RawTimeTaggs,RawChannelTags); // Get raw values
 	unsigned long long int NormInitialTimeTaggsVal=RawTimeTaggs[0];
 	// Normalize values to work with more plausible values
 	//for (int i=0;i<RawNumStoredQubits;i++){
@@ -1511,7 +1549,7 @@ if (ApplyRawQubitFilteringFlag==true){
 	////////////////////////////////////////
 }
 else{ // Do not apply filtering
-	this->SimulateNumStoredQubitsNode[0]=PRUGPIO.RetrieveNumStoredQuBits(TimeTaggs,ChannelTags); // Get raw values
+	this->SimulateNumStoredQubitsNode[0]=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,TimeTaggs,ChannelTags); // Get raw values
 	cout << "QPLA::Not applying ApplyRawQubitFilteringFlag...to be activated" << endl;
 }
 //this->release(); It is already within an acquire/release

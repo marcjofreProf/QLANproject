@@ -52,6 +52,7 @@ private: //Variables/Instances
 	int NumberRepetitionsSignal=32768;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	int NumQuBitsPerRun=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)	
 	int numberLinks=0;// Number of full duplex links directly connected to this physical quantum node
+	unsigned long long int RawLastTimeTaggRef[1]={0}; // Timetaggs of the start of the detection in units of Time (not PRU time)
 	unsigned long long int RawTimeTaggs[NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections raw
 	unsigned short RawChannelTags[NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs raw
 	unsigned long long int TimeTaggs[NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections
@@ -112,6 +113,7 @@ private: //Variables/Instances
 	char ListCombinationSpecificLink[2*((1LL<<LinkNumberMAX)-1)][NumBytesPayloadBuffer]; // Stores the list of detected links and combinations in an ordered way
 	int numSpecificLinkmatches=0; // Identifies if multiple links used currently
 	int CurrentSpecificLinkMultipleIndices[2*((1LL<<LinkNumberMAX)-1)]={0}; // Array containing the indices CurrentSpecificLink when involving multiple links. The different combinaion of links is 2*(2**(NumberLinks)-1); the minus 1 since the not using any link is not contemplated, and then all of it multiplied by 2 because sometimes we will further identify the link with the actual emitter/sender
+	long long int SynchTimeTaggRef[NumCalcCenterMass][NumRunsPerCenterMass]; // Holder to store the starts of the detections
 	long long int SynchFirstTagsArrayAux[NumQubitsMemoryBuffer]={0}; // Holder to perform median computing
 	long long int SynchFirstTagsArray[NumCalcCenterMass][NumRunsPerCenterMass]; // To store the first tags (averaged if needed for all the tags in the run
 	long long int SynchFirstTagsArrayOffsetCalc[NumRunsPerCenterMass]; // To momentally store the first iteration of the synch which has no extra relative frequency edifferencew
@@ -128,7 +130,7 @@ private: //Variables/Instances
 	int CurrentNumIdentifiedEmitReceiveIP=0; // Variable to keep track of the number of identified IPs emitting/receiving to this node
 	int CurrentNumIdentifiedMultipleIP=0; // Variable to keep track of the number of identified multiple links to this node
 	char LinkIdentificationArray[LinkNumberMAX][IPcharArrayLengthMAX]={0}; // To track details of each specific link
-	bool ApplyProcQubitsSmallTimeOffsetContinuousCorrection=true; // Since we know that (after correcting for relative frequency difference and time offset) the tags should coincide with the initial value of the periodicity where the signals are sent
+	bool ApplyProcQubitsSmallTimeOffsetContinuousCorrection=false; // Since we know that (after correcting for relative frequency difference and time offset) the tags should coincide with the initial value of the periodicity where the signals are sent
 	// the following arrays are initialized to zero in the Agent creator
 	long long int SmallOffsetDriftPerLink[2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
 	long long int ReferencePointSmallOffsetDriftPerLink[2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
