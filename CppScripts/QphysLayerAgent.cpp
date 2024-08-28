@@ -1397,7 +1397,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	}
 		
 	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
-	cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
+	cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2]/dHistPeriodicityAux << endl;
 	cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;
 	
 	// Identify the specific link and store/update iteratively the values

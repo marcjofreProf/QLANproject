@@ -1832,7 +1832,7 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			
 			// Instead of a simple sleep, which would block the operation (specially processing new messages)
 			// usleep(usSynchProcIterRunsTimePoint);// Give time between iterations to send and receive qubits
-			int numForstEquivalentToSleep=3000;//100: Equivalent to 1 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
+			int numForstEquivalentToSleep=2000;//100: Equivalent to 1 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
 			for (int i=0;i<numForstEquivalentToSleep;i++){
 				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 				//cout << "this->getState(): " << this->getState() << endl;
