@@ -1245,12 +1245,14 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	
 	// compute the std to select the most effective
 	SynchFirstTagsArrayStd[iCenterMass]=0.0; // Reset value
+	double CurrentStdAux=0.0;
 	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
-		if (abs(SynchHistCenterMassArray[iCenterMass]-static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux))>(dHistPeriodicityAux/2.0)){
-			SynchFirstTagsArrayStd[iCenterMass]+=pow(SynchHistCenterMassArray[iCenterMass]+static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux),2);
+		CurrentStdAux=static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
+		if (abs(SynchHistCenterMassArray[iCenterMass]-CurrentStdAux)>(dHistPeriodicityAux/2.0)){
+			SynchFirstTagsArrayStd[iCenterMass]+=pow(SynchHistCenterMassArray[iCenterMass]+CurrentStdAux,2);
 		}
 		else{
-			SynchFirstTagsArrayStd[iCenterMass]+=pow(SynchHistCenterMassArray[iCenterMass]-static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux),2);
+			SynchFirstTagsArrayStd[iCenterMass]+=pow(SynchHistCenterMassArray[iCenterMass]-CurrentStdAux,2);
 		}
 	}
 	SynchFirstTagsArrayStd[iCenterMass]=sqrt(SynchFirstTagsArrayStd[iCenterMass]/static_cast<double>(NumRunsPerCenterMass-1));
