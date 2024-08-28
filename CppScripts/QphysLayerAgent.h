@@ -24,7 +24,7 @@ Header declaration file for Quantum physical Layer Agent
 #define MaxNumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 #define NumQubitsMemoryBuffer 1*MaxNumQuBitsPerRun// In multiples of NumQuBitsPerRun (e.g., 1964, 3928, ...). Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
 // Synchronization
-#define NumCalcCenterMass 1 // 3 // Number of centers of mass to measure to compute the synchronization
+#define NumCalcCenterMass 3 // 1 // Number of centers of mass to measure to compute the synchronization
 #define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 // String operations
 #include<string>
@@ -118,7 +118,7 @@ private: //Variables/Instances
 	double SynchHistCenterMassArray[NumCalcCenterMass]={0.0}; // Array containing the needed center of mass for the histograms of the synchronization
 	double SynchFirstTagsArrayStd[NumCalcCenterMass]={0.0}; // Array containing the std of the calculation of center mass to make decition
 	double SynchCalcValuesArray[3]={0.0,0.0,0.0}; // Computed values for achieving synchronization protocol
-	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0};//,-0.1,0.1}; // Normalized values of frequency testing
+	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,-0.35,0.35}; // Normalized values of frequency testing
 	double adjFreqSynchNormRatiosArray[NumCalcCenterMass]={1.0};//,1.0,1.0}; // adjusting Normalized ratios of frequency testing
 	double SynchNetworkParamsLink[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send
 	double CurrentSynchNetworkParamsLink[3]={0.0}; //Stores currently the network synch values of interest given the link in use for reception
