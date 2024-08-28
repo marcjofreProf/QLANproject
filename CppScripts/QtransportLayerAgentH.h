@@ -94,7 +94,7 @@ private: // Variables/Objects
 	};
 	using Clock = my_clock;//
 	// Synchronization network parameters
-	double TestPeriodFactorAux=0.5; // Scales the HistPeriodicity and Number of RepetitionSignal
+	double TestPeriodFactorAux=0.5; // Scales the HistPeriodicity and Number of RepetitionSignal. The larger the period, the more probable that the relative frequency difference will be well measured/Captured
 	double HistPeriodicityAuxAux=4096.0/TestPeriodFactorAux;// Histogram value by default to perform network synchronization
 	int NumberRepetitionsSignalAux=static_cast<int>(32768.0*TestPeriodFactorAux);//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	int NumQuBitsPerRunAux=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
