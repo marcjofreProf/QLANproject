@@ -1462,7 +1462,8 @@ while(AchievedAttentionParticularHosts==false or FirstPassAux==true){
 	if (FirstPassAux==false){
 		cout << "Host " << this->IPaddressesSockets[2] << " trying to get attention from other involved hosts!" << endl;
 		cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
-		cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[1]: " << HostsActiveActionsFree[1] << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
 		cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
 		cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 	}
