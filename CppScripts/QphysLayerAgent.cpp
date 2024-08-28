@@ -1230,7 +1230,7 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	// Median averaging
 	double CenterMassValAux[NumRunsPerCenterMass-1]={0.0};	
 	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
-		CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);//static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
+		CenterMassValAux[i]=static_cast<double>(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]);//static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
 	}
 	SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));
 
@@ -1247,12 +1247,12 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	SynchFirstTagsArrayStd[iCenterMass]=0.0; // Reset value
 	double CurrentStdAux=0.0;
 	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
-		CurrentStdAux=static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
+		CurrentStdAux=static_cast<double>(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]);//static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
 		if (abs(SynchHistCenterMassArray[iCenterMass]-CurrentStdAux)>(dHistPeriodicityAux/2.0)){
-			SynchFirstTagsArrayStd[iCenterMass]+=pow(SynchHistCenterMassArray[iCenterMass]+CurrentStdAux,2);
+			SynchFirstTagsArrayStd[iCenterMass]+=pow(SynchHistCenterMassArray[iCenterMass]+CurrentStdAux,2.0);
 		}
 		else{
-			SynchFirstTagsArrayStd[iCenterMass]+=pow(SynchHistCenterMassArray[iCenterMass]-CurrentStdAux,2);
+			SynchFirstTagsArrayStd[iCenterMass]+=pow(SynchHistCenterMassArray[iCenterMass]-CurrentStdAux,2.0);
 		}
 	}
 	SynchFirstTagsArrayStd[iCenterMass]=sqrt(SynchFirstTagsArrayStd[iCenterMass]/static_cast<double>(NumRunsPerCenterMass-1));
