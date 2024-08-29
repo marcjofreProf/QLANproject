@@ -1249,10 +1249,10 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	// compute the std to select the most effective
 	SynchFirstTagsArrayStd[iCenterMass]=0.0; // Reset value
 	double CurrentStdAux=0.0;
-	cout << "QPLA::SynchHistCenterMassArray[iCenterMass]: " << SynchHistCenterMassArray[iCenterMass] << endl;
+	//cout << "QPLA::SynchHistCenterMassArray[iCenterMass]: " << SynchHistCenterMassArray[iCenterMass] << endl;
 	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
 		CurrentStdAux=static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);//static_cast<double>(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]);//static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
-		cout << "QPLA::CurrentStdAux: " << CurrentStdAux << endl;
+		//cout << "QPLA::CurrentStdAux: " << CurrentStdAux << endl;
 		if (abs(SynchHistCenterMassArray[iCenterMass]-CurrentStdAux)>(dHistPeriodicityAux/2.0)){
 			SynchFirstTagsArrayStd[iCenterMass]+=pow(SynchHistCenterMassArray[iCenterMass]+CurrentStdAux,2.0);
 		}
@@ -1262,9 +1262,9 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	}
 	SynchFirstTagsArrayStd[iCenterMass]=sqrt(SynchFirstTagsArrayStd[iCenterMass]/static_cast<double>(NumRunsPerCenterMass-1));
 	
-	cout << "QPLA::SynchFirstTagsArrayStd[0]: " << SynchFirstTagsArrayStd[0] << endl;
-	cout << "QPLA::SynchFirstTagsArrayStd[1]: " << SynchFirstTagsArrayStd[1] << endl;
-	cout << "QPLA::SynchFirstTagsArrayStd[2]: " << SynchFirstTagsArrayStd[2] << endl;
+	//cout << "QPLA::SynchFirstTagsArrayStd[0]: " << SynchFirstTagsArrayStd[0] << endl;
+	//cout << "QPLA::SynchFirstTagsArrayStd[1]: " << SynchFirstTagsArrayStd[1] << endl;
+	//cout << "QPLA::SynchFirstTagsArrayStd[2]: " << SynchFirstTagsArrayStd[2] << endl;
 }
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
@@ -1338,9 +1338,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 			SynchNetTransHardwareAdj=1.0;
 		}
 		
-		cout << "QPLA::SynchCalcValuesArrayFreqAux[0]: " << SynchCalcValuesArrayFreqAux[0] << endl;
-		cout << "QPLA::SynchCalcValuesArrayFreqAux[1]: " << SynchCalcValuesArrayFreqAux[1] << endl;
-		cout << "QPLA::SynchCalcValuesArrayFreqAux[2]: " << SynchCalcValuesArrayFreqAux[2] << endl;		
+		//cout << "QPLA::SynchCalcValuesArrayFreqAux[0]: " << SynchCalcValuesArrayFreqAux[0] << endl;
+		//cout << "QPLA::SynchCalcValuesArrayFreqAux[1]: " << SynchCalcValuesArrayFreqAux[1] << endl;
+		//cout << "QPLA::SynchCalcValuesArrayFreqAux[2]: " << SynchCalcValuesArrayFreqAux[2] << endl;		
 	}	
 	else{	// When using the base frequency to synchronize
 		// Compute the average time between measurements
@@ -1356,7 +1356,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	
 	double SynchNetAdj=(64.0/SynchTimeTaggRefMedianAux); // Adjustment value consisting of the 64.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
 	
-	SynchCalcValuesArray[2]=SynchNetAdj*SynchNetTransHardwareAdj*SynchCalcValuesArray[2]*dHistPeriodicityAux;
+	SynchCalcValuesArray[2]=SynchNetAdj*(1.0/SynchNetTransHardwareAdj)*SynchCalcValuesArray[2]*dHistPeriodicityAux;
 			
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	cout << "QPLA::SynchTimeTaggRefMedianAux: " << SynchTimeTaggRefMedianAux << endl;
