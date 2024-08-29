@@ -1292,16 +1292,16 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		
 		// Compute related to Period
 		adjFreqSynchNormRatiosArray[0]=1.0;
-		adjFreqSynchNormRatiosArray[1]=((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
-		adjFreqSynchNormRatiosArray[2]=((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[1])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[1]))/dHistPeriodicityAux;
-
-		SynchCalcValuesArray[0]=((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])); //Period adjustment	
+		adjFreqSynchNormRatiosArray[1]=1.0;//((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
+		adjFreqSynchNormRatiosArray[2]=1.0;//((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
+	
+		SynchCalcValuesArray[0]=dHistPeriodicityAux;//((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])); //Period adjustment	
 		// Computations related to retrieve the relative frequency difference
 		// Adjustment of the coefficient into hardware
 		//cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;	
-		cout << "QPLA::adjFreqSynchNormRatiosArray[0]: " << adjFreqSynchNormRatiosArray[0] << endl;
-		cout << "QPLA::adjFreqSynchNormRatiosArray[1]: " << adjFreqSynchNormRatiosArray[1] << endl;
-		cout << "QPLA::adjFreqSynchNormRatiosArray[2]: " << adjFreqSynchNormRatiosArray[2] << endl;
+		//cout << "QPLA::adjFreqSynchNormRatiosArray[0]: " << adjFreqSynchNormRatiosArray[0] << endl;
+		//cout << "QPLA::adjFreqSynchNormRatiosArray[1]: " << adjFreqSynchNormRatiosArray[1] << endl;
+		//cout << "QPLA::adjFreqSynchNormRatiosArray[2]: " << adjFreqSynchNormRatiosArray[2] << endl;
 		
 		// Adjustment of the adj ratios (except for 0 extra relative frequency difference		
 		//adjFreqSynchNormRatiosArray[1]=abs(adjFreqSynchNormRatiosArray[1]);
@@ -1315,16 +1315,16 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchCalcValuesArrayFreqAux[0]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];//+FreqSynchNormValuesArray[0]; // Relative Frequency adjustment
 		// The retrieved frequency difference is retrieved from the no added frequency measurement		
 		SynchCalcValuesArray[2]=SynchCalcValuesArrayFreqAux[0];
-		// The two other frequencies help calibrate the hardware constant, iether for negative or for positive directions
+		// The two other frequencies help calibrate the hardware constant, either for negative or for positive directions
 		if ((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])>0.0){// For negative adjustment
-			SynchCalcValuesArrayFreqAux[1]=(-SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]);
+			SynchCalcValuesArrayFreqAux[1]=((SynchHistCenterMassArray[1]-SynchCalcValuesArray[0])-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]);
 		}
 		else{
 			SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[1];
 		}
 
 		if ((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])<0.0){// For positive adjustment
-			SynchCalcValuesArrayFreqAux[2]=(-SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);
+			SynchCalcValuesArrayFreqAux[2]=((SynchHistCenterMassArray[2]+SynchCalcValuesArray[0])-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);
 		}
 		else{
 			SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[2]; 
@@ -1359,7 +1359,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAux[0])*(1e-9);// Conversion to seconds
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//Period adjustment
 		
-		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]+FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];//+FreqSynchNormValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];//+FreqSynchNormValuesArray[0]; // Relative Frequency adjustment
 	}
 	
 	double SynchNetAdj=(64.0/SynchTimeTaggRefMedianAux); // Adjustment value consisting of the 64.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
@@ -1373,7 +1373,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];
 	for (int i=0;i<NumRunsPerCenterMass;i++){
-		SynchCalcValuesArrayAux[i]=static_cast<double>((LLIHistPeriodicityHalfAux+SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		SynchCalcValuesArrayAux[i]=-static_cast<double>((LLIHistPeriodicityHalfAux+SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
 	
