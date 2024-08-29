@@ -1299,17 +1299,17 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		// Computations related to retrieve the relative frequency difference
 		// Adjustment of the coefficient into hardware
 		//cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;	
-		//cout << "QPLA::adjFreqSynchNormRatiosArray[0]: " << adjFreqSynchNormRatiosArray[0] << endl;
-		//cout << "QPLA::adjFreqSynchNormRatiosArray[1]: " << adjFreqSynchNormRatiosArray[1] << endl;
-		//cout << "QPLA::adjFreqSynchNormRatiosArray[2]: " << adjFreqSynchNormRatiosArray[2] << endl;
+		cout << "QPLA::adjFreqSynchNormRatiosArray[0]: " << adjFreqSynchNormRatiosArray[0] << endl;
+		cout << "QPLA::adjFreqSynchNormRatiosArray[1]: " << adjFreqSynchNormRatiosArray[1] << endl;
+		cout << "QPLA::adjFreqSynchNormRatiosArray[2]: " << adjFreqSynchNormRatiosArray[2] << endl;
 		
 		// Adjustment of the adj ratios (except for 0 extra relative frequency difference		
-		adjFreqSynchNormRatiosArray[1]=abs(adjFreqSynchNormRatiosArray[1]);
-		adjFreqSynchNormRatiosArray[2]=abs(adjFreqSynchNormRatiosArray[2]);
+		//adjFreqSynchNormRatiosArray[1]=abs(adjFreqSynchNormRatiosArray[1]);
+		//adjFreqSynchNormRatiosArray[2]=abs(adjFreqSynchNormRatiosArray[2]);
 		
-		double wholeDoublePart;
-		adjFreqSynchNormRatiosArray[1]=modf(adjFreqSynchNormRatiosArray[1],&wholeDoublePart);
-		adjFreqSynchNormRatiosArray[2]=modf(adjFreqSynchNormRatiosArray[2],&wholeDoublePart);
+		//double wholeDoublePart;
+		//adjFreqSynchNormRatiosArray[1]=modf(adjFreqSynchNormRatiosArray[1],&wholeDoublePart);
+		//adjFreqSynchNormRatiosArray[2]=modf(adjFreqSynchNormRatiosArray[2],&wholeDoublePart);
 		
 		double SynchCalcValuesArrayFreqAux[NumCalcCenterMass];
 		SynchCalcValuesArrayFreqAux[0]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];//+FreqSynchNormValuesArray[0]; // Relative Frequency adjustment
@@ -1346,9 +1346,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 			SynchNetTransHardwareAdj=1.0;
 		}
 		
-		//cout << "QPLA::SynchCalcValuesArrayFreqAux[0]: " << SynchCalcValuesArrayFreqAux[0] << endl;
-		//cout << "QPLA::SynchCalcValuesArrayFreqAux[1]: " << SynchCalcValuesArrayFreqAux[1] << endl;
-		//cout << "QPLA::SynchCalcValuesArrayFreqAux[2]: " << SynchCalcValuesArrayFreqAux[2] << endl;		
+		cout << "QPLA::SynchCalcValuesArrayFreqAux[0]: " << SynchCalcValuesArrayFreqAux[0] << endl;
+		cout << "QPLA::SynchCalcValuesArrayFreqAux[1]: " << SynchCalcValuesArrayFreqAux[1] << endl;
+		cout << "QPLA::SynchCalcValuesArrayFreqAux[2]: " << SynchCalcValuesArrayFreqAux[2] << endl;		
 	}	
 	else{	// When using the base frequency to synchronize
 		// Compute the average time between measurements
