@@ -1308,24 +1308,29 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		else{
 			SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[1];
 		}
-		SynchCalcValuesArrayFreqAux[1]=SynchCalcValuesArrayFreqAux[1]*(1.0/static_cast<double>(SynchTimeTaggRefMedianArrayAux[1]));// Adjustment
+		//SynchCalcValuesArrayFreqAux[1]=SynchCalcValuesArrayFreqAux[1]*(1.0/(static_cast<double>(SynchTimeTaggRefMedianArrayAux[1])*(1e-9)));// Adjustment
 		if ((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])<0.0){// For positive adjustment
 			SynchCalcValuesArrayFreqAux[2]=(-SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);
 		}
 		else{
 			SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[2]; 
 		}
-		SynchCalcValuesArrayFreqAux[2]=SynchCalcValuesArrayFreqAux[2]*(1.0/static_cast<double>(SynchTimeTaggRefMedianArrayAux[2]));// Adjustment
+		//SynchCalcValuesArrayFreqAux[2]=SynchCalcValuesArrayFreqAux[2]*(1.0/(static_cast<double>(SynchTimeTaggRefMedianArrayAux[2])*(1e-9)));// Adjustment
 		// Selection of the adjustment depending on the relative frequency offset correction direction
 		if (SynchCalcValuesArray[2]>0.0){
-			SynchNetTransHardwareAdj=abs(SynchCalcValuesArrayFreqAux[2]);
+			SynchNetTransHardwareAdj=SynchCalcValuesArrayFreqAux[2];
 		}
 		else if(SynchCalcValuesArray[2]<0.0){
-			SynchNetTransHardwareAdj=abs(SynchCalcValuesArrayFreqAux[1]);
+			SynchNetTransHardwareAdj=SynchCalcValuesArrayFreqAux[1];
 		}
 		else{
 			SynchNetTransHardwareAdj=1.0;
 		}		
+		
+		if (SynchNetTransHardwareAdj<=0.0){
+			cout << "QPLA::Bad calculation of SynchNetTransHardwareAdj: " << SynchNetTransHardwareAdj << ". Setting it to 1.0!" << endl;
+			SynchNetTransHardwareAdj=1.0;
+		}
 		
 		cout << "QPLA::SynchCalcValuesArrayFreqAux[0]: " << SynchCalcValuesArrayFreqAux[0] << endl;
 		cout << "QPLA::SynchCalcValuesArrayFreqAux[1]: " << SynchCalcValuesArrayFreqAux[1] << endl;
