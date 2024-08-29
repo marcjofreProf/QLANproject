@@ -1273,6 +1273,12 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	double SynchTimeTaggRefMedianAux=0.0;// AVerage values of the time interval between measurements	
 	double SynchNetTransHardwareAdj=1.0;// Coeeficient to correctly adjust the hardware coefficient transformation 64.0
 	if (NumCalcCenterMass>1){// when using multiple frequencies - Much more precise, but more time
+		if (FreqSynchNormValuesArray[1]>=0.0){
+			cout << "QPLA::FreqSynchNormValuesArray[1] is not negative (it has to be negative): " << FreqSynchNormValuesArray[1] << ". Correct using a negative value!!!" << endl;	
+		}
+		if (FreqSynchNormValuesArray[2]<=0.0){
+			cout << "QPLA::FreqSynchNormValuesArray[2] is not positive (it has to be positive): " << FreqSynchNormValuesArray[2] << ". Correct using a positive value!!!" << endl;	
+		}
 		// Compute the average time between measurements
 		for (int i=0;i<(NumRunsPerCenterMass-1);i++){
 			SynchTimeTaggRefMedianArrayAuxAux[i]=SynchTimeTaggRef[0][i+1]-SynchTimeTaggRef[0][i];
@@ -1292,16 +1298,16 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		
 		// Compute related to Period
 		adjFreqSynchNormRatiosArray[0]=1.0;
-		adjFreqSynchNormRatiosArray[1]=1.0;//((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
-		adjFreqSynchNormRatiosArray[2]=1.0;//((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
+		adjFreqSynchNormRatiosArray[1]=0.5;//((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
+		adjFreqSynchNormRatiosArray[2]=0.5;//((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
 	
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])); //Period adjustment	
 		// Computations related to retrieve the relative frequency difference
 		// Adjustment of the coefficient into hardware
 		//cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;	
-		//cout << "QPLA::adjFreqSynchNormRatiosArray[0]: " << adjFreqSynchNormRatiosArray[0] << endl;
-		//cout << "QPLA::adjFreqSynchNormRatiosArray[1]: " << adjFreqSynchNormRatiosArray[1] << endl;
-		//cout << "QPLA::adjFreqSynchNormRatiosArray[2]: " << adjFreqSynchNormRatiosArray[2] << endl;
+		cout << "QPLA::adjFreqSynchNormRatiosArray[0]: " << adjFreqSynchNormRatiosArray[0] << endl;
+		cout << "QPLA::adjFreqSynchNormRatiosArray[1]: " << adjFreqSynchNormRatiosArray[1] << endl;
+		cout << "QPLA::adjFreqSynchNormRatiosArray[2]: " << adjFreqSynchNormRatiosArray[2] << endl;
 		
 		// Adjustment of the adj ratios (except for 0 extra relative frequency difference		
 		//adjFreqSynchNormRatiosArray[1]=abs(adjFreqSynchNormRatiosArray[1]);
@@ -1364,7 +1370,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	
 	double SynchNetAdj=(64.0/SynchTimeTaggRefMedianAux); // Adjustment value consisting of the 64.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
 	
-	SynchCalcValuesArray[2]=SynchNetAdj*(1.0/SynchNetTransHardwareAdj)*SynchCalcValuesArray[2]*dHistPeriodicityAux;
+	SynchCalcValuesArray[2]=SynchNetAdj*SynchNetTransHardwareAdj*SynchCalcValuesArray[2]*dHistPeriodicityAux;
 			
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	cout << "QPLA::SynchTimeTaggRefMedianAux: " << SynchTimeTaggRefMedianAux << endl;
@@ -1373,7 +1379,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];
 	for (int i=0;i<NumRunsPerCenterMass;i++){
-		SynchCalcValuesArrayAux[i]=-static_cast<double>((LLIHistPeriodicityHalfAux+SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		SynchCalcValuesArrayAux[i]=-static_cast<double>((LLIHistPeriodicityHalfAux-SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
 	
