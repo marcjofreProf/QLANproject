@@ -51,7 +51,7 @@ private:// Variables
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=9; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
 	long long int ApproxInterruptTime=5000; // Typical time of interrupt time duration
-	int NumSynchMeasAvgAux=51; // Num averages to compute the time error. Better to be odd number.
+	int NumSynchMeasAvgAux=201; // Num averages to compute the time error. Better to be odd number.
 	int ExtraNumSynchMeasAvgAux=NumSynchMeasAvgAux; // More averaging for computing interrupts access time. VEry critical
 	unsigned int NextSynchPRUcommand=5;// set initially to NextSynchPRUcorrection=0
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
@@ -142,7 +142,7 @@ private:// Variables
 	long long int valCarryOnCycleCountPRU=0; // 64 bits
 	// PRU timetagger
 	int retInterruptsPRU0;
-	int WaitTimeInterruptPRU0=5000000; //up to 20000000 with Simple TTG. In microseconds. Although the longer the more innacurraccy in the synch routine
+	int WaitTimeInterruptPRU0=7500000; //up to 20000000 with Simple TTG. In microseconds. Although the longer the more innacurraccy in the synch routine
 	//TimePoint TimePointClockNowPRU0;
 	//unsigned long long int TimeNow_time_as_countPRU0;	
 	//TimePoint FutureTimePointPRU0;
@@ -153,7 +153,7 @@ private:// Variables
 	unsigned int NumberRepetitionsSignal=32768;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	unsigned int NumQuBitsPerRun=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 	int retInterruptsPRU1;
-	int WaitTimeInterruptPRU1=5000000; // In microseconds. Signal generation
+	int WaitTimeInterruptPRU1=7500000; // In microseconds. Signal generation
 	//int WaitTimeToFutureTimePointPRU1=1000;// The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s, not more otherwise the synch calculation error overflows as well and things go bad.
 	//TimePoint TimePointClockNowPRU1;
 	//unsigned long long int TimeNow_time_as_countPRU1;	
