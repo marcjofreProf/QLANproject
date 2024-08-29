@@ -1303,25 +1303,33 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		//cout << "QPLA::adjFreqSynchNormRatiosArray[1]: " << adjFreqSynchNormRatiosArray[1] << endl;
 		//cout << "QPLA::adjFreqSynchNormRatiosArray[2]: " << adjFreqSynchNormRatiosArray[2] << endl;
 		
+		// Adjustment of the adj ratios (except for 0 extra relative frequency difference		
+		adjFreqSynchNormRatiosArray[1]=abs(adjFreqSynchNormRatiosArray[1]);
+		adjFreqSynchNormRatiosArray[2]=abs(adjFreqSynchNormRatiosArray[2]);
+		
+		double wholeDoublePart;
+		adjFreqSynchNormRatiosArray[1]=modf(adjFreqSynchNormRatiosArray[1],&wholeDoublePart);
+		adjFreqSynchNormRatiosArray[2]=modf(adjFreqSynchNormRatiosArray[2],&wholeDoublePart);
+		
 		double SynchCalcValuesArrayFreqAux[NumCalcCenterMass];
 		SynchCalcValuesArrayFreqAux[0]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];//+FreqSynchNormValuesArray[0]; // Relative Frequency adjustment
 		// The retrieved frequency difference is retrieved from the no added frequency measurement		
 		SynchCalcValuesArray[2]=SynchCalcValuesArrayFreqAux[0];
 		// The two other frequencies help calibrate the hardware constant, iether for negative or for positive directions
 		if ((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])>0.0){// For negative adjustment
-			SynchCalcValuesArrayFreqAux[1]=(-SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]);
+			SynchCalcValuesArrayFreqAux[1]=(-SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]);
 		}
 		else{
-			SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[1];
+			SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[1];
 		}
-		SynchCalcValuesArrayFreqAux[1]=2.0*SynchCalcValuesArrayFreqAux[1];//*(1.0/(static_cast<double>(SynchTimeTaggRefMedianArrayAux[1])*(1e-9)));// Adjustment
+
 		if ((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])<0.0){// For positive adjustment
-			SynchCalcValuesArrayFreqAux[2]=(-SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);
+			SynchCalcValuesArrayFreqAux[2]=(-SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);
 		}
 		else{
-			SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[2]; 
+			SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[2]; 
 		}
-		SynchCalcValuesArrayFreqAux[2]=2.0*SynchCalcValuesArrayFreqAux[2];//*(1.0/(static_cast<double>(SynchTimeTaggRefMedianArrayAux[2])*(1e-9)));// Adjustment
+
 		// Selection of the adjustment depending on the relative frequency offset correction direction
 		if (SynchCalcValuesArray[2]>0.0){
 			SynchNetTransHardwareAdj=SynchCalcValuesArrayFreqAux[2];

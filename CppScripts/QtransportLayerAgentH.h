@@ -16,7 +16,7 @@ Header declaration file for Quantum transport Layer Agent Host
 // Network hosts
 #define NumConnectedHosts 2// Number of connected hosts (not counting this one)
 // Synchronization
-#define NumCalcCenterMass 1 //3 // Number of centers of mass to measure to compute the synchronization
+#define NumCalcCenterMass 3 //1 // Number of centers of mass to measure to compute the synchronization
 #define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 // Threading
 #include <thread>
@@ -98,7 +98,7 @@ private: // Variables/Objects
 	double HistPeriodicityAuxAux=4096.0/TestPeriodFactorAux;// Histogram value by default to perform network synchronization
 	int NumberRepetitionsSignalAux=static_cast<int>(32768.0*TestPeriodFactorAux);//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	int NumQuBitsPerRunAux=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
-	bool FastInitialFakeSkipNetworkSynchFlag=false; // Variable that when activated, skips the initial network synchronization steps
+	bool FastInitialFakeSkipNetworkSynchFlag=true; // Variable that when activated, skips the initial network synchronization steps
 	int InitialNetworkSynchPass=1; // Variable to control that at least two rounds of network synchronization are performed the very first time (when set to 0). If set to 1, then a single initial pass
 	int numHolderOtherNodesSynchNetwork=0; // Variable to keep track if the other connected nodes have iterated thorugh the network synch
 	bool CycleSynchNetworkDone=false; // Variable to keep track if this host has been network synchronized in this cycle round of network sincronizxations
@@ -109,7 +109,7 @@ private: // Variables/Objects
 	unsigned long long int MaxiIterPeriodicBlockTimer=3600000; //100000;//3600000; // Counter of how much passes the host is constantly block. If larger than , unblock itself
 	bool GPIOnodeHardwareSynched=false;// Variable to know the hardware synch status of the node below. Actually, do not let many operations and controls to happen until this variable is set to true.
 	bool GPIOnodeNetworkSynched=false;// Variable to know the network synch status of the node below. Periodically turn to false, to proceed again with network synchronization
-	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0};//,-0.25,0.25}; // Normalized values of frequency testing// Relative frequency difference normalized
+	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0,-0.25,0.25}; // Normalized values of frequency testing// Relative frequency difference normalized
 	// Scheduler status
 	unsigned long long int iIterPeriodicTimerVal=0; // Variable to keep track of number of passes thorugh periodic checks
 	unsigned long long int MaxiIterPeriodicTimerVal=1000; // Max number of passes so that it enters the periodic checks
