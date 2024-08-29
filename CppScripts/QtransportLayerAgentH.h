@@ -17,7 +17,7 @@ Header declaration file for Quantum transport Layer Agent Host
 #define NumConnectedHosts 2// Number of connected hosts (not counting this one)
 // Synchronization
 #define NumCalcCenterMass 3 //1 // Number of centers of mass to measure to compute the synchronization
-#define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
+#define NumRunsPerCenterMass 6 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 // Threading
 #include <thread>
 // Semaphore
@@ -109,7 +109,7 @@ private: // Variables/Objects
 	unsigned long long int MaxiIterPeriodicBlockTimer=3600000; //100000;//3600000; // Counter of how much passes the host is constantly block. If larger than , unblock itself
 	bool GPIOnodeHardwareSynched=false;// Variable to know the hardware synch status of the node below. Actually, do not let many operations and controls to happen until this variable is set to true.
 	bool GPIOnodeNetworkSynched=false;// Variable to know the network synch status of the node below. Periodically turn to false, to proceed again with network synchronization
-	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0,-0.35,0.35}; // Normalized values of frequency testing// Relative frequency difference normalized
+	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0,-0.25,0.25}; // Normalized values of frequency testing// Relative frequency difference normalized
 	// Scheduler status
 	unsigned long long int iIterPeriodicTimerVal=0; // Variable to keep track of number of passes thorugh periodic checks
 	unsigned long long int MaxiIterPeriodicTimerVal=1000; // Max number of passes so that it enters the periodic checks

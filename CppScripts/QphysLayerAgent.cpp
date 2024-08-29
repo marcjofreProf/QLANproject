@@ -1308,14 +1308,14 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		else{
 			SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[1];
 		}
-		//SynchCalcValuesArrayFreqAux[1]=SynchCalcValuesArrayFreqAux[1]*(1.0/(static_cast<double>(SynchTimeTaggRefMedianArrayAux[1])*(1e-9)));// Adjustment
+		SynchCalcValuesArrayFreqAux[1]=2.0*SynchCalcValuesArrayFreqAux[1];//*(1.0/(static_cast<double>(SynchTimeTaggRefMedianArrayAux[1])*(1e-9)));// Adjustment
 		if ((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])<0.0){// For positive adjustment
 			SynchCalcValuesArrayFreqAux[2]=(-SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);
 		}
 		else{
 			SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[2]; 
 		}
-		//SynchCalcValuesArrayFreqAux[2]=SynchCalcValuesArrayFreqAux[2]*(1.0/(static_cast<double>(SynchTimeTaggRefMedianArrayAux[2])*(1e-9)));// Adjustment
+		SynchCalcValuesArrayFreqAux[2]=2.0*SynchCalcValuesArrayFreqAux[2];//*(1.0/(static_cast<double>(SynchTimeTaggRefMedianArrayAux[2])*(1e-9)));// Adjustment
 		// Selection of the adjustment depending on the relative frequency offset correction direction
 		if (SynchCalcValuesArray[2]>0.0){
 			SynchNetTransHardwareAdj=SynchCalcValuesArrayFreqAux[2];
