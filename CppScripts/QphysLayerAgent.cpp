@@ -1353,13 +1353,14 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]+FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];//+FreqSynchNormValuesArray[0]; // Relative Frequency adjustment
 	}
 	
-	double SynchNetAdj=(64.0/SynchTimeTaggRefMedianAux)*dHistPeriodicityAux; // Adjustment value consisting of the 64.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
+	double SynchNetAdj=(64.0/SynchTimeTaggRefMedianAux); // Adjustment value consisting of the 64.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
 	
-	SynchCalcValuesArray[2]=SynchNetTransHardwareAdj*(1.0/SynchNetAdj)*SynchCalcValuesArray[2];
+	SynchCalcValuesArray[2]=SynchNetAdj*(1.0/SynchNetTransHardwareAdj)*SynchCalcValuesArray[2]*dHistPeriodicityAux;
 			
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	cout << "QPLA::SynchTimeTaggRefMedianAux: " << SynchTimeTaggRefMedianAux << endl;
 	cout << "QPLA::SynchNetAdj: " << SynchNetAdj << endl;
+	cout << "QPLA::SynchNetTransHardwareAdj: " << SynchNetTransHardwareAdj << endl;
 	
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];
 	for (int i=0;i<NumRunsPerCenterMass;i++){
