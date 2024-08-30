@@ -5228,7 +5228,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "IPcharArrayLengthMAX",SWIG_From_int(static_cast< int >(15)));
   SWIG_Python_SetConstant(d, "NumConnectedHosts",SWIG_From_int(static_cast< int >(2)));
   SWIG_Python_SetConstant(d, "NumCalcCenterMass",SWIG_From_int(static_cast< int >(3)));
-  SWIG_Python_SetConstant(d, "NumRunsPerCenterMass",SWIG_From_int(static_cast< int >(6)));
+  SWIG_Python_SetConstant(d, "NumRunsPerCenterMass",SWIG_From_int(static_cast< int >(4)));
   SWIG_Python_SetConstant(d, "QTLAH_APPLICATION_RUNNING",SWIG_From_int(static_cast< int >(nsQtransportLayerAgentH::QTLAH::APPLICATION_RUNNING)));
   SWIG_Python_SetConstant(d, "QTLAH_APPLICATION_PAUSED",SWIG_From_int(static_cast< int >(nsQtransportLayerAgentH::QTLAH::APPLICATION_PAUSED)));
   SWIG_Python_SetConstant(d, "QTLAH_APPLICATION_EXIT",SWIG_From_int(static_cast< int >(nsQtransportLayerAgentH::QTLAH::APPLICATION_EXIT)));

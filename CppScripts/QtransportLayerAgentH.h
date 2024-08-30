@@ -17,7 +17,7 @@ Header declaration file for Quantum transport Layer Agent Host
 #define NumConnectedHosts 2// Number of connected hosts (not counting this one)
 // Synchronization
 #define NumCalcCenterMass 3 //1 // Number of centers of mass to measure to compute the synchronization
-#define NumRunsPerCenterMass 6 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
+#define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 // Threading
 #include <thread>
 // Semaphore
@@ -98,7 +98,7 @@ private: // Variables/Objects
 	double HistPeriodicityAuxAux=4096.0/TestPeriodFactorAux;// Histogram value by default to perform network synchronization
 	int NumberRepetitionsSignalAux=static_cast<int>(65536.0*TestPeriodFactorAux);//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	int NumQuBitsPerRunAux=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
-	bool FastInitialFakeSkipNetworkSynchFlag=false; // Variable that when activated, skips the initial network synchronization steps
+	bool FastInitialFakeSkipNetworkSynchFlag=true; // Variable that when activated, skips the initial network synchronization steps
 	int InitialNetworkSynchPass=1; // Variable to control that at least two rounds of network synchronization are performed the very first time (when set to 0). If set to 1, then a single initial pass
 	int numHolderOtherNodesSynchNetwork=0; // Variable to keep track if the other connected nodes have iterated thorugh the network synch
 	bool CycleSynchNetworkDone=false; // Variable to keep track if this host has been network synchronized in this cycle round of network sincronizations

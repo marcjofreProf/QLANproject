@@ -25,7 +25,7 @@ Header declaration file for Quantum physical Layer Agent
 #define NumQubitsMemoryBuffer 1*MaxNumQuBitsPerRun// In multiples of NumQuBitsPerRun (e.g., 1964, 3928, ...). Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
 // Synchronization
 #define NumCalcCenterMass 3 // 1 // Number of centers of mass to measure to compute the synchronization
-#define NumRunsPerCenterMass 6 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
+#define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 // String operations
 #include<string>
 #include<fstream>
@@ -130,7 +130,7 @@ private: //Variables/Instances
 	int CurrentNumIdentifiedEmitReceiveIP=0; // Variable to keep track of the number of identified IPs emitting/receiving to this node
 	int CurrentNumIdentifiedMultipleIP=0; // Variable to keep track of the number of identified multiple links to this node
 	char LinkIdentificationArray[LinkNumberMAX][IPcharArrayLengthMAX]={0}; // To track details of each specific link
-	bool ApplyProcQubitsSmallTimeOffsetContinuousCorrection=true; // Since we know that (after correcting for relative frequency difference and time offset) the tags should coincide with the initial value of the periodicity where the signals are sent
+	bool ApplyProcQubitsSmallTimeOffsetContinuousCorrection=false; // Since we know that (after correcting for relative frequency difference and time offset) the tags should coincide with the initial value of the periodicity where the signals are sent
 	// the following arrays are initialized to zero in the Agent creator
 	long long int SmallOffsetDriftPerLink[2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
 	long long int ReferencePointSmallOffsetDriftPerLink[2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
