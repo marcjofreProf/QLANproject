@@ -25,7 +25,7 @@ Header declaration file for Quantum physical Layer Agent
 #define NumQubitsMemoryBuffer 1*MaxNumQuBitsPerRun// In multiples of NumQuBitsPerRun (e.g., 1964, 3928, ...). Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
 // Synchronization
 #define NumCalcCenterMass 3 // 1 // Number of centers of mass to measure to compute the synchronization
-#define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
+#define NumRunsPerCenterMass 6 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 // String operations
 #include<string>
 #include<fstream>

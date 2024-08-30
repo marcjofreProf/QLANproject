@@ -1353,9 +1353,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 			SynchNetTransHardwareAdj=1.0;
 		}
 		
-		cout << "QPLA::SynchCalcValuesArrayFreqAux[0]: " << SynchCalcValuesArrayFreqAux[0] << endl;
-		cout << "QPLA::SynchCalcValuesArrayFreqAux[1]: " << SynchCalcValuesArrayFreqAux[1] << endl;
-		cout << "QPLA::SynchCalcValuesArrayFreqAux[2]: " << SynchCalcValuesArrayFreqAux[2] << endl;		
+		//cout << "QPLA::SynchCalcValuesArrayFreqAux[0]: " << SynchCalcValuesArrayFreqAux[0] << endl;
+		//cout << "QPLA::SynchCalcValuesArrayFreqAux[1]: " << SynchCalcValuesArrayFreqAux[1] << endl;
+		//cout << "QPLA::SynchCalcValuesArrayFreqAux[2]: " << SynchCalcValuesArrayFreqAux[2] << endl;		
 	}	
 	else{	// When using the base frequency to synchronize
 		// Compute the average time between measurements

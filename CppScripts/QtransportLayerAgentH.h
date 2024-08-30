@@ -17,7 +17,7 @@ Header declaration file for Quantum transport Layer Agent Host
 #define NumConnectedHosts 2// Number of connected hosts (not counting this one)
 // Synchronization
 #define NumCalcCenterMass 3 //1 // Number of centers of mass to measure to compute the synchronization
-#define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
+#define NumRunsPerCenterMass 6 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 // Threading
 #include <thread>
 // Semaphore
