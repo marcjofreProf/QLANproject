@@ -101,7 +101,7 @@ private: // Variables/Objects
 	bool FastInitialFakeSkipNetworkSynchFlag=false; // Variable that when activated, skips the initial network synchronization steps
 	int InitialNetworkSynchPass=1; // Variable to control that at least two rounds of network synchronization are performed the very first time (when set to 0). If set to 1, then a single initial pass
 	int numHolderOtherNodesSynchNetwork=0; // Variable to keep track if the other connected nodes have iterated thorugh the network synch
-	bool CycleSynchNetworkDone=false; // Variable to keep track if this host has been network synchronized in this cycle round of network sincronizxations
+	bool CycleSynchNetworkDone=false; // Variable to keep track if this host has been network synchronized in this cycle round of network sincronizations
 	int numHolderOtherNodesSendSynchQubits=0; // Variable to count number of consecutive SendSynchQubits request
 	unsigned long long int iIterNetworkSynchcurrentTimerVal=0;// Variable to count how many time has passed since last network synchronization
 	unsigned long long int MaxiIterNetworkSynchcurrentTimerVal=2160; //20;//2160; // Counter value to reset network synchronization, which is actually multiplied by the variable MaxiIterPeriodicTimerVal. E.g, every 6 hours
