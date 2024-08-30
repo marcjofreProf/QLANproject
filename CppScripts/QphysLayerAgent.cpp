@@ -1381,7 +1381,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	// Offset calculation
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];
 	for (int i=0;i<NumRunsPerCenterMass;i++){
-		SynchCalcValuesArrayAux[i]=static_cast<double>((LLIHistPeriodicityHalfAux-SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]*SynchNetTransHardwareAdj))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		SynchCalcValuesArrayAux[i]=static_cast<double>((LLIHistPeriodicityHalfAux-SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]*SynchNetTransHardwareAdj*SynchNetTransHardwareAdj))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
 	
@@ -1399,9 +1399,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
 	}
 		
-	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1]/dHistPeriodicityAux << endl;
-	cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2]/dHistPeriodicityAux << endl;
-	cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;
+	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl; // Offset
+	cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2]/dHistPeriodicityAux << endl; // Relative frequency difference
+	cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl; // Period
 	
 	// Identify the specific link and store/update iteratively the values
 	
