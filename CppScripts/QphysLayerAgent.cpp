@@ -812,9 +812,9 @@ if (CurrentSpecificLinkMultiple<0){
 // Update the holder values that need to be passed depending on the current link of interest
 if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to RequestQubits Node to node or SendEntangled. The receiver always performs correction, so does not matter for the sender since they are zeroed
 	// For receiver correction
-	CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0]/static_cast<double>(HistPeriodicityAux);
-	CurrentSynchNetworkParamsLink[1]=SynchNetworkParamsLink[CurrentSpecificLink][1]/static_cast<double>(HistPeriodicityAux);
-	CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]/static_cast<double>(HistPeriodicityAux);
+	CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];// Offset
+	CurrentSynchNetworkParamsLink[1]=SynchNetworkParamsLink[CurrentSpecificLink][1]/static_cast<double>(HistPeriodicityAux);// Relative frequency offset
+	CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]; // Period
 	//For emitter correction - No correction, since it is taking place at the receiver
 	CurrentExtraSynchNetworkParamsLink[0]=0.0;
 	CurrentExtraSynchNetworkParamsLink[1]=0.0;
@@ -823,13 +823,13 @@ if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to
 else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
 	// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for deteciton to use another story is if compensating for emitter
 	// For receiver correction - Correction has to take place at the emitter, where the first IP identifies the single receiver
-	CurrentSynchNetworkParamsLink[0]=0.0;//SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0]/static_cast<double>(HistPeriodicityAux);
+	CurrentSynchNetworkParamsLink[0]=0.0;//SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0];
 	CurrentSynchNetworkParamsLink[1]=0.0;//SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1]/static_cast<double>(HistPeriodicityAux);
-	CurrentSynchNetworkParamsLink[2]=0.0;//SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][2]/static_cast<double>(HistPeriodicityAux);
+	CurrentSynchNetworkParamsLink[2]=0.0;//SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][2];
 	//For emitter correction - to be develop
-	CurrentExtraSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0]/static_cast<double>(HistPeriodicityAux);
+	CurrentExtraSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0];
 	CurrentExtraSynchNetworkParamsLink[1]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1]/static_cast<double>(HistPeriodicityAux);
-	CurrentExtraSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][2]/static_cast<double>(HistPeriodicityAux);
+	CurrentExtraSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][2];
 	
 }
 else{
@@ -1336,7 +1336,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		else{
 			SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[2]; 
 		}
-		SynchCalcValuesArrayFreqAux[2]=SynchCalcValuesArrayFreqAux[2]-SynchCalcValuesArrayFreqAux[0];// Frequency adjustment
+		SynchCalcValuesArrayFreqAux[2]=SynchCalcValuesArrayFreqAux[2]+SynchCalcValuesArrayFreqAux[0];// Frequency adjustment
 		// Selection of the adjustment depending on the relative frequency offset correction direction
 		if (SynchCalcValuesArray[2]>0.0){
 			SynchNetTransHardwareAdj=SynchCalcValuesArrayFreqAux[2];
@@ -1381,7 +1381,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	// Offset calculation
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];
 	for (int i=0;i<NumRunsPerCenterMass;i++){
-		SynchCalcValuesArrayAux[i]=static_cast<double>((LLIHistPeriodicityHalfAux-SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		SynchCalcValuesArrayAux[i]=static_cast<double>((LLIHistPeriodicityHalfAux-SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]*SynchNetTransHardwareAdj))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
 	
@@ -1399,7 +1399,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
 	}
 		
-	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
+	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1]/dHistPeriodicityAux << endl;
 	cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2]/dHistPeriodicityAux << endl;
 	cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;
 	
