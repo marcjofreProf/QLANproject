@@ -1381,11 +1381,11 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	// Offset calculation
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];
 	for (int i=0;i<NumRunsPerCenterMass;i++){
-		SynchCalcValuesArrayAux[i]=static_cast<double>((LLIHistPeriodicityHalfAux-SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]*SynchNetTransHardwareAdj))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		SynchCalcValuesArrayAux[i]=static_cast<double>((LLIHistPeriodicityHalfAux-SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]*SynchNetTransHardwareAdj/SynchNetAdj))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
 	
-	// Check if nan values, then convert them to 0 and inform thorugh the terminal
+	// Check if nan values, then convert them to 0 and inform through the terminal
 	if (std::isnan(SynchCalcValuesArray[0])){
 	SynchCalcValuesArray[0]=0.0;
 	cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
