@@ -26,6 +26,7 @@ Header declaration file for Quantum physical Layer Agent
 // Synchronization
 #define NumCalcCenterMass 3 // 1 // Number of centers of mass to measure to compute the synchronization
 #define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
+#define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
 // String operations
 #include<string>
 #include<fstream>
@@ -53,10 +54,10 @@ private: //Variables/Instances
 	int NumQuBitsPerRun=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)	
 	int numberLinks=0;// Number of full duplex links directly connected to this physical quantum node
 	unsigned long long int RawLastTimeTaggRef[1]={0}; // Timetaggs of the start of the detection in units of Time (not PRU time)
-	unsigned long long int RawTimeTaggs[NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections raw
-	unsigned short RawChannelTags[NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs raw
-	unsigned long long int TimeTaggs[NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections
-	unsigned short ChannelTags[NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs
+	unsigned long long int RawTimeTaggs[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections raw
+	unsigned short RawChannelTags[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs raw
+	unsigned long long int TimeTaggs[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections
+	unsigned short ChannelTags[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs
         //int EmitLinkNumberArray[LinkNumberMAX]={60}; // Array indicating the GPIO numbers identifying the emit pins
         //int ReceiveLinkNumberArray[LinkNumberMAX]={48}; // Array indicating the GPIO numbers identifying the receive pins
         float QuBitsPerSecondVelocity[LinkNumberMAX]={1000000.0}; // Array indicating the qubits per second velocity of each emit/receive pair 

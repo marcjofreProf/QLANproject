@@ -547,7 +547,7 @@ int GPIO::PRUsignalTimerSynch(){
 return 0; // All ok
 }
 
-int GPIO::ReadTimeStamps(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux, double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber){// Read the detected timestaps in four channels
+int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux, double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber){// Read the detected timestaps in four channels
 /////////////
 std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 this->QPLAFutureTimePoint=Clock::time_point(duration_back);
@@ -634,7 +634,7 @@ else{
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 	cout << "PRU0 interrupt poll error" << endl;
 }
-this->DDRdumpdata(); // Store to file
+this->DDRdumpdata(iIterRunsAux); // Store to file
 
 return 0;// all ok
 }
@@ -760,7 +760,7 @@ return HardwareSynchStatusAux; // All Ok
 
 //PRU0 - Operation - getting iputs
 
-int GPIO::DDRdumpdata(){
+int GPIO::DDRdumpdata(int iIterRunsAux){
 // Reading data from PRU shared and own RAMs
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=valpHolder; // Coincides with SHARED in PRUassTaggDetScript.p
@@ -800,6 +800,8 @@ this->TimeTaggsLast=static_cast<unsigned long long int>((static_cast<unsigned lo
 //Furthermore, remove some time from epoch - in multiples of the SynchTrigPeriod, so it is easier to handle in the above agents
 this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsLast)-static_cast<long long int>((this->ULLIEpochReOffset/static_cast<unsigned long long int>(SynchTrigPeriod))*static_cast<unsigned long long int>(SynchTrigPeriod)));
 
+if (iIterRunsAux==0){this->TimeTaggsLastStored=this->TimeTaggsLast;}// First iteration of current runs, store the value for synchronization time difference calibration
+
 long long int LLIOldLastTimeTagg=static_cast<long long int>(OldLastTimeTagg);
 unsigned int valCycleCountPRUAux1;
 unsigned int valCycleCountPRUAux2;
@@ -828,33 +830,6 @@ for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 	if (TotalCurrentNumRecords<(MaxNumQuBitsMemStored-1)){TotalCurrentNumRecords++;}//Variable to hold the number of currently stroed records in memory
 	else{cout << "GPIO::We have reach the maximum number of qubits storage" << endl;}
 }
-////////////////////////////////////////////
-// Checks of proper values handling
-//long long int CheckValueAux=(static_cast<long long int>(SynchTrigPeriod/2.0)+static_cast<long long int>(TimeTaggsStored[0]))%static_cast<long long int>(SynchTrigPeriod)-static_cast<long long int>(SynchTrigPeriod/2.0);
-//cout << "GPIO::DDRdumpdata::CheckValueAux: "<< CheckValueAux << endl;
-//cout << "GPIO::DDRdumpdata::SynchTrigPeriod: " << SynchTrigPeriod << endl;
-//cout << "GPIO::DDRdumpdata::NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
-///////////////////////////////////////////////
-// Correct the detected qubits relative frequency difference (due to the sender node)
-PRUdetCorrRelFreq();
-	
-if (SlowMemoryPermanentStorageFlag==true){
-	// Reading TimeTaggs
-	if (streamDDRpru.is_open()){
-		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
-			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-			streamDDRpru.write(reinterpret_cast<const char*>(&TimeTaggsStored[iIterDump]), sizeof(TimeTaggsStored[iIterDump]));
-			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-			streamDDRpru.write(reinterpret_cast<const char*>(&ChannelTagsStored[iIterDump]), sizeof(ChannelTagsStored[iIterDump]));
-			//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
-		}
-	}
-	else{
-		cout << "DDRdumpdata streamDDRpru is not open!" << endl;
-	}
-}
-
 // Notify lost of track of counts due to timer overflow
 //if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
 //else{this->AfterCountsThreshold=this->valThresholdResetCounts+5;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
@@ -869,53 +844,95 @@ cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
 //this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU-(AboveThresoldCycleCountPRUCompValue-1)*static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0x80000000);
 ////cout << "this->valCarryOnCycleCountPRU: " << this->valCarryOnCycleCountPRU << endl;
 //}
-
 //cout << "sharedMem_int: " << sharedMem_int << endl;
+////////////////////////////////////////////
+// Checks of proper values handling
+//long long int CheckValueAux=(static_cast<long long int>(SynchTrigPeriod/2.0)+static_cast<long long int>(TimeTaggsStored[0]))%static_cast<long long int>(SynchTrigPeriod)-static_cast<long long int>(SynchTrigPeriod/2.0);
+//cout << "GPIO::DDRdumpdata::CheckValueAux: "<< CheckValueAux << endl;
+//cout << "GPIO::DDRdumpdata::SynchTrigPeriod: " << SynchTrigPeriod << endl;
+//cout << "GPIO::DDRdumpdata::NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
+///////////////////////////////////////////////
+if (SlowMemoryPermanentStorageFlag==true){
+	// Reading TimeTaggs
+	if (streamDDRpru.is_open()){	        
+		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		streamDDRpru.write(reinterpret_cast<const char*>(&TimeTaggsLastStored), sizeof(TimeTaggsLastStored));// Store this reference value
+		for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
+			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+			streamDDRpru.write(reinterpret_cast<const char*>(&TimeTaggsStored[iIterDump]), sizeof(TimeTaggsStored[iIterDump]));
+			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+			streamDDRpru.write(reinterpret_cast<const char*>(&ChannelTagsStored[iIterDump]), sizeof(ChannelTagsStored[iIterDump]));
+			//streamDDRpru << extendedCounterPRU << valBitsInterest << endl;
+		}
+	}
+	else{
+		cout << "DDRdumpdata streamDDRpru is not open!" << endl;
+	}
+}
 
 return 0; // all ok
 }
 
-int GPIO::PRUdetCorrRelFreq(){
-unsigned long long int ULLIInitialTimeTaggsStored=TimeTaggsStored[0];// Normalize to the first timetag, which is a strong reference
-long long int LLIInitialTimeTaggsStored=static_cast<long long int>(TimeTaggsStored[0]);
-long long int LLITimeTaggsStored[TotalCurrentNumRecords]={0};
+int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int* TimeTaggs, unsigned short* ChannelTags){
+// Separate the detection by quad channels and do the processing independently
+// First (reset)compute the number of detections per quad channel
+for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+  TotalCurrentNumRecordsQuadCh[iQuadChIter]=0;
+}
 for (int i=0;i<TotalCurrentNumRecords;i++){
-	LLITimeTaggsStored[i]=static_cast<long long int>(TimeTaggsStored[i])-LLIInitialTimeTaggsStored;
-}
-double SlopeDetTagsAux=1.0;
-
-if (SlopeDetTagsAux<=0.0){
-	cout << "GPIO::PRUdetCorrRelFreq wrong computation of the SlopeDetTagsAux " << SlopeDetTagsAux << ". Not applying the correction..." << endl;
-}
-
-// Calculate the "x" values
-long long int xAux[MaxNumQuBitsMemStored]={0};
-long long int LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
-for (int i=0;i<TotalCurrentNumRecords;i++){
-	xAux[i]=(LLITimeTaggsStored[i]/LLISynchTrigPeriod)*LLISynchTrigPeriod;
+  for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+    if ((ChannelTags[i]&&(0x000F<<(4*iQuadChIter)))>0){  
+      TimeTaggs[TotalCurrentNumRecordsQuadCh[iQuadChIter]]=TimeTaggsStored[i];
+      ChannelTags[TotalCurrentNumRecordsQuadCh[iQuadChIter]]=ChannelTags[i]&&(0x000F<<(4*iQuadChIter));
+      TotalCurrentNumRecordsQuadCh[iQuadChIter]++;
+    }
+  }
 }
 
-// Compute the candidate slope
-int iAux=0;
-for (int i=0;i<(TotalCurrentNumRecords-TagsSeparationDetRelFreq);i++){
-	if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
-		SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggsStored[i+TagsSeparationDetRelFreq]-LLITimeTaggsStored[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
-		iAux++;
-	}
-}
+for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+  if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
+    unsigned long long int ULLIInitialTimeTaggs=TimeTaggs[iQuadChIter][0];// Normalize to the first timetag, which is a strong reference
+    long long int LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
+    long long int LLITimeTaggs[TotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
+    for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+	    LLITimeTaggs[i]=static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLIInitialTimeTaggs;
+    }
+    double SlopeDetTagsAux=1.0;
 
-SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
-//cout << "GPIO::SlopeDetTagsAux: " << SlopeDetTagsAux << endl;
-// Un-normalize
-for (int i=0;i<TotalCurrentNumRecords;i++){
-	TimeTaggsStored[i]=static_cast<unsigned long long int>((1.0/SlopeDetTagsAux)*static_cast<double>(LLITimeTaggsStored[i]))+ULLIInitialTimeTaggsStored;
-}
+    if (SlopeDetTagsAux<=0.0){
+	    cout << "GPIO::PRUdetCorrRelFreq wrong computation of the SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << ". Not applying the correction..." << endl;
+    }
 
-//////////////////////////////////////////
-// Checks of proper values handling
-//long long int CheckValueAux=(static_cast<long long int>(SynchTrigPeriod/2.0)+static_cast<long long int>(TimeTaggsStored[0]))%static_cast<long long int>(SynchTrigPeriod)-static_cast<long long int>(SynchTrigPeriod/2.0);
-//cout << "GPIO::PRUdetCorrRelFreq::CheckValueAux: "<< CheckValueAux << endl;
-////////////////////////////////////////
+    // Calculate the "x" values
+    long long int xAux[MaxNumQuBitsMemStored]={0};
+    long long int LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
+    for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+	    xAux[i]=(LLITimeTaggs[i]/LLISynchTrigPeriod)*LLISynchTrigPeriod;
+    }
+
+    // Compute the candidate slope
+    int iAux=0;
+    for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-TagsSeparationDetRelFreq);i++){
+	    if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
+		    SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
+		    iAux++;
+	    }
+    }
+
+    SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
+    //cout << "GPIO::SlopeDetTagsAux: " << SlopeDetTagsAux << endl;
+    // Un-normalize
+    for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+	    TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>((1.0/SlopeDetTagsAux)*static_cast<double>(LLITimeTaggs[i]))+ULLIInitialTimeTaggs;
+    }
+
+    //////////////////////////////////////////
+    // Checks of proper values handling
+    //long long int CheckValueAux=(static_cast<long long int>(SynchTrigPeriod/2.0)+static_cast<long long int>(TimeTaggsStored[0]))%static_cast<long long int>(SynchTrigPeriod)-static_cast<long long int>(SynchTrigPeriod/2.0);
+    //cout << "GPIO::PRUdetCorrRelFreq::CheckValueAux: "<< CheckValueAux << endl;
+    ////////////////////////////////////////
+  }// if
+}
 return 0; // All ok
 }
 
@@ -972,9 +989,9 @@ else{
 return 0; // all ok
 }
 
-int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned long long int* TimeTaggs, unsigned short* ChannelTags){
+int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int* TimeTaggs, unsigned short* ChannelTags){
 if (SlowMemoryPermanentStorageFlag==true){
-	LastTimeTaggRef[0]=TimeTaggsLast*static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds);// Since whole number
+	LastTimeTaggRef[0]=0*static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds);// Since whole number. Initiation value
 	// Detection tags
 	if (streamDDRpru.is_open()){
 		streamDDRpru.close();	
@@ -993,22 +1010,24 @@ if (SlowMemoryPermanentStorageFlag==true){
 
 	if (streamDDRpru.is_open()){
 		streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
-		int lineCount = 0;
-		unsigned long long int ValueReadTest;
 		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		streamDDRpru.read(reinterpret_cast<char*>(&TimeTaggsLastStored), sizeof(TimeTaggsLastStored))
+		LastTimeTaggRef[0]=TimeTaggsLastStored*static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds);// Since whole number. Initiation value
+		int lineCount = 0;
+		unsigned long long int ValueReadTest;		
 		int iIterMovAdjPulseSynchCoeff=0;
 		while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
-		    TimeTaggs[lineCount]=static_cast<unsigned long long int>(ValueReadTest);		    
+		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+		    TimeTaggsStored[lineCount]=static_cast<unsigned long long int>(ValueReadTest);		    
 		    ////////////////////////////////////////////////////////////////////////////////
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTags[lineCount]), sizeof(ChannelTags[lineCount]));
+	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTagsStored[lineCount]), sizeof(ChannelTags[lineCount]));
 	    	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
 	    	    //cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
-	    	    lineCount++; // Increment line count for each line read
-	    	    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations 	    
+	    	    lineCount++; // Increment line count for each line read	    
 	    	    }
 	    	if (lineCount==0){cout << "RetrieveNumStoredQuBits: No timetaggs present!" << endl;}
-		return lineCount;
+	    	TotalCurrentNumRecords=lineCount;
 	}
 	else{
 		cout << "RetrieveNumStoredQuBits: BBB streamDDRpru is not open!" << endl;
@@ -1016,14 +1035,13 @@ if (SlowMemoryPermanentStorageFlag==true){
 	}
 }
 else{// Memory allocation
-	LastTimeTaggRef[0]=TimeTaggsLast*static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds);// Since whole number
-	for (int i=0; i<TotalCurrentNumRecords;i++){
-		TimeTaggs[i]=TimeTaggsStored[i];
-		ChannelTags[i]=ChannelTagsStored[i];
-	}
-	return TotalCurrentNumRecords;
+	LastTimeTaggRef[0]=TimeTaggsLastStored*static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds);// Since whole number. It is meant for computing the time between measurements to estimate the relative frequency difference. It is for synchronization purposes which generally will be under control so even if it is a multiple adquisiton the itme difference will be mantained so it generally ok.
 }
 
+// Correct the detected qubits relative frequency difference (due to the sender node) and split between quad groups of 4 channels
+PRUdetCorrRelFreq(TotalCurrentNumRecordsQuadCh,TimeTaggs,ChannelTags);
+
+return TotalCurrentNumRecords;
 }
 
 int GPIO::IntMedianFilterSubArray(int* ArrayHolderAux,int MedianFilterFactor){

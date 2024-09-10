@@ -30,6 +30,7 @@ using std::fstream;
 #define MaxNumPulses	8192	// Used in the averaging of time synchronization arrays
 #define PRUclockStepPeriodNanoseconds		5.00000//4.99999 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
 #define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
+#define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
 
 namespace exploringBB {
 
@@ -207,6 +208,7 @@ private:// Variables
 	unsigned long long int ULLIEpochReOffset=344810000000000000;// Amount to remove to timetaggs so that thier numbers are not so high and difficult to handle by other agents (value adjusted August 2024)
 	unsigned long long int OldLastTimeTagg=0;
 	unsigned long long int TimeTaggsLast=0;
+	unsigned long long int TimeTaggsLastStored=0;
 	unsigned long long int TimeTaggsInit=0;
 	// Pulses compensation
 	int NumSynchPulsesRed=0;
@@ -232,13 +234,13 @@ public:	// Functions/Methods
 	GPIO(); // initializates PRU operation
 	int InitAgentProcess();
 	int LOCAL_DDMinit();
-	int DDRdumpdata();
+	int DDRdumpdata(int iIterRunsAux);
 	int DisablePRUs();
-	int ReadTimeStamps(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux,double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber);// Read the detected timestaps in four channels
+	int ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux,double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber);// Read the detected timestaps in four channels
 	int SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	int SendTriggerSignalsSelfTest();//
 	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
-	int RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned long long int* TimeTaggs, unsigned short* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
+	int RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int* TimeTaggs, unsigned short* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
 	int ClearStoredQuBits(); // Send the writting pointer back to the beggining - effectively clearing stored QuBits
 	// Synchronization related
 	int SetSynchDriftParams(double* AccumulatedErrorDriftParamsAux);// Method to update (or reset with 0s) the synchronization parameters of the long time drift (maybe updated periodically)
@@ -290,7 +292,7 @@ private: // Functions/Methods
 	int PRUsignalTimerSynch(); // Periodic synchronizaton of the timer to control the generated signals
 	int PRUsignalTimerSynchJitterLessInterrupt();// Tries to avoid interrupt jitter (might not be completely absolute time
 	int PIDcontrolerTimeJiterlessInterrupt();
-	int PRUdetCorrRelFreq();// Correct the detections relative frequency difference 
+	int PRUdetCorrRelFreq(unsigned int TotalCurrentNumRecordsQuadCh, unsigned long long int* TimeTaggs, unsigned short* ChannelTags);// Correct the detections relative frequency difference of the sender as well as separate by quad channel groups
 	// Data processing
 	unsigned short packBits(unsigned short value);
 	// Non-PRU

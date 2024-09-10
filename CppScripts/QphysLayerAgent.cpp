@@ -855,8 +855,6 @@ return 0; // All ok
 int QPLA::ThreadSimulateReceiveQubit(){
 cout << "Receiving Qubits" << endl;
 this->acquire();
-TimeTaggs[NumQubitsMemoryBuffer]={0}; // Clear the array. Actually only the first items is set to 0.
-ChannelTags[NumQubitsMemoryBuffer]={0}; // Clear the array. Actually only the first items is set to 0.
 PRUGPIO.ClearStoredQuBits();//PRUGPIO->ClearStoredQuBits();
 this->release();
 int iIterRuns;
@@ -887,7 +885,7 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrie
 // Convert duration to desired time
 unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin
  for (iIterRuns=0;iIterRuns<DetRunsCount;iIterRuns++){	
-	PRUGPIO.ReadTimeStamps(this->QuadEmitDetecSelec,this->HistPeriodicityAux,static_cast<unsigned int>(NumQuBitsPerRun),this->FineSynchAdjVal,TimePointFuture_time_as_count);//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
+	PRUGPIO.ReadTimeStamps(iIterRuns,this->QuadEmitDetecSelec,this->HistPeriodicityAux,static_cast<unsigned int>(NumQuBitsPerRun),this->FineSynchAdjVal,TimePointFuture_time_as_count);//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
  }
  // Basic Input 
  /* Very slow GPIO BBB not used anymore
@@ -1459,7 +1457,7 @@ return 0; // All Ok
 int QPLA::LinearRegressionQuBitFilter(){
 //this->acquire(); It is already within an acquire/release
 if (ApplyRawQubitFilteringFlag==true){	
-	int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,RawTimeTaggs,RawChannelTags); // Get raw values
+	int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,RawTotalCurrentNumRecordsQuadCh,RawTimeTaggs,RawChannelTags); // Get raw values
 	unsigned long long int NormInitialTimeTaggsVal=RawTimeTaggs[0];
 	// Normalize values to work with more plausible values
 	//for (int i=0;i<RawNumStoredQubits;i++){
