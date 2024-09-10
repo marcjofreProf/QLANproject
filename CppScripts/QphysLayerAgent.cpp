@@ -30,7 +30,7 @@ Agent script for Quantum Physical Layer
 // Semaphore
 #include <atomic>
 // time points
-#define WaitTimeToFutureTimePoint 399000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformatoin used)
+#define WaitTimeToFutureTimePoint 399000000 // Max 999999999. It is the time barrier to try to achieve synchronization. Considered nanoseconds (it can be changed on the transformation used)
 #define UTCoffsetBarrierErrorThreshold 37000000000 // Some BBB when synch with linuxPTP have an error on the UTC offset with respect TAI. Remove this sistemic offset and announce it!
 // Mathematical calculations
 #include <cmath>
@@ -533,7 +533,7 @@ auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
 unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin 
 
-PRUGPIO.SendTriggerSignals(this->HistPeriodicityAux,static_cast<unsigned int>(NumberRepetitionsSignal),this->FineSynchAdjVal,TimePointFuture_time_as_count);//PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of NumQuBitsPerRun
+PRUGPIO.SendTriggerSignals(this->QuadEmitDetecSelec,this->HistPeriodicityAux,static_cast<unsigned int>(NumberRepetitionsSignal),this->FineSynchAdjVal,TimePointFuture_time_as_count);//PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of NumQuBitsPerRun
  
  /* Very slow GPIO BBB not used anymore
  // Basic Output - Generate a pulse of 1 second period
@@ -887,7 +887,7 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrie
 // Convert duration to desired time
 unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin
  for (iIterRuns=0;iIterRuns<DetRunsCount;iIterRuns++){	
-	PRUGPIO.ReadTimeStamps(this->HistPeriodicityAux,static_cast<unsigned int>(NumQuBitsPerRun),this->FineSynchAdjVal,TimePointFuture_time_as_count);//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
+	PRUGPIO.ReadTimeStamps(this->QuadEmitDetecSelec,this->HistPeriodicityAux,static_cast<unsigned int>(NumQuBitsPerRun),this->FineSynchAdjVal,TimePointFuture_time_as_count);//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
  }
  // Basic Input 
  /* Very slow GPIO BBB not used anymore

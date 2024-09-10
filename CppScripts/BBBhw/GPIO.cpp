@@ -1,3 +1,12 @@
+/* Author: Prof. Marc Jofre
+Dept. Network Engineering
+Universitat Politècnica de Catalunya - Technical University of Catalonia
+
+Modified: 2024
+Created: 2024
+
+Script for PRU real-time handling
+*/
 #include "GPIO.h"
 #include<iostream>
 #include<fstream>
@@ -16,7 +25,7 @@
 // Time/synchronization management
 #include <chrono>
 // Mathemtical calculations
-#include <cmath>// abs, fmodl, floor, ceil
+#include <cmath>// abs, fmod, fmodl, floor, ceil
 // PRU programming
 #include<poll.h>
 #include <stdio.h>
@@ -538,7 +547,7 @@ int GPIO::PRUsignalTimerSynch(){
 return 0; // All ok
 }
 
-int GPIO::ReadTimeStamps(double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux, double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber){// Read the detected timestaps in four channels
+int GPIO::ReadTimeStamps(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux, double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber){// Read the detected timestaps in four channels
 /////////////
 std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 this->QPLAFutureTimePoint=Clock::time_point(duration_back);
@@ -547,6 +556,7 @@ NumQuBitsPerRun=NumQuBitsPerRunAux;
 valpAuxHolder=valpHolder+4+6*NumQuBitsPerRun;// 6* since each detection also includes the channels (2 Bytes) and 4 bytes for 32 bits counter, and plus 4 since the first tag is captured at the very beggining
 AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
 AccumulatedErrorDrift=FineSynchAdjValAux[1]; // Synch trig frequency
+QuadEmitDetecSelecGPIO=QuadEmitDetecSelecAux;// Update value
 //while (this->ManualSemaphoreExtra);// Wait until periodic synch method finishes
 while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->ManualSemaphoreExtra=true;
@@ -629,13 +639,14 @@ this->DDRdumpdata(); // Store to file
 return 0;// all ok
 }
 
-int GPIO::SendTriggerSignals(double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 this->QPLAFutureTimePoint=Clock::time_point(duration_back);
 SynchTrigPeriod=SynchTrigPeriodAux;// Histogram/Period value
 NumberRepetitionsSignal=static_cast<unsigned int>(NumberRepetitionsSignalAux);// Number of repetitions to send signals
 AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
 AccumulatedErrorDrift=FineSynchAdjValAux[1]; // Synch trig frequency
+QuadEmitDetecSelecGPIO=QuadEmitDetecSelecAux;// Update value
 while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
 this->ManualSemaphoreExtra=true;
 this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization

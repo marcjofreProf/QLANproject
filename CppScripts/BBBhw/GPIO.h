@@ -27,7 +27,7 @@ using std::fstream;
 #define PRUdataPATH2 "../PRUdata/"
 #define MaxNumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 #define MaxNumQuBitsMemStored 10*MaxNumQuBitsPerRun // Maximum size of the array for memory storing qubits (timetaggs and channels)
-#define MaxNumPulses	8192	// Used in the averging of time synchronization arrays
+#define MaxNumPulses	8192	// Used in the averaging of time synchronization arrays
 #define PRUclockStepPeriodNanoseconds		5.00000//4.99999 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
 #define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
 
@@ -223,6 +223,8 @@ private:// Variables
 	double SlopeDetTagsAuxArray[MaxNumQuBitsMemStored]={0.0}; // Array in order to do the computations
 	// Information and status
 	bool HardwareSynchStatus=false; // Turn to true when hardware synchronized with the PRU clock
+	// Specific emission or detection quad group of channels
+	int QuadEmitDetecSelecGPIO=7; // Initialization to all channels
 
 public:	// Functions/Methods
 	GPIO(int number); //constructor will export the pin	
@@ -232,8 +234,8 @@ public:	// Functions/Methods
 	int LOCAL_DDMinit();
 	int DDRdumpdata();
 	int DisablePRUs();
-	int ReadTimeStamps(double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux,double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber);// Read the detected timestaps in four channels
-	int SendTriggerSignals(double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+	int ReadTimeStamps(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux,double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber);// Read the detected timestaps in four channels
+	int SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	int SendTriggerSignalsSelfTest();//
 	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
 	int RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned long long int* TimeTaggs, unsigned short* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits

@@ -144,6 +144,8 @@ private: //Variables/Instances
 	bool UseAllTagsForEstimation=true; // When false, use only the first tag (not resilent because it could be a remaining noise tag), when true it uses all tags of the run
 	//int iCenterMassAuxiliarTest=0;
 	//int iNumRunsPerCenterMassAuxiliarTest=0;
+	// Selector of mission or detection quadruples or group. 0=000b no channel selected (actually it is not a valid option), 1=001b emission or detection of the first lower group of 4 channels, 2=010b emission or detection of the second lower group of 4 channels, 3=011b emission or detection of the first and second group of lower group of 4 channels....7=111b emission or detection of the third, second and first lower groups of 4 channels (all channels). This value is updated thorugh upper layer agents for each emission or detection
+	int QuadEmitDetecSelec=7; // Initialization to all channels
         
 public: // Variables/Instances
 	exploringBB::GPIO PRUGPIO;
