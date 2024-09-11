@@ -54,16 +54,16 @@ this->valueSemaphore=0; // Make sure it stays at 0
 // https://stackoverflow.com/questions/61493121/when-can-memory-order-acquire-or-memory-order-release-be-safely-removed-from-com
 // https://medium.com/@pauljlucas/advanced-thread-safety-in-c-4cbab821356e
 //int oldCount;
-bool valueSemaphoreExpected=true;
-while(true){
+	bool valueSemaphoreExpected=true;
+	while(true){
 	//oldCount = this->valueSemaphore.load(std::memory_order_acquire);
 	//if (oldCount > 0 && this->valueSemaphore.compare_exchange_strong(oldCount,oldCount-1,std::memory_order_acquire)){
-	if (this->valueSemaphore.compare_exchange_strong(valueSemaphoreExpected,false,std::memory_order_acquire)){	
-	break;
+		if (this->valueSemaphore.compare_exchange_strong(valueSemaphoreExpected,false,std::memory_order_acquire)){	
+			break;
+		}
 	}
 }
-}
- 
+
 void QTLAN::release() {
 this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stays at 1
 //this->valueSemaphore.fetch_add(1,std::memory_order_release);
@@ -71,13 +71,13 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 /// Errors handling
 std::atomic<bool> signalReceivedFlag{false};
 static void SignalINTHandler(int s) {
-signalReceivedFlag.store(true);
-cout << "Caught SIGINT" << endl;
+	signalReceivedFlag.store(true);
+	cout << "Caught SIGINT" << endl;
 }
 
 static void SignalPIPEHandler(int s) {
-signalReceivedFlag.store(true);
-cout << "Caught SIGPIPE" << endl;
+	signalReceivedFlag.store(true);
+	cout << "Caught SIGPIPE" << endl;
 }
 
 //static void SignalSegmentationFaultHandler(int s) {
@@ -86,9 +86,9 @@ cout << "Caught SIGPIPE" << endl;
 //}
 ///////////////////////////////////////////////////////
 int QTLAN::InitiateBelowAgentsObjects(){// Some objects of the below layers that have to be initialized
-strcpy(this->QNLAagent.SCmode[0],this->SCmode[1]);
-strcpy(this->QNLAagent.QLLAagent.SCmode[0],this->SCmode[1]);
-strcpy(this->QNLAagent.QLLAagent.QPLAagent.SCmode[0],this->SCmode[1]);
+	strcpy(this->QNLAagent.SCmode[0],this->SCmode[1]);
+	strcpy(this->QNLAagent.QLLAagent.SCmode[0],this->SCmode[1]);
+	strcpy(this->QNLAagent.QLLAagent.QPLAagent.SCmode[0],this->SCmode[1]);
 
 return 0; // All OK
 }
@@ -103,7 +103,7 @@ return 0; //All OK
 int QTLAN::SendParametersAgent(){// The upper layer gets the information to be send
 //this->acquire(); Does not need it since it is within the while loop
 
-char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 strcpy(ParamsCharArray,"Trans;"); // Initiates the ParamsCharArray, so use strcpy
 if (string(this->PayloadSendBuffer)!=string("")){
 	strcat(ParamsCharArray,this->PayloadSendBuffer);
@@ -147,30 +147,30 @@ return 0; // All OK
 
 int QTLAN::SetSendParametersAgent(char* ParamsCharArray){// Node accumulates parameters for the other node
 
-strcpy(this->PayloadSendBuffer,"none_none_");
+	strcpy(this->PayloadSendBuffer,"none_none_");
 
 return 0; //All OK
 }
 
 int QTLAN::ReadParametersAgent(char* ParamsCharArray){// Node checks parameters from the other node
 //cout << "QTLAN::ReadParametersAgent: " << ParamsCharArray << endl;
-char DiscardBuffer[NumBytesPayloadBuffer]={0};
-strcpy(DiscardBuffer,strtok(ParamsCharArray,";"));
-strcpy(this->PayloadReadBuffer,strtok(NULL,";"));
+	char DiscardBuffer[NumBytesPayloadBuffer]={0};
+	strcpy(DiscardBuffer,strtok(ParamsCharArray,";"));
+	strcpy(this->PayloadReadBuffer,strtok(NULL,";"));
 //cout << "this->PayloadReadBuffer: " << this->PayloadReadBuffer << endl;
-char ParamsCharArrayAux[NumBytesPayloadBuffer]={0};
-strcpy(ParamsCharArrayAux,strtok(NULL,";"));
-strcat(ParamsCharArrayAux,";");
-strcat(ParamsCharArrayAux,strtok(NULL,";"));
-strcat(ParamsCharArrayAux,";");
-strcat(ParamsCharArrayAux,strtok(NULL,";"));
-strcat(ParamsCharArrayAux,";");
-strcat(ParamsCharArrayAux,strtok(NULL,";"));
-strcat(ParamsCharArrayAux,";");
-strcat(ParamsCharArrayAux,strtok(NULL,";"));
-strcat(ParamsCharArrayAux,";");
-strcat(ParamsCharArrayAux,strtok(NULL,";"));
-strcat(ParamsCharArrayAux,";");
+	char ParamsCharArrayAux[NumBytesPayloadBuffer]={0};
+	strcpy(ParamsCharArrayAux,strtok(NULL,";"));
+	strcat(ParamsCharArrayAux,";");
+	strcat(ParamsCharArrayAux,strtok(NULL,";"));
+	strcat(ParamsCharArrayAux,";");
+	strcat(ParamsCharArrayAux,strtok(NULL,";"));
+	strcat(ParamsCharArrayAux,";");
+	strcat(ParamsCharArrayAux,strtok(NULL,";"));
+	strcat(ParamsCharArrayAux,";");
+	strcat(ParamsCharArrayAux,strtok(NULL,";"));
+	strcat(ParamsCharArrayAux,";");
+	strcat(ParamsCharArrayAux,strtok(NULL,";"));
+	strcat(ParamsCharArrayAux,";");
 //cout << "ParamsCharArrayAux: " << ParamsCharArrayAux << endl;
 QNLAagent.SetReadParametersAgent(ParamsCharArrayAux); // Send respective information to the below layer agent
 
@@ -183,84 +183,84 @@ return 0; // All OK
 }
 
 int QTLAN::SetReadParametersAgent(char* ParamsCharArray){// The upper layer sets information to be read
-this->acquire();
-strcat(this->PayloadReadBuffer,ParamsCharArray);
-this->release();
+	this->acquire();
+	strcat(this->PayloadReadBuffer,ParamsCharArray);
+	this->release();
 return 0; // All OK
 }
 ////////////////////////////////////////////////////
 int QTLAN::countQintupleComas(char* ParamsCharArray) {
-  int comasCount = 0;
+	int comasCount = 0;
 
-  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
-    if (ParamsCharArray[i] == ',') {
-      comasCount++;
-    }
-  }
+	for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+		if (ParamsCharArray[i] == ',') {
+			comasCount++;
+		}
+	}
 
-  return comasCount/5;
+	return comasCount/5;
 }
 
 int QTLAN::countDoubleColons(char* ParamsCharArray) {
-  int colonCount = 0;
+	int colonCount = 0;
 
-  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
-    if (ParamsCharArray[i] == ':') {
-      colonCount++;
-    }
-  }
+	for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+		if (ParamsCharArray[i] == ':') {
+			colonCount++;
+		}
+	}
 
-  return colonCount/2;
+	return colonCount/2;
 }
 
 int QTLAN::countDoubleUnderscores(char* ParamsCharArray) {
-  int underscoreCount = 0;
+	int underscoreCount = 0;
 
-  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
-    if (ParamsCharArray[i] == '_') {
-      underscoreCount++;
-    }
-  }
+	for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+		if (ParamsCharArray[i] == '_') {
+			underscoreCount++;
+		}
+	}
 
-  return underscoreCount/2;
+	return underscoreCount/2;
 }
 
 int QTLAN::countUnderscores(char* ParamsCharArray) {
-  int underscoreCount = 0;
+	int underscoreCount = 0;
 
-  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
-    if (ParamsCharArray[i] == '_') {
-      underscoreCount++;
-    }
-  }
+	for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+		if (ParamsCharArray[i] == '_') {
+			underscoreCount++;
+		}
+	}
 
-  return underscoreCount;
+	return underscoreCount;
 }
 
 int QTLAN::ProcessNewParameters(){
-char ParamsCharArray[NumBytesPayloadBuffer]={0};
-char HeaderCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
-char ValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
-char TokenValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
+	char ParamsCharArray[NumBytesPayloadBuffer]={0};
+	char HeaderCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
+	char ValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
+	char TokenValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
 
-strcpy(ParamsCharArray,this->PayloadReadBuffer);
+	strcpy(ParamsCharArray,this->PayloadReadBuffer);
 
-int NumDoubleUnderscores = this->countDoubleUnderscores(ParamsCharArray);
+	int NumDoubleUnderscores = this->countDoubleUnderscores(ParamsCharArray);
 
-for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
-	if (iHeaders==0){
-		strcpy(HeaderCharArray[iHeaders],strtok(ParamsCharArray,"_"));		
+	for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
+		if (iHeaders==0){
+			strcpy(HeaderCharArray[iHeaders],strtok(ParamsCharArray,"_"));		
+		}
+		else{
+			strcpy(HeaderCharArray[iHeaders],strtok(NULL,"_"));
+		}
+		strcpy(ValuesCharArray[iHeaders],strtok(NULL,"_"));
 	}
-	else{
-		strcpy(HeaderCharArray[iHeaders],strtok(NULL,"_"));
-	}
-	strcpy(ValuesCharArray[iHeaders],strtok(NULL,"_"));
-}
 
-for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
+	for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 // Missing to develop if there are different values
 
-}
+	}
 
 return 0; // All OK
 }
@@ -291,8 +291,8 @@ return 0; // All Ok
 }
 
 int QTLAN::InitiateICPconnections(int argc){
-int RetValue = 0;
-if (string(SOCKtype)=="SOCK_DGRAM"){
+	int RetValue = 0;
+	if (string(SOCKtype)=="SOCK_DGRAM"){
 	// The sockets for receiving
 	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[1],this->IPSocketsList[0]);// Listen to the port
 	// The sockets for sending	
@@ -319,55 +319,55 @@ else{// TCP
 }
 
 int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPaddressesSocketsLocal,char* IPSocketsList) {    
-    struct sockaddr_in address;   
-    int opt = 1;
+	struct sockaddr_in address;   
+	int opt = 1;
     // Creating socket file descriptor
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
     // type: SOCK_STREAM: TCP(reliable, connection oriented) // ( SOCK_STREAM for TCP / SOCK_DGRAM for UDP ) 
     // Protocol value for Internet Protocol(IP), which is 0 
-    if (string(SOCKtype)=="SOCK_DGRAM"){socket_fd = socket(AF_INET, SOCK_DGRAM, 0);}
-    else {socket_fd = socket(AF_INET, SOCK_STREAM, 0);}
-    if (socket_fd < 0) {
-        cout << "Client Socket creation error" << endl;
-        return -1;
-    }
-    
+	if (string(SOCKtype)=="SOCK_DGRAM"){socket_fd = socket(AF_INET, SOCK_DGRAM, 0);}
+	else {socket_fd = socket(AF_INET, SOCK_STREAM, 0);}
+	if (socket_fd < 0) {
+		cout << "Client Socket creation error" << endl;
+		return -1;
+	}
+	
     // Check status of a previously initiated socket to reduce misconnections
     //this->SocketCheckForceShutDown(socket_fd); Not used
-    
+	
     // Specifying some options to the port
-    if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
-	cout << "Server attaching socket options failed" << endl;
-	return -1;
-    }
-    
-    address.sin_family = AF_INET;
-    if (string(SOCKtype)=="SOCK_DGRAM"){
+	if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
+		cout << "Server attaching socket options failed" << endl;
+		return -1;
+	}
+	
+	address.sin_family = AF_INET;
+	if (string(SOCKtype)=="SOCK_DGRAM"){
     	address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);// Since we have the info, it is better to specify, instead of INADDR_ANY;
     	address.sin_port = htons(0);// 0 any avaliable
     }
     else{address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);address.sin_port = htons(PORT);}// Since we have the info, it is better to specify, instead of INADDR_ANY;
-        
+    
     // Forcefully attaching socket to the port
     if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
-        cout << "Client socket bind failed" << endl;
-        return -1;
+    	cout << "Client socket bind failed" << endl;
+    	return -1;
     }
     
     
     // Connect is for TCP
     if (string(SOCKtype)=="SOCK_STREAM"){	 
 	    // Convert IPv4 and IPv6 addresses from text to binary form
-	    if (inet_pton(AF_INET, IPaddressesSockets, &address.sin_addr)<= 0) {
-		cout << "Invalid address / Address not supported" << endl;
-		return -1;
-	    }    
-    
-	    int status= connect(socket_fd, (struct sockaddr*)&address,sizeof(address));
-	    if (status< 0) {
-		cout << "Client Connection Failed" << endl;
-		return -1;
-	    }
+    	if (inet_pton(AF_INET, IPaddressesSockets, &address.sin_addr)<= 0) {
+    		cout << "Invalid address / Address not supported" << endl;
+    		return -1;
+    	}    
+    	
+    	int status= connect(socket_fd, (struct sockaddr*)&address,sizeof(address));
+    	if (status< 0) {
+    		cout << "Client Connection Failed" << endl;
+    		return -1;
+    	}
     }
     
     strcpy(IPSocketsList,IPaddressesSockets);
@@ -375,102 +375,102 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     
     cout << "Client connected to server: "<< IPaddressesSockets << endl;
     return 0; // All Ok
-}
+  }
 
 int QTLAN::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddressesSockets,char* IPaddressesSocketsLocal,char* IPSocketsList) {// Node listening for connection from attached host    
-    struct sockaddr_in address;
-    int opt = 1;
-    socklen_t addrlen = sizeof(address);       
- 
+	struct sockaddr_in address;
+	int opt = 1;
+	socklen_t addrlen = sizeof(address);       
+	
     // Creating socket file descriptor
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
     // type: SOCK_STREAM: TCP(reliable, connection oriented) // ( SOCK_STREAM for TCP / SOCK_DGRAM for UDP ) 
     // Protocol value for Internet Protocol(IP), which is 0
-    if (string(SOCKtype)=="SOCK_DGRAM"){socket_fd = socket(AF_INET, SOCK_DGRAM, 0);}
-    else {socket_fd = socket(AF_INET, SOCK_STREAM, 0);}
-    if (socket_fd < 0) {
-        cout << "Server socket failed" << endl;
-        return -1;
-    }
-    
+	if (string(SOCKtype)=="SOCK_DGRAM"){socket_fd = socket(AF_INET, SOCK_DGRAM, 0);}
+	else {socket_fd = socket(AF_INET, SOCK_STREAM, 0);}
+	if (socket_fd < 0) {
+		cout << "Server socket failed" << endl;
+		return -1;
+	}
+	
     // Check status of a previously initiated socket to reduce misconnections
     //this->SocketCheckForceShutDown(socket_fd); Not used
-    
+	
     // Specifying some options to the port
-    if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
-	cout << "Server attaching socket options failed" << endl;
-	return -1;
-    }
-    
-    address.sin_family = AF_INET;
-    if (string(SOCKtype)=="SOCK_DGRAM"){
+	if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
+		cout << "Server attaching socket options failed" << endl;
+		return -1;
+	}
+	
+	address.sin_family = AF_INET;
+	if (string(SOCKtype)=="SOCK_DGRAM"){
     	address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);// Since we have the info, it is better to specify, instead of INADDR_ANY;
     }
     else{address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);}// Since we have the info, it is better to specify, instead of INADDR_ANY;
     address.sin_port = htons(PORT);
- 
+    
     // Forcefully attaching socket to the port
     if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
-        cout << "Server socket bind failed" << endl;
-        return -1;
+    	cout << "Server socket bind failed" << endl;
+    	return -1;
     }
     
     // listen and accept are particular of TCP
     if (string(SOCKtype)=="SOCK_STREAM"){
-	    if (listen(socket_fd, 3) < 0) {
-		cout << "Server socket listen failed" << endl;
-		return -1;
-	    }
-	    new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen);
-	    if (new_socket< 0) {
-		cout << "Server socket accept failed" << endl;
-		return -1;
-	    }
+    	if (listen(socket_fd, 3) < 0) {
+    		cout << "Server socket listen failed" << endl;
+    		return -1;
+    	}
+    	new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen);
+    	if (new_socket< 0) {
+    		cout << "Server socket accept failed" << endl;
+    		return -1;
+    	}
 	// Retrive IP address client
-    strcpy(IPSocketsList,inet_ntoa(address.sin_addr));
+    	strcpy(IPSocketsList,inet_ntoa(address.sin_addr));
     }
     else{
     // Retrive IP address client
-    strcpy(IPSocketsList,IPaddressesSockets);
+    	strcpy(IPSocketsList,IPaddressesSockets);
     }
     
     //cout << "IPSocketsList: "<< IPSocketsList << endl;
     
     cout << "Node starting socket server to host/node: " << IPSocketsList << endl;
     return 0; // All Ok
-}
+  }
 
-int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
+  int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
   // Check for new messages
-  fd_set fds;
-  FD_ZERO(&fds);
-  FD_SET(socket_fd_conn, &fds);
+  	fd_set fds;
+  	FD_ZERO(&fds);
+  	FD_SET(socket_fd_conn, &fds);
 
   // Set the timeout
-  struct timeval timeout;
+  	struct timeval timeout;
   // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
-  timeout.tv_sec = 0;
-  timeout.tv_usec = SockListenTimeusec;
-  
-  int nfds = socket_fd_conn + 1;
-  int ret = 0;
-  if (string(SOCKtype)=="SOCK_DGRAM"){ret = select(nfds, &fds, NULL, NULL, &timeout);}
-  else{ret = select(nfds, &fds, NULL, NULL, &timeout);}
+  	timeout.tv_sec = 0;
+  	timeout.tv_usec = SockListenTimeusec;
+  	
+  	int nfds = socket_fd_conn + 1;
+  	int ret = 0;
+  	if (string(SOCKtype)=="SOCK_DGRAM"){ret = select(nfds, &fds, NULL, NULL, &timeout);}
+  	else{ret = select(nfds, &fds, NULL, NULL, &timeout);}
 
-  if (ret < 0) {
+  	if (ret < 0) {
     //cout << "Node select no new messages" << endl;this->m_exit();
-    return -1;}
-   else if (ret==0){
+  		return -1;}
+  		else if (ret==0){
    //cout << "Node no new messages" << endl;
-   return -1;}
+  			return -1;}
   else {// There is at least one new message
     if (FD_ISSET(socket_fd_conn, &fds)) {// is a macro that checks whether a specified file descriptor is set in a specified file descriptor set.
       // Read the message from the socket
-        int valread=0;
-	if (this->ReadFlagWait){
-		if (string(SOCKtype)=="SOCK_DGRAM"){
-		struct sockaddr_in orgaddr; 
-		    memset(&orgaddr, 0, sizeof(orgaddr));		       
+    	int valread=0;
+    	if (this->ReadFlagWait){
+    		if (string(SOCKtype)=="SOCK_DGRAM"){
+    			struct sockaddr_in orgaddr; 
+    			memset(&orgaddr, 0, sizeof(orgaddr));		       
 		    // Filling information 
 		    orgaddr.sin_family    = AF_INET; // IPv4
 		    for (int i=0; i<(NumSocketsMax); i++){
@@ -478,19 +478,19 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 		    	if (socket_fd_conn==socket_fdArray[i]){
 		    		orgaddr.sin_addr.s_addr = inet_addr(this->IPaddressesSockets[i]);//INADDR_ANY; 
 		    		orgaddr.sin_port = htons(PORT);
-		    unsigned int addrLen;
-			addrLen = sizeof(orgaddr);
-		valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
+		    		unsigned int addrLen;
+		    		addrLen = sizeof(orgaddr);
+		    		valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
 		    	}
 		    }
 		    
+		  }
+		  else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 		}
-    		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
-		}
-	else{
-		if (string(SOCKtype)=="SOCK_DGRAM"){
-		struct sockaddr_in orgaddr; 
-		    memset(&orgaddr, 0, sizeof(orgaddr));		       
+		else{
+			if (string(SOCKtype)=="SOCK_DGRAM"){
+				struct sockaddr_in orgaddr; 
+				memset(&orgaddr, 0, sizeof(orgaddr));		       
 		    // Filling information 
 		    orgaddr.sin_family    = AF_INET; // IPv4 
 		    for (int i=0; i<(NumSocketsMax); i++){
@@ -498,17 +498,17 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 		    	if (socket_fd_conn==socket_fdArray[i]){
 		    		orgaddr.sin_addr.s_addr = inet_addr(this->IPaddressesSockets[i]);//INADDR_ANY; 
 		    		orgaddr.sin_port = htons(PORT);
-		    unsigned int addrLen;
-			addrLen = sizeof(orgaddr);
+		    		unsigned int addrLen;
+		    		addrLen = sizeof(orgaddr);
 		valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);//MSG_WAITALL (needs a NULL in the timer in select
-		    	}
-		    }
-		    
-		}
-    		else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
 	}
+}
+
+}
+else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
+}
         //cout << "Node message received: " << this->ReadBuffer << endl;
-      if (valread <= 0) {
+if (valread <= 0) {
 	if (valread<0){
 		cout << strerror(errno) << endl;
 		cout << "Node error reading new messages" << endl;
@@ -522,7 +522,7 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 	this->m_exit();
 	return -1;
-      }
+}
       // Process the message
       else{// (n>0){
       	//cout << "Received message: " << this->ReadBuffer << endl;
@@ -534,31 +534,31 @@ int QTLAN::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
 }
 
 bool QTLAN::isSocketWritable(int sock) {
-if (string(SOCKtype)=="SOCK_DGRAM"){ 
-for (int i=0; i<(NumSocketsMax); i++){
+	if (string(SOCKtype)=="SOCK_DGRAM"){ 
+		for (int i=0; i<(NumSocketsMax); i++){
     	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
-    	if (sock==socket_fdArray[i]){
+			if (sock==socket_fdArray[i]){
     		//cout << "socket_fd_conn: " << socket_fd_conn << endl;
     		//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
     		//cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
-    		sock=socket_SendUDPfdArray[i];
- 	}
- }
- }
-    fd_set write_fds;
-    FD_ZERO(&write_fds);
-    FD_SET(sock, &write_fds);
+				sock=socket_SendUDPfdArray[i];
+			}
+		}
+	}
+	fd_set write_fds;
+	FD_ZERO(&write_fds);
+	FD_SET(sock, &write_fds);
 
     // Set timeout to zero for non-blocking check
-    timeval timeout;
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 0;
+	timeval timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 0;
 
     // Check if the socket is writable
-    int select_res = select(sock + 1, nullptr, &write_fds, nullptr, &timeout);
+	int select_res = select(sock + 1, nullptr, &write_fds, nullptr, &timeout);
 
     // select_res > 0 means the socket is writable
-    return select_res > 0;
+	return select_res > 0;
 }
 
 int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
@@ -569,56 +569,56 @@ int QTLAN::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	//	cout << "Host socket ICPmanagementSend not writable!" << endl;
 	//}
 	
-    const char* SendBufferAux = this->SendBuffer;
-    int BytesSent=0;
-    if (string(SOCKtype)=="SOCK_DGRAM"){    
-    	    int socket_fd=0;
-	    
-	    struct sockaddr_in destaddr;   
-	    memset(&destaddr, 0, sizeof(destaddr)); 
-	       
+	const char* SendBufferAux = this->SendBuffer;
+	int BytesSent=0;
+	if (string(SOCKtype)=="SOCK_DGRAM"){    
+		int socket_fd=0;
+		
+		struct sockaddr_in destaddr;   
+		memset(&destaddr, 0, sizeof(destaddr)); 
+		
 	    // Filling server information 
-	    destaddr.sin_family = AF_INET; 
-	    destaddr.sin_port = htons(PORT); 
-	    destaddr.sin_addr.s_addr = inet_addr(IPaddressesSockets); 
-	    
-	    for (int i=0; i<(NumSocketsMax); i++){
+		destaddr.sin_family = AF_INET; 
+		destaddr.sin_port = htons(PORT); 
+		destaddr.sin_addr.s_addr = inet_addr(IPaddressesSockets); 
+		
+		for (int i=0; i<(NumSocketsMax); i++){
 	    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
-	    	if (socket_fd_conn==socket_fdArray[i]){
-	    		socket_fd=socket_SendUDPfdArray[i];
+			if (socket_fd_conn==socket_fdArray[i]){
+				socket_fd=socket_SendUDPfdArray[i];
 	    		BytesSent=sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_DONTWAIT,(const struct sockaddr *) &destaddr,sizeof(destaddr));//MSG_CONFIRM
 	    	}
 	    }
-    }
-    else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
-    
-    if (BytesSent<0){
-    	perror("send");
-    	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
-    }
+	  }
+	  else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
+	  
+	  if (BytesSent<0){
+	  	perror("send");
+	  	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
+	  }
     return 0; // All OK
-}
+  }
 
-int QTLAN::ICPmanagementCloseClient(int socket_fd) {
+  int QTLAN::ICPmanagementCloseClient(int socket_fd) {
     // closing the connected socket
-    close(socket_fd);
- 
+  	close(socket_fd);
+  	
     return 0; // All OK
-}
+  }
 
-int QTLAN::ICPmanagementCloseServer(int socket_fd,int new_socket) {
-if (string(SOCKtype)=="SOCK_STREAM"){
+  int QTLAN::ICPmanagementCloseServer(int socket_fd,int new_socket) {
+  	if (string(SOCKtype)=="SOCK_STREAM"){
     // closing the connected socket
-    close(new_socket);
-}
+  		close(new_socket);
+  	}
     // closing the listening socket
-    close(socket_fd);
-    
+  	close(socket_fd);
+  	
     return 0; // All OK
-}
+  }
 
-int QTLAN::StopICPconnections(int argc){
-	if (string(SOCKtype)=="SOCK_DGRAM"){ICPmanagementCloseClient(this->socket_SendUDPfdArray[0]);}
+  int QTLAN::StopICPconnections(int argc){
+  	if (string(SOCKtype)=="SOCK_DGRAM"){ICPmanagementCloseClient(this->socket_SendUDPfdArray[0]);}
 	// First, eventually close the client socket	
 	// Eventually, if it is an intermediate node
 	if (argc > 1){ // Establish client connection with next node
@@ -634,7 +634,7 @@ int QTLAN::StopICPconnections(int argc){
 }
 
 int QTLAN::ICPConnectionsCheckNewMessages(int SockListenTimeusec){ 
-int socket_fd_conn=0;
+	int socket_fd_conn=0;
 
 if (string(this->SCmode[this->socketReadIter])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){// Client sends on the file descriptor (applies also to UDP)
 	socket_fd_conn=this->socket_fdArray[this->socketReadIter];
@@ -655,7 +655,7 @@ int QTLAN::ICPdiscoverSend(char* ParamsCharArray){
      strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
     //cout << "SendBuffer: " << this->SendBuffer << endl;	
     // Parse the message information
-    char IPaddressesSocketsAux[IPcharArrayLengthMAX];
+     char IPaddressesSocketsAux[IPcharArrayLengthMAX];
     strcpy(IPaddressesSocketsAux,strtok(ParamsCharArray,","));//Null indicates we are using the same pointer as the last strtok
     //cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
     // Understand which socket descriptor has to be used
@@ -671,41 +671,41 @@ int QTLAN::ICPdiscoverSend(char* ParamsCharArray){
     		//cout << "socket_fd_conn" << socket_fd_conn << endl;
     		socket_fd_conn=this->new_socketArray[i];
     	}
-    	}
-    }  
-    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);  
+    }
+  }  
+  this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);  
 return 0; // All Ok
 }
 ///////////////////////////////////////////////////////////////////////
 int QTLAN::SendMessageAgent(char* ParamsDescendingCharArray){// Probably not use for this class
-    memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
-    this->ICPdiscoverSend(ParamsDescendingCharArray);   
+	memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
+	this->ICPdiscoverSend(ParamsDescendingCharArray);   
 
     return 0; //All OK
-}
+  }
 
-int QTLAN::UpdateSocketsInformation(){
+  int QTLAN::UpdateSocketsInformation(){
 	// First resolve the IPs the sockets are pointing to:
-	for (int i=0;i<NumSocketsMax;++i){
-	    struct sockaddr_in Address;
-	    socklen_t len = sizeof (Address);
-	    memset(&Address, 42, len);
-	    if (getsockname(this->socket_fdArray[i], (struct sockaddr*)&Address, &len) == -1) {
+  	for (int i=0;i<NumSocketsMax;++i){
+  		struct sockaddr_in Address;
+  		socklen_t len = sizeof (Address);
+  		memset(&Address, 42, len);
+  		if (getsockname(this->socket_fdArray[i], (struct sockaddr*)&Address, &len) == -1) {
 	      //cout << "Failed to get socket name" << endl;
 	      //return -1;
-	    }
-	    strcpy(IPSocketsList[i],inet_ntoa(Address.sin_addr));
-	    cout << "inet_ntoa(Address.sin_addr): "<< inet_ntoa(Address.sin_addr) << endl;
-	    cout << "IPSocketsList: "<< this->IPSocketsList[i] << endl;
-	 }
+  		}
+  		strcpy(IPSocketsList[i],inet_ntoa(Address.sin_addr));
+  		cout << "inet_ntoa(Address.sin_addr): "<< inet_ntoa(Address.sin_addr) << endl;
+  		cout << "IPSocketsList: "<< this->IPSocketsList[i] << endl;
+  	}
 	 return 0; // All ok
-}
+	}
 
-int QTLAN::ProcessNewMessage(){
+	int QTLAN::ProcessNewMessage(){
 //cout << "Node ReadBuffer: " << this->ReadBuffer << endl;
 
 // Parse the message information
-char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
+		char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
 strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 
 int NumQintupleComas=this->countQintupleComas(ReadBufferAuxOriginal);
@@ -747,22 +747,22 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			if (string(Payload)==string("SimulateNumStoredQubitsNode")){
 			  //cout << "IPorg: " << IPorg << endl;
 			  //cout << "IPdest: " << IPdest << endl;
-			  strcpy(this->IPorgAux,IPorg);
-			  strcpy(this->IPdestAux,IPdest);
-			  std::thread threadGetSimulateNumStoredQubitsNodeRefAux=std::thread(&QTLAN::GetSimulateNumStoredQubitsNode,this);
-			  threadGetSimulateNumStoredQubitsNodeRefAux.detach();
+				strcpy(this->IPorgAux,IPorg);
+				strcpy(this->IPdestAux,IPdest);
+				std::thread threadGetSimulateNumStoredQubitsNodeRefAux=std::thread(&QTLAN::GetSimulateNumStoredQubitsNode,this);
+				threadGetSimulateNumStoredQubitsNodeRefAux.detach();
 			}
 			else if (string(Payload)==string("SimulateRetrieveSynchParamsNode")){
 			  //cout << "IPorg: " << IPorg << endl;
 			  //cout << "IPdest: " << IPdest << endl;
-			  strcpy(this->IPorgAux,IPorg);
-			  strcpy(this->IPdestAux,IPdest);
-			  std::thread threadGetSimulateSynchParamsNodeRefAux=std::thread(&QTLAN::GetSimulateSynchParamsNode,this);
-			  threadGetSimulateSynchParamsNodeRefAux.detach();
+				strcpy(this->IPorgAux,IPorg);
+				strcpy(this->IPdestAux,IPdest);
+				std::thread threadGetSimulateSynchParamsNodeRefAux=std::thread(&QTLAN::GetSimulateSynchParamsNode,this);
+				threadGetSimulateSynchParamsNodeRefAux.detach();
 			}
 			else{
 			//discard
-			cout << "Node does not have this information: "<< Payload << endl;
+				cout << "Node does not have this information: "<< Payload << endl;
 			}
 		}		
 		else if (string(Command)==string("InfoProcess")){// Params messages
@@ -814,7 +814,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAQuadEmitDetecSelec=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			//cout << "this->QLLAFineSynchAdjVal[1]: " << this->QLLAFineSynchAdjVal[1] << endl;
-						
+			
 			std::thread threadSimulateEmitQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitQuBit,this,HistPeriodicityAuxAux);
 			threadSimulateEmitQuBitRefAux.detach();
 		}
@@ -869,7 +869,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAQuadEmitDetecSelec=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
-						
+			
 			std::thread threadSimulateReceiveSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveSynchQuBit,this,HistPeriodicityAuxAux,iCenterMass,iNumRunsPerCenterMass);
 			threadSimulateReceiveSynchQuBitRefAux.detach();
 		}
@@ -895,7 +895,7 @@ return 0; // All OK
 }
 
 int QTLAN::QPLASimulateEmitQuBit(double HistPeriodicityAuxAux) {
-this->acquire();	  
+	this->acquire();	  
 if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateEmitQuBitFlag=true; 
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,this->QLLAQuadEmitDetecSelec);
@@ -906,7 +906,7 @@ return 0;
 }
 
 int QTLAN::QPLASimulateEmitSynchQuBit(double HistPeriodicityAuxAux,int iCenterMass,int iNumRunsPerCenterMass) {
-this->acquire();
+	this->acquire();
 if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateEmitQuBitFlag=true; 
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitSynchQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass,this->QLLAQuadEmitDetecSelec);
@@ -919,7 +919,7 @@ return 0;
 }
 
 int QTLAN::QPLASimulateReceiveQuBit(double HistPeriodicityAuxAux) {
-this->acquire();	  
+	this->acquire();	  
 if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateReceiveQuBitFlag=true; 
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,this->QLLAQuadEmitDetecSelec);
@@ -930,7 +930,7 @@ return 0;
 }
 
 int QTLAN::QPLASimulateReceiveSynchQuBit(double HistPeriodicityAuxAux,int iCenterMass,int iNumRunsPerCenterMass) {
-this->acquire();
+	this->acquire();
 if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateReceiveQuBitFlag=true; 
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass,this->QLLAQuadEmitDetecSelec);
@@ -943,10 +943,10 @@ return 0;
 
 int QTLAN::GetSimulateNumStoredQubitsNode() {
 //cout<< "Node before acquire" << endl;
-this->acquire();	  
+	this->acquire();	  
 //cout<< "Node before this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
 while (this->GetSimulateNumStoredQubitsNodeFlag==true or this->QPLASimulateReceiveQuBitFlag==true){// Wait here// No other thread checking this info
-this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();
+	this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();
 }
 
 //cout<< "Node after this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
@@ -1032,10 +1032,10 @@ return 0;
 
 int QTLAN::GetSimulateSynchParamsNode() {
 //cout<< "Node before GetSimulateSynchParamsNode" << endl;
-this->acquire();	  
+	this->acquire();	  
 //cout<< "Node before this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
 while (this->GetSimulateNumStoredQubitsNodeFlag==true or this->QPLASimulateReceiveQuBitFlag==true){// Wait here// No other thread checking this info
-this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();
+	this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();
 }
 
 //cout<< "Node after this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
@@ -1098,17 +1098,17 @@ return 0;
 }
 
 int QTLAN::SendKeepAliveHeartBeatsSockets(){
-for (int i=0;i<NumSocketsMax;i++){
-	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-	strcpy(ParamsCharArray,this->IPSocketsList[i]);
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,this->IPaddressesSockets[1]);
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"KeepAlive");
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"HeartBeat");
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"none");
+	for (int i=0;i<NumSocketsMax;i++){
+		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+		strcpy(ParamsCharArray,this->IPSocketsList[i]);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,this->IPaddressesSockets[1]);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"KeepAlive");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"HeartBeat");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"none");
 	strcat(ParamsCharArray,",");// Very important to end the message
 	//cout << "SimulateRetrieveNumStoredQubitsNode ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
@@ -1118,16 +1118,16 @@ return 0; // all ok
 }
 
 int QTLAN::RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep){
-struct timespec ts;
-ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
-ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
+	struct timespec ts;
+	ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
+	ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
 clock_nanosleep(CLOCK_TAI, 0, &ts, NULL); //
 
 return 0; // All ok
 }
 
 int QTLAN::RegularCheckToPerform(){
-if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
+	if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 	if (GPIOnodeHardwareSynched==false){// Only until node is hardware synched
 		GPIOnodeHardwareSynched=this->QNLAagent.QLLAagent.QPLAagent.GetGPIOHardwareSynchedNode();// Since only transportN agent can send messages to host, then it is ersponsibility of transportN to also check for this and then send message to host
 		/* Host will ask
@@ -1163,34 +1163,34 @@ QTLAN::~QTLAN() {
 }
 
 void QTLAN::AgentProcessRequestsPetitions(){// Check next thing to do
- bool isValidWhileLoop = true;
- while(isValidWhileLoop){
- try{
-   try {
+	bool isValidWhileLoop = true;
+	while(isValidWhileLoop){
+		try{
+			try {
    	this->acquire();// Wait semaphore until it can proceed
-    	
+   	
         this->release(); // Release the semaphore 
         this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
-    }
-    catch (const std::exception& e) {
+      }
+      catch (const std::exception& e) {
 	// Handle the exception
-    	cout << "Exception: " << e.what() << endl;
-    }
+      	cout << "Exception: " << e.what() << endl;
+      }
     } // upper try
   catch (...) { // Catches any exception
-  cout << "Exception caught" << endl;
-    }
+  	cout << "Exception caught" << endl;
+  }
     } // while
-}
+  }
 
 } /* namespace nsQnetworkLayerAgentN */
 
 
 // For running in the quantum node
 
-using namespace nsQtransportLayerAgentN;
+  using namespace nsQtransportLayerAgentN;
 
-int main(int argc, char const * argv[]){
+  int main(int argc, char const * argv[]){
  // Basically used for testing, since the declarations of the other functions will be used by other Agents as primitives 
  // argv and argc are how command line arguments are passed to main() in C and C++.
 
@@ -1199,10 +1199,10 @@ int main(int argc, char const * argv[]){
  // The variables are named argc (argument count) and argv (argument vector) by convention, but they can be given any valid identifier: int main(int num_args, char** arg_strings) is equally valid.
 
  // They can also be omitted entirely, yielding int main(), if you do not intend to process command line arguments.
- 
+  	
  //printf( "argc:     %d\n", argc );
  //printf( "argv[0]:  %s\n", argv[0] );
- 
+  	
  //if ( argc == 1 ) {
  // printf( "No arguments were passed.\n" );
  //}
@@ -1235,7 +1235,7 @@ int main(int argc, char const * argv[]){
  
  // One of the firsts things to do for a node is to initialize listening ICP socket connection with its host
  QTLANagent.InitiateICPconnections(QTLANagent.ParamArgc);
-  
+ 
  // Then await for next actions
  int sockKeepAlivecounter=0;// To send periodic heart beats through sockets to keep them alive
  bool isValidWhileLoop;
@@ -1243,29 +1243,29 @@ int main(int argc, char const * argv[]){
  else{isValidWhileLoop = true;}
  
  while(isValidWhileLoop){ 
-   try{
- 	try {
+ 	try{
+ 		try {
     	// Code that might throw an exception 
  	// Check if there are need messages or actions to be done by the node
- 	QTLANagent.acquire();
+ 			QTLANagent.acquire();
  	QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
  	QTLANagent.SendParametersAgent(); // Send Parameters information stored
  	QTLANagent.RegularCheckToPerform();// Every now and then some checks have to happen  
-       switch(QTLANagent.getState()) {
-           case QTLAN::APPLICATION_RUNNING: {               
+ 	switch(QTLANagent.getState()) {
+ 	case QTLAN::APPLICATION_RUNNING: {               
                // Do Some Work
-               QTLANagent.ProcessNewMessage();
+ 		QTLANagent.ProcessNewMessage();
                //while(QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard)>0);// Make sure to remove all pending mesages in the socket
                QTLANagent.m_pause(); // After procesing the request, pass to paused state. It is when receiving new messages that it turn into start (running again)
                break;
-           }
+             }
            case QTLAN::APPLICATION_PAUSED: {
                // Maybe do some checks if necessary 
-               break;
+           	break;
            }
-           case QTLAN::APPLICATION_EXIT: {                  
+         case QTLAN::APPLICATION_EXIT: {                  
                isValidWhileLoop=false;//break;
-           }
+             }
            default: {
                // ErrorHandling Throw An Exception Etc.
            }
@@ -1276,19 +1276,19 @@ int main(int argc, char const * argv[]){
         QTLANagent.release();
 	if (signalReceivedFlag.load()){QTLANagent.~QTLAN();}// Destroy the instance
         QTLANagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
-    }
-    catch (const std::exception& e) {
+      }
+      catch (const std::exception& e) {
 	// Handle the exception
-    	cout << "Exception: " << e.what() << endl;
-  	}
+      	cout << "Exception: " << e.what() << endl;
+      }
   } // upper try
   catch (...) { // Catches any exception
-  cout << "Exception caught" << endl;
-    }
+  	cout << "Exception caught" << endl;
+  }
     } // while
-  cout << "Exiting the QtransportLayerAgentN" << endl;
-  QTLANagent.StopICPconnections(QTLANagent.ParamArgc);
-  
+    cout << "Exiting the QtransportLayerAgentN" << endl;
+    QTLANagent.StopICPconnections(QTLANagent.ParamArgc);
+    
  return 0; // Everything Ok
 }
 

@@ -35,13 +35,13 @@ namespace nsQtransportLayerAgentH {
 // typedef int (*CallbackType)(int);
 // enum GPIO_DIRECTION{ INPUT, OUTPUT };
 
-class QTLAH {
+	class QTLAH {
 public: // Variables/Objects
 	enum ApplicationState { // State of the agent sequences
 		APPLICATION_RUNNING = 0,
 		APPLICATION_PAUSED = 1,  // Out of Focus or Paused If In A Timed Situation
 		APPLICATION_EXIT = -1,
-	    };	    
+	};	    
 	int numberSessions=0;
 private: // Variables/Objects	
 	ApplicationState m_state;
@@ -77,21 +77,21 @@ private: // Variables/Objects
 	// Time synchronization
 	struct my_clock
 	{
-	    using duration   = std::chrono::nanoseconds;
-	    using rep        = duration::rep;
-	    using period     = duration::period;
-	    using time_point = std::chrono::time_point<my_clock>;
+		using duration   = std::chrono::nanoseconds;
+		using rep        = duration::rep;
+		using period     = duration::period;
+		using time_point = std::chrono::time_point<my_clock>;
 	    static constexpr bool is_steady = false;// true, false
 
 	    static time_point now()
 	    {
-		timespec ts;
+	    	timespec ts;
 		if (clock_gettime(CLOCK_TAI, &ts))// CLOCK_REALTIME//CLOCK_TAI
-		    throw 1;
+			throw 1;
 		using sec = std::chrono::seconds;
 		return time_point{sec{ts.tv_sec}+duration{ts.tv_nsec}};
-	    }
-	};
+	}
+};
 	using Clock = my_clock;//
 	// Synchronization network parameters
 	double TestPeriodFactorAux=0.25; // Scales the HistPeriodicity and Number of RepetitionSignal. The larger the period, the more probable that the relative frequency difference will be well measured/Captured. The larger the resulting HistPeriodicityAuxAux the larger range of initial relative frequency difference it can be handled
@@ -127,15 +127,15 @@ public: // Functions
 	QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAscendingCharArray); //constructor
 	int SendKeepAliveHeartBeatsSockets();
 	ApplicationState getState() const { return m_state; }	
-        bool m_start() { m_state = APPLICATION_RUNNING; return true; }
-        bool m_pause() { m_state = APPLICATION_PAUSED; return true; } 
+	bool m_start() { m_state = APPLICATION_RUNNING; return true; }
+	bool m_pause() { m_state = APPLICATION_PAUSED; return true; } 
         // resume may keep track of time if the application uses a timer.
         // This is what makes it different than start() where the timer
         // in start() would be initialized to 0. And the last time before
         // paused was trigger would be saved, and then reset as new starting
         // time for your timer or counter. 
-        bool m_resume() { m_state = APPLICATION_RUNNING; return true; }      
-        bool m_exit() { m_state = APPLICATION_EXIT;  return false; }
+	bool m_resume() { m_state = APPLICATION_RUNNING; return true; }      
+	bool m_exit() { m_state = APPLICATION_EXIT;  return false; }
 	// Process Requests and Petitions
 	int InitAgentProcess(); // Initializer of the thread
 	// Requests. They have to be in semaphore structure to avoid collisions between main and thread

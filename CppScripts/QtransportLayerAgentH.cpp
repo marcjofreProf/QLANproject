@@ -49,7 +49,7 @@ QTLAH::QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAsce
 // signal(SIGINT, SignalINTHandler);// Interruption signal
 // signal(SIGPIPE, SignalPIPEHandler);// Error trying to write/read to a socket
 // signal(SIGSEGV, SignalSegmentationFaultHandler);// Segmentation fault
- 
+	
  this->numberSessions = numberSessions; // Number of sessions of different services
  
  //cout << "The value of the input is: "<< ParamsDescendingCharArray << endl;
@@ -106,16 +106,16 @@ this->valueSemaphore=0; // Make sure it stays at 0
 // https://stackoverflow.com/questions/61493121/when-can-memory-order-acquire-or-memory-order-release-be-safely-removed-from-com
 // https://medium.com/@pauljlucas/advanced-thread-safety-in-c-4cbab821356e
 //int oldCount;
-bool valueSemaphoreExpected=true;
-while(true){
+	bool valueSemaphoreExpected=true;
+	while(true){
 	//oldCount = this->valueSemaphore.load(std::memory_order_acquire);
 	//if (oldCount > 0 && this->valueSemaphore.compare_exchange_strong(oldCount,oldCount-1,std::memory_order_acquire)){
-	if (this->valueSemaphore.compare_exchange_strong(valueSemaphoreExpected,false,std::memory_order_acquire)){	
-	break;
+		if (this->valueSemaphore.compare_exchange_strong(valueSemaphoreExpected,false,std::memory_order_acquire)){	
+			break;
+		}
 	}
 }
-}
- 
+
 void QTLAH::release() {
 /*
 bool CheckRelease = valueSemaphore.fetch_add(1, std::memory_order_acquire);
@@ -149,59 +149,59 @@ cout << "Caught SIGSEGV" << endl;
 */
 /////////////////////////////////////////////////////////
 int QTLAH::countQintupleComas(char* ParamsCharArray) {
-  int comasCount = 0;
+	int comasCount = 0;
 
-  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
-    if (ParamsCharArray[i] == ',') {
-      comasCount++;
-    }
-  }
+	for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+		if (ParamsCharArray[i] == ',') {
+			comasCount++;
+		}
+	}
  //cout << "comasCount: " << comasCount << endl;
-  return comasCount/5;
+	return comasCount/5;
 }
 
 int QTLAH::countColons(char* ParamsCharArray) {
-  int colonCount = 0;
+	int colonCount = 0;
 
-  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
-    if (ParamsCharArray[i] == ':') {
-      colonCount++;
-    }
-  }
+	for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+		if (ParamsCharArray[i] == ':') {
+			colonCount++;
+		}
+	}
 
-  return colonCount;
+	return colonCount;
 }
 
 int QTLAH::countDoubleColons(char* ParamsCharArray) {
-  int colonCount = 0;
+	int colonCount = 0;
 
-  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
-    if (ParamsCharArray[i] == ':') {
-      colonCount++;
-    }
-  }
+	for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+		if (ParamsCharArray[i] == ':') {
+			colonCount++;
+		}
+	}
 
-  return colonCount/2;
+	return colonCount/2;
 }
 
 int QTLAH::countDoubleUnderscores(char* ParamsCharArray) {
-  int underscoreCount = 0;
-  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
-    if (ParamsCharArray[i] == '_') {
-      underscoreCount++;
-    }
-  }
-  return underscoreCount/2;
+	int underscoreCount = 0;
+	for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+		if (ParamsCharArray[i] == '_') {
+			underscoreCount++;
+		}
+	}
+	return underscoreCount/2;
 }
 
 int QTLAH::countQuadrupleUnderscores(char* ParamsCharArray) {
-  int underscoreCount = 0;
-  for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
-    if (ParamsCharArray[i] == '_') {
-      underscoreCount++;
-    }
-  }
-  return underscoreCount/4;
+	int underscoreCount = 0;
+	for (int i = 0; ParamsCharArray[i] != '\0'; i++) {
+		if (ParamsCharArray[i] == '_') {
+			underscoreCount++;
+		}
+	}
+	return underscoreCount/4;
 }
 ////////////////////////////////////////////////////////
 int QTLAH::InitAgentProcess(){
@@ -216,8 +216,8 @@ int QTLAH::InitAgentProcess(){
 }
 
 int QTLAH::InitiateICPconnections() {
-int RetValue=0;
-if (string(SOCKtype)=="SOCK_DGRAM"){
+	int RetValue=0;
+	if (string(SOCKtype)=="SOCK_DGRAM"){
 	// UDP philosophy is different since it is not connection oriented. Actually, we are telling to listen to a port, and if we want also specifically to an IP (which we might want to do to keep better track of things)
 	// The sockets for receiving
 	RetValue=this->ICPmanagementOpenServer(this->socket_fdArray[0],this->new_socketArray[0],this->IPaddressesSockets[0],this->IPaddressesSockets[1],this->IPSocketsList[0]); // Listen to the port
@@ -271,7 +271,7 @@ else{// TCP
 	if (RetValue==-1){this->m_exit();} // Exit application
 	this->numberSessions=1;
 	this->NumSockets=3;
-		
+	
 	return 0; // All OK
 }
 
@@ -323,57 +323,57 @@ return 0; // All Ok
 }
 
 int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPaddressesSocketsLocal,char* IPSocketsList) {    
-    struct sockaddr_in address;
-    int opt = 1;
+	struct sockaddr_in address;
+	int opt = 1;
     // Creating socket file descriptor
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
     // type: SOCK_STREAM: TCP(reliable, connection oriented) // ( SOCK_STREAM for TCP / SOCK_DGRAM for UDP ) 
     // Protocol value for Internet Protocol(IP), which is 0 
-    if (string(SOCKtype)=="SOCK_DGRAM"){socket_fd = socket(AF_INET, SOCK_DGRAM, 0);}
-    else {socket_fd = socket(AF_INET, SOCK_STREAM, 0);}
-    if (socket_fd < 0) {
-        cout << "Client Socket creation error" << endl;
-        return -1;
-    }
-    
+	if (string(SOCKtype)=="SOCK_DGRAM"){socket_fd = socket(AF_INET, SOCK_DGRAM, 0);}
+	else {socket_fd = socket(AF_INET, SOCK_STREAM, 0);}
+	if (socket_fd < 0) {
+		cout << "Client Socket creation error" << endl;
+		return -1;
+	}
+	
     //cout << "Client Socket file descriptor: " << socket_fd << endl;
-    
+	
     // Check status of a previously initiated socket to reduce misconnections
     //this->SocketCheckForceShutDown(socket_fd); Not used
-    
+	
     // Specifying some options to the port
-    if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
-	cout << "Server attaching socket options failed" << endl;
-	return -1;
-    }
-    
-    address.sin_family = AF_INET;
-    if (string(SOCKtype)=="SOCK_DGRAM"){
+	if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
+		cout << "Server attaching socket options failed" << endl;
+		return -1;
+	}
+	
+	address.sin_family = AF_INET;
+	if (string(SOCKtype)=="SOCK_DGRAM"){
     	address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);// Since we have the info, it is better to specify, instead of INADDR_ANY;
     	address.sin_port = htons(0);// 0 any avaliable
     }
     else{address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);address.sin_port = htons(PORT);}// Since we have the info, it is better to specify, instead of INADDR_ANY;
-        
+    
     // Forcefully attaching socket to the port
     if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
-	cout << "Client socket bind failed" << endl;
-	return -1;
+    	cout << "Client socket bind failed" << endl;
+    	return -1;
     }
     
     // Connect is for TCP
     if (string(SOCKtype)=="SOCK_STREAM"){	 
 	    // Convert IPv4 and IPv6 addresses from text to binary form
-	    if (inet_pton(AF_INET, IPaddressesSockets, &address.sin_addr)<= 0) {
-		cout << "Invalid address / Address not supported" << endl;
-		return -1;
-	    }
-	    
-    
-	    int status= connect(socket_fd, (struct sockaddr*)&address,sizeof(address));
-	    if (status< 0) {
-		cout << "Client Connection Failed" << endl;
-		return -1;
-	    }
+    	if (inet_pton(AF_INET, IPaddressesSockets, &address.sin_addr)<= 0) {
+    		cout << "Invalid address / Address not supported" << endl;
+    		return -1;
+    	}
+    	
+    	
+    	int status= connect(socket_fd, (struct sockaddr*)&address,sizeof(address));
+    	if (status< 0) {
+    		cout << "Client Connection Failed" << endl;
+    		return -1;
+    	}
     }
     
     strcpy(IPSocketsList,IPaddressesSockets);
@@ -381,35 +381,35 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     
     cout << "Host client connected to server: "<< IPaddressesSockets << endl;
     return 0; // All Ok
-}
+  }
 
 int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddressesSockets,char* IPaddressesSocketsLocal,char* IPSocketsList) {// Node listening for connection from attached host
-    struct sockaddr_in address;
-    int opt = 1;
-    socklen_t addrlen = sizeof(address);       
- 
+	struct sockaddr_in address;
+	int opt = 1;
+	socklen_t addrlen = sizeof(address);       
+	
     // Creating socket file descriptor
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
     // type: SOCK_STREAM: TCP(reliable, connection oriented) // ( SOCK_STREAM for TCP / SOCK_DGRAM for UDP ) 
     // Protocol value for Internet Protocol(IP), which is 0 
-    if (string(SOCKtype)=="SOCK_DGRAM"){socket_fd = socket(AF_INET, SOCK_DGRAM, 0);}
-    else {socket_fd = socket(AF_INET, SOCK_STREAM, 0);}
-    if (socket_fd < 0) {
-        cout << "Server socket failed" << endl;
-        return -1;
-    }
-    
+	if (string(SOCKtype)=="SOCK_DGRAM"){socket_fd = socket(AF_INET, SOCK_DGRAM, 0);}
+	else {socket_fd = socket(AF_INET, SOCK_STREAM, 0);}
+	if (socket_fd < 0) {
+		cout << "Server socket failed" << endl;
+		return -1;
+	}
+	
     // Check status of a previously initiated socket to reduce misconnections
     //this->SocketCheckForceShutDown(socket_fd); Not used
-    
+	
     // Specifying some options to the port
-    if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
-	cout << "Server attaching socket options failed" << endl;
-	return -1;
-    }
-    
-    address.sin_family = AF_INET;
-    if (string(SOCKtype)=="SOCK_DGRAM"){
+	if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
+		cout << "Server attaching socket options failed" << endl;
+		return -1;
+	}
+	
+	address.sin_family = AF_INET;
+	if (string(SOCKtype)=="SOCK_DGRAM"){
     	address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);// Since we have the info, it is better to specify, instead of INADDR_ANY;
     }
     else{address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);}// Since we have the info, it is better to specify, instead of INADDR_ANY;
@@ -419,28 +419,28 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddres
     if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
     	//cout << "Server bind IPaddressesSocketsLocal: " << IPaddressesSocketsLocal << endl;
     	cout << strerror(errno) << endl;
-        cout << "Server socket bind failed" << endl;
-        return -1;
+    	cout << "Server socket bind failed" << endl;
+    	return -1;
     }
     
     // listen and accept are particular of TCP
     if (string(SOCKtype)=="SOCK_STREAM"){
-	    if (listen(socket_fd, 3) < 0) {
-		cout << "Server socket listen failed" << endl;
-		return -1;
-	    }
-	    
-	    new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen);
-	    if (new_socket< 0) {
-		cout << "Server socket accept failed" << endl;
-		return -1;
-	    }
+    	if (listen(socket_fd, 3) < 0) {
+    		cout << "Server socket listen failed" << endl;
+    		return -1;
+    	}
+    	
+    	new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen);
+    	if (new_socket< 0) {
+    		cout << "Server socket accept failed" << endl;
+    		return -1;
+    	}
 	// Retrive IP address client
-    strcpy(IPSocketsList,inet_ntoa(address.sin_addr));
+    	strcpy(IPSocketsList,inet_ntoa(address.sin_addr));
     }
     else{
     // Retrive IP address client
-    strcpy(IPSocketsList,IPaddressesSockets);
+    	strcpy(IPSocketsList,IPaddressesSockets);
     }
     
     //cout << " Server socket_fd: " << socket_fd << endl;
@@ -451,30 +451,30 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddres
     
     cout << "Host starting socket server to host/node: " << IPSocketsList << endl;
     return 0; // All Ok
-}
+  }
 
-int QTLAH::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
+  int QTLAH::ICPmanagementRead(int socket_fd_conn,int SockListenTimeusec) {
     // Check for new messages
-  fd_set fds;
-  FD_ZERO(&fds);
-  FD_SET(socket_fd_conn, &fds);
+  	fd_set fds;
+  	FD_ZERO(&fds);
+  	FD_SET(socket_fd_conn, &fds);
 
   // Set the timeout
-  struct timeval timeout;
+  	struct timeval timeout;
   // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
-  timeout.tv_sec = 0;
-  timeout.tv_usec = SockListenTimeusec;
-  
+  	timeout.tv_sec = 0;
+  	timeout.tv_usec = SockListenTimeusec;
+  	
   int nfds = socket_fd_conn + 1; //The nfds argument specifies the range of file descriptors to be tested. The select() function tests file descriptors in the range of 0 to nfds-1.
   int ret = 0;
   if (string(SOCKtype)=="SOCK_DGRAM"){ret = select(nfds, &fds, NULL, NULL, &timeout);}
   else{ret = select(nfds, &fds, NULL, NULL, &timeout);}
 
-if (ret < 0){
+  if (ret < 0){
 //cout << "Host select no new messages" << endl;this->m_exit();
-return -1;}
+  	return -1;}
 else if (ret==0){//cout << "No new messages" << endl;
-return -1;
+	return -1;
 }
 else {// There might be at least one new message
 	if (FD_ISSET(socket_fd_conn, &fds)){// is a macro that checks whether a specified file descriptor is set in a specified file descriptor set.
@@ -483,7 +483,7 @@ else {// There might be at least one new message
 		if (this->ReadFlagWait){			
 			if (string(SOCKtype)=="SOCK_DGRAM"){
 				struct sockaddr_in orgaddr; 
-			    memset(&orgaddr, 0, sizeof(orgaddr));		       
+				memset(&orgaddr, 0, sizeof(orgaddr));		       
 			    // Filling information 
 			    orgaddr.sin_family    = AF_INET; // IPv4 
 			    
@@ -494,9 +494,9 @@ else {// There might be at least one new message
 			    		//cout << "this->IPaddressesSockets[i]: " << this->IPaddressesSockets[i] << endl;
 			    		orgaddr.sin_addr.s_addr = inet_addr(this->IPaddressesSockets[i]);//INADDR_ANY;
 			    		orgaddr.sin_port = htons(PORT);
-					    unsigned int addrLen;
-						addrLen = sizeof(orgaddr);
-					valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
+			    		unsigned int addrLen;
+			    		addrLen = sizeof(orgaddr);
+			    		valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);
 			    	}
 			    }
 			    
@@ -508,13 +508,13 @@ else {// There might be at least one new message
 			//cout << "Host " << string(this->SCmode[i]) << " this->ReadBuffer: " << this->ReadBuffer << endl;
 			//}
 			//}
+			  }
+			  else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
 			}
-    			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,0);}
-			}
-		else{			
-			if (string(SOCKtype)=="SOCK_DGRAM"){
-				struct sockaddr_in orgaddr; 
-			    memset(&orgaddr, 0, sizeof(orgaddr));		       
+			else{			
+				if (string(SOCKtype)=="SOCK_DGRAM"){
+					struct sockaddr_in orgaddr; 
+					memset(&orgaddr, 0, sizeof(orgaddr));		       
 			    // Filling information 
 			    orgaddr.sin_family    = AF_INET; // IPv4
 			    for (int i=0; i<(NumSockets); i++){
@@ -524,12 +524,12 @@ else {// There might be at least one new message
 			    		//cout << "this->IPaddressesSockets[i]: " << this->IPaddressesSockets[i] << endl;
 			    		orgaddr.sin_addr.s_addr = inet_addr(this->IPaddressesSockets[i]);//INADDR_ANY; 
 			    		orgaddr.sin_port = htons(PORT);
-			    unsigned int addrLen;
-				addrLen = sizeof(orgaddr);
+			    		unsigned int addrLen;
+			    		addrLen = sizeof(orgaddr);
 			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);//MSG_WAITALL
-			    	}
-			    }
-			    
+		}
+	}
+	
 			//cout << "valread: " << valread << endl;
 			//for (int i=0; i<(NumSockets); i++){
 			//	cout << "socket_fd_conn: " << socket_fd_conn << endl;
@@ -538,27 +538,27 @@ else {// There might be at least one new message
 			//cout << "Host " << string(this->SCmode[i]) << " this->ReadBuffer: " << this->ReadBuffer << endl;
 			//}
 			//}
-			}
-    			else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
-			}
+}
+else{valread = recv(socket_fd_conn, this->ReadBuffer,NumBytesBufferICPMAX,MSG_DONTWAIT);}
+}
 		//cout << "valread: " << valread << endl;
 		//cout << "Host message received: " << this->ReadBuffer << endl;
-		if (valread <= 0){
-			if (valread<0){
-				cout << strerror(errno) << endl;
-				for (int i=0; i<(NumSockets); i++){
+if (valread <= 0){
+	if (valread<0){
+		cout << strerror(errno) << endl;
+		for (int i=0; i<(NumSockets); i++){
 				//cout << "socket_fd_conn: " << socket_fd_conn << endl;
 			    	//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
-			    	if (socket_fd_conn==socket_fdArray[i]){
+			if (socket_fd_conn==socket_fdArray[i]){
 				cout << "Host " << string(this->SCmode[i]) << " error reading new messages" << endl;
-				}
-				}
-				
 			}
-			else{
-				cout << strerror(errno) << endl;
-				cout << "Host agent message of 0 Bytes" << endl;				
-			}
+		}
+		
+	}
+	else{
+		cout << strerror(errno) << endl;
+		cout << "Host agent message of 0 Bytes" << endl;				
+	}
 			// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
 			memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 			this->m_exit();
@@ -572,37 +572,37 @@ else {// There might be at least one new message
 		}
 	}
 	else{cout << "Host FD_ISSET error new messages" << endl;this->m_exit();return -1;}
-   }
+}
 
 }
 
 bool QTLAH::isSocketWritable(int sock) {
-if (string(SOCKtype)=="SOCK_DGRAM"){ 
-for (int i=0; i<(NumSockets); i++){
+	if (string(SOCKtype)=="SOCK_DGRAM"){ 
+		for (int i=0; i<(NumSockets); i++){
     	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
-    	if (sock==socket_fdArray[i]){
+			if (sock==socket_fdArray[i]){
     		//cout << "socket_fd_conn: " << socket_fd_conn << endl;
     		//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
     		//cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
-    		sock=socket_SendUDPfdArray[i];
- 	}
- }
- }
-    
-    fd_set write_fds;
-    FD_ZERO(&write_fds);
-    FD_SET(sock, &write_fds);
+				sock=socket_SendUDPfdArray[i];
+			}
+		}
+	}
+	
+	fd_set write_fds;
+	FD_ZERO(&write_fds);
+	FD_SET(sock, &write_fds);
 
     // Set timeout to zero for non-blocking check
-    timeval timeout;
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 0;
+	timeval timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 0;
 
     // Check if the socket is writable
-    int select_res = select(sock + 1, nullptr, &write_fds, nullptr, &timeout);
+	int select_res = select(sock + 1, nullptr, &write_fds, nullptr, &timeout);
 
     // select_res > 0 means the socket is writable
-    return select_res > 0;
+	return select_res > 0;
 }
 
 int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
@@ -612,37 +612,37 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	//if (!this->isSocketWritable(socket_fd_conn)){//Reconnect socket
 	//	cout << "Host socket ICPmanagementSend not writable!" << endl;
 	//}
-    const char* SendBufferAux = this->SendBuffer;
+	const char* SendBufferAux = this->SendBuffer;
     //cout << "SendBufferAux: " << SendBufferAux << endl;
-    int BytesSent=0;
-    if (string(SOCKtype)=="SOCK_DGRAM"){
-	int socket_fd = 0;
-	    
-	    struct sockaddr_in destaddr;   
-	    memset(&destaddr, 0, sizeof(destaddr)); 
-	       
+	int BytesSent=0;
+	if (string(SOCKtype)=="SOCK_DGRAM"){
+		int socket_fd = 0;
+		
+		struct sockaddr_in destaddr;   
+		memset(&destaddr, 0, sizeof(destaddr)); 
+		
 	    // Filling server information 
-	    destaddr.sin_family = AF_INET; 
-	    destaddr.sin_port = htons(PORT); 
-	    destaddr.sin_addr.s_addr = inet_addr(IPaddressesSockets); 
-	    
-	    for (int i=0; i<(NumSockets); i++){
+		destaddr.sin_family = AF_INET; 
+		destaddr.sin_port = htons(PORT); 
+		destaddr.sin_addr.s_addr = inet_addr(IPaddressesSockets); 
+		
+		for (int i=0; i<(NumSockets); i++){
 	    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
-	    	if (socket_fd_conn==socket_fdArray[i]){
+			if (socket_fd_conn==socket_fdArray[i]){
 	    		//cout << "socket_fd_conn: " << socket_fd_conn << endl;
 	    		//cout << "socket_fdArray[i]: " << socket_fdArray[i] << endl;
 	    		//cout << "IPaddressesSockets: " << IPaddressesSockets << endl;
-	    		socket_fd=socket_SendUDPfdArray[i];
+				socket_fd=socket_SendUDPfdArray[i];
 	    		BytesSent=sendto(socket_fd,SendBufferAux,strlen(SendBufferAux),MSG_DONTWAIT,(const struct sockaddr *) &destaddr,sizeof(destaddr));//MSG_CONFIRM
 	    	}
 	    }	    
-    }
-    else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
-    
-    if (BytesSent<0){
-    	perror("send");
-    	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
-    }
+	  }
+	  else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
+	  
+	  if (BytesSent<0){
+	  	perror("send");
+	  	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
+	  }
     /*
     // Check if file descriptor is only readable
     	int flags = fcntl(socket_fd, F_GETFL);
@@ -655,37 +655,37 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	*/
 
     return 0; // All OK
-}
+  }
 
-int QTLAH::ICPmanagementCloseClient(int socket_fd) {
+  int QTLAH::ICPmanagementCloseClient(int socket_fd) {
     // closing the connected socket
-    close(socket_fd);
- 
+  	close(socket_fd);
+  	
     return 0; // All OK
-}
+  }
 
-int QTLAH::ICPmanagementCloseServer(int socket_fd,int new_socket) {
-if (string(SOCKtype)=="SOCK_STREAM"){
+  int QTLAH::ICPmanagementCloseServer(int socket_fd,int new_socket) {
+  	if (string(SOCKtype)=="SOCK_STREAM"){
     // closing the connected socket
-    close(new_socket);
-}
+  		close(new_socket);
+  	}
     // closing the listening socket
-    close(socket_fd);
-    
+  	close(socket_fd);
+  	
     return 0; // All OK
-}
+  }
 
-int QTLAH::RelativeNanoSleepWait(unsigned long long int TimeNanoSecondsSleep){
-struct timespec ts;
-ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
-ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
+  int QTLAH::RelativeNanoSleepWait(unsigned long long int TimeNanoSecondsSleep){
+  	struct timespec ts;
+  	ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
+  	ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
 clock_nanosleep(CLOCK_TAI, 0, &ts, NULL); //
 
 return 0; // All ok
 }
 
 int QTLAH::RegularCheckToPerform(){
-if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
+	if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 	// First thing to do is to know if the node below is PRU hardware synch
 	if (GPIOnodeHardwareSynched==false){// Ask the node
 		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
@@ -785,7 +785,7 @@ if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 int OtherHostsActiveActionsFreeAux=0;
 for (int i=0;i<NumConnectedHosts;i++){
 	if (HostsActiveActionsFree[1+i]==false){
-	OtherHostsActiveActionsFreeAux++;
+		OtherHostsActiveActionsFreeAux++;
 	}
 }
 if (HostsActiveActionsFree[0]==true and (string(InfoRemoteHostActiveActions[0])!=string("\0") or string(InfoRemoteHostActiveActions[1])!=string("\0") or AchievedAttentionParticularHosts==true or OtherHostsActiveActionsFreeAux>0)){
@@ -797,8 +797,8 @@ if (HostsActiveActionsFree[0]==true and (string(InfoRemoteHostActiveActions[0])!
 	cout << "Host " << this->IPaddressesSockets[2] << " AchievedAttentionParticularHosts: " << AchievedAttentionParticularHosts << endl;
 	AchievedAttentionParticularHosts=false;
 	for (int i=0;i<NumConnectedHosts;i++){
-	cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[1+i]: " << HostsActiveActionsFree[1+i] << endl;
-	HostsActiveActionsFree[1+i]=true;
+		cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[1+i]: " << HostsActiveActionsFree[1+i] << endl;
+		HostsActiveActionsFree[1+i]=true;
 	}
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -852,30 +852,30 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  while(isValidWhileLoop){
  //cout << "CheckCounter: " << CheckCounter << endl;
  //CheckCounter++;
- try{
-   try {
+ 	try{
+ 		try {
    	this->acquire();// Wait semaphore until it can proceed
     	// Code that might throw an exception
  	// Check if there are need messages or actions to be done by the node 	
  	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
  	this->RegularCheckToPerform();// Every now and then some checks have to happen
-       switch(this->getState()) {
-           case QTLAH::APPLICATION_RUNNING: {               
+ 	switch(this->getState()) {
+ 	case QTLAH::APPLICATION_RUNNING: {               
                // Do Some Work
-               this->ProcessNewMessage();
+ 		this->ProcessNewMessage();
                //while(this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard)>0);// Make sure to remove all pending mesages in the socket
                this->m_pause(); // After procesing the request, pass to paused state
                break;
-           }
+             }
            case QTLAH::APPLICATION_PAUSED: {
                // Wait Till You Have Focus Or Continues
                // Maybe do some checks if necessary   
-               break;
+           	break;
            }
-           case QTLAH::APPLICATION_EXIT: {    
-               cout << "Exiting the QtransportLayerAgentH" << endl;
+         case QTLAH::APPLICATION_EXIT: {    
+         	cout << "Exiting the QtransportLayerAgentH" << endl;
                isValidWhileLoop=false;//break;
-           }
+             }
            default: {
                // ErrorHandling Throw An Exception Etc.
            }
@@ -888,21 +888,21 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
         //cout << "(int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)): " << (int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)) << endl;
         //usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
         this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few nanoseconds for other processes to enter
-    }
-    catch (const std::exception& e) {
+      }
+      catch (const std::exception& e) {
 	// Handle the exception
-    	cout << "Exception: " << e.what() << endl;
-    }
+      	cout << "Exception: " << e.what() << endl;
+      }
     } // upper try
   catch (...) { // Catches any exception
-  cout << "Exception caught" << endl;
-    }
+  	cout << "Exception caught" << endl;
+  }
     } // while
-   
-}
+    
+  }
 
 int QTLAH::ICPConnectionsCheckNewMessages(int SockListenTimeusec){// Read one message at a time and from the different sockets
-int socket_fd_conn=0;
+	int socket_fd_conn=0;
 if (string(this->SCmode[this->socketReadIter])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){// Client sends on the file descriptor (applies also to UDP)
 	socket_fd_conn=this->socket_fdArray[this->socketReadIter];
 }
@@ -922,7 +922,7 @@ return 0; // All OK
 int QTLAH::ProcessNewMessage(){
 //cout << "Host ReadBuffer: " << this->ReadBuffer << endl;
 // Parse the message information
-char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
+	char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
 strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 
 int NumQintupleComas=this->countQintupleComas(ReadBufferAuxOriginal);
@@ -978,7 +978,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 						//cout << "stof(SubPayload): " << stod(SubPayload) << endl;
 					}
 				}
-								
+				
 				this->InfoSimulateNumStoredQubitsNodeFlag=true;
 				//cout << "SimulateNumStoredQubitsNode finished parsing values" << endl;		
 			}
@@ -998,7 +998,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 					this->TimeTaggsDetSynchParams[i]=stod(SubPayload);
 					//cout << "stod(SubPayload): " << stod(SubPayload) << endl;
 				}
-								
+				
 				this->InfoSimulateNumStoredQubitsNodeFlag=true;
 				//cout << "SimulateSynchParamsNode finished parsing values" << endl;		
 			}
@@ -1075,7 +1075,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 						cout << "IPdest: " << IPdest << ", IPorg: " << IPorg << ", Type: " << Type << ", Command: " << Command << " , Payload: " << Payload << endl;
 					}
 				}
-			
+				
 			}
 			else if (string(Command)==string("print")){
 				cout << "Host " << this->IPaddressesSockets[2] << " New Message: "<< Payload << endl;
@@ -1107,27 +1107,27 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		if (string(IPorg)==string(this->IPaddressesSockets[0])){ // If it comes from its attached node and is a control message then it is not for this host, forward it to other hosts' nodes
 		// The node of a host is always identified in the Array in position 0
 		    //cout << "Host retransmit params from node: " << Payload << endl;			    
-		    int socket_fd_conn;
+			int socket_fd_conn;
 		    // Mount message
 		    // Notice that nodes Control (and only Control messages, Operational messages do not have this) messages meant to other nodes through their respective hosts have a composed payload, where the first part has the other host's node to whom the message has to be forwarded (at least up to its host - the host of the node sending the message). Hence, the Payload has to be processed a bit.
 		    for (int iIterOpHost=0;iIterOpHost<2;iIterOpHost++){// Manually set - This should be programmed in order to scale
-		    	    char PayLoadReassembled[NumBytesPayloadBuffer] = {0};
+		    	char PayLoadReassembled[NumBytesPayloadBuffer] = {0};
 		    	    char PayLoadProc1[NumBytesPayloadBuffer] = {0};// To process the "_" level
 		    	    char PayLoadProc1Aux[NumBytesPayloadBuffer] = {0};// To process the "_" level Aux
 		    	    char PayloadAux[NumBytesPayloadBuffer] = {0};
 			    // Process the payload first
-			    char IPaddressesSocketsAux[IPcharArrayLengthMAX] = {0};
-			    strcpy(IPaddressesSocketsAux,this->IPaddressesSockets[iIterOpHost+3]);
-			    bool NonEmptyPayloadAux=false;
+		    	    char IPaddressesSocketsAux[IPcharArrayLengthMAX] = {0};
+		    	    strcpy(IPaddressesSocketsAux,this->IPaddressesSockets[iIterOpHost+3]);
+		    	    bool NonEmptyPayloadAux=false;
 			    // Analyze if there are messages for host this->IPaddressesSockets[iIterOpHost+3]
 			    // Payload message is like: Trans;Header_Payload1:Payload2:_Header_Payload_;Header_Payload_Header_Payload_;Net;none_none_;Link;none_none_;Phys;none_none_; 
-			    
+		    	    
 			    for (int iIterNodeAgents=0;iIterNodeAgents<4;iIterNodeAgents++){// Discard the first Layer Name = Trans
 			        strcpy(PayloadAux,Payload);// Make a copy of the original Payload
 			    	for (int iIterPayloadDump=0;iIterPayloadDump<(2*iIterNodeAgents);iIterPayloadDump++){// Reposition the pointer of strtok
-					if (iIterPayloadDump==0){strtok(PayloadAux,";");}
-					else{strtok(NULL,";");}
-				}
+			    		if (iIterPayloadDump==0){strtok(PayloadAux,";");}
+			    		else{strtok(NULL,";");}
+			    	}
 			    	if (iIterNodeAgents==0){
 			    		strcpy(PayLoadReassembled,strtok(PayloadAux,";"));
 			    	}
@@ -1153,12 +1153,12 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    				strcat(PayLoadReassembled,"_");	// Finish with underscore
 			    				NumInterestSubPayloads++;
 			    				NonEmptyPayloadAux=true;
-				    		}
+			    			}
 				    		else{// Discard params because not meant for the IP of interest
 				    			strtok(NULL,"_");
 				    			strtok(NULL,"_");
 				    		}
-			    		}
+				    	}
 			    		if (NumInterestSubPayloads==0){// Just put "none_none_" if empty; none of the parameters was for the IP checked
 			    			strcat(PayLoadReassembled,"none_none_");
 			    		}
@@ -1187,23 +1187,23 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				//cout << "Node message to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
 				//cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
 			if(NonEmptyPayloadAux){// Non-empty, hence send
-			    strcpy(this->SendBuffer,ParamsCharArray);			
+				strcpy(this->SendBuffer,ParamsCharArray);			
 			    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
 				    socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
 				    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);//this->IPaddressesSockets[3]);
-			    }
+				  }
 			    else{ //host acts as server		    
 				    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
 				    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);//this->IPaddressesSockets[3]);
-			    }
-			    }
+				  }
+				}
 		     } // end for	    
-		}	
+		   }	
 		else{// It does not come from its node and it is a control message, so it has to forward to its node
 		   // The node of a host is always identified in the Array in position 0	
 		    //cout << "SendBuffer: " << this->SendBuffer << endl;
 		    // Mount message
-		    char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 			strcpy(ParamsCharArray,IPdest);
 			strcat(ParamsCharArray,",");
 			strcat(ParamsCharArray,IPorg);
@@ -1215,7 +1215,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			strcat(ParamsCharArray,Payload);
 			strcat(ParamsCharArray,",");// Very important to end the message
 			//cout << "ParamsCharArray: " << ParamsCharArray << endl;
-		    strcpy(this->SendBuffer,ParamsCharArray);
+			strcpy(this->SendBuffer,ParamsCharArray);
 		    int socket_fd_conn=this->socket_fdArray[0];  // the host always acts as client to the node, so it needs the socket descriptor (it applies both to TCP and UDP)
 		    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
 		    // Just to keep track of things
@@ -1226,7 +1226,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		    	// Second way of counting for superior resilence and avoid being blocked
 		    	// PArtially decoding the Payload with the information of the current iterators of the network synching process
 		    	char PayloadAux[NumBytesBufferICPMAX] = {0}; // Copy the Payload to not correct it when reading with strtok
-			strcpy(PayloadAux,Payload);	
+		    	strcpy(PayloadAux,Payload);	
 		    	strtok(PayloadAux,";");// skip content//strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
 			//char PayloadAuxAux[NumBytesPayloadBuffer]={0};
 			strtok(NULL,";");// skip content//strcpy(PayloadAux,strtok(NULL,";"));
@@ -1238,21 +1238,21 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			//this->QLLAFreqSynchNormValuesArray[2]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			//this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			//this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
-		    	if (numHolderOtherNodesSendSynchQubits>=(NumCalcCenterMass*NumRunsPerCenterMass) or (iCenterMassAux==(NumCalcCenterMass-1) and iNumRunsPerCenterMassAux==(NumRunsPerCenterMass-1))){
+			if (numHolderOtherNodesSendSynchQubits>=(NumCalcCenterMass*NumRunsPerCenterMass) or (iCenterMassAux==(NumCalcCenterMass-1) and iNumRunsPerCenterMassAux==(NumRunsPerCenterMass-1))){
 		    		numHolderOtherNodesSendSynchQubits=0;// reset value
 		    		numHolderOtherNodesSynchNetwork++;// Count the number of other nodes that run network synch
 		    		cout << "Another pair of nodes " << IPorg << " and " << IPdest << " synch iteration completed!" << endl;
 		    		if (numHolderOtherNodesSynchNetwork==(NumConnectedHosts+1)){// All connected nodes and this host's node have been netwrok synch, so we can reset the synch cycle 
-					CycleSynchNetworkDone=false;
+		    			CycleSynchNetworkDone=false;
 					numHolderOtherNodesSynchNetwork=0;// reset value
 				}
-		    	}
-		    }		    
-		}  
-	}
-	else if(string(Type)==string("KeepAlive")){
+			}
+		}		    
+	}  
+}
+else if(string(Type)==string("KeepAlive")){
 		//cout << "Message to Host HeartBeat: "<< Payload << endl;
-	}
+}
 	else{// 
 		cout << "Message not handled by host: "<< Payload << endl;
 	}  
@@ -1263,7 +1263,7 @@ return 0; // All OK
 }
 
 int QTLAH::ICPdiscoverSend(char* ParamsCharArray){
-    memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
+	memset(this->SendBuffer, 0, sizeof(this->SendBuffer));
     strcpy(this->SendBuffer,ParamsCharArray);//strtok(NULL,","));
     //cout << "SendBuffer: " << this->SendBuffer << endl;	
     // Parse the message information
@@ -1284,9 +1284,9 @@ int QTLAH::ICPdiscoverSend(char* ParamsCharArray){
     		//cout << "socket_fd_conn" << socket_fd_conn << endl;
     		socket_fd_conn=this->new_socketArray[i];
     	}
-    	}
-    }  
-    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);   
+    }
+  }  
+  this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);   
 return 0; //All OK
 }
 ///////////////////////////////////////////////////////////////////
@@ -1300,21 +1300,21 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
     //cout << "After acquire valueSemaphore: " << valueSemaphore << endl;
     //cout << "After acquire valueSemaphoreExpected: " << valueSemaphoreExpected << endl;
     try{
-    this->ICPdiscoverSend(ParamsDescendingCharArray);
+    	this->ICPdiscoverSend(ParamsDescendingCharArray);
     } // try
   catch (...) { // Catches any exception
-  cout << "Exception caught" << endl;
-    }
+  	cout << "Exception caught" << endl;
+  }
     this->release(); // Release the semaphore 
     return 0; //All OK
-}
+  }
 
 int QTLAH::SimulateRetrieveNumStoredQubitsNode(char* IPhostReply,char* IPhostRequest, int* ParamsIntArray,int nIntarray,double* ParamsDoubleArray,int nDoublearray){ // Send to the upper layer agent how many qubits are stored
 this->RelativeNanoSleepWait((unsigned long long int)(100*(unsigned long long int)(WaitTimeAfterMainWhileLoop)));//usleep((int)(5000*WaitTimeAfterMainWhileLoop));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes. This can be improved by sending messages to the specific node, and this node replying that has received the detection command, then this could start
 this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 while(this->SimulateRetrieveNumStoredQubitsNodeFlag==true){//Wait, only one asking
-this->release();
+	this->release();
 this->RelativeNanoSleepWait((unsigned long long int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
 this->acquire();
 }
@@ -1323,21 +1323,21 @@ int isValidWhileLoopCount = 10; // Number of tries If it needs more than one tri
 this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 while(isValidWhileLoopCount>0){
 	if (isValidWhileLoopCount % 10==0){// Only try to resend the message once every 10 times
-	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-	strcpy(ParamsCharArray,IPhostReply);
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,IPhostRequest);
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"Control");
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"InfoRequest");
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"SimulateNumStoredQubitsNode");
+		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+		strcpy(ParamsCharArray,IPhostReply);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,IPhostRequest);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"Control");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"InfoRequest");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"SimulateNumStoredQubitsNode");
 	strcat(ParamsCharArray,",");// Very important to end the message
 	//cout << "SimulateRetrieveNumStoredQubitsNode ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
-	}
-	this->release();
+}
+this->release();
 	this->RelativeNanoSleepWait((unsigned long long int)(1000*(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));//usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
 	this->acquire();
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
@@ -1379,7 +1379,7 @@ this->RelativeNanoSleepWait((unsigned long long int)(100*(unsigned long long int
 this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 while(this->SimulateRetrieveNumStoredQubitsNodeFlag==true){//Wait, only one asking
-this->release();
+	this->release();
 this->RelativeNanoSleepWait((unsigned long long int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
 this->acquire();
 }
@@ -1388,21 +1388,21 @@ int isValidWhileLoopCount = 10; // Number of tries If it needs more than one tri
 this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 while(isValidWhileLoopCount>0){
 	if (isValidWhileLoopCount % 10==0){// Only try to resend the message once every 10 times
-	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-	strcpy(ParamsCharArray,IPhostReply);
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,IPhostRequest);
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"Control");
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"InfoRequest");
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"SimulateRetrieveSynchParamsNode");
+		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+		strcpy(ParamsCharArray,IPhostReply);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,IPhostRequest);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"Control");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"InfoRequest");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"SimulateRetrieveSynchParamsNode");
 	strcat(ParamsCharArray,",");// Very important to end the message
 	//cout << "SimulateRetrieveSynchParamsNode ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
-	}
-	this->release();
+}
+this->release();
 	this->RelativeNanoSleepWait((unsigned long long int)(1000*(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));//usleep((int)(500*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Give some time to have the chance to receive the response
 	this->acquire();
 	if (this->InfoSimulateNumStoredQubitsNodeFlag==true){
@@ -1436,17 +1436,17 @@ return 0; // All OK
 }
 
 int QTLAH::SendKeepAliveHeartBeatsSockets(){
-for (int i=0;i<NumSockets;i++){
-	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-	strcpy(ParamsCharArray,this->IPSocketsList[i]);
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,this->IPaddressesSockets[1]);
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"KeepAlive");
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"HeartBeat");
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"none");
+	for (int i=0;i<NumSockets;i++){
+		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+		strcpy(ParamsCharArray,this->IPSocketsList[i]);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,this->IPaddressesSockets[1]);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"KeepAlive");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"HeartBeat");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"none");
 	strcat(ParamsCharArray,",");// Very important to end the message
 	//cout << "SendKeepAliveHeartBeatsSockets ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
@@ -1456,17 +1456,17 @@ return 0; // all ok
 }
 
 int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){
-this->acquire();
-bool FirstPassAux=true;
-while(AchievedAttentionParticularHosts==false or FirstPassAux==true){
-	if (FirstPassAux==false){
-		cout << "Host " << this->IPaddressesSockets[2] << " trying to get attention from other involved hosts!" << endl;
-		cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
-		cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
-		cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
-		cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
-		cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
-	}
+	this->acquire();
+	bool FirstPassAux=true;
+	while(AchievedAttentionParticularHosts==false or FirstPassAux==true){
+		if (FirstPassAux==false){
+			cout << "Host " << this->IPaddressesSockets[2] << " trying to get attention from other involved hosts!" << endl;
+			cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+			cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
+			cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
+			cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
+			cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
+		}
 	FirstPassAux=false;// First pass is compulsory, since it might be true AchievedAttentionParticularHosts, but because of another process
 	while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
 		this->release();
@@ -1498,9 +1498,9 @@ return 0; // all ok;
 
 int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 //cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
-this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+	this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 //cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
-while(IterHostsActiveActionsFreeStatus!=0){
+	while(IterHostsActiveActionsFreeStatus!=0){
 	//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 	if(this->getState()==0){
@@ -1516,29 +1516,29 @@ return 0; // All ok
 }
 
 int QTLAH::UnBlockActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){
-this->acquire();
-this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);
-this->release();
+	this->acquire();
+	this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);
+	this->release();
 
 return 0; // All ok
 }
 
 int QTLAH::UnBlockActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 
-this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+	this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 
 return 0; // All ok
 }
 
 int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
-if (IterHostsActiveActionsFreeStatus==0){
-this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-}
-else if (IterHostsActiveActionsFreeStatus==1){
-this->AcumulateAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-}
+	if (IterHostsActiveActionsFreeStatus==0){
+		this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+	}
+	else if (IterHostsActiveActionsFreeStatus==1){
+		this->AcumulateAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+	}
 else{// if (IterHostsActiveActionsFreeStatus==2){
-AchievedAttentionParticularHosts=this->CheckReceivedAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+	AchievedAttentionParticularHosts=this->CheckReceivedAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 }
 
 return 0; // All Ok
@@ -1586,18 +1586,18 @@ return 0; // All ok
 }
 
 int QTLAH::AcumulateAnswersYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
-int NumInterestIPaddressesAux=nChararray;
-char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
-char ParamsCharArrayArgAux[NumBytesBufferICPMAX] = {0};
-strcpy(ParamsCharArrayArgAux,ParamsCharArrayArg);
-for (int i=0;i<NumInterestIPaddressesAux;i++){
-	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArgAux,","));}
-	else{strcpy(interestIPaddressesSocketsAux[i],strtok(NULL,","));}
-}
+	int NumInterestIPaddressesAux=nChararray;
+	char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
+	char ParamsCharArrayArgAux[NumBytesBufferICPMAX] = {0};
+	strcpy(ParamsCharArrayArgAux,ParamsCharArrayArg);
+	for (int i=0;i<NumInterestIPaddressesAux;i++){
+		if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArgAux,","));}
+		else{strcpy(interestIPaddressesSocketsAux[i],strtok(NULL,","));}
+	}
 
 //IterHostsActiveActionsFreeStatus 0: Not asked this question; 1: Question asked; 2: All questions received; -1: Abort and reset all
-if (NumAnswersOtherHostsActiveActionsFree>=NumInterestIPaddressesAux){
-	IterHostsActiveActionsFreeStatus=2;
+	if (NumAnswersOtherHostsActiveActionsFree>=NumInterestIPaddressesAux){
+		IterHostsActiveActionsFreeStatus=2;
 	ReWaitsAnswersHostsActiveActionsFree=0;// Reset the counter
 }
 else if (ReWaitsAnswersHostsActiveActionsFree<MaxReWaitsAnswersHostsActiveActionsFree){// Increment the wait counter
@@ -1616,26 +1616,26 @@ return 0; // All ok
 
 bool QTLAH::CheckReceivedAnswersYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 // Check result of the request to all other hosts
-bool CheckAllOthersFreeAux=false;
-int SumCheckAllOthersFree=0;
+	bool CheckAllOthersFreeAux=false;
+	int SumCheckAllOthersFree=0;
 
-int NumInterestIPaddressesAux=nChararray;
-char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
-char ParamsCharArrayArgAux[NumBytesBufferICPMAX] = {0};
-strcpy(ParamsCharArrayArgAux,ParamsCharArrayArg);
-for (int i=0;i<NumInterestIPaddressesAux;i++){
-	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArgAux,","));}
-	else{strcpy(interestIPaddressesSocketsAux[i],strtok(NULL,","));}
-}
-
-for (int i=0;i<NumInterestIPaddressesAux;i++){
-	if (HostsActiveActionsFree[1+i]==false){
-		SumCheckAllOthersFree++;
+	int NumInterestIPaddressesAux=nChararray;
+	char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
+	char ParamsCharArrayArgAux[NumBytesBufferICPMAX] = {0};
+	strcpy(ParamsCharArrayArgAux,ParamsCharArrayArg);
+	for (int i=0;i<NumInterestIPaddressesAux;i++){
+		if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArgAux,","));}
+		else{strcpy(interestIPaddressesSocketsAux[i],strtok(NULL,","));}
 	}
-}
+
+	for (int i=0;i<NumInterestIPaddressesAux;i++){
+		if (HostsActiveActionsFree[1+i]==false){
+			SumCheckAllOthersFree++;
+		}
+	}
 //cout << "SumCheckAllOthersFree: " << SumCheckAllOthersFree << endl;
 
-if (SumCheckAllOthersFree>=NumInterestIPaddressesAux){CheckAllOthersFreeAux=true;}
+	if (SumCheckAllOthersFree>=NumInterestIPaddressesAux){CheckAllOthersFreeAux=true;}
 
 for (int i=0;i<NumInterestIPaddressesAux;i++){// Reset values
 	HostsActiveActionsFree[1+i]=true;
@@ -1718,14 +1718,14 @@ for (int i=0;i<numForstEquivalentToSleep;i++){
 	}
 	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 }
-	
+
 return 0; // All ok
 }
 
 int QTLAH::PeriodicRequestSynchsHost(){// Execute automatically the network synchronization from this host node to all other connected hosts nodes
-char charNumAux[NumBytesBufferICPMAX] = {0};
-char messagePayloadAux[NumBytesBufferICPMAX] = {0};
-char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+	char charNumAux[NumBytesBufferICPMAX] = {0};
+	char messagePayloadAux[NumBytesBufferICPMAX] = {0};
+	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){// For each connected node to be synch with
 	for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 		for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){			
@@ -1847,7 +1847,7 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 }
 return 0; // all ok
 }			
-				
+
 ///////////////////////////////////////////////////////////////////
 QTLAH::~QTLAH() {
 	// destructor
@@ -1871,10 +1871,10 @@ int main(int argc, char const * argv[]){
  // The variables are named argc (argument count) and argv (argument vector) by convention, but they can be given any valid identifier: int main(int num_args, char** arg_strings) is equally valid.
 
  // They can also be omitted entirely, yielding int main(), if you do not intend to process command line arguments.
- 
+	
  //printf( "argc:     %d\n", argc );
  //printf( "argv[0]:  %s\n", argv[0] );
- 
+	
  //if ( argc == 1 ) {
  // printf( "No arguments were passed.\n" );
  //}
@@ -1884,6 +1884,6 @@ int main(int argc, char const * argv[]){
  //  printf( "  %d. %s\n", i, argv[i] );
  // }
  //}
-  
- return 0;
+	
+	return 0;
 }
