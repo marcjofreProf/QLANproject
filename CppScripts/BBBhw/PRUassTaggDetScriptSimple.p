@@ -157,6 +157,35 @@ DWTSTART:
 	// Some loadings and resets
 	LBCO	r4, CONST_PRUDRAM, 4, 4 // Load to r4 the content of CONST_PRUDRAM with offset 4, and 4 bytes. It is the number of RECORDS
 	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start
+CMDSEL:// Identify the command number to generate the mask of interest for checking detections
+	QBEQ	QUADDET1, r0.b0, 1 // 1 command is detect signals first lower quad group channel
+	QBEQ	QUADDET2, r0.b0, 2 // 2 command is detect signals second lower quad group channel
+	QBEQ	QUADDET3, r0.b0, 3 // 3 command is detect signals frist and second lower quad group channel
+	QBEQ	QUADDET4, r0.b0, 4 // 4 command is detect signals third lower quad group channel
+	QBEQ	QUADDET5, r0.b0, 5 // 5 command is detect signals first and third lower quad group channel
+	QBEQ	QUADDET6, r0.b0, 6 // 6 command is detect signals second and third lower quad group channel
+	QBEQ	QUADDET7, r0.b0, 7 // 7 command is detect signals first, second and third (all) lower quad group channel
+QUADDET7:
+	MOV	r11, 0xC000C0FF // detection mask
+	JMP	PSEUDOSYNCH
+QUADDET6:
+	MOV	r11, 0xC000C0F0 // detection mask
+	JMP	PSEUDOSYNCH
+QUADDET5:
+	MOV	r11, 0xC000C00F // detection mask
+	JMP	PSEUDOSYNCH
+QUADDET4:
+	MOV	r11, 0xC000C000 // detection mask
+	JMP	PSEUDOSYNCH
+QUADDET3:
+	MOV	r11, 0x000000FF // detection mask
+	JMP	PSEUDOSYNCH
+QUADDET2:
+	MOV	r11, 0x000000F0 // detection mask
+	JMP	PSEUDOSYNCH
+QUADDET1:
+	MOV	r11, 0x0000000F // detection mask
+	JMP	PSEUDOSYNCH
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to receiving at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering through an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	// Read the number of RECORDS from positon 0 of PRU1 DATA RAM and stored it
 	LBCO	r10, CONST_PRUDRAM, 8, 4 // Read from PRU RAM offset signal period

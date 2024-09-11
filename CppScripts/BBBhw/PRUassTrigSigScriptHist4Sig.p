@@ -74,6 +74,11 @@
 
 // r10 is arbitrary used for operations
 
+// r11 is reserved for emitting state 1
+// r12 is reserved for emitting state 2
+// r13 is reserved for emitting state 3
+// r14 is reserved for emitting state 4
+
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
 // r30 is reserved for output pins
@@ -125,6 +130,11 @@ INITIATIONS:
 	LDI	r0, 0 // Ensure reset commands
 	LDI	r9, DELAY
 	
+	MOV	r11, 0x00000011
+	MOV	r12, 0x00000022
+	MOV	r13, 0x00000044
+	MOV	r14, 0x00000088
+	
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
@@ -142,10 +152,18 @@ CMDLOOP2:// Double verification of host sending start command
 	//MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Here send interrupt to host to measure time
 	// Start executing
 	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-	QBEQ	PSEUDOSYNCH, r0.b0, 1 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
-	QBEQ	PERIODICTIMESYNCHSUB, r0.b0, 2 // 2 command is measure IEP timer status and so a substraction correction
-	QBEQ	PERIODICTIMESYNCHADD, r0.b0, 3 // 3 command is measure IEP timer status and so a addition correction
-	QBEQ	PERIODICTIMESYNCHCHECK, r0.b0, 4 // 4 command is measure IEP timer status and so a check
+CMDSEL:
+	QBEQ	QUADEMT1, r0.b0, 1 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
+	QBEQ	QUADEMT2, r0.b0, 2 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
+	QBEQ	QUADEMT3, r0.b0, 3 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
+	QBEQ	QUADEMT4, r0.b0, 4 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
+	QBEQ	QUADEMT5, r0.b0, 5 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
+	QBEQ	QUADEMT6, r0.b0, 6 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
+	QBEQ	QUADEMT7, r0.b0, 7 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
+	QBEQ	PERIODICTIMESYNCHSUB, r0.b0, 8 // 2 command is measure IEP timer status and so a substraction correction
+	QBEQ	PERIODICTIMESYNCHADD, r0.b0, 9 // 3 command is measure IEP timer status and so a addition correction
+	QBEQ	PERIODICTIMESYNCHCHECK, r0.b0, 10 // 4 command is measure IEP timer status and so a check
+	QBEQ	PERIODICTIMESYNCHSET, r0.b0, 11 // 4 command is measure IEP timer set synch
 PERIODICTIMESYNCHSET: // with command coded 5 means setting synch
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
@@ -175,6 +193,48 @@ PERIODICTIMESYNCHSUB: // with command coded 2 means synch by reseting the IEP ti
 	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP	CMDLOOP
+QUADEMT7:
+	MOV	r11, 0x00000111
+	MOV	r12, 0x00000222
+	MOV	r13, 0x00000444
+	MOV	r14, 0x00000888
+	JMP	PSEUDOSYNCH
+QUADEMT6:
+	MOV	r11, 0x00000110
+	MOV	r12, 0x00000220
+	MOV	r13, 0x00000440
+	MOV	r14, 0x00000880
+	JMP	PSEUDOSYNCH
+QUADEMT5:
+	MOV	r11, 0x00000101
+	MOV	r12, 0x00000202
+	MOV	r13, 0x00000404
+	MOV	r14, 0x00000808
+	JMP	PSEUDOSYNCH
+QUADEMT4:
+	MOV	r11, 0x00000100
+	MOV	r12, 0x00000200
+	MOV	r13, 0x00000400
+	MOV	r14, 0x00000800
+	JMP	PSEUDOSYNCH
+QUADEMT3:
+	MOV	r11, 0x00000011
+	MOV	r12, 0x00000022
+	MOV	r13, 0x00000044
+	MOV	r14, 0x00000088
+	JMP	PSEUDOSYNCH
+QUADEMT2:
+	MOV	r11, 0x00000010
+	MOV	r12, 0x00000020
+	MOV	r13, 0x00000040
+	MOV	r14, 0x00000080
+	JMP	PSEUDOSYNCH
+QUADEMT1:
+	MOV	r11, 0x00000001
+	MOV	r12, 0x00000002
+	MOV	r13, 0x00000004
+	MOV	r14, 0x00000008
+	JMP	PSEUDOSYNCH
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	// Since there is a dead period betwen pulses (to do management), divide the period by 2
 	LSR	r9, r7, 1
@@ -211,17 +271,17 @@ FINETIMEOFFSETADJLOOP:
 //	QBEQ	SIGNALON1, r0.b0, 1 // Coincides with a 1
 //	QBEQ	SIGNALON1, r0.b0, 0 // Coincides with a 0
 SIGNALON1:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
-	MOV	r30.b0, 0x11 // Double channels 1. write to magic r30 output byte 0
+	MOV	r30.w0, r11 // Double channels 1. write to magic r30 output byte 0
 	MOV	r5, r9
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 //	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-	MOV	r30.b0, 0x00 // All off
+	MOV	r30.w0, 0x0000 // All off
 SIGNALON1DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON1DEL, r5, 0
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON2:
-	MOV	r30.b0, 0x00 // All off
+	MOV	r30.w0, 0x0000 // All off
 	MOV	r5, r9
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
@@ -230,17 +290,17 @@ SIGNALON2DEL:
 	QBNE	SIGNALON2DEL, r5, 0
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON3:
-	MOV	r30.b0, 0x22 // Double channels 2. write to magic r30 output byte 0
+	MOV	r30.w0, r12 // Double channels 2. write to magic r30 output byte 0
 	MOV	r5, r9
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 //	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-	MOV	r30.b0, 0x00 // All off
+	MOV	r30.w0, 0x0000 // All off
 SIGNALON3DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON3DEL, r5, 0
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON4:
-	MOV	r30.b0, 0x00 // All off
+	MOV	r30.w0, 0x0000 // All off
 	MOV	r5, r9
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
@@ -249,17 +309,17 @@ SIGNALON4DEL:
 	QBNE	SIGNALON4DEL, r5, 0
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON5:
-	MOV	r30.b0, 0x44 // Double channels 3. write to magic r30 output byte 0
+	MOV	r30.w0, r13 // Double channels 3. write to magic r30 output byte 0
 	MOV	r5, r9
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 //	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-	MOV	r30.b0, 0x00 // All off
+	MOV	r30.w0, 0x0000 // All off
 SIGNALON5DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON5DEL, r5, 0
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON6:
-	MOV	r30.b0, 0x00 // All off
+	MOV	r30.w0, 0x0000 // All off
 	MOV	r5, r9
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
@@ -268,17 +328,17 @@ SIGNALON6DEL:
 	QBNE	SIGNALON6DEL, r5, 0
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON7:
-	MOV	r30.b0, 0x88 // Double channels 4. write to magic r30 output byte 0
+	MOV	r30.w0, r14 // Double channels 4. write to magic r30 output byte 0
 	MOV	r5, r9
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 //	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-	MOV	r30.b0, 0x00 // All off
+	MOV	r30.w0, 0x0000 // All off
 SIGNALON7DEL:
 	SUB	r5, r5, 1
 	QBNE	SIGNALON7DEL, r5, 0
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON8:
-	MOV	r30.b0, 0x00 // All off
+	MOV	r30.w0, 0x0000 // All off
 	MOV	r5, r9 // No extra controlled delay since two instructions below as well in FINISH
 SIGNALON8DEL:
 	SUB	r5, r5, 1

@@ -48,7 +48,7 @@ namespace nsQphysLayerAgent {
 // typedef int (*CallbackType)(int);
 // enum GPIO_DIRECTION{ INPUT, OUTPUT };
 
-class QPLA {
+	class QPLA {
 private: //Variables/Instances	
 	int NumberRepetitionsSignal=32768;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	int NumQuBitsPerRun=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)	
@@ -77,21 +77,21 @@ private: //Variables/Instances
 	// Time/synchronization management
 	struct my_clock
 	{
-	    using duration   = std::chrono::nanoseconds;
-	    using rep        = duration::rep;
-	    using period     = duration::period;
-	    using time_point = std::chrono::time_point<my_clock>;
+		using duration   = std::chrono::nanoseconds;
+		using rep        = duration::rep;
+		using period     = duration::period;
+		using time_point = std::chrono::time_point<my_clock>;
 	    static constexpr bool is_steady = false;// true, false
 
 	    static time_point now()
 	    {
-		timespec ts;
+	    	timespec ts;
 		if (clock_gettime(CLOCK_TAI, &ts))// CLOCK_REALTIME//CLOCK_TAI
-		    throw 1;
+			throw 1;
 		using sec = std::chrono::seconds;
 		return time_point{sec{ts.tv_sec}+duration{ts.tv_nsec}};
-	    }
-	};
+	}
+};
 	using Clock = my_clock;//using Clock = std::chrono::system_clock;//system_clock;steady_clock;high_resolution_clock. We need a wathc to wall synchronize starting of signal and measurement, that is why we use system_clock (if we wanted a chrono we would use steady_clock)
 	using TimePoint = std::chrono::time_point<Clock>;
 	TimePoint FutureTimePoint=std::chrono::time_point<Clock>();// could be milliseconds, microseconds or others, but it has to be consistent everywhere
@@ -147,15 +147,17 @@ private: //Variables/Instances
 	//int iCenterMassAuxiliarTest=0;
 	//int iNumRunsPerCenterMassAuxiliarTest=0;
 	// Selector of mission or detection quadruples or group. 0=000b no channel selected (actually it is not a valid option), 1=001b emission or detection of the first lower group of 4 channels, 2=010b emission or detection of the second lower group of 4 channels, 3=011b emission or detection of the first and second group of lower group of 4 channels....7=111b emission or detection of the third, second and first lower groups of 4 channels (all channels). This value is updated thorugh upper layer agents for each emission or detection
-	int QuadEmitDetecSelec=7; // Initialization to all channels	
-        
+	int QuadEmitDetecSelec=7; // Initialization to all channels
+	int SpecificQuadChEmt=-1; //[0,2]; -1 indicates none in particular selected. Identifies the current single quad group channel emitter (e.g., for synchronization purposes)
+	int SpecificQuadChDet=-1; //[0,2]; -1 indicates none in particular selected. Identifies the current single quad group channel detection (e.g., for synchronization purposes)
+
 public: // Variables/Instances
 	exploringBB::GPIO PRUGPIO;
 	enum ApplicationState { // State of the agent sequences
 		APPLICATION_RUNNING = 0,
 		APPLICATION_PAUSED = 1,  // Out of Focus or Paused If In A Timed Situation
 		APPLICATION_EXIT = -1,
-	    };
+	};
 	ApplicationState m_state;
 	int SimulateNumStoredQubitsNode[LinkNumberMAX]={0}; // Array indicating the number of stored qubits
 	int SimulateQuBitValueArray[NumQubitsMemoryBuffer]={0};
@@ -168,13 +170,13 @@ public: // Functions/Methods
 	int SendParametersAgent(char* ParamsCharArray);// The upper layer gets the information to be send
         int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node
         // General Input and Output functions
-	int SimulateEmitQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux);
-	int SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
-	int SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux);
-	int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
-	int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
-	int GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams);
-	bool GetGPIOHardwareSynchedNode();
+        int SimulateEmitQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux);
+        int SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
+        int SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux);
+        int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
+        int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
+        int GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams);
+        bool GetGPIOHardwareSynchedNode();
 	~QPLA();  //destructor
 
 private: // Functions/Methods
@@ -187,15 +189,15 @@ private: // Functions/Methods
 //	friend void* threadedPoll(void *value);
 	// Managing status of this Agent
 	ApplicationState getState() const { return m_state; }	
-        bool m_start() { m_state = APPLICATION_RUNNING; return true; }
-        bool m_pause() { m_state = APPLICATION_PAUSED; return true; } 
+	bool m_start() { m_state = APPLICATION_RUNNING; return true; }
+	bool m_pause() { m_state = APPLICATION_PAUSED; return true; } 
         // resume may keep track of time if the application uses a timer.
         // This is what makes it different than start() where the timer
         // in start() would be initialized to 0. And the last time before
         // paused was trigger would be saved, and then reset as new starting
         // time for your timer or counter. 
-        bool m_resume() { m_state = APPLICATION_RUNNING; return true; }      
-        bool m_exit() { m_state = APPLICATION_EXIT;  return false; } 
+	bool m_resume() { m_state = APPLICATION_RUNNING; return true; }      
+	bool m_exit() { m_state = APPLICATION_EXIT;  return false; } 
         // Payload information parameters
         int InitParametersAgent();// Client node have some parameters to adjust to the server node
         int RegularCheckToPerform(); // Some check to do every now and then     

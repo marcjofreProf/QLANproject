@@ -83,17 +83,17 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	prussdrv_init();
 	// Interrupts
 	if (prussdrv_open(PRU_EVTOUT_0) == -1) {// Event PRU-EVTOUT0 - Interrupt from PRU0
-	   perror("prussdrv_open(PRU_EVTOUT_0) failed. Execute as root: sudo su or sudo. /boot/uEnv.txt has to be properly configured with iuo. Message: "); 
-	  }
+		perror("prussdrv_open(PRU_EVTOUT_0) failed. Execute as root: sudo su or sudo. /boot/uEnv.txt has to be properly configured with iuo. Message: "); 
+	}
 	
 	if (prussdrv_open(PRU_EVTOUT_1) == -1) {// Event PRU-EVTOUT1 - Interrupt from PRU1
-	   perror("prussdrv_open(PRU_EVTOUT_1) failed. Execute as root: sudo su or sudo. /boot/uEnv.txt has to be properly configured with iuo. Message: "); 
-	  }
+		perror("prussdrv_open(PRU_EVTOUT_1) failed. Execute as root: sudo su or sudo. /boot/uEnv.txt has to be properly configured with iuo. Message: "); 
+	}
 	
 	// Map PRU's interrupts
 	// prussdrv.pruintc_init(); // Init handling interrupts from PRUs
 	prussdrv_pruintc_init(&pruss_intc_initdata);
-    	
+	
 	// Clear prior interrupt events
 	prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
 	prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
@@ -137,8 +137,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Timetagging
-	    // Execute program
-	    // Load and execute the PRU program on the PRU0
+	// Execute program
+	// Load and execute the PRU program on the PRU0
 	pru0dataMem_int[0]=static_cast<unsigned int>(0); // set no command
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures, with overflow clock
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
@@ -178,7 +178,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	cout << "Wait to proceed, calibrating synchronization!" << endl;
 	////prussdrv_pru_enable(PRU_Signal_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
-	  
+	
 	  /*// Doing debbuging checks - Debugging 1	  
 	  std::thread threadReadTimeStampsAux=std::thread(&GPIO::ReadTimeStamps,this);
 	  std::thread threadSendTriggerSignalsAux=std::thread(&GPIO::SendTriggerSignals,this);
@@ -208,17 +208,17 @@ int GPIO::InitAgentProcess(){
 }
 /////////////////////////////////////////////////////////
 bool GPIO::setMaxRrPriority(){// For rapidly handling interrupts
-int max_priority=sched_get_priority_max(SCHED_FIFO);
-int Nice_priority=10;
+	int max_priority=sched_get_priority_max(SCHED_FIFO);
+	int Nice_priority=10;
 // SCHED_RR: Round robin
 // SCHED_FIFO: First-In-First-Out
-sched_param sch_params;
-sch_params.sched_priority = Nice_priority;
-if (sched_setscheduler(0,SCHED_FIFO,&sch_params)==-1){
-	cout <<" Failed to set maximum real-time priority." << endl;
-	return false;
-}
-return true;
+	sched_param sch_params;
+	sch_params.sched_priority = Nice_priority;
+	if (sched_setscheduler(0,SCHED_FIFO,&sch_params)==-1){
+		cout <<" Failed to set maximum real-time priority." << endl;
+		return false;
+	}
+	return true;
 }
 ////////////////////////////////////////////////////////
 void GPIO::acquire() {
@@ -228,16 +228,16 @@ this->valueSemaphore=0; // Make sure it stays at 0
 // https://stackoverflow.com/questions/61493121/when-can-memory-order-acquire-or-memory-order-release-be-safely-removed-from-com
 // https://medium.com/@pauljlucas/advanced-thread-safety-in-c-4cbab821356e
 //int oldCount;
-bool valueSemaphoreExpected=true;
-while(true){
+	bool valueSemaphoreExpected=true;
+	while(true){
 	//oldCount = this->valueSemaphore.load(std::memory_order_acquire);
 	//if (oldCount > 0 && this->valueSemaphore.compare_exchange_strong(oldCount,oldCount-1,std::memory_order_acquire)){
-	if (this->valueSemaphore.compare_exchange_strong(valueSemaphoreExpected,false,std::memory_order_acquire)){	
-	break;
+		if (this->valueSemaphore.compare_exchange_strong(valueSemaphoreExpected,false,std::memory_order_acquire)){	
+			break;
+		}
 	}
 }
-}
- 
+
 void GPIO::release() {
 this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stays at 1
 //this->valueSemaphore.fetch_add(1,std::memory_order_release);
@@ -292,7 +292,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//if ((this->iIterPRUcurrentTimerVal%50)==0){// Every now and then correct absolutelly, although some interrupt jitter will be present
 				//	this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+1.0*static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
 				//	this->NextSynchPRUcorrection=static_cast<unsigned int>(static_cast<unsigned int>((static_cast<unsigned long long int>(PRUoffsetDriftError)+static_cast<unsigned long long int>(LostCounts))%iepPRUtimerRange32bits));
-				//	this->NextSynchPRUcommand=static_cast<unsigned int>(5);// Hard setting of the time
+				//	this->NextSynchPRUcommand=static_cast<unsigned int>(11);// Hard setting of the time
 				//}
 				
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
@@ -341,7 +341,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					// Compute Synch - Absolute
 					//this->EstimateSynch=static_cast<double>(fmodl((static_cast<long double>((this->iIterPRUcurrentTimerVal)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))/(this->PRUcurrentTimerValWrap-0*this->PRUcurrentTimerValOldWrap));
 					this->EstimateSynchArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynch;
-				this->ManualSemaphoreExtra=true;
+					this->ManualSemaphoreExtra=true;
 					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
 					
 					// Compute error - Relative correction				
@@ -356,9 +356,9 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
 					//this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,NumSynchMeasAvgAux);
 					
-				this->ManualSemaphoreExtra=false;
-				this->ManualSemaphore=false;
-				this->release();					
+					this->ManualSemaphoreExtra=false;
+					this->ManualSemaphore=false;
+					this->release();					
 					
 					this->NextSynchPRUcorrection=static_cast<unsigned int>(0);
 					this->iIterPRUcurrentTimerValSynch++;
@@ -366,12 +366,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
 					iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
 					this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
-					this->NextSynchPRUcommand=static_cast<unsigned int>(4);// set command 4, to execute synch functions no correction
-													
+					this->NextSynchPRUcommand=static_cast<unsigned int>(10);// set command 4, to execute synch functions no correction
+					
 					// Updates for next round					
 					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
 					this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update											
-			}
+				}
 			else{// does not enter in time
 				this->iIterPRUcurrentTimerValPass++;
 			}					
@@ -421,7 +421,7 @@ int GPIO::PIDcontrolerTimeJiterlessInterrupt(){
 //PRUoffsetDriftErrorDerivative=(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorLast);//*(static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast));//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds)));
 //PRUoffsetDriftErrorIntegral=PRUoffsetDriftErrorIntegral+PRUoffsetDriftErrorAvg;//*static_cast<double>(iIterPRUcurrentTimerVal-iIterPRUcurrentTimerValLast);//*(static_cast<double>(this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
 
-this->PRUoffsetDriftErrorAppliedRaw=PRUoffsetDriftErrorAvg;
+	this->PRUoffsetDriftErrorAppliedRaw=PRUoffsetDriftErrorAvg;
 
 if (this->PRUoffsetDriftErrorAppliedRaw<(-this->LostCounts)){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw-LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
 else if(this->PRUoffsetDriftErrorAppliedRaw>this->LostCounts){this->PRUoffsetDriftErrorApplied=this->PRUoffsetDriftErrorAppliedRaw+LostCounts;}// The LostCounts is to compensate the lost counts in the PRU when applying the update
@@ -454,7 +454,7 @@ int GPIO::PRUsignalTimerSynch(){
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);//while(Clock::now() < TimePointClockCurrentSynchPRU1futureAux);//while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// If used with this->TimePointClockCurrentSynchPRU1futureAux, then the instaneous error interrupt can be removed with "Discounting the time to enter the interrupt to measure the deviation" and for the duration_FinalInitialMeasTrig has to be used this->TimePointClockCurrentSynchPRU1future// while(Clock::now() < TimePointClockCurrentSynchPRU1futureAux);// Busy waiting
 				// Notice that if the duration for estimating the synch deviation is done with discounting the average time of the interrupt (and not removing the instantaneous error of the interrupt itme) then the time is referenced in average to the PRU time, but then there is a lot of fluctuation when transforming to the system time. Instead, if the synch deviation is computed removing the instantaneous error of te interupt time then, the system clock error is minimized but aflourish the relative small frequency differents of the different PRU clcokcs - this can be accounted for adding a general frequency deviation in the triggered sequences (specified in the python code).
 				////this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info. Already computed in the steps before				// Important, the following line at the very beggining to reduce the command jitter
-				pru1dataMem_int[0]=static_cast<unsigned int>(5);//static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
+				pru1dataMem_int[0]=static_cast<unsigned int>(11);//static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
 				//prussdrv_pru_send_event(22);
 				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
 				//retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// First interrupt sent to measure time				
@@ -495,23 +495,23 @@ int GPIO::PRUsignalTimerSynch(){
 				this->PRUoffsetDriftError=static_cast<double>((this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod/static_cast<double>(PRUclockStepPeriodNanoseconds)))-(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap);
 				this->ManualSemaphoreExtra=true;
 					// Computations for Synch calculaton for PRU0 compensation
-					this->EstimateSynch=(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))/(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap);
-					this->EstimateSynchArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynch;
-					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
+				this->EstimateSynch=(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds))/(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap);
+				this->EstimateSynchArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynch;
+				this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
 					// Estimate synch direction					
 					//this->EstimateSynch=1.0; // To disable synch adjustment
 					// Error averaging
-					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
-					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
+				this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
+				this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
 				this->release();
 				// SEt the value to IEP timer	
-					this->PRUoffsetDriftErrorAppliedRaw=this->PRUoffsetDriftErrorAvg;
+				this->PRUoffsetDriftErrorAppliedRaw=this->PRUoffsetDriftErrorAvg;
 					this->PRUcurrentTimerValOldWrap=this->PRUoffsetDriftErrorAppliedRaw;//this->PRUcurrentTimerValWrap;// Update				
 					this->iIterPRUcurrentTimerValSynch++;
 					this->iIterPRUcurrentTimerValPass=1;									
-			}
+				}
 			else{// does not enter in time
 				this->iIterPRUcurrentTimerValPass++;
 			}					
@@ -584,7 +584,7 @@ InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(Sync
 
 pru0dataMem_int[3]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
 
-pru0dataMem_int[0]=static_cast<unsigned int>(1); // set command
+pru0dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command
 
 TimePointClockTagPRUinitial=TimePointClockTagPRUinitial-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 
@@ -640,8 +640,8 @@ return 0;// all ok
 }
 
 int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
-this->QPLAFutureTimePoint=Clock::time_point(duration_back);
+	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
+	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
 SynchTrigPeriod=SynchTrigPeriodAux;// Histogram/Period value
 NumberRepetitionsSignal=static_cast<unsigned int>(NumberRepetitionsSignalAux);// Number of repetitions to send signals
 AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
@@ -677,7 +677,7 @@ InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(Sync
 
 pru1dataMem_int[2]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
 
-pru1dataMem_int[0]=static_cast<unsigned int>(1); // set command. Generate signals. Takes around 900000 clock ticks
+pru1dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command. Generate signals. Takes around 900000 clock ticks
 
 this->TimePointClockTagPRUinitial=this->TimePointClockTagPRUinitial-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 
@@ -740,7 +740,7 @@ return 0;// all ok
 }
 
 int GPIO::SetSynchDriftParams(double* AccumulatedErrorDriftParamsAux){// Not Used
-this->acquire();
+	this->acquire();
 // Make it iterative algorithm
 AccumulatedErrorDrift=AccumulatedErrorDrift+static_cast<long double>(AccumulatedErrorDriftParamsAux[0]); // For retrieved relative frequency difference from protocol
 AccumulatedErrorDriftAux=AccumulatedErrorDriftAux+static_cast<long double>(AccumulatedErrorDriftParamsAux[1]);// For retrieved relative offset difference from protocol
@@ -751,10 +751,10 @@ return 0; // All Ok
 }
 
 bool GPIO::GetHardwareSynchStatus(){// Provide information to the above agents
-bool HardwareSynchStatusAux=false;
-this->acquire();
-HardwareSynchStatusAux=HardwareSynchStatus;
-this->release();
+	bool HardwareSynchStatusAux=false;
+	this->acquire();
+	HardwareSynchStatusAux=HardwareSynchStatus;
+	this->release();
 return HardwareSynchStatusAux; // All Ok
 }
 
@@ -836,9 +836,9 @@ for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 this->AfterCountsThreshold=24+5;
 this->FirstTimeDDRdumpdata=false;
 if(valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
-cout << "We have lost ttg counts! Lost of tags accuracy! Reduce the number of tags per run, and if needed increase the runs number." << endl;
-cout << "AfterCountsThreshold: " << AfterCountsThreshold << endl;
-cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
+	cout << "We have lost ttg counts! Lost of tags accuracy! Reduce the number of tags per run, and if needed increase the runs number." << endl;
+	cout << "AfterCountsThreshold: " << AfterCountsThreshold << endl;
+	cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
 }
 //else if (valCycleCountPRU > (0x80000000-this->AfterCountsThreshold)){// The exceeded counts, remove them
 //this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU-(AboveThresoldCycleCountPRUCompValue-1)*static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0x80000000);
@@ -876,54 +876,54 @@ return 0; // all ok
 int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int TimeTaggs[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTags[QuadNumChGroups][MaxNumQuBitsMemStored]){
 // Separate the detection by quad channels and do the processing independently
 // First (reset)compute the number of detections per quad channel
-for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-  TotalCurrentNumRecordsQuadCh[iQuadChIter]=0;
-}
-for (int i=0;i<TotalCurrentNumRecords;i++){
-  for (unsigned short iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-    if ((ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter)))>0){  
-      TimeTaggs[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=TimeTaggsStored[i];
-      ChannelTags[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter));
-      TotalCurrentNumRecordsQuadCh[iQuadChIter]++;
-    }
-  }
-}
+	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+		TotalCurrentNumRecordsQuadCh[iQuadChIter]=0;
+	}
+	for (int i=0;i<TotalCurrentNumRecords;i++){
+		for (unsigned short iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+			if ((ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter)))>0){  
+				TimeTaggs[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=TimeTaggsStored[i];
+				ChannelTags[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter));
+				TotalCurrentNumRecordsQuadCh[iQuadChIter]++;
+			}
+		}
+	}
 
-for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-  if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
+	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+		if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
     unsigned long long int ULLIInitialTimeTaggs=TimeTaggs[iQuadChIter][0];// Normalize to the first timetag, which is a strong reference
     long long int LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
     long long int LLITimeTaggs[TotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
     for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-	    LLITimeTaggs[i]=static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLIInitialTimeTaggs;
+    	LLITimeTaggs[i]=static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLIInitialTimeTaggs;
     }
     double SlopeDetTagsAux=1.0;
 
     if (SlopeDetTagsAux<=0.0){
-	    cout << "GPIO::PRUdetCorrRelFreq wrong computation of the SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << ". Not applying the correction..." << endl;
+    	cout << "GPIO::PRUdetCorrRelFreq wrong computation of the SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << ". Not applying the correction..." << endl;
     }
 
     // Calculate the "x" values
     long long int xAux[MaxNumQuBitsMemStored]={0};
     long long int LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
     for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-	    xAux[i]=(LLITimeTaggs[i]/LLISynchTrigPeriod)*LLISynchTrigPeriod;
+    	xAux[i]=(LLITimeTaggs[i]/LLISynchTrigPeriod)*LLISynchTrigPeriod;
     }
 
     // Compute the candidate slope
     int iAux=0;
     for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-TagsSeparationDetRelFreq);i++){
-	    if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
-		    SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
-		    iAux++;
-	    }
+    	if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
+    		SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
+    		iAux++;
+    	}
     }
 
     SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
     //cout << "GPIO::SlopeDetTagsAux: " << SlopeDetTagsAux << endl;
     // Un-normalize
     for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-	    TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>((1.0/SlopeDetTagsAux)*static_cast<double>(LLITimeTaggs[i]))+ULLIInitialTimeTaggs;
+    	TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>((1.0/SlopeDetTagsAux)*static_cast<double>(LLITimeTaggs[i]))+ULLIInitialTimeTaggs;
     }
 
     //////////////////////////////////////////
@@ -947,12 +947,12 @@ unsigned short GPIO::packBits(unsigned short value) {
 }
 
 int GPIO::ClearStoredQuBits(){
-if (SlowMemoryPermanentStorageFlag==true){
+	if (SlowMemoryPermanentStorageFlag==true){
 	// Timetagging data
-	if (streamDDRpru.is_open()){
-		streamDDRpru.close();	
+		if (streamDDRpru.is_open()){
+			streamDDRpru.close();	
 		//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	}
+		}
 
 	streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);// Open for write and read, and clears all previous content	
 	if (!streamDDRpru.is_open()) {
@@ -990,7 +990,7 @@ return 0; // all ok
 }
 
 int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int TimeTaggs[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTags[QuadNumChGroups][MaxNumQuBitsMemStored]){
-if (SlowMemoryPermanentStorageFlag==true){
+	if (SlowMemoryPermanentStorageFlag==true){
 	LastTimeTaggRef[0]=0*static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds);// Since whole number. Initiation value
 	// Detection tags
 	if (streamDDRpru.is_open()){
@@ -1021,19 +1021,19 @@ if (SlowMemoryPermanentStorageFlag==true){
 		    TimeTaggsStored[lineCount]=static_cast<unsigned long long int>(ValueReadTest);		    
 		    ////////////////////////////////////////////////////////////////////////////////
 		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	    	    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTagsStored[lineCount]), sizeof(ChannelTags[lineCount]));
+		    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTagsStored[lineCount]), sizeof(ChannelTags[lineCount]));
 	    	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
 	    	    //cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
 	    	    lineCount++; // Increment line count for each line read	    
-	    	    }
+	    	}
 	    	if (lineCount==0){cout << "RetrieveNumStoredQuBits: No timetaggs present!" << endl;}
 	    	TotalCurrentNumRecords=lineCount;
+	    }
+	    else{
+	    	cout << "RetrieveNumStoredQuBits: BBB streamDDRpru is not open!" << endl;
+	    	return -1;
+	    }
 	}
-	else{
-		cout << "RetrieveNumStoredQuBits: BBB streamDDRpru is not open!" << endl;
-	return -1;
-	}
-}
 else{// Memory allocation
 	LastTimeTaggRef[0]=TimeTaggsLastStored*static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds);// Since whole number. It is meant for computing the time between measurements to estimate the relative frequency difference. It is for synchronization purposes which generally will be under control so even if it is a multiple adquisiton the itme difference will be mantained so it generally ok.
 }
@@ -1045,93 +1045,93 @@ return TotalCurrentNumRecords;
 }
 
 int GPIO::IntMedianFilterSubArray(int* ArrayHolderAux,int MedianFilterFactor){
-if (MedianFilterFactor<=1){
-	return ArrayHolderAux[0];
-}
-else{
+	if (MedianFilterFactor<=1){
+		return ArrayHolderAux[0];
+	}
+	else{
 	// Step 1: Copy the array to a temporary array
-    int temp[MedianFilterFactor]={0};
-    for(int i = 0; i < MedianFilterFactor; i++) {
-        temp[i] = ArrayHolderAux[i];
-    }
-    
+		int temp[MedianFilterFactor]={0};
+		for(int i = 0; i < MedianFilterFactor; i++) {
+			temp[i] = ArrayHolderAux[i];
+		}
+		
     // Step 2: Sort the temporary array
-    this->IntBubbleSort(temp,MedianFilterFactor);
+		this->IntBubbleSort(temp,MedianFilterFactor);
     // If odd, middle number
-    return temp[MedianFilterFactor/2];
-}
+		return temp[MedianFilterFactor/2];
+	}
 }
 
 // Function to implement Bubble Sort
 int GPIO::IntBubbleSort(int* arr,int MedianFilterFactor) {
-    int temp=0;
-    for (int i = 0; i < MedianFilterFactor-1; i++) {
-        for (int j = 0; j < MedianFilterFactor-i-1; j++) {
-            if (arr[j] > arr[j+1]) {
+	int temp=0;
+	for (int i = 0; i < MedianFilterFactor-1; i++) {
+		for (int j = 0; j < MedianFilterFactor-i-1; j++) {
+			if (arr[j] > arr[j+1]) {
                 // Swap arr[j] and arr[j+1]
-                temp = arr[j];
-                arr[j] = arr[j+1];
-                arr[j+1] = temp;
-            }
-        }
-    }
+				temp = arr[j];
+				arr[j] = arr[j+1];
+				arr[j+1] = temp;
+			}
+		}
+	}
     return 0; // All ok
 }
 
 double GPIO::DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor){
-if (MedianFilterFactor<=1){
-	return ArrayHolderAux[0];
-}
-else{
+	if (MedianFilterFactor<=1){
+		return ArrayHolderAux[0];
+	}
+	else{
 	// Step 1: Copy the array to a temporary array
-    double temp[MedianFilterFactor]={0.0};
-    for(int i = 0; i < MedianFilterFactor; i++) {
-        temp[i] = ArrayHolderAux[i];
-    }
-    
+		double temp[MedianFilterFactor]={0.0};
+		for(int i = 0; i < MedianFilterFactor; i++) {
+			temp[i] = ArrayHolderAux[i];
+		}
+		
     // Step 2: Sort the temporary array
-    this->DoubleBubbleSort(temp,MedianFilterFactor);
+		this->DoubleBubbleSort(temp,MedianFilterFactor);
     // If odd, middle number
-    return temp[MedianFilterFactor/2];
-}
+		return temp[MedianFilterFactor/2];
+	}
 }
 
 // Function to implement Bubble Sort
 int GPIO::DoubleBubbleSort(double* arr,int MedianFilterFactor) {
-    double temp=0.0;
-    for (int i = 0; i < MedianFilterFactor-1; i++) {
-        for (int j = 0; j < MedianFilterFactor-i-1; j++) {
-            if (arr[j] > arr[j+1]) {
+	double temp=0.0;
+	for (int i = 0; i < MedianFilterFactor-1; i++) {
+		for (int j = 0; j < MedianFilterFactor-i-1; j++) {
+			if (arr[j] > arr[j+1]) {
                 // Swap arr[j] and arr[j+1]
-                temp = arr[j];
-                arr[j] = arr[j+1];
-                arr[j+1] = temp;
-            }
-        }
-    }
+				temp = arr[j];
+				arr[j] = arr[j+1];
+				arr[j+1] = temp;
+			}
+		}
+	}
     return 0; // All ok
 }
 
 double GPIO::DoubleMeanFilterSubArray(double* ArrayHolderAux,int MeanFilterFactor){
-if (MeanFilterFactor<=1){
-	return ArrayHolderAux[0];
-}
-else{
+	if (MeanFilterFactor<=1){
+		return ArrayHolderAux[0];
+	}
+	else{
 	// Step 1: Copy the array to a temporary array
-    double temp=0.0;
-    for(int i = 0; i < MeanFilterFactor; i++) {
-        temp = temp + ArrayHolderAux[i];
-    }
-    
-    temp=temp/((double)(MeanFilterFactor));
-    return temp;
-}
+		double temp=0.0;
+		for(int i = 0; i < MeanFilterFactor; i++) {
+			temp = temp + ArrayHolderAux[i];
+		}
+		
+		temp=temp/((double)(MeanFilterFactor));
+		return temp;
+	}
 }
 
 int GPIO::SendTriggerSignalsSelfTest(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 // Important, the following line at the very beggining to reduce the command jitter
 pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-pru1dataMem_int[0]=static_cast<unsigned int>(1); // set command
+pru1dataMem_int[0]=static_cast<unsigned int>(7); // set command
 prussdrv_pru_send_event(22);//pru1dataMem_int[1]=(unsigned int)2; // set to 2 means perform signals//prussdrv_pru_send_event(22);
 
 // Here there should be the instruction command to tell PRU1 to start generating signals
@@ -1152,7 +1152,7 @@ int GPIO::LOCAL_DDMinit(){
     //void *DDR_regaddr1, *DDR_regaddr2, *DDR_regaddr3;    
     prussdrv_map_prumem(PRUSS0_SHARED_DATARAM, &sharedMem);// Maps the PRU shared RAM memory is then accessed by an array.
     sharedMem_int = (unsigned int*) sharedMem;
-        
+    
     prussdrv_map_prumem(PRUSS0_PRU0_DATARAM, &pru0dataMem);// Maps the PRU0 DRAM memory to input pointer. Memory is then accessed by an array.
     pru0dataMem_int = (unsigned int*) pru0dataMem;
     
@@ -1220,33 +1220,33 @@ GPIO::GPIO(int number) {
 }
 
 int GPIO::write(string path, string filename, string value){
-   ofstream fs;
-   fs.open((path + filename).c_str());
-   if (!fs.is_open()){
-	   perror("GPIO: write failed to open file ");
-	   return -1;
-   }
-   fs << value;
-   fs.close();
-   return 0;
+	ofstream fs;
+	fs.open((path + filename).c_str());
+	if (!fs.is_open()){
+		perror("GPIO: write failed to open file ");
+		return -1;
+	}
+	fs << value;
+	fs.close();
+	return 0;
 }
 
 string GPIO::read(string path, string filename){
-   ifstream fs;
-   fs.open((path + filename).c_str());
-   if (!fs.is_open()){
-	   perror("GPIO: read failed to open file ");
-    }
-   string input;
-   getline(fs,input);
-   fs.close();
-   return input;
+	ifstream fs;
+	fs.open((path + filename).c_str());
+	if (!fs.is_open()){
+		perror("GPIO: read failed to open file ");
+	}
+	string input;
+	getline(fs,input);
+	fs.close();
+	return input;
 }
 
 int GPIO::write(string path, string filename, int value){
-   stringstream s;
-   s << value;
-   return this->write(path,filename,s.str());
+	stringstream s;
+	s << value;
+	return this->write(path,filename,s.str());
 }
 
 //int GPIO::exportGPIO(){
@@ -1258,46 +1258,46 @@ int GPIO::write(string path, string filename, int value){
 //}
 
 int GPIO::setDirection(GPIO_DIRECTION dir){
-   switch(dir){
-   case INPUT: return this->write(this->path, "direction", "in");
-      break;
-   case OUTPUT:return this->write(this->path, "direction", "out");
-      break;
-   }
-   return -1;
+	switch(dir){
+	case INPUT: return this->write(this->path, "direction", "in");
+		break;
+	case OUTPUT:return this->write(this->path, "direction", "out");
+		break;
+	}
+	return -1;
 }
 
 int GPIO::setValue(GPIO_VALUE value){
-   switch(value){
-   case HIGH: return this->write(this->path, "value", "1");
-      break;
-   case LOW: return this->write(this->path, "value", "0");
-      break;
-   }
-   return -1;
+	switch(value){
+	case HIGH: return this->write(this->path, "value", "1");
+		break;
+	case LOW: return this->write(this->path, "value", "0");
+		break;
+	}
+	return -1;
 }
 
 int GPIO::setEdgeType(GPIO_EDGE value){
-   switch(value){
-   case NONE: return this->write(this->path, "edge", "none");
-      break;
-   case RISING: return this->write(this->path, "edge", "rising");
-      break;
-   case FALLING: return this->write(this->path, "edge", "falling");
-      break;
-   case BOTH: return this->write(this->path, "edge", "both");
-      break;
-   }
-   return -1;
+	switch(value){
+	case NONE: return this->write(this->path, "edge", "none");
+		break;
+	case RISING: return this->write(this->path, "edge", "rising");
+		break;
+	case FALLING: return this->write(this->path, "edge", "falling");
+		break;
+	case BOTH: return this->write(this->path, "edge", "both");
+		break;
+	}
+	return -1;
 }
 
 int GPIO::setActiveLow(bool isLow){
-   if(isLow) return this->write(this->path, "active_low", "1");
-   else return this->write(this->path, "active_low", "0");
+	if(isLow) return this->write(this->path, "active_low", "1");
+	else return this->write(this->path, "active_low", "0");
 }
 
 int GPIO::setActiveHigh(){
-   return this->setActiveLow(false);
+	return this->setActiveLow(false);
 }
 
 GPIO_VALUE GPIO::getValue(){
@@ -1331,13 +1331,13 @@ int GPIO::streamOutOpen(){
 }
 
 int GPIO::streamOutWrite(GPIO_VALUE value){
-if (streamOut.is_open())
-    {
-	streamOut << value << std::flush;
-}
-else{
-cout << "BBB streamOut is not open!" << endl;
-}
+	if (streamOut.is_open())
+	{
+		streamOut << value << std::flush;
+	}
+	else{
+		cout << "BBB streamOut is not open!" << endl;
+	}
 	return 0;
 }
 
@@ -1345,12 +1345,12 @@ int GPIO::streamInRead(){
 	//string StrValue;	
 	//streamIn >> StrValue;//std::flush;
 	//return stoi(StrValue);
-if (streamIn.is_open())
-    {
-	string StrValue;
+	if (streamIn.is_open())
+	{
+		string StrValue;
 	//int IntValue;
 	//streamIn >> IntValue;	
-	getline(streamIn,StrValue);
+		getline(streamIn,StrValue);
 	streamIn.clear(); //< Now we can read again
 	streamIn.seekg(0, std::ios::beg); // back to the start!
 	//cout<<StrValue<<endl;
@@ -1360,8 +1360,8 @@ if (streamIn.is_open())
 	//return IntValue;
 }
 else{
-cout << "BBB streamIn is not open!" << endl;
-return 0;
+	cout << "BBB streamIn is not open!" << endl;
+	return 0;
 }
 }
 
@@ -1379,7 +1379,7 @@ int GPIO::toggleOutput(){
 	this->setDirection(OUTPUT);
 	if ((bool) this->getValue()) this->setValue(LOW);
 	else this->setValue(HIGH);
-    return 0;
+	return 0;
 }
 
 int GPIO::toggleOutput(int time){ return this->toggleOutput(-1, time); }
@@ -1388,12 +1388,12 @@ int GPIO::toggleOutput(int numberOfTimes, int time){
 	this->toggleNumber = numberOfTimes;
 	this->togglePeriod = time;
 	this->threadRunning = true;
-    if(pthread_create(&this->thread, NULL, &threadedToggle, static_cast<void*>(this))){
-    	perror("GPIO: Failed to create the toggle thread");
-    	this->threadRunning = false;
-    	return -1;
-    }
-    return 0;
+	if(pthread_create(&this->thread, NULL, &threadedToggle, static_cast<void*>(this))){
+		perror("GPIO: Failed to create the toggle thread");
+		this->threadRunning = false;
+		return -1;
+	}
+	return 0;
 }
 
 // This thread function is a friend function of the class
@@ -1417,23 +1417,23 @@ int GPIO::waitForEdge(){
 	int fd, i, epollfd, count=0;
 	struct epoll_event ev;
 	epollfd = epoll_create(1);
-    if (epollfd == -1) {
-	   perror("GPIO: Failed to create epollfd");
-	   return -1;
-    }
-    if ((fd = open((this->path + "value").c_str(), O_RDONLY | O_NONBLOCK)) == -1) {
-       perror("GPIO: Failed to open file");
-       return -1;
-    }
+	if (epollfd == -1) {
+		perror("GPIO: Failed to create epollfd");
+		return -1;
+	}
+	if ((fd = open((this->path + "value").c_str(), O_RDONLY | O_NONBLOCK)) == -1) {
+		perror("GPIO: Failed to open file");
+		return -1;
+	}
 
     //ev.events = read operation | edge triggered | urgent data
-    ev.events = EPOLLIN | EPOLLET | EPOLLPRI;
+	ev.events = EPOLLIN | EPOLLET | EPOLLPRI;
     ev.data.fd = fd;  // attach the file file descriptor
 
     //Register the file descriptor on the epoll instance, see: man epoll_ctl
     if (epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &ev) == -1) {
-       perror("GPIO: Failed to add control interface");
-       return -1;
+    	perror("GPIO: Failed to add control interface");
+    	return -1;
     }
 	while(count<=1){  // ignore the first trigger
 		i = epoll_wait(epollfd, &ev, 1, -1);
@@ -1445,8 +1445,8 @@ int GPIO::waitForEdge(){
 			count++; // count the triggers up
 		}
 	}
-    close(fd);
-    if (count==5) return -1;
+	close(fd);
+	if (count==5) return -1;
 	return 0;
 }
 
@@ -1464,20 +1464,20 @@ int GPIO::waitForEdge(CallbackType callback){
 	this->threadRunning = true;
 	this->callbackFunction = callback;
     // create the thread, pass the reference, address of the function and data
-    if(pthread_create(&this->thread, NULL, &threadedPoll, static_cast<void*>(this))){
-    	perror("GPIO: Failed to create the poll thread");
-    	this->threadRunning = false;
-    	return -1;
-    }
-    return 0;
+	if(pthread_create(&this->thread, NULL, &threadedPoll, static_cast<void*>(this))){
+		perror("GPIO: Failed to create the poll thread");
+		this->threadRunning = false;
+		return -1;
+	}
+	return 0;
 }
 
 int GPIO::DisablePRUs(){
 // Disable PRU and close memory mappings
-prussdrv_pru_disable(PRU_Signal_NUM);
-prussdrv_pru_disable(PRU_Operation_NUM);
+	prussdrv_pru_disable(PRU_Signal_NUM);
+	prussdrv_pru_disable(PRU_Operation_NUM);
 
-return 0;
+	return 0;
 }
 
 GPIO::~GPIO() {

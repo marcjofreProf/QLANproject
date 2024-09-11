@@ -34,12 +34,12 @@ using std::fstream;
 
 namespace exploringBB {
 
-typedef int (*CallbackType)(int);
-enum GPIO_DIRECTION{ INPUT, OUTPUT };
-enum GPIO_VALUE{ LOW=0, HIGH=1 };
-enum GPIO_EDGE{ NONE, RISING, FALLING, BOTH };
+	typedef int (*CallbackType)(int);
+	enum GPIO_DIRECTION{ INPUT, OUTPUT };
+	enum GPIO_VALUE{ LOW=0, HIGH=1 };
+	enum GPIO_EDGE{ NONE, RISING, FALLING, BOTH };
 
-class GPIO {
+	class GPIO {
 //public: //Variables
 
 private:// Variables
@@ -85,21 +85,21 @@ private:// Variables
 	// Time/synchronization management
 	struct my_clock
 	{
-	    using duration   = std::chrono::nanoseconds;
-	    using rep        = duration::rep;
-	    using period     = duration::period;
-	    using time_point = std::chrono::time_point<my_clock>;
+		using duration   = std::chrono::nanoseconds;
+		using rep        = duration::rep;
+		using period     = duration::period;
+		using time_point = std::chrono::time_point<my_clock>;
 	    static constexpr bool is_steady = false;// true, false. With false, probably the corrections are abrupt, but less slots affected by misadjustments in time. True, the corrections are smooth and probably more slots affected by misadjustments in time.
 
 	    static time_point now()
 	    {
-		timespec ts;
+	    	timespec ts;
 		if (clock_gettime(CLOCK_TAI, &ts))// CLOCK_REALTIME//CLOCK_TAI
-		    throw 1;
+			throw 1;
 		using sec = std::chrono::seconds;
 		return time_point{sec{ts.tv_sec}+duration{ts.tv_nsec}};
-	    }
-	};
+	}
+};
 	using Clock = my_clock;//Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
 	using TimePoint = std::chrono::time_point<Clock>;
 	double SynchTrigPeriod=4096.0; //For slotted analysis. It has to match to the histogram analysis
