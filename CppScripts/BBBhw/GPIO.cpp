@@ -873,17 +873,17 @@ if (SlowMemoryPermanentStorageFlag==true){
 return 0; // all ok
 }
 
-int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int* TimeTaggs, unsigned short* ChannelTags){
+int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int** TimeTaggs, unsigned short int** ChannelTags){
 // Separate the detection by quad channels and do the processing independently
 // First (reset)compute the number of detections per quad channel
 for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
   TotalCurrentNumRecordsQuadCh[iQuadChIter]=0;
 }
 for (int i=0;i<TotalCurrentNumRecords;i++){
-  for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-    if ((ChannelTags[i]&&(0x000F<<(4*iQuadChIter)))>0){  
-      TimeTaggs[TotalCurrentNumRecordsQuadCh[iQuadChIter]]=TimeTaggsStored[i];
-      ChannelTags[TotalCurrentNumRecordsQuadCh[iQuadChIter]]=ChannelTags[i]&&(0x000F<<(4*iQuadChIter));
+  for (unsigned short iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+    if ((ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter)))>0){  
+      TimeTaggs[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=TimeTaggsStored[i];
+      ChannelTags[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter));
       TotalCurrentNumRecordsQuadCh[iQuadChIter]++;
     }
   }
@@ -989,7 +989,7 @@ else{
 return 0; // all ok
 }
 
-int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int* TimeTaggs, unsigned short* ChannelTags){
+int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int** TimeTaggs, unsigned short int** ChannelTags){
 if (SlowMemoryPermanentStorageFlag==true){
 	LastTimeTaggRef[0]=0*static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds);// Since whole number. Initiation value
 	// Detection tags
@@ -1011,7 +1011,7 @@ if (SlowMemoryPermanentStorageFlag==true){
 	if (streamDDRpru.is_open()){
 		streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
 		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		streamDDRpru.read(reinterpret_cast<char*>(&TimeTaggsLastStored), sizeof(TimeTaggsLastStored))
+		streamDDRpru.read(reinterpret_cast<char*>(&TimeTaggsLastStored), sizeof(TimeTaggsLastStored));
 		LastTimeTaggRef[0]=TimeTaggsLastStored*static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds);// Since whole number. Initiation value
 		int lineCount = 0;
 		unsigned long long int ValueReadTest;		

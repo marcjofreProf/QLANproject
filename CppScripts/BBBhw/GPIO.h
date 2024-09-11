@@ -240,7 +240,7 @@ public:	// Functions/Methods
 	int SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	int SendTriggerSignalsSelfTest();//
 	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
-	int RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int* TimeTaggs, unsigned short* ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
+	int RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int** TimeTaggs, unsigned short int** ChannelTags); // Reads the fstream file to retrieve number of stored timetagged qubits
 	int ClearStoredQuBits(); // Send the writting pointer back to the beggining - effectively clearing stored QuBits
 	// Synchronization related
 	int SetSynchDriftParams(double* AccumulatedErrorDriftParamsAux);// Method to update (or reset with 0s) the synchronization parameters of the long time drift (maybe updated periodically)
@@ -292,7 +292,7 @@ private: // Functions/Methods
 	int PRUsignalTimerSynch(); // Periodic synchronizaton of the timer to control the generated signals
 	int PRUsignalTimerSynchJitterLessInterrupt();// Tries to avoid interrupt jitter (might not be completely absolute time
 	int PIDcontrolerTimeJiterlessInterrupt();
-	int PRUdetCorrRelFreq(unsigned int TotalCurrentNumRecordsQuadCh, unsigned long long int* TimeTaggs, unsigned short* ChannelTags);// Correct the detections relative frequency difference of the sender as well as separate by quad channel groups
+	int PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int** TimeTaggs, unsigned short int** ChannelTags);// Correct the detections relative frequency difference of the sender as well as separate by quad channel groups
 	// Data processing
 	unsigned short packBits(unsigned short value);
 	// Non-PRU
