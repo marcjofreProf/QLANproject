@@ -61,13 +61,14 @@ QPLA::QPLA() {// Constructor
 	// Synchronized "slotted" emission
 	// Initialize some arrays at the beggining
 	int CombinationLinksNumAux=static_cast<int>(2*((1LL<<LinkNumberMAX)-1));
-	for (int i=0;i<CombinationLinksNumAux;i++){
-		SmallOffsetDriftPerLink[i]=0.0; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
-		ReferencePointSmallOffsetDriftPerLink[i]=0.0; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
-		// Filtering qubits
-		NonInitialReferencePointSmallOffsetDriftPerLink[i]=false; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
-	}
-	
+	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+	  for (int i=0;i<CombinationLinksNumAux;i++){
+		  SmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
+		  ReferencePointSmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
+		  // Filtering qubits
+		  NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][i]=false; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
+	  }
+      }	
 }
 
 ////////////////////////////////////////////////////////
@@ -930,7 +931,7 @@ this->release();
 return GPIOHardwareSynchedAux;
 }
 
-int QPLA::SmallDriftContinuousCorrection(){
+int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drifts because it is assumed that qubists fall within their histogram period
 
 int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];// Number of qubits to process
 
@@ -944,63 +945,65 @@ return 0;
 // Apply the small offset drift correction
 if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){	
 	if (CurrentSpecificLinkMultiple>-1){// The specific identification IP is present
-		// If it is the first time, annotate the relative time offset with respect HostPeriodicityAux
-		ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=0;// Reset value. ReferencePointSmallOffset could be used to allocate multiple channels separated by time
-		if (NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]==false){			
-			SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=0;// Reset value
-			NonInitialReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=true;// Update value, so that it is not run again
-		}	
-		// First compute the relative new time offset from last iteration
-		long long int SmallOffsetDriftAux=0;
-		long long int SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[CurrentSpecificLinkMultiple];
-		long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);	
-		long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
-		if (UseAllTagsForEstimation){
-			long long int SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0};				
-			for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-				// Mean averaging, not very resilent with glitches, eventhough filtered in liner regression
-				// Median averaging
-				SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
-				cout << "TimeTaggs[0][i] has to identify properly the sub array" << endl;
-			}
-			SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,SimulateNumStoredQubitsNodeAux); // Median averaging
-		}
-		else{
-			SmallOffsetDriftAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
-			cout << "TimeTaggs[0][i] has to identify properly the sub array" << endl;
-			cout << "QPLA::Using only first timetag for small offset correction!...to be deactivated" << endl;
-		}
-						
-		//cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
-		//cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
-		//////////////////////////////////////////
-		// Checks of proper values handling
-		//long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
-		//long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2);
-		//long long int CheckValueAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
-		//cout << "QPLA::SmallDriftContinuousCorrection::CheckValueAux: "<< CheckValueAux << endl;
-		//cout << "QPLA::SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink: " << SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink << endl;
-		////////////////////////////////////////
-		
-		long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple];
-		//long long int LLISmallOffsetDriftAux=static_cast<long long int>(SmallOffsetDriftAux);
-		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-			TimeTaggs[i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
-		}
-			
-		if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/4.0)){// Large step
-			cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
-			cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
-		}
-		
-		// Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
-		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;// Just for monitoring purposes
-		long long int SignAuxInstantCorr=0;
-		if (SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]>0){SignAuxInstantCorr=1;}
-		else if (SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]<0){SignAuxInstantCorr=-1;}
-		else {SignAuxInstantCorr=0;}
-		SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=SignAuxInstantCorr*(abs(SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux);
-		//SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+	    for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+	      if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
+		  // If it is the first time, annotate the relative time offset with respect HostPeriodicityAux
+		  ReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=0;// Reset value. ReferencePointSmallOffset could be used to allocate multiple channels separated by time
+		  if (NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]==false){			
+			  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=0;// Reset value
+			  NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=true;// Update value, so that it is not run again
+		  }	
+		  // First compute the relative new time offset from last iteration
+		  long long int SmallOffsetDriftAux=0;
+		  long long int SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
+		  long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);	
+		  long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
+		  if (UseAllTagsForEstimation){
+			  long long int SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0};				
+			  for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+				  // Mean averaging, not very resilent with glitches, eventhough filtered in liner regression
+				  // Median averaging
+				  SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+			  }
+			  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median averaging
+		  }
+		  else{
+			  SmallOffsetDriftAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+			  cout << "QPLA::Using only first timetag for small offset correction!...to be deactivated" << endl;
+		  }
+						  
+		  //cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
+		  //cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
+		  //////////////////////////////////////////
+		  // Checks of proper values handling
+		  //long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
+		  //long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2);
+		  //long long int CheckValueAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+		  //cout << "QPLA::SmallDriftContinuousCorrection::CheckValueAux: "<< CheckValueAux << endl;
+		  //cout << "QPLA::SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink: " << SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink << endl;
+		  ////////////////////////////////////////
+		  
+		  long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftAux+SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
+		  //long long int LLISmallOffsetDriftAux=static_cast<long long int>(SmallOffsetDriftAux);
+		  for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+			  TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
+		  }
+			  
+		  if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/4.0)){// Large step
+			  cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[iQuadChIter][CurrentSpecificLinkMultiple] << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
+			  cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
+		  }
+		  
+		  // Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
+		  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;// Just for monitoring purposes
+		  long long int SignAuxInstantCorr=0;
+		  if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]>0){SignAuxInstantCorr=1;}
+		  else if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]<0){SignAuxInstantCorr=-1;}
+		  else {SignAuxInstantCorr=0;}
+		  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SignAuxInstantCorr*(abs(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux);
+		  //SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+	    }
+	  }
 	}
 	else{// Mal function we should not be here
 		cout << "QPLA::The Emitter nodes have not been previously identified, so no small offset drift correction applied" << endl;
@@ -1019,6 +1022,12 @@ this->acquire();
 while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];// Number of qubits to process
+int SimulateNumStoredQubitsNodeMinus1Aux=0;
+for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+  if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
+    SimulateNumStoredQubitsNodeMinus1Aux+=RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1;// Number of qubits to process
+  }
+}
 TimeTaggsDetAnalytics[0]=0.0;
 TimeTaggsDetAnalytics[1]=0.0;
 TimeTaggsDetAnalytics[2]=0.0;
@@ -1045,44 +1054,50 @@ if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubit
 
 // Generally mean averaging can be used since outliers (either noise or glitches) have been removed in LinearRegressionQuBitFilter
 if (SimulateNumStoredQubitsNodeAux>1){
-for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-//cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
-//cout << "ChannelTags[i]: "<< std::bitset<8>(ChannelTags[i]) << endl;
-if (ChannelTags[i]&0x0001==1 or (ChannelTags[i]>>4)&0x0001==1 or (ChannelTags[i]>>8)&0x0001==1){TimeTaggsDetAnalytics[0]++;}
-if ((ChannelTags[i]>>1)&0x0001==1 or (ChannelTags[i]>>5)&0x0001==1 or (ChannelTags[i]>>9)&0x0001==1){TimeTaggsDetAnalytics[1]++;}
-if ((ChannelTags[i]>>2)&0x0001==1 or (ChannelTags[i]>>6)&0x0001==1 or (ChannelTags[i]>>10)&0x0001==1){TimeTaggsDetAnalytics[2]++;}
-if ((ChannelTags[i]>>3)&0x0001==1 or (ChannelTags[i]>>7)&0x0001==1 or (ChannelTags[i]>>11)&0x0001==1){TimeTaggsDetAnalytics[3]++;}
+  for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+    if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
+      TimeTaggsDetAnalytics[7]=static_cast<double>(TimeTaggs[iQuadChIter][0]);// Timetag of the first capture
+      for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+        //cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
+        //cout << "ChannelTags[i]: "<< std::bitset<8>(ChannelTags[i]) << endl;
+        if (ChannelTags[iQuadChIter][i]&0x0001==1 or (ChannelTags[iQuadChIter][i]>>4)&0x0001==1 or (ChannelTags[iQuadChIter][i]>>8)&0x0001==1){TimeTaggsDetAnalytics[0]++;}
+        if ((ChannelTags[iQuadChIter][i]>>1)&0x0001==1 or (ChannelTags[iQuadChIter][i]>>5)&0x0001==1 or (ChannelTags[iQuadChIter][i]>>9)&0x0001==1){TimeTaggsDetAnalytics[1]++;}
+        if ((ChannelTags[iQuadChIter][i]>>2)&0x0001==1 or (ChannelTags[iQuadChIter][i]>>6)&0x0001==1 or (ChannelTags[iQuadChIter][i]>>10)&0x0001==1){TimeTaggsDetAnalytics[2]++;}
+        if ((ChannelTags[iQuadChIter][i]>>3)&0x0001==1 or (ChannelTags[iQuadChIter][i]>>7)&0x0001==1 or (ChannelTags[iQuadChIter][i]>>11)&0x0001==1){TimeTaggsDetAnalytics[3]++;}
 
-if (((ChannelTags[i]&0x0001)+((ChannelTags[i]>>1)&0x0001)+((ChannelTags[i]>>2)&0x0001)+((ChannelTags[i]>>3)&0x0001)+((ChannelTags[i]>>4)&0x0001)+((ChannelTags[i]>>5)&0x0001)+((ChannelTags[i]>>6)&0x0001)+((ChannelTags[i]>>7)&0x0001)+((ChannelTags[i]>>8)&0x0001)+((ChannelTags[i]>>9)&0x0001)+((ChannelTags[i]>>10)&0x0001)+((ChannelTags[i]>>11)&0x0001))>1){
-TimeTaggsDetAnalytics[4]=static_cast<double>(TimeTaggsDetAnalytics[4])+1.0;
-}
-if (i>0){//Compute the mean value
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/(static_cast<double>(SimulateNumStoredQubitsNodeAux)-1.0))*(static_cast<double>(TimeTaggs[i]-TimeTaggs[i-1]));
+        if (((ChannelTags[iQuadChIter][i]&0x0001)+((ChannelTags[iQuadChIter][i]>>1)&0x0001)+((ChannelTags[iQuadChIter][i]>>2)&0x0001)+((ChannelTags[iQuadChIter][i]>>3)&0x0001)+((ChannelTags[iQuadChIter][i]>>4)&0x0001)+((ChannelTags[iQuadChIter][i]>>5)&0x0001)+((ChannelTags[iQuadChIter][i]>>6)&0x0001)+((ChannelTags[iQuadChIter][i]>>7)&0x0001)+((ChannelTags[iQuadChIter][i]>>8)&0x0001)+((ChannelTags[iQuadChIter][i]>>9)&0x0001)+((ChannelTags[iQuadChIter][i]>>10)&0x0001)+((ChannelTags[iQuadChIter][i]>>11)&0x0001))>1){
+        TimeTaggsDetAnalytics[4]=static_cast<double>(TimeTaggsDetAnalytics[4])+1.0;
+        }
+        if (i>0){//Compute the mean value
+          TimeTaggsDetAnalytics[5]+=(1.0/(static_cast<double>(SimulateNumStoredQubitsNodeMinus1Aux)))*(static_cast<double>(TimeTaggs[iQuadChIter][i]-TimeTaggs[iQuadChIter][i-1]));
 
-//// Debugging
-//if ((TimeTaggs[i]-TimeTaggs[i-1])>100){
-//cout << "TimeTaggs[i]: " << TimeTaggs[i] << endl;
-//cout << "TimeTaggs[i-1]: " << TimeTaggs[i-1] << endl;
-//}
-
-}
-}
-
-for (int i=1;i<SimulateNumStoredQubitsNodeAux;i++){
-if (i>0){TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/(static_cast<double>(SimulateNumStoredQubitsNodeAux)-1.0))*pow(static_cast<double>(TimeTaggs[i]-TimeTaggs[i-1])-TimeTaggsDetAnalytics[5],2.0);}
-}
-TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
-TimeTaggsDetAnalytics[7]=static_cast<double>(TimeTaggs[0]);// Timetag of the first capture
+          //// Debugging
+          //if ((TimeTaggs[i]-TimeTaggs[i-1])>100){
+          //cout << "TimeTaggs[i]: " << TimeTaggs[i] << endl;
+          //cout << "TimeTaggs[i-1]: " << TimeTaggs[i-1] << endl;
+          //}
+        }
+      }
+    }
+  }
+  for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+    if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
+      for (int i=1;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+        if (i>0){TimeTaggsDetAnalytics[6]+=(1.0/(static_cast<double>(SimulateNumStoredQubitsNodeMinus1Aux)))*pow(static_cast<double>(TimeTaggs[iQuadChIter][i]-TimeTaggs[iQuadChIter][i-1])-TimeTaggsDetAnalytics[5],2.0);}
+      }
+    }
+  }
+  TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);  
 }
 else{
-TimeTaggsDetAnalytics[0]=0.0;
-TimeTaggsDetAnalytics[1]=0.0;
-TimeTaggsDetAnalytics[2]=0.0;
-TimeTaggsDetAnalytics[3]=0.0;
-TimeTaggsDetAnalytics[4]=0.0;
-TimeTaggsDetAnalytics[5]=0.0;
-TimeTaggsDetAnalytics[6]=0.0;
-TimeTaggsDetAnalytics[7]=0.0;
+  TimeTaggsDetAnalytics[0]=0.0;
+  TimeTaggsDetAnalytics[1]=0.0;
+  TimeTaggsDetAnalytics[2]=0.0;
+  TimeTaggsDetAnalytics[3]=0.0;
+  TimeTaggsDetAnalytics[4]=0.0;
+  TimeTaggsDetAnalytics[5]=0.0;
+  TimeTaggsDetAnalytics[6]=0.0;
+  TimeTaggsDetAnalytics[7]=0.0;
 }
 //cout << "TimeTaggsDetAnalytics[0]: " << TimeTaggsDetAnalytics[0] << endl;
 //cout << "TimeTaggsDetAnalytics[1]: " << TimeTaggsDetAnalytics[1] << endl;
@@ -1105,61 +1120,53 @@ cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference
 cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
 cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
 if (SimulateNumStoredQubitsNodeAux>1){
-unsigned long long int TimeTaggs0Aux=TimeTaggs[0];
-unsigned long long int TimeTaggsLastAux=TimeTaggs[SimulateNumStoredQubitsNodeAux-1];
-//for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){//// To have synchronisms in between inter captures. For long range synch testing with histogram, this could be commented
-//TimeTaggs[i]=TimeTaggs[i]-TimeTaggs0Aux+OldLastTimeTagg+static_cast<unsigned long long int>(HistPeriodicityAux);
-//}
+  TimeTaggsDetAnalytics[0]=0.0;
+  TimeTaggsDetAnalytics[1]=0.0;
+  TimeTaggsDetAnalytics[2]=0.0;
+  TimeTaggsDetAnalytics[3]=0.0;
+  TimeTaggsDetAnalytics[4]=0.0;
+  TimeTaggsDetAnalytics[5]=0.0;
+  TimeTaggsDetAnalytics[6]=0.0;
+  TimeTaggsDetAnalytics[7]=0.0;
+  
+  for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+    if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
+      TimeTaggsDetAnalytics[7]=static_cast<double>(TimeTaggs[iQuadChIter][0]);
+      for (int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){
+        if (i==0){cout << "TimeTaggs[iQuadChIter][1]-TimeTaggs[iQuadChIter][0]: " << TimeTaggs[iQuadChIter][1]-TimeTaggs[iQuadChIter][0] << endl;}
+        else if(i==(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-2)){cout << "TimeTaggs[iQuadChIter][i+1]-TimeTaggs[iQuadChIter][i]: " << TimeTaggs[iQuadChIter][i+1]-TimeTaggs[iQuadChIter][i] << endl;}
 
-TimeTaggsDetAnalytics[0]=0.0;
-TimeTaggsDetAnalytics[1]=0.0;
-TimeTaggsDetAnalytics[2]=0.0;
-TimeTaggsDetAnalytics[3]=0.0;
-TimeTaggsDetAnalytics[4]=0.0;
-TimeTaggsDetAnalytics[5]=0.0;
-TimeTaggsDetAnalytics[6]=0.0;
-TimeTaggsDetAnalytics[7]=0.0;
-
-TimeTaggsDetAnalytics[7]=static_cast<double>(TimeTaggs[0]);
-//cout << "QPLA::TimeTaggs[0]: " << TimeTaggs[0] << endl;
-
-TimeTaggsDetAnalytics[5]=0.0;
-TimeTaggsDetAnalytics[6]=0.0;
-for (int i=0;i<(SimulateNumStoredQubitsNodeAux-1);i++){
-if (i==0){cout << "TimeTaggs[1]-TimeTaggs[0]: " << TimeTaggs[1]-TimeTaggs[0] << endl;}
-else if(i==(SimulateNumStoredQubitsNodeAux-2)){cout << "TimeTaggs[i+1]-TimeTaggs[i]: " << TimeTaggs[i+1]-TimeTaggs[i] << endl;}
-
-TimeTaggsDetAnalytics[5]=TimeTaggsDetAnalytics[5]+(1.0/(static_cast<double>(SimulateNumStoredQubitsNodeAux)-1.0))*((static_cast<double>((static_cast<long long int>(HistPeriodicityAux)/2+static_cast<long long int>(TimeTaggs[i+1])-static_cast<long long int>(TimeTaggs[i]))%(static_cast<long long int>(HistPeriodicityAux))))-static_cast<double>(static_cast<long long int>(HistPeriodicityAux)/2));
-}
-
-for (int i=0;i<(SimulateNumStoredQubitsNodeAux-1);i++){
-TimeTaggsDetAnalytics[6]=TimeTaggsDetAnalytics[6]+(1.0/(static_cast<double>(SimulateNumStoredQubitsNodeAux)-1.0))*pow((static_cast<double>((static_cast<long long int>(HistPeriodicityAux)/2+static_cast<long long int>(TimeTaggs[i+1])-static_cast<long long int>(TimeTaggs[i]))%(static_cast<long long int>(HistPeriodicityAux))))-static_cast<double>(static_cast<long long int>(HistPeriodicityAux)/2)-TimeTaggsDetAnalytics[5],2.0);
-}
-TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
-
-//OldLastTimeTagg=TimeTaggsLastAux;// Update value
-
-//cout << "Offset corrected TimeTaggs[0]: " << TimeTaggs[0] << endl;
-//cout << "Offset corrected TimeTaggs[1]: " << TimeTaggs[1] << endl;
-//cout << "Offset corrected TimeTaggs[2]: " << TimeTaggs[2] << endl;
-//cout << "Offset corrected TimeTaggs[3]: " << TimeTaggs[3] << endl;
-
+        TimeTaggsDetAnalytics[5]+=(1.0/(static_cast<double>(SimulateNumStoredQubitsNodeMinus1Aux)))*((static_cast<double>((static_cast<long long int>(HistPeriodicityAux)/2+static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i]))%(static_cast<long long int>(HistPeriodicityAux))))-static_cast<double>(static_cast<long long int>(HistPeriodicityAux)/2));
+      }
+    }
+  }
+  
+  for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+    if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
+      for (int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){
+        TimeTaggsDetAnalytics[6]+=(1.0/(static_cast<double>(SimulateNumStoredQubitsNodeMinus1Aux)))*pow((static_cast<double>((static_cast<long long int>(HistPeriodicityAux)/2+static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i]))%(static_cast<long long int>(HistPeriodicityAux))))-static_cast<double>(static_cast<long long int>(HistPeriodicityAux)/2)-TimeTaggsDetAnalytics[5],2.0);
+      }
+    }
+  }
+  TimeTaggsDetAnalytics[6]=sqrt(TimeTaggsDetAnalytics[6]);
+  //cout << "Offset corrected TimeTaggs[0]: " << TimeTaggs[0] << endl;
+  //cout << "Offset corrected TimeTaggs[1]: " << TimeTaggs[1] << endl;
+  //cout << "Offset corrected TimeTaggs[2]: " << TimeTaggs[2] << endl;
+  //cout << "Offset corrected TimeTaggs[3]: " << TimeTaggs[3] << endl;
 }
 else{
-TimeTaggsDetAnalytics[0]=0.0;
-TimeTaggsDetAnalytics[1]=0.0;
-TimeTaggsDetAnalytics[2]=0.0;
-TimeTaggsDetAnalytics[3]=0.0;
-TimeTaggsDetAnalytics[4]=0.0;
-TimeTaggsDetAnalytics[5]=0.0;
-TimeTaggsDetAnalytics[6]=0.0;
-TimeTaggsDetAnalytics[7]=0.0;
+  TimeTaggsDetAnalytics[0]=0.0;
+  TimeTaggsDetAnalytics[1]=0.0;
+  TimeTaggsDetAnalytics[2]=0.0;
+  TimeTaggsDetAnalytics[3]=0.0;
+  TimeTaggsDetAnalytics[4]=0.0;
+  TimeTaggsDetAnalytics[5]=0.0;
+  TimeTaggsDetAnalytics[6]=0.0;
+  TimeTaggsDetAnalytics[7]=0.0;
 }
-
 
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();
-
 return SimulateNumStoredQubitsNodeAux;
 }
 
@@ -1194,10 +1201,11 @@ int QPLA::HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass){
 //this->acquire();
 //while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 //this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
-int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];
+cout << "QPLA::HistCalcPeriodTimeTags needed to develop to identify the specific quad channel group!" << endl;
+int SpecificQuadChIter=0;
 
 // Check that we not exceed the QuBits buffer size
-if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
+if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChIter]>NumQubitsMemoryBuffer){RawTotalCurrentNumRecordsQuadCh[SpecificQuadChIter]=NumQubitsMemoryBuffer;}
 
 long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
 long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
@@ -1207,21 +1215,21 @@ double dHistPeriodicityHalfAux=static_cast<double>(HistPeriodicityAux/2.0);
 // Store the information of the start of the detection
 SynchTimeTaggRef[iCenterMass][iNumRunsPerCenterMass]=static_cast<long long int>(RawLastTimeTaggRef[0]);
 
-if (SimulateNumStoredQubitsNodeAux>0){	
+if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChIter]>0){	
 	if (UseAllTagsForEstimation){
 		// Mean averaging
 		//for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
 		//CenterMassVal=CenterMassVal+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
 		//}
 		// Median averaging
-		for (int i=0;i<SimulateNumStoredQubitsNodeAux;i++){
-			SynchFirstTagsArrayAux[i]=static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
+		for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChIter];i++){
+			SynchFirstTagsArrayAux[i]=static_cast<long long int>(TimeTaggs[SpecificQuadChIter][i])%LLIHistPeriodicityAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
 		}
-		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,SimulateNumStoredQubitsNodeAux);
+		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,RawTotalCurrentNumRecordsQuadCh[SpecificQuadChIter]);
 	}
 	else{
 		// Single value
-		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux; // Considering only the first timetagg. Might not be very resilence with noise
+		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=static_cast<long long int>(TimeTaggs[SpecificQuadChIter][0])%LLIHistPeriodicityAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux; // Considering only the first timetagg. Might not be very resilence with noise
 		cout << "QPLA::Using only first timetag for network synch computations!...to be deactivated" << endl;
 	}
 	//cout << "QPLA::SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]: " << SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass] << endl;
@@ -1456,21 +1464,24 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 return 0; // All Ok
 }
 
-int QPLA::LinearRegressionQuBitFilter(){
+int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection window
 //this->acquire(); It is already within an acquire/release
-if (ApplyRawQubitFilteringFlag==true){	
-	int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,RawTotalCurrentNumRecordsQuadCh,RawTimeTaggs,RawChannelTags); // Get raw values
-	unsigned long long int NormInitialTimeTaggsVal=RawTimeTaggs[0];
+if (ApplyRawQubitFilteringFlag==true){
+  this->SimulateNumStoredQubitsNode[0]=0; // Reset this value
+  int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,RawTotalCurrentNumRecordsQuadCh,RawTimeTaggs,RawChannelTags); // Get raw values
+  for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+    if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){	
+	unsigned long long int NormInitialTimeTaggsVal=RawTimeTaggs[iQuadChIter][0];
 	// Normalize values to work with more plausible values
 	//for (int i=0;i<RawNumStoredQubits;i++){
 	//	RawTimeTaggs[i]=RawTimeTaggs[i]-NormInitialTimeTaggsVal;
 	//}
 	// If the SNR is not well above 20 dB or 30dB, this methods perform really bad
 	// Estimate the x values for the linear regression from the y values (RawTimeTaggs)
-	unsigned long long int xEstimateRawTimeTaggs[RawNumStoredQubits]={0}; // Timetaggs of the detections raw
+	unsigned long long int xEstimateRawTimeTaggs[RawTotalCurrentNumRecordsQuadCh[iQuadChIter]]={0}; // Timetaggs of the detections raw
 	//long long int RoundingAux;
 	unsigned long long int ULLIHistPeriodicityAux=static_cast<unsigned long long int>(HistPeriodicityAux);
-	for (int i=0;i<RawNumStoredQubits;i++){
+	for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 		/*if (i==0){
 			RoundingAux=(HistPeriodicityAux/2+RawTimeTaggs[i])%HistPeriodicityAux-HistPeriodicityAux/2;
 			if (RoundingAux>=(HistPeriodicityAux/4)){RoundingAux=1;}
@@ -1489,13 +1500,13 @@ if (ApplyRawQubitFilteringFlag==true){
 		//if (RoundingAux>=(HistPeriodicityAux/4)){RoundingAux=1;}
 		//else if (RoundingAux<=(-HistPeriodicityAux/4)){RoundingAux=-1;}
 		//else{RoundingAux=0;}
-		xEstimateRawTimeTaggs[i]=(RawTimeTaggs[i]/ULLIHistPeriodicityAux)*ULLIHistPeriodicityAux;		
+		xEstimateRawTimeTaggs[i]=(RawTimeTaggs[iQuadChIter][i]/ULLIHistPeriodicityAux)*ULLIHistPeriodicityAux;		
 	}
 
 	// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
 	double y_mean = 0.0;
 	//double x_mean = 0.0;
-	double y_meanArray[RawNumStoredQubits]={0.0};
+	double y_meanArray[RawTotalCurrentNumRecordsQuadCh[iQuadChIter]]={0.0};
 	//double x_meanArray[RawNumStoredQubits]={0.0};
 	// Relative
         //for (int i=0; i < (RawNumStoredQubits-1); i++) {
@@ -1507,15 +1518,15 @@ if (ApplyRawQubitFilteringFlag==true){
         //}
         //y_mean=DoubleMedianFilterSubArray(y_meanArray,(RawNumStoredQubits-1)); // Median average
         // Absolute
-        for (int i=0; i < RawNumStoredQubits; i++) {
-            y_meanArray[i]=static_cast<double>(RawTimeTaggs[i]%ULLIHistPeriodicityAux);
+        for (int i=0; i < RawTotalCurrentNumRecordsQuadCh[iQuadChIter]; i++) {
+            y_meanArray[i]=static_cast<double>(RawTimeTaggs[iQuadChIter][i]%ULLIHistPeriodicityAux);
             //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
             // We cannot use mean averaging since there might be outliers
 	    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
 	    //x_mean += static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
         }
-        y_mean=DoubleMedianFilterSubArray(y_meanArray,RawNumStoredQubits); // Median average
-        //x_mean=DoubleMedianFilterSubArray(x_meanArray,RawNumStoredQubits); // Median average. Not really needed x_mean
+        y_mean=DoubleMedianFilterSubArray(y_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average
+        //x_mean=DoubleMedianFilterSubArray(x_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average. Not really needed x_mean
         //cout << "QPLA::y_mean: " << y_mean << endl;
         //cout << "QPLA::x_mean: " << x_mean << endl;
 	unsigned long long int EstInterceptVal = static_cast<unsigned long long int>(y_mean);// - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1
@@ -1529,10 +1540,10 @@ if (ApplyRawQubitFilteringFlag==true){
 	int FilteredNumStoredQubits=0;
 	// Filter out detections not falling within the defined detection window and calculated signal positions
 	
-	for (int i=0;i<RawNumStoredQubits;i++){
-		if (abs(static_cast<long long int>(RawTimeTaggs[i])-static_cast<long long int>(xEstimateRawTimeTaggs[i]))<FilteringAcceptWindowSize){// Within acceptance window
-			TimeTaggs[FilteredNumStoredQubits]=RawTimeTaggs[i];
-			ChannelTags[FilteredNumStoredQubits]=RawChannelTags[i];
+	for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+		if (abs(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-static_cast<long long int>(xEstimateRawTimeTaggs[i]))<FilteringAcceptWindowSize){// Within acceptance window
+			TimeTaggs[iQuadChIter][FilteredNumStoredQubits]=RawTimeTaggs[iQuadChIter][i];
+			ChannelTags[iQuadChIter][FilteredNumStoredQubits]=RawChannelTags[iQuadChIter][i];
 			FilteredNumStoredQubits++;
 		}
 	}
@@ -1544,9 +1555,9 @@ if (ApplyRawQubitFilteringFlag==true){
 		cout << "QPLA::LinearRegressionQuBitFilter EstimatedSNRqubitsRatio " << EstimatedSNRqubitsRatio << " does not have enough SNR (>10 dB) to perform good when filtering raw qubits!!!" << endl;
 		cout << "QPLA::Not filtering outlier qubits!!!" << endl;
 		FilteredNumStoredQubits=0;// Reset value
-		for (int i=0;i<RawNumStoredQubits;i++){
-			TimeTaggs[FilteredNumStoredQubits]=RawTimeTaggs[i];
-			ChannelTags[FilteredNumStoredQubits]=RawChannelTags[i];
+		for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+			TimeTaggs[iQuadChIter][FilteredNumStoredQubits]=RawTimeTaggs[iQuadChIter][i];
+			ChannelTags[iQuadChIter][FilteredNumStoredQubits]=RawChannelTags[iQuadChIter][i];
 			FilteredNumStoredQubits++;
 		}
 	}
@@ -1557,7 +1568,8 @@ if (ApplyRawQubitFilteringFlag==true){
 	//}
 	
 	// Update final values
-	this->SimulateNumStoredQubitsNode[0]=FilteredNumStoredQubits; // Update value
+	this->SimulateNumStoredQubitsNode[0]+=FilteredNumStoredQubits; // Update value
+	RawTotalCurrentNumRecordsQuadCh[iQuadChIter]=FilteredNumStoredQubits;
 	
 	//////////////////////////////////////////
 	// Checks of proper values handling
@@ -1566,9 +1578,11 @@ if (ApplyRawQubitFilteringFlag==true){
 	//long long int CheckValueAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
 	//cout << "QPLA::LinearRegressionQuBitFilter::CheckValueAux: "<< CheckValueAux << endl;
 	////////////////////////////////////////
+    }
+  }
 }
 else{ // Do not apply filtering
-	this->SimulateNumStoredQubitsNode[0]=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,TimeTaggs,ChannelTags); // Get raw values
+	this->SimulateNumStoredQubitsNode[0]=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,RawTotalCurrentNumRecordsQuadCh,RawTimeTaggs,RawChannelTags); // Get raw values
 	cout << "QPLA::Not applying ApplyRawQubitFilteringFlag...to be activated" << endl;
 }
 //this->release(); It is already within an acquire/release

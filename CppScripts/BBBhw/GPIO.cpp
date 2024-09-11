@@ -873,7 +873,7 @@ if (SlowMemoryPermanentStorageFlag==true){
 return 0; // all ok
 }
 
-int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int** TimeTaggs, unsigned short int** ChannelTags){
+int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int TimeTaggs[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTags[QuadNumChGroups][MaxNumQuBitsMemStored]){
 // Separate the detection by quad channels and do the processing independently
 // First (reset)compute the number of detections per quad channel
 for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
@@ -989,7 +989,7 @@ else{
 return 0; // all ok
 }
 
-int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int** TimeTaggs, unsigned short int** ChannelTags){
+int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int TimeTaggs[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTags[QuadNumChGroups][MaxNumQuBitsMemStored]){
 if (SlowMemoryPermanentStorageFlag==true){
 	LastTimeTaggRef[0]=0*static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds);// Since whole number. Initiation value
 	// Detection tags

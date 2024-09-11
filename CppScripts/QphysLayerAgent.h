@@ -22,7 +22,7 @@ Header declaration file for Quantum physical Layer Agent
 #define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 //Qubits
 #define MaxNumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
-#define NumQubitsMemoryBuffer 1*MaxNumQuBitsPerRun// In multiples of NumQuBitsPerRun (e.g., 1964, 3928, ...). Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
+#define NumQubitsMemoryBuffer 10*MaxNumQuBitsPerRun// In multiples of NumQuBitsPerRun (e.g., 1964, 3928, ...). Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
 // Synchronization
 #define NumCalcCenterMass 3 // 1 // Number of centers of mass to measure to compute the synchronization
 #define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
@@ -55,9 +55,10 @@ private: //Variables/Instances
 	int numberLinks=0;// Number of full duplex links directly connected to this physical quantum node
 	unsigned long long int RawLastTimeTaggRef[1]={0}; // Timetaggs of the start of the detection in units of Time (not PRU time)
 	unsigned long long int RawTimeTaggs[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections raw
-	unsigned short RawChannelTags[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs raw
+	unsigned short int RawChannelTags[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs raw
 	unsigned long long int TimeTaggs[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections
-	unsigned short ChannelTags[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs
+	unsigned short int ChannelTags[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs
+	unsigned int RawTotalCurrentNumRecordsQuadCh[QuadNumChGroups]={0}; // Number of detections for quad channels groups
         //int EmitLinkNumberArray[LinkNumberMAX]={60}; // Array indicating the GPIO numbers identifying the emit pins
         //int ReceiveLinkNumberArray[LinkNumberMAX]={48}; // Array indicating the GPIO numbers identifying the receive pins
         float QuBitsPerSecondVelocity[LinkNumberMAX]={1000000.0}; // Array indicating the qubits per second velocity of each emit/receive pair 
@@ -135,10 +136,10 @@ private: //Variables/Instances
 	char LinkIdentificationArray[LinkNumberMAX][IPcharArrayLengthMAX]={0}; // To track details of each specific link
 	bool ApplyProcQubitsSmallTimeOffsetContinuousCorrection=true; // Since we know that (after correcting for relative frequency difference and time offset) the tags should coincide with the initial value of the periodicity where the signals are sent
 	// the following arrays are initialized to zero in the Agent creator
-	long long int SmallOffsetDriftPerLink[2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
-	long long int ReferencePointSmallOffsetDriftPerLink[2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
+	long long int SmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
+	long long int ReferencePointSmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
 	// Filtering qubits
-	bool NonInitialReferencePointSmallOffsetDriftPerLink[2*((1LL<<LinkNumberMAX)-1)]={false}; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
+	bool NonInitialReferencePointSmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={false}; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
 	// Filtering qubits
 	bool ApplyRawQubitFilteringFlag=true;// Variable to select or unselect the filtering of raw qubits
 	long long int FilteringAcceptWindowSize=250; // Equivalent to around 3 times the time jitter
@@ -146,7 +147,7 @@ private: //Variables/Instances
 	//int iCenterMassAuxiliarTest=0;
 	//int iNumRunsPerCenterMassAuxiliarTest=0;
 	// Selector of mission or detection quadruples or group. 0=000b no channel selected (actually it is not a valid option), 1=001b emission or detection of the first lower group of 4 channels, 2=010b emission or detection of the second lower group of 4 channels, 3=011b emission or detection of the first and second group of lower group of 4 channels....7=111b emission or detection of the third, second and first lower groups of 4 channels (all channels). This value is updated thorugh upper layer agents for each emission or detection
-	int QuadEmitDetecSelec=7; // Initialization to all channels
+	int QuadEmitDetecSelec=7; // Initialization to all channels	
         
 public: // Variables/Instances
 	exploringBB::GPIO PRUGPIO;
