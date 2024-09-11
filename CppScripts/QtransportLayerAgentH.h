@@ -45,7 +45,7 @@ public: // Variables/Objects
 	int numberSessions=0;
 private: // Variables/Objects	
 	ApplicationState m_state;
-	char IPaddressesSockets[5][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks
+	char IPaddressesSockets[NumConnectedHosts+3][IPcharArrayLengthMAX]; // IP address of the client/server host/node in the control/operation networks
 	// IPaddressesSockets[0]: IP node attached ConNet
 	// IPaddressesSockets[1]: IP host attached ConNet
 	// IPaddressesSockets[2]: IP host attached OpNet
@@ -121,6 +121,8 @@ private: // Variables/Objects
 	int NumAnswersOtherHostsActiveActionsFree=0;// Counter of the number of answers from other hosts proceessed
 	char InfoRemoteHostActiveActions[2][IPcharArrayLengthMAX]={"\0"}; // Two parameters indicating current active blocking host and status of this hosts
 	bool AchievedAttentionParticularHosts=false;// Indicates that we have got the attenation of the hosts
+	int QTLAHParamsTableDetAutoSynchQuadChEmt[NumConnectedHosts]={0};//
+	int QTLAHParamsTableDetAutoSynchQuadChDet[NumConnectedHosts]={0};//
 
 public: // Functions
 	// Management

@@ -49,7 +49,7 @@ QTLAH::QTLAH(int numberSessions,char* ParamsDescendingCharArray,char* ParamsAsce
 // signal(SIGINT, SignalINTHandler);// Interruption signal
 // signal(SIGPIPE, SignalPIPEHandler);// Error trying to write/read to a socket
 // signal(SIGSEGV, SignalSegmentationFaultHandler);// Segmentation fault
-	
+
  this->numberSessions = numberSessions; // Number of sessions of different services
  
  //cout << "The value of the input is: "<< ParamsDescendingCharArray << endl;
@@ -62,6 +62,27 @@ strcpy(this->IPaddressesSockets[1],strtok(NULL,","));//Null indicates we are usi
 strcpy(this->IPaddressesSockets[2],strtok(NULL,","));
 strcpy(this->IPaddressesSockets[3],strtok(NULL,","));
 strcpy(this->IPaddressesSockets[4],strtok(NULL,","));
+// Hard coded order of quad groups channels for automatic periodic synchronization
+char ParamsCharArrayEmt[NumBytesBufferICPMAX] = {0};
+char ParamsCharArrayDet[NumBytesBufferICPMAX] = {0};
+strcpy(ParamsCharArrayEmt,strtok(NULL,","));
+strcpy(ParamsCharArrayDet,strtok(NULL,","));
+for (int iNumConnectedHosts=0;iNumConnectedHosts<NumConnectedHosts;iNumConnectedHosts++){
+	if (iNumConnectedHosts==0){
+		this->QTLAHParamsTableDetAutoSynchQuadChEmt[iNumConnectedHosts]=atoi(strtok(ParamsCharArrayEmt,";"));
+	}
+	else{
+		this->QTLAHParamsTableDetAutoSynchQuadChEmt[iNumConnectedHosts]=atoi(strtok(NULL,";"));
+	}	
+}
+for (int iNumConnectedHosts=0;iNumConnectedHosts<NumConnectedHosts;iNumConnectedHosts++){
+	if (iNumConnectedHosts==0){
+		this->QTLAHParamsTableDetAutoSynchQuadChDet[iNumConnectedHosts]=atoi(strtok(ParamsCharArrayDet,";"));
+	}
+	else{
+		this->QTLAHParamsTableDetAutoSynchQuadChDet[iNumConnectedHosts]=atoi(strtok(NULL,";"));
+	}	
+}
 
 //cout << "IPaddressesSockets[0]: "<< this->IPaddressesSockets[0] << endl;
 //cout << "IPaddressesSockets[1]: "<< this->IPaddressesSockets[1] << endl;
@@ -271,7 +292,7 @@ else{// TCP
 	if (RetValue==-1){this->m_exit();} // Exit application
 	this->numberSessions=1;
 	this->NumSockets=3;
-	
+
 	return 0; // All OK
 }
 
@@ -335,25 +356,25 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
 		cout << "Client Socket creation error" << endl;
 		return -1;
 	}
-	
+
     //cout << "Client Socket file descriptor: " << socket_fd << endl;
-	
+
     // Check status of a previously initiated socket to reduce misconnections
     //this->SocketCheckForceShutDown(socket_fd); Not used
-	
+
     // Specifying some options to the port
 	if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
 		cout << "Server attaching socket options failed" << endl;
 		return -1;
 	}
-	
+
 	address.sin_family = AF_INET;
 	if (string(SOCKtype)=="SOCK_DGRAM"){
     	address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);// Since we have the info, it is better to specify, instead of INADDR_ANY;
     	address.sin_port = htons(0);// 0 any avaliable
     }
     else{address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);address.sin_port = htons(PORT);}// Since we have the info, it is better to specify, instead of INADDR_ANY;
-    
+
     // Forcefully attaching socket to the port
     if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
     	cout << "Client socket bind failed" << endl;
@@ -367,8 +388,8 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     		cout << "Invalid address / Address not supported" << endl;
     		return -1;
     	}
-    	
-    	
+
+
     	int status= connect(socket_fd, (struct sockaddr*)&address,sizeof(address));
     	if (status< 0) {
     		cout << "Client Connection Failed" << endl;
@@ -387,7 +408,7 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddres
 	struct sockaddr_in address;
 	int opt = 1;
 	socklen_t addrlen = sizeof(address);       
-	
+
     // Creating socket file descriptor
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
     // type: SOCK_STREAM: TCP(reliable, connection oriented) // ( SOCK_STREAM for TCP / SOCK_DGRAM for UDP ) 
@@ -398,16 +419,16 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddres
 		cout << "Server socket failed" << endl;
 		return -1;
 	}
-	
+
     // Check status of a previously initiated socket to reduce misconnections
     //this->SocketCheckForceShutDown(socket_fd); Not used
-	
+
     // Specifying some options to the port
 	if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
 		cout << "Server attaching socket options failed" << endl;
 		return -1;
 	}
-	
+
 	address.sin_family = AF_INET;
 	if (string(SOCKtype)=="SOCK_DGRAM"){
     	address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);// Since we have the info, it is better to specify, instead of INADDR_ANY;
@@ -429,7 +450,7 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddres
     		cout << "Server socket listen failed" << endl;
     		return -1;
     	}
-    	
+
     	new_socket= accept(socket_fd, (struct sockaddr*)&address,&addrlen);
     	if (new_socket< 0) {
     		cout << "Server socket accept failed" << endl;
@@ -464,7 +485,7 @@ int QTLAH::ICPmanagementOpenServer(int& socket_fd,int& new_socket,char* IPaddres
   // The tv_usec member is rarely used, but it can be used to specify a more precise timeout. For example, if you want to wait for a message to arrive on the socket for up to 1.5 seconds, you could set tv_sec to 1 and tv_usec to 500,000.
   	timeout.tv_sec = 0;
   	timeout.tv_usec = SockListenTimeusec;
-  	
+
   int nfds = socket_fd_conn + 1; //The nfds argument specifies the range of file descriptors to be tested. The select() function tests file descriptors in the range of 0 to nfds-1.
   int ret = 0;
   if (string(SOCKtype)=="SOCK_DGRAM"){ret = select(nfds, &fds, NULL, NULL, &timeout);}
@@ -529,7 +550,7 @@ else {// There might be at least one new message
 			valread=recvfrom(socket_fd_conn,this->ReadBuffer,NumBytesBufferICPMAX,0,(struct sockaddr *) &orgaddr,&addrLen);//MSG_WAITALL
 		}
 	}
-	
+
 			//cout << "valread: " << valread << endl;
 			//for (int i=0; i<(NumSockets); i++){
 			//	cout << "socket_fd_conn: " << socket_fd_conn << endl;
@@ -553,7 +574,7 @@ if (valread <= 0){
 				cout << "Host " << string(this->SCmode[i]) << " error reading new messages" << endl;
 			}
 		}
-		
+
 	}
 	else{
 		cout << strerror(errno) << endl;
@@ -588,7 +609,7 @@ bool QTLAH::isSocketWritable(int sock) {
 			}
 		}
 	}
-	
+
 	fd_set write_fds;
 	FD_ZERO(&write_fds);
 	FD_SET(sock, &write_fds);
@@ -617,15 +638,15 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	int BytesSent=0;
 	if (string(SOCKtype)=="SOCK_DGRAM"){
 		int socket_fd = 0;
-		
+
 		struct sockaddr_in destaddr;   
 		memset(&destaddr, 0, sizeof(destaddr)); 
-		
+
 	    // Filling server information 
 		destaddr.sin_family = AF_INET; 
 		destaddr.sin_port = htons(PORT); 
 		destaddr.sin_addr.s_addr = inet_addr(IPaddressesSockets); 
-		
+
 		for (int i=0; i<(NumSockets); i++){
 	    	//cout << "IPSocketsList[i]: " << this->IPSocketsList[i] << endl;
 			if (socket_fd_conn==socket_fdArray[i]){
@@ -638,7 +659,7 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
 	    }	    
 	  }
 	  else{BytesSent=send(socket_fd_conn, SendBufferAux, strlen(SendBufferAux),MSG_DONTWAIT);}
-	  
+
 	  if (BytesSent<0){
 	  	perror("send");
 	  	cout << "ICPmanagementSend: Errors sending Bytes" << endl;
@@ -660,7 +681,7 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
   int QTLAH::ICPmanagementCloseClient(int socket_fd) {
     // closing the connected socket
   	close(socket_fd);
-  	
+
     return 0; // All OK
   }
 
@@ -671,7 +692,7 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
   	}
     // closing the listening socket
   	close(socket_fd);
-  	
+
     return 0; // All OK
   }
 
@@ -898,7 +919,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
   	cout << "Exception caught" << endl;
   }
     } // while
-    
+
   }
 
 int QTLAH::ICPConnectionsCheckNewMessages(int SockListenTimeusec){// Read one message at a time and from the different sockets
@@ -978,7 +999,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 						//cout << "stof(SubPayload): " << stod(SubPayload) << endl;
 					}
 				}
-				
+
 				this->InfoSimulateNumStoredQubitsNodeFlag=true;
 				//cout << "SimulateNumStoredQubitsNode finished parsing values" << endl;		
 			}
@@ -998,7 +1019,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 					this->TimeTaggsDetSynchParams[i]=stod(SubPayload);
 					//cout << "stod(SubPayload): " << stod(SubPayload) << endl;
 				}
-				
+
 				this->InfoSimulateNumStoredQubitsNodeFlag=true;
 				//cout << "SimulateSynchParamsNode finished parsing values" << endl;		
 			}
@@ -1075,7 +1096,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 						cout << "IPdest: " << IPdest << ", IPorg: " << IPorg << ", Type: " << Type << ", Command: " << Command << " , Payload: " << Payload << endl;
 					}
 				}
-				
+
 			}
 			else if (string(Command)==string("print")){
 				cout << "Host " << this->IPaddressesSockets[2] << " New Message: "<< Payload << endl;
@@ -1121,7 +1142,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		    	    bool NonEmptyPayloadAux=false;
 			    // Analyze if there are messages for host this->IPaddressesSockets[iIterOpHost+3]
 			    // Payload message is like: Trans;Header_Payload1:Payload2:_Header_Payload_;Header_Payload_Header_Payload_;Net;none_none_;Link;none_none_;Phys;none_none_; 
-		    	    
+
 			    for (int iIterNodeAgents=0;iIterNodeAgents<4;iIterNodeAgents++){// Discard the first Layer Name = Trans
 			        strcpy(PayloadAux,Payload);// Make a copy of the original Payload
 			    	for (int iIterPayloadDump=0;iIterPayloadDump<(2*iIterNodeAgents);iIterPayloadDump++){// Reposition the pointer of strtok
@@ -1764,6 +1785,9 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			sprintf(charNumAux, "%4f", 0.0);// Zero added relative frequency difference offset since we are not testing
 			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%d", QTLAHParamsTableDetAutoSynchQuadChDet[iConnHostsNodes]);
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
 			//cout << "PeriodicRequestSynchsHost messagePayloadAux: " << messagePayloadAux << endl;	
 			
 			strcpy(ParamsCharArray,this->IPaddressesSockets[0]);// Destination, the attached node ConNet
@@ -1813,6 +1837,9 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");
 			sprintf(charNumAux, "%4f", 0.0);// Zero added relative frequency difference offset since we are not testing
+			strcat(messagePayloadAux,charNumAux);
+			strcat(messagePayloadAux,";");
+			sprintf(charNumAux, "%d", QTLAHParamsTableDetAutoSynchQuadChEmt[iConnHostsNodes]);
 			strcat(messagePayloadAux,charNumAux);
 			strcat(messagePayloadAux,";");
 			
@@ -1871,10 +1898,10 @@ int main(int argc, char const * argv[]){
  // The variables are named argc (argument count) and argv (argument vector) by convention, but they can be given any valid identifier: int main(int num_args, char** arg_strings) is equally valid.
 
  // They can also be omitted entirely, yielding int main(), if you do not intend to process command line arguments.
-	
+
  //printf( "argc:     %d\n", argc );
  //printf( "argv[0]:  %s\n", argv[0] );
-	
+
  //if ( argc == 1 ) {
  // printf( "No arguments were passed.\n" );
  //}
@@ -1884,6 +1911,6 @@ int main(int argc, char const * argv[]){
  //  printf( "  %d. %s\n", i, argv[i] );
  // }
  //}
-	
+
 	return 0;
 }
