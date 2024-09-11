@@ -111,6 +111,7 @@ private: // Variables/Objects
 	bool GPIOnodeHardwareSynched=false;// Indicates if the node is hardware PRU synchronized.
 	unsigned long long int iIterPeriodicTimerVal=0; // Variable to keep track of number of passes thorugh periodic checks
 	unsigned long long int MaxiIterPeriodicTimerVal=2000; // Max number of passes so that it enters the periodic checks
+	int QLLAQuadEmitDetecSelec=7; // Identifies the quad group channels to emitt or detect
 	
 public: // Functions/Methods
 	int RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep);

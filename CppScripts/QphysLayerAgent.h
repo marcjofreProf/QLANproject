@@ -168,15 +168,15 @@ public: // Functions/Methods
 	int InitAgentProcess(); // Initializer of the thread
 	// Payload information parameters
 	int SendParametersAgent(char* ParamsCharArray);// The upper layer gets the information to be send
-        int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node
-        // General Input and Output functions
-        int SimulateEmitQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux);
-        int SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
-        int SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux);
-        int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass);
-        int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
-        int GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams);
-        bool GetGPIOHardwareSynchedNode();
+    int SetReadParametersAgent(char* ParamsCharArray);// The upper layer sets information from the other node
+    // General Input and Output functions
+    int SimulateEmitQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux, int QuadEmitDetecSelecAux);
+    int SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux);
+    int SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux, int QuadEmitDetecSelecAux);
+    int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux);
+    int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
+    int GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams);
+    bool GetGPIOHardwareSynchedNode();
 	~QPLA();  //destructor
 
 private: // Functions/Methods

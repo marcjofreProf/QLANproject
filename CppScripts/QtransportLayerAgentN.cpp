@@ -812,6 +812,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			double HistPeriodicityAuxAux=atof(strtok(NULL,";"));//Period in PRU counts of the synch period/histogram
 			this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			this->QLLAQuadEmitDetecSelec=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			//cout << "this->QLLAFineSynchAdjVal[1]: " << this->QLLAFineSynchAdjVal[1] << endl;
 						
 			std::thread threadSimulateEmitQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitQuBit,this,HistPeriodicityAuxAux);
@@ -832,6 +833,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			double HistPeriodicityAuxAux=atof(strtok(NULL,";"));//Period in PRU counts of the synch period/histogram
 			this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			this->QLLAQuadEmitDetecSelec=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			
 			std::thread threadSimulateEmitSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateEmitSynchQuBit,this,HistPeriodicityAuxAux,iCenterMass,iNumRunsPerCenterMass);
 			threadSimulateEmitSynchQuBitRefAux.detach();
@@ -845,6 +847,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			double HistPeriodicityAuxAux=atof(strtok(NULL,";"));//Period in PRU counts of the synch period/histogram
 			this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			this->QLLAQuadEmitDetecSelec=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			//cout << "this->QLLAFineSynchAdjVal[1]: " << this->QLLAFineSynchAdjVal[1] << endl;
 			
 			std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveQuBit,this,HistPeriodicityAuxAux);
@@ -865,6 +868,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			double HistPeriodicityAuxAux=atof(strtok(NULL,";"));//Period in PRU counts of the synch period/histogram
 			this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+			this->QLLAQuadEmitDetecSelec=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 						
 			std::thread threadSimulateReceiveSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveSynchQuBit,this,HistPeriodicityAuxAux,iCenterMass,iNumRunsPerCenterMass);
 			threadSimulateReceiveSynchQuBitRefAux.detach();
@@ -894,7 +898,7 @@ int QTLAN::QPLASimulateEmitQuBit(double HistPeriodicityAuxAux) {
 this->acquire();	  
 if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateEmitQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal);
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,this->QLLAQuadEmitDetecSelec);
 	this->QPLASimulateEmitQuBitFlag=false;
 }
 this->release();
@@ -905,7 +909,7 @@ int QTLAN::QPLASimulateEmitSynchQuBit(double HistPeriodicityAuxAux,int iCenterMa
 this->acquire();
 if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateEmitQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitSynchQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass);
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitSynchQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass,this->QLLAQuadEmitDetecSelec);
 	this->QPLASimulateEmitQuBitFlag=false;
 	
 }
@@ -918,7 +922,7 @@ int QTLAN::QPLASimulateReceiveQuBit(double HistPeriodicityAuxAux) {
 this->acquire();	  
 if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateReceiveQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal);
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,this->QLLAQuadEmitDetecSelec);
 	this->QPLASimulateReceiveQuBitFlag=false;
 }
 this->release();
@@ -929,7 +933,7 @@ int QTLAN::QPLASimulateReceiveSynchQuBit(double HistPeriodicityAuxAux,int iCente
 this->acquire();
 if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateReceiveQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass);
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass,this->QLLAQuadEmitDetecSelec);
 	this->QPLASimulateReceiveQuBitFlag=false;
 }
 this->release();

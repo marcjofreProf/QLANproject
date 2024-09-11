@@ -74,10 +74,8 @@
 
 // r10 is arbitrary used for operations
 
-// r11 is reserved for emitting state 1
-// r12 is reserved for emitting state 2
-// r13 is reserved for emitting state 3
-// r14 is reserved for emitting state 4
+// r11 is reserved for emitting state 1 and 2 (w0 and w1)
+// r12 is reserved for emitting state 3 and 4 (w0 and w1)
 
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
@@ -130,10 +128,8 @@ INITIATIONS:
 	LDI	r0, 0 // Ensure reset commands
 	LDI	r9, DELAY
 	
-	MOV	r11, 0x00000111
-	MOV	r12, 0x00000222
-	MOV	r13, 0x00000444
-	MOV	r14, 0x00000888
+	MOV	r11, 0x02220111
+	MOV	r12, 0x08880444
 	
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
@@ -194,46 +190,32 @@ PERIODICTIMESYNCHSUB: // with command coded 2 means synch by reseting the IEP ti
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP	CMDLOOP
 QUADEMT7:
-	MOV	r11, 0x00000111
-	MOV	r12, 0x00000222
-	MOV	r13, 0x00000444
-	MOV	r14, 0x00000888
+	MOV	r11, 0x02220111
+	MOV	r12, 0x08880444
 	JMP	PSEUDOSYNCH
 QUADEMT6:
-	MOV	r11, 0x00000110
-	MOV	r12, 0x00000220
-	MOV	r13, 0x00000440
-	MOV	r14, 0x00000880
+	MOV	r11, 0x02200110
+	MOV	r12, 0x08800440
 	JMP	PSEUDOSYNCH
 QUADEMT5:
-	MOV	r11, 0x00000101
-	MOV	r12, 0x00000202
-	MOV	r13, 0x00000404
-	MOV	r14, 0x00000808
+	MOV	r11, 0x02020101
+	MOV	r12, 0x08080404
 	JMP	PSEUDOSYNCH
 QUADEMT4:
-	MOV	r11, 0x00000100
-	MOV	r12, 0x00000200
-	MOV	r13, 0x00000400
-	MOV	r14, 0x00000800
+	MOV	r11, 0x02000100
+	MOV	r12, 0x08000400
 	JMP	PSEUDOSYNCH
 QUADEMT3:
-	MOV	r11, 0x00000011
-	MOV	r12, 0x00000022
-	MOV	r13, 0x00000044
-	MOV	r14, 0x00000088
+	MOV	r11, 0x00220011
+	MOV	r12, 0x00880044
 	JMP	PSEUDOSYNCH
 QUADEMT2:
-	MOV	r11, 0x00000010
-	MOV	r12, 0x00000020
-	MOV	r13, 0x00000040
-	MOV	r14, 0x00000080
+	MOV	r11, 0x00200010
+	MOV	r12, 0x00800040
 	JMP	PSEUDOSYNCH
 QUADEMT1:
-	MOV	r11, 0x00000001
-	MOV	r12, 0x00000002
-	MOV	r13, 0x00000004
-	MOV	r14, 0x00000008
+	MOV	r11, 0x00020001
+	MOV	r12, 0x00080004
 	JMP	PSEUDOSYNCH
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	// Since there is a dead period betwen pulses (to do management), divide the period by 2
@@ -290,7 +272,7 @@ SIGNALON2DEL:
 	QBNE	SIGNALON2DEL, r5, 0
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON3:
-	MOV	r30.w0, r12.w0 // Double channels 2. write to magic r30 output byte 0
+	MOV	r30.w0, r11.w2 // Double channels 2. write to magic r30 output byte 0
 	MOV	r5, r9
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 //	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
@@ -309,7 +291,7 @@ SIGNALON4DEL:
 	QBNE	SIGNALON4DEL, r5, 0
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON5:
-	MOV	r30.w0, r13.w0 // Double channels 3. write to magic r30 output byte 0
+	MOV	r30.w0, r12.w0 // Double channels 3. write to magic r30 output byte 0
 	MOV	r5, r9
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 //	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
@@ -328,7 +310,7 @@ SIGNALON6DEL:
 	QBNE	SIGNALON6DEL, r5, 0
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON7:
-	MOV	r30.w0, r14.w0 // Double channels 4. write to magic r30 output byte 0
+	MOV	r30.w0, r12.w2 // Double channels 4. write to magic r30 output byte 0
 	MOV	r5, r9
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 //	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)

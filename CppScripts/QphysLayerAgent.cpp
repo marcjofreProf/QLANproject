@@ -408,12 +408,13 @@ this->OtherClientNodeFutureTimePoint=std::chrono::time_point<Clock>();
 return 0; // All ok
 }
 
-int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux){
+int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int QuadEmitDetecSelecAux){
 	this->acquire();
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
 	this->RetrieveOtherEmiterReceiverMethod(); // Identifies involved links by IPs mentioned
 	// Retrieve the involved single specific quad group channel if possible
+	QuadEmitDetecSelec=QuadEmitDetecSelecAux; // Identifies the quad groups to emit
 	SpecificQuadChEmt=-1;// Reset value
 	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){// Identify the quad group channel if there is only one
 		if (QuadEmitDetecSelec==(1<<iQuadChIter)){
@@ -455,12 +456,13 @@ cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
 return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass){
+int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux){
 	this->acquire();
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
 	this->RetrieveOtherEmiterReceiverMethod();
 	// Retrieve the involved single specific quad group channel if possible
+	QuadEmitDetecSelec=QuadEmitDetecSelecAux; // Identifies the quad groups to emit
 	SpecificQuadChEmt=-1;// Reset value
 	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){// Identify the quad group channel if there is only one
 		if (QuadEmitDetecSelec==(1<<iQuadChIter)){
@@ -586,12 +588,13 @@ cout << "End Emiting Qubits" << endl;
  return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux){
+int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int QuadEmitDetecSelecAux){
 	this->acquire();
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
 	this->RetrieveOtherEmiterReceiverMethod();
 	// Retrieve the involved single specific quad group channel if possible
+	QuadEmitDetecSelec=QuadEmitDetecSelecAux; // Identifies the quad groups channels to detect
 	SpecificQuadChDet=-1;// Reset value
 	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){// Identify the quad group channel if there is only one
 		if (QuadEmitDetecSelec==(1<<iQuadChIter)){
@@ -638,12 +641,13 @@ cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
 return 0; // return 0 is for no error
 }
 
-int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass){
+int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux){
 	this->acquire();
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
 	this->RetrieveOtherEmiterReceiverMethod();
 	// Retrieve the involved single specific quad group channel if possible
+	QuadEmitDetecSelec=QuadEmitDetecSelecAux; // Identifies the quad groups channels to detect
 	SpecificQuadChDet=-1;// Reset value
 	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){// Identify the quad group channel if there is only one
 		if (QuadEmitDetecSelec==(1<<iQuadChIter)){
