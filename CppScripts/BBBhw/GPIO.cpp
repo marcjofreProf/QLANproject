@@ -841,7 +841,7 @@ while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>extendedCounterPRU
 	else{cout << "GPIO::No detection of qubits!" << endl;}
 	iIterDump++;
 }
-cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
+//cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
 
 // Reset values of the sharedMem_int after each iteration
 for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
@@ -951,7 +951,7 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 		    //cout << "GPIO::PRUdetCorrRelFreq::CheckValueAux: "<< CheckValueAux << endl;
 		    ////////////////////////////////////////
 		}// if
-		else{
+		else if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
 			cout << "GPIO::PRUdetCorrRelFreq not enough detections in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;
 		}
 	} // for

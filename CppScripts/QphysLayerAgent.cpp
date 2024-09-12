@@ -1049,7 +1049,7 @@ else
 {
 	cout << "QPLA::Not applying ApplyProcQubitsSmallTimeOffsetContinuousCorrection small drift offset correction...to be activated..." << endl;
 }
-cout << "QPLA::SmallDriftContinuousCorrection completed!" << endl;
+//cout << "QPLA::SmallDriftContinuousCorrection completed!" << endl;
 return 0; // All Ok
 }
 
@@ -1638,7 +1638,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 		} // for
 	}
 	//this->release(); It is already within an acquire/release
-cout << "QPLA::LinearRegressionQuBitFilter completed!" << endl;
+//cout << "QPLA::LinearRegressionQuBitFilter completed!" << endl;
 return 0; // All Ok
 }
 
