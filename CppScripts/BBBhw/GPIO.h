@@ -179,6 +179,7 @@ private:// Variables
 	//unsigned int valIEPtimerFinalCounts; // 32 bits
 	unsigned long long int extendedCounterPRU=0; // 64 bits
 	unsigned long long int extendedCounterPRUholder=0; // 64 bits
+	unsigned long long int extendedCounterPRUholderOld=0; // 64 bits
 	unsigned long long int extendedCounterPRUaux=0; // 64 bits
 	//unsigned char val; // 8 bits
 	unsigned short valBitsInterest=0; // 16 bits, 2 bytes

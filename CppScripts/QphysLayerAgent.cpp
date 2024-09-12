@@ -1027,8 +1027,8 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 			}
 
 		  if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/4.0)){// Large step
-		  	cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[iQuadChIter][CurrentSpecificLinkMultiple] << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
-		  	cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
+		  	cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
+		  	cout << "QPLA::Applying SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
 		  }
 		  
 		  // Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
@@ -1163,6 +1163,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 
 	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
+			cout << "QPLA::Quad group channel: " << iQuadChIter << endl;
 			TimeTaggsDetAnalytics[7]=static_cast<double>(TimeTaggs[iQuadChIter][0]);
 			for (int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){
 				if (i==0){cout << "TimeTaggs[iQuadChIter][1]-TimeTaggs[iQuadChIter][0]: " << TimeTaggs[iQuadChIter][1]-TimeTaggs[iQuadChIter][0] << endl;}

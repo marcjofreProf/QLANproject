@@ -808,7 +808,10 @@ unsigned int valCycleCountPRUAux2;
 //cout << "GPIO::NumQuBitsPerRun " << NumQuBitsPerRun << endl;
 //cout << "GPIO::TotalCurrentNumRecords " << TotalCurrentNumRecords << endl;
 //cout << "GPIO::MaxNumQuBitsMemStored " << MaxNumQuBitsMemStored << endl;
-for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
+//for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
+iIterDump=0
+while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>=extendedCounterPRUholderOld){// Do it until a timetagg is smaller in value than the previous one, because it means that it could not achieve to capture NumQuBitsPerRun
+	extendedCounterPRUholderOld=extendedCounterPRUholder;
 	// When unsigned short
 	//valCycleCountPRU=static_cast<unsigned int>(0);// Reset value
 	valCycleCountPRUAux1=static_cast<unsigned int>(*valp) & 0x0000FFFF;
@@ -831,18 +834,19 @@ for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 	ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
 	valp++;// 1 times 16 bits
 	if (TotalCurrentNumRecords<MaxNumQuBitsMemStored){TotalCurrentNumRecords++;}//Variable to hold the number of currently stored records in memory	
-	else{cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}	
+	else{cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
+	iIterDump++;
 }
-// Notify lost of track of counts due to timer overflow
+// Notify lost of track of counts due to timer overflow - Not really used
 //if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
 //else{this->AfterCountsThreshold=this->valThresholdResetCounts+5;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
-this->AfterCountsThreshold=24+5;
+/*this->AfterCountsThreshold=24+5;
 this->FirstTimeDDRdumpdata=false;
 if(valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts that we will lose because of the reset
 	cout << "We have lost ttg counts! Lost of tags accuracy! Reduce the number of tags per run, and if needed increase the runs number." << endl;
 	cout << "AfterCountsThreshold: " << AfterCountsThreshold << endl;
 	cout << "valCycleCountPRU: " << valCycleCountPRU << endl;
-}
+}*/
 //else if (valCycleCountPRU > (0x80000000-this->AfterCountsThreshold)){// The exceeded counts, remove them
 //this->valCarryOnCycleCountPRU=this->valCarryOnCycleCountPRU-(AboveThresoldCycleCountPRUCompValue-1)*static_cast<unsigned long long int>((this->AfterCountsThreshold+valCycleCountPRU)-0x80000000);
 ////cout << "this->valCarryOnCycleCountPRU: " << this->valCarryOnCycleCountPRU << endl;
