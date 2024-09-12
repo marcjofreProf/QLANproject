@@ -836,12 +836,17 @@ while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>extendedCounterPRU
 	// When unsigned short
 	ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
 	valp++;// 1 times 16 bits
-	if (TotalCurrentNumRecords<MaxNumQuBitsMemStored){TotalCurrentNumRecords++;}//Variable to hold the number of currently stored records in memory	
-	else{cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
+	if (TotalCurrentNumRecords<MaxNumQuBitsMemStored and extendedCounterPRUholder>0){TotalCurrentNumRecords++;}//Variable to hold the number of currently stored records in memory	
+	else if (TotalCurrentNumRecords>=MaxNumQuBitsMemStored){cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
+	else{cout << "GPIO::No detection of qubits!" << endl;}
 	iIterDump++;
 }
 cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
 
+// Reset values of the sharedMem_int after each iteration
+for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
+	sharedMem_int[OFFSET_SHAREDRAM+iIterDump]=static_cast<unsigned int>(0x00000000); // Put it all to zeros
+}
 // Notify lost of track of counts due to timer overflow - Not really used
 //if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
 //else{this->AfterCountsThreshold=this->valThresholdResetCounts+5;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
@@ -947,7 +952,7 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 		    ////////////////////////////////////////
 		}// if
 		else{
-			cout << "GPIO::PRUdetCorrRelFreq not enough detection in iQuadChIter= " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;
+			cout << "GPIO::PRUdetCorrRelFreq not enough detections in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;
 		}
 	} // for
 cout << "GPIO::PRUdetCorrRelFreq completed!" << endl;
