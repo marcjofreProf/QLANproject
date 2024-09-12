@@ -805,6 +805,9 @@ if (iIterRunsAux==0){this->TimeTaggsLastStored=this->TimeTaggsLast;TotalCurrentN
 long long int LLIOldLastTimeTagg=static_cast<long long int>(OldLastTimeTagg);
 unsigned int valCycleCountPRUAux1;
 unsigned int valCycleCountPRUAux2;
+cout << "GPIONumQuBitsPerRun " << NumQuBitsPerRun << endl;
+cout << "GPIO::TotalCurrentNumRecords " << TotalCurrentNumRecords << endl;
+cout << "GPIO::MaxNumQuBitsMemStored " << MaxNumQuBitsMemStored << endl;
 for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 	// When unsigned short
 	//valCycleCountPRU=static_cast<unsigned int>(0);// Reset value
@@ -828,9 +831,7 @@ for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 	ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
 	valp++;// 1 times 16 bits
 	if (TotalCurrentNumRecords<(MaxNumQuBitsMemStored-1)){TotalCurrentNumRecords++;}//Variable to hold the number of currently stored records in memory	
-	else{cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
-	cout << "GPIO::TotalCurrentNumRecords " << TotalCurrentNumRecords << endl;
-	cout << "GPIO::MaxNumQuBitsMemStored " << MaxNumQuBitsMemStored << endl;
+	else{cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}	
 }
 // Notify lost of track of counts due to timer overflow
 //if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
