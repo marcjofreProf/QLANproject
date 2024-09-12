@@ -809,7 +809,7 @@ unsigned int valCycleCountPRUAux2;
 //cout << "GPIO::TotalCurrentNumRecords " << TotalCurrentNumRecords << endl;
 //cout << "GPIO::MaxNumQuBitsMemStored " << MaxNumQuBitsMemStored << endl;
 //for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
-iIterDump=0
+iIterDump=0;
 while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>=extendedCounterPRUholderOld){// Do it until a timetagg is smaller in value than the previous one, because it means that it could not achieve to capture NumQuBitsPerRun
 	extendedCounterPRUholderOld=extendedCounterPRUholder;
 	// When unsigned short
