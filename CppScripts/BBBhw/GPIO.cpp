@@ -811,6 +811,8 @@ unsigned int valCycleCountPRUAux2;
 //cout << "GPIO::MaxNumQuBitsMemStored " << MaxNumQuBitsMemStored << endl;
 //for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 iIterDump=0;
+extendedCounterPRUholder=1;// Re-initialize at each run. 1 so that at least the first is checked and stored
+extendedCounterPRUholderOld=0;// Re-initialize at each run
 while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>extendedCounterPRUholderOld){// Do it until a timetagg is smaller in value than the previous one, because it means that it could not achieve to capture NumQuBitsPerRun
 	extendedCounterPRUholderOld=extendedCounterPRUholder;
 	// When unsigned short
@@ -900,7 +902,7 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 	}
 
 	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-		if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
+		if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>TagsSeparationDetRelFreq){
     		unsigned long long int ULLIInitialTimeTaggs=TimeTaggs[iQuadChIter][0];// Normalize to the first timetag, which is a strong reference
     		long long int LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
     		long long int LLITimeTaggs[TotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
@@ -944,6 +946,9 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 		    //cout << "GPIO::PRUdetCorrRelFreq::CheckValueAux: "<< CheckValueAux << endl;
 		    ////////////////////////////////////////
 		}// if
+		else{
+			cout << "GPIO::PRUdetCorrRelFreq not enough detection in iQuadChIter= " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;
+		}
 	} // for
 cout << "GPIO::PRUdetCorrRelFreq completed!" << endl;
 return 0; // All ok
