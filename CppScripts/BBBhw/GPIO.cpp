@@ -806,7 +806,6 @@ long long int LLIOldLastTimeTagg=static_cast<long long int>(OldLastTimeTagg);
 unsigned int valCycleCountPRUAux1;
 unsigned int valCycleCountPRUAux2;
 //cout << "GPIO::NumQuBitsPerRun " << NumQuBitsPerRun << endl;
-//cout << "GPIO::TotalCurrentNumRecords " << TotalCurrentNumRecords << endl;
 //cout << "GPIO::MaxNumQuBitsMemStored " << MaxNumQuBitsMemStored << endl;
 //for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 iIterDump=0;
@@ -837,6 +836,8 @@ while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>=extendedCounterPR
 	else{cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
 	iIterDump++;
 }
+cout << "GPIO::TotalCurrentNumRecords " << TotalCurrentNumRecords << endl;
+
 // Notify lost of track of counts due to timer overflow - Not really used
 //if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
 //else{this->AfterCountsThreshold=this->valThresholdResetCounts+5;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
