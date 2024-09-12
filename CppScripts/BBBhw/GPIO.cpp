@@ -277,7 +277,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 	// First setting of time
 	this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(ApproxInterruptTime))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
 	this->NextSynchPRUcorrection=static_cast<unsigned int>(static_cast<unsigned int>((static_cast<unsigned long long int>(this->PRUoffsetDriftError)+static_cast<unsigned long long int>(LostCounts))%iepPRUtimerRange32bits));
-	this->NextSynchPRUcommand=static_cast<unsigned int>(5); // set command 5, do absolute correction
+	this->NextSynchPRUcommand=static_cast<unsigned int>(11); // set command 5, do absolute correction
 	
 	while(true){		
 		clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);
