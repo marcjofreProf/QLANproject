@@ -1505,6 +1505,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 	  this->SimulateNumStoredQubitsNode[0]=0; // Reset this value
 	  int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,RawTotalCurrentNumRecordsQuadCh,RawTimeTaggs,RawChannelTags); // Get raw values
 	  for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+	  	cout << "QPLA::RawTotalCurrentNumRecordsQuadCh[iQuadChIter] " << RawTotalCurrentNumRecordsQuadCh[iQuadChIter] << endl;
 	  	if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
 	  		unsigned long long int NormInitialTimeTaggsVal=RawTimeTaggs[iQuadChIter][0];
 				// Normalize values to work with more plausible values
