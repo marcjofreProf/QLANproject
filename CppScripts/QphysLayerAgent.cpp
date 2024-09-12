@@ -969,7 +969,6 @@ return GPIOHardwareSynchedAux;
 }
 
 int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drifts because it is assumed that qubists fall within their histogram period
-
 int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];// Number of qubits to process
 
 // Check that we now exceed the QuBits buffer size
@@ -1050,7 +1049,7 @@ else
 {
 	cout << "QPLA::Not applying ApplyProcQubitsSmallTimeOffsetContinuousCorrection small drift offset correction...to be activated..." << endl;
 }
-
+cout << "QPLA::SmallDriftContinuousCorrection completed!" << endl;
 return 0; // All Ok
 }
 
@@ -1639,7 +1638,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 		} // for
 	}
 	//this->release(); It is already within an acquire/release
-
+cout << "QPLA::LinearRegressionQuBitFilter completed!" << endl;
 return 0; // All Ok
 }
 

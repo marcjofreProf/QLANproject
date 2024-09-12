@@ -178,7 +178,7 @@ private:// Variables
 	int AboveThresoldCycleCountPRUCompValue=8;//Value adjusted experimentally when PRU clock goes aboe 0x80000000. Not used
 	//unsigned int valIEPtimerFinalCounts; // 32 bits
 	unsigned long long int extendedCounterPRU=0; // 64 bits
-	unsigned long long int extendedCounterPRUholder=0; // 64 bits
+	unsigned long long int extendedCounterPRUholder=1; // 64 bits. Important that at the beggining this one is at least 1 unit larger than extendedCounterPRUholderOld
 	unsigned long long int extendedCounterPRUholderOld=0; // 64 bits
 	unsigned long long int extendedCounterPRUaux=0; // 64 bits
 	//unsigned char val; // 8 bits

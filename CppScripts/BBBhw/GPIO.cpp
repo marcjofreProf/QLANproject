@@ -630,9 +630,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	}
 	else if (retInterruptsPRU0==0){
 		prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-		cout << "GPIO::ReadTimeStamps took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessary." << endl;
-		cout << "We have lost ttg counts! Lost of tags accuracy! Reduce the number of tags per run, and if needed increase the runs number." << endl;
-		
+		cout << "GPIO::ReadTimeStamps took to much time for the TimeTagg. Timetags might be inaccurate. Reset PRUO if necessary." << endl;		
 	}
 	else{
 		prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -813,7 +811,7 @@ unsigned int valCycleCountPRUAux2;
 //cout << "GPIO::MaxNumQuBitsMemStored " << MaxNumQuBitsMemStored << endl;
 //for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 iIterDump=0;
-while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>=extendedCounterPRUholderOld){// Do it until a timetagg is smaller in value than the previous one, because it means that it could not achieve to capture NumQuBitsPerRun
+while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>extendedCounterPRUholderOld){// Do it until a timetagg is smaller in value than the previous one, because it means that it could not achieve to capture NumQuBitsPerRun
 	extendedCounterPRUholderOld=extendedCounterPRUholder;
 	// When unsigned short
 	//valCycleCountPRU=static_cast<unsigned int>(0);// Reset value
@@ -840,7 +838,7 @@ while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>=extendedCounterPR
 	else{cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
 	iIterDump++;
 }
-cout << "GPIO::TotalCurrentNumRecords " << TotalCurrentNumRecords << endl;
+cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
 
 // Notify lost of track of counts due to timer overflow - Not really used
 //if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
@@ -947,6 +945,7 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 		    ////////////////////////////////////////
 		}// if
 	} // for
+cout << "GPIO::PRUdetCorrRelFreq completed!" << endl;
 return 0; // All ok
 }
 
