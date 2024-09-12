@@ -1157,11 +1157,6 @@ cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference
 cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
 cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
 if (SimulateNumStoredQubitsNodeAux>1){
-	TimeTaggsDetAnalytics[0]=0.0;
-	TimeTaggsDetAnalytics[1]=0.0;
-	TimeTaggsDetAnalytics[2]=0.0;
-	TimeTaggsDetAnalytics[3]=0.0;
-	TimeTaggsDetAnalytics[4]=0.0;
 	TimeTaggsDetAnalytics[5]=0.0;
 	TimeTaggsDetAnalytics[6]=0.0;
 	TimeTaggsDetAnalytics[7]=0.0;
@@ -1505,7 +1500,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 	  this->SimulateNumStoredQubitsNode[0]=0; // Reset this value
 	  int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,RawTotalCurrentNumRecordsQuadCh,RawTimeTaggs,RawChannelTags); // Get raw values
 	  for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-	  	cout << "QPLA::RawTotalCurrentNumRecordsQuadCh[iQuadChIter] " << RawTotalCurrentNumRecordsQuadCh[iQuadChIter] << endl;
+	  	//cout << "QPLA::RawTotalCurrentNumRecordsQuadCh[iQuadChIter] " << RawTotalCurrentNumRecordsQuadCh[iQuadChIter] << endl;
 	  	if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
 	  		unsigned long long int NormInitialTimeTaggsVal=RawTimeTaggs[iQuadChIter][0];
 				// Normalize values to work with more plausible values
@@ -1584,7 +1579,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				}
 	
 				// Compute quality of estimation, related to the SNR
-				double EstimatedSNRqubitsRatio=1.0-static_cast<double>(FilteredNumStoredQubits)/static_cast<double>(RawNumStoredQubits);// in linear	
+				double EstimatedSNRqubitsRatio=1.0-static_cast<double>(FilteredNumStoredQubits)/static_cast<double>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]);// in linear	
 
 				if (EstimatedSNRqubitsRatio>0.1){ // 0.1 equivalent to 10 dB// < Bad SNR
 					cout << "QPLA::LinearRegressionQuBitFilter EstimatedSNRqubitsRatio " << EstimatedSNRqubitsRatio << " does not have enough SNR (>10 dB) to perform good when filtering raw qubits!!!" << endl;
@@ -1597,7 +1592,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 					}
 				}
 				
-				cout << "QPLA::FilteredNumStoredQubits: " << FilteredNumStoredQubits << endl;
+				//cout << "QPLA::FilteredNumStoredQubits: " << FilteredNumStoredQubits << endl;
 
 				// Un-normalize values to have absolute values
 				//for (int i=0;i<FilteredNumStoredQubits;i++){
