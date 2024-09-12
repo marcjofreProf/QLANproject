@@ -191,16 +191,16 @@ private: // Functions/Methods
 	ApplicationState getState() const { return m_state; }	
 	bool m_start() { m_state = APPLICATION_RUNNING; return true; }
 	bool m_pause() { m_state = APPLICATION_PAUSED; return true; } 
-        // resume may keep track of time if the application uses a timer.
-        // This is what makes it different than start() where the timer
-        // in start() would be initialized to 0. And the last time before
-        // paused was trigger would be saved, and then reset as new starting
-        // time for your timer or counter. 
+    // resume may keep track of time if the application uses a timer.
+    // This is what makes it different than start() where the timer
+    // in start() would be initialized to 0. And the last time before
+    // paused was trigger would be saved, and then reset as new starting
+    // time for your timer or counter. 
 	bool m_resume() { m_state = APPLICATION_RUNNING; return true; }      
 	bool m_exit() { m_state = APPLICATION_EXIT;  return false; } 
-        // Payload information parameters
-        int InitParametersAgent();// Client node have some parameters to adjust to the server node
-        int RegularCheckToPerform(); // Some check to do every now and then     
+    // Payload information parameters
+    int InitParametersAgent();// Client node have some parameters to adjust to the server node
+    int RegularCheckToPerform(); // Some check to do every now and then     
 	int SetSendParametersAgent(char* ParamsCharArray);// Node accumulates parameters for the other node
 	int ReadParametersAgent();// Node checks parameters from the other node
 	int NegotiateInitialParamsNode();
