@@ -955,7 +955,7 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 			cout << "GPIO::PRUdetCorrRelFreq not enough detections in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;
 		}
 	} // for
-cout << "GPIO::PRUdetCorrRelFreq completed!" << endl;
+//cout << "GPIO::PRUdetCorrRelFreq completed!" << endl;
 return 0; // All ok
 }
 
