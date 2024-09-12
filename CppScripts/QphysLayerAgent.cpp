@@ -1569,7 +1569,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				//cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
 
 				// Re-escale the xEstimated values with the intercept point
-				for (int i=0;i<RawNumStoredQubits;i++){
+				for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 					xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i]+EstInterceptVal;
 				}
 
@@ -1597,14 +1597,16 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 					}
 				}
 				
+				cout << "QPLA::FilteredNumStoredQubits: " << FilteredNumStoredQubits << endl;
+
 				// Un-normalize values to have absolute values
 				//for (int i=0;i<FilteredNumStoredQubits;i++){
 				//	TimeTaggs[i]=TimeTaggs[i]+NormInitialTimeTaggsVal;
 				//}
 				
 				// Update final values
-				this->SimulateNumStoredQubitsNode[0]+=FilteredNumStoredQubits; // Update value
-				RawTotalCurrentNumRecordsQuadCh[iQuadChIter]=FilteredNumStoredQubits;
+				this->SimulateNumStoredQubitsNode[0]+=static_cast<unsigned int>(FilteredNumStoredQubits); // Update value
+				RawTotalCurrentNumRecordsQuadCh[iQuadChIter]=static_cast<unsigned int>(FilteredNumStoredQubits); // Update value
 				
 				//////////////////////////////////////////
 				// Checks of proper values handling
@@ -1613,9 +1615,6 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				//long long int CheckValueAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
 				//cout << "QPLA::LinearRegressionQuBitFilter::CheckValueAux: "<< CheckValueAux << endl;
 				////////////////////////////////////////
-			}
-			else{
-				RawTotalCurrentNumRecordsQuadCh[iQuadChIter]=0;
 			}
 		}
 	}
@@ -1639,8 +1638,8 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 			//}
 			
 			// Update final values
-			this->SimulateNumStoredQubitsNode[0]+=FilteredNumStoredQubits; // Update value
-			RawTotalCurrentNumRecordsQuadCh[iQuadChIter]=FilteredNumStoredQubits;
+			this->SimulateNumStoredQubitsNode[0]+=static_cast<unsigned int>(FilteredNumStoredQubits); // Update value
+			RawTotalCurrentNumRecordsQuadCh[iQuadChIter]=static_cast<unsigned int>(FilteredNumStoredQubits);
 		} // for
 	}
 	//this->release(); It is already within an acquire/release
