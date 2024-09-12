@@ -181,7 +181,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	// Reset values of the sharedMem_int at the beggining
 	for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
-		sharedMem_int[OFFSET_SHAREDRAM+iIterDump]=static_cast<unsigned short>(0x0000);
+		sharedMem_int[OFFSET_SHAREDRAM+iIterDump]=static_cast<unsigned int>(0x00000000); // Put it all to zeros
 	}
 	  /*// Doing debbuging checks - Debugging 1	  
 	  std::thread threadReadTimeStampsAux=std::thread(&GPIO::ReadTimeStamps,this);
