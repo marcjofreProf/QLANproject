@@ -22,7 +22,7 @@ Header declaration file for Quantum physical Layer Agent
 #define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 //Qubits
 #define MaxNumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
-#define NumQubitsMemoryBuffer 10*MaxNumQuBitsPerRun// In multiples of NumQuBitsPerRun (e.g., 1964, 3928, ...). Equivalent to received MTU (Maximum Transmission Unit) - should be in link layer - could be named received Quantum MTU
+#define NumQubitsMemoryBuffer 1*MaxNumQuBitsPerRun// In multiples of NumQuBitsPerRun (e.g., 1964, 3928, ...). Maximum buffer size
 // Synchronization
 #define NumCalcCenterMass 3 // 1 // Number of centers of mass to measure to compute the synchronization
 #define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements

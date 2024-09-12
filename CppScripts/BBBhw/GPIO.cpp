@@ -800,14 +800,14 @@ this->TimeTaggsLast=static_cast<unsigned long long int>((static_cast<unsigned lo
 //Furthermore, remove some time from epoch - in multiples of the SynchTrigPeriod, so it is easier to handle in the above agents
 this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsLast)-static_cast<long long int>((this->ULLIEpochReOffset/static_cast<unsigned long long int>(SynchTrigPeriod))*static_cast<unsigned long long int>(SynchTrigPeriod)));
 
-if (iIterRunsAux==0){this->TimeTaggsLastStored=this->TimeTaggsLast;TotalCurrentNumRecords=0;}// First iteration of current runs, store the value for synchronization time difference calibration
+if (iIterRunsAux==0){this->TimeTaggsLastStored=this->TimeTaggsLast;}// First iteration of current runs, store the value for synchronization time difference calibration
 
 long long int LLIOldLastTimeTagg=static_cast<long long int>(OldLastTimeTagg);
 unsigned int valCycleCountPRUAux1;
 unsigned int valCycleCountPRUAux2;
-cout << "GPIONumQuBitsPerRun " << NumQuBitsPerRun << endl;
-cout << "GPIO::TotalCurrentNumRecords " << TotalCurrentNumRecords << endl;
-cout << "GPIO::MaxNumQuBitsMemStored " << MaxNumQuBitsMemStored << endl;
+//cout << "GPIO::NumQuBitsPerRun " << NumQuBitsPerRun << endl;
+//cout << "GPIO::TotalCurrentNumRecords " << TotalCurrentNumRecords << endl;
+//cout << "GPIO::MaxNumQuBitsMemStored " << MaxNumQuBitsMemStored << endl;
 for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 	// When unsigned short
 	//valCycleCountPRU=static_cast<unsigned int>(0);// Reset value
@@ -830,7 +830,7 @@ for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 	// When unsigned short
 	ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
 	valp++;// 1 times 16 bits
-	if (TotalCurrentNumRecords<(MaxNumQuBitsMemStored-1)){TotalCurrentNumRecords++;}//Variable to hold the number of currently stored records in memory	
+	if (TotalCurrentNumRecords<MaxNumQuBitsMemStored){TotalCurrentNumRecords++;}//Variable to hold the number of currently stored records in memory	
 	else{cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}	
 }
 // Notify lost of track of counts due to timer overflow

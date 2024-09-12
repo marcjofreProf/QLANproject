@@ -26,7 +26,7 @@ using std::fstream;
 #define PRUdataPATH1 "./PRUdata/"
 #define PRUdataPATH2 "../PRUdata/"
 #define MaxNumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
-#define MaxNumQuBitsMemStored 10*MaxNumQuBitsPerRun // Maximum size of the array for memory storing qubits (timetaggs and channels)
+#define MaxNumQuBitsMemStored 1*MaxNumQuBitsPerRun // Maximum size of the array for memory storing qubits (timetaggs and channels)
 #define MaxNumPulses	8192	// Used in the averaging of time synchronization arrays
 #define PRUclockStepPeriodNanoseconds		5.00000//4.99999 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
 #define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
