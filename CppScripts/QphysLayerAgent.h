@@ -59,13 +59,13 @@ private: //Variables/Instances
 	unsigned long long int TimeTaggs[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections
 	unsigned short int ChannelTags[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Detection channels of the timetaggs
 	unsigned int RawTotalCurrentNumRecordsQuadCh[QuadNumChGroups]={0}; // Number of detections for quad channels groups
-        //int EmitLinkNumberArray[LinkNumberMAX]={60}; // Array indicating the GPIO numbers identifying the emit pins
-        //int ReceiveLinkNumberArray[LinkNumberMAX]={48}; // Array indicating the GPIO numbers identifying the receive pins
-        float QuBitsPerSecondVelocity[LinkNumberMAX]={1000000.0}; // Array indicating the qubits per second velocity of each emit/receive pair 
-        //int QuBitsNanoSecPeriodInt[LinkNumberMAX]={1000000};
-        //int QuBitsNanoSecHalfPeriodInt[LinkNumberMAX]={500000};
-        //int QuBitsNanoSecQuarterPeriodInt[LinkNumberMAX]={250000};// Not exacte quarter period since it should be 2.5
-        // Semaphore
+    //int EmitLinkNumberArray[LinkNumberMAX]={60}; // Array indicating the GPIO numbers identifying the emit pins
+    //int ReceiveLinkNumberArray[LinkNumberMAX]={48}; // Array indicating the GPIO numbers identifying the receive pins
+    float QuBitsPerSecondVelocity[LinkNumberMAX]={1000000.0}; // Array indicating the qubits per second velocity of each emit/receive pair 
+    //int QuBitsNanoSecPeriodInt[LinkNumberMAX]={1000000};
+    //int QuBitsNanoSecHalfPeriodInt[LinkNumberMAX]={500000};
+    //int QuBitsNanoSecQuarterPeriodInt[LinkNumberMAX]={250000};// Not exacte quarter period since it should be 2.5
+    // Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	// Payload messages
 	char PayloadReadBuffer[NumBytesPayloadBuffer]={0}; //Buffer to read payload messages
