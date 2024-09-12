@@ -179,6 +179,10 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	////prussdrv_pru_enable(PRU_Signal_NUM);
 	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
 	
+	// Reset values of the sharedMem_int at the beggining
+	for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
+		sharedMem_int[OFFSET_SHAREDRAM+iIterDump]=static_cast<unsigned short>(0x0000);
+	}
 	  /*// Doing debbuging checks - Debugging 1	  
 	  std::thread threadReadTimeStampsAux=std::thread(&GPIO::ReadTimeStamps,this);
 	  std::thread threadSendTriggerSignalsAux=std::thread(&GPIO::SendTriggerSignals,this);
