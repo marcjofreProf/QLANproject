@@ -813,6 +813,7 @@ unsigned int valCycleCountPRUAux2;
 iIterDump=0;
 extendedCounterPRUholder=1;// Re-initialize at each run. 1 so that at least the first is checked and stored
 extendedCounterPRUholderOld=0;// Re-initialize at each run
+int TotalCurrentNumRecordsOld=TotalCurrentNumRecords;
 while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>extendedCounterPRUholderOld){// Do it until a timetagg is smaller in value than the previous one, because it means that it could not achieve to capture NumQuBitsPerRun
 	extendedCounterPRUholderOld=extendedCounterPRUholder;
 	// When unsigned short
@@ -837,10 +838,10 @@ while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>extendedCounterPRU
 	ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
 	valp++;// 1 times 16 bits
 	if (TotalCurrentNumRecords<MaxNumQuBitsMemStored and extendedCounterPRUholder>0){TotalCurrentNumRecords++;}//Variable to hold the number of currently stored records in memory	
-	else if (TotalCurrentNumRecords>=MaxNumQuBitsMemStored){cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
-	else{cout << "GPIO::No detection of qubits!" << endl;}
 	iIterDump++;
 }
+if (TotalCurrentNumRecords>=MaxNumQuBitsMemStored){cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
+else if (TotalCurrentNumRecords=TotalCurrentNumRecordsOld){cout << "GPIO::No detection of qubits!" << endl;}
 //cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
 
 // Reset values of the sharedMem_int after each iteration
@@ -907,7 +908,7 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 	}
 
 	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-		if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>TagsSeparationDetRelFreq){
+		if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>=TagsSeparationDetRelFreq){
     		unsigned long long int ULLIInitialTimeTaggs=TimeTaggs[iQuadChIter][0];// Normalize to the first timetag, which is a strong reference
     		long long int LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
     		long long int LLITimeTaggs[TotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
@@ -952,7 +953,7 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 		    ////////////////////////////////////////
 		}// if
 		else if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
-			cout << "GPIO::PRUdetCorrRelFreq not enough detections in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;
+			cout << "GPIO::PRUdetCorrRelFreq not enough detections " << TotalCurrentNumRecordsQuadCh[iQuadChIter] << "<" << TagsSeparationDetRelFreq << " in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;
 		}
 	} // for
 //cout << "GPIO::PRUdetCorrRelFreq completed!" << endl;

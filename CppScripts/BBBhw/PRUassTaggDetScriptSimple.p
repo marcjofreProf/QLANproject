@@ -121,7 +121,7 @@ INITIATIONS:// This is only run once
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
-	CLR	r2.t3
+	CLR		r2.t3
 	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -153,7 +153,7 @@ CMDLOOP2:// Double verification of host sending start command
 DWTSTART:
 	// Re-start DWT_CYCNT
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
-	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	//CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	// Some loadings and resets
 	LBCO	r4, CONST_PRUDRAM, 4, 4 // Load to r4 the content of CONST_PRUDRAM with offset 4, and 4 bytes. It is the number of RECORDS
 	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start
@@ -166,46 +166,46 @@ CMDSEL:// Identify the command number to generate the mask of interest for check
 	QBEQ	QUADDET6, r0.b0, 6 // 6 command is detect signals second and third lower quad group channel
 	QBEQ	QUADDET7, r0.b0, 7 // 7 command is detect signals first, second and third (all) lower quad group channel
 QUADDET7:
-	MOV	r11, 0xC000C0FF // detection mask
-	JMP	PSEUDOSYNCH
+	MOV		r11, 0xC000C0FF // detection mask
+	JMP		PSEUDOSYNCH
 QUADDET6:
-	MOV	r11, 0xC000C0F0 // detection mask
-	JMP	PSEUDOSYNCH
+	MOV		r11, 0xC000C0F0 // detection mask
+	JMP		PSEUDOSYNCH
 QUADDET5:
-	MOV	r11, 0xC000C00F // detection mask
-	JMP	PSEUDOSYNCH
+	MOV		r11, 0xC000C00F // detection mask
+	JMP		PSEUDOSYNCH
 QUADDET4:
-	MOV	r11, 0xC000C000 // detection mask
-	JMP	PSEUDOSYNCH
+	MOV		r11, 0xC000C000 // detection mask
+	JMP		PSEUDOSYNCH
 QUADDET3:
-	MOV	r11, 0x000000FF // detection mask
-	JMP	PSEUDOSYNCH
+	MOV		r11, 0x000000FF // detection mask
+	JMP		PSEUDOSYNCH
 QUADDET2:
-	MOV	r11, 0x000000F0 // detection mask
-	JMP	PSEUDOSYNCH
+	MOV		r11, 0x000000F0 // detection mask
+	JMP		PSEUDOSYNCH
 QUADDET1:
-	MOV	r11, 0x0000000F // detection mask
-	JMP	PSEUDOSYNCH
+	MOV		r11, 0x0000000F // detection mask
+	JMP		PSEUDOSYNCH
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to receiving at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering through an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	// Read the number of RECORDS from positon 0 of PRU1 DATA RAM and stored it
 	LBCO	r10, CONST_PRUDRAM, 8, 4 // Read from PRU RAM offset signal period
 	LBCO	r9, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
-	SUB	r3, r10, 1 // Generate the value for r3 from r10
+	SUB		r3, r10, 1 // Generate the value for r3 from r10
 	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
-	AND	r0, r0, r3 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
-	SUB	r0, r10, r0 // Substract to find how long to wait	
-	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCHLOOP consumes double
-	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+	AND		r0, r0, r3 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
+	SUB		r0, r10, r0 // Substract to find how long to wait	
+	LSR		r0, r0, 1// Divide by two because the PSEUDOSYNCHLOOP consumes double
+	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
 PSEUDOSYNCHLOOP:
-	SUB	r0, r0, 1
+	SUB		r0, r0, 1
 	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
 FINETIMEOFFSETADJ:
-	MOV	r0, r9 // For security work with register r0
-	LSR	r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
-	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+	MOV		r0, r9 // For security work with register r0
+	LSR		r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
+	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
 FINETIMEOFFSETADJLOOP:
-	SUB	r0, r0, 1
+	SUB		r0, r0, 1
 	QBNE	FINETIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
 FIRSTREF:	
 	// Store a calibration timetagg
@@ -215,26 +215,26 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Load the value of R31 into a working register
 	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
 	// Measuring all pins of interest
-	MOV		r16.w1, r30.w0 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. Limits the pulse rate to 50 MHz. Takes a lot of time and so it is skew with respect the bits from r31
+	MOV		r16.w2, r30.w0 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. Limits the pulse rate to 50 MHz. Takes a lot of time and so it is skew with respect the bits from r31
 	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection (bits 15, 14 and 7 to 0)
-	MOV		r6.w1, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. TAkes a lot of time and so it is skew with respect the bits from r31
+	MOV		r6.w2, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. TAkes a lot of time and so it is skew with respect the bits from r31
 	MOV		r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)
 //	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections. Soft barrier, maybe a non-useful bit has fired, but gives timeto increase the detection time
 	// The two lines below augment, if needed, the readings on the general r31 bits - altough it produces skews
 //	MOV	r19.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0), increases the windows length but improves probability of detection
 //	OR	r6, r6, r19 // Combine the possibilities of reading on these bits.
 	//
-	AND	r6, r6, r11 // Mask to make sure there are no other info
+	AND		r6, r6, r11 // Mask to make sure there are no other info
 	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections	
 	// Combining all reading pins
-	AND	r16, r16, r11 // Mask to make sure there are no other info
-	LSR	r17.b1, r16.b3, 2
-	LSR	r18.b1, r6.b3, 2
-	OR	r16, r16, r17// Combine the registers
-	OR	r6, r6, r18// Combine the registers
+	AND		r16, r16, r11 // Mask to make sure there are no other info
+	LSR		r17.b1, r16.b3, 2
+	LSR		r18.b1, r6.b3, 2
+	OR		r16, r16, r17// Combine the registers
+	OR		r6, r6, r18// Combine the registers
 	// Edge detection with the pins of interest
-	NOT	r16.w0, r16.w0 // 0s converted to 1s. This step can be placed here to increase chances of detection.	
-	AND	r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge
+	NOT		r16.w0, r16.w0 // 0s converted to 1s. This step can be placed here to increase chances of detection.	
+	AND		r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge
 CHECKDET:		
 	QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 //all the b0 above can be converted to w0 to capture more channels, but then in the channel tag recorded has to be increaed and appropiatelly handled in c++ (also the number of tags per run has to be reduced)
 	// If the program reaches this point, at least one of the bits is high
@@ -249,20 +249,20 @@ TIMETAG:
 FINISH:
 	// Faster Concatenated Checks writting	
 	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 4 // writes values of r8
-	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
+	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	LDI		r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	// Prepare DWT_CYCNT for next round
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
-	CLR	r2.t3
+	CLR		r2.t3
 	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
-	SET	r2.t3
+	SET		r2.t3
 	////////////////////////////////////////
 	MOV	r31.b0, PRU0_ARM_INTERRUPT+16// Notification sent at the beginning of the signal//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF	
 	LBBO	r14, r13, 0, 4//LBCO	r9, CONST_IETREG, 0xC, 4 // read IEP	 // LBBO	r9, r13, 0, 4 // read DWT_CYCNT
-	SUB	r8, r14, r5 // Use the last value of DWT_CYCNT
+	SUB		r8, r14, r5 // Use the last value of DWT_CYCNT
 	JMP 	CMDLOOP // finished, wait for next command. So it continuosly loops	
 EXIT:
 	// Send notification (interrupt) to Host for program completion

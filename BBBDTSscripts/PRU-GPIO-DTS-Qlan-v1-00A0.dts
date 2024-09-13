@@ -90,7 +90,7 @@
          0x0A8 0x05	 // Mode 5 output pull-down
          0x0AC 0x05	 // Mode 5 output pull-down
          0x0A0 0x05	 // Mode 5 output pull-down
-	 0x0A4 0x05	 // Mode 5 output pull-down
+	       0x0A4 0x05	 // Mode 5 output pull-down
        >;  
       };  
     };  

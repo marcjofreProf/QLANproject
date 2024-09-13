@@ -147,7 +147,7 @@ CMDLOOP2:// Double verification of host sending start command
 	SBCO	r4.b0, CONST_PRUDRAM, 0, 1 // We remove the command from the host (in case there is a reset from host, we are saved) 1 bytes.	
 	//MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Here send interrupt to host to measure time
 	// Start executing
-	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	//CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 CMDSEL:
 	QBEQ	QUADEMT1, r0.b0, 1 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
 	QBEQ	QUADEMT2, r0.b0, 2 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
@@ -164,13 +164,13 @@ PERIODICTIMESYNCHSET: // with command coded 11 means setting synch
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
-	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
+	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP	CMDLOOP
 PERIODICTIMESYNCHCHECK: // with command coded 10 means chech synch only	
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
-	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP	CMDLOOP
 PERIODICTIMESYNCHADD: // with command coded 9 means synch by reseting the IEP timer
@@ -178,7 +178,7 @@ PERIODICTIMESYNCHADD: // with command coded 9 means synch by reseting the IEP ti
 	ADD	r0, r0, r7 // Apply correction
 	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
-	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
+	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP	CMDLOOP
 PERIODICTIMESYNCHSUB: // with command coded 8 means synch by reseting the IEP timer
@@ -186,7 +186,7 @@ PERIODICTIMESYNCHSUB: // with command coded 8 means synch by reseting the IEP ti
 	SUB	r0, r0, r7 // Apply correction
 	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
-	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP	CMDLOOP
 QUADEMT7:
@@ -253,7 +253,7 @@ FINETIMEOFFSETADJLOOP:
 //	QBEQ	SIGNALON1, r0.b0, 1 // Coincides with a 1
 //	QBEQ	SIGNALON1, r0.b0, 0 // Coincides with a 0
 SIGNALON1:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
-	MOV	r30.w0, r11.w0 // Double channels 1. write to magic r30 output byte 0
+	MOV	r30.w0, r11.w0 // Double channels 1. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
 	MOV	r5, r9
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 //	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
@@ -272,7 +272,7 @@ SIGNALON2DEL:
 	QBNE	SIGNALON2DEL, r5, 0
 //	LDI	r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON3:
-	MOV	r30.w0, r11.w2 // Double channels 2. write to magic r30 output byte 0
+	MOV	r30.w0, r11.w2 // Double channels 2. write to magic r30 output byte 0. Half word=15,14,13,12,11,10,9,8 bits
 	MOV	r5, r9
 	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 //	LDI	r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
@@ -337,7 +337,7 @@ FINISH:
 //	QBNE 	DELAYOFF, r0, 0
 FINISHLOOP:
 	// The following lines do not consume "signal speed"
-	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Notification sent at the beginning of the signal//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
