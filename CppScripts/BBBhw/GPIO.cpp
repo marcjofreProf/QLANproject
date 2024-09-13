@@ -802,7 +802,7 @@ this->TimeTaggsLast=static_cast<unsigned long long int>((static_cast<unsigned lo
 //Furthermore, remove some time from epoch - in multiples of the SynchTrigPeriod, so it is easier to handle in the above agents
 this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsLast)-static_cast<long long int>((this->ULLIEpochReOffset/static_cast<unsigned long long int>(SynchTrigPeriod))*static_cast<unsigned long long int>(SynchTrigPeriod)));
 
-if (iIterRunsAux==0){this->TimeTaggsLastStored=this->TimeTaggsLast;}// First iteration of current runs, store the value for synchronization time difference calibration
+if (iIterRunsAux==0){this->TimeTaggsLastStored=this->TimeTaggsLast;TotalCurrentNumRecords=0;}// First iteration of current runs, store the value for synchronization time difference calibration
 
 long long int LLIOldLastTimeTagg=static_cast<long long int>(OldLastTimeTagg);
 unsigned int valCycleCountPRUAux1;
