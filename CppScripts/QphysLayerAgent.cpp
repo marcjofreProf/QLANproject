@@ -470,8 +470,8 @@ int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitRec
 		}
 	}
 	if (SpecificQuadChEmt<0){
-		SpecificQuadChEmt=0;
-		cout << "QPLA::SimulateEmitSynchQuBit wrongly identified single specific quad group channel...setting it to index 0" << endl;
+		SpecificQuadChEmt=7;
+		cout << "QPLA::SimulateEmitSynchQuBit wrongly identified single specific quad group channel...setting it to index 7 (all channels)" << endl;
 	}
 	strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 	this->NumberRepetitionsSignal=numReqQuBitsAux;
@@ -655,8 +655,8 @@ int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmit
 		}
 	}
 	if (SpecificQuadChDet<0){
-		SpecificQuadChDet=0;
-		cout << "QPLA::SimulateReceiveSynchQuBit wrongly identified single specific quad group channel...setting it to index 0" << endl;
+		SpecificQuadChDet=7;
+		cout << "QPLA::SimulateReceiveSynchQuBit wrongly identified single specific quad group channel...setting it to index 7 (all channels)" << endl;
 	}
 	strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 	this->NumQuBitsPerRun=numReqQuBitsAux;				
