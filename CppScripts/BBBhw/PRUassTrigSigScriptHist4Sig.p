@@ -166,29 +166,29 @@ PERIODICTIMESYNCHSET: // with command coded 11 means setting synch
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
-	JMP	CMDLOOP
+	JMP		CMDLOOP
 PERIODICTIMESYNCHCHECK: // with command coded 10 means chech synch only	
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
-	JMP	CMDLOOP
+	JMP		CMDLOOP
 PERIODICTIMESYNCHADD: // with command coded 9 means synch by reseting the IEP timer
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
-	ADD	r0, r0, r7 // Apply correction
+	ADD		r0, r0, r7 // Apply correction
 	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
-	JMP	CMDLOOP
+	JMP		CMDLOOP
 PERIODICTIMESYNCHSUB: // with command coded 8 means synch by reseting the IEP timer
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
-	SUB	r0, r0, r7 // Apply correction
+	SUB		r0, r0, r7 // Apply correction
 	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
-	JMP	CMDLOOP
+	JMP		CMDLOOP
 QUADEMT7:
 	MOV	r11, 0x02220111
 	MOV	r12, 0x08880444

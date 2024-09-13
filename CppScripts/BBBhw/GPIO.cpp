@@ -837,6 +837,8 @@ while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>extendedCounterPRU
 	// When unsigned short
 	ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
 	valp++;// 1 times 16 bits
+	cout << "GPIO::extendedCounterPRUholder: " << extendedCounterPRUholder << endl;
+	cout << "GPIO::extendedCounterPRUholder>0: " << (extendedCounterPRUholder>0) << endl;
 	if (TotalCurrentNumRecords<MaxNumQuBitsMemStored and extendedCounterPRUholder>0){TotalCurrentNumRecords++;}//Variable to hold the number of currently stored records in memory	
 	iIterDump++;
 }
