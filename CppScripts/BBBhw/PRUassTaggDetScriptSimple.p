@@ -177,7 +177,7 @@ QUADDET6:
 	MOV		r11, 0xC000C0F0 // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET5:
-	MOV		r11, 0xC000C00F // detection mask
+	MOV		r11, 0xC000C08D // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET4:
 	MOV		r11, 0xC000C000 // detection mask
@@ -186,10 +186,10 @@ QUADDET3:
 	MOV		r11, 0x000000FF // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET2:
-	MOV		r11, 0x000000F0 // detection mask
+	MOV		r11, 0x0000008D // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET1:
-	MOV		r11, 0x0000000F // detection mask
+	MOV		r11, 0x00000072 // detection mask
 	JMP		PSEUDOSYNCH
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to receiving at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering through an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	// Read the number of RECORDS from positon 0 of PRU1 DATA RAM and stored it
