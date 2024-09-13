@@ -152,6 +152,11 @@ CMDLOOP2:// Double verification of host sending start command
 	//MOV 	r31.b0, PRU0_ARM_INTERRUPT+16// Here send interrupt to host to measure time
 DWTSTART:
 	// Re-start DWT_CYCNT
+	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+	CLR		r2.t3
+	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
+	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
+	SET		r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
 	//CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	// Some loadings and resets
@@ -187,7 +192,6 @@ QUADDET1:
 	MOV		r11, 0x0000000F // detection mask
 	JMP		PSEUDOSYNCH
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to receiving at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering through an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
-	MOV		r11, 0xC000C0FF // detection mask
 	// Read the number of RECORDS from positon 0 of PRU1 DATA RAM and stored it
 	LBCO	r10, CONST_PRUDRAM, 8, 4 // Read from PRU RAM offset signal period
 	LBCO	r9, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction
