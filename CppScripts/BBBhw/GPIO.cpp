@@ -840,9 +840,9 @@ while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>extendedCounterPRU
 	if (TotalCurrentNumRecords<MaxNumQuBitsMemStored and extendedCounterPRUholder>0){TotalCurrentNumRecords++;}//Variable to hold the number of currently stored records in memory	
 	iIterDump++;
 }
-if (TotalCurrentNumRecords>=MaxNumQuBitsMemStored){cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
+if (TotalCurrentNumRecords>MaxNumQuBitsMemStored){cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
 else if (TotalCurrentNumRecords=TotalCurrentNumRecordsOld){cout << "GPIO::No detection of qubits!" << endl;}
-//cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
+cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
 
 // Reset values of the sharedMem_int after each iteration
 for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
