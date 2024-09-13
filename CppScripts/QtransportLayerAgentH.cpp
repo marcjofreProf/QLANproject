@@ -1624,9 +1624,20 @@ int QTLAH::AcumulateAnswersYouFreeRequestToParticularHosts(char* ParamsCharArray
 else if (ReWaitsAnswersHostsActiveActionsFree<MaxReWaitsAnswersHostsActiveActionsFree){// Increment the wait counter
 	ReWaitsAnswersHostsActiveActionsFree++;// Update the counter
 }
-else{// Too many rounds, kill the process of blocking other hosts	
+else{// Too many rounds, kill the process of blocking other hosts
+	cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 	cout << "Host " << this->IPaddressesSockets[2] << " too many iterations waiting for Block requests answers from other nodes...aborting block request!" << endl;
+	
 	this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+	cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 	IterHostsActiveActionsFreeStatus=0;
 	ReWaitsAnswersHostsActiveActionsFree=0;// Reset the counter
 }
