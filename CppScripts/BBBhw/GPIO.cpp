@@ -807,8 +807,8 @@ if (iIterRunsAux==0){this->TimeTaggsLastStored=this->TimeTaggsLast;TotalCurrentN
 long long int LLIOldLastTimeTagg=static_cast<long long int>(OldLastTimeTagg);
 unsigned int valCycleCountPRUAux1;
 unsigned int valCycleCountPRUAux2;
-cout << "GPIO::NumQuBitsPerRun " << NumQuBitsPerRun << endl;
-cout << "GPIO::MaxNumQuBitsMemStored " << MaxNumQuBitsMemStored << endl;
+//cout << "GPIO::NumQuBitsPerRun " << NumQuBitsPerRun << endl;
+//cout << "GPIO::MaxNumQuBitsMemStored " << MaxNumQuBitsMemStored << endl;
 //for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 iIterDump=0;
 extendedCounterPRUholder=1;// Re-initialize at each run. 1 so that at least the first is checked and stored
@@ -837,15 +837,15 @@ while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>extendedCounterPRU
 	// When unsigned short
 	ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
 	valp++;// 1 times 16 bits
-	cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
-	cout << "GPIO::extendedCounterPRUholder: " << extendedCounterPRUholder << endl;
-	cout << "GPIO::extendedCounterPRUholder>0: " << (extendedCounterPRUholder>0) << endl;
+	//cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
+	//cout << "GPIO::extendedCounterPRUholder: " << extendedCounterPRUholder << endl;
+	//cout << "GPIO::extendedCounterPRUholder>0: " << (extendedCounterPRUholder>0) << endl;
 	if (TotalCurrentNumRecords<MaxNumQuBitsMemStored and extendedCounterPRUholder>0){TotalCurrentNumRecords++;}//Variable to hold the number of currently stored records in memory	
 	iIterDump++;
 }
 if (TotalCurrentNumRecords>MaxNumQuBitsMemStored){cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
-else if (TotalCurrentNumRecords=TotalCurrentNumRecordsOld){cout << "GPIO::No detection of qubits!" << endl;}
-cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
+else if (TotalCurrentNumRecords==TotalCurrentNumRecordsOld){cout << "GPIO::No detection of qubits!" << endl;}
+//cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
 
 // Reset values of the sharedMem_int after each iteration
 for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
