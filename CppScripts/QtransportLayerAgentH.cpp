@@ -1569,6 +1569,9 @@ int QTLAH::SendAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int 
 // Three-step handshake
 // First block the current host
 HostsActiveActionsFree[0]=false;// This host blocked
+strcpy(InfoRemoteHostActiveActions[0],this->IPaddressesSockets[2]);// Clear active host
+strcpy(InfoRemoteHostActiveActions[1],"Block");// Clear status
+
 NumAnswersOtherHostsActiveActionsFree=0;// Reset the number of answers received
 ReWaitsAnswersHostsActiveActionsFree=0; // Reset the counter
 
