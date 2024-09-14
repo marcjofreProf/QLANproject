@@ -1238,7 +1238,7 @@ int QPLA::HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass){
 	// Check that we not exceed the QuBits buffer size
 	if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]>NumQubitsMemoryBuffer){RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]=NumQubitsMemoryBuffer;}
 	else if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]<1){
-		cout << "QPLA::HistCalcPeriodTimeTags SpecificQuadChDet " << SpecificQuadChDet << " not enough detecttions for proper synch. calibration RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]: " << RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet] << endl;
+		cout << "QPLA::HistCalcPeriodTimeTags SpecificQuadChDet " << SpecificQuadChDet << " not enough detections for proper synch. calibration RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]: " << RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet] << endl;
 	}
 
 	long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
