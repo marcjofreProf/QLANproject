@@ -9,6 +9,7 @@
 
 // Length of acquisition:
 #define RECORDS 1964 // readings and it matches in the host c++ script. Not really used because updated from cpp host
+#define EXITCOUNTER 0x7FFFFFFF // almost 10 seconds
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
@@ -52,6 +53,8 @@
 // r17 might be used for some intermediate operations
 // r18 might be used for some intermediate operations
 // r19 might be used for some intermediate operations
+
+// r20 reserved for exit counter
 
 //// If using IET timer (potentially adjusted to synchronization protocols)
 // We can use Constant table pointers C26
@@ -117,7 +120,8 @@ INITIATIONS:// This is only run once
 	MOV	r11, 0xC000C0FF // detection mask. Bits might be moved out of position
 	LDI	r17, 0
 	LDI	r18, 0
-	LDI	r19, 0 
+	LDI	r19, 0
+	MOV r20, EXITCOUNTER // Maximum value to start with to exit if nothing happens
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -159,6 +163,7 @@ DWTSTART:
 	SET		r2.t3
 	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
 	LDI		r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
+	MOV 	r20, EXITCOUNTER // Maximum value to start with to exit if nothing happens
 	//CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	// Some loadings and resets
 	LBCO	r4, CONST_PRUDRAM, 4, 4 // Load to r4 the content of CONST_PRUDRAM with offset 4, and 4 bytes. It is the number of RECORDS
@@ -218,6 +223,8 @@ FIRSTREF:
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
 	SBCO	r5, CONST_PRUDRAM, 8, 4// Calibration time tag (together with the acumulated synchronization error)
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
+	SUB 	r20, r20, 1 // Substract 1 to the exit counter
+	QBEQ 	FINISH, r20, 0 // When this exit counter reaches 0 (almost 10 seconds, it oculd be up to almost 20 seconds) exit the program
 	// Load the value of R31 into a working register
 	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
 	// Measuring all pins of interest
