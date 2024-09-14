@@ -966,8 +966,8 @@ return 0; // All ok
 // Function to pack bits 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15 of an unsigned int into the lower values
 unsigned short GPIO::packBits(unsigned short value) {
     // Rearrange the lower two bytes so that they are correctly splitted for each quad group channel. For each group of 4 bits the order does not follow an arranged order for channel detectors
-    unsigned short byte0aux1 = (value & 0x0070) | ((value & 0x0002)<<6); // Are the bits 0x0072
-    unsigned short byte0aux0 = ((value & 0x0080)>> 6) | (value & 0x000D); // Are the bits 0x008D
+    unsigned short byte0aux0 = ((value & 0x0070) | ((value & 0x0002)<<6))>>4; // Are the bits 0x0072
+    unsigned short byte0aux1 = (((value & 0x0080)>> 6) | (value & 0x000D))<<4; // Are the bits 0x008D
     unsigned short byte1 = ((value & 0xF000) >> 4); // Byte 1 shifts to the right four bit positions (the interesting ones)
 
     // Combine the bytes into a single unsigned short
