@@ -1231,11 +1231,11 @@ return 0; // All ok
 }
 
 int QPLA::HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass){
-//this->acquire();
-//while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
-//this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
-
-// Check that we not exceed the QuBits buffer size
+	//this->acquire();
+	//while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
+	//this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
+	cout << "QPLA::HistCalcPeriodTimeTags RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]: " << RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet] << endl;
+	// Check that we not exceed the QuBits buffer size
 	if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]>NumQubitsMemoryBuffer){RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]=NumQubitsMemoryBuffer;}
 
 	long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
