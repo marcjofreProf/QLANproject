@@ -410,7 +410,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++;
 		if (this->iIterPRUcurrentTimerValSynch==(2*this->NumSynchMeasAvgAux)){
-			cout << "Hardware synchronized, now proceding with the network synchronization managed by hosts..." << endl;
+			cout << "Hardware synchronized, now proceeding with the network synchronization managed by hosts..." << endl;
 			// Update HardwareSynchStatus			
 			this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 			HardwareSynchStatus=true;
