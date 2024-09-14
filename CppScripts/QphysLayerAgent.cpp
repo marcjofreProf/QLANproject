@@ -1237,6 +1237,9 @@ int QPLA::HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass){
 	//cout << "QPLA::HistCalcPeriodTimeTags RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]: " << RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet] << endl;
 	// Check that we not exceed the QuBits buffer size
 	if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]>NumQubitsMemoryBuffer){RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]=NumQubitsMemoryBuffer;}
+	else if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]<1){
+		cout << "QPLA::HistCalcPeriodTimeTags SpecificQuadChDet " << SpecificQuadChDet << " not enough detecttions for proper synch. calibration RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]: " << RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet] << endl;
+	}
 
 	long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
 	long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
@@ -1451,9 +1454,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
 	}
 
-	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1]/dHistPeriodicityAux << endl; // Offset
-	cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2]/dHistPeriodicityAux << endl; // Relative frequency difference
-	cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl; // Period
+	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1]/dHistPeriodicityAux << " modulo offset" << endl; // Offset
+	cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2]/dHistPeriodicityAux << " rel. freq. " << endl; // Relative frequency difference
+	cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << " hist. period " << endl; // Period
 	
 	// Identify the specific link and store/update iteratively the values
 	
