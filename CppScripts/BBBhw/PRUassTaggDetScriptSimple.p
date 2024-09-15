@@ -226,6 +226,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Load the value of R31 into a working register
 	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
 	// Measuring all pins of interest
+	// First measure what whould be zero (for edge detection)
 	MOV		r16.w2, r30.w0 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. Limits the pulse rate to 50 MHz. Takes a lot of time and so it is skew with respect the bits from r31
 	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection (bits 15, 14 and 7 to 0)
 	AND		r16, r16, r11 // Mask to make sure there are no other info
@@ -233,6 +234,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	SUB 	r20, r20, 1 // Substract 1 to the exit counter
 	QBEQ 	FINISH, r20, 0 // When this exit counter reaches 0 (almost 10 seconds, it oculd be up to almost 20 seconds) exit the program
 	// Give some time - while doing operations
+	// Then measure wha should be 1 (for edge detection)
 	MOV		r6.w2, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. TAkes a lot of time and so it is skew with respect the bits from r31
 	MOV		r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)
 	AND		r6, r6, r11 // Mask to make sure there are no other info

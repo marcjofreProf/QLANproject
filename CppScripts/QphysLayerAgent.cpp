@@ -1151,11 +1151,11 @@ else{
 // Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
 // Accordingly, the std wrapped count difference is stored in TimeTaggsDetAnalytics[6]
 cout << "TIMETAGGING ANALYSIS of QphysLayerAgent.h" << endl;
-cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
-cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
-cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
-cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
-cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
+//cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
+//cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
+//cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
+//cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected first timetagg" << endl;
+//cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
 if (SimulateNumStoredQubitsNodeAux>1){
 	TimeTaggsDetAnalytics[5]=0.0;
 	TimeTaggsDetAnalytics[6]=0.0;
