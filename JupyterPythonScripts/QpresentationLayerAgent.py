@@ -141,7 +141,7 @@ class QPLA:
 		"""
 				
 	def SimulateRequestMultipleNodesQubitsHost(self,IPhostDest1OpNet,IPhostOrg1OpNet,IPhostDest2OpNet,IPhostOrg2OpNet,IPnodeDestConNet,IPnodeDest1ConNet,IPnodeDest2ConNet,IPhostOrgConNet,NumRequestedQubitsSend,NumRequestedQubitsReceive,PeriodSignalHistVal,SynchPRUoffFreqVal1,SynchPRUoffFreqVal2,QuadChEmtDet): # Request other nodes to send to this node qubits
-		ReceiveSynchPRUoffFreqVal=0.0*SynchPRUoffFreqVal
+		ReceiveSynchPRUoffFreqVal=0.0*(0.5*SynchPRUoffFreqVal1+0.5*SynchPRUoffFreqVal2)
 		# For the list of IP for the correction, it is very important the order, first the destination and then the other sender
 		# Attention, this method QuadChEmtDet contains an array with more than one quad group channel emitter and at the end the quad group channel receiver
 		messagePayloadAux=self.SemiColonListCharArrayParser(["Passive",self.UnderScoreListCharArrayParser([IPhostOrg1OpNet,IPhostDest2OpNet]),self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostOrg2OpNet]),str(NumRequestedQubitsSend),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal2[0]),str(SynchPRUoffFreqVal2[1]),str(QuadChEmtDet[0])])
@@ -159,7 +159,7 @@ class QPLA:
 		messageAuxChar = self.ListCharArrayParser([messageIPdest,messageIPorg,messageTypeAux,messageCommandAux,messagePayloadAux])
 		self.QSLAagent.SendMessageAgent(messageAuxChar)
 		
-		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostOrg1OpNet,IPhostOrg2OpNet]),self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostDest2OpNet]),str(NumRequestedQubitsReceive),str(PeriodSignalHistVal),str(ReceiveSynchPRUoffFreqVal[0]),str(ReceiveSynchPRUoffFreqVal[1]),str(QuadChEmtDet[2])])
+		messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostDest2OpNet]),self.UnderScoreListCharArrayParser([IPhostDest1OpNet,IPhostDest2OpNet]),str(NumRequestedQubitsReceive),str(PeriodSignalHistVal),str(ReceiveSynchPRUoffFreqVal[0]),str(ReceiveSynchPRUoffFreqVal[1]),str(QuadChEmtDet[2])])
 		messageCommandAux="SimulateReceiveQubits"
 		messageTypeAux="Control"
 		messageIPorg=IPhostOrgConNet
