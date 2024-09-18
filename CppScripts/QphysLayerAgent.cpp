@@ -426,8 +426,8 @@ int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveI
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=-CurrentExtraSynchNetworkParamsLink[0];// synch trig offset - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter
-this->FineSynchAdjVal[1]=-CurrentExtraSynchNetworkParamsLink[1];// synch trig frequency - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter
+this->FineSynchAdjVal[0]=CurrentExtraSynchNetworkParamsLink[0];// synch trig offset - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter
+this->FineSynchAdjVal[1]=CurrentExtraSynchNetworkParamsLink[1];// synch trig frequency - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter
 }
 else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
@@ -490,8 +490,8 @@ else{
 // Adjust the network synchronization values
 this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=-0.0*CurrentExtraSynchNetworkParamsLink[0];// synch trig offset - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter, just a very slight percentage of any other current adjustment
-this->FineSynchAdjVal[1]=-0.0*CurrentExtraSynchNetworkParamsLink[1];// synch trig frequency - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter, just a very slight percentage of any other current adjustment
+this->FineSynchAdjVal[0]=0.0*CurrentExtraSynchNetworkParamsLink[0];// synch trig offset - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter, just a very slight percentage of any other current adjustment
+this->FineSynchAdjVal[1]=0.0*CurrentExtraSynchNetworkParamsLink[1];// synch trig frequency - in the other direction and only half so that the other node also has to compensate a bit, nulled because otherwise inconsistencies when shared emitter, just a very slight percentage of any other current adjustment
 }
 else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
