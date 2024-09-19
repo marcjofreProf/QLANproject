@@ -750,7 +750,7 @@ for (int j=0;j<numCurrentEmitReceiveIP;j++){
 	else{strcpy(SpecificCurrentEmitReceiveIPAuxAux,strtok(NULL,"_"));}
 	for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
 		if (string(LinkIdentificationArray[i])==string(SpecificCurrentEmitReceiveIPAuxAux)){// IP already present
-			CurrentSpecificLink=i;
+			if (CurrentSpecificLink>=0){CurrentSpecificLink=i;}// Take the first identified, which is th eone that matters most
 			CurrentSpecificLinkMultipleIndices[numSpecificLinkmatches]=i; // For multiple links at the same time
 			numSpecificLinkmatches++;
 		}
@@ -872,7 +872,7 @@ if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to
 	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[2]: " << CurrentSynchNetworkParamsLink[2] << endl;
 }
 else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
-	// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for deteciton to use another story is if compensating for emitter
+	// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for detection to use another story is if compensating for emitter
 	if ((-SynchNetworkParamsLink[CurrentSpecificLink][1])<0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1];}// For negative correction
 	else if ((-SynchNetworkParamsLink[CurrentSpecificLink][1])>0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2];}// For positivenegative correction
 	else{SynchNetTransHardwareAdjAux=1.0;}
