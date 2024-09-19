@@ -850,10 +850,10 @@ if (CurrentSpecificLinkMultiple<0){
 // Update the holder values that need to be passed depending on the current link of interest
 double dHistPeriodicityAux=static_cast<double>(HistPeriodicityAux);
 double dHistPeriodicityHalfAux=static_cast<double>(HistPeriodicityAux/2.0);
+double SynchNetTransHardwareAdjAux=1.0;
 if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to RequestQubits Node to node or SendEntangled. The receiver always performs correction, so does not matter for the sender since they are zeroed
 	// For receiver correction
 	CurrentSynchNetworkParamsLink[0]=fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][0],dHistPeriodicityAux)-dHistPeriodicityHalfAux;// Offset
-	double SynchNetTransHardwareAdjAux=1.0;
 	if (SynchNetworkParamsLink[CurrentSpecificLink][1]<0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1];}// For negative correction
 	else if (SynchNetworkParamsLink[CurrentSpecificLink][1]>0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2];}// For positivenegative correction
 	else{SynchNetTransHardwareAdjAux=1.0;}
@@ -869,7 +869,6 @@ if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to
 }
 else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
 	// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for deteciton to use another story is if compensating for emitter
-	double SynchNetTransHardwareAdjAux=1.0;
 	if ((-SynchNetworkParamsLink[CurrentSpecificLink][1])<0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1];}// For negative correction
 	else if ((-SynchNetworkParamsLink[CurrentSpecificLink][1])>0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2];}// For positivenegative correction
 	else{SynchNetTransHardwareAdjAux=1.0;}
@@ -896,6 +895,17 @@ else{
 	CurrentExtraSynchNetworkParamsLink[1]=0.0; // Reset values
 	CurrentExtraSynchNetworkParamsLink[2]=0.0; // Reset values
 }
+
+// Debuging
+cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSpecificLink: " << CurrentSpecificLink << endl;
+cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSpecificLinkMultipleIndices: " << CurrentSpecificLinkMultipleIndices << endl;
+cout << "QPLA::RetrieveOtherEmiterReceiverMethod LinkIdentificationArray[CurrentSpecificLink]: " << LinkIdentificationArray[CurrentSpecificLink] << endl;
+cout << "QPLA::RetrieveOtherEmiterReceiverMethod ListCombinationSpecificLink[CurrentSpecificLinkMultiple]: " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
+cout << "QPLA::RetrieveOtherEmiterReceiverMethod SynchNetAdj[CurrentSpecificLink]: " << SynchNetAdj[CurrentSpecificLink] << endl;
+cout << "QPLA::RetrieveOtherEmiterReceiverMethod SynchNetTransHardwareAdjAux: " << SynchNetTransHardwareAdjAux << endl;
+cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[0]: " << CurrentExtraSynchNetworkParamsLink[0] << endl;
+cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[1]: " << CurrentExtraSynchNetworkParamsLink[1] << endl;
+cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[2]: " << CurrentExtraSynchNetworkParamsLink[2] << endl;
 return 0; // All ok
 }
 
@@ -1447,7 +1457,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	cout << "QPLA::SynchTimeTaggRefMedianAux: " << SynchTimeTaggRefMedianAux << endl;
 	cout << "QPLA::SynchNetAdjAux: " << SynchNetAdjAux << endl;
 	cout << "QPLA::SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1] << ", adjustment factor for negative rel. freq. correction" << endl;
-	cout << "QPLA::SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1] << ", adjustment factor for positive rel. freq. correction" << endl;
+	cout << "QPLA::SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2] << ", adjustment factor for positive rel. freq. correction" << endl;
 	
 	// Offset calculation
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];
