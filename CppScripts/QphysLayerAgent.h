@@ -122,9 +122,9 @@ private: //Variables/Instances
 	double SynchHistCenterMassArray[NumCalcCenterMass]={0.0}; // Array containing the needed center of mass for the histograms of the synchronization
 	double SynchFirstTagsArrayStd[NumCalcCenterMass]={0.0}; // Array containing the std of the calculation of center mass to make decition
 	double SynchCalcValuesArray[3]={0.0,0.0,0.0}; // Computed values for achieving synchronization protocol
-	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,-0.25,0.25}; // Normalized values of frequency testing
-	double SynchNetAdj[2*((1LL<<LinkNumberMAX)-1)]={1.0};//
-	double SynchNetTransHardwareAdj[2*((1LL<<LinkNumberMAX)-1)]={1.0};
+	double SynchAdjRelFreqCalcValuesArray[2*((1LL<<LinkNumberMAX)-1)][3]={1.0}; // Computed hardware values for adjusting the application of the computed rel.freq. correction. The order is, 0 index is 0 rel. freq. correction (so 1.0), adjustment value for negative correction for index 1 and adjustment value for positive correction for index 2.
+	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,-0.25,0.25}; // Normalized values of frequency testing which are applied for calibration
+	double SynchNetAdj[2*((1LL<<LinkNumberMAX)-1)]={1.0};
 	double adjFreqSynchNormRatiosArray[NumCalcCenterMass]={1.0}; // adjusting Normalized ratios of frequency testing
 	double SynchNetworkParamsLink[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send
 	double CurrentSynchNetworkParamsLink[3]={0.0}; //Stores currently the network synch values of interest given the link in use for reception

@@ -1482,11 +1482,11 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 	while(AchievedAttentionParticularHosts==false or FirstPassAux==true){
 		if (FirstPassAux==false){
 			cout << "Host " << this->IPaddressesSockets[2] << " trying to get attention from other involved hosts!" << endl;
-			cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
-			cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
-			cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
-			cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
-			cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
+			//cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+			//cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
+			//cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
+			//cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
+			//cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 		}
 	FirstPassAux=false;// First pass is compulsory, since it might be true AchievedAttentionParticularHosts, but because of another process
 	while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
