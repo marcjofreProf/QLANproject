@@ -903,12 +903,12 @@ else{
 }
 
 // Debugging
-cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSpecificLink: " << CurrentSpecificLink << endl;
-cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSpecificLinkMultipleIndices[0]: " << CurrentSpecificLinkMultipleIndices[0] << endl;
-cout << "QPLA::RetrieveOtherEmiterReceiverMethod LinkIdentificationArray[CurrentSpecificLink]: " << LinkIdentificationArray[CurrentSpecificLink] << endl;
-cout << "QPLA::RetrieveOtherEmiterReceiverMethod ListCombinationSpecificLink[CurrentSpecificLinkMultiple]: " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
-cout << "QPLA::RetrieveOtherEmiterReceiverMethod SynchNetAdj[CurrentSpecificLink]: " << SynchNetAdj[CurrentSpecificLink] << endl;
-cout << "QPLA::RetrieveOtherEmiterReceiverMethod SynchNetTransHardwareAdjAux: " << SynchNetTransHardwareAdjAux << endl;
+//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSpecificLink: " << CurrentSpecificLink << endl;
+//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSpecificLinkMultipleIndices[0]: " << CurrentSpecificLinkMultipleIndices[0] << endl;
+//cout << "QPLA::RetrieveOtherEmiterReceiverMethod LinkIdentificationArray[CurrentSpecificLink]: " << LinkIdentificationArray[CurrentSpecificLink] << endl;
+//cout << "QPLA::RetrieveOtherEmiterReceiverMethod ListCombinationSpecificLink[CurrentSpecificLinkMultiple]: " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
+//cout << "QPLA::RetrieveOtherEmiterReceiverMethod SynchNetAdj[CurrentSpecificLink]: " << SynchNetAdj[CurrentSpecificLink] << endl;
+//cout << "QPLA::RetrieveOtherEmiterReceiverMethod SynchNetTransHardwareAdjAux: " << SynchNetTransHardwareAdjAux << endl;
 
 return 0; // All ok
 }
