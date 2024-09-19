@@ -1511,6 +1511,9 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 	if (HostsActiveActionsFree[0]==true){//string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){
 		this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 	}
+	if (AchievedAttentionParticularHosts==false and string(InfoRemoteHostActiveActions[1])==string("Block") and string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true){// Autoblocked
+		this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);// Unblock
+	}
 }
 this->release();
 return 0; // all ok;
