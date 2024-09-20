@@ -83,13 +83,13 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 
 //////////////////////////////////////////////////////////////////////////
 bool CKPD::setMaxRrPriority(){// For rapidly handling interrupts
-int max_priority=sched_get_priority_max(SCHED_RR);
+int max_priority=sched_get_priority_max(SCHED_FIFO);
 int Nice_priority=10;
 // SCHED_RR: Round robin
 // SCHED_FIFO: First-In-First-Out
 sched_param sch_params;
 sch_params.sched_priority = Nice_priority;
-if (sched_setscheduler(0,SCHED_RR,&sch_params)==-1){
+if (sched_setscheduler(0,SCHED_FIFO,&sch_params)==-1){
 	cout <<" Failed to set maximum real-time priority." << endl;
 	return false;
 }
@@ -227,9 +227,9 @@ this->duration_FinalInitialDriftAuxArrayAvg = this->RatioAverageFactorClockQuart
 }
 }
 
-if (this->duration_FinalInitialDriftAuxArrayAvg>5000){
-	cout << "Time for pre processing the time barrier is too long " << this->duration_FinalInitialDriftAuxArrayAvg << " ...adjust TimeClockMarging! Set to nominal value of 5000..." << endl;
-	this->duration_FinalInitialDriftAuxArrayAvg=5000;// For the time being adjust it to the nominal initial value
+if (this->duration_FinalInitialDriftAuxArrayAvg>65000){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
+	cout << "Time for pre processing the time barrier is too long " << this->duration_FinalInitialDriftAuxArrayAvg << " ...adjust TimeClockMarging! Set to nominal value of 65000..." << endl;
+	this->duration_FinalInitialDriftAuxArrayAvg=65000;// For the time being adjust it to the nominal initial value
 }
 
 this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
