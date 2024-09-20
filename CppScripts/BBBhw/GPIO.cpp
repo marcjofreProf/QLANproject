@@ -619,7 +619,10 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 	*/
 	// Important check to do
-	if (duration_FinalInitialMeasTrigAuxAvg>5000){cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay!" << endl;}
+	if (duration_FinalInitialMeasTrigAuxAvg>5000){
+		cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay!S et to nominal value of 5000..." << endl;
+		this->duration_FinalInitialMeasTrigAuxAvg=5000;// For the time being adjust it to the nominal initial value
+	}
 	this->ManualSemaphore=false;
 	this->ManualSemaphoreExtra=false;
 	this->release();
@@ -713,7 +716,10 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 	*/
 	// Important check to do
-	if (duration_FinalInitialMeasTrigAuxAvg>5000){cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay!" << endl;}
+	if (duration_FinalInitialMeasTrigAuxAvg>5000){
+		cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay! Set to nominal value of 5000..." << endl;
+		this->duration_FinalInitialMeasTrigAuxAvg=5000;// For the time being adjust it to the nominal initial value
+	}
 	this->ManualSemaphore=false;
 	this->ManualSemaphoreExtra=false;
 	this->release();
