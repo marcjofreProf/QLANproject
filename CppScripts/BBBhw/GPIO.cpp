@@ -214,8 +214,8 @@ int GPIO::InitAgentProcess(){
 bool GPIO::setMaxRrPriority(){// For rapidly handling interrupts
 	int max_priority=sched_get_priority_max(SCHED_FIFO);
 	int Nice_priority=10;
-// SCHED_RR: Round robin
-// SCHED_FIFO: First-In-First-Out
+	// SCHED_RR: Round robin
+	// SCHED_FIFO: First-In-First-Out
 	sched_param sch_params;
 	sch_params.sched_priority = Nice_priority;
 	if (sched_setscheduler(0,SCHED_FIFO,&sch_params)==-1){
