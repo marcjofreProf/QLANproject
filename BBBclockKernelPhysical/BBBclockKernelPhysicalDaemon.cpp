@@ -172,6 +172,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(floor(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentInitial.time_since_epoch()).count())/static_cast<long double>(this->TimeAdjPeriod))*static_cast<long double>(this->TimeAdjPeriod)));
 	this->TimePointClockCurrentInitial=ClockWatch::time_point(duration_back);
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
+	this->TimePointClockCurrentInitialMeas=this->TimePointClockCurrentFinal-std::chrono::nanoseconds(this->duration_FinalInitialDriftAuxArrayAvg);// Important that it is discounted the time to enter the interrupt so that in this way the signal generation in the PRU is reference to an absolute time.
 	cout << "Generating clock output..." << endl;	
 }
 
@@ -186,7 +187,6 @@ return 0;// all ok
 }
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-this->TimePointClockCurrentInitialMeas=this->TimePointClockCurrentFinal-std::chrono::nanoseconds(this->duration_FinalInitialDriftAuxArrayAvg);// Important that it is discounted the time to enter the interrupt so that in this way the signal generation in the PRU is reference to an absolute time.
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME// https://opensource.com/article/17/6/timekeeping-linux-vms
 while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);// Busy waiting
 //this->TimePointClockCurrentInitialMeas=ClockWatch::now(); //Computed in the step before
@@ -232,6 +232,7 @@ if (this->duration_FinalInitialDriftAuxArrayAvg>5000){
 }
 
 this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
+this->TimePointClockCurrentInitialMeas=this->TimePointClockCurrentFinal-std::chrono::nanoseconds(this->duration_FinalInitialDriftAuxArrayAvg);// Important that it is discounted the time to enter the interrupt so that in this way the signal generation in the PRU is reference to an absolute time.
 
 // Compute error
 if (retInterruptsPRU1>0){
@@ -268,7 +269,7 @@ if (retInterruptsPRU1>0){
 	else if (this->TimePointClockCurrentAdjFilError<this->MinTimePointClockCurrentAdjFilError){this->TimePointClockCurrentAdjFilError=this->MinTimePointClockCurrentAdjFilError;}
 	
 	// PID implementation
-	this->PIDcontrolerTime();
+	//this->PIDcontrolerTime();
 	
 	// Apply period scaling selected by the user
 	if (this->CounterHandleInterruptSynchPRU<WaitCyclesBeforeAveraging){// Do not apply the averaging in the first ones since everything is adjusting
@@ -291,8 +292,9 @@ else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterCloc
 
 this->CounterHandleInterruptSynchPRU++;// Update counter
 
-if (PlotPIDHAndlerInfo){
-	if (this->CounterHandleInterruptSynchPRU%3==0){
+if (this->CounterHandleInterruptSynchPRU%128==0){
+	this->CounterHandleInterruptSynchPRU=0;// Reset value
+	if (PlotPIDHAndlerInfo){	
 	//cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
 	//cout << "this->NumClocksQuarterPeriodPRUclock: " << this->NumClocksQuarterPeriodPRUclock << endl;
 	// Not used cout << "this->TimePointClockCurrentFinalInitialAdj_time_as_count: " << this->TimePointClockCurrentFinalInitialAdj_time_as_count << endl;
@@ -314,8 +316,8 @@ return 0;// All ok
 }
 
 int CKPD::PIDcontrolerTime(){
-TimePointClockCurrentAdjFilErrorDerivative=(TimePointClockCurrentAdjFilError-TimePointClockCurrentAdjFilErrorLast)/(static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast));
-TimePointClockCurrentAdjFilErrorIntegral=TimePointClockCurrentAdjFilErrorIntegral+TimePointClockCurrentAdjFilError*static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast);
+TimePointClockCurrentAdjFilErrorDerivative=0.0;//(TimePointClockCurrentAdjFilError-TimePointClockCurrentAdjFilErrorLast)/(static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast));
+TimePointClockCurrentAdjFilErrorIntegral=0.0;//TimePointClockCurrentAdjFilErrorIntegral+TimePointClockCurrentAdjFilError*static_cast<double>(CounterHandleInterruptSynchPRU-CounterHandleInterruptSynchPRUlast);
 
 this->TimePointClockCurrentAdjFilErrorApplied=PIDconstant*TimePointClockCurrentAdjFilError+PIDintegral*TimePointClockCurrentAdjFilErrorIntegral+PIDderiv*TimePointClockCurrentAdjFilErrorDerivative;
 TimePointClockCurrentAdjFilErrorLast=TimePointClockCurrentAdjFilError;// Update
