@@ -124,7 +124,7 @@ private:// Variables
 	double duration_FinalInitialCountAuxArrayAvg=0.0;
 	//int duration_FinalInitialMeasTrigAux=0;
 	int duration_FinalInitialMeasTrigAuxArray[MaxNumPulses]={0};
-	int duration_FinalInitialMeasTrigAuxAvg=0;
+	int duration_FinalInitialMeasTrigAuxAvg=static_cast<int>(ApproxInterruptTime);// Typical value around 5000
 	unsigned long long int TrigAuxIterCount=0;
 	// Trigger Signal and Timetagging methods
 	int SynchRem=0;

@@ -279,10 +279,11 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 	this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(SynchRem);
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 	// First setting of time
-	this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(ApproxInterruptTime))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
+	//this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(ApproxInterruptTime))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
+	auto duration_since_epochTimeNow=(Clock::now()).time_since_epoch();
+	this->PRUoffsetDriftError=static_cast<double>(fmodl(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg),static_cast<long double>(iepPRUtimerRange32bits)));
 	this->NextSynchPRUcorrection=static_cast<unsigned int>(static_cast<unsigned int>((static_cast<unsigned long long int>(this->PRUoffsetDriftError)+static_cast<unsigned long long int>(LostCounts))%iepPRUtimerRange32bits));
-	this->NextSynchPRUcommand=static_cast<unsigned int>(11); // set command 5, do absolute correction
-	
+	this->NextSynchPRUcommand=static_cast<unsigned int>(11); // set command 11, do absolute correction
 	while(true){		
 		clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);
 		//if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(this->TimeClockMargingExtra)) and this->ManualSemaphoreExtra==false){// It was possible to execute when needed
@@ -293,11 +294,13 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html
-				//if ((this->iIterPRUcurrentTimerVal%50)==0){// Every now and then correct absolutelly, although some interrupt jitter will be present
-				//	this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+1.0*static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
-				//	this->NextSynchPRUcorrection=static_cast<unsigned int>(static_cast<unsigned int>((static_cast<unsigned long long int>(PRUoffsetDriftError)+static_cast<unsigned long long int>(LostCounts))%iepPRUtimerRange32bits));
-				//	this->NextSynchPRUcommand=static_cast<unsigned int>(11);// Hard setting of the time
-				//}
+				if ((this->iIterPRUcurrentTimerVal%(this->NumSynchMeasAvgAux*2))==0){// Every now and then correct absolutelly, although some interrupt jitter will be present
+					//this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+1.0*static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
+				    auto duration_since_epochTimeNow=(Clock::now()).time_since_epoch();
+					this->PRUoffsetDriftError=static_cast<double>(fmodl(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg),static_cast<long double>(iepPRUtimerRange32bits)));
+					this->NextSynchPRUcorrection=static_cast<unsigned int>(static_cast<unsigned int>((static_cast<unsigned long long int>(PRUoffsetDriftError)+static_cast<unsigned long long int>(LostCounts))%iepPRUtimerRange32bits));
+					this->NextSynchPRUcommand=static_cast<unsigned int>(11);// Hard setting of the time
+				}
 				
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
 				pru1dataMem_int[0]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
@@ -327,6 +330,10 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				// Below for the triggering
 				this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 				this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
+				if (this->duration_FinalInitialMeasTrigAuxAvg>ApproxInterruptTime){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
+					//cout << "Time for pre processing the time barrier is too long " << this->duration_FinalInitialDriftAuxArrayAvg << " ...adjust TimeClockMarging! Set to nominal value of 5000..." << endl;
+					this->duration_FinalInitialMeasTrigAuxAvg=ApproxInterruptTime;// For the time being adjust it to the nominal initial value
+				}
 				this->TrigAuxIterCount++;
 				// Below for synch calculation compensation
 				duration_FinalInitialCountAuxArrayAvg=static_cast<double>(duration_FinalInitialMeasTrigAuxAvg);
