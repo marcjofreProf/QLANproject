@@ -19,7 +19,6 @@
 #define ClockPeriodNanoseconds			1000000000// 1pps //1000000// 1KHz//1000000000// 1pps 31250// 32Khz. If this is touched, then the below WaitTimeAfterMainWhileLoop has to be adjusted so that there is enough time after the sleep. For 1pps WaitTimeAfterMainWhileLoop=990000000. For 1 KHz WaitTimeAfterMainWhileLoop=100000 but a lot of averaging needed at it is suffering and drifting. Maybe it is better to use 1pps and discount ticks in the arguments passed -99900000.0
 #define WaitTimeAfterMainWhileLoop 990000000 //nanoseconds. Maximum 999999999. Adjusted to have 10ms time slot to activate the busy wait
 #define PRUclockStepPeriodNanoseconds		5.00000//4.99999 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
-#define ClockCyclePeriodAdjustment		1// pps// 65536 32 KHz // Very important parameter. The larger the better, since the interrupts time jitter do not paly a role, as long as the PRU counter does not overexceed (the turn down is that ht eupdate time is larger)
 #define WaitCyclesBeforeAveraging	10 // To go into steady state in the initialization
 #define MaxMedianFilterArraySize	100
 #define FilterMode 1 // 0: averaging; 1: median; 2: mean window. The error jumps between two values, then maybe it is better to use mean window
@@ -85,8 +84,8 @@ private:// Variables
 	//static int chunk;
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
 	// Time keeping
-	unsigned long long int TimeClockMarging=250000;// In nanoseconds
-	unsigned long long int TimeAdjPeriod=static_cast<unsigned long long int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds); // Period at which the clock is adjusted. VEry important parameter
+	unsigned long long int TimeClockMarging=25000;// In nanoseconds
+	unsigned long long int TimeAdjPeriod=static_cast<unsigned long long int>(ClockPeriodNanoseconds); // Period at which the clock is adjusted. VEry important parameter
 	double TimePointClockCurrentAdjError=0;
 	double TimePointClockCurrentAdjFilError=0;
 	double TimePointClockCurrentAdjFilErrorIntegral=0;
@@ -105,7 +104,6 @@ private:// Variables
 	int duration_FinalInitialDriftAuxArrayAvg=0;
 	// PRU clock handling			
 	int retInterruptsPRU0;
-	int WaitTimeInterruptPRU0=static_cast<int>(ClockCyclePeriodAdjustment*ClockPeriodNanoseconds/2000); // In microseconds
 	// PRU clock generation
 	unsigned int PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock);
 	int retInterruptsPRU1;
