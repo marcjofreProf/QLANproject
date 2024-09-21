@@ -84,7 +84,7 @@ private:// Variables
 	//static int chunk;
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
 	// Time keeping
-	unsigned long long int TimeClockMarging=850000;// In nanoseconds. It has to be sufficiently large so that after the sleep the system gets aggresive enough with the busy waiting
+	unsigned long long int TimeClockMarging=950000;// In nanoseconds. It has to be sufficiently large so that after the sleep the system gets aggresive enough with the busy waiting
 	unsigned long long int TimeAdjPeriod=static_cast<unsigned long long int>(ClockPeriodNanoseconds); // Period at which the clock is adjusted. VEry important parameter
 	double TimePointClockCurrentAdjError=0;
 	double TimePointClockCurrentAdjFilError=0;
