@@ -281,7 +281,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 	// First setting of time
 	//this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(ApproxInterruptTime))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
 	auto duration_since_epochTimeNow=(Clock::now()).time_since_epoch();
-	this->PRUoffsetDriftError=static_cast<double>(fmodl(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg),static_cast<long double>(iepPRUtimerRange32bits)));
+	this->PRUoffsetDriftError=static_cast<double>(fmodl(ceill(static_cast<long double>((std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count()))/static_cast<long double>(TimePRU1synchPeriod))*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg),static_cast<long double>(iepPRUtimerRange32bits)));
 	this->NextSynchPRUcorrection=static_cast<unsigned int>(static_cast<unsigned int>((static_cast<unsigned long long int>(this->PRUoffsetDriftError)+static_cast<unsigned long long int>(LostCounts))%iepPRUtimerRange32bits));
 	this->NextSynchPRUcommand=static_cast<unsigned int>(11); // set command 11, do absolute correction
 	while(true){		
@@ -297,7 +297,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				if ((this->iIterPRUcurrentTimerVal%(this->NumSynchMeasAvgAux*2))==0){// Every now and then correct absolutelly, although some interrupt jitter will be present
 					//this->PRUoffsetDriftError=static_cast<double>(fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)+1.0*static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
 				    auto duration_since_epochTimeNow=(Clock::now()).time_since_epoch();
-					this->PRUoffsetDriftError=static_cast<double>(fmodl(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg),static_cast<long double>(iepPRUtimerRange32bits)));
+					this->PRUoffsetDriftError=static_cast<double>(fmodl(ceill(static_cast<long double>((std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count()))/static_cast<long double>(TimePRU1synchPeriod))*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg),static_cast<long double>(iepPRUtimerRange32bits)));
 					this->NextSynchPRUcorrection=static_cast<unsigned int>(static_cast<unsigned int>((static_cast<unsigned long long int>(PRUoffsetDriftError)+static_cast<unsigned long long int>(LostCounts))%iepPRUtimerRange32bits));
 					this->NextSynchPRUcommand=static_cast<unsigned int>(11);// Hard setting of the time
 				}
