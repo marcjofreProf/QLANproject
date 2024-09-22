@@ -77,6 +77,8 @@
 // r11 is reserved for emitting state 1 and 2 (w0 and w1)
 // r12 is reserved for emitting state 3 and 4 (w0 and w1)
 
+// r13 is reserved for enabling IEP counter
+
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
 // r30 is reserved for output pins
@@ -98,6 +100,7 @@ INITIATIONS:
 	
 	// Initial initializations
 	LDI	r4, 0 // zeroing
+	LDI r13, 0x00000111
 	
 	// Initial Re-initialization for IET counter
 	// The Clock gating Register controls the state of Clock Management. 
@@ -162,8 +165,10 @@ CMDSEL:
 	QBEQ	PERIODICTIMESYNCHCHECK, r0.b0, 10 // 10 command is measure IEP timer status and so a check
 	QBEQ	PERIODICTIMESYNCHSET, r0.b0, 11 // 11 command is measure IEP timer set synch
 PERIODICTIMESYNCHSET: // with command coded 11 means setting synch
-	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically	
+	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
+	SBCO	r4.b0, CONST_IETREG, 0x0, 1 // Stop the counter
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
+	SBCO	r13.b0, CONST_IETREG, 0x0, 1 // Enable the counter
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
@@ -177,7 +182,9 @@ PERIODICTIMESYNCHCHECK: // with command coded 10 means chech synch only
 PERIODICTIMESYNCHADD: // with command coded 9 means synch by reseting the IEP timer
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
 	ADD		r0, r0, r7 // Apply correction
+	SBCO	r4.b0, CONST_IETREG, 0x0, 1 // Stop the counter
 	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
+	SBCO	r13.b0, CONST_IETREG, 0x0, 1 // Enable the counter
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
@@ -185,7 +192,9 @@ PERIODICTIMESYNCHADD: // with command coded 9 means synch by reseting the IEP ti
 PERIODICTIMESYNCHSUB: // with command coded 8 means synch by reseting the IEP timer
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
 	SUB		r0, r0, r7 // Apply correction
+	SBCO	r4.b0, CONST_IETREG, 0x0, 1 // Stop the counter
 	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
+	SBCO	r13.b0, CONST_IETREG, 0x0, 1 // Enable the counter
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
