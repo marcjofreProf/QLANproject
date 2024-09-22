@@ -148,9 +148,9 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	//		perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
 	//	}
 	//}
-	if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScriptSimple.bin") == -1){
-		if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScriptSimple.bin") == -1){
-			perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScriptSimple.bin");
+	if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScriptSimpleHist4.bin") == -1){
+		if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScriptSimpleHist4.bin") == -1){
+			perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScriptSimpleHist4.bin");
 		}
 	}
 	////prussdrv_pru_enable(PRU_Operation_NUM);
