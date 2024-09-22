@@ -105,11 +105,12 @@ INITIATIONS:
 	MOV 	r0, 0x24924
 	SBCO 	r0, CONST_PRUCFG, 0x10, 4 
 	//LBCO	r2, CONST_IETREG, 0, 1 //
-	//SET ocp_clk:1 or of iep_clk:0// It is important to select the clock source to be in synch with the PRU clock. Seems that with ocp_clk much better?
-	LDI	r0, 1
+	//SET ocp_clk:1 or of iep_clk:0// It is important to select the clock source to be in synch with the PRU clock. Seems that ocp_clk allows adjustments and other controls, but eip_clk runs at 200 MHz and much more robust.
+	// https://mythopoeic.org/BBB-PRU/am335xPruReferenceGuide.pdf
+	LDI		r0, 0
 	SBCO 	r0, CONST_PRUCFG, 0x30, 4
 	// IEP configuration
-	MOV	r0, 0x111 // Enable and Define increment value to 1
+	MOV		r0, 0x111 // Enable and Define increment value to 1
 	SBCO	r0, CONST_IETREG, 0, 4 // Enables IET count and sets configuration
 	// Deactivate IEP compensation
 	SBCO 	r4, CONST_IETREG, 0x08, 4
@@ -161,7 +162,7 @@ CMDSEL:
 	QBEQ	PERIODICTIMESYNCHCHECK, r0.b0, 10 // 10 command is measure IEP timer status and so a check
 	QBEQ	PERIODICTIMESYNCHSET, r0.b0, 11 // 11 command is measure IEP timer set synch
 PERIODICTIMESYNCHSET: // with command coded 11 means setting synch
-	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically		
+	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically	
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
