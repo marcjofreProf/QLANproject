@@ -1487,34 +1487,37 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 			//cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
 			//cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 		}
-	FirstPassAux=false;// First pass is compulsory, since it might be true AchievedAttentionParticularHosts, but because of another process
-	while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
-		this->release();
-		//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
-		//cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
-		//cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
-		cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization and availability of other hosts to proceed with the request!" << endl;
-		this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
-		this->acquire();
+		FirstPassAux=false;// First pass is compulsory, since it might be true AchievedAttentionParticularHosts, but because of another process
+		while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
+			this->release();
+			//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+			//cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
+			//cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
+			cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization and availability of other hosts to proceed with the request!" << endl;
+			this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+			this->acquire();
+		}
+		//int numForstEquivalentToSleep=200;//100: Equivalent to 1 seconds# give time to other hosts to enter
+		//for (int i=0;i<numForstEquivalentToSleep;i++){
+		//	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+		//	//cout << "this->getState(): " << this->getState() << endl;
+		//	if(this->getState()==0) {
+		//		this->ProcessNewMessage();
+		//		this->m_pause(); // After procesing the request, pass to paused state
+		//	}
+		//	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+		//}
+		if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true){//string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){
+			this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
+		}
+		else{
+			AchievedAttentionParticularHosts=false;
+		}
+		//if (AchievedAttentionParticularHosts==false and string(InfoRemoteHostActiveActions[1])==string("Block") and string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true){// Autoblocked
+		//	this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);// Unblock
+		//}
 	}
-	//int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
-	//for (int i=0;i<numForstEquivalentToSleep;i++){
-	//	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
-	//	//cout << "this->getState(): " << this->getState() << endl;
-	//	if(this->getState()==0) {
-	//		this->ProcessNewMessage();
-	//		this->m_pause(); // After procesing the request, pass to paused state
-	//	}
-	//	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
-	//}
-	if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true){//string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){
-		this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
-	}
-	//if (AchievedAttentionParticularHosts==false and string(InfoRemoteHostActiveActions[1])==string("Block") and string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true){// Autoblocked
-	//	this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);// Unblock
-	//}
-}
-this->release();
+	this->release();
 return 0; // all ok;
 
 }
