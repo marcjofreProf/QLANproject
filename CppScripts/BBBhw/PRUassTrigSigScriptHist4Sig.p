@@ -220,6 +220,8 @@ QUADEMT1:
 PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	// Since there is a dead period betwen pulses (to do management), divide the period by 2
 	LSR	r9, r7, 1
+	// Since this script produces a sequence of four different values, we need to multiply the period by 4 to have the effective period for this script
+	LSL	r9, r9, 2 // Specific of this script
 	// Compute DELAY value
 	SUB	r9, r9, 4
 	LSR	r9, r9, 1
