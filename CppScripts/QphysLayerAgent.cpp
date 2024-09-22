@@ -1496,8 +1496,10 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchCalcValuesArrayAux[i]=static_cast<double>((-SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))%LLIHistPeriodicityAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
+	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	// Convert offset to center of histogram
 	SynchCalcValuesArray[1]=fmod(dHistPeriodicityHalfAux+SynchCalcValuesArray[1],dHistPeriodicityAux)-dHistPeriodicityHalfAux;
+	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	
 	// Check if nan values, then convert them to 0 and inform through the terminal
 	if (std::isnan(SynchCalcValuesArray[0])){

@@ -1497,16 +1497,16 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 		this->acquire();
 	}
-	int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
-	for (int i=0;i<numForstEquivalentToSleep;i++){
-		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
-		//cout << "this->getState(): " << this->getState() << endl;
-		if(this->getState()==0) {
-			this->ProcessNewMessage();
-			this->m_pause(); // After procesing the request, pass to paused state
-		}
-		this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
-	}
+	//int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
+	//for (int i=0;i<numForstEquivalentToSleep;i++){
+	//	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+	//	//cout << "this->getState(): " << this->getState() << endl;
+	//	if(this->getState()==0) {
+	//		this->ProcessNewMessage();
+	//		this->m_pause(); // After procesing the request, pass to paused state
+	//	}
+	//	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+	//}
 	if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true){//string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){
 		this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 	}
@@ -1520,20 +1520,20 @@ return 0; // all ok;
 }
 
 int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
-//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
-	this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
-	while(IterHostsActiveActionsFreeStatus!=0){
 	//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
-	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
-	if(this->getState()==0){
-		this->ProcessNewMessage();
-		this->m_pause(); // After procesing the request, pass to paused state
-		//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
-	}
 	this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-	this->RelativeNanoSleepWait((unsigned long long int)(5*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
-}
+	//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+	while(IterHostsActiveActionsFreeStatus!=0){
+		//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+		if(this->getState()==0){
+			this->ProcessNewMessage();
+			this->m_pause(); // After procesing the request, pass to paused state
+			//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+		}
+		this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+		this->RelativeNanoSleepWait((unsigned long long int)(5*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+	}
 //cout << "Finished WaitUntilActiveActionFree" << endl;
 return 0; // All ok
 }
@@ -1560,9 +1560,9 @@ int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg,
 	else if (IterHostsActiveActionsFreeStatus==1){
 		this->AcumulateAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 	}
-else{// if (IterHostsActiveActionsFreeStatus==2){
-	AchievedAttentionParticularHosts=this->CheckReceivedAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-}
+	else{// if (IterHostsActiveActionsFreeStatus==2){
+		AchievedAttentionParticularHosts=this->CheckReceivedAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+	}
 
 return 0; // All Ok
 }
@@ -1679,10 +1679,8 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){// Reset values
 	HostsActiveActionsFree[1+i]=true;
 }
 
-// If all available, block them all
+// If all available, notify that attention achieved
 if (CheckAllOthersFreeAux==true){
-	strcpy(InfoRemoteHostActiveActions[0],this->IPaddressesSockets[2]);// Clear active host
-	strcpy(InfoRemoteHostActiveActions[1],"Block");// Set to Block
 	IterHostsActiveActionsFreeStatus=0;// reset process
 	return true;
 }
