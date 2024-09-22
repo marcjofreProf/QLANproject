@@ -120,7 +120,7 @@ private: //Variables/Instances
 	long long int SynchFirstTagsArray[NumCalcCenterMass][NumRunsPerCenterMass]; // To store the first tags (averaged if needed for all the tags in the run
 	long long int SynchFirstTagsArrayOffsetCalc[NumRunsPerCenterMass]; // To momentally store the first iteration of the synch which has no extra relative frequency edifferencew
 	double SynchHistCenterMassArray[NumCalcCenterMass]={0.0}; // Array containing the needed center of mass for the histograms of the synchronization
-	double SynchFirstTagsArrayStd[NumCalcCenterMass]={0.0}; // Array containing the std of the calculation of center mass to make decition
+	double SynchFirstTagsArrayStd[NumCalcCenterMass]={0.0}; // Array containing the std of the calculation of center mass to make decitions
 	double SynchCalcValuesArray[3]={0.0,0.0,0.0}; // Computed values for achieving synchronization protocol
 	double SynchAdjRelFreqCalcValuesArray[2*((1LL<<LinkNumberMAX)-1)][3]={1.0}; // Computed hardware values for adjusting the application of the computed rel.freq. correction. The order is, 0 index is 0 rel. freq. correction (so 1.0), adjustment value for negative correction for index 1 and adjustment value for positive correction for index 2.
 	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,-0.25,0.25}; // Normalized values of frequency testing which are applied for calibration

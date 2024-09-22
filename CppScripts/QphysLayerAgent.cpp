@@ -1325,7 +1325,7 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	//	cout << "(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])/LLIHistPeriodicityAux: " << (SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])/LLIHistPeriodicityAux << endl;
 	//}
 	
-	// compute the std to select the most effective
+	// compute the std to select the most effective - Not used
 	SynchFirstTagsArrayStd[iCenterMass]=0.0; // Reset value
 	double CurrentStdAux=0.0;
 	//cout << "QPLA::SynchHistCenterMassArray[iCenterMass]: " << SynchHistCenterMassArray[iCenterMass] << endl;
@@ -1496,19 +1496,22 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchCalcValuesArrayAux[i]=static_cast<double>((LLIHistPeriodicityHalfAux-SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
+	// Convert offset to center of histogram
+	SynchCalcValuesArray[1]=fmod(dHistPeriodicityHalfAux+SynchCalcValuesArray[1],dHistPeriodicityAux)-dHistPeriodicityHalfAux;
 	
 	// Check if nan values, then convert them to 0 and inform through the terminal
 	if (std::isnan(SynchCalcValuesArray[0])){
 		SynchCalcValuesArray[0]=0.0;
-		cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
+		cout << "QPLA::Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
+		SynchCalcValuesArray[0]=dHistPeriodicityAux; // Set it to nominal histogram value
 	}
 	if (std::isnan(SynchCalcValuesArray[1])){
 		SynchCalcValuesArray[1]=0.0;
-		cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
+		cout << "QPLA::Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
 	}
 	if (std::isnan(SynchCalcValuesArray[2])){
 		SynchCalcValuesArray[2]=0.0;
-		cout << "Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
+		cout << "QPLA::Attention QPLA HistCalcPeriodTimeTags nan values!!!" << endl;
 	}
 
 	cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1]/dHistPeriodicityAux << " modulo offset" << endl; // Offset
