@@ -1498,7 +1498,12 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	// Convert offset to center of histogram
-	SynchCalcValuesArray[1]=fmod(dHistPeriodicityHalfAux+SynchCalcValuesArray[1],dHistPeriodicityAux)-dHistPeriodicityHalfAux;
+	if(SynchCalcValuesArray[1]<0.0){
+		SynchCalcValuesArray[1]=fmod(-dHistPeriodicityHalfAux+SynchCalcValuesArray[1],dHistPeriodicityAux)+dHistPeriodicityHalfAux;
+	}
+	else{
+		SynchCalcValuesArray[1]=fmod(dHistPeriodicityHalfAux+SynchCalcValuesArray[1],dHistPeriodicityAux)-dHistPeriodicityHalfAux;
+	}
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	
 	// Check if nan values, then convert them to 0 and inform through the terminal
