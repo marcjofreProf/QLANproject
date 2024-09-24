@@ -358,7 +358,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
 					
 					// Compute error - Relative correction of the frequency difference			
-					this->PRUoffsetDriftError=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap))/static_cast<long double>(TimePRU1synchPeriod)); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions
+					//this->PRUoffsetDriftError=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap))/static_cast<long double>(TimePRU1synchPeriod)); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions
+					this->PRUoffsetDriftError=static_cast<double>((-static_cast<double>((static_cast<long long int>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod))/static_cast<long long int>(PRUclockStepPeriodNanoseconds)%static_cast<long long int>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap))/static_cast<long double>(TimePRU1synchPeriod)); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions
 					// Relative error
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
