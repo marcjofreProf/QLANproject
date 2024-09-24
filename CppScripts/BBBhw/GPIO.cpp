@@ -367,10 +367,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					double PRUoffsetDriftErrorAbsAux=0.0;
 					
 					if (this->PRUoffsetDriftError<0.0){
-						PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerValWrap)-fmodl(static_cast<long double>(-this->PRUoffsetDriftErrorAvg)*static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(this->iIterPRUcurrentTimerVal),static_cast<long double>(iepPRUtimerRange32bits)))); 
+						//PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerValWrap)-fmodl(static_cast<long double>(-this->PRUoffsetDriftErrorAvg)*static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(this->iIterPRUcurrentTimerVal),static_cast<long double>(iepPRUtimerRange32bits))));
+						PRUoffsetDriftErrorAbsAux=static_cast<double>((static_cast<long double>(this->PRUcurrentTimerValWrap)-fmodl(static_cast<long double>(-this->PRUoffsetDriftErrorAvg)*static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(this->iIterPRUcurrentTimerVal),static_cast<long double>(iepPRUtimerRange32bits)))); 
 					}
 					else{
-						PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerValWrap)+fmodl(static_cast<long double>(this->PRUoffsetDriftErrorAvg)*static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(this->iIterPRUcurrentTimerVal),static_cast<long double>(iepPRUtimerRange32bits)))); 
+						//PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerValWrap)+fmodl(static_cast<long double>(this->PRUoffsetDriftErrorAvg)*static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(this->iIterPRUcurrentTimerVal),static_cast<long double>(iepPRUtimerRange32bits))));
+						PRUoffsetDriftErrorAbsAux=static_cast<double>((static_cast<long double>(this->PRUcurrentTimerValWrap)+fmodl(static_cast<long double>(this->PRUoffsetDriftErrorAvg)*static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(this->iIterPRUcurrentTimerVal),static_cast<long double>(iepPRUtimerRange32bits)))); 
 					}
 					if (PRUoffsetDriftErrorAbsAux<0.0){
 						this->PRUoffsetDriftErrorAbs=-fmod(-PRUoffsetDriftErrorAbsAux,static_cast<double>(iepPRUtimerRange32bits));
@@ -723,7 +725,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 	//this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
 	//this->TrigAuxIterCount++;
-	/*
+	
 	cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 	long double AccumulatedErrorDriftEvolved=static_cast<long double>((1.0/64.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
 	cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
@@ -737,7 +739,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	////cout << "SynchRem: " << SynchRem << endl;
 	cout << "this->AdjPulseSynchCoeffAverage: " << this->AdjPulseSynchCoeffAverage << endl;
 	cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
-	*/
+	
 	// Important check to do
 	if (duration_FinalInitialMeasTrigAuxAvg>static_cast<int>(ApproxInterruptTime)){
 		cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay! Set to nominal value of " << static_cast<int>(ApproxInterruptTime) << "..." << endl;
