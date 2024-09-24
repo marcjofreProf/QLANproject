@@ -378,7 +378,9 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 						this->PRUoffsetDriftErrorAbs=-fmod(-PRUoffsetDriftErrorAbsAux,static_cast<double>(iepPRUtimerRange32bits));
 					}
 					else{
-						this->PRUoffsetDriftErrorAbs=fmod(PRUoffsetDriftErrorAbsAux,static_cast<double>(iepPRUtimerRange32bits));					}
+						this->PRUoffsetDriftErrorAbs=fmod(PRUoffsetDriftErrorAbsAux,static_cast<double>(iepPRUtimerRange32bits));
+					}
+					this->PRUoffsetDriftErrorAbs=PRUoffsetDriftErrorAbsAux;
 					
 					// Absolute corrected error
 					this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
