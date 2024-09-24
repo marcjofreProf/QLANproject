@@ -366,7 +366,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					// Compute error - Absolute corrected error of absolute error after removing the frequency difference
 					//this->PRUoffsetDriftErrorAbs=static_cast<double>(fmodl(-((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds)+(static_cast<long double>(this->PRUcurrentTimerValWrap)+static_cast<long double>(this->PRUoffsetDriftError)*static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(this->iIterPRUcurrentTimerVal)),static_cast<long double>(iepPRUtimerRange32bits))); // Substract (it is a sum because relative error is already negated) the relative error // // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions
 					//this->PRUoffsetDriftErrorAbs=static_cast<double>(((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds)); 
-					this->PRUoffsetDriftErrorAbs=static_cast<double>((static_cast<long double>(this->PRUcurrentTimerValWrap)+fmodl(static_cast<long double>(this->PRUoffsetDriftError)*static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(this->iIterPRUcurrentTimerVal),static_cast<long double>(iepPRUtimerRange32bits)))); 
+					if (this->PRUoffsetDriftError<0.0){
+						this->PRUoffsetDriftErrorAbs=static_cast<double>((static_cast<long double>(this->PRUcurrentTimerValWrap)-fmodl(static_cast<long double>(-this->PRUoffsetDriftError)*static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(this->iIterPRUcurrentTimerVal),static_cast<long double>(iepPRUtimerRange32bits)))); 
+					}
+					else{
+						this->PRUoffsetDriftErrorAbs=static_cast<double>((static_cast<long double>(this->PRUcurrentTimerValWrap)+fmodl(static_cast<long double>(this->PRUoffsetDriftError)*static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(this->iIterPRUcurrentTimerVal),static_cast<long double>(iepPRUtimerRange32bits)))); 
+					}
 					// Absolute corrected error
 					this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
 					this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,NumSynchMeasAvgAux);
