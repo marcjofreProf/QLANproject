@@ -377,10 +377,10 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 						PRUoffsetDriftErrorAbsAux=-(((static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())+0*static_cast<long long int>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long long int>(PRUclockStepPeriodNanoseconds)/static_cast<unsigned long long int>(1000000000))%static_cast<long long int>(iepPRUtimerRange32bits))+(static_cast<long long int>(this->PRUcurrentTimerValWrap)+((static_cast<long long int>(this->PRUoffsetDriftErrorAvg)*static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<long long int>(iepPRUtimerRange32bits))); 
 					}
 					if (PRUoffsetDriftErrorAbsAux<0){
-						this->PRUoffsetDriftErrorAbs=static_cast<double>(-(-PRUoffsetDriftErrorAbsAux%static_cast<long long int>(iepPRUtimerRange32bits)));
+						this->PRUoffsetDriftErrorAbs=static_cast<double>(-(-PRUoffsetDriftErrorAbsAux%static_cast<long long int>(iepPRUtimerRange32bits))/static_cast<long double>(TimePRU1synchPeriod));
 					}
 					else{
-						this->PRUoffsetDriftErrorAbs=static_cast<double>((PRUoffsetDriftErrorAbsAux%static_cast<long long int>(iepPRUtimerRange32bits)));
+						this->PRUoffsetDriftErrorAbs=static_cast<double>((PRUoffsetDriftErrorAbsAux%static_cast<long long int>(iepPRUtimerRange32bits))/static_cast<long double>(TimePRU1synchPeriod));
 					}
 					
 					// Absolute corrected error
