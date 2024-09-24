@@ -364,23 +364,23 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
 					
 					// Compute error - Absolute corrected error of absolute error after removing the frequency difference. It adds jitter but probably ensures that hardwware clock offsets are removed periodically (a different story is the offset due to links which is calibrated with the algortm).
-					long double PRUoffsetDriftErrorAbsAux=0.0;
+					// Dealing with lon lon int matters due to floting or not precition!!!!
+					long long int PRUoffsetDriftErrorAbsAux=0;
 					
 					if (this->PRUoffsetDriftError<0.0){
 						//PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future).count())+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerValWrap)-fmodl(static_cast<long double>(-this->PRUoffsetDriftErrorAvg)*static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(this->iIterPRUcurrentTimerVal),static_cast<long double>(iepPRUtimerRange32bits))));
-						PRUoffsetDriftErrorAbsAux=static_cast<long double>((static_cast<long long int>(this->PRUcurrentTimerValWrap)-(static_cast<long long int>(-this->PRUoffsetDriftErrorAvg)*static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())%static_cast<long long int>(iepPRUtimerRange32bits)))); 
+						PRUoffsetDriftErrorAbsAux=-((static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())+static_cast<long long int>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long long int>(PRUclockStepPeriodNanoseconds)%static_cast<long long int>(iepPRUtimerRange32bits))+(static_cast<long long int>(this->PRUcurrentTimerValWrap)-(static_cast<long long int>(-this->PRUoffsetDriftErrorAvg)*static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())%static_cast<long long int>(iepPRUtimerRange32bits))); 
 					}
 					else{
 						//PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future).count())+static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerValWrap)+fmodl(static_cast<long double>(this->PRUoffsetDriftErrorAvg)*static_cast<long double>(TimePRU1synchPeriod)*static_cast<long double>(this->iIterPRUcurrentTimerVal),static_cast<long double>(iepPRUtimerRange32bits))));
-						PRUoffsetDriftErrorAbsAux=static_cast<long double>((static_cast<long long int>(this->PRUcurrentTimerValWrap)+(static_cast<long long int>(this->PRUoffsetDriftErrorAvg)*static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())%static_cast<long long int>(iepPRUtimerRange32bits)))); 
+						PRUoffsetDriftErrorAbsAux=-((static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())+static_cast<long long int>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long long int>(PRUclockStepPeriodNanoseconds)%static_cast<long long int>(iepPRUtimerRange32bits))+(static_cast<long long int>(this->PRUcurrentTimerValWrap)+(static_cast<long long int>(this->PRUoffsetDriftErrorAvg)*static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())%static_cast<long long int>(iepPRUtimerRange32bits))); 
 					}
-					if (PRUoffsetDriftErrorAbsAux<0.0){
-						this->PRUoffsetDriftErrorAbs=static_cast<double>(-fmodl(-PRUoffsetDriftErrorAbsAux,static_cast<long double>(iepPRUtimerRange32bits)));
+					if (PRUoffsetDriftErrorAbsAux<0){
+						this->PRUoffsetDriftErrorAbs=static_cast<double>(-(-PRUoffsetDriftErrorAbsAux%static_cast<long long int>(iepPRUtimerRange32bits)));
 					}
 					else{
-						this->PRUoffsetDriftErrorAbs=static_cast<double>(fmodl(PRUoffsetDriftErrorAbsAux,static_cast<long double>(iepPRUtimerRange32bits)));
+						this->PRUoffsetDriftErrorAbs=static_cast<double>((PRUoffsetDriftErrorAbsAux%static_cast<long long int>(iepPRUtimerRange32bits)));
 					}
-					this->PRUoffsetDriftErrorAbs=PRUoffsetDriftErrorAbsAux;
 					
 					// Absolute corrected error
 					this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
