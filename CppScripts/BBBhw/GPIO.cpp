@@ -368,21 +368,22 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					// Dealing with lon lon int matters due to floting or not precition!!!!
 					long long int PRUoffsetDriftErrorAbsAux=0;
 					
-					if (this->PRUoffsetDriftError<0.0){
-						PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerVal)+(static_cast<long double>(this->PRUoffsetDriftErrorAvg)*static_cast<long double>(this->TimePRU1synchPeriod))));
-						//PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerVal)-fmodl(static_cast<long double>(-this->PRUoffsetDriftErrorAvg)*static_cast<long double>(this->TimePRU1synchPeriod),static_cast<long double>(iepPRUtimerRange32bits))));
-					}
-					else{
-						PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerVal)+(static_cast<long double>(this->PRUoffsetDriftErrorAvg)*static_cast<long double>(this->TimePRU1synchPeriod))));
-						//PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerVal)+fmodl(static_cast<long double>(this->PRUoffsetDriftErrorAvg)*static_cast<long double>(this->TimePRU1synchPeriod),static_cast<long double>(iepPRUtimerRange32bits))));
-					}
+					//if (this->PRUoffsetDriftError<0.0){
+					//	PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerVal)+(static_cast<long double>(this->PRUoffsetDriftErrorAvg)*static_cast<long double>(this->TimePRU1synchPeriod))));
+					//	//PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerVal)-fmodl(static_cast<long double>(-this->PRUoffsetDriftErrorAvg)*static_cast<long double>(this->TimePRU1synchPeriod),static_cast<long double>(iepPRUtimerRange32bits))));
+					//}
+					//else{
+					//	PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerVal)+(static_cast<long double>(this->PRUoffsetDriftErrorAvg)*static_cast<long double>(this->TimePRU1synchPeriod))));
+					//	//PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerVal)+fmodl(static_cast<long double>(this->PRUoffsetDriftErrorAvg)*static_cast<long double>(this->TimePRU1synchPeriod),static_cast<long double>(iepPRUtimerRange32bits))));
+					//}
+					PRUoffsetDriftErrorAbsAux=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerVal)-(static_cast<long double>(this->PRUoffsetDriftErrorAvg)*static_cast<long double>(this->TimePRU1synchPeriod))));
 					if (PRUoffsetDriftErrorAbsAux<0){
 						this->PRUoffsetDriftErrorAbs=static_cast<double>(-(-PRUoffsetDriftErrorAbsAux%static_cast<long long int>(iepPRUtimerRange32bits)));
 					}
 					else{
 						this->PRUoffsetDriftErrorAbs=static_cast<double>((PRUoffsetDriftErrorAbsAux%static_cast<long long int>(iepPRUtimerRange32bits)));
 					}
-					
+					//this->PRUoffsetDriftErrorAbs=this->PRUoffsetDriftErrorAbs*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(1000000000);
 					// Absolute corrected error
 					this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
 					this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,NumSynchMeasAvgAux);
