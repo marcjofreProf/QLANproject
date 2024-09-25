@@ -37,7 +37,6 @@ cleanup_on_SIGINT() {
   sudo systemctl start systemd-timesyncd # start system synch
   sudo systemctl daemon-reload
   sudo timedatectl set-ntp true # Start NTP
-  sudo hwclock --systohc
   #sudo /etc/init.d/rsyslog start # start logging
   exit 0
 }
@@ -124,14 +123,14 @@ fi
 
 # adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
 sleep 30 # give time to time protocols to lock
-sudo adjtimex -a --force-adjust
+sudo adjtimex -f 0 #-a --force-adjust
 
 if ! sudo crontab -l > /dev/null 2>&1; then
     sudo crontab -e
 fi
 
 line_to_check="adjtimex"
-line_to_add="30 * * * * sudo /sbin/adjtimex -a --force-adjust"
+line_to_add="30 * * * * sudo /sbin/adjtimex -f 0" #-a --force-adjust"
 
 sudo crontab -l | grep -q "$line_to_check"
 
