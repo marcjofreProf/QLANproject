@@ -1443,7 +1443,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 			cout << "QPLA::Bad calculation of SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1] << ". Setting it to 1.0!" << endl;
 			SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]=1.0;
 		}
-		else if (SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]>2.5)
+		else if (SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]>10.0)
 		{
 			cout << "QPLA::Bad calculation of SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1] << ". Setting it to 1.0!" << endl;
 			SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]=1.0;
@@ -1453,7 +1453,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 			cout << "QPLA::Bad calculation of SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2] << ". Setting it to 1.0!" << endl;
 			SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]=1.0;
 		}
-		else if (SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]>2.5){
+		else if (SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]>10.0){
 			cout << "QPLA::Bad calculation of SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2] << ". Setting it to 1.0!" << endl;
 			SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]=1.0;
 		}
