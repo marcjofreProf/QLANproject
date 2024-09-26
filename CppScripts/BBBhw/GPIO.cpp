@@ -656,6 +656,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 	cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
 	cout << "PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << endl;
+	cout << "PRUoffsetDriftErrorAbsAvgAux: " << PRUoffsetDriftErrorAbsAvgAux << endl;
 	cout << "SynchTrigPeriod: " << SynchTrigPeriod << endl;
 	cout << "InstantCorr: " << InstantCorr << endl;
 	////cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
@@ -760,6 +761,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 	cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
 	cout << "PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << endl;
+	cout << "PRUoffsetDriftErrorAbsAvgAux: " << PRUoffsetDriftErrorAbsAvgAux << endl;	
 	cout << "SynchTrigPeriod: " << SynchTrigPeriod << endl;
 	cout << "InstantCorr: " << InstantCorr << endl;
 	////cout << "RecurrentAuxTime: " << RecurrentAuxTime << endl;
