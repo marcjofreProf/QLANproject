@@ -1476,9 +1476,12 @@ return 0; // all ok
 }
 
 int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){
+	cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFreePreLock" << endl;
 	this->acquire();
+	cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 1" << endl;
 	bool FirstPassAux=true;
 	while(AchievedAttentionParticularHosts==false or FirstPassAux==true){
+		cout << "Host " << this->IPaddressesSockets[2] << " Entered While 1" << endl;
 		if (FirstPassAux==false){
 			cout << "Host " << this->IPaddressesSockets[2] << " trying to get attention from other involved hosts!" << endl;
 			//cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
@@ -1489,13 +1492,16 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		}
 		FirstPassAux=false;// First pass is compulsory, since it might be true AchievedAttentionParticularHosts, but because of another process
 		while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
+			cout << "Host " << this->IPaddressesSockets[2] << " Entered While 2" << endl;
 			this->release();
+			cout << "Host " << this->IPaddressesSockets[2] << " Exited release 1" << endl;
 			//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
 			//cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
 			//cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 			cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization and availability of other hosts to proceed with the request!" << endl;
 			this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 			this->acquire();
+			cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 2" << endl;
 		}
 		//int numForstEquivalentToSleep=200;//100: Equivalent to 1 seconds# give time to other hosts to enter
 		//for (int i=0;i<numForstEquivalentToSleep;i++){
@@ -1507,10 +1513,13 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		//	}
 		//	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 		//}
+		cout << "Host " << this->IPaddressesSockets[2] << " Exited While 2" << endl;
 		if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true){//string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){
+			cout << "Host " << this->IPaddressesSockets[2] << " Entering WaitUntilActiveActionFree" << endl;
 			this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 		}
 		else{
+			cout << "Host " << this->IPaddressesSockets[2] << " NOT Entering WaitUntilActiveActionFree" << endl;
 			AchievedAttentionParticularHosts=false;
 		}
 		//if (AchievedAttentionParticularHosts==false and string(InfoRemoteHostActiveActions[1])==string("Block") and string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true){// Autoblocked
@@ -1518,16 +1527,21 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		//}
 	}
 	this->release();
+	cout << "Host " << this->IPaddressesSockets[2] << " Exited release 2" << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " Finished WaitUntilActiveActionFreePreLock" << endl;
+
 return 0; // all ok;
 
 }
 
 int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
-	//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFree" << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 	this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-	//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 	while(IterHostsActiveActionsFreeStatus!=0){
-		//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " WaitUntilActiveActionFree While 1: " << IterHostsActiveActionsFreeStatus << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 		if(this->getState()==0){
 			this->ProcessNewMessage();
@@ -1537,7 +1551,7 @@ int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 		this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 		this->RelativeNanoSleepWait((unsigned long long int)(5*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 	}
-//cout << "Finished WaitUntilActiveActionFree" << endl;
+cout << "Host " << this->IPaddressesSockets[2] << " Finished WaitUntilActiveActionFree" << endl;
 return 0; // All ok
 }
 
@@ -1676,7 +1690,7 @@ bool QTLAH::CheckReceivedAnswersYouFreeRequestToParticularHosts(char* ParamsChar
 	}
 //cout << "SumCheckAllOthersFree: " << SumCheckAllOthersFree << endl;
 
-	if (SumCheckAllOthersFree>=NumInterestIPaddressesAux){CheckAllOthersFreeAux=true;}
+if (SumCheckAllOthersFree>=NumInterestIPaddressesAux){CheckAllOthersFreeAux=true;}
 
 for (int i=0;i<NumInterestIPaddressesAux;i++){// Reset values
 	HostsActiveActionsFree[1+i]=true;
