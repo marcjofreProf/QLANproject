@@ -1540,7 +1540,7 @@ int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 	this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 	cout << "Host " << this->IPaddressesSockets[2] << " IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 	while(IterHostsActiveActionsFreeStatus!=0){
-		cout << "Host " << this->IPaddressesSockets[2] << " WaitUntilActiveActionFree While 1: " << IterHostsActiveActionsFreeStatus << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " WaitUntilActiveActionFree While 1" << endl;
 		cout << "Host " << this->IPaddressesSockets[2] << " IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 		if(this->getState()==0){
@@ -1639,8 +1639,8 @@ int QTLAH::AcumulateAnswersYouFreeRequestToParticularHosts(char* ParamsCharArray
 	}
 
 //IterHostsActiveActionsFreeStatus 0: Not asked this question; 1: Question asked; 2: All questions received; -1: Abort and reset all
-	if (NumAnswersOtherHostsActiveActionsFree>=NumInterestIPaddressesAux){
-		IterHostsActiveActionsFreeStatus=2;
+if (NumAnswersOtherHostsActiveActionsFree>=NumInterestIPaddressesAux){
+	IterHostsActiveActionsFreeStatus=2;
 	ReWaitsAnswersHostsActiveActionsFree=0;// Reset the counter
 }
 else if (ReWaitsAnswersHostsActiveActionsFree<MaxReWaitsAnswersHostsActiveActionsFree){// Increment the wait counter
