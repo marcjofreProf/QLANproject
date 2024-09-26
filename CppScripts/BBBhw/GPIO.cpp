@@ -309,6 +309,10 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->NextSynchPRUcorrection=static_cast<unsigned int>(0); // resetting to 0
 					this->NextSynchPRUcommand=static_cast<unsigned int>(11);// Hard setting of the time
 					this->iIterPRUcurrentTimerVal=0;// reset this value
+					// Reset values of Abs offset
+					for (int i=0;i<NumSynchMeasAvgAux;i++){
+						this->PRUoffsetDriftErrorAbsArray[i]=0.0;
+					}
 				}
 				
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
