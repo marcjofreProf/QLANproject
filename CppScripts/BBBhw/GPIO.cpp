@@ -301,19 +301,19 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html
-				if (this->IEPtimerPRUreset){//(this->iIterPRUcurrentTimerVal%(this->NumSynchMeasAvgAux*2))==0){// Every now and then correct absolutelly, although some interrupt jitter will be present
+				//if (this->IEPtimerPRUreset){//(this->iIterPRUcurrentTimerVal%(this->NumSynchMeasAvgAux*2))==0){// Every now and then correct absolutelly, although some interrupt jitter will be present
 				//	auto duration_since_epochTimeNow=(Clock::now()).time_since_epoch();
 				//	this->PRUoffsetDriftError=static_cast<double>(fmodl(static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod)+1)*static_cast<unsigned long long int>(TimePRU1synchPeriod)+static_cast<unsigned long long int>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
 				//	this->NextSynchPRUcorrection=static_cast<unsigned int>(static_cast<unsigned int>((static_cast<unsigned long long int>(PRUoffsetDriftError)+0*static_cast<unsigned long long int>(LostCounts))%iepPRUtimerRange32bits));
-					this->IEPtimerPRUreset=false;//reset flag
-					this->NextSynchPRUcorrection=static_cast<unsigned int>(0); // resetting to 0
-					this->NextSynchPRUcommand=static_cast<unsigned int>(11);// Hard setting of the time
-					this->iIterPRUcurrentTimerVal=0;// reset this value
-					// Reset values of Abs offset
-					for (int i=0;i<NumSynchMeasAvgAux;i++){
-						this->PRUoffsetDriftErrorAbsArray[i]=0.0;
-					}
-				}
+				//	this->IEPtimerPRUreset=false;//reset flag
+				//	this->NextSynchPRUcorrection=static_cast<unsigned int>(0); // resetting to 0
+				//	this->NextSynchPRUcommand=static_cast<unsigned int>(11);// Hard setting of the time
+				//	this->iIterPRUcurrentTimerVal=0;// reset this value
+				//	// Reset values of Abs offset
+				//	for (int i=0;i<NumSynchMeasAvgAux;i++){
+				//		this->PRUoffsetDriftErrorAbsArray[i]=0.0;
+				//	}
+				//}
 				
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
 				pru1dataMem_int[0]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
@@ -396,19 +396,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					// Absolute corrected error
 					this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
 					this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,NumSynchMeasAvgAux);
-					// The Absolute error is introduced at each signal trigger and timetagging sequence
-					PRUoffsetDriftErrorAbsAvgAux=static_cast<double>(OffsetSynchPRUBaseCorrection)+this->PRUoffsetDriftErrorAbsAvg;// Initialization
-					if (PRUoffsetDriftErrorAbsAvgAux<0.0){
-						cout << "GPIO::PRUsignalTimerSynchJitterLessInterrupt PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << " too negative offset. PRUoffsetDriftErrorAbsAvgAux set to 0 and IEP counter reset to 0. Increase OffsetSynchPRUBaseCorrection: " << OffsetSynchPRUBaseCorrection << endl;
-						PRUoffsetDriftErrorAbsAvgAux=0.0;
-						this->IEPtimerPRUreset=true;
-					}
-					else if(PRUoffsetDriftErrorAbsAvgAux>(2.0*OffsetSynchPRUBaseCorrection)){// Atention 2.0 OffsetSynchPRUBaseCorrection cannot be larger than iepPRUtimerRange32bits (otherwise, we can gain a factor two by doing the division by 2 here insted of in the PRU)
-						cout << "GPIO::PRUsignalTimerSynchJitterLessInterrupt PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << " too positive offset. PRUoffsetDriftErrorAbsAvgAux set to 2.0*OffsetSynchPRUBaseCorrection and IEP counter reset to 0. Increase OffsetSynchPRUBaseCorrection: " << OffsetSynchPRUBaseCorrection << endl;
-						PRUoffsetDriftErrorAbsAvgAux=2.0*OffsetSynchPRUBaseCorrection;
-						this->IEPtimerPRUreset=true;
-					}
-					
+										
 					this->ManualSemaphoreExtra=false;
 					this->ManualSemaphore=false;
 					this->release();					
@@ -619,6 +607,13 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	///////////
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and it is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures
+	// The Absolute error is introduced at each signal trigger and timetagging sequence
+	if (this->PRUoffsetDriftErrorAbsAvg<0.0){
+		PRUoffsetDriftErrorAbsAvgAux=(4.0*SynchTrigPeriod)-fmod(-this->PRUoffsetDriftErrorAbsAvg,4.0*SynchTrigPeriod);
+	}
+	else{
+		PRUoffsetDriftErrorAbsAvgAux=(4.0*SynchTrigPeriod)+fmod(this->PRUoffsetDriftErrorAbsAvg,4.0*SynchTrigPeriod);
+	}
 	pru0dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	// Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
 	requestCoincidenceWhileWait=CoincidenceSetWhileWait();
@@ -638,7 +633,6 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(SynchTrigPeriod));
 
 	pru0dataMem_int[3]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
-
 	pru0dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command
 
 	TimePointClockTagPRUinitial=TimePointClockTagPRUinitial-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
@@ -713,6 +707,13 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
+	// The Absolute error is introduced at each signal trigger and timetagging sequence
+	if (this->PRUoffsetDriftErrorAbsAvg<0.0){
+		PRUoffsetDriftErrorAbsAvgAux=(4.0*SynchTrigPeriod)-fmod(-this->PRUoffsetDriftErrorAbsAvg,4.0*SynchTrigPeriod);
+	}
+	else{
+		PRUoffsetDriftErrorAbsAvgAux=(4.0*SynchTrigPeriod)+fmod(this->PRUoffsetDriftErrorAbsAvg,4.0*SynchTrigPeriod);
+	}
 	pru1dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	// Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
 	requestCoincidenceWhileWait=CoincidenceSetWhileWait();
