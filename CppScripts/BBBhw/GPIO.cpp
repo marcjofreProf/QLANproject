@@ -301,12 +301,14 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				// https://www.kernel.org/doc/html/latest/timers/timers-howto.html
-				//if ((this->iIterPRUcurrentTimerVal%(this->NumSynchMeasAvgAux*2))==0){// Every now and then correct absolutelly, although some interrupt jitter will be present
+				if (this->IEPtimerPRUreset){//(this->iIterPRUcurrentTimerVal%(this->NumSynchMeasAvgAux*2))==0){// Every now and then correct absolutelly, although some interrupt jitter will be present
 				//	auto duration_since_epochTimeNow=(Clock::now()).time_since_epoch();
 				//	this->PRUoffsetDriftError=static_cast<double>(fmodl(static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod)+1)*static_cast<unsigned long long int>(TimePRU1synchPeriod)+static_cast<unsigned long long int>(duration_FinalInitialCountAuxArrayAvg))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));
 				//	this->NextSynchPRUcorrection=static_cast<unsigned int>(static_cast<unsigned int>((static_cast<unsigned long long int>(PRUoffsetDriftError)+0*static_cast<unsigned long long int>(LostCounts))%iepPRUtimerRange32bits));
-				//	this->NextSynchPRUcommand=static_cast<unsigned int>(11);// Hard setting of the time
-				//}
+					this->IEPtimerPRUreset=false;//reset flag
+					this->NextSynchPRUcorrection=static_cast<unsigned int>(0); // resetting to 0
+					this->NextSynchPRUcommand=static_cast<unsigned int>(11);// Hard setting of the time
+				}
 				
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
 				pru1dataMem_int[0]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
@@ -392,12 +394,14 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					// The Absolute error is introduced at each signal trigger and timetagging sequence
 					PRUoffsetDriftErrorAbsAvgAux=static_cast<double>(OffsetSynchPRUBaseCorrection)+this->PRUoffsetDriftErrorAbsAvg;// Initialization
 					if (PRUoffsetDriftErrorAbsAvgAux<0.0){
-						cout << "GPIO::PRUsignalTimerSynchJitterLessInterrupt PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << " too negative offset. PRUoffsetDriftErrorAbsAvgAux set to 0. Increase OffsetSynchPRUBaseCorrection: " << OffsetSynchPRUBaseCorrection << endl;
+						cout << "GPIO::PRUsignalTimerSynchJitterLessInterrupt PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << " too negative offset. PRUoffsetDriftErrorAbsAvgAux set to 0 and IEP counter reset to 0. Increase OffsetSynchPRUBaseCorrection: " << OffsetSynchPRUBaseCorrection << endl;
 						PRUoffsetDriftErrorAbsAvgAux=0.0;
+						this->IEPtimerPRUreset=true;
 					}
 					else if(PRUoffsetDriftErrorAbsAvgAux>(2.0*OffsetSynchPRUBaseCorrection)){// Atention 2.0 OffsetSynchPRUBaseCorrection cannot be larger than iepPRUtimerRange32bits (otherwise, we can gain a factor two by doing the division by 2 here insted of in the PRU)
-						cout << "GPIO::PRUsignalTimerSynchJitterLessInterrupt PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << " too positive offset. PRUoffsetDriftErrorAbsAvgAux set to 2.0*OffsetSynchPRUBaseCorrection. Increase OffsetSynchPRUBaseCorrection: " << OffsetSynchPRUBaseCorrection << endl;
+						cout << "GPIO::PRUsignalTimerSynchJitterLessInterrupt PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << " too positive offset. PRUoffsetDriftErrorAbsAvgAux set to 2.0*OffsetSynchPRUBaseCorrection and IEP counter reset to 0. Increase OffsetSynchPRUBaseCorrection: " << OffsetSynchPRUBaseCorrection << endl;
 						PRUoffsetDriftErrorAbsAvgAux=2.0*OffsetSynchPRUBaseCorrection;
+						this->IEPtimerPRUreset=true;
 					}
 					
 					this->ManualSemaphoreExtra=false;

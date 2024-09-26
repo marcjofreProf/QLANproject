@@ -217,10 +217,6 @@ PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of star
 PSEUDOSYNCHLOOP:
 	SUB		r0, r0, 1
 	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
-FINETIMEOFFSETADJ:
-	MOV		r0, r9 // For security work with register r0
-	LSR		r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
-	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
 PERIODICOFFSET:
 	LBCO	r21, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
 	LSR 	r0, r21, 1 // Divide by 2 since the loop consumes to at each iteration
@@ -228,6 +224,10 @@ PERIODICOFFSET:
 PERIODICOFFSETLOOP:
 	SUB		r0, r0, 1
 	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
+FINETIMEOFFSETADJ:
+	MOV		r0, r9 // For security work with register r0
+	LSR		r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
+	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
 FINETIMEOFFSETADJLOOP:
 	SUB		r0, r0, 1
 	QBNE	FINETIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
