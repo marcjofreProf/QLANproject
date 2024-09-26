@@ -143,6 +143,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures, with overflow clock
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru0dataMem_int[3]=static_cast<unsigned int>(0);
+	pru0dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	//if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
 	//	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
 	//		perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
@@ -158,6 +159,9 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Generate signals
 	pru1dataMem_int[0]=static_cast<unsigned int>(0); // set no command
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
+	pru1dataMem_int[2]=static_cast<unsigned int>(0);// Referenced to the synch trig period
+	pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
+	pru1dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	// Load and execute the PRU program on the PRU1
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
 		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
@@ -385,18 +389,28 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					// Absolute corrected error
 					this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
 					this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,NumSynchMeasAvgAux);
+					// The Absolute error is introduced at each signal trigger and timetagging sequence
+					PRUoffsetDriftErrorAbsAvgAux=static_cast<double>(OffsetSynchPRUBaseCorrection)+this->PRUoffsetDriftErrorAbsAvg;// Initialization
+					if (PRUoffsetDriftErrorAbsAvgAux<0.0){
+						cout << "GPIO::PRUsignalTimerSynchJitterLessInterrupt PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << " too negative offset. PRUoffsetDriftErrorAbsAvgAux set to 0. Increase OffsetSynchPRUBaseCorrection: " << OffsetSynchPRUBaseCorrection << endl;
+						PRUoffsetDriftErrorAbsAvgAux=0.0;
+					}
+					else if(PRUoffsetDriftErrorAbsAvgAux>(2.0*OffsetSynchPRUBaseCorrection)){// Atention 2.0 OffsetSynchPRUBaseCorrection cannot be larger than iepPRUtimerRange32bits (otherwise, we can gain a factor two by doing the division by 2 here insted of in the PRU)
+						cout << "GPIO::PRUsignalTimerSynchJitterLessInterrupt PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << " too positive offset. PRUoffsetDriftErrorAbsAvgAux set to 2.0*OffsetSynchPRUBaseCorrection. Increase OffsetSynchPRUBaseCorrection: " << OffsetSynchPRUBaseCorrection << endl;
+						PRUoffsetDriftErrorAbsAvgAux=2.0*OffsetSynchPRUBaseCorrection;
+					}
 					
 					this->ManualSemaphoreExtra=false;
 					this->ManualSemaphore=false;
 					this->release();					
 					
-					this->NextSynchPRUcorrection=static_cast<unsigned int>(0);
 					this->iIterPRUcurrentTimerValSynch++;
 					this->iIterPRUcurrentTimerValPass=1;
 					PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
 					iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
 					this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
-					this->NextSynchPRUcommand=static_cast<unsigned int>(10);// set command 4, to execute synch functions no correction
+					this->NextSynchPRUcorrection=0;
+					this->NextSynchPRUcommand=static_cast<unsigned int>(10);// set command 10, to execute synch functions no correction
 					
 					// Updates for next round					
 					this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
@@ -596,6 +610,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	///////////
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and it is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures
+	pru0dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	// Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
 	requestCoincidenceWhileWait=CoincidenceSetWhileWait();
 	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestCoincidenceWhileWait,NULL); // Synch barrier. So that SendTriggerSignals and ReadTimeStamps of the different nodes coincide
@@ -687,10 +702,9 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	// Apply a slotted synch configuration (like synchronized Ethernet)
 	this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
-
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
-
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
+	pru1dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	// Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
 	requestCoincidenceWhileWait=CoincidenceSetWhileWait();
 	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestCoincidenceWhileWait,NULL); // Synch barrier. So that SendTriggerSignals and ReadTimeStamps of the different nodes coincide

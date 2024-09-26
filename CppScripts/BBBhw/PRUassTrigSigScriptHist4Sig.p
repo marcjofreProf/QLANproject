@@ -78,6 +78,7 @@
 // r12 is reserved for emitting state 3 and 4 (w0 and w1)
 
 // r13 is reserved for enabling IEP counter
+// r14 is reserved for storing the periodically updated offset value
 
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
@@ -101,6 +102,7 @@ INITIATIONS:
 	// Initial initializations
 	LDI	r4, 0 // zeroing
 	LDI r13, 0x00000111
+	LDI r14, 0 // initial value
 	
 	// Initial Re-initialization for IET counter
 	// The Clock gating Register controls the state of Clock Management. 
@@ -173,7 +175,7 @@ PERIODICTIMESYNCHSET: // with command coded 11 means setting synch
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP		CMDLOOP
-PERIODICTIMESYNCHCHECK: // with command coded 10 means chech synch only	
+PERIODICTIMESYNCHCHECK: // with command coded 10 means chech synch only	(but also store the offset correction value)
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
@@ -248,6 +250,13 @@ PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of star
 PSEUDOSYNCHLOOP:
 	SUB	r0, r0, 1
 	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
+PERIODICOFFSET:
+	LBCO	r14, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
+	LSR 	r0, r14, 1 // Divide by 2 since the loop consumes to at each iteration
+	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
+PERIODICOFFSETLOOP:
+	SUB	r0, r0, 1
+	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
 FINETIMEOFFSETADJ:
 	MOV	r0, r8 // For security work with register r0
 	LSR	r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
