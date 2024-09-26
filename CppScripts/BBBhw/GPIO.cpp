@@ -308,6 +308,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->IEPtimerPRUreset=false;//reset flag
 					this->NextSynchPRUcorrection=static_cast<unsigned int>(0); // resetting to 0
 					this->NextSynchPRUcommand=static_cast<unsigned int>(11);// Hard setting of the time
+					this->iIterPRUcurrentTimerVal=0;// reset this value
 				}
 				
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
