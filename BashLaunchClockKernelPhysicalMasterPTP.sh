@@ -118,12 +118,12 @@ sudo /etc/init.d/rsyslog stop # stop logging
 #sudo phc_ctl /dev/ptp0 set $current_time # $current_nano # if the initial phc2sys offset is really huge. Then, run "sudo phc_ctl /dev/ptp0 set" before starting the ptp4l service, so that it has an initial time based on the RTC taht is "in the ballpark" and and set "step_threshold" at least or below to 0.00002 in the config file so that it can jump to converge
 
 # Configure SYSTEM CLOCKS: CLOCK_REALTIME and CLOCK_TAI
-# utc_offset should be 37, but seems that some slaves do not acquire it propperly, so set to zero (so TAI and UTC time will be the same)
-sudo pmc -u -b 0 -t 1 "SET GRANDMASTER_SETTINGS_NP clockClass 248 \
-        clockAccuracy 0xfe offsetScaledLogVariance 0xffff \
-        currentUtcOffset 37 leap61 0 leap59 0 currentUtcOffsetValid 1 \
-        ptpTimescale 1 timeTraceable 1 frequencyTraceable 0 \
-        timeSource 0xa0"
+# utc_offset should be 37 with respect TAI
+#sudo pmc -u -b 0 -t 1 "SET GRANDMASTER_SETTINGS_NP clockClass 248 \
+#        clockAccuracy 0xfe offsetScaledLogVariance 0xffff \
+#        currentUtcOffset 37 leap61 0 leap59 0 currentUtcOffsetValid 1 \
+#        ptpTimescale 1 timeTraceable 1 frequencyTraceable 0 \
+#        timeSource 0xa0"
 
 sudo nice -n $NicenestPriorValue ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
 pidAux=$(pgrep -f "ptp4l")
