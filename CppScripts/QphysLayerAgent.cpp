@@ -856,7 +856,7 @@ if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to
 	if (SynchNetworkParamsLink[CurrentSpecificLink][1]<0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1];}// For negative correction
 	else if (SynchNetworkParamsLink[CurrentSpecificLink][1]>0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2];}// For positivenegative correction
 	else{SynchNetTransHardwareAdjAux=1.0;}
-	CurrentSynchNetworkParamsLink[0]=fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][0],dHistPeriodicityAux)-dHistPeriodicityHalfAux;// Offset
+	CurrentSynchNetworkParamsLink[0]=fmod(4.0*dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][0],4.0*dHistPeriodicityAux)-4.0*dHistPeriodicityHalfAux;// Offset
 	CurrentSynchNetworkParamsLink[1]=((fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][1],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]; // Period
 	//CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];// Offset
@@ -883,7 +883,7 @@ else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has 
 	CurrentSynchNetworkParamsLink[1]=0.0;
 	CurrentSynchNetworkParamsLink[2]=0.0;
 	//For emitter correction - to be develop
-	CurrentExtraSynchNetworkParamsLink[0]=fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0],dHistPeriodicityAux)-dHistPeriodicityHalfAux;// Offset
+	CurrentExtraSynchNetworkParamsLink[0]=fmod(4.0*dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0],4.0*dHistPeriodicityAux)-4.0*dHistPeriodicityHalfAux;// Offset
 	CurrentExtraSynchNetworkParamsLink[1]=((fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	CurrentExtraSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][2]; // Period
 	// Debugging
@@ -1235,7 +1235,7 @@ if (CurrentSpecificLink>=0){
 	double dHistPeriodicityAux=static_cast<double>(HistPeriodicityAux);
 	double dHistPeriodicityHalfAux=static_cast<double>(HistPeriodicityAux/2.0);
 	double SynchNetTransHardwareAdjAux=1.0;// Not retrieving the rel. freq. difference whether positive correction or negative
-	TimeTaggsDetSynchParams[0]=(fmodl(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux; // Offset in the period it was computed
+	TimeTaggsDetSynchParams[0]=(fmodl(4.0*dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][0],4.0*dHistPeriodicityAux)-4.0*dHistPeriodicityHalfAux)/(4.0*dHistPeriodicityAux); // Offset in the period it was computed
 	TimeTaggsDetSynchParams[1]=((fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][1],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux); // Relative frequency difference
 	TimeTaggsDetSynchParams[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]; // Period in which it was calculated
 	//TimeTaggsDetSynchParams[0]=SynchNetworkParamsLink[CurrentSpecificLink][0]*dHistPeriodicityAux; // Offset in the period it was computed
@@ -1493,16 +1493,16 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	// Offset calculation
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];
 	for (int i=0;i<NumRunsPerCenterMass;i++){
-		SynchCalcValuesArrayAux[i]=static_cast<double>((-SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))%LLIHistPeriodicityAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		SynchCalcValuesArrayAux[i]=static_cast<double>((-SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))%(4*LLIHistPeriodicityAux));// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	// Convert offset to center of histogram
 	if(SynchCalcValuesArray[1]<0.0){
-		SynchCalcValuesArray[1]=fmod(-dHistPeriodicityHalfAux+SynchCalcValuesArray[1],dHistPeriodicityAux)+dHistPeriodicityHalfAux;
+		SynchCalcValuesArray[1]=fmod(-4.0*dHistPeriodicityHalfAux+SynchCalcValuesArray[1],4.0*dHistPeriodicityAux)+4.0*dHistPeriodicityHalfAux;
 	}
 	else{
-		SynchCalcValuesArray[1]=fmod(dHistPeriodicityHalfAux+SynchCalcValuesArray[1],dHistPeriodicityAux)-dHistPeriodicityHalfAux;
+		SynchCalcValuesArray[1]=fmod(4.0*dHistPeriodicityHalfAux+SynchCalcValuesArray[1],4.0*dHistPeriodicityAux)-4.0*dHistPeriodicityHalfAux;
 	}
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	

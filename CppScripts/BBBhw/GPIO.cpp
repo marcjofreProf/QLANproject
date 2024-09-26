@@ -608,11 +608,11 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and it is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures
 	// The Absolute error is introduced at each signal trigger and timetagging sequence
-	if (this->PRUoffsetDriftErrorAbsAvg<0.0){
-		PRUoffsetDriftErrorAbsAvgAux=(4.0*SynchTrigPeriod)-fmod(-this->PRUoffsetDriftErrorAbsAvg,4.0*SynchTrigPeriod);
+	if ((this->PRUoffsetDriftErrorAbsAvg+AccumulatedErrorDriftAux)<0.0){
+		PRUoffsetDriftErrorAbsAvgAux=(4.0*SynchTrigPeriod)-fmod(-(this->PRUoffsetDriftErrorAbsAvg+AccumulatedErrorDriftAux),4.0*SynchTrigPeriod);
 	}
 	else{
-		PRUoffsetDriftErrorAbsAvgAux=(4.0*SynchTrigPeriod)+fmod(this->PRUoffsetDriftErrorAbsAvg,4.0*SynchTrigPeriod);
+		PRUoffsetDriftErrorAbsAvgAux=(4.0*SynchTrigPeriod)+fmod((this->PRUoffsetDriftErrorAbsAvg+AccumulatedErrorDriftAux),4.0*SynchTrigPeriod);
 	}
 	pru0dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	// Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
@@ -625,7 +625,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	SynchRem=static_cast<int>((static_cast<long double>(1.5*4.0*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(4.0*SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));// For time stamping it waits 1.5
 	TimePointClockTagPRUinitial=TimePointClockTagPRUinitial+std::chrono::nanoseconds(SynchRem);
 
-	InstantCorr=static_cast<long long int>(static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>((1.0/64.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod))+static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod)));
+	InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/64.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod))+static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod)));
 
 	if (InstantCorr>0){SignAuxInstantCorr=1;}
 	else if (InstantCorr<0){SignAuxInstantCorr=-1;}
@@ -709,11 +709,11 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 	// The Absolute error is introduced at each signal trigger and timetagging sequence
-	if (this->PRUoffsetDriftErrorAbsAvg<0.0){
-		PRUoffsetDriftErrorAbsAvgAux=(4.0*SynchTrigPeriod)-fmod(-this->PRUoffsetDriftErrorAbsAvg,4.0*SynchTrigPeriod);
+	if ((this->PRUoffsetDriftErrorAbsAvg+AccumulatedErrorDriftAux)<0.0){
+		PRUoffsetDriftErrorAbsAvgAux=(4.0*SynchTrigPeriod)-fmod(-(this->PRUoffsetDriftErrorAbsAvg+AccumulatedErrorDriftAux),4.0*SynchTrigPeriod);
 	}
 	else{
-		PRUoffsetDriftErrorAbsAvgAux=(4.0*SynchTrigPeriod)+fmod(this->PRUoffsetDriftErrorAbsAvg,4.0*SynchTrigPeriod);
+		PRUoffsetDriftErrorAbsAvgAux=(4.0*SynchTrigPeriod)+fmod((this->PRUoffsetDriftErrorAbsAvg+AccumulatedErrorDriftAux),4.0*SynchTrigPeriod);
 	}
 	pru1dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	// Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
@@ -726,7 +726,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	SynchRem=static_cast<int>((static_cast<long double>(1.5*4.0*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(4.0*SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 	this->TimePointClockTagPRUinitial=this->TimePointClockTagPRUinitial+std::chrono::nanoseconds(SynchRem);
 
-	InstantCorr=static_cast<long long int>(static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>((1.0/64.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod))+static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod)));
+	InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/64.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod))+static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod)));
 
 	if (InstantCorr>0){SignAuxInstantCorr=1;}
 	else if (InstantCorr<0){SignAuxInstantCorr=-1;}

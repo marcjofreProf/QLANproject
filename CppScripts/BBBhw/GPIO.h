@@ -221,8 +221,8 @@ private:// Variables
 	double PeriodCountsPulseAdj=(((1.0/(double)(PulseFreq))*1e9)/((double)(PRUclockStepPeriodNanoseconds)));// Not used
 	double AdjPulseSynchCoeff=1.0;
 	double AdjPulseSynchCoeffAverage=1.0;
-	long double AccumulatedErrorDrift=0.0; // For retrieved relative frequency difference from protocol
-	long double AccumulatedErrorDriftAux=0.0;// For retrieved relative offset difference from protocol
+	double AccumulatedErrorDrift=0.0; // For retrieved relative frequency difference from protocol
+	double AccumulatedErrorDriftAux=0.0;// For retrieved relative offset difference from protocol
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
 	// Correct Qubits relative frequency difference due to the sender
 	int TagsSeparationDetRelFreq=10; // Number of index separation to compute the slope of disadjustment in order to have accuraccy
