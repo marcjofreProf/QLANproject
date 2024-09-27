@@ -67,7 +67,7 @@ private: // Variables/Objects
 	// Semaphore
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)	
 	int valueSemaphoreExpected = 1;
-	unsigned long long int UnTrapSemaphoreValueMaxCounter=3600000000000;//MAx counter trying to acquire semaphore, then force release
+	unsigned long long int UnTrapSemaphoreValueMaxCounter=1800000000000;//MAx counter trying to acquire semaphore, then force release
 	// Status
 	bool InfoSimulateNumStoredQubitsNodeFlag=false;// Flag to account that there is informaiton on number Qubits in node
 	int SimulateNumStoredQubitsNodeParamsIntArray[1]={0};// Array storing the Number Qubits stored in the node
