@@ -54,10 +54,13 @@ this->valueSemaphore=0; // Make sure it stays at 0
 // https://stackoverflow.com/questions/61493121/when-can-memory-order-acquire-or-memory-order-release-be-safely-removed-from-com
 // https://medium.com/@pauljlucas/advanced-thread-safety-in-c-4cbab821356e
 //int oldCount;
+	unsigned long long int ProtectionSemaphoreTrap=0;
 	bool valueSemaphoreExpected=true;
 	while(true){
 	//oldCount = this->valueSemaphore.load(std::memory_order_acquire);
 	//if (oldCount > 0 && this->valueSemaphore.compare_exchange_strong(oldCount,oldCount-1,std::memory_order_acquire)){
+		ProtectionSemaphoreTrap++;
+		if (ProtectionSemaphoreTrap>UnTrapSemaphoreValueMaxCounter){this->release();}// Avoid trapping situations
 		if (this->valueSemaphore.compare_exchange_strong(valueSemaphoreExpected,false,std::memory_order_acquire)){	
 			break;
 		}
@@ -1165,21 +1168,22 @@ QTLAN::~QTLAN() {
 void QTLAN::AgentProcessRequestsPetitions(){// Check next thing to do
 	bool isValidWhileLoop = true;
 	while(isValidWhileLoop){
+		this->acquire();// Wait semaphore until it can proceed
 		try{
-			try {
-   	this->acquire();// Wait semaphore until it can proceed
+			try {   	
    	
-        this->release(); // Release the semaphore 
+        
+		      }
+		      catch (const std::exception& e) {
+			// Handle the exception
+		      	cout << "Exception: " << e.what() << endl;
+		      }
+		    } // upper try
+		  catch (...) { // Catches any exception
+		  	cout << "Exception caught" << endl;
+		  }
+		  this->release(); // Release the semaphore 
         this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
-      }
-      catch (const std::exception& e) {
-	// Handle the exception
-      	cout << "Exception: " << e.what() << endl;
-      }
-    } // upper try
-  catch (...) { // Catches any exception
-  	cout << "Exception caught" << endl;
-  }
     } // while
   }
 
@@ -1242,49 +1246,50 @@ void QTLAN::AgentProcessRequestsPetitions(){// Check next thing to do
  if (QTLANagent.getState()==QTLAN::APPLICATION_EXIT){isValidWhileLoop = false;}
  else{isValidWhileLoop = true;}
  
- while(isValidWhileLoop){ 
+ while(isValidWhileLoop){
+ 	QTLANagent.acquire();
  	try{
  		try {
     	// Code that might throw an exception 
- 	// Check if there are need messages or actions to be done by the node
- 			QTLANagent.acquire();
- 	QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
- 	QTLANagent.SendParametersAgent(); // Send Parameters information stored
- 	QTLANagent.RegularCheckToPerform();// Every now and then some checks have to happen  
- 	switch(QTLANagent.getState()) {
- 	case QTLAN::APPLICATION_RUNNING: {               
-               // Do Some Work
- 		QTLANagent.ProcessNewMessage();
-               //while(QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard)>0);// Make sure to remove all pending mesages in the socket
-               QTLANagent.m_pause(); // After procesing the request, pass to paused state. It is when receiving new messages that it turn into start (running again)
-               break;
-             }
-           case QTLAN::APPLICATION_PAUSED: {
-               // Maybe do some checks if necessary 
-           	break;
-           }
-         case QTLAN::APPLICATION_EXIT: {                  
-               isValidWhileLoop=false;//break;
-             }
-           default: {
-               // ErrorHandling Throw An Exception Etc.
-           }
+ 	// Check if there are need messages or actions to be done by the node 			
+		 	QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+		 	QTLANagent.SendParametersAgent(); // Send Parameters information stored
+		 	QTLANagent.RegularCheckToPerform();// Every now and then some checks have to happen  
+		 	switch(QTLANagent.getState()) {
+		 	case QTLAN::APPLICATION_RUNNING: {               
+		               // Do Some Work
+		 		QTLANagent.ProcessNewMessage();
+		               //while(QTLANagent.ICPConnectionsCheckNewMessages(SockListenTimeusecStandard)>0);// Make sure to remove all pending mesages in the socket
+		               QTLANagent.m_pause(); // After procesing the request, pass to paused state. It is when receiving new messages that it turn into start (running again)
+		               break;
+		             }
+		           case QTLAN::APPLICATION_PAUSED: {
+		               // Maybe do some checks if necessary 
+		           	break;
+		           }
+		         case QTLAN::APPLICATION_EXIT: {                  
+		               isValidWhileLoop=false;//break;
+		             }
+		           default: {
+		               // ErrorHandling Throw An Exception Etc.
+		           }
 
-        } // switch
-        //if (sockKeepAlivecounter>=SOCKkeepaliveTime){sockKeepAlivecounter=0;QTLANagent.SendKeepAliveHeartBeatsSockets();}
-        //else{sockKeepAlivecounter++;}
-        QTLANagent.release();
-	if (signalReceivedFlag.load()){QTLANagent.~QTLAN();}// Destroy the instance
-        QTLANagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
-      }
-      catch (const std::exception& e) {
-	// Handle the exception
-      	cout << "Exception: " << e.what() << endl;
-      }
-  } // upper try
-  catch (...) { // Catches any exception
-  	cout << "Exception caught" << endl;
-  }
+		        } // switch
+		        //if (sockKeepAlivecounter>=SOCKkeepaliveTime){sockKeepAlivecounter=0;QTLANagent.SendKeepAliveHeartBeatsSockets();}
+		        //else{sockKeepAlivecounter++;}
+		        
+		      }
+		      catch (const std::exception& e) {
+			// Handle the exception
+		      	cout << "Exception: " << e.what() << endl;
+		      }
+		  } // upper try
+		  catch (...) { // Catches any exception
+		  	cout << "Exception caught" << endl;
+		  }
+		  QTLANagent.release();
+			if (signalReceivedFlag.load()){QTLANagent.~QTLAN();}// Destroy the instance
+	        QTLANagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
     } // while
     cout << "Exiting the QtransportLayerAgentN" << endl;
     QTLANagent.StopICPconnections(QTLANagent.ParamArgc);

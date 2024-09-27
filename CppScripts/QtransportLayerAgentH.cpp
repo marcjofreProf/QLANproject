@@ -127,14 +127,17 @@ this->valueSemaphore=0; // Make sure it stays at 0
 // https://stackoverflow.com/questions/61493121/when-can-memory-order-acquire-or-memory-order-release-be-safely-removed-from-com
 // https://medium.com/@pauljlucas/advanced-thread-safety-in-c-4cbab821356e
 //int oldCount;
+	unsigned long long int ProtectionSemaphoreTrap=0;
 	bool valueSemaphoreExpected=true;
 	while(true){
 	//oldCount = this->valueSemaphore.load(std::memory_order_acquire);
 	//if (oldCount > 0 && this->valueSemaphore.compare_exchange_strong(oldCount,oldCount-1,std::memory_order_acquire)){
+		ProtectionSemaphoreTrap++;
+		if (ProtectionSemaphoreTrap>UnTrapSemaphoreValueMaxCounter){this->release();}// Avoid trapping situations
 		if (this->valueSemaphore.compare_exchange_strong(valueSemaphoreExpected,false,std::memory_order_acquire)){	
 			break;
 		}
-	}
+	}	
 }
 
 void QTLAH::release() {
@@ -872,9 +875,10 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
  while(isValidWhileLoop){
  //cout << "CheckCounter: " << CheckCounter << endl;
  //CheckCounter++;
+ 	this->acquire();// Wait semaphore until it can proceed
  	try{
  		try {
-   	this->acquire();// Wait semaphore until it can proceed
+   	
     	// Code that might throw an exception
  	// Check if there are need messages or actions to be done by the node 	
  	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
@@ -902,12 +906,7 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
 
         } // switch
         //if (sockKeepAlivecounter>=SOCKkeepaliveTime){sockKeepAlivecounter=0;this->SendKeepAliveHeartBeatsSockets();}
-        //else{sockKeepAlivecounter++;}
-        this->release(); // Release the semaphore
-        //if (signalReceivedFlag.load()){this->~QTLAH();}// Destroy the instance
-        //cout << "(int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)): " << (int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)) << endl;
-        //usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
-        this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few nanoseconds for other processes to enter
+        //else{sockKeepAlivecounter++;}        
       }
       catch (const std::exception& e) {
 	// Handle the exception
@@ -917,6 +916,11 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
   catch (...) { // Catches any exception
   	cout << "Exception caught" << endl;
   }
+  	this->release(); // Release the semaphore
+  	//if (signalReceivedFlag.load()){this->~QTLAH();}// Destroy the instance
+    //cout << "(int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)): " << (int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)) << endl;
+    //usleep((int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
+    this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few nanoseconds for other processes to enter
     } // while
 
   }

@@ -229,7 +229,7 @@ QUADEMT1:
 	MOV	r11, 0x00020001
 	MOV	r12, 0x00080004
 	JMP	PSEUDOSYNCH
-PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
+PSEUDOSYNCH:// Neutralizing interrupt jitter time //// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	// Since there is a dead period betwen pulses (to do management), divide the period by 2
 	LSR	r9, r7, 1	
 	// Compute DELAY value
@@ -250,14 +250,14 @@ PSEUDOSYNCH:// Only needed at the beggining to remove the unsynchronisms of star
 PSEUDOSYNCHLOOP:
 	SUB	r0, r0, 1
 	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
-PERIODICOFFSET:
+PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
 	LBCO	r14, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
 	LSR 	r0, r14, 1 // Divide by 2 since the loop consumes to at each iteration
 	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
 PERIODICOFFSETLOOP:
 	SUB	r0, r0, 1
 	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
-FINETIMEOFFSETADJ:
+FINETIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
 	MOV	r0, r8 // For security work with register r0
 	LSR	r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
 	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts

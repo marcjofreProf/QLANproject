@@ -79,10 +79,13 @@ this->valueSemaphore=0; // Make sure it stays at 0
 // https://stackoverflow.com/questions/61493121/when-can-memory-order-acquire-or-memory-order-release-be-safely-removed-from-com
 // https://medium.com/@pauljlucas/advanced-thread-safety-in-c-4cbab821356e
 //int oldCount;
+	unsigned long long int ProtectionSemaphoreTrap=0;
 	bool valueSemaphoreExpected=true;
 	while(true){
 	//oldCount = this->valueSemaphore.load(std::memory_order_acquire);
 	//if (oldCount > 0 && this->valueSemaphore.compare_exchange_strong(oldCount,oldCount-1,std::memory_order_acquire)){
+		ProtectionSemaphoreTrap++;
+		if (ProtectionSemaphoreTrap>UnTrapSemaphoreValueMaxCounter){this->release();}// Avoid trapping situations
 		if (this->valueSemaphore.compare_exchange_strong(valueSemaphoreExpected,false,std::memory_order_acquire)){	
 			break;
 		}
@@ -1759,22 +1762,23 @@ void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
 
 	bool isValidWhileLoop = true;
 	while(isValidWhileLoop){
+		this->acquire();// Wait semaphore until it can proceed
 		try{
-			try {
-   	this->acquire();// Wait semaphore until it can proceed
+			try {   	
     	this->ReadParametersAgent(); // Reads messages from above layer
     	this->RegularCheckToPerform();// Every now and then some checks have to happen    	
-        this->release(); // Release the semaphore 
-        this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
+        
       }
       catch (const std::exception& e) {
-	// Handle the exception
-      	cout << "Exception: " << e.what() << endl;
-      }
-    } // upper try
-  catch (...) { // Catches any exception
-  	cout << "Exception caught" << endl;
-  }
+			// Handle the exception
+		      	cout << "Exception: " << e.what() << endl;
+		      }
+		    } // upper try
+		  catch (...) { // Catches any exception
+		  	cout << "Exception caught" << endl;
+		  }
+		  this->release(); // Release the semaphore 
+        this->RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));// Wait a few microseconds for other processes to enter
     } // while
   }
 

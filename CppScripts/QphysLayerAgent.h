@@ -66,6 +66,7 @@ private: //Variables/Instances
     //int QuBitsNanoSecHalfPeriodInt[LinkNumberMAX]={500000};
     //int QuBitsNanoSecQuarterPeriodInt[LinkNumberMAX]={250000};// Not exacte quarter period since it should be 2.5
     // Semaphore
+    unsigned long long int UnTrapSemaphoreValueMaxCounter=3600000000000;//MAx counter trying to acquire semaphore, then force release
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	// Payload messages
 	char PayloadReadBuffer[NumBytesPayloadBuffer]={0}; //Buffer to read payload messages

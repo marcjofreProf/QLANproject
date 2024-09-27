@@ -46,6 +46,7 @@ private:// Variables
 	bool SlowMemoryPermanentStorageFlag=false; // Variable when true they are stored in a file (slower due to writting and reading) ; otherwise it uses array memory to store qubits (much faster)
 	bool ResetPeriodicallyTimerPRU1=true;// Avoiding interrupts
 	// Semaphore
+	unsigned long long int UnTrapSemaphoreValueMaxCounter=3600000000000;//MAx counter trying to acquire semaphore, then force release
 	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
 	std::atomic<bool> ManualSemaphore=false;
 	std::atomic<bool> ManualSemaphoreExtra=false;
