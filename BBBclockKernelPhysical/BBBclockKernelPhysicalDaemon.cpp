@@ -66,10 +66,13 @@ this->valueSemaphore=0; // Make sure it stays at 0
 // https://stackoverflow.com/questions/61493121/when-can-memory-order-acquire-or-memory-order-release-be-safely-removed-from-com
 // https://medium.com/@pauljlucas/advanced-thread-safety-in-c-4cbab821356e
 //int oldCount;
+	unsigned long long int ProtectionSemaphoreTrap=0;
 bool valueSemaphoreExpected=true;
 while(true){
 	//oldCount = this->valueSemaphore.load(std::memory_order_acquire);
 	//if (oldCount > 0 && this->valueSemaphore.compare_exchange_strong(oldCount,oldCount-1,std::memory_order_acquire)){
+	ProtectionSemaphoreTrap++;
+		if (ProtectionSemaphoreTrap>UnTrapSemaphoreValueMaxCounter){this->release();cout << "CKPD::Releasing semaphore!!!" << endl;}// Avoid trapping situations
 	if (this->valueSemaphore.compare_exchange_strong(valueSemaphoreExpected,false,std::memory_order_acquire)){	
 	break;
 	}
@@ -674,11 +677,12 @@ int main(int argc, char const * argv[]){
  cout << "Starting to actively adjust clock output..." << endl;
  
  while(isValidWhileLoop){ 
+ 	//CKPDagent.acquire();
    //try{
  	//try {
     	// Code that might throw an exception 
  	// Check if there are need messages or actions to be done by the node
- 	//CKPDagent.acquire();
+ 	
        switch(CKPDagent.getState()) {
            case CKPD::APPLICATION_RUNNING: {               
                // Do Some Work
@@ -697,10 +701,10 @@ int main(int argc, char const * argv[]){
            }
 
         } // switch
-        //CKPDagent.release();
+        
 	if (signalReceivedFlag.load()){CKPDagent.~CKPD();}// Destroy the instance
         // Main barrier is in HandleInterruptSynchPRU function. No need for this CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));
-        //CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Used in busy-wait
+        
     //}
     //catch (const std::exception& e) {
     //	// Handle the exception
@@ -710,6 +714,8 @@ int main(int argc, char const * argv[]){
   //catch (...) { // Catches any exception
   //cout << "Exception caught" << endl;
   //  }
+	//CKPDagent.release();
+	//CKPDagent.RelativeNanoSleepWait((unsigned int)(WaitTimeAfterMainWhileLoop));// Used in busy-wait
     } // while
   cout << "Exiting the BBBclockKernelPhysicalDaemon" << endl;
   

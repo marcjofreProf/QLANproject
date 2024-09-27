@@ -60,7 +60,7 @@ this->valueSemaphore=0; // Make sure it stays at 0
 	//oldCount = this->valueSemaphore.load(std::memory_order_acquire);
 	//if (oldCount > 0 && this->valueSemaphore.compare_exchange_strong(oldCount,oldCount-1,std::memory_order_acquire)){
 		ProtectionSemaphoreTrap++;
-		if (ProtectionSemaphoreTrap>UnTrapSemaphoreValueMaxCounter){this->release();}// Avoid trapping situations
+		if (ProtectionSemaphoreTrap>UnTrapSemaphoreValueMaxCounter){this->release();cout << "QTLAN::Releasing semaphore!!!" << endl;}// Avoid trapping situations
 		if (this->valueSemaphore.compare_exchange_strong(valueSemaphoreExpected,false,std::memory_order_acquire)){	
 			break;
 		}

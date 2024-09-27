@@ -49,6 +49,7 @@ public: //Variables
 private:// Variables
 	ApplicationState m_state;
 	// Semaphore
+	unsigned long long int UnTrapSemaphoreValueMaxCounter=3600000000000;//MAx counter trying to acquire semaphore, then force release
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	// Time/synchronization management
 	unsigned long long int CounterHandleInterruptSynchPRU=0;
