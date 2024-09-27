@@ -60,6 +60,7 @@ private:// Variables
 	//unsigned int OffsetSynchPRUBaseCorrection=262144;// Base value from where the synch offset is added or discounted to achieve periodic offset correction
 	double PRUoffsetDriftErrorAbsAvgAux=0.0;
 	//bool IEPtimerPRUreset=false;
+	bool SynchCorrectionTimeFlag=true; // If True, it correct for Time synchronization (more strict, and maybe not needed with synch protocol develop), otherwise it corrects for frequency correction (which variations in frequency whens added pahses and lost phases at the end)
 	// Relative error
 	double PRUoffsetDriftError=0;
 	double PRUoffsetDriftErrorArray[MaxNumPulses]={0};
