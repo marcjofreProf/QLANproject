@@ -363,6 +363,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//pru1dataMem_int[2]// Current IEP timer sample
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[2]);
+				cout << "GPIO::pru1dataMem_int[2]: " << pru1dataMem_int[2] << endl;
 				// Correct for interrupt handling time might add a bias in the estimation/reading
 				//this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);//this->PRUcurrentTimerValWrap-duration_FinalInitialCountAuxArrayAvg/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command //this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
 				// Unwrap
