@@ -170,8 +170,8 @@ PERIODICTIMESYNCHSET: // with command coded 11 means setting synch
 	SBCO	r4.b0, CONST_IETREG, 0, 1 // Stop the counter
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	SBCO	r13.b0, CONST_IETREG, 0, 1 // Enable the counter
-	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
-	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
+//	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
+	SBCO	r7, CONST_PRUDRAM, 8, 4 //SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP		CMDLOOP
