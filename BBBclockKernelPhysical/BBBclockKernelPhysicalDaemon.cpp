@@ -230,9 +230,9 @@ this->duration_FinalInitialDriftAuxArrayAvg = this->RatioAverageFactorClockQuart
 }
 }
 
-if (this->duration_FinalInitialDriftAuxArrayAvg>5000){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
-	cout << "Time for pre processing the time barrier is too long " << this->duration_FinalInitialDriftAuxArrayAvg << " ...adjust TimeClockMarging! Set to nominal value of 5000..." << endl;
-	this->duration_FinalInitialDriftAuxArrayAvg=5000;// For the time being adjust it to the nominal initial value
+if (this->duration_FinalInitialDriftAuxArrayAvg>6000){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
+	cout << "Time for pre processing the time barrier is too long " << this->duration_FinalInitialDriftAuxArrayAvg << " ...adjust TimeClockMarging! Set to nominal value of 6000..." << endl;
+	this->duration_FinalInitialDriftAuxArrayAvg=6000;// For the time being adjust it to the nominal initial value
 }
 
 this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
