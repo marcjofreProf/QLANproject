@@ -236,7 +236,7 @@ if (this->duration_FinalInitialDriftAuxArrayAvg>6000){// Much longer than for cl
 }
 
 this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
-this->TimePointClockCurrentInitialMeas=this->TimePointClockCurrentFinal-std::chrono::nanoseconds(this->duration_FinalInitialDriftAuxArrayAvg);// Important that it is discounted the time to enter the interrupt so that in this way the signal generation in the PRU is reference to an absolute time.
+this->TimePointClockCurrentInitialMeas=this->TimePointClockCurrentFinal;//-std::chrono::nanoseconds(this->duration_FinalInitialDriftAuxArrayAvg);// Actually, the time measured duration_FinalInitialDriftAuxArrayAvg is not indicative of much (only if it changes a lot to high values it means trouble)
 
 // Compute error
 if (retInterruptsPRU1>0){

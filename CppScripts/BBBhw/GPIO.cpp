@@ -648,7 +648,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	pru0dataMem_int[3]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
 	pru0dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command
 
-	TimePointClockTagPRUinitial=TimePointClockTagPRUinitial-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
+	//TimePointClockTagPRUinitial=TimePointClockTagPRUinitial-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);// Actually, the time measured duration_FinalInitialMeasTrigAuxAvg is not indicative of much (only if it changes a lot to high values it means trouble)
 
 	while (Clock::now()<TimePointClockTagPRUinitial);// Busy wait time synch sending signals
 	prussdrv_pru_send_event(21);
@@ -750,7 +750,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 
 	pru1dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command. Generate signals. Takes around 900000 clock ticks
 
-	this->TimePointClockTagPRUinitial=this->TimePointClockTagPRUinitial-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
+	//this->TimePointClockTagPRUinitial=this->TimePointClockTagPRUinitial-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg); // Actually, the time measured duration_FinalInitialMeasTrigAuxAvg is not indicative of much (only if it changes a lot to high values it means trouble)
 
 	////if (Clock::now()<this->TimePointClockTagPRUinitial){cout << "Check that we have enough time" << endl;}
 	while (Clock::now()<this->TimePointClockTagPRUinitial);// Busy wait time synch sending signals
