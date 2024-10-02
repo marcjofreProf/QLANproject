@@ -111,7 +111,6 @@ private: //Variables/Instances
 	double FineSynchAdjVal[2]={0.0};// Adjust synch trig offset and frequency
 	// Automatic calculation of synchronization
 	double HistPeriodicityAux=4096.0; //Value indicated by upper agents (and uploaded to GPIO)//Period in PRU counts of the synch period/histogram
-	double MultFactorEffSynchPeriod=4.0; // When using 4 channels histogram, this value is 4.0; when using real signals this value should be 1.0
 	int CurrentSpecificLink=-1; // Identifies th eindex of the other emiter/receiver
 	int CurrentSpecificLinkMultiple=-1; // Identifies the index of the other emiter/receiver links when multiple present
 	char ListCombinationSpecificLink[2*((1LL<<LinkNumberMAX)-1)][NumBytesPayloadBuffer]; // Stores the list of detected links and combinations in an ordered way
