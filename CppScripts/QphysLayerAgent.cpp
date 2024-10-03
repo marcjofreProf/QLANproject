@@ -859,12 +859,14 @@ if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to
 	if (SynchNetworkParamsLink[CurrentSpecificLink][1]<0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1];}// For negative correction
 	else if (SynchNetworkParamsLink[CurrentSpecificLink][1]>0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2];}// For positivenegative correction
 	else{SynchNetTransHardwareAdjAux=1.0;}
-	if (SynchNetworkParamsLink[CurrentSpecificLink][0]<0.0){
-		CurrentSynchNetworkParamsLink[0]=-(fmod(-MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux-SynchNetworkParamsLink[CurrentSpecificLink][0],MultFactorEffSynchPeriodQPLA*dHistPeriodicityAux)+MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux);// Offset
-	}
-	else{
-		CurrentSynchNetworkParamsLink[0]=fmod(MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][0],MultFactorEffSynchPeriodQPLA*dHistPeriodicityAux)-MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux;// Offset
-	}
+	//if (SynchNetworkParamsLink[CurrentSpecificLink][0]<0.0){
+	//	CurrentSynchNetworkParamsLink[0]=-(fmod(-MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux-SynchNetworkParamsLink[CurrentSpecificLink][0],MultFactorEffSynchPeriodQPLA*dHistPeriodicityAux)+MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux);// Offset
+	//}
+	//else{
+	//	CurrentSynchNetworkParamsLink[0]=fmod(MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][0],MultFactorEffSynchPeriodQPLA*dHistPeriodicityAux)-MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux;// Offset
+	//}
+	// Maybe the offset should no be transformed
+	CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];
 	if (SynchNetworkParamsLink[CurrentSpecificLink][1]<0.0){
 		CurrentSynchNetworkParamsLink[1]=(-(fmod(-dHistPeriodicityHalfAux-SynchNetworkParamsLink[CurrentSpecificLink][1],dHistPeriodicityAux)+dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	}
@@ -896,12 +898,14 @@ else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has 
 	CurrentSynchNetworkParamsLink[1]=0.0;
 	CurrentSynchNetworkParamsLink[2]=0.0;
 	//For emitter correction - to be develop
-	if (SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0]<0.0){
-		CurrentExtraSynchNetworkParamsLink[0]=-(fmod(-MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux-SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0],MultFactorEffSynchPeriodQPLA*dHistPeriodicityAux)+MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux);// Offset
-	}
-	else{
-		CurrentExtraSynchNetworkParamsLink[0]=fmod(MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0],MultFactorEffSynchPeriodQPLA*dHistPeriodicityAux)-MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux;// Offset
-	}
+	//if (SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0]<0.0){
+	//	CurrentExtraSynchNetworkParamsLink[0]=-(fmod(-MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux-SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0],MultFactorEffSynchPeriodQPLA*dHistPeriodicityAux)+MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux);// Offset
+	//}
+	//else{
+	//	CurrentExtraSynchNetworkParamsLink[0]=fmod(MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0],MultFactorEffSynchPeriodQPLA*dHistPeriodicityAux)-MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux;// Offset
+	//}
+	// Maybe the offset does not have to be transformed
+	CurrentExtraSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0];
 	if (SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1]<0.0){
 		CurrentExtraSynchNetworkParamsLink[1]=(-(fmod(-dHistPeriodicityHalfAux-SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)+dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	}
