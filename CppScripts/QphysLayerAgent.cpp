@@ -1293,6 +1293,7 @@ int QPLA::HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass){
 	long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
 	double dHistPeriodicityAux=static_cast<double>(HistPeriodicityAux);
 	double dHistPeriodicityHalfAux=static_cast<double>(HistPeriodicityAux/2.0);
+	long long int LLIMultFactorEffSynchPeriod=static_cast<long long int>(MultFactorEffSynchPeriodQPLA);
 
 // Store the information of the start of the detection
 	SynchTimeTaggRef[iCenterMass][iNumRunsPerCenterMass]=static_cast<long long int>(RawLastTimeTaggRef[0]);
@@ -1317,9 +1318,31 @@ int QPLA::HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass){
 	//cout << "QPLA::SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]: " << SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass] << endl;
 }
 
-// If the first iteration, since no extra relative frequency difference added, store the values, for at the end compute the offset, at least within theHistPeriodicityAux
-if (iCenterMass==0){
-	SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass];
+// If the first iteration, since no extra relative frequency difference added, store the values, for at the end compute the offset, at least within the HistPeriodicityAux
+if (iCenterMass==0){// Here the modulo is dependent n the effective period		
+		long long int ChOffsetCorrection=0;// Variable to acomodate the 4 different channels in the periodic histogram analysis
+		if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]>0){	
+			if (UseAllTagsForEstimation){
+			// Mean averaging
+			//for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
+			//CenterMassVal=CenterMassVal+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
+			//}
+			// Median averaging
+				for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
+					ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a states
+				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
+			}
+			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]);
+			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass];
+		}
+		else{
+			// Single value
+			ChOffsetCorrection=ChannelTags[SpecificQuadChDet][0]%4;// Maps the offset correction for the different channels to detect a states
+			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][0])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux; // Considering only the first timetagg. Might not be very resilence with noise
+			cout << "QPLA::Using only first timetag for network synch computations!...to be deactivated" << endl;
+		}
+		//cout << "QPLA::SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]: " << SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass] << endl;
+	}	
 }
 
 //this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
@@ -1515,15 +1538,16 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	cout << "QPLA::SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2] << ", adjustment factor for positive rel. freq. correction" << endl;
 	
 	// Offset calculation
-	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];// Split between the four channels
-	long long int LLIMultFactorEffSynchPeriod=static_cast<long long int>(MultFactorEffSynchPeriodQPLA);
-	long long int ChOffsetCorrection=0;// Variable to acomodate the 4 different channels in the periodic histogram analysis
+	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];// Split between the four channels		
 	for (int i=0;i<NumRunsPerCenterMass;i++){
-		ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a states
-		SynchCalcValuesArrayAux[i]=-static_cast<double>((SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux));// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		if ((SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))<0){
+			SynchCalcValuesArrayAux[i]=static_cast<double>((-(SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2])))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux));// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		}
+		else{
+			SynchCalcValuesArrayAux[i]=-static_cast<double>((SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux));// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		}
 		cout << "QPLA::SynchFirstTagsArrayOffsetCalc[i]: " << SynchFirstTagsArrayOffsetCalc[i] << endl;
 		cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
-		cout << "QPLA::ChOffsetCorrection: " << ChOffsetCorrection << endl;
 		cout << "QPLA::SynchCalcValuesArrayAux[i]: " << SynchCalcValuesArrayAux[i] << endl;
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
