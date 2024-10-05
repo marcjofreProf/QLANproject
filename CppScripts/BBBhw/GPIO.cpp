@@ -633,7 +633,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestCoincidenceWhileWait,NULL); // Synch barrier. So that SendTriggerSignals and ReadTimeStamps of the different nodes coincide
 
 	// From this point below, the timming is very critical to have long time synchronziation stability!!!!
-	this->TimePointClockTagPRUinitial=Clock::now()+std::chrono::nanoseconds(2*TimePRUcommandDelay);// Crucial to make the link between PRU clock and system clock (already well synchronized). Two memory mapping to PRU
+	this->TimePointClockTagPRUinitial=this->QPLAFutureTimePoint+std::chrono::nanoseconds(2*TimePRUcommandDelay);// Crucial to make the link between PRU clock and system clock (already well synchronized). Two memory mapping to PRU
 	// Atenttion, since Histogram analysis has effectively 4 times the SynchTrigPeriod, for the SynchRem this period is multiplied by 4!!! It will have to be removed
 	SynchRem=static_cast<int>((static_cast<long double>(1.5*MultFactorEffSynchPeriod*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));// For time stamping it waits 1.5
 	TimePointClockTagPRUinitial=TimePointClockTagPRUinitial+std::chrono::nanoseconds(SynchRem);
@@ -734,7 +734,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestCoincidenceWhileWait,NULL); // Synch barrier. So that SendTriggerSignals and ReadTimeStamps of the different nodes coincide
 
 	// From this point below, the timming is very critical to have long time synchronziation stability!!!!
-	this->TimePointClockTagPRUinitial=Clock::now()+std::chrono::nanoseconds(2*TimePRUcommandDelay);// Since two memory mapping to PRU memory
+	this->TimePointClockTagPRUinitial=this->QPLAFutureTimePoint+std::chrono::nanoseconds(2*TimePRUcommandDelay);// Since two memory mapping to PRU memory
 	// Atenttion, since Histogram analysis has effectively 4 times the SynchTrigPeriod, for the SynchRem this period is multiplied by 4!!! It will have to be removed
 	SynchRem=static_cast<int>((static_cast<long double>(1.5*MultFactorEffSynchPeriod*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 	this->TimePointClockTagPRUinitial=this->TimePointClockTagPRUinitial+std::chrono::nanoseconds(SynchRem);
