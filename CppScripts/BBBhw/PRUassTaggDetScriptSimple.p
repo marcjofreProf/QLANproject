@@ -38,7 +38,6 @@
 // r6 reserved because detected channels are concatenated with r5 in the write to SHARED RAM
 // r7 reserved for 0 value (zeroing registers)
 // r8 reserved for cycle count final threshold reset
-// r9 reserved for offset correction
 
 // r10 is arbitrary used for operations
 
@@ -55,8 +54,6 @@
 // r19 might be used for some intermediate operations
 
 // r20 reserved for exit counter
-
-// r21 reserved for storing the periodically updated offset value
 
 //// If using IET timer (potentially adjusted to synchronization protocols)
 // We can use Constant table pointers C26
@@ -117,14 +114,12 @@ INITIATIONS:// This is only run once
 	LDI	r7, 0 // Register for clearing other registers
 	// Initiate to zero for counters of skew and offset
 	LDI	r8, 0
-	LDI	r9, 0
 	MOV	r14, 0xFFFFFFFF
 	MOV	r11, 0xC000C0FF // detection mask. Bits might be moved out of position
 	LDI	r17, 0
 	LDI	r18, 0
 	LDI	r19, 0
 	MOV r20, EXITCOUNTER // Maximum value to start with to exit if nothing happens
-	LDI r21, 0 // initial value
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -181,29 +176,35 @@ CMDSEL:// Identify the command number to generate the mask of interest for check
 	QBEQ	QUADDET7, r0.b0, 7 // 7 command is detect signals first, second and third (all) lower quad group channel
 QUADDET7:
 	MOV		r11, 0xC000C0FF // detection mask
-	JMP		PSEUDOSYNCH
+	JMP		PERIODICOFFSET
 QUADDET6:
 	MOV		r11, 0xC000C0F0 // detection mask
-	JMP		PSEUDOSYNCH
+	JMP		PERIODICOFFSET
 QUADDET5:
 	MOV		r11, 0xC000C08D // detection mask
-	JMP		PSEUDOSYNCH
+	JMP		PERIODICOFFSET
 QUADDET4:
 	MOV		r11, 0xC000C000 // detection mask
-	JMP		PSEUDOSYNCH
+	JMP		PERIODICOFFSET
 QUADDET3:
 	MOV		r11, 0x000000FF // detection mask
-	JMP		PSEUDOSYNCH
+	JMP		PERIODICOFFSET
 QUADDET2:
 	MOV		r11, 0x0000008D // detection mask
-	JMP		PSEUDOSYNCH
+	JMP		PERIODICOFFSET
 QUADDET1:
 	MOV		r11, 0x00000072 // detection mask
-	JMP		PSEUDOSYNCH
+	JMP		PERIODICOFFSET
+PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
+	LBCO	r0, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
+	LSR 	r0, r0, 1 // Divide by 2 since the loop consumes to at each iteration
+	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
+PERIODICOFFSETLOOP:
+	SUB		r0, r0, 1
+	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
 PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to receiving at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering through an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	// Read the number of RECORDS from positon 0 of PRU1 DATA RAM and stored it
-	LBCO	r10, CONST_PRUDRAM, 8, 4 // Read from PRU RAM offset signal period
-	LBCO	r9, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction
+	LBCO	r10, CONST_PRUDRAM, 8, 4 // Read from PRU RAM offset signal period	
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	SUB		r3, r10, 1 // Generate the value for r3 from r10
 	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
@@ -214,15 +215,15 @@ PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first be
 PSEUDOSYNCHLOOP:
 	SUB		r0, r0, 1
 	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
-PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
-	LBCO	r21, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
-	LSR 	r0, r21, 1 // Divide by 2 since the loop consumes to at each iteration
-	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
-PERIODICOFFSETLOOP:
+TIMEOFFSETADJ: // Neutralizing sender/emitter synch offset	
+	LBCO	r0, CONST_PRUDRAM, 20, 4 // Read from PRU RAM offset correction
+	LSR		r0, r0, 1// Divide by two because the TIMEOFFSETADJLOOP consumes double
+	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+TIMEOFFSETADJLOOP:
 	SUB		r0, r0, 1
-	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
+	QBNE	TIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
 FINETIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
-	MOV		r0, r9 // For security work with register r0
+	LBCO	r0, CONST_PRUDRAM, 12, 4 // Read from PRU RAM rel. freq. diff. correction
 	LSR		r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
 	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
 FINETIMEOFFSETADJLOOP:

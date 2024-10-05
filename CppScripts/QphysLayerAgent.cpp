@@ -552,7 +552,7 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
 
  //cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
- this->FutureTimePoint=this->FutureTimePoint+std::chrono::nanoseconds(TimePointMarginGPIOTrigTagQubits);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO
+ this->FutureTimePoint=this->FutureTimePoint+std::chrono::nanoseconds(4*TimePointMarginGPIOTrigTagQubits);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
  auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
 unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin 
@@ -866,7 +866,7 @@ if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to
 	//	CurrentSynchNetworkParamsLink[0]=fmod(MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][0],MultFactorEffSynchPeriodQPLA*dHistPeriodicityAux)-MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux;// Offset
 	//}
 	// Maybe the offset should no be transformed
-	CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];
+	CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0]; // Synch offset
 	if (SynchNetworkParamsLink[CurrentSpecificLink][1]<0.0){
 		CurrentSynchNetworkParamsLink[1]=(-(fmod(-dHistPeriodicityHalfAux-SynchNetworkParamsLink[CurrentSpecificLink][1],dHistPeriodicityAux)+dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	}
@@ -905,7 +905,7 @@ else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has 
 	//	CurrentExtraSynchNetworkParamsLink[0]=fmod(MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0],MultFactorEffSynchPeriodQPLA*dHistPeriodicityAux)-MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux;// Offset
 	//}
 	// Maybe the offset does not have to be transformed
-	CurrentExtraSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0];
+	CurrentExtraSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0];// Synch offset
 	if (SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1]<0.0){
 		CurrentExtraSynchNetworkParamsLink[1]=(-(fmod(-dHistPeriodicityHalfAux-SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)+dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	}
@@ -968,7 +968,7 @@ int QPLA::ThreadSimulateReceiveQubit(){
 	// Start measuring
 	 //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
 
-	 this->FutureTimePoint=this->FutureTimePoint+std::chrono::nanoseconds(TimePointMarginGPIOTrigTagQubits);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO)
+	 this->FutureTimePoint=this->FutureTimePoint+std::chrono::nanoseconds(4*TimePointMarginGPIOTrigTagQubits);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
 	 auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 	// Convert duration to desired time
 	unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin

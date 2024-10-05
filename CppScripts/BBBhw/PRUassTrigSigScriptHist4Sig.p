@@ -69,7 +69,6 @@
 // r5 reserved for delay count
 // r6 reserved for half period of delay module
 // r7 reserved for period of delay module
-// r8 reserved for fine adjustment delay
 // r9 reserved for DELAY value
 
 // r10 is arbitrary used for operations
@@ -78,7 +77,6 @@
 // r12 is reserved for emitting state 3 and 4 (w0 and w1)
 
 // r13 is reserved for enabling IEP counter
-// r14 is reserved for storing the periodically updated offset value
 
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
@@ -130,7 +128,6 @@ INITIATIONS:
 	MOV	r1, NUM_REPETITIONS// Initial initialization jus tin case// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
 	MOV	r6, DELAYHALFMODULE
 	MOV	r7, DELAYMODULE
-	LDI	r8, 0 // Fine extra offset
 	LDI	r0, 0 // Ensure reset commands
 	LDI	r9, DELAY
 	
@@ -148,7 +145,6 @@ CMDLOOP2:// Double verification of host sending start command
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction	
 	// Read the number of NUM_REPETITIONS from positon 0 of PRU1 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 4, 4 // Load number of repetitons of the signal
-	LBCO	r8, CONST_PRUDRAM, 8, 4 // Load from PRU RAM position the extra delay
 	LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction or sequence signal period
 	SBCO	r4.b0, CONST_PRUDRAM, 0, 1 // We remove the command from the host (in case there is a reset from host, we are saved) 1 bytes.	
 	//MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Here send interrupt to host to measure time
@@ -204,37 +200,40 @@ PERIODICTIMESYNCHSUB: // with command coded 8 means synch by reseting the IEP ti
 QUADEMT7:
 	MOV	r11, 0x02220111
 	MOV	r12, 0x08880444
-	JMP	PSEUDOSYNCH
+	JMP	PERIODICOFFSET
 QUADEMT6:
 	MOV	r11, 0x02200110
 	MOV	r12, 0x08800440
-	JMP	PSEUDOSYNCH
+	JMP	PERIODICOFFSET
 QUADEMT5:
 	MOV	r11, 0x02020101
 	MOV	r12, 0x08080404
-	JMP	PSEUDOSYNCH
+	JMP	PERIODICOFFSET
 QUADEMT4:
 	MOV	r11, 0x02000100
 	MOV	r12, 0x08000400
-	JMP	PSEUDOSYNCH
+	JMP	PERIODICOFFSET
 QUADEMT3:
 	MOV	r11, 0x00220011
 	MOV	r12, 0x00880044
-	JMP	PSEUDOSYNCH
+	JMP	PERIODICOFFSET
 QUADEMT2:
 	MOV	r11, 0x00200010
 	MOV	r12, 0x00800040
-	JMP	PSEUDOSYNCH
+	JMP	PERIODICOFFSET
 QUADEMT1:
 	MOV	r11, 0x00020001
 	MOV	r12, 0x00080004
-	JMP	PSEUDOSYNCH
+	JMP	PERIODICOFFSET
+PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
+	LBCO	r0, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
+	LSR 	r0, r14, 1 // Divide by 2 since the loop consumes to at each iteration
+	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
+PERIODICOFFSETLOOP:
+	SUB		r0, r0, 1
+	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
 PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
-	// Since there is a dead period betwen pulses (to do management), divide the period by 2
-	LSR	r9, r7, 1	
-	// Compute DELAY value
-	SUB	r9, r9, 4
-	LSR	r9, r9, 1
+	MOV r9, r7
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	// Since this script produces a sequence of four different values, we need to multiply the period by 4 to have the effective period for this script
 	LSL	r7, r7, 2 // Specific of this script because analysing a signal with an effective period 4 times the original period
@@ -248,22 +247,28 @@ PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first be
 	LSR	r0, r0, 1// Divide by two because the PSEUDOSYNCHLOOP consumes double
 	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
 PSEUDOSYNCHLOOP:
-	SUB	r0, r0, 1
+	SUB		r0, r0, 1
 	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
-PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
-	LBCO	r14, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
-	LSR 	r0, r14, 1 // Divide by 2 since the loop consumes to at each iteration
-	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
-PERIODICOFFSETLOOP:
-	SUB	r0, r0, 1
-	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
+TIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
+	LBCO	r0, CONST_PRUDRAM, 20, 4 // Load from PRU RAM position the extra delay
+	LSR		r0, r0, 1// Divide by two because the TIMEOFFSETADJLOOP consumes double
+	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+TIMEOFFSETADJLOOP:
+	SUB		r0, r0, 1
+	QBNE	TIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
 FINETIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
-	MOV	r0, r8 // For security work with register r0
+	LBCO	r0, CONST_PRUDRAM, 8, 4 // Load from PRU RAM position the extra delay
 	LSR	r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
 	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
 FINETIMEOFFSETADJLOOP:
 	SUB	r0, r0, 1
 	QBNE	FINETIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
+MANAGECALC:
+	// Since there is a dead period betwen pulses (to do management), divide the period by 2
+	LSR	r9, r9, 1	
+	// Compute DELAY value
+	SUB	r9, r9, 4
+	LSR	r9, r9, 1
 //BASICPSEUDOSYNCH:
 //	AND	r0, r0, 0x07 // Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) we can get a value between 0 and 7
 //	QBEQ	SIGNALON1, r0.b0, 7 // Coincides with a 7
