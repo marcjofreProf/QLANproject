@@ -237,7 +237,7 @@ PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first be
 	LSR	r9, r9, 1
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	// Since this script produces a sequence of four different values, we need to multiply the period by 4 to have the effective period for this script
-//	LSL	r7, r7, 2 // Specific of this script because analysing a signal with an effective period 4 times the original period
+	LSL	r7, r7, 2 // Specific of this script because analysing a signal with an effective period 4 times the original period
 	//
 	SUB	r6, r7, 1 // Generate the value for r6
 	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
