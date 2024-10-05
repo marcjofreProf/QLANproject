@@ -358,18 +358,16 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 
-				if (((this->iIterPRUcurrentTimerValSynch<NumSynchMeasAvgAux) and abs(PRUoffsetDriftErrorAbs)>ApproxInterruptTime) or (this->iIterPRUcurrentTimerValSynch<static_cast<unsigned long long int>(NumSynchMeasAvgAux/2))){// Initially compute the time for interrupt handling
+				if (((this->iIterPRUcurrentTimerValSynch<NumSynchMeasAvgAux) and abs(duration_FinalInitialMeasTrigAuxAvg)>ApproxInterruptTime) or (this->iIterPRUcurrentTimerValSynch<static_cast<unsigned long long int>(NumSynchMeasAvgAux/2))){// Initially compute the time for interrupt handling
 					//int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future).count());
 					int duration_FinalInitialMeasTrig=static_cast<int>(this->PRUcurrentTimerValWrap)-static_cast<int>(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));// static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future).count());
 					cout << "GPIO::duration_FinalInitialMeasTrig: " << duration_FinalInitialMeasTrig << endl;
-					cout << "GPIO::PRUoffsetDriftErrorAbs: " << PRUoffsetDriftErrorAbs << endl;
 					duration_FinalInitialCountAux=static_cast<double>(duration_FinalInitialMeasTrig);
 					
 					// Below for the triggering
 					this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 					this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,static_cast<int>(this->iIterPRUcurrentTimerValSynch));
 					cout << "GPIO::duration_FinalInitialMeasTrigAuxAvg: " << duration_FinalInitialMeasTrigAuxAvg << endl;
-					cout << "GPIO::PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << endl;
 					if (this->duration_FinalInitialMeasTrigAuxAvg>ApproxInterruptTime){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
 						//cout << "Time for pre processing the time barrier is too long " << this->duration_FinalInitialDriftAuxArrayAvg << " ...adjust TimeClockMarging! Set to nominal value of 5000..." << endl;
 						this->duration_FinalInitialMeasTrigAuxAvg=ApproxInterruptTime;// For the time being adjust it to the nominal initial value
@@ -409,12 +407,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//this->PRUoffsetDriftErrorAbs=this->PRUoffsetDriftErrorAbs*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(1000000000);
 					// Absolute corrected error
 					this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
-					if (this->iIterPRUcurrentTimerValSynch<NumSynchMeasAvgAux){
-						this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,static_cast<int>(this->iIterPRUcurrentTimerValSynch));// Since we are applying a filter of length NumSynchMeasAvgAux, temporally it effects somehow the longer the filter. Altough it is difficult to correct
-					}
-					else{
-						this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,NumSynchMeasAvgAux);// Since we are applying a filter of length NumSynchMeasAvgAux, temporally it effects somehow the longer the filter. Altough it is difficult to correct
-					}
+					this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,NumSynchMeasAvgAux);// Since we are applying a filter of length NumSynchMeasAvgAux, temporally it effects somehow the longer the filter. Altough it is difficult to correct
 				}
 				else{ // Frequency synchronization correction
 					// Compute error - Relative correction of the frequency difference			
@@ -593,9 +586,9 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 	
 	// Important check to do
-	if (duration_FinalInitialMeasTrigAuxAvg>static_cast<int>(ApproxInterruptTime)){
+	if (duration_FinalInitialMeasTrigAuxAvg>ApproxInterruptTime){
 		cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay! Set to nominal value of " << static_cast<int>(ApproxInterruptTime) << "..." << endl;
-		this->duration_FinalInitialMeasTrigAuxAvg=static_cast<int>(ApproxInterruptTime);// For the time being adjust it to the nominal initial value
+		this->duration_FinalInitialMeasTrigAuxAvg=ApproxInterruptTime;// For the time being adjust it to the nominal initial value
 	}
 	this->ManualSemaphore=false;
 	this->ManualSemaphoreExtra=false;
@@ -715,9 +708,9 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
 	
 	// Important check to do
-	if (duration_FinalInitialMeasTrigAuxAvg>static_cast<int>(ApproxInterruptTime)){
+	if (duration_FinalInitialMeasTrigAuxAvg>ApproxInterruptTime){
 		cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay! Set to nominal value of " << static_cast<int>(ApproxInterruptTime) << "..." << endl;
-		this->duration_FinalInitialMeasTrigAuxAvg=static_cast<int>(ApproxInterruptTime);// For the time being adjust it to the nominal initial value
+		this->duration_FinalInitialMeasTrigAuxAvg=ApproxInterruptTime;// For the time being adjust it to the nominal initial value
 	}
 	this->ManualSemaphore=false;
 	this->ManualSemaphoreExtra=false;

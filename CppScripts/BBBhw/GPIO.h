@@ -52,7 +52,7 @@ private:// Variables
 	std::atomic<bool> ManualSemaphoreExtra=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=4; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
-	long long int ApproxInterruptTime=5000; // Typical time of interrupt time duration
+	int ApproxInterruptTime=5000; // Typical time of interrupt time duration
 	int NumSynchMeasAvgAux=51;//51; // Num averages to compute the time error. Better to be odd number.
 	int ExtraNumSynchMeasAvgAux=NumSynchMeasAvgAux; // More averaging for computing interrupts access time. VEry critical
 	unsigned int NextSynchPRUcommand=11;// set initially to NextSynchPRUcorrection=0
@@ -131,7 +131,7 @@ private:// Variables
 	double duration_FinalInitialCountAuxArrayAvg=0.0;
 	//int duration_FinalInitialMeasTrigAux=0;
 	int duration_FinalInitialMeasTrigAuxArray[MaxNumPulses]={0};
-	int duration_FinalInitialMeasTrigAuxAvg=static_cast<int>(ApproxInterruptTime);// Typical value around 5000
+	int duration_FinalInitialMeasTrigAuxAvg=0;
 	unsigned long long int TrigAuxIterCount=0;
 	// Trigger Signal and Timetagging methods
 	int SynchRem=0;
