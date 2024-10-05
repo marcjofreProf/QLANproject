@@ -552,7 +552,6 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
  //exploringBB::GPIO outGPIO=exploringBB::GPIO(this->EmitLinkNumberArray[0]); // GPIO number is calculated by taking the GPIO chip number, multiplying it by 32, and then adding the offset. For example, GPIO1_12=(1X32)+12=GPIO 44.
 
  //cout << "Start Emiting Qubits" << endl;// For less time jitter this line should be commented
- this->FutureTimePoint=this->FutureTimePoint+std::chrono::nanoseconds(4*TimePointMarginGPIOTrigTagQubits);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
  auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 // Convert duration to desired time
 unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin 
@@ -966,10 +965,9 @@ int QPLA::ThreadSimulateReceiveQubit(){
 	//cout << "Start Receiving Qubits" << endl;// This line should be commented to reduce the time jitter
 
 	// Start measuring
-	 //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
+	//exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
 
-	 this->FutureTimePoint=this->FutureTimePoint+std::chrono::nanoseconds(4*TimePointMarginGPIOTrigTagQubits);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
-	 auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
+	auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 	// Convert duration to desired time
 	unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin
 	for (iIterRuns=0;iIterRuns<DetRunsCount;iIterRuns++){	

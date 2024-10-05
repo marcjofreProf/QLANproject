@@ -613,6 +613,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 /////////////
 	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
+	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(4*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
 	SynchTrigPeriod=SynchTrigPeriodAux;// Histogram/Period value
 	NumQuBitsPerRun=NumQuBitsPerRunAux;
 	valpAuxHolder=valpHolder+4+6*NumQuBitsPerRun;// 6* since each detection also includes the channels (2 Bytes) and 4 bytes for 32 bits counter, and plus 4 since the first tag is captured at the very beggining
@@ -730,6 +731,7 @@ return 0;// all ok
 int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
+	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(4*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
 	SynchTrigPeriod=SynchTrigPeriodAux;// Histogram/Period value
 	NumberRepetitionsSignal=static_cast<unsigned int>(NumberRepetitionsSignalAux);// Number of repetitions to send signals
 	AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
