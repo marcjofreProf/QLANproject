@@ -361,7 +361,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 
 				if ((this->iIterPRUcurrentTimerValSynch<static_cast<long long int>(NumSynchMeasAvgAux) and abs(duration_FinalInitialMeasTrig)>ApproxInterruptTime) or this->iIterPRUcurrentTimerValSynch<static_cast<long long int>(NumSynchMeasAvgAux/2)){// Initially compute the time for interrupt handling
 					//int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future).count());
-					duration_FinalInitialMeasTrig=static_cast<int>(this->PRUcurrentTimerValWrap)-static_cast<int>(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));// static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future).count());
+					if (this->iIterPRUcurrentTimerValSynch<static_cast<long long int>(NumSynchMeasAvgAux) and abs(duration_FinalInitialMeasTrig)>ApproxInterruptTime){
+						duration_FinalInitialMeasTrig=static_cast<int>(this->PRUcurrentTimerValWrap)-static_cast<int>(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));// static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future).count());
+					}
+					else{
+						duration_FinalInitialMeasTrig=static_cast<int>(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap)-static_cast<int>(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));
+					}
 					cout << "GPIO::duration_FinalInitialMeasTrig: " << duration_FinalInitialMeasTrig << endl;
 					duration_FinalInitialCountAux=static_cast<double>(duration_FinalInitialMeasTrig);
 					
