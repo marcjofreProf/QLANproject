@@ -362,14 +362,13 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				if ((this->iIterPRUcurrentTimerValSynch<static_cast<long long int>(NumSynchMeasAvgAux) and abs(duration_FinalInitialMeasTrig)>(ApproxInterruptTime/2)) or this->iIterPRUcurrentTimerValSynch<static_cast<long long int>(NumSynchMeasAvgAux/2)){// Initially compute the time for interrupt handling
 					//int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future).count());
 					duration_FinalInitialMeasTrig=static_cast<int>(this->PRUcurrentTimerValWrap)-static_cast<int>(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));// static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future).count());
-
-					cout << "GPIO::duration_FinalInitialMeasTrig: " << duration_FinalInitialMeasTrig << endl;
+					//cout << "GPIO::duration_FinalInitialMeasTrig: " << duration_FinalInitialMeasTrig << endl;
 					duration_FinalInitialCountAux=static_cast<double>(duration_FinalInitialMeasTrig);
 					
 					// Below for the triggering
 					this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 					this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,static_cast<int>(this->iIterPRUcurrentTimerValSynch));
-					cout << "GPIO::duration_FinalInitialMeasTrigAuxAvg: " << duration_FinalInitialMeasTrigAuxAvg << endl;
+					//cout << "GPIO::duration_FinalInitialMeasTrigAuxAvg: " << duration_FinalInitialMeasTrigAuxAvg << endl;
 					if (this->duration_FinalInitialMeasTrigAuxAvg>ApproxInterruptTime){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
 						//cout << "Time for pre processing the time barrier is too long " << this->duration_FinalInitialDriftAuxArrayAvg << " ...adjust TimeClockMarging! Set to nominal value of 5000..." << endl;
 						this->duration_FinalInitialMeasTrigAuxAvg=ApproxInterruptTime;// For the time being adjust it to the nominal initial value
@@ -571,7 +570,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	//this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 	//this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
 	//this->TrigAuxIterCount++;
-	
+	/*
 	cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 	long double AccumulatedErrorDriftEvolved=static_cast<long double>((1.0/64.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
 	cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
@@ -586,7 +585,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	////cout << "SynchRem: " << SynchRem << endl;
 	cout << "this->AdjPulseSynchCoeffAverage: " << this->AdjPulseSynchCoeffAverage << endl;
 	cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
-	
+	*/
 	// Important check to do
 	if (duration_FinalInitialMeasTrigAuxAvg>ApproxInterruptTime){
 		cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay! Set to nominal value of " << static_cast<int>(ApproxInterruptTime) << "..." << endl;
@@ -693,7 +692,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 	//this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
 	//this->TrigAuxIterCount++;
-	
+	/*
 	cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 	long double AccumulatedErrorDriftEvolved=static_cast<long double>((1.0/64.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
 	cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
@@ -708,7 +707,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	////cout << "SynchRem: " << SynchRem << endl;
 	cout << "this->AdjPulseSynchCoeffAverage: " << this->AdjPulseSynchCoeffAverage << endl;
 	cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
-	
+	*/
 	// Important check to do
 	if (duration_FinalInitialMeasTrigAuxAvg>ApproxInterruptTime){
 		cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay! Set to nominal value of " << static_cast<int>(ApproxInterruptTime) << "..." << endl;
