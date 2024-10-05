@@ -968,7 +968,7 @@ int QPLA::ThreadSimulateReceiveQubit(){
 	// Start measuring
 	 //exploringBB::GPIO inGPIO=exploringBB::GPIO(this->ReceiveLinkNumberArray[0]); // Receiving GPIO. Of course gnd have to be connected accordingly.
 
-	 this->FutureTimePoint=this->FutureTimePoint+std::chrono::nanoseconds(TimePointMarginGPIOTrigTagQubits);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once
+	 this->FutureTimePoint=this->FutureTimePoint+std::chrono::nanoseconds(TimePointMarginGPIOTrigTagQubits);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO)
 	 auto duration_since_epochFutureTimePoint=FutureTimePoint.time_since_epoch();
 	// Convert duration to desired time
 	unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin
@@ -1520,7 +1520,11 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	long long int ChOffsetCorrection=0;// Variable to acomodate the 4 different channels in the periodic histogram analysis
 	for (int i=0;i<NumRunsPerCenterMass;i++){
 		ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a states
-		SynchCalcValuesArrayAux[i]=static_cast<double>((-SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux));// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		SynchCalcValuesArrayAux[i]=-static_cast<double>((SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux));// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+		cout << "QPLA::SynchFirstTagsArrayOffsetCalc[i]: " << SynchFirstTagsArrayOffsetCalc[i] << endl;
+		cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
+		cout << "QPLA::ChOffsetCorrection: " << ChOffsetCorrection << endl;
+		cout << "QPLA::SynchCalcValuesArrayAux[i]: " << SynchCalcValuesArrayAux[i] << endl;
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
