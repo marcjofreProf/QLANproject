@@ -168,10 +168,10 @@ CMDSEL:
 	QBEQ	PERIODICTIMESYNCHSET, r0.b0, 11 // 11 command is measure IEP timer set synch
 PERIODICTIMESYNCHSET: // with command coded 11 means setting synch	
 	SBCO	r4.b0, CONST_IETREG, 0, 1 // Stop the counter
+	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
 	SBCO	r7, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	SBCO	r13.b0, CONST_IETREG, 0, 1 // Enable the counter
-//	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
-	SBCO	r7, CONST_PRUDRAM, 8, 4 //SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
+	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP		CMDLOOP
@@ -204,38 +204,31 @@ PERIODICTIMESYNCHSUB: // with command coded 8 means synch by reseting the IEP ti
 QUADEMT7:
 	MOV	r11, 0x02220111
 	MOV	r12, 0x08880444
-	JMP	PERIODICOFFSET
+	JMP	PSEUDOSYNCH
 QUADEMT6:
 	MOV	r11, 0x02200110
 	MOV	r12, 0x08800440
-	JMP	PERIODICOFFSET
+	JMP	PSEUDOSYNCH
 QUADEMT5:
 	MOV	r11, 0x02020101
 	MOV	r12, 0x08080404
-	JMP	PERIODICOFFSET
+	JMP	PSEUDOSYNCH
 QUADEMT4:
 	MOV	r11, 0x02000100
 	MOV	r12, 0x08000400
-	JMP	PERIODICOFFSET
+	JMP	PSEUDOSYNCH
 QUADEMT3:
 	MOV	r11, 0x00220011
 	MOV	r12, 0x00880044
-	JMP	PERIODICOFFSET
+	JMP	PSEUDOSYNCH
 QUADEMT2:
 	MOV	r11, 0x00200010
 	MOV	r12, 0x00800040
-	JMP	PERIODICOFFSET
+	JMP	PSEUDOSYNCH
 QUADEMT1:
 	MOV	r11, 0x00020001
 	MOV	r12, 0x00080004
-	JMP	PERIODICOFFSET
-PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
-	LBCO	r14, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
-	LSR 	r0, r14, 1 // Divide by 2 since the loop consumes to at each iteration
-	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
-PERIODICOFFSETLOOP:
-	SUB	r0, r0, 1
-	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
+	JMP	PSEUDOSYNCH
 PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	// Since there is a dead period betwen pulses (to do management), divide the period by 2
 	LSR	r9, r7, 1	
@@ -257,6 +250,13 @@ PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first be
 PSEUDOSYNCHLOOP:
 	SUB	r0, r0, 1
 	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
+PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
+	LBCO	r14, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
+	LSR 	r0, r14, 1 // Divide by 2 since the loop consumes to at each iteration
+	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
+PERIODICOFFSETLOOP:
+	SUB	r0, r0, 1
+	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
 FINETIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
 	MOV	r0, r8 // For security work with register r0
 	LSR	r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
