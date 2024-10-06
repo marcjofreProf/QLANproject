@@ -368,7 +368,9 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,static_cast<int>(this->iIterPRUcurrentTimerValSynch));
 					//cout << "GPIO::duration_FinalInitialMeasTrigAuxAvg: " << duration_FinalInitialMeasTrigAuxAvg << endl;
 					if (this->duration_FinalInitialMeasTrigAuxAvg>ApproxInterruptTime){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
-						cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay! Set to nominal value of " << static_cast<int>(ApproxInterruptTime) << "..." << endl;
+						if (this->iIterPRUcurrentTimerValSynch>static_cast<long long int>(NumSynchMeasAvgAux/2)){
+							cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay! Set to nominal value of " << static_cast<int>(ApproxInterruptTime) << "..." << endl;
+						}
 						this->duration_FinalInitialMeasTrigAuxAvg=ApproxInterruptTime;// For the time being adjust it to the nominal initial value
 					}				
 					// Below for synch calculation compensation
@@ -564,11 +566,6 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	//  PRU long execution making sure that notification interrupts do not overlap
 	retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
 
-	// Better to not update the time to trig with this since the interrupt is different
-	//int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUfinal-TimePointClockTagPRUinitial).count());
-	//this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
-	//this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,ExtraNumSynchMeasAvgAux);
-	//this->TrigAuxIterCount++;
 	/*
 	cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 	long double AccumulatedErrorDriftEvolved=static_cast<long double>((1.0/64.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
@@ -778,14 +775,11 @@ valpAux++;// 1 times 16 bits
 OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
 //cout << "OldLastTimeTagg: " << OldLastTimeTagg << endl;
 
-// Slot the TimeTaggsLast
-//this->TimeTaggsLast=static_cast<unsigned long long int>(ceil((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))/static_cast<long double>(SynchTrigPeriod))*static_cast<long double>(SynchTrigPeriod));
-
-// Since PRUclockStepPeriodNanoseconds and SynchTrigPeriod are whole numbers (+1 because it supossedly runs a whole period in the assembler code)
-this->TimeTaggsLast=static_cast<unsigned long long int>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/(static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds)*static_cast<unsigned long long int>(SynchTrigPeriod))+1)*static_cast<unsigned long long int>(SynchTrigPeriod));
+// Slot the TimeTaggsLast, since it eventually has to start at the beggining of the effective period
+this->TimeTaggsLast=(static_cast<unsigned long long int>(static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds))/static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod))*static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod);
 
 //Furthermore, remove some time from epoch - in multiples of the SynchTrigPeriod, so it is easier to handle in the above agents
-this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsLast)-static_cast<long long int>((this->ULLIEpochReOffset/static_cast<unsigned long long int>(SynchTrigPeriod))*static_cast<unsigned long long int>(SynchTrigPeriod)));
+this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsLast)-static_cast<long long int>((this->ULLIEpochReOffset/static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod))*static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 
 if (iIterRunsAux==0){this->TimeTaggsLastStored=this->TimeTaggsLast;TotalCurrentNumRecords=0;}// First iteration of current runs, store the value for synchronization time difference calibration
 
