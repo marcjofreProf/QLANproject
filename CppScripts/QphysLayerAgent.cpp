@@ -1525,7 +1525,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	}
 	
 	// The SynchNetAdjAux is a value around 2.0, generally
-	double SynchNetAdjAux=(64.0/SynchTimeTaggRefMedianAux); // Adjustment value consisting of the 64.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
+	double SynchNetAdjAux=(8.0/SynchTimeTaggRefMedianAux); // Adjustment value consisting of the 8.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
 	
 	SynchCalcValuesArray[2]=SynchCalcValuesArray[2]*dHistPeriodicityAux; // Normalized frequency difference to the histogram period
 

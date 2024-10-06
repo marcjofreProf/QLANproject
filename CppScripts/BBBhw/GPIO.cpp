@@ -514,14 +514,15 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and it is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures
 	// The Absolute error is introduced at each signal trigger and timetagging sequence
-	if (abs(PRUoffsetDriftErrorAbsAvg)>PRUoffsetDriftErrorAbsAvgMax){
-		cout << "GPIO::PRUoffsetDriftErrorAbsAvg magnitude is too large: " << PRUoffsetDriftErrorAbsAvg << "Increase PRUoffsetDriftErrorAbsAvgMax." << endl;
+	double dPRUoffsetDriftErrorAvg=static_cast<double>(static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(SynchTrigPeriod)));
+	if (abs(PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg)>PRUoffsetDriftErrorAbsAvgMax){
+		cout << "GPIO::PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg magnitude is too large: " << PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg << "Increase PRUoffsetDriftErrorAbsAvgMax." << endl;
 	}
-	if (this->PRUoffsetDriftErrorAbsAvg<0.0){
-		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax-fmod(-this->PRUoffsetDriftErrorAbsAvg,PRUoffsetDriftErrorAbsAvgMax);
+	if ((PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg)<0.0){
+		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax-fmod(-(PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg),PRUoffsetDriftErrorAbsAvgMax);
 	}
 	else{
-		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+fmod(this->PRUoffsetDriftErrorAbsAvg,PRUoffsetDriftErrorAbsAvgMax);
+		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+fmod((PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg),PRUoffsetDriftErrorAbsAvgMax);
 	}
 	pru0dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	// The synch offset
@@ -548,7 +549,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
 	// The relative frequency difference is not module over MultFactorEffSynchPeriod, since its value is computed over the original synch period
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/64.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds)/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod))+static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds)/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod)));
-	InstantCorr=static_cast<long long int>((static_cast<long double>((1.0/64.0)*AccumulatedErrorDrift)+static_cast<long double>(PRUoffsetDriftErrorAvg))*static_cast<long double>(SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(SynchTrigPeriod)));
+	InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/8.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(SynchTrigPeriod)));
 
 	if (InstantCorr>0){SignAuxInstantCorr=1;}
 	else if (InstantCorr<0){SignAuxInstantCorr=-1;}
@@ -569,7 +570,6 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 
 	/*
 	cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
-	long double AccumulatedErrorDriftEvolved=static_cast<long double>((1.0/64.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
 	cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
 	cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 	cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
@@ -625,14 +625,15 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 	// The Absolute error is introduced at each signal trigger and timetagging sequence
-	if (abs(PRUoffsetDriftErrorAbsAvg)>PRUoffsetDriftErrorAbsAvgMax){
-		cout << "GPIO::PRUoffsetDriftErrorAbsAvg magnitude is to large: " << PRUoffsetDriftErrorAbsAvg << "Increase PRUoffsetDriftErrorAbsAvgMax." << endl;
+	double dPRUoffsetDriftErrorAvg=static_cast<double>(static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(SynchTrigPeriod)));
+	if (abs(PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg)>PRUoffsetDriftErrorAbsAvgMax){
+		cout << "GPIO::PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg magnitude is too large: " << PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg << "Increase PRUoffsetDriftErrorAbsAvgMax." << endl;
 	}
-	if (this->PRUoffsetDriftErrorAbsAvg<0.0){
-		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax-fmod(-this->PRUoffsetDriftErrorAbsAvg,PRUoffsetDriftErrorAbsAvgMax);
+	if ((PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg)<0.0){
+		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax-fmod(-(PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg),PRUoffsetDriftErrorAbsAvgMax);
 	}
 	else{
-		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+fmod(this->PRUoffsetDriftErrorAbsAvg,PRUoffsetDriftErrorAbsAvgMax);
+		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+fmod((PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg),PRUoffsetDriftErrorAbsAvgMax);
 	}
 	pru1dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 
@@ -661,7 +662,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 
 	// The relative frequency difference is not module over MultFactorEffSynchPeriod, since its value is computed over the original synch period
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/64.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds)/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod))+static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds)/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod)));
-	InstantCorr=static_cast<long long int>((static_cast<long double>((1.0/64.0)*AccumulatedErrorDrift)+static_cast<long double>(PRUoffsetDriftErrorAvg))*static_cast<long double>(SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(SynchTrigPeriod)));
+	InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/8.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(SynchTrigPeriod)));
 	
 	if (InstantCorr>0){SignAuxInstantCorr=1;}
 	else if (InstantCorr<0){SignAuxInstantCorr=-1;}
@@ -686,7 +687,6 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 
 	/*
 	cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
-	long double AccumulatedErrorDriftEvolved=static_cast<long double>((1.0/64.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*static_cast<long double>((static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockTagPRUinitial.time_since_epoch()).count())/static_cast<unsigned long long int>(1000000000))%static_cast<unsigned long long int>(SynchTrigPeriod));
 	cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
 	cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 	cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
