@@ -43,6 +43,7 @@ namespace exploringBB {
 //public: //Variables
 
 private:// Variables
+	bool SynchCorrectionTimeFlag=false; // If True, it correct for Time synchronization (more strict, and maybe not needed with synch protocol develop), otherwise it corrects for frequency correction (which variations in frequency whens added pahses and lost phases at the end)
 	bool SlowMemoryPermanentStorageFlag=false; // Variable when true they are stored in a file (slower due to writting and reading) ; otherwise it uses array memory to store qubits (much faster)
 	bool ResetPeriodicallyTimerPRU1=true;// Avoiding interrupts
 	// Semaphore
@@ -59,8 +60,7 @@ private:// Variables
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
 	//unsigned int OffsetSynchPRUBaseCorrection=262144;// Base value from where the synch offset is added or discounted to achieve periodic offset correction
 	double PRUoffsetDriftErrorAbsAvgAux=0.0;
-	//bool IEPtimerPRUreset=false;
-	bool SynchCorrectionTimeFlag=true; // If True, it correct for Time synchronization (more strict, and maybe not needed with synch protocol develop), otherwise it corrects for frequency correction (which variations in frequency whens added pahses and lost phases at the end)
+	//bool IEPtimerPRUreset=false;	
 	// Relative error
 	double PRUoffsetDriftError=0;
 	double PRUoffsetDriftErrorArray[MaxNumPulses]={0};
