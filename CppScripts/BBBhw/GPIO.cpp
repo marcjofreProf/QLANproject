@@ -554,7 +554,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	else if (InstantCorr<0){SignAuxInstantCorr=-1;}
 	else {SignAuxInstantCorr=0;}
 	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(SynchTrigPeriod));
-
+	ldTimePointClockTagPRUinitial=ldTimePointClockTagPRUinitial+static_cast<long double>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Update the value with the rel. freq. adj.
 	pru0dataMem_int[3]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
 	pru0dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command
 
@@ -667,7 +667,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	else if (InstantCorr<0){SignAuxInstantCorr=-1;}
 	else {SignAuxInstantCorr=0;}
 	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(SynchTrigPeriod));
-
+	ldTimePointClockTagPRUinitial=ldTimePointClockTagPRUinitial+static_cast<long double>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Update the value with the rel. freq. adj.
 	pru1dataMem_int[2]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
 
 	pru1dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command. Generate signals. Takes around 900000 clock ticks
@@ -999,7 +999,7 @@ return 0; // all ok
 
 int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int TimeTaggs[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTags[QuadNumChGroups][MaxNumQuBitsMemStored]){
 	if (SlowMemoryPermanentStorageFlag==true){
-	LastTimeTaggRef[0]=0*static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds);// Since whole number. Initiation value
+	LastTimeTaggRef[0]=static_cast<unsigned long long int>(0.0*PRUclockStepPeriodNanoseconds);// Since whole number. Initiation value
 	// Detection tags
 	if (streamDDRpru.is_open()){
 		streamDDRpru.close();	
@@ -1020,7 +1020,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsig
 		streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
 		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 		streamDDRpru.read(reinterpret_cast<char*>(&TimeTaggsLastStored), sizeof(TimeTaggsLastStored));
-		LastTimeTaggRef[0]=TimeTaggsLastStored*static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds);// Since whole number. Initiation value
+		LastTimeTaggRef[0]=static_cast<unsigned long long int>(static_cast<long double>(TimeTaggsLastStored)*static_cast<long double>(PRUclockStepPeriodNanoseconds));// Since whole number. Initiation value
 		int lineCount = 0;
 		unsigned long long int ValueReadTest;		
 		int iIterMovAdjPulseSynchCoeff=0;
@@ -1043,7 +1043,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsig
 	    }
 	}
 else{// Memory allocation
-	LastTimeTaggRef[0]=TimeTaggsLastStored*static_cast<unsigned long long int>(PRUclockStepPeriodNanoseconds);// Since whole number. It is meant for computing the time between measurements to estimate the relative frequency difference. It is for synchronization purposes which generally will be under control so even if it is a multiple adquisiton the itme difference will be mantained so it generally ok.
+	LastTimeTaggRef[0]=static_cast<unsigned long long int>(static_cast<long double>(TimeTaggsLastStored)*static_cast<long double>(PRUclockStepPeriodNanoseconds));// Since whole number. It is meant for computing the time between measurements to estimate the relative frequency difference. It is for synchronization purposes which generally will be under control so even if it is a multiple adquisiton the itme difference will be mantained so it generally ok.
 }
 
 // Correct the detected qubits relative frequency difference (due to the sender node) and split between quad groups of 4 channels
