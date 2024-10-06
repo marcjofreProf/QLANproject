@@ -95,7 +95,7 @@ private:// Variables
 		using rep        = duration::rep;
 		using period     = duration::period;
 		using time_point = std::chrono::time_point<my_clock>;
-	    static constexpr bool is_steady = true;// true, false. With true, much better zeroing of the Absulte time at the beggining
+	    static constexpr bool is_steady = false;// true, false. With true, much better zeroing of the Absulte time at the beggining
 
 	    static time_point now()
 	    {

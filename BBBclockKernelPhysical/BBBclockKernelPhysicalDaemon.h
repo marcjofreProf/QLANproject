@@ -60,7 +60,7 @@ private:// Variables
 	    using rep        = duration::rep;
 	    using period     = duration::period;
 	    using time_point = std::chrono::time_point<my_clock>;
-	    static constexpr bool is_steady = true;//false, true. 
+	    static constexpr bool is_steady = false;//false, true. 
 
 	    static time_point now()
 	    {
