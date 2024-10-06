@@ -35,7 +35,7 @@ class QNLA {
 private:// Variables/Instances		
 	int numberHops=0;
 	// Semaphore
-	unsigned long long int UnTrapSemaphoreValueMaxCounter=450000000000;//MAx counter trying to acquire semaphore, then force release
+	unsigned long long int UnTrapSemaphoreValueMaxCounter=450000000;//MAx counter trying to acquire semaphore, then force release
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	// Payload messages
 	char PayloadReadBuffer[NumBytesPayloadBuffer]={0}; //Buffer to read payload messages
