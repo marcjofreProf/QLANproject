@@ -153,6 +153,13 @@ CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 1 bytes. It is the command to start
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
 	//MOV 	r31.b0, PRU0_ARM_INTERRUPT+16// Here send interrupt to host to measure time
+INITCMDSEL:
+	QBEQ	WARMUP, r0.b0, 8 // 8 command is just warm up interruptions
+	JMP		DWTSTART// command is generate taggs
+WARMUP:
+	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start
+	MOV		r31.b0, PRU0_ARM_INTERRUPT+16// Send end interrupt
+	JMP 	CMDLOOP // finished, wait for next command. So it continuosly loops	
 DWTSTART:
 	// Re-start DWT_CYCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register

@@ -418,7 +418,24 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
 				}
-									
+				// Warm up interrupt handling for Timetagg PRU0
+				pru0dataMem_int[0]=static_cast<unsigned int>(8); // set command warm-up
+				prussdrv_pru_send_event(21);				
+				retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);				
+
+				//cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
+				if (retInterruptsPRU0>0){
+					prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+				}
+				else if (retInterruptsPRU0==0){
+					prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+					cout << "GPIO::PRU0 warm-up took to much time for the TimeTagg. Reset PRUO if necessary." << endl;		
+				}
+				else{
+					prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+					cout << "PRU0 interrupt poll error" << endl;
+				}
+				//	
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
 				this->release();					
@@ -597,12 +614,11 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		cout << "PRU0 interrupt poll error" << endl;
 	}
 
+	this->DDRdumpdata(iIterRunsAux); // Pre-process tags. Needs to access memory of PRU, so better within the controlled acquired environment
+
 	this->ManualSemaphore=false;
 	this->ManualSemaphoreExtra=false;
 	this->release();
-
-	this->DDRdumpdata(iIterRunsAux); // Pre-process tags
-
 return 0;// all ok
 }
 
