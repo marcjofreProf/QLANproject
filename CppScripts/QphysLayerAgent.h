@@ -128,6 +128,7 @@ private: //Variables/Instances
 	double SynchNetAdj[2*((1LL<<LinkNumberMAX)-1)]={1.0};
 	double adjFreqSynchNormRatiosArray[NumCalcCenterMass]={1.0}; // adjusting Normalized ratios of frequency testing
 	double SynchNetworkParamsLink[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send
+	double SynchNetworkParamsLinkOther[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send from the other nodes
 	double CurrentSynchNetworkParamsLink[3]={0.0}; //Stores currently the network synch values of interest given the link in use for reception
 	double CurrentExtraSynchNetworkParamsLink[3]={0.0}; //Stores currently the network synch values of interest given the link in use for emission
 	double GPIOHardwareSynched=false; // Variable to monitor the hardware synch status of the GPIO process
@@ -220,6 +221,7 @@ private: // Functions/Methods
 	struct timespec GetFutureTimePointOtherNode();
 	// Synchronization primitives
 	unsigned long long int IPtoNumber(char* IPaddressAux);
+	int SetSynchParamsOtherNode();// Tell the other nodes about the synchronization information calculated
 	int RetrieveOtherEmiterReceiverMethod();// Stores and retrieves the current other emiter receiver
 	int HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass); // Calculate the histogram center given a period and a list of timetaggs
 	int SmallDriftContinuousCorrection();// Methods to keep track of the small offset correction at each measurement (but not in the network synch)

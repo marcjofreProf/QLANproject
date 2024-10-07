@@ -643,7 +643,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	// The Absolute error is introduced at each signal trigger and timetagging sequence
 	double dPRUoffsetDriftErrorAvg=static_cast<double>(static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(SynchTrigPeriod)));
 	if (abs(PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg)>PRUoffsetDriftErrorAbsAvgMax){
-		cout << "GPIO::PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg magnitude is too large: " << PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg << "Increase PRUoffsetDriftErrorAbsAvgMax." << endl;
+		cout << "GPIO::PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg magnitude is too large: " << PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg << ". Increase PRUoffsetDriftErrorAbsAvgMax." << endl;
 	}
 	if ((PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg)<0.0){
 		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax-fmod(-(PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg),PRUoffsetDriftErrorAbsAvgMax);
@@ -655,7 +655,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 
 	// The synch offset
 	if (abs(AccumulatedErrorDriftAux)>PRUoffsetDriftErrorAbsAvgMax){
-		cout << "GPIO::AccumulatedErrorDriftAux magnitude is too large: " << AccumulatedErrorDriftAux << "Increase PRUoffsetDriftErrorAbsAvgMax." << endl;
+		cout << "GPIO::AccumulatedErrorDriftAux magnitude is too large: " << AccumulatedErrorDriftAux << ". Increase PRUoffsetDriftErrorAbsAvgMax." << endl;
 	}
 	if (this->AccumulatedErrorDriftAux<0.0){
 		AccumulatedErrorDriftAux=PRUoffsetDriftErrorAbsAvgMax-fmod(-this->AccumulatedErrorDriftAux,PRUoffsetDriftErrorAbsAvgMax);

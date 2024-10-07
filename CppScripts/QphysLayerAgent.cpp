@@ -247,6 +247,17 @@ else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]"))
 }
 */
 		if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
+else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeSynchParams")){// Information about synchronization from other nodes
+	// Identify the IP of the informing node and store it accordingly
+
+	//ValuesCharArray[iHeaders] consists of IP of the node sending the information to this specific node: Offset:Rel.Freq.Diff:Period
+	strtok(ValuesCharArray[iHeaders],":"); // Identifies the IP
+	cout << "QPLA::Receiving synch. parameters from node: " <<  << endl;
+	
+	SynchNetworkParamsLinkOther[][0]=atof(strtok(NULL,":")); // Save the provided values to the proper indices. Synch offset
+	SynchNetworkParamsLinkOther[][1]=atof(strtok(NULL,":")); // Save the provided values to the proper indices. Relative frequency difference.
+	SynchNetworkParamsLinkOther[][2]=atof(strtok(NULL,":")); // Save the provided values to the proper indices. Period.
+}
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread	
 	std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(strtoull(ValuesCharArray[iHeaders],NULL,10)));
 	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
@@ -605,42 +616,85 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 	}
 	strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 	this->NumQuBitsPerRun=numReqQuBitsAux;
-// Adjust the network synchronization values
-this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
-if (CurrentSpecificLink>=0){
-this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
-this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
+	// Adjust the network synchronization values
+	this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
+	if (CurrentSpecificLink>=0){
+	this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
+	this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
+	}
+	else{
+	this->FineSynchAdjVal[0]=0.0;// synch trig offset
+	this->FineSynchAdjVal[1]=0.0;// synch trig frequ
+	}
+	this->FineSynchAdjVal[0]+=FineSynchAdjValAux[0];// synch trig offset
+	this->FineSynchAdjVal[1]+=FineSynchAdjValAux[1];// synch trig frequency
+	if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
+	this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
+	std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
+	threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
+	this->SmallDriftContinuousCorrection();// Run after threadSimulateReceiveQuBitRefAux
+	}
+	else{
+		cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
+	}
+	this->release();
+	/*
+	cout << "ModeActivePassive: " << ModeActivePassive << endl;
+	cout << "CurrentSpecificLink: " << CurrentSpecificLink << endl;
+	cout << "NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
+	cout << "HistPeriodicityAux: " << HistPeriodicityAux << endl;
+	cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
+	cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
+	*/
+	// Axiliar network synch tests
+	//this->HistCalcPeriodTimeTags(iCenterMassAuxiliarTest,iNumRunsPerCenterMassAuxiliarTest);// Compute synch values
+	//cout << "iCenterMassAuxiliarTest: " << iCenterMassAuxiliarTest << endl;
+	//cout << "iNumRunsPerCenterMassAuxiliarTest: " << iNumRunsPerCenterMassAuxiliarTest << endl;
+	//iNumRunsPerCenterMassAuxiliarTest=(iNumRunsPerCenterMassAuxiliarTest+1)%4;
+	return 0; // return 0 is for no error
 }
-else{
-this->FineSynchAdjVal[0]=0.0;// synch trig offset
-this->FineSynchAdjVal[1]=0.0;// synch trig frequ
-}
-this->FineSynchAdjVal[0]+=FineSynchAdjValAux[0];// synch trig offset
-this->FineSynchAdjVal[1]+=FineSynchAdjValAux[1];// synch trig frequency
-if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
-this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
-std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
-threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
-this->SmallDriftContinuousCorrection();// Run after threadSimulateReceiveQuBitRefAux
-}
-else{
-	cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
-}
-this->release();
-/*
-cout << "ModeActivePassive: " << ModeActivePassive << endl;
-cout << "CurrentSpecificLink: " << CurrentSpecificLink << endl;
-cout << "NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
-cout << "HistPeriodicityAux: " << HistPeriodicityAux << endl;
-cout << "FineSynchAdjVal[0]: " << FineSynchAdjVal[0] << endl;
-cout << "FineSynchAdjVal[1]: " << FineSynchAdjVal[1] << endl;
-*/
-// Axiliar network synch tests
-//this->HistCalcPeriodTimeTags(iCenterMassAuxiliarTest,iNumRunsPerCenterMassAuxiliarTest);// Compute synch values
-//cout << "iCenterMassAuxiliarTest: " << iCenterMassAuxiliarTest << endl;
-//cout << "iNumRunsPerCenterMassAuxiliarTest: " << iNumRunsPerCenterMassAuxiliarTest << endl;
-//iNumRunsPerCenterMassAuxiliarTest=(iNumRunsPerCenterMassAuxiliarTest+1)%4;
-return 0; // return 0 is for no error
+
+int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distribute this synch information to the other involved nodes
+	cout << "QPLA::Sending synch. parameters to the other nodes." << endl;
+	// Tell to the other nodes
+	char ParamsCharArray[NumBytesPayloadBuffer] = {0};
+	char charNum[NumBytesPayloadBuffer] = {0};
+
+	int numUnderScores=countUnderscores(this->IPaddressesTimePointBarrier); // Which means the number of IP addresses to send the Time Point barrier
+	char IPaddressesTimePointBarrierAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
+	strcpy(IPaddressesTimePointBarrierAux,IPaddressesTimePointBarrier);
+	for (int iIterIPaddr=0;iIterIPaddr<numUnderScores;iIterIPaddr++){// Iterate over the different nodes to tell
+		// Mount the Parameters message for the other node
+		if (iIterIPaddr==0){
+			strcpy(ParamsCharArray,"IPdest_");// Initiates the ParamsCharArray, so use strcpy
+			strcat(ParamsCharArray,strtok(IPaddressesTimePointBarrierAux,"_"));// Indicate the address to send the Future time Point
+		} 
+		else{
+			strcat(ParamsCharArray,"IPdest_");// Continues the ParamsCharArray, so use strcat
+			strcat(ParamsCharArray,strtok(NULL,"_"));// Indicate the address to send the Synch parameters information
+		}
+		strcat(ParamsCharArray,"_");// Add underscore separator
+		strcat(ParamsCharArray,"OtherClientNodeSynchParams_"); // Continues the ParamsCharArray, so use strcat
+		// The values to send separated by :
+		strcat(ParamsCharArray,); // IP of the sender
+		strcat(ParamsCharArray,":");
+		sprintf(charNum, "%8f",SynchNetworkParamsLink[CurrentSpecificLink][0]); // Offset
+		strcat(ParamsCharArray,charNum);
+		strcat(ParamsCharArray,":");
+		sprintf(charNum, "%8f",SynchNetworkParamsLink[CurrentSpecificLink][1]); // Relative frequency difference
+		strcat(ParamsCharArray,charNum);
+		strcat(ParamsCharArray,":");
+		sprintf(charNum, "%8f",SynchNetworkParamsLink[CurrentSpecificLink][2]); // Period
+		strcat(ParamsCharArray,charNum);
+		strcat(ParamsCharArray,":"); // Final :
+		strcat(ParamsCharArray,"_"); // Final _
+	} // end for to the different addresses to send the params information
+	//cout << "QPLA::ParamsCharArray: " << ParamsCharArray << endl;
+	this->acquire();
+	this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
+	this->release();
+	this->RelativeNanoSleepWait((unsigned int)(100*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));// Give some time to be able to send the above message
+	return 0; // All Ok
 }
 
 int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux){
@@ -702,6 +756,8 @@ else{
 	cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 }		
 this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
+
+this->SetSynchParamsOtherNode(); // Tell the synchronization information to the other nodes
 
 this->release();
 /*
@@ -888,30 +944,24 @@ if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to
 }
 else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
 	// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for detection to use another story is if compensating for emitter
-	if ((SynchNetworkParamsLink[CurrentSpecificLink][1])<0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1];}// For negative correction
-	else if ((SynchNetworkParamsLink[CurrentSpecificLink][1])>0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2];}// For positivenegative correction
+	if ((SynchNetworkParamsLinkOther[CurrentSpecificLink][1])<0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1];}// For negative correction
+	else if ((SynchNetworkParamsLinkOther[CurrentSpecificLink][1])>0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2];}// For positivenegative correction
 	else{SynchNetTransHardwareAdjAux=1.0;}
 	// Notice that the relative frequency and offset correction is negated (or maybe not)
 	// For receiver correction - Correction has to take place at the emitter, where the first IP identifies the single receiver
 	CurrentSynchNetworkParamsLink[0]=0.0;
 	CurrentSynchNetworkParamsLink[1]=0.0;
 	CurrentSynchNetworkParamsLink[2]=0.0;
-	//For emitter correction - to be develop
-	//if (SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0]<0.0){
-	//	CurrentExtraSynchNetworkParamsLink[0]=-(fmod(-MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux-SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0],MultFactorEffSynchPeriodQPLA*dHistPeriodicityAux)+MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux);// Offset
-	//}
-	//else{
-	//	CurrentExtraSynchNetworkParamsLink[0]=fmod(MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0],MultFactorEffSynchPeriodQPLA*dHistPeriodicityAux)-MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux;// Offset
-	//}
+	//For emitter correction - info provided by the other nodes
 	// Maybe the offset does not have to be transformed
-	CurrentExtraSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][0];// Synch offset
-	if (SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1]<0.0){
-		CurrentExtraSynchNetworkParamsLink[1]=(-(fmod(-dHistPeriodicityHalfAux-SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)+dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
+	CurrentExtraSynchNetworkParamsLink[0]=SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][0];// Synch offset
+	if (SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1]<0.0){
+		CurrentExtraSynchNetworkParamsLink[1]=(-(fmod(-dHistPeriodicityHalfAux-SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)+dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	}
 	else{
-		CurrentExtraSynchNetworkParamsLink[1]=((fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
+		CurrentExtraSynchNetworkParamsLink[1]=((fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	}
-	CurrentExtraSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][2]; // Period in which the parameters where calculated
+	CurrentExtraSynchNetworkParamsLink[2]=SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]; // Period in which the parameters where calculated
 	// Debugging
 	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod Correction for emitter (receiver does not correct)" << endl;
 	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[0]: " << CurrentExtraSynchNetworkParamsLink[0] << endl;
@@ -1808,7 +1858,7 @@ return 0; // All ok
 
 void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
 
-	this->NegotiateInitialParamsNode();
+	//this->NegotiateInitialParamsNode();
 
 	bool isValidWhileLoop = true;
 	while(isValidWhileLoop){
