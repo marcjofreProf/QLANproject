@@ -742,6 +742,8 @@ int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentRece
 	this->acquire();
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
+	char CurrentReceiveHostIP[NumBytesBufferICPMAX]={0};
+	strcpy(CurrentReceiveHostIP,CurrentReceiveHostIPaux);
 	this->RetrieveOtherEmiterReceiverMethod();
 	// Retrieve the involved single specific quad group channel if possible
 	QuadEmitDetecSelec=QuadEmitDetecSelecAux; // Identifies the quad groups channels to detect
@@ -796,8 +798,8 @@ threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detac
 else{
 	cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 }
-cout << "QPLA::HistCalcPeriodTimeTags CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
-this->HistCalcPeriodTimeTags(CurrentReceiveHostIPaux,iCenterMass,iNumRunsPerCenterMass);// Compute synch values
+cout << "QPLA::HistCalcPeriodTimeTags CurrentReceiveHostIP: " << CurrentReceiveHostIP << endl;
+this->HistCalcPeriodTimeTags(CurrentReceiveHostIP,iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 
 this->release();
 /*
