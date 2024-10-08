@@ -250,7 +250,7 @@ int QPLA::ProcessNewParameters(){
 	if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
 	else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeSynchParams")){// Information about synchronization from other nodes
 		// Identify the IP of the informing node and store it accordingly
-		cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArray[iHeaders] << endl;
+		//cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArray[iHeaders] << endl;
 		//ValuesCharArray[iHeaders] consists of IP of the node sending the information to this specific node: Offset:Rel.Freq.Diff:Period
 		char CurrentReceiveHostIP[NumBytesBufferICPMAX]={0};
 		char ValuesCharArrayiHeadersAux[NumBytesBufferICPMAX]={0};
@@ -287,20 +287,20 @@ int QPLA::ProcessNewParameters(){
 			}	
 		}
 
-		cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArray[iHeaders] << endl;
+		//cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArray[iHeaders] << endl;
 		strcpy(ValuesCharArrayiHeadersAux,ValuesCharArray[iHeaders]); // Copy it to manipulate without losing information
 		strcpy(CurrentReceiveHostIP,strtok(ValuesCharArrayiHeadersAux,":")); // Identifies index position for storage
 		cout << "QPLA::Receiving synch. parameters from other node " << CurrentReceiveHostIP << endl;
 		
 		if (CurrentSpecificLink>=0 and CurrentSpecificLink<LinkNumberMAX){
-			cout << "QPLA::ProcessNewParameters CurrentSpecificLink " << CurrentSpecificLink << endl;
+			//cout << "QPLA::ProcessNewParameters CurrentSpecificLink " << CurrentSpecificLink << endl;
 			SynchNetworkParamsLinkOther[CurrentSpecificLink][0]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Synch offset
 			SynchNetworkParamsLinkOther[CurrentSpecificLink][1]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Relative frequency difference.
 			SynchNetworkParamsLinkOther[CurrentSpecificLink][2]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Period.
 
-			cout << "QPLA::SynchNetworkParamsLinkOther[CurrentSpecificLink][0]: " << SynchNetworkParamsLinkOther[CurrentSpecificLink][0] << endl;
-			cout << "QPLA::SynchNetworkParamsLinkOther[CurrentSpecificLink][1]: " << SynchNetworkParamsLinkOther[CurrentSpecificLink][1] << endl;
-			cout << "QPLA::SynchNetworkParamsLinkOther[CurrentSpecificLink][2]: " << SynchNetworkParamsLinkOther[CurrentSpecificLink][2] << endl;
+			//cout << "QPLA::SynchNetworkParamsLinkOther[CurrentSpecificLink][0]: " << SynchNetworkParamsLinkOther[CurrentSpecificLink][0] << endl;
+			//cout << "QPLA::SynchNetworkParamsLinkOther[CurrentSpecificLink][1]: " << SynchNetworkParamsLinkOther[CurrentSpecificLink][1] << endl;
+			//cout << "QPLA::SynchNetworkParamsLinkOther[CurrentSpecificLink][2]: " << SynchNetworkParamsLinkOther[CurrentSpecificLink][2] << endl;
 		}
 		else{// We should be here
 			cout << "QPLA::Bad CurrentSpecificLink index. Not updating other node synch values!" << endl;
@@ -740,7 +740,7 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 		strcat(ParamsCharArray,":"); // Final :
 		strcat(ParamsCharArray,"_"); // Final _
 	} // end for to the different addresses to send the params information
-	cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
+	//cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
 	//this->acquire(); // important not to do it
 	this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 	//this->release(); // Important not to do it
@@ -1718,7 +1718,6 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	}
 	cout << "QPLA::Synchronization parameters updated for this node" << endl;
 }
-this->SetSynchParamsOtherNode(CurrentReceiveHostIPaux); // To be removed
 return 0; // All Ok
 }
 
