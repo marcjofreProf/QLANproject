@@ -762,8 +762,6 @@ else{
 }		
 this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 
-this->SetSynchParamsOtherNode(); // Tell the synchronization information to the other nodes
-
 this->release();
 /*
 cout << "ModeActivePassive: " << ModeActivePassive << endl;
@@ -1664,6 +1662,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 		SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 		SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
+		this->SetSynchParamsOtherNode(); // Tell the synchronization information to the other nodes
 		
 	}
 	cout << "QPLA::Synchronization parameters updated for this node" << endl;
