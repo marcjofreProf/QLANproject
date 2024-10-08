@@ -106,7 +106,7 @@ private: //Variables/Instances
 	unsigned long long int OldLastTimeTagg=0;
 	// Above agents passed values to this agent
 	char ModeActivePassive[NumBytesPayloadBuffer] = {0};// "Active" or "Passive"
-	char IPaddressesTimePointBarrier[NumBytesBufferICPMAX] = {0};// List of IP addresses separated by "_" to send the Time Point BArrier to
+	char IPaddressesTimePointBarrier[NumBytesBufferICPMAX] = {0};// List of IP addresses separated by "_" to send the Time Point Barrier to
 	double FineSynchAdjVal[2]={0.0};// Adjust synch trig offset and frequency
 	// Automatic calculation of synchronization
 	double MultFactorEffSynchPeriodQPLA=4.0; // When using 4 channels histogram, this value is 4.0; when using real signals this value should be 1.0 (also in GPIO.h)
