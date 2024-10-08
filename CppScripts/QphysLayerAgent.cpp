@@ -283,6 +283,8 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeSynchParams")
 			}
 		}	
 	}
+
+	strcpy(CurrentReceiveHostIP,strtok(ValuesCharArray[iHeaders],":")); // Identifies index position for storage
 	cout << "QPLA::Receiving synch. parameters from other node " << CurrentReceiveHostIP << endl;
 	if (CurrentSpecificLink>=0 and CurrentSpecificLink<LinkNumberMAX){
 		SynchNetworkParamsLinkOther[CurrentSpecificLink][0]=atof(strtok(NULL,":")); // Save the provided values to the proper indices. Synch offset
@@ -690,12 +692,14 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 }
 
 int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is responsability of the host to distribute this synch information to the other involved nodes	
+	cout << "QPLA::SetSynchParamsOtherNode CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
 	// Tell to the other nodes
 	char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 	char charNum[NumBytesPayloadBuffer] = {0};
 	char CurrentReceiveHostIP[NumBytesPayloadBuffer]={0};
 	strcpy(CurrentReceiveHostIP,strtok(CurrentReceiveHostIPaux,"_"));
-	int numUnderScores=countUnderscores(this->CurrentEmitReceiveIP); // Which means the number of IP addresses to send the Time Point barrier
+	cout << "QPLA::SetSynchParamsOtherNode CurrentReceiveHostIP: " << CurrentReceiveHostIP << endl;
+	int numUnderScores=countUnderscores(this->CurrentEmitReceiveIP); // Which means the number of IP addresses to send the synch information
 	char CurrentEmitReceiveIPAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
 	strcpy(CurrentEmitReceiveIPAux,this->CurrentEmitReceiveIP);
 	for (int iIterIPaddr=0;iIterIPaddr<numUnderScores;iIterIPaddr++){// Iterate over the different nodes to tell
@@ -712,7 +716,7 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 		strcat(ParamsCharArray,"_");// Add underscore separator
 		strcat(ParamsCharArray,"OtherClientNodeSynchParams_"); // Continues the ParamsCharArray, so use strcat
 		// The values to send separated by :
-		strcat(ParamsCharArray,CurrentReceiveHostIP); // IP of sender with a final underscore _(this node host)
+		strcat(ParamsCharArray,CurrentReceiveHostIP); // IP of sender (this node host)
 		strcat(ParamsCharArray,":");
 		sprintf(charNum, "%8f",SynchNetworkParamsLink[CurrentSpecificLink][0]); // Offset
 		strcat(ParamsCharArray,charNum);
@@ -734,7 +738,7 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 }
 
 int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentReceiveHostIPaux, char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux){
-	cout << "QPLA::SimulateReceiveSynchQuBit: " << CurrentReceiveHostIPaux << endl;
+	//cout << "QPLA::SimulateReceiveSynchQuBit: " << CurrentReceiveHostIPaux << endl;
 	this->acquire();
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
