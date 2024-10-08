@@ -253,7 +253,7 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeSynchParams")
 	//ValuesCharArray[iHeaders] consists of IP of the node sending the information to this specific node: Offset:Rel.Freq.Diff:Period
 	char CurrentReceiveHostIP[NumBytesBufferICPMAX]={0};
 	strcpy(CurrentReceiveHostIP,strtok(ValuesCharArray[iHeaders],":")); // Identifies index position for storage
-
+	strcat(CurrentReceiveHostIP,"_"); // Add _ so that the identifier below works
 
 	// Store the potential IP identification of the emitters (for Receive) and receivers for (Emit) - in order to identify the link
 	CurrentSpecificLink=-1;// Reset value
@@ -283,7 +283,7 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeSynchParams")
 			}
 		}	
 	}
-	cout << "QPLA::Receiving synch. parameters from other node" << CurrentReceiveHostIP << endl;
+	cout << "QPLA::Receiving synch. parameters from other node " << CurrentReceiveHostIP << endl;
 	if (CurrentSpecificLink>=0 and CurrentSpecificLink<LinkNumberMAX){
 		SynchNetworkParamsLinkOther[CurrentSpecificLink][0]=atof(strtok(NULL,":")); // Save the provided values to the proper indices. Synch offset
 		SynchNetworkParamsLinkOther[CurrentSpecificLink][1]=atof(strtok(NULL,":")); // Save the provided values to the proper indices. Relative frequency difference.
@@ -693,10 +693,11 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 	// Tell to the other nodes
 	char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 	char charNum[NumBytesPayloadBuffer] = {0};
-
+	char CurrentReceiveHostIP[NumBytesPayloadBuffer]={0};
+	strcpy(CurrentReceiveHostIP,strtok(CurrentReceiveHostIPaux,"_"));
 	int numUnderScores=countUnderscores(this->CurrentEmitReceiveIP); // Which means the number of IP addresses to send the Time Point barrier
 	char CurrentEmitReceiveIPAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
-	strcpy(CurrentEmitReceiveIPAux,CurrentEmitReceiveIP);
+	strcpy(CurrentEmitReceiveIPAux,this->CurrentEmitReceiveIP);
 	for (int iIterIPaddr=0;iIterIPaddr<numUnderScores;iIterIPaddr++){// Iterate over the different nodes to tell
 		// Mount the Parameters message for the other node
 		if (iIterIPaddr==0){
@@ -707,11 +708,11 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 			strcat(ParamsCharArray,"IPdest_");// Continues the ParamsCharArray, so use strcat
 			strcat(ParamsCharArray,strtok(NULL,"_"));// Indicate the address to send the Synch parameters information
 		}
-		cout << "QPLA::Sending synch. parameters to node: " << ParamsCharArray << endl;
+		cout << "QPLA::Sending synch. parameters to node " << ParamsCharArray << endl;
 		strcat(ParamsCharArray,"_");// Add underscore separator
 		strcat(ParamsCharArray,"OtherClientNodeSynchParams_"); // Continues the ParamsCharArray, so use strcat
 		// The values to send separated by :
-		strcat(ParamsCharArray,CurrentReceiveHostIPaux); // IP of sender with a final underscore _(this node host)
+		strcat(ParamsCharArray,CurrentReceiveHostIP); // IP of sender with a final underscore _(this node host)
 		strcat(ParamsCharArray,":");
 		sprintf(charNum, "%8f",SynchNetworkParamsLink[CurrentSpecificLink][0]); // Offset
 		strcat(ParamsCharArray,charNum);
