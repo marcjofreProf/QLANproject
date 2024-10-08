@@ -718,13 +718,13 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 		// The values to send separated by :
 		strcat(ParamsCharArray,CurrentReceiveHostIP); // IP of sender (this node host)
 		strcat(ParamsCharArray,":");
-		sprintf(charNum, "%8f",SynchNetworkParamsLink[CurrentSpecificLink][0]); // Offset
+		sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLink][0]); // Offset
 		strcat(ParamsCharArray,charNum);
 		strcat(ParamsCharArray,":");
-		sprintf(charNum, "%8f",SynchNetworkParamsLink[CurrentSpecificLink][1]); // Relative frequency difference
+		sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLink][1]); // Relative frequency difference
 		strcat(ParamsCharArray,charNum);
 		strcat(ParamsCharArray,":");
-		sprintf(charNum, "%8f",SynchNetworkParamsLink[CurrentSpecificLink][2]); // Period
+		sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLink][2]); // Period
 		strcat(ParamsCharArray,charNum);
 		strcat(ParamsCharArray,":"); // Final :
 		strcat(ParamsCharArray,"_"); // Final _
@@ -733,7 +733,7 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 	//this->acquire(); // important not to do it
 	this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 	//this->release(); // Important not to do it
-	this->RelativeNanoSleepWait((unsigned int)(100*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));// Give some time to be able to send the above message
+	//this->RelativeNanoSleepWait((unsigned int)(100*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));// Give some time to be able to send the above message
 	return 0; // All Ok
 }
 
