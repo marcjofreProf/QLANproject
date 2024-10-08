@@ -738,7 +738,7 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 }
 
 int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentReceiveHostIPaux, char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux){
-	//cout << "QPLA::SimulateReceiveSynchQuBit: " << CurrentReceiveHostIPaux << endl;
+	cout << "QPLA::SimulateReceiveSynchQuBit CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
 	this->acquire();
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
@@ -795,7 +795,8 @@ threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detac
 }
 else{
 	cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
-}		
+}
+cout << "QPLA::HistCalcPeriodTimeTags CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
 this->HistCalcPeriodTimeTags(CurrentReceiveHostIPaux,iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 
 this->release();
@@ -1366,6 +1367,7 @@ return 0; // All ok
 }
 
 int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,int iNumRunsPerCenterMass){
+	cout << "QPLA::HistCalcPeriodTimeTags CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
 	//this->acquire();
 	//while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 	//this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
