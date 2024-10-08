@@ -250,11 +250,10 @@ int QPLA::ProcessNewParameters(){
 	if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
 	else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeSynchParams")){// Information about synchronization from other nodes
 		// Identify the IP of the informing node and store it accordingly
-
+		cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArray[iHeaders] << endl;
 		//ValuesCharArray[iHeaders] consists of IP of the node sending the information to this specific node: Offset:Rel.Freq.Diff:Period
 		char CurrentReceiveHostIP[NumBytesBufferICPMAX]={0};
-		char ValuesCharArrayiHeadersAux[NumBytesBufferICPMAX]={0};
-		strcpy(ValuesCharArrayiHeadersAux,ValuesCharArray[iHeaders]);
+
 		strcpy(CurrentReceiveHostIP,strtok(ValuesCharArray[iHeaders],":")); // Identifies index position for storage
 		strcat(CurrentReceiveHostIP,"_"); // Add _ so that the identifier below works
 
@@ -287,9 +286,9 @@ int QPLA::ProcessNewParameters(){
 			}	
 		}
 
-		strcpy(CurrentReceiveHostIP,strtok(ValuesCharArrayiHeadersAux,":")); // Identifies index position for storage
+		strcpy(CurrentReceiveHostIP,strtok(ValuesCharArray[iHeaders],":")); // Identifies index position for storage
 		cout << "QPLA::Receiving synch. parameters from other node " << CurrentReceiveHostIP << endl;
-		cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArrayiHeadersAux << endl;
+		cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArray[iHeaders] << endl;
 		if (CurrentSpecificLink>=0 and CurrentSpecificLink<LinkNumberMAX){
 			cout << "QPLA::ProcessNewParameters CurrentSpecificLink " << CurrentSpecificLink << endl;
 			SynchNetworkParamsLinkOther[CurrentSpecificLink][0]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Synch offset
@@ -734,7 +733,7 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 		strcat(ParamsCharArray,":"); // Final :
 		strcat(ParamsCharArray,"_"); // Final _
 	} // end for to the different addresses to send the params information
-	//cout << "QPLA::ParamsCharArray SetSynchParamsOtherNode: " << ParamsCharArray << endl;
+	cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
 	//this->acquire(); // important not to do it
 	this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 	//this->release(); // Important not to do it

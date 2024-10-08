@@ -1130,7 +1130,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	else if(string(Type)==string("Control")){//Control message are not meant for host, so forward it accordingly
 		if (string(IPorg)==string(this->IPaddressesSockets[0])){ // If it comes from its attached node and is a control message then it is not for this host, forward it to other hosts' nodes
 		// The node of a host is always identified in the Array in position 0
-		    //cout << "Host retransmit params from node: " << Payload << endl;			    
+		  cout << "Host " << this->IPaddressesSockets[2] << " retransmit params from node: " << Payload << endl;			    
 			int socket_fd_conn;
 		    // Mount message
 		    // Notice that nodes Control (and only Control messages, Operational messages do not have this) messages meant to other nodes through their respective hosts have a composed payload, where the first part has the other host's node to whom the message has to be forwarded (at least up to its host - the host of the node sending the message). Hence, the Payload has to be processed a bit.
