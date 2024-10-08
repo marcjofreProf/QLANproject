@@ -730,9 +730,9 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 		strcat(ParamsCharArray,"_"); // Final _
 	} // end for to the different addresses to send the params information
 	//cout << "QPLA::ParamsCharArray SetSynchParamsOtherNode: " << ParamsCharArray << endl;
-	this->acquire();
+	//this->acquire(); // important not to do it
 	this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
-	this->release();
+	//this->release(); // Important not to do it
 	this->RelativeNanoSleepWait((unsigned int)(100*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));// Give some time to be able to send the above message
 	return 0; // All Ok
 }
