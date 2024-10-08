@@ -294,6 +294,10 @@ int QPLA::ProcessNewParameters(){
 			SynchNetworkParamsLinkOther[CurrentSpecificLink][0]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Synch offset
 			SynchNetworkParamsLinkOther[CurrentSpecificLink][1]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Relative frequency difference.
 			SynchNetworkParamsLinkOther[CurrentSpecificLink][2]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Period.
+
+			cout << "QPLA::SynchNetworkParamsLinkOther[CurrentSpecificLink][0]: " << SynchNetworkParamsLinkOther[CurrentSpecificLink][0] << endl;
+			cout << "QPLA::SynchNetworkParamsLinkOther[CurrentSpecificLink][1]: " << SynchNetworkParamsLinkOther[CurrentSpecificLink][1] << endl;
+			cout << "QPLA::SynchNetworkParamsLinkOther[CurrentSpecificLink][2]: " << SynchNetworkParamsLinkOther[CurrentSpecificLink][2] << endl;
 		}
 		else{// We should be here
 			cout << "QPLA::Bad CurrentSpecificLink index. Not updating other node synch values!" << endl;
@@ -1706,12 +1710,12 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 		SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 		SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
-		this->SetSynchParamsOtherNode(CurrentReceiveHostIPaux); // Tell the synchronization information to the other nodes
+		//this->SetSynchParamsOtherNode(CurrentReceiveHostIPaux); // Tell the synchronization information to the other nodes
 		
 	}
 	cout << "QPLA::Synchronization parameters updated for this node" << endl;
 }
-
+this->SetSynchParamsOtherNode(CurrentReceiveHostIPaux); // To be removed
 return 0; // All Ok
 }
 

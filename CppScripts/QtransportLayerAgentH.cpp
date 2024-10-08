@@ -1130,24 +1130,24 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	else if(string(Type)==string("Control")){//Control message are not meant for host, so forward it accordingly
 		if (string(IPorg)==string(this->IPaddressesSockets[0])){ // If it comes from its attached node and is a control message then it is not for this host, forward it to other hosts' nodes
 		// The node of a host is always identified in the Array in position 0
-		  cout << "Host " << this->IPaddressesSockets[2] << " retransmit params from node: " << Payload << endl;			    
+		  cout << "Host " << this->IPaddressesSockets[2] << " retransmit params from node " << this->IPaddressesSockets[0] <<": " << Payload << endl;			    
 			int socket_fd_conn;
 		    // Mount message
 		    // Notice that nodes Control (and only Control messages, Operational messages do not have this) messages meant to other nodes through their respective hosts have a composed payload, where the first part has the other host's node to whom the message has to be forwarded (at least up to its host - the host of the node sending the message). Hence, the Payload has to be processed a bit.
-		    for (int iIterOpHost=0;iIterOpHost<2;iIterOpHost++){// Manually set - This should be programmed in order to scale
+		    for (int iIterOpHost=0;iIterOpHost<NumConnectedHosts;iIterOpHost++){// Manually set - This should be programmed in order to scale
 		    	char PayLoadReassembled[NumBytesPayloadBuffer] = {0};
-		    	    char PayLoadProc1[NumBytesPayloadBuffer] = {0};// To process the "_" level
-		    	    char PayLoadProc1Aux[NumBytesPayloadBuffer] = {0};// To process the "_" level Aux
-		    	    char PayloadAux[NumBytesPayloadBuffer] = {0};
+    	    char PayLoadProc1[NumBytesPayloadBuffer] = {0};// To process the "_" level
+    	    char PayLoadProc1Aux[NumBytesPayloadBuffer] = {0};// To process the "_" level Aux
+    	    char PayloadAux[NumBytesPayloadBuffer] = {0};
 			    // Process the payload first
-		    	    char IPaddressesSocketsAux[IPcharArrayLengthMAX] = {0};
-		    	    strcpy(IPaddressesSocketsAux,this->IPaddressesSockets[iIterOpHost+3]);
-		    	    bool NonEmptyPayloadAux=false;
+		    	char IPaddressesSocketsAux[IPcharArrayLengthMAX] = {0};
+    	    strcpy(IPaddressesSocketsAux,this->IPaddressesSockets[iIterOpHost+3]);
+    	    bool NonEmptyPayloadAux=false;
 			    // Analyze if there are messages for host this->IPaddressesSockets[iIterOpHost+3]
 			    // Payload message is like: Trans;Header_Payload1:Payload2:_Header_Payload_;Header_Payload_Header_Payload_;Net;none_none_;Link;none_none_;Phys;none_none_; 
 
 			    for (int iIterNodeAgents=0;iIterNodeAgents<4;iIterNodeAgents++){// Discard the first Layer Name = Trans
-			        strcpy(PayloadAux,Payload);// Make a copy of the original Payload
+			      strcpy(PayloadAux,Payload);// Make a copy of the original Payload
 			    	for (int iIterPayloadDump=0;iIterPayloadDump<(2*iIterNodeAgents);iIterPayloadDump++){// Reposition the pointer of strtok
 			    		if (iIterPayloadDump==0){strtok(PayloadAux,";");}
 			    		else{strtok(NULL,";");}
@@ -1159,6 +1159,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    		strcat(PayLoadReassembled,strtok(NULL,";"));			    		
 			    	}
 			    	strcat(PayLoadReassembled,";");// Finish with semicolon
+			    	cout << "QTLAH::PayLoadReassembled: " << PayLoadReassembled << endl;
 			    	strcpy(PayLoadProc1,strtok(NULL,";"));// To process the "_" level
 			    	if (string(PayLoadProc1)!=string("") and string(PayLoadProc1)!=string("none_none_")){// There is data to process
 			    		int NumSubPayloads=countQuadrupleUnderscores(PayLoadProc1);//
@@ -1198,29 +1199,29 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    
 			    // Actually mount the reassembled message
 			    char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-				strcpy(ParamsCharArray,IPaddressesSocketsAux);//IPdest);
-				strcat(ParamsCharArray,",");
-				strcat(ParamsCharArray,IPorg);
-				strcat(ParamsCharArray,",");
-				strcat(ParamsCharArray,Type);
-				strcat(ParamsCharArray,",");
-				strcat(ParamsCharArray,Command);
-				strcat(ParamsCharArray,",");
-				strcat(ParamsCharArray,PayLoadReassembled);//Payload);
-				strcat(ParamsCharArray,",");// Very important to end the message
-				//cout << "Node message to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
-				//cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
-			if(NonEmptyPayloadAux){// Non-empty, hence send
-				strcpy(this->SendBuffer,ParamsCharArray);			
-			    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
-				    socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
-				    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);//this->IPaddressesSockets[3]);
-				  }
-			    else{ //host acts as server		    
-				    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
-				    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);//this->IPaddressesSockets[3]);
-				  }
-				}
+					strcpy(ParamsCharArray,IPaddressesSocketsAux);//IPdest);
+					strcat(ParamsCharArray,",");
+					strcat(ParamsCharArray,IPorg);
+					strcat(ParamsCharArray,",");
+					strcat(ParamsCharArray,Type);
+					strcat(ParamsCharArray,",");
+					strcat(ParamsCharArray,Command);
+					strcat(ParamsCharArray,",");
+					strcat(ParamsCharArray,PayLoadReassembled);//Payload);
+					strcat(ParamsCharArray,",");// Very important to end the message
+					//cout << "Node message to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
+					//cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
+				if(NonEmptyPayloadAux){// Non-empty, hence send
+					strcpy(this->SendBuffer,ParamsCharArray);			
+				    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
+					    socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
+					    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);//this->IPaddressesSockets[3]);
+					  }
+				    else{ //host acts as server		    
+					    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
+					    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);//this->IPaddressesSockets[3]);
+					  }
+					}
 		     } // end for	    
 		   }	
 		else{// It does not come from its node and it is a control message, so it has to forward to its node
