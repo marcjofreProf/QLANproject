@@ -253,8 +253,9 @@ int QPLA::ProcessNewParameters(){
 		cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArray[iHeaders] << endl;
 		//ValuesCharArray[iHeaders] consists of IP of the node sending the information to this specific node: Offset:Rel.Freq.Diff:Period
 		char CurrentReceiveHostIP[NumBytesBufferICPMAX]={0};
-
-		strcpy(CurrentReceiveHostIP,strtok(ValuesCharArray[iHeaders],":")); // Identifies index position for storage
+		char ValuesCharArrayiHeadersAux[NumBytesBufferICPMAX]={0};
+		strcpy(ValuesCharArrayiHeadersAux,ValuesCharArray[iHeaders]); // Copy it to manipulate without losing information
+		strcpy(CurrentReceiveHostIP,strtok(ValuesCharArrayiHeadersAux,":")); // Identifies index position for storage
 		strcat(CurrentReceiveHostIP,"_"); // Add _ so that the identifier below works
 
 		// Store the potential IP identification of the emitters (for Receive) and receivers for (Emit) - in order to identify the link
@@ -286,9 +287,11 @@ int QPLA::ProcessNewParameters(){
 			}	
 		}
 
-		strcpy(CurrentReceiveHostIP,strtok(ValuesCharArray[iHeaders],":")); // Identifies index position for storage
-		cout << "QPLA::Receiving synch. parameters from other node " << CurrentReceiveHostIP << endl;
 		cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArray[iHeaders] << endl;
+		strcpy(ValuesCharArrayiHeadersAux,ValuesCharArray[iHeaders]); // Copy it to manipulate without losing information
+		strcpy(CurrentReceiveHostIP,strtok(ValuesCharArrayiHeadersAux,":")); // Identifies index position for storage
+		cout << "QPLA::Receiving synch. parameters from other node " << CurrentReceiveHostIP << endl;
+		
 		if (CurrentSpecificLink>=0 and CurrentSpecificLink<LinkNumberMAX){
 			cout << "QPLA::ProcessNewParameters CurrentSpecificLink " << CurrentSpecificLink << endl;
 			SynchNetworkParamsLinkOther[CurrentSpecificLink][0]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Synch offset
@@ -1710,7 +1713,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 		SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 		SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
-		//this->SetSynchParamsOtherNode(CurrentReceiveHostIPaux); // Tell the synchronization information to the other nodes
+		this->SetSynchParamsOtherNode(CurrentReceiveHostIPaux); // Tell the synchronization information to the other nodes
 		
 	}
 	cout << "QPLA::Synchronization parameters updated for this node" << endl;

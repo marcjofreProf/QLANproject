@@ -1130,7 +1130,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	else if(string(Type)==string("Control")){//Control message are not meant for host, so forward it accordingly
 		if (string(IPorg)==string(this->IPaddressesSockets[0])){ // If it comes from its attached node and is a control message then it is not for this host, forward it to other hosts' nodes
 		// The node of a host is always identified in the Array in position 0
-		  cout << "Host " << this->IPaddressesSockets[2] << " retransmit params from node " << this->IPaddressesSockets[0] <<": " << Payload << endl;			    
+		  //cout << "Host " << this->IPaddressesSockets[2] << " retransmit params from node " << this->IPaddressesSockets[0] <<": " << Payload << endl;			    
 			int socket_fd_conn;
 		    // Mount message
 		    // Notice that nodes Control (and only Control messages, Operational messages do not have this) messages meant to other nodes through their respective hosts have a composed payload, where the first part has the other host's node to whom the message has to be forwarded (at least up to its host - the host of the node sending the message). Hence, the Payload has to be processed a bit.
@@ -1159,7 +1159,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    		strcat(PayLoadReassembled,strtok(NULL,";"));			    		
 			    	}
 			    	strcat(PayLoadReassembled,";");// Finish with semicolon
-			    	cout << "QTLAH::PayLoadReassembled: " << PayLoadReassembled << endl;
+			    	//cout << "QTLAH::PayLoadReassembled: " << PayLoadReassembled << endl;
 			    	strcpy(PayLoadProc1,strtok(NULL,";"));// To process the "_" level
 			    	if (string(PayLoadProc1)!=string("") and string(PayLoadProc1)!=string("none_none_")){// There is data to process
 			    		int NumSubPayloads=countQuadrupleUnderscores(PayLoadProc1);//
@@ -1194,8 +1194,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			    	}
 			    	strcat(PayLoadReassembled,";");	// Finish with semicolon	    			    				    
 			    }
-			    //cout << "Host's node Control Message original: " << Payload << endl;
-			    //cout << "Host's node Control Message reassembled: " << PayLoadReassembled << endl;
+			    //cout << "Host's node Control Message original Payload: " << Payload << endl;
+			    //cout << "Host's node Control Message reassembled Payload: " << PayLoadReassembled << endl;
 			    
 			    // Actually mount the reassembled message
 			    char ParamsCharArray[NumBytesBufferICPMAX] = {0};
