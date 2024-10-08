@@ -286,7 +286,9 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeSynchParams")
 
 	strcpy(CurrentReceiveHostIP,strtok(ValuesCharArray[iHeaders],":")); // Identifies index position for storage
 	cout << "QPLA::Receiving synch. parameters from other node " << CurrentReceiveHostIP << endl;
+	cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArray[iHeaders] << endl;
 	if (CurrentSpecificLink>=0 and CurrentSpecificLink<LinkNumberMAX){
+		cout << "QPLA::ProcessNewParameters CurrentSpecificLink " << CurrentSpecificLink << endl;
 		SynchNetworkParamsLinkOther[CurrentSpecificLink][0]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Synch offset
 		SynchNetworkParamsLinkOther[CurrentSpecificLink][1]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Relative frequency difference.
 		SynchNetworkParamsLinkOther[CurrentSpecificLink][2]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Period.
