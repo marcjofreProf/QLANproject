@@ -184,7 +184,7 @@ private: // Functions/Methods
 	int QPLASimulateEmitQuBit(double HistPeriodicityAuxAux);
 	int QPLASimulateEmitSynchQuBit(double HistPeriodicityAuxAux,int iCenterMass,int iNumRunsPerCenterMass);
 	int QPLASimulateReceiveQuBit(double HistPeriodicityAuxAux);
-	int QPLASimulateReceiveSynchQuBit(double HistPeriodicityAuxAux,int iCenterMass,int iNumRunsPerCenterMass);
+	int QPLASimulateReceiveSynchQuBit(char* CurrentReceiveHostIPaux, double HistPeriodicityAuxAux,int iCenterMass,int iNumRunsPerCenterMass);
 	int GetSimulateNumStoredQubitsNode();
 	int GetSimulateSynchParamsNode();
 	

@@ -175,7 +175,7 @@ public: // Functions/Methods
     int SimulateEmitQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux, int QuadEmitDetecSelecAux);
     int SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux);
     int SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux, int QuadEmitDetecSelecAux);
-    int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux);
+    int SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentReceiveHostIPaux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux);
     int GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics);
     int GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams);
     bool GetGPIOHardwareSynchedNode();
@@ -221,9 +221,9 @@ private: // Functions/Methods
 	struct timespec GetFutureTimePointOtherNode();
 	// Synchronization primitives
 	unsigned long long int IPtoNumber(char* IPaddressAux);
-	int SetSynchParamsOtherNode();// Tell the other nodes about the synchronization information calculated
+	int SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux);// Tell the other nodes about the synchronization information calculated
 	int RetrieveOtherEmiterReceiverMethod();// Stores and retrieves the current other emiter receiver
-	int HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass); // Calculate the histogram center given a period and a list of timetaggs
+	int HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,int iNumRunsPerCenterMass); // Calculate the histogram center given a period and a list of timetaggs
 	int SmallDriftContinuousCorrection();// Methods to keep track of the small offset correction at each measurement (but not in the network synch)
 	double DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor);
 	int DoubleBubbleSort(double* arr,int MedianFilterFactor);

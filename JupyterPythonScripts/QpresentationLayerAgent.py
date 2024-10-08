@@ -174,10 +174,10 @@ class QPLA:
 			for iNumRunsPerCenterMass in range(0,NumRunsPerCenterMass,1):				
 				if (NumCalcCenterMass>1):
 					# With three values of frequency test for network synchronization
-					messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRequestedQubitsReceive),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2]),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1]),str(QuadChEmtDet[1])])
+					messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),self.UnderScoreListCharArrayParser([IPhostDestOpNet]),self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRequestedQubitsReceive),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(SynchFreqPRUarrayTest[1]),str(SynchFreqPRUarrayTest[2]),str(PeriodSignalHistVal),str(SynchPRUoffFreqVal[0]),str(SynchPRUoffFreqVal[1]),str(QuadChEmtDet[1])])
 				else:
 					# With one value of frequency test for network synchronization
-					messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostDestOpNet]),self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRequestedQubitsReceive),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(PeriodSignalHistVal),str(ReceiveSynchPRUoffFreqVal[0]),str(ReceiveSynchPRUoffFreqVal[1]),str(QuadChEmtDet[1])])
+					messagePayloadAux=self.SemiColonListCharArrayParser(["Active",self.UnderScoreListCharArrayParser([IPhostOrgOpNet]),self.UnderScoreListCharArrayParser([IPhostDestOpNet]),self.UnderScoreListCharArrayParser([IPhostDestOpNet]),str(NumRequestedQubitsReceive),str(NumRunsPerCenterMass),str(iCenterMass),str(iNumRunsPerCenterMass),str(SynchFreqPRUarrayTest[0]),str(PeriodSignalHistVal),str(ReceiveSynchPRUoffFreqVal[0]),str(ReceiveSynchPRUoffFreqVal[1]),str(QuadChEmtDet[1])])
 				
 				messageCommandAux="SimulateReceiveSynchQubits"
 				messageTypeAux="Control"

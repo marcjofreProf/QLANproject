@@ -858,6 +858,8 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		}
 		else if (string(Command)==string("SimulateReceiveSynchQubits")){// Read qubits to the attached node
 			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
+			char CurrentReceiveHostIP[NumBytesPayloadBuffer]={0};
+			strcpy(CurrentReceiveHostIP,strtok(NULL,";"));
 			strcpy(this->QPLLACurrentEmitReceiveIP,strtok(NULL,";"));
 			//char PayloadAux[NumBytesPayloadBuffer]={0};
 			strcpy(this->QLLAIPaddresses,strtok(NULL,";"));
@@ -873,7 +875,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			this->QLLAQuadEmitDetecSelec=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
 			
-			std::thread threadSimulateReceiveSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveSynchQuBit,this,HistPeriodicityAuxAux,iCenterMass,iNumRunsPerCenterMass);
+			std::thread threadSimulateReceiveSynchQuBitRefAux=std::thread(&QTLAN::QPLASimulateReceiveSynchQuBit,this,CurrentReceiveHostIP,HistPeriodicityAuxAux,iCenterMass,iNumRunsPerCenterMass);
 			threadSimulateReceiveSynchQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("print")){
@@ -932,11 +934,11 @@ this->release();
 return 0;
 }
 
-int QTLAN::QPLASimulateReceiveSynchQuBit(double HistPeriodicityAuxAux,int iCenterMass,int iNumRunsPerCenterMass) {
+int QTLAN::QPLASimulateReceiveSynchQuBit(char* CurrentReceiveHostIPaux, double HistPeriodicityAuxAux,int iCenterMass,int iNumRunsPerCenterMass) {
 	this->acquire();
 if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
 	this->QPLASimulateReceiveQuBitFlag=true; 
-	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass,this->QLLAQuadEmitDetecSelec);
+	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(CurrentReceiveHostIPaux,this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass,this->QLLAQuadEmitDetecSelec);
 	this->QPLASimulateReceiveQuBitFlag=false;
 }
 this->release();

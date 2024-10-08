@@ -1787,6 +1787,9 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			// First message - Receive Qubits
 			strcpy(messagePayloadAux,"Active");
 			strcat(messagePayloadAux,";");
+			strcat(messagePayloadAux,this->IPaddressesSockets[2]);// Ip OPnet of the receiver
+			strcat(messagePayloadAux,"_");
+			strcat(messagePayloadAux,";");
 			strcat(messagePayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);// Ip OPnet of the emitter
 			strcat(messagePayloadAux,"_");
 			strcat(messagePayloadAux,";");				

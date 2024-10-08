@@ -251,15 +251,46 @@ else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeSynchParams")
 	// Identify the IP of the informing node and store it accordingly
 
 	//ValuesCharArray[iHeaders] consists of IP of the node sending the information to this specific node: Offset:Rel.Freq.Diff:Period
-	int CurrentSpecificLinkAux=atoi(strtok(ValuesCharArray[iHeaders],":")); // Identifies index position for storage
-	cout << "QPLA::Receiving synch. parameters from other node" << endl;
-	if (CurrentSpecificLinkAux>=0 and CurrentSpecificLinkAux<LinkNumberMAX){
-		SynchNetworkParamsLinkOther[CurrentSpecificLinkAux][0]=atof(strtok(NULL,":")); // Save the provided values to the proper indices. Synch offset
-		SynchNetworkParamsLinkOther[CurrentSpecificLinkAux][1]=atof(strtok(NULL,":")); // Save the provided values to the proper indices. Relative frequency difference.
-		SynchNetworkParamsLinkOther[CurrentSpecificLinkAux][2]=atof(strtok(NULL,":")); // Save the provided values to the proper indices. Period.
+	char CurrentReceiveHostIP[NumBytesBufferICPMAX]={0};
+	strcpy(CurrentReceiveHostIP,strtok(ValuesCharArray[iHeaders],":")); // Identifies index position for storage
+
+
+	// Store the potential IP identification of the emitters (for Receive) and receivers for (Emit) - in order to identify the link
+	CurrentSpecificLink=-1;// Reset value
+	numSpecificLinkmatches=0; // Reset value
+	int numCurrentEmitReceiveIP=countUnderscores(CurrentReceiveHostIP); // Which means the number of IP addresses that currently will send/receive qubits
+	char CurrentReceiveHostIPAuxAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
+	strcpy(CurrentReceiveHostIPAuxAux,CurrentReceiveHostIP);
+	char SpecificCurrentReceiveHostIPAuxAux[IPcharArrayLengthMAX]={0};
+	for (int j=0;j<numCurrentEmitReceiveIP;j++){
+		if (j==0){strcpy(SpecificCurrentReceiveHostIPAuxAux,strtok(CurrentReceiveHostIPAuxAux,"_"));}
+		else{strcpy(SpecificCurrentReceiveHostIPAuxAux,strtok(NULL,"_"));}
+		for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
+			if (string(LinkIdentificationArray[i])==string(SpecificCurrentReceiveHostIPAuxAux)){// IP already present
+				if (CurrentSpecificLink<0){CurrentSpecificLink=i;}// Take the first identified, which is th eone that matters most
+				CurrentSpecificLinkMultipleIndices[numSpecificLinkmatches]=i; // For multiple links at the same time
+				numSpecificLinkmatches++;
+			}
+		}
+		if (CurrentSpecificLink<0){// Not previously identified, so stored them if possible
+			if ((CurrentNumIdentifiedEmitReceiveIP+1)<=LinkNumberMAX){
+				strcpy(LinkIdentificationArray[CurrentNumIdentifiedEmitReceiveIP],SpecificCurrentReceiveHostIPAuxAux);// Update value
+				CurrentSpecificLink=CurrentNumIdentifiedEmitReceiveIP;
+				CurrentNumIdentifiedEmitReceiveIP++;
+			}
+			else{// Mal function we should not be here
+				cout << "QPLA::Number of identified emitters/receivers to this node has exceeded the expected value!!!" << endl;
+			}
+		}	
+	}
+	cout << "QPLA::Receiving synch. parameters from other node" << CurrentReceiveHostIP << endl;
+	if (CurrentSpecificLink>=0 and CurrentSpecificLink<LinkNumberMAX){
+		SynchNetworkParamsLinkOther[CurrentSpecificLink][0]=atof(strtok(NULL,":")); // Save the provided values to the proper indices. Synch offset
+		SynchNetworkParamsLinkOther[CurrentSpecificLink][1]=atof(strtok(NULL,":")); // Save the provided values to the proper indices. Relative frequency difference.
+		SynchNetworkParamsLinkOther[CurrentSpecificLink][2]=atof(strtok(NULL,":")); // Save the provided values to the proper indices. Period.
 	}
 	else{// We should be here
-		cout << "QPLA::Bad CurrentSpecificLinkAux index. Not updating other node synch values!" << endl;
+		cout << "QPLA::Bad CurrentSpecificLink index. Not updating other node synch values!" << endl;
 	}
 }
 else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread	
@@ -658,8 +689,7 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 	return 0; // return 0 is for no error
 }
 
-int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distribute this synch information to the other involved nodes
-	cout << "QPLA::Sending synch. parameters to the other nodes." << endl;
+int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is responsability of the host to distribute this synch information to the other involved nodes	
 	// Tell to the other nodes
 	char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 	char charNum[NumBytesPayloadBuffer] = {0};
@@ -677,11 +707,11 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 			strcat(ParamsCharArray,"IPdest_");// Continues the ParamsCharArray, so use strcat
 			strcat(ParamsCharArray,strtok(NULL,"_"));// Indicate the address to send the Synch parameters information
 		}
+		cout << "QPLA::Sending synch. parameters to node: " << ParamsCharArray << endl;
 		strcat(ParamsCharArray,"_");// Add underscore separator
 		strcat(ParamsCharArray,"OtherClientNodeSynchParams_"); // Continues the ParamsCharArray, so use strcat
 		// The values to send separated by :
-		sprintf(charNum, "%d",CurrentSpecificLink); // Index position
-		strcat(ParamsCharArray,charNum);
+		strcat(ParamsCharArray,CurrentReceiveHostIPaux); // IP of sender with a final underscore _(this node host)
 		strcat(ParamsCharArray,":");
 		sprintf(charNum, "%8f",SynchNetworkParamsLink[CurrentSpecificLink][0]); // Offset
 		strcat(ParamsCharArray,charNum);
@@ -702,7 +732,7 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 	return 0; // All Ok
 }
 
-int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux){
+int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentReceiveHostIPaux, char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux){
 	this->acquire();
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
@@ -760,7 +790,7 @@ threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detac
 else{
 	cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 }		
-this->HistCalcPeriodTimeTags(iCenterMass,iNumRunsPerCenterMass);// Compute synch values
+this->HistCalcPeriodTimeTags(CurrentReceiveHostIPaux,iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 
 this->release();
 /*
@@ -1329,7 +1359,7 @@ this->release();
 return 0; // All ok
 }
 
-int QPLA::HistCalcPeriodTimeTags(int iCenterMass,int iNumRunsPerCenterMass){
+int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,int iNumRunsPerCenterMass){
 	//this->acquire();
 	//while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 	//this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
@@ -1662,7 +1692,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 		SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 		SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
-		this->SetSynchParamsOtherNode(); // Tell the synchronization information to the other nodes
+		this->SetSynchParamsOtherNode(CurrentReceiveHostIPaux); // Tell the synchronization information to the other nodes
 		
 	}
 	cout << "QPLA::Synchronization parameters updated for this node" << endl;
