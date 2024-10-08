@@ -692,13 +692,13 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 }
 
 int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is responsability of the host to distribute this synch information to the other involved nodes	
-	cout << "QPLA::SetSynchParamsOtherNode CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
+	//cout << "QPLA::SetSynchParamsOtherNode CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
 	// Tell to the other nodes
 	char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 	char charNum[NumBytesPayloadBuffer] = {0};
 	char CurrentReceiveHostIP[NumBytesPayloadBuffer]={0};
 	strcpy(CurrentReceiveHostIP,strtok(CurrentReceiveHostIPaux,"_"));
-	cout << "QPLA::SetSynchParamsOtherNode CurrentReceiveHostIP: " << CurrentReceiveHostIP << endl;
+	//cout << "QPLA::SetSynchParamsOtherNode CurrentReceiveHostIP: " << CurrentReceiveHostIP << endl;
 	int numUnderScores=countUnderscores(this->CurrentEmitReceiveIP); // Which means the number of IP addresses to send the synch information
 	char CurrentEmitReceiveIPAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
 	strcpy(CurrentEmitReceiveIPAux,this->CurrentEmitReceiveIP);
@@ -729,7 +729,7 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 		strcat(ParamsCharArray,":"); // Final :
 		strcat(ParamsCharArray,"_"); // Final _
 	} // end for to the different addresses to send the params information
-	cout << "QPLA::ParamsCharArray SetSynchParamsOtherNode: " << ParamsCharArray << endl;
+	//cout << "QPLA::ParamsCharArray SetSynchParamsOtherNode: " << ParamsCharArray << endl;
 	this->acquire();
 	this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 	this->release();
@@ -738,7 +738,7 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 }
 
 int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentReceiveHostIPaux, char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux){
-	cout << "QPLA::SimulateReceiveSynchQuBit CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
+	//cout << "QPLA::SimulateReceiveSynchQuBit CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
 	this->acquire();
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
@@ -798,7 +798,7 @@ threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detac
 else{
 	cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
 }
-cout << "QPLA::HistCalcPeriodTimeTags CurrentReceiveHostIP: " << CurrentReceiveHostIP << endl;
+//cout << "QPLA::HistCalcPeriodTimeTags CurrentReceiveHostIP: " << CurrentReceiveHostIP << endl;
 this->HistCalcPeriodTimeTags(CurrentReceiveHostIP,iCenterMass,iNumRunsPerCenterMass);// Compute synch values
 
 this->release();
@@ -1369,7 +1369,7 @@ return 0; // All ok
 }
 
 int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,int iNumRunsPerCenterMass){
-	cout << "QPLA::HistCalcPeriodTimeTags CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
+	//cout << "QPLA::HistCalcPeriodTimeTags CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
 	//this->acquire();
 	//while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 	//this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
