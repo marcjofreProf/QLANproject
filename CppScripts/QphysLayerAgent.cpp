@@ -725,7 +725,7 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 		strcat(ParamsCharArray,":"); // Final :
 		strcat(ParamsCharArray,"_"); // Final _
 	} // end for to the different addresses to send the params information
-	//cout << "QPLA::ParamsCharArray: " << ParamsCharArray << endl;
+	cout << "QPLA::ParamsCharArray SetSynchParamsOtherNode: " << ParamsCharArray << endl;
 	this->acquire();
 	this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 	this->release();
@@ -734,6 +734,7 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 }
 
 int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentReceiveHostIPaux, char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux){
+	cout << "QPLA::SimulateReceiveSynchQuBit: " << CurrentReceiveHostIPaux << endl;
 	this->acquire();
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
