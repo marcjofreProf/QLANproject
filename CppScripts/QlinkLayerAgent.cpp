@@ -148,6 +148,7 @@ char ValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
 char TokenValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
 
 strcpy(ParamsCharArray,this->PayloadReadBuffer);
+memset(this->PayloadReadBuffer, 0, sizeof(this->PayloadReadBuffer));// Reset buffer
 
 int NumDoubleUnderscores = this->countDoubleUnderscores(ParamsCharArray);
 

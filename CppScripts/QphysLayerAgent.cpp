@@ -212,9 +212,10 @@ int QPLA::ProcessNewParameters(){
 	char TokenValuesCharArray[NumParamMessagesMax][NumBytesPayloadBuffer]={0};
 
 	strcpy(ParamsCharArray,this->PayloadReadBuffer);
-
+	memset(this->PayloadReadBuffer, 0, sizeof(this->PayloadReadBuffer));// Reset buffer
+	
 	int NumDoubleUnderscores = this->countDoubleUnderscores(ParamsCharArray);
-//cout << "NumDoubleUnderscores: " << NumDoubleUnderscores << endl;
+	//cout << "NumDoubleUnderscores: " << NumDoubleUnderscores << endl;
 
 	for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
 		if (iHeaders==0){
@@ -225,98 +226,98 @@ int QPLA::ProcessNewParameters(){
 		}
 		strcpy(ValuesCharArray[iHeaders],strtok(NULL,"_"));
 	}
-//cout << "Phys: Processing Parameters" << endl;
-//cout << "this->PayloadReadBuffer: " << this->PayloadReadBuffer << endl;
-	for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
-//cout << "HeaderCharArray[iHeaders]: " << HeaderCharArray[iHeaders] << endl;
-// Missing to develop if there are different values
-/*
-if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){
-	this->EmitLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);	
-	outGPIO=new GPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
-	outGPIO->setDirection(OUTPUT);
-	outGPIO->streamOutOpen();
-	outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);
-}
-else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){
-	this->ReceiveLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);
-	inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
-	inGPIO->setDirection(INPUT);
-	inGPIO->setEdgeType(NONE);
-	inGPIO->streamInOpen();
-}
-*/
-		if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
-else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeSynchParams")){// Information about synchronization from other nodes
-	// Identify the IP of the informing node and store it accordingly
+	//cout << "Phys: Processing Parameters" << endl;
+	//cout << "this->PayloadReadBuffer: " << this->PayloadReadBuffer << endl;
+		for (int iHeaders=0;iHeaders<NumDoubleUnderscores;iHeaders++){
+	//cout << "HeaderCharArray[iHeaders]: " << HeaderCharArray[iHeaders] << endl;
+	// Missing to develop if there are different values
+	/*
+	if (string(HeaderCharArray[iHeaders])==string("EmitLinkNumberArray[0]")){
+		this->EmitLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);	
+		outGPIO=new GPIO(this->EmitLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
+		outGPIO->setDirection(OUTPUT);
+		outGPIO->streamOutOpen();
+		outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);
+	}
+	else if (string(HeaderCharArray[iHeaders])==string("ReceiveLinkNumberArray[0]")){
+		this->ReceiveLinkNumberArray[0]=(int)atoi(ValuesCharArray[iHeaders]);
+		inGPIO=new GPIO(this->ReceiveLinkNumberArray[0]);// Produces a 250ms sleep, so it has to be executed at the beggining to not produce relevant delays
+		inGPIO->setDirection(INPUT);
+		inGPIO->setEdgeType(NONE);
+		inGPIO->streamInOpen();
+	}
+	*/
+	if (string(HeaderCharArray[iHeaders])==string("QuBitsPerSecondVelocity[0]")){this->QuBitsPerSecondVelocity[0]=(float)atoi(ValuesCharArray[iHeaders]);}
+	else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeSynchParams")){// Information about synchronization from other nodes
+		// Identify the IP of the informing node and store it accordingly
 
-	//ValuesCharArray[iHeaders] consists of IP of the node sending the information to this specific node: Offset:Rel.Freq.Diff:Period
-	char CurrentReceiveHostIP[NumBytesBufferICPMAX]={0};
-	strcpy(CurrentReceiveHostIP,strtok(ValuesCharArray[iHeaders],":")); // Identifies index position for storage
-	strcat(CurrentReceiveHostIP,"_"); // Add _ so that the identifier below works
+		//ValuesCharArray[iHeaders] consists of IP of the node sending the information to this specific node: Offset:Rel.Freq.Diff:Period
+		char CurrentReceiveHostIP[NumBytesBufferICPMAX]={0};
+		strcpy(CurrentReceiveHostIP,strtok(ValuesCharArray[iHeaders],":")); // Identifies index position for storage
+		strcat(CurrentReceiveHostIP,"_"); // Add _ so that the identifier below works
 
-	// Store the potential IP identification of the emitters (for Receive) and receivers for (Emit) - in order to identify the link
-	CurrentSpecificLink=-1;// Reset value
-	numSpecificLinkmatches=0; // Reset value
-	int numCurrentEmitReceiveIP=countUnderscores(CurrentReceiveHostIP); // Which means the number of IP addresses that currently will send/receive qubits
-	char CurrentReceiveHostIPAuxAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
-	strcpy(CurrentReceiveHostIPAuxAux,CurrentReceiveHostIP);
-	char SpecificCurrentReceiveHostIPAuxAux[IPcharArrayLengthMAX]={0};
-	for (int j=0;j<numCurrentEmitReceiveIP;j++){
-		if (j==0){strcpy(SpecificCurrentReceiveHostIPAuxAux,strtok(CurrentReceiveHostIPAuxAux,"_"));}
-		else{strcpy(SpecificCurrentReceiveHostIPAuxAux,strtok(NULL,"_"));}
-		for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
-			if (string(LinkIdentificationArray[i])==string(SpecificCurrentReceiveHostIPAuxAux)){// IP already present
-				if (CurrentSpecificLink<0){CurrentSpecificLink=i;}// Take the first identified, which is th eone that matters most
-				CurrentSpecificLinkMultipleIndices[numSpecificLinkmatches]=i; // For multiple links at the same time
-				numSpecificLinkmatches++;
+		// Store the potential IP identification of the emitters (for Receive) and receivers for (Emit) - in order to identify the link
+		CurrentSpecificLink=-1;// Reset value
+		numSpecificLinkmatches=0; // Reset value
+		int numCurrentEmitReceiveIP=countUnderscores(CurrentReceiveHostIP); // Which means the number of IP addresses that currently will send/receive qubits
+		char CurrentReceiveHostIPAuxAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
+		strcpy(CurrentReceiveHostIPAuxAux,CurrentReceiveHostIP);
+		char SpecificCurrentReceiveHostIPAuxAux[IPcharArrayLengthMAX]={0};
+		for (int j=0;j<numCurrentEmitReceiveIP;j++){
+			if (j==0){strcpy(SpecificCurrentReceiveHostIPAuxAux,strtok(CurrentReceiveHostIPAuxAux,"_"));}
+			else{strcpy(SpecificCurrentReceiveHostIPAuxAux,strtok(NULL,"_"));}
+			for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
+				if (string(LinkIdentificationArray[i])==string(SpecificCurrentReceiveHostIPAuxAux)){// IP already present
+					if (CurrentSpecificLink<0){CurrentSpecificLink=i;}// Take the first identified, which is th eone that matters most
+					CurrentSpecificLinkMultipleIndices[numSpecificLinkmatches]=i; // For multiple links at the same time
+					numSpecificLinkmatches++;
+				}
 			}
+			if (CurrentSpecificLink<0){// Not previously identified, so stored them if possible
+				if ((CurrentNumIdentifiedEmitReceiveIP+1)<=LinkNumberMAX){
+					strcpy(LinkIdentificationArray[CurrentNumIdentifiedEmitReceiveIP],SpecificCurrentReceiveHostIPAuxAux);// Update value
+					CurrentSpecificLink=CurrentNumIdentifiedEmitReceiveIP;
+					CurrentNumIdentifiedEmitReceiveIP++;
+				}
+				else{// Mal function we should not be here
+					cout << "QPLA::Number of identified emitters/receivers to this node has exceeded the expected value!!!" << endl;
+				}
+			}	
 		}
-		if (CurrentSpecificLink<0){// Not previously identified, so stored them if possible
-			if ((CurrentNumIdentifiedEmitReceiveIP+1)<=LinkNumberMAX){
-				strcpy(LinkIdentificationArray[CurrentNumIdentifiedEmitReceiveIP],SpecificCurrentReceiveHostIPAuxAux);// Update value
-				CurrentSpecificLink=CurrentNumIdentifiedEmitReceiveIP;
-				CurrentNumIdentifiedEmitReceiveIP++;
-			}
-			else{// Mal function we should not be here
-				cout << "QPLA::Number of identified emitters/receivers to this node has exceeded the expected value!!!" << endl;
-			}
-		}	
+
+		strcpy(CurrentReceiveHostIP,strtok(ValuesCharArray[iHeaders],":")); // Identifies index position for storage
+		cout << "QPLA::Receiving synch. parameters from other node " << CurrentReceiveHostIP << endl;
+		cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArray[iHeaders] << endl;
+		if (CurrentSpecificLink>=0 and CurrentSpecificLink<LinkNumberMAX){
+			cout << "QPLA::ProcessNewParameters CurrentSpecificLink " << CurrentSpecificLink << endl;
+			SynchNetworkParamsLinkOther[CurrentSpecificLink][0]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Synch offset
+			SynchNetworkParamsLinkOther[CurrentSpecificLink][1]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Relative frequency difference.
+			SynchNetworkParamsLinkOther[CurrentSpecificLink][2]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Period.
+		}
+		else{// We should be here
+			cout << "QPLA::Bad CurrentSpecificLink index. Not updating other node synch values!" << endl;
+		}
+	}
+	else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread	
+		std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(strtoull(ValuesCharArray[iHeaders],NULL,10)));
+		this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
+		//cout << "OtherClientNodeFutureTimePoint: " << static_cast<unsigned long long int>(strtoull(ValuesCharArray[iHeaders],NULL,10)) << endl;
+		// Debugging
+		//TimePoint TimePointClockNow=Clock::now();
+		//auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
+		// Convert duration to desired time
+		//unsigned int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds) 
+		//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
+		//auto duration_since_epoch=this->OtherClientNodeFutureTimePoint.time_since_epoch();
+		// Convert duration to desired time
+		//unsigned int time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epoch).count(); // Convert 
+		//cout << "time_as_count: " << time_as_count << endl;
+	}
+	else{// discard
+	}
 	}
 
-	strcpy(CurrentReceiveHostIP,strtok(ValuesCharArray[iHeaders],":")); // Identifies index position for storage
-	cout << "QPLA::Receiving synch. parameters from other node " << CurrentReceiveHostIP << endl;
-	cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArray[iHeaders] << endl;
-	if (CurrentSpecificLink>=0 and CurrentSpecificLink<LinkNumberMAX){
-		cout << "QPLA::ProcessNewParameters CurrentSpecificLink " << CurrentSpecificLink << endl;
-		SynchNetworkParamsLinkOther[CurrentSpecificLink][0]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Synch offset
-		SynchNetworkParamsLinkOther[CurrentSpecificLink][1]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Relative frequency difference.
-		SynchNetworkParamsLinkOther[CurrentSpecificLink][2]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Period.
-	}
-	else{// We should be here
-		cout << "QPLA::Bad CurrentSpecificLink index. Not updating other node synch values!" << endl;
-	}
-}
-else if (string(HeaderCharArray[iHeaders])==string("OtherClientNodeFutureTimePoint")){// Also helps to wait here for the thread	
-	std::chrono::nanoseconds duration_back(static_cast<unsigned long long int>(strtoull(ValuesCharArray[iHeaders],NULL,10)));
-	this->OtherClientNodeFutureTimePoint=Clock::time_point(duration_back);
-	//cout << "OtherClientNodeFutureTimePoint: " << static_cast<unsigned long long int>(strtoull(ValuesCharArray[iHeaders],NULL,10)) << endl;
-	// Debugging
-	//TimePoint TimePointClockNow=Clock::now();
-	//auto duration_since_epochTimeNow=TimePointClockNow.time_since_epoch();
-	// Convert duration to desired time
-	//unsigned int TimeNow_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochTimeNow).count(); // Convert duration to desired time unit (e.g., microseconds,microseconds) 
-	//cout << "TimeNow_time_as_count: " << TimeNow_time_as_count << endl;
-	//auto duration_since_epoch=this->OtherClientNodeFutureTimePoint.time_since_epoch();
-	// Convert duration to desired time
-	//unsigned int time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epoch).count(); // Convert 
-	//cout << "time_as_count: " << time_as_count << endl;
-}
-else{// discard
-}
-}
-
-return 0; // All OK
+	return 0; // All OK
 }
 ////////////////////////////////////////////////////
 
