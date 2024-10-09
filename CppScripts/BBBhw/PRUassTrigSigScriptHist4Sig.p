@@ -226,13 +226,13 @@ QUADEMT1:
 	MOV	r12, 0x00080004
 	JMP	PERIODICOFFSET
 PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
-//	LBCO	r0, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
-//	LSR 	r0, r14, 1 // Divide by 2 since the loop consumes to at each iteration
-//	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
-//PERIODICOFFSETLOOP:
-//	SUB		r0, r0, 1
-//	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
-//PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
+	LBCO	r0, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
+	LSR 	r0, r14, 1 // Divide by 2 since the loop consumes to at each iteration
+	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
+PERIODICOFFSETLOOP:
+	SUB		r0, r0, 1
+	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
+PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	MOV r9, r7
 //	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 //	// Since this script produces a sequence of four different values, we need to multiply the period by 4 to have the effective period for this script
