@@ -248,20 +248,20 @@ PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and 
 PERIODICOFFSETLOOP:
 	SUB		r0, r0, 1
 	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
-//TIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
-//	LBCO	r0, CONST_PRUDRAM, 20, 4 // Load from PRU RAM position the extra delay
-//	LSR		r0, r0, 1// Divide by two because the TIMEOFFSETADJLOOP consumes double
-//	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
-//TIMEOFFSETADJLOOP:
-//	SUB		r0, r0, 1
-//	QBNE	TIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
-//FINETIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
-//	LBCO	r0, CONST_PRUDRAM, 8, 4 // Load from PRU RAM position the extra delay
-//	LSR	r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
-//	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
-//FINETIMEOFFSETADJLOOP:
-//	SUB	r0, r0, 1
-//	QBNE	FINETIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
+TIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
+	LBCO	r0, CONST_PRUDRAM, 20, 4 // Load from PRU RAM position the extra delay
+	LSR		r0, r0, 1// Divide by two because the TIMEOFFSETADJLOOP consumes double
+	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+TIMEOFFSETADJLOOP:
+	SUB		r0, r0, 1
+	QBNE	TIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
+FINETIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
+	LBCO	r0, CONST_PRUDRAM, 8, 4 // Load from PRU RAM position the extra delay
+	LSR	r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
+	ADD	r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+FINETIMEOFFSETADJLOOP:
+	SUB	r0, r0, 1
+	QBNE	FINETIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
 MANAGECALC:
 	// Since there is a dead period betwen pulses (to do management), divide the period by 2
 	LSR	r9, r9, 1	
