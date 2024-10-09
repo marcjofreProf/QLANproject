@@ -358,15 +358,18 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 
 				if ((this->iIterPRUcurrentTimerValSynch<static_cast<long long int>(NumSynchMeasAvgAux) and abs(duration_FinalInitialMeasTrig)>(ApproxInterruptTime/2)) or this->iIterPRUcurrentTimerValSynch<static_cast<long long int>(NumSynchMeasAvgAux/2)){// Initially compute the time for interrupt handling
+					if (this->iIterPRUcurrentTimerValSynch==(static_cast<long long int>(NumSynchMeasAvgAux/2)-1)){
+						cout << "GPIO::PRUsignalTimerSynchJitterLessInterrupt initial time synchronization calibration not achieved! Increase number of NumSynchMeasAvgAux." << endl;
+					}
 					//int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future).count());
 					duration_FinalInitialMeasTrig=static_cast<int>(this->PRUcurrentTimerValWrap)-static_cast<int>(static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod)/static_cast<double>(PRUclockStepPeriodNanoseconds));// static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future).count());
-					cout << "GPIO::duration_FinalInitialMeasTrig: " << duration_FinalInitialMeasTrig << endl;
-					duration_FinalInitialCountAux=static_cast<double>(duration_FinalInitialMeasTrig);
+					//cout << "GPIO::duration_FinalInitialMeasTrig: " << duration_FinalInitialMeasTrig << endl;
+					duration_FinalInitialCountAux=static_cast<double>(duration_FinalInitialMeasTrig);// This final value achieved is subtracted in the absolute time synch readings
 
 					// Below for the triggering
 					this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%ExtraNumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 					this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,static_cast<int>(this->iIterPRUcurrentTimerValSynch));
-					cout << "GPIO::duration_FinalInitialMeasTrigAuxAvg: " << duration_FinalInitialMeasTrigAuxAvg << endl;
+					//cout << "GPIO::duration_FinalInitialMeasTrigAuxAvg: " << duration_FinalInitialMeasTrigAuxAvg << endl;
 					if (this->duration_FinalInitialMeasTrigAuxAvg>ApproxInterruptTime){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
 						if (this->iIterPRUcurrentTimerValSynch>static_cast<long long int>(NumSynchMeasAvgAux/2)){
 							cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay! Set to nominal value of " << static_cast<int>(ApproxInterruptTime) << "..." << endl;
@@ -391,7 +394,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					// Compute error - Absolute corrected error of absolute error after removing the frequency difference. It adds jitter but probably ensures that hardwware clock offsets are removed periodically (a different story is the offset due to links which is calibrated with the algortm).
 					// Dealing with lon lon int matters due to floting or not precition!!!!
 					long double PRUoffsetDriftErrorAbsAux=0.0;
-					PRUoffsetDriftErrorAbsAux=static_cast<long double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerValWrap)));
+					PRUoffsetDriftErrorAbsAux=static_cast<long double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerValWrap)-static_cast<long double>(duration_FinalInitialCountAux)));
 					// Below unwrap the difference
 					if (PRUoffsetDriftErrorAbsAux>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
 						PRUoffsetDriftErrorAbsAux=static_cast<long double>(iepPRUtimerRange32bits)-PRUoffsetDriftErrorAbsAux+1;
