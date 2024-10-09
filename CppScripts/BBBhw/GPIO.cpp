@@ -535,15 +535,23 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures
 	// The Absolute error is introduced at each signal trigger and timetagging sequence
 	double dPRUoffsetDriftErrorAvg=static_cast<double>(static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(SynchTrigPeriod)));
-	if (abs(PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg)>PRUoffsetDriftErrorAbsAvgMax){
-		cout << "GPIO::PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg magnitude is too large: " << PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg << "Increase PRUoffsetDriftErrorAbsAvgMax." << endl;
-	}
-	if ((PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg)<0.0){
-		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax-fmod(-(PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg),PRUoffsetDriftErrorAbsAvgMax);
+	PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg;
+	if (PRUoffsetDriftErrorAbsAvgAux<0.0){
+		PRUoffsetDriftErrorAbsAvgAux=-fmod(-PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
 	else{
-		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+fmod((PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg),PRUoffsetDriftErrorAbsAvgMax);
+		PRUoffsetDriftErrorAbsAvgAux=+fmod(PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
+	if (abs(PRUoffsetDriftErrorAbsAvgAux)>PRUoffsetDriftErrorAbsAvgMax){
+		cout << "GPIO::PRUoffsetDriftErrorAbsAvgAux magnitude is too large: " << PRUoffsetDriftErrorAbsAvgAux << "Increase PRUoffsetDriftErrorAbsAvgMax. Wrapping PRUoffsetDriftErrorAbsAvgAux around PRUoffsetDriftErrorAbsAvgMax." << endl;
+		if (PRUoffsetDriftErrorAbsAvgAux<0.0){
+			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax-fmod(-PRUoffsetDriftErrorAbsAvgAux,PRUoffsetDriftErrorAbsAvgMax);
+		}
+		else{
+			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+fmod(PRUoffsetDriftErrorAbsAvgAux,PRUoffsetDriftErrorAbsAvgMax);
+		}
+	}
+	
 	pru0dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	// The synch offset
 	if (abs(AccumulatedErrorDriftAux)>PRUoffsetDriftErrorAbsAvgMax){
@@ -645,15 +653,23 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 	// The Absolute error is introduced at each signal trigger and timetagging sequence
 	double dPRUoffsetDriftErrorAvg=static_cast<double>(static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(SynchTrigPeriod)));
-	if (abs(PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg)>PRUoffsetDriftErrorAbsAvgMax){
-		cout << "GPIO::PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg magnitude is too large: " << PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg << ". Increase PRUoffsetDriftErrorAbsAvgMax." << endl;
-	}
-	if ((PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg)<0.0){
-		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax-fmod(-(PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg),PRUoffsetDriftErrorAbsAvgMax);
+	PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg;
+	if (PRUoffsetDriftErrorAbsAvgAux<0.0){
+		PRUoffsetDriftErrorAbsAvgAux=-fmod(-PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
 	else{
-		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+fmod((PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg),PRUoffsetDriftErrorAbsAvgMax);
+		PRUoffsetDriftErrorAbsAvgAux=+fmod(PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
+	if (abs(PRUoffsetDriftErrorAbsAvgAux)>PRUoffsetDriftErrorAbsAvgMax){
+		cout << "GPIO::PRUoffsetDriftErrorAbsAvgAux magnitude is too large: " << PRUoffsetDriftErrorAbsAvgAux << "Increase PRUoffsetDriftErrorAbsAvgMax. Wrapping PRUoffsetDriftErrorAbsAvgAux around PRUoffsetDriftErrorAbsAvgMax." << endl;
+		if (PRUoffsetDriftErrorAbsAvgAux<0.0){
+			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax-fmod(-PRUoffsetDriftErrorAbsAvgAux,PRUoffsetDriftErrorAbsAvgMax);
+		}
+		else{
+			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+fmod(PRUoffsetDriftErrorAbsAvgAux,PRUoffsetDriftErrorAbsAvgMax);
+		}
+	}
+	
 	pru1dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 
 	// The synch offset
