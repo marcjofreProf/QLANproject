@@ -242,13 +242,13 @@ PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first be
 PSEUDOSYNCHLOOP:
 	SUB		r0, r0, 1
 	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
-//PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
-//	LBCO	r0, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
-//	LSR 	r0, r14, 1 // Divide by 2 since the loop consumes to at each iteration
-//	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
-//PERIODICOFFSETLOOP:
-//	SUB		r0, r0, 1
-//	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
+PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
+	LBCO	r0, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
+	LSR 	r0, r14, 1 // Divide by 2 since the loop consumes to at each iteration
+	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
+PERIODICOFFSETLOOP:
+	SUB		r0, r0, 1
+	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
 //TIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
 //	LBCO	r0, CONST_PRUDRAM, 20, 4 // Load from PRU RAM position the extra delay
 //	LSR		r0, r0, 1// Divide by two because the TIMEOFFSETADJLOOP consumes double
