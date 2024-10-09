@@ -100,7 +100,6 @@ INITIATIONS:
 	// Initial initializations
 	LDI	r4, 0 // zeroing
 	LDI r13, 0x00000111
-	LDI r14, 0 // initial value
 	
 	// Initial Re-initialization for IET counter
 	// The Clock gating Register controls the state of Clock Management. 
@@ -244,7 +243,7 @@ PSEUDOSYNCHLOOP:
 	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
 PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
 	LBCO	r0, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
-	LSR 	r0, r14, 1 // Divide by 2 since the loop consumes to at each iteration
+	LSR 	r0, r0, 1 // Divide by 2 since the loop consumes to at each iteration
 	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
 PERIODICOFFSETLOOP:
 	SUB		r0, r0, 1
