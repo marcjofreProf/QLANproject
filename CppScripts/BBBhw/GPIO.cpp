@@ -358,7 +358,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 
 				if ((this->iIterPRUcurrentTimerValSynch<static_cast<long long int>(NumSynchMeasAvgAux) and abs(duration_FinalInitialMeasTrig)>(ApproxInterruptTime/2)) or this->iIterPRUcurrentTimerValSynch<static_cast<long long int>(NumSynchMeasAvgAux/2)){// Initially compute the time for interrupt handling
-					if (this->iIterPRUcurrentTimerValSynch==(static_cast<long long int>(NumSynchMeasAvgAux/2)-1)){
+					if (this->iIterPRUcurrentTimerValSynch==(static_cast<long long int>(NumSynchMeasAvgAux)-1)){
 						cout << "GPIO::PRUsignalTimerSynchJitterLessInterrupt initial time synchronization calibration not achieved! Increase number of NumSynchMeasAvgAux." << endl;
 					}
 					//int duration_FinalInitialMeasTrig=static_cast<int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future).count());
