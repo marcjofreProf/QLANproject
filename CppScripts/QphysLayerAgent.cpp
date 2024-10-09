@@ -1629,7 +1629,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	}
 	
 	// The SynchNetAdjAux is a value around 2.0, generally
-	double InitialCalValueHardwareSynch=(15.0/10.0)/0.5; // VAlue manually inserted to the factor/ratio of the time (in seconds) between the automatic synch script time between tests and the itme used manually to check for the factor 6.0. In this example 15 seconds / 10.0 seconds, and corrected with a 0.5 factor.
+	double InitialCalValueHardwareSynch=(15.0/10.0)/0.5; // Value manually inserted to the factor/ratio between the automatic synch script time between tests and the time used manually to check for the factor 6.0. In this example 15.0 seconds / 10.0 seconds, and corrected with a 0.5 division factor (as for the relative frequency calculation).
 	double SynchNetAdjAux=InitialCalValueHardwareSynch*(6.0/SynchTimeTaggRefMedianAux); // Adjustment value consisting of the 6.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
 	
 	SynchCalcValuesArray[2]=SynchCalcValuesArray[2]*dHistPeriodicityAux; // Normalized frequency difference to the histogram period
