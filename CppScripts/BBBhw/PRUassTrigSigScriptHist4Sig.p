@@ -145,7 +145,7 @@ CMDLOOP2:// Double verification of host sending start command
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction	
 	// Read the number of NUM_REPETITIONS from positon 0 of PRU1 DATA RAM and stored it
 	LBCO 	r1, CONST_PRUDRAM, 4, 4 // Load number of repetitons of the signal
-	LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction or sequence signal period
+	
 	SBCO	r4.b0, CONST_PRUDRAM, 0, 1 // We remove the command from the host (in case there is a reset from host, we are saved) 1 bytes.	
 	//MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Here send interrupt to host to measure time
 	// Start executing
@@ -233,22 +233,23 @@ PERIODICOFFSETLOOP:
 	SUB		r0, r0, 1
 	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
 PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
-	MOV 	r9, r7
-//	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
-//	// Since this script produces a sequence of four different values, we need to multiply the period by 4 to have the effective period for this script
-//	LSL		r7, r7, 2 // Specific of this script because analysing a signal with an effective period 4 times the original period
-//	//
-//	SUB		r6, r7, 1 // Generate the value for r6
-//	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
-//	AND		r0, r0, r6 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
-//	//LDI	r0, 0 // To remove previous values
-//	//LBCO	r0.w0, CONST_IETREG, 0xC, 2// Trick since for period of 65536 we can directly implement module reading 2 bytes
-//	SUB		r0, r7, r0 // Substract to find how long to wait	
-//	LSR		r0, r0, 1// Divide by two because the PSEUDOSYNCHLOOP consumes double
-//	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
-//PSEUDOSYNCHLOOP:
-//	SUB		r0, r0, 1
-//	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
+	LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction or sequence signal period
+	MOV 	r9, r7 // Save this value for cycling thorugh the sequence
+	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
+	// Since this script produces a sequence of four different values, we need to multiply the period by 4 to have the effective period for this script
+	LSL		r7, r7, 2 // Specific of this script because analysing a signal with an effective period 4 times the original period
+	//
+	SUB		r6, r7, 1 // Generate the value for r6
+	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
+	AND		r0, r0, r6 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
+	//LDI	r0, 0 // To remove previous values
+	//LBCO	r0.w0, CONST_IETREG, 0xC, 2// Trick since for period of 65536 we can directly implement module reading 2 bytes
+	SUB		r0, r7, r0 // Substract to find how long to wait	
+	LSR		r0, r0, 1// Divide by two because the PSEUDOSYNCHLOOP consumes double
+	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+PSEUDOSYNCHLOOP:
+	SUB		r0, r0, 1
+	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
 //TIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
 //	LBCO	r0, CONST_PRUDRAM, 20, 4 // Load from PRU RAM position the extra delay
 //	LSR		r0, r0, 1// Divide by two because the TIMEOFFSETADJLOOP consumes double
