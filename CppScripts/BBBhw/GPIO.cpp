@@ -534,7 +534,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and it is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures
 	// The Absolute error is introduced at each signal trigger and timetagging sequence
-	double dPRUoffsetDriftErrorAvg=static_cast<double>(static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(SynchTrigPeriod)));
+	double dPRUoffsetDriftErrorAvg=static_cast<double>(static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 	PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg;
 	if (PRUoffsetDriftErrorAbsAvgAux<0.0){
 		PRUoffsetDriftErrorAbsAvgAux=-fmod(-PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
@@ -550,6 +550,9 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		else{
 			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+fmod(PRUoffsetDriftErrorAbsAvgAux,PRUoffsetDriftErrorAbsAvgMax);
 		}
+	}
+	else{
+		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+PRUoffsetDriftErrorAbsAvgAux;
 	}
 	
 	pru0dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
@@ -652,7 +655,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 	// The Absolute error is introduced at each signal trigger and timetagging sequence
-	double dPRUoffsetDriftErrorAvg=static_cast<double>(static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(SynchTrigPeriod)));
+	double dPRUoffsetDriftErrorAvg=static_cast<double>(static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 	PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg;
 	if (PRUoffsetDriftErrorAbsAvgAux<0.0){
 		PRUoffsetDriftErrorAbsAvgAux=-fmod(-PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
@@ -669,7 +672,10 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+fmod(PRUoffsetDriftErrorAbsAvgAux,PRUoffsetDriftErrorAbsAvgMax);
 		}
 	}
-	
+	else{
+		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+PRUoffsetDriftErrorAbsAvgAux;
+	}
+
 	pru1dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 
 	// The synch offset
