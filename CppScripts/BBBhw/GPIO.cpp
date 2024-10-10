@@ -551,7 +551,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		PRUoffsetDriftErrorAbsAvgAux=-fmod(-PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
 	else{
-		PRUoffsetDriftErrorAbsAvgAux=+fmod(PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
+		PRUoffsetDriftErrorAbsAvgAux=fmod(PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
 	if (abs(PRUoffsetDriftErrorAbsAvgAux)>PRUoffsetDriftErrorAbsAvgMax){
 		cout << "GPIO::PRUoffsetDriftErrorAbsAvgAux magnitude is too large: " << PRUoffsetDriftErrorAbsAvgAux << "Increase PRUoffsetDriftErrorAbsAvgMax. Wrapping PRUoffsetDriftErrorAbsAvgAux around PRUoffsetDriftErrorAbsAvgMax." << endl;
