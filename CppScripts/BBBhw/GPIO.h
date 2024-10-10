@@ -43,6 +43,7 @@ namespace exploringBB {
 //public: //Variables
 
 private:// Variables
+	// Probably not enough resolution in the PRU step to have frequency synchronization since values of 10⁻9 should be able to be captured. Then, the interrogation time has to be made very large (seconds)
 	bool SynchCorrectionTimeFlag=false; // If True, it correct for Time synchronization (more strict, and maybe not needed with synch protocol develop), otherwise it corrects for frequency correction (which variations in frequency whens added pahses and lost phases at the end)
 	bool SlowMemoryPermanentStorageFlag=false; // Variable when true they are stored in a file (slower due to writting and reading) ; otherwise it uses array memory to store qubits (much faster)
 	bool ResetPeriodicallyTimerPRU1=true;// Avoiding interrupts
@@ -54,7 +55,7 @@ private:// Variables
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=4; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
 	int ApproxInterruptTime=5000; // Typical time of interrupt time duration
-	int NumSynchMeasAvgAux=51;//51; // Num averages to compute the time error. Better to be odd number.
+	int NumSynchMeasAvgAux=101;//51; // Num averages to compute the time error. Better to be odd number.
 	int ExtraNumSynchMeasAvgAux=NumSynchMeasAvgAux; // More averaging for computing interrupts access time. VEry critical
 	unsigned int NextSynchPRUcommand=11;// set initially to NextSynchPRUcorrection=0
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
