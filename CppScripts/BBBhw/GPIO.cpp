@@ -580,15 +580,15 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	QPLAFutureTimePoint=QPLAFutureTimePoint+std::chrono::nanoseconds(SynchRem);
 	ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
 	// The relative frequency difference is not module over MultFactorEffSynchPeriod, since its value is computed over the original synch period
-	InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
+	InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 
 	if (InstantCorr>0){SignAuxInstantCorr=1;}
 	else if (InstantCorr<0){SignAuxInstantCorr=-1;}
 	else {SignAuxInstantCorr=0;}
-	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod));
-	ldTimePointClockTagPRUinitial=ldTimePointClockTagPRUinitial+static_cast<long double>(static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod)+InstantCorr);// Update the value with the rel. freq. adj.
-	pru0dataMem_int[3]=static_cast<unsigned int>(static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
+	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(SynchTrigPeriod));
+	ldTimePointClockTagPRUinitial=ldTimePointClockTagPRUinitial+static_cast<long double>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Update the value with the rel. freq. adj.
+	pru0dataMem_int[3]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
 	pru0dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command
 
 	//QPLAFutureTimePoint=QPLAFutureTimePoint-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);// Actually, the time measured duration_FinalInitialMeasTrigAuxAvg is not indicative of much (only if it changes a lot to high values it means trouble)
@@ -704,15 +704,15 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
 
 	// The relative frequency difference is not module over MultFactorEffSynchPeriod, since its value is computed over the original synch period
-	InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
+	InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 	
 	if (InstantCorr>0){SignAuxInstantCorr=1;}
 	else if (InstantCorr<0){SignAuxInstantCorr=-1;}
 	else {SignAuxInstantCorr=0;}
-	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod));
-	ldTimePointClockTagPRUinitial=ldTimePointClockTagPRUinitial+static_cast<long double>(static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod)+InstantCorr);// Update the value with the rel. freq. adj.
-	pru1dataMem_int[2]=static_cast<unsigned int>(static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
+	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(SynchTrigPeriod));
+	ldTimePointClockTagPRUinitial=ldTimePointClockTagPRUinitial+static_cast<long double>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Update the value with the rel. freq. adj.
+	pru1dataMem_int[2]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
 
 	pru1dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command. Generate signals. Takes around 900000 clock ticks
 
