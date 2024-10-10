@@ -534,6 +534,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and it is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures
 	// The Absolute error is introduced at each signal trigger and timetagging sequence
+	ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
 	double dPRUoffsetDriftErrorAvg=static_cast<double>(static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 	PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg;
 	if (PRUoffsetDriftErrorAbsAvgAux<0.0){
@@ -585,7 +586,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	if (InstantCorr>0){SignAuxInstantCorr=1;}
 	else if (InstantCorr<0){SignAuxInstantCorr=-1;}
 	else {SignAuxInstantCorr=0;}
-	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(SynchTrigPeriod));
+	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod));
 	ldTimePointClockTagPRUinitial=ldTimePointClockTagPRUinitial+static_cast<long double>(static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod)+InstantCorr);// Update the value with the rel. freq. adj.
 	pru0dataMem_int[3]=static_cast<unsigned int>(static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
 	pru0dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command
@@ -601,7 +602,6 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 
 	/*
 	cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
-	cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
 	cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 	cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
 	cout << "PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << endl;
@@ -655,6 +655,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 	// The Absolute error is introduced at each signal trigger and timetagging sequence
+	ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
 	double dPRUoffsetDriftErrorAvg=static_cast<double>(static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 	PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg;
 	if (PRUoffsetDriftErrorAbsAvgAux<0.0){
@@ -708,7 +709,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	if (InstantCorr>0){SignAuxInstantCorr=1;}
 	else if (InstantCorr<0){SignAuxInstantCorr=-1;}
 	else {SignAuxInstantCorr=0;}
-	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(SynchTrigPeriod));
+	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod));
 	ldTimePointClockTagPRUinitial=ldTimePointClockTagPRUinitial+static_cast<long double>(static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod)+InstantCorr);// Update the value with the rel. freq. adj.
 	pru1dataMem_int[2]=static_cast<unsigned int>(static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
 
@@ -726,9 +727,8 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//  PRU long execution making sure that notification interrupts do not overlap
 	retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
 
-	/*
+
 	cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
-	cout << "AccumulatedErrorDriftEvolved: " << AccumulatedErrorDriftEvolved << endl;
 	cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 	cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
 	cout << "PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << endl;
@@ -740,7 +740,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	////cout << "SynchRem: " << SynchRem << endl;
 	cout << "this->AdjPulseSynchCoeffAverage: " << this->AdjPulseSynchCoeffAverage << endl;
 	cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
-	*/
+	
 
 	//cout << "SendTriggerSignals: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 	if (retInterruptsPRU1>0){
