@@ -67,7 +67,7 @@ private: // Variables/Objects
 	bool ReadFlagWait=false;
 	int socketReadIter = 0; // Variable to read each time a different socket
 	// Semaphore
-	unsigned long long int UnTrapSemaphoreValueMaxCounter=100000000;//MAx counter trying to acquire semaphore, then force release
+	unsigned long long int UnTrapSemaphoreValueMaxCounter=10000000;//MAx counter trying to acquire semaphore, then force release
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	// Payload messages
 	char PayloadReadBuffer[NumBytesPayloadBuffer]={0}; //Buffer to read payload messages
