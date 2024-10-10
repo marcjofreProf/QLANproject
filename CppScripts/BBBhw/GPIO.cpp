@@ -415,7 +415,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				}
 				else{ // Frequency synchronization correction
 					// Compute error - Relative correction of the frequency difference
-					this->PRUoffsetDriftError=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerValPass)*static_cast<long double>(this->TimePRU1synchPeriod))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap))/(static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds))); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions
+					this->PRUoffsetDriftError=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerValPass)*static_cast<long double>(this->TimePRU1synchPeriod))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap))/(static_cast<long double>(TimePRU1synchPeriod))); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions
 					// Relative error average
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
@@ -533,9 +533,8 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and it is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures
 	// The Absolute error is introduced at each signal trigger and timetagging sequence
-	//ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
-	double dPRUoffsetDriftErrorAvg=PRUoffsetDriftErrorAvg*PRUoffsetDriftErrorAbsAvgMax;//*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
-	//double dPRUoffsetDriftErrorAvg=static_cast<double>(static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
+	ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
+	double dPRUoffsetDriftErrorAvg=static_cast<double>(fmodl((static_cast<long double>(PRUoffsetDriftErrorAvg)*ldTimePointClockTagPRUinitial)/(static_cast<long double>(PRUclockStepPeriodNanoseconds)/static_cast<long double>(1000000000.0)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 	PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg;
 	if (PRUoffsetDriftErrorAbsAvgAux<0.0){
 		PRUoffsetDriftErrorAbsAvgAux=-fmod(-PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
@@ -655,9 +654,8 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 	// The Absolute error is introduced at each signal trigger and timetagging sequence
-	//ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
-	double dPRUoffsetDriftErrorAvg=PRUoffsetDriftErrorAvg*PRUoffsetDriftErrorAbsAvgMax;//static_cast<double>(static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
-	//double dPRUoffsetDriftErrorAvg=static_cast<double>(static_cast<long double>(PRUoffsetDriftErrorAvg)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
+	ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
+	double dPRUoffsetDriftErrorAvg=static_cast<double>(fmodl((static_cast<long double>(PRUoffsetDriftErrorAvg)*ldTimePointClockTagPRUinitial)/(static_cast<long double>(PRUclockStepPeriodNanoseconds)/static_cast<long double>(1000000000.0)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 	PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+dPRUoffsetDriftErrorAvg;
 	if (PRUoffsetDriftErrorAbsAvgAux<0.0){
 		PRUoffsetDriftErrorAbsAvgAux=-fmod(-PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
@@ -728,7 +726,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//  PRU long execution making sure that notification interrupts do not overlap
 	retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
 
-	/*
+	
 	cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 	cout << "AccumulatedErrorDriftAux: " << AccumulatedErrorDriftAux << endl;
 	cout << "PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
@@ -741,7 +739,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	////cout << "SynchRem: " << SynchRem << endl;
 	cout << "this->AdjPulseSynchCoeffAverage: " << this->AdjPulseSynchCoeffAverage << endl;
 	cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
-	*/
+	
 
 	//cout << "SendTriggerSignals: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 	if (retInterruptsPRU1>0){

@@ -48,7 +48,7 @@ private:// Variables
 	bool ResetPeriodicallyTimerPRU1=true;// Avoiding interrupts
 	// Semaphore
 	unsigned long long int UnTrapSemaphoreValueMaxCounter=10000000;//MAx counter trying to acquire semaphore, then force release
-	std::atomic<bool> valueSemaphore=true;// Start as 1  (open or acquireable)
+	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	std::atomic<bool> ManualSemaphore=false;
 	std::atomic<bool> ManualSemaphoreExtra=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
