@@ -997,9 +997,9 @@ if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to
 }
 else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
 	// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for detection to use another story is if compensating for emitter
-	// Eventually, the correction of the offset has to be from the receiver inferred offset, but the relative frequency difference from this emitter
-	if ((SynchNetworkParamsLink[CurrentSpecificLink][1])<0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1];}// For negative correction
-	else if ((SynchNetworkParamsLink[CurrentSpecificLink][1])>0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2];}// For positivenegative correction
+	// Eventually, the correction has to be from the receiver inferred
+	if ((SynchNetworkParamsLinkOther[CurrentSpecificLink][1])<0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1];}// For negative correction
+	else if ((SynchNetworkParamsLinkOther[CurrentSpecificLink][1])>0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2];}// For positivenegative correction
 	else{SynchNetTransHardwareAdjAux=1.0;}
 	// Notice that the relative frequency and offset correction is negated (or maybe not)
 	// For receiver correction - Correction has to take place at the emitter, where the first IP identifies the single receiver
@@ -1009,14 +1009,14 @@ else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has 
 	//For emitter correction - info provided by the other nodes
 	// Maybe the offset does not have to be transformed
 	CurrentExtraSynchNetworkParamsLink[0]=SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][0];// Synch offset
-	// Re. frequency difference
-	if (SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1]<0.0){
-		CurrentExtraSynchNetworkParamsLink[1]=(-(fmod(-dHistPeriodicityHalfAux-SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)+dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
+	// Relative frequency difference
+	if (SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1]<0.0){
+		CurrentExtraSynchNetworkParamsLink[1]=(-(fmod(-dHistPeriodicityHalfAux-SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)+dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	}
 	else{
-		CurrentExtraSynchNetworkParamsLink[1]=((fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
+		CurrentExtraSynchNetworkParamsLink[1]=((fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	}
-	CurrentExtraSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLinkMultipleIndices[0]][2]; // Period in which the parameters where calculated
+	CurrentExtraSynchNetworkParamsLink[2]=SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]; // Period in which the parameters where calculated
 	// Debugging
 	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod Correction for emitter (receiver does not correct)" << endl;
 	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[0]: " << CurrentExtraSynchNetworkParamsLink[0] << endl;
