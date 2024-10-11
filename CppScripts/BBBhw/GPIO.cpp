@@ -76,6 +76,13 @@ int exploringBB::GPIO::mem_fd = -1;// Define and initialize
  * @param number The GPIO number for the BBB
  */
 GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
+	// Some variable initialization
+	if (SynchCorrectionTimeFlag==true){// Time synchronization
+		TimePRU1synchPeriod=500000000;
+	}
+	else{ // Frequency synchronization
+		TimePRU1synchPeriod=5000000000;
+	}
 	// Initialize structure used by prussdrv_pruintc_intc
 	// PRUSS_INTC_INITDATA is found in pruss_intc_mapping.h
 	tpruss_intc_initdata pruss_intc_initdata = PRUSS_INTC_INITDATA;
@@ -393,7 +400,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				
 				if (SynchCorrectionTimeFlag){ // Time correction
 					// Compute error - Absolute corrected error of absolute error after removing the frequency difference. It adds jitter but probably ensures that hardwware clock offsets are removed periodically (a different story is the offset due to links which is calibrated with the algortm).
-					// Dealing with lon lon int matters due to floting or not precition!!!!
+					// Dealing with lon lon int matters due to floating or not precition!!!!
 					long double PRUoffsetDriftErrorAbsAux=0.0;
 					PRUoffsetDriftErrorAbsAux=-fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+static_cast<long double>(this->PRUcurrentTimerValWrap)-static_cast<long double>(duration_FinalInitialCountAux);
 					// Below unwrap the difference
@@ -416,7 +423,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				}
 				else{ // Frequency synchronization correction
 					// Compute error - Relative correction of the frequency difference. This provides like the stability of the hardware clock referenced to the system clock (disciplined with network protocol)...so in the order of 10^-7
-					this->PRUoffsetDriftError=-fmod((static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions
+					this->PRUoffsetDriftError=-fmod((static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap)-duration_FinalInitialCountAux; // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions
 					// Below unwrap the difference
 					if (PRUoffsetDriftError>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
 						PRUoffsetDriftError=static_cast<long double>(iepPRUtimerRange32bits)-PRUoffsetDriftError+1;
