@@ -44,7 +44,7 @@ namespace exploringBB {
 
 private:// Variables
 	// For frequency synchronization Then, the interrogation time has to be made very large (seconds)
-	bool SynchCorrectionTimeFlag=true; // If True, it correct for Time synchronization (more strict, and maybe not needed with synch protocol develop), otherwise it corrects for frequency correction (which variations in frequency whens added pahses and lost phases at the end)
+	bool SynchCorrectionTimeFlag=false; // If True, it correct for Time synchronization (more strict, and maybe not needed with synch protocol develop), otherwise it corrects for frequency correction (which variations in frequency whens added pahses and lost phases at the end)
 	bool SlowMemoryPermanentStorageFlag=false; // Variable when true they are stored in a file (slower due to writting and reading) ; otherwise it uses array memory to store qubits (much faster)
 	bool ResetPeriodicallyTimerPRU1=true;// Avoiding interrupts
 	// Semaphore
