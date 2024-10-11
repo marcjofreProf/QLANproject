@@ -545,7 +545,13 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		ldTimePointClockTagPRUinitial=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
 		this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint; // Update value	
 		//ldTimePointClockTagPRUinitial=(static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod))static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>((this->QPLAFutureTimePoint).time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
-		long double ldPRUoffsetDriftErrorAvg=ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg);
+		long double ldPRUoffsetDriftErrorAvg=0.0;
+		if (abs(PRUoffsetDriftErrorAvg)>1e-6){
+			ldPRUoffsetDriftErrorAvg=ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg);
+		}
+		else{
+			ldPRUoffsetDriftErrorAvg=0.0;
+		}
 		double dPRUoffsetDriftErrorAvg=0.0;
 		if (ldPRUoffsetDriftErrorAvg<0.0){
 			dPRUoffsetDriftErrorAvg=static_cast<double>(-fmodl(-ldPRUoffsetDriftErrorAvg,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
@@ -682,7 +688,13 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		ldTimePointClockTagPRUinitial=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
 		this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint; // Update value	
 		//ldTimePointClockTagPRUinitial=(static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod))static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>((this->QPLAFutureTimePoint).time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
-		long double ldPRUoffsetDriftErrorAvg=ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg);
+		long double ldPRUoffsetDriftErrorAvg=0.0;
+		if (abs(PRUoffsetDriftErrorAvg)>1e-6){
+			ldPRUoffsetDriftErrorAvg=ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg);
+		}
+		else{
+			ldPRUoffsetDriftErrorAvg=0.0;
+		}
 		double dPRUoffsetDriftErrorAvg=0.0;
 		if (ldPRUoffsetDriftErrorAvg<0.0){
 			dPRUoffsetDriftErrorAvg=static_cast<double>(-fmodl(-ldPRUoffsetDriftErrorAvg,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
