@@ -395,7 +395,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					// Compute error - Absolute corrected error of absolute error after removing the frequency difference. It adds jitter but probably ensures that hardwware clock offsets are removed periodically (a different story is the offset due to links which is calibrated with the algortm).
 					// Dealing with lon lon int matters due to floting or not precition!!!!
 					long double PRUoffsetDriftErrorAbsAux=0.0;
-					PRUoffsetDriftErrorAbsAux=static_cast<long double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)))+(static_cast<long double>(this->PRUcurrentTimerValWrap)-static_cast<long double>(duration_FinalInitialCountAux)));
+					PRUoffsetDriftErrorAbsAux=-fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+static_cast<long double>(this->PRUcurrentTimerValWrap);
 					// Below unwrap the difference
 					if (PRUoffsetDriftErrorAbsAux>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
 						PRUoffsetDriftErrorAbsAux=static_cast<long double>(iepPRUtimerRange32bits)-PRUoffsetDriftErrorAbsAux+1;
@@ -416,7 +416,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				}
 				else{ // Frequency synchronization correction
 					// Compute error - Relative correction of the frequency difference. This provides like the stability of the hardware clock referenced to the system clock (disciplined with network protocol)...so in the order of 10^-7
-					this->PRUoffsetDriftError=static_cast<double>((-fmodl((static_cast<long double>(this->iIterPRUcurrentTimerValPass)*static_cast<long double>(this->TimePRU1synchPeriod))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap))/(static_cast<long double>(TimePRU1synchPeriod))); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions
+					this->PRUoffsetDriftError=static_cast<double>((-fmod((static_cast<double>(this->iIterPRUcurrentTimerValPass)*static_cast<double>(this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap))/(static_cast<long double>(TimePRU1synchPeriod))); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions
 					// Relative error average
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
@@ -546,13 +546,8 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint; // Update value	
 		//ldTimePointClockTagPRUinitial=(static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod))static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>((this->QPLAFutureTimePoint).time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
 		long double ldPRUoffsetDriftErrorAvg=0.0;
-		if (abs(PRUoffsetDriftErrorAvg)>1e-6){
-			ldPRUoffsetDriftErrorAvg=ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg);
-		}
-		else{
-			ldPRUoffsetDriftErrorAvg=0.0;
-		}
 		double dPRUoffsetDriftErrorAvg=0.0;
+		ldPRUoffsetDriftErrorAvg=ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg);
 		if (ldPRUoffsetDriftErrorAvg<0.0){
 			dPRUoffsetDriftErrorAvg=static_cast<double>(-fmodl(-ldPRUoffsetDriftErrorAvg,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 		}
@@ -689,19 +684,14 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint; // Update value	
 		//ldTimePointClockTagPRUinitial=(static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod))static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>((this->QPLAFutureTimePoint).time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
 		long double ldPRUoffsetDriftErrorAvg=0.0;
-		if (abs(PRUoffsetDriftErrorAvg)>1e-6){
-			ldPRUoffsetDriftErrorAvg=ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg);
-		}
-		else{
-			ldPRUoffsetDriftErrorAvg=0.0;
-		}
 		double dPRUoffsetDriftErrorAvg=0.0;
+		ldPRUoffsetDriftErrorAvg=ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg);
 		if (ldPRUoffsetDriftErrorAvg<0.0){
 			dPRUoffsetDriftErrorAvg=static_cast<double>(-fmodl(-ldPRUoffsetDriftErrorAvg,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 		}
 		else{
 			dPRUoffsetDriftErrorAvg=static_cast<double>(fmodl(ldPRUoffsetDriftErrorAvg,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
-		}
+		}		
 		PRUoffsetDriftErrorAbsAvgAux=dPRUoffsetDriftErrorAvg;
 	}
 	
