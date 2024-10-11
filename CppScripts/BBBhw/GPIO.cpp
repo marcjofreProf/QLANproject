@@ -77,14 +77,14 @@ int exploringBB::GPIO::mem_fd = -1;// Define and initialize
  */
 GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Some variable initialization
-	/*
+	
 	if (SynchCorrectionTimeFlag==true){// Time synchronization
 		TimePRU1synchPeriod=500000000;
 	}
 	else{ // Frequency synchronization
 		TimePRU1synchPeriod=5000000000;
 	}
-	*/
+	
 	// Initialize structure used by prussdrv_pruintc_intc
 	// PRUSS_INTC_INITDATA is found in pruss_intc_mapping.h
 	tpruss_intc_initdata pruss_intc_initdata = PRUSS_INTC_INITDATA;
@@ -468,8 +468,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				this->NextSynchPRUcorrection=0;
 				this->NextSynchPRUcommand=static_cast<unsigned int>(10);// set command 10, to execute synch functions no correction
 				
-				// Updates for next round					
-				this->PRUcurrentTimerValOldWrap=static_cast<double>(fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())-static_cast<long double>(this->TimePRU1synchPeriod))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits)));//this->PRUcurrentTimerValWrap;// Update
+				// Updates for next round				
+				this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
 				this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update											
 			}
 			else{// does not enter in time
