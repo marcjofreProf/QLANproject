@@ -44,7 +44,7 @@ namespace exploringBB {
 
 private:// Variables
 	// For frequency synchronization Then, the interrogation time has to be made very large (seconds)
-	bool SynchCorrectionTimeFlag=false; // If True, it correct for Time synchronization (more strict, and maybe not needed with synch protocol develop), otherwise it corrects for frequency correction (which variations in frequency whens added pahses and lost phases at the end)
+	bool SynchCorrectionTimeFlag=true; // If True, it correct for Time synchronization (more strict, and maybe not needed with synch protocol develop), otherwise it corrects for frequency correction (which variations in frequency whens added pahses and lost phases at the end)
 	bool SlowMemoryPermanentStorageFlag=false; // Variable when true they are stored in a file (slower due to writting and reading) ; otherwise it uses array memory to store qubits (much faster)
 	bool ResetPeriodicallyTimerPRU1=true;// Avoiding interrupts
 	// Semaphore
@@ -56,7 +56,7 @@ private:// Variables
 	long long int LostCounts=4; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
 	int ApproxInterruptTime=5000; // Typical time of interrupt time duration
 	int NumSynchMeasAvgAux=51;//51; // Num averages to compute the time error. Better to be odd number.
-	int ExtraNumSynchMeasAvgAux=NumSynchMeasAvgAux; // More averaging for computing interrupts access time. VEry critical
+	int ExtraNumSynchMeasAvgAux=31; // Averaging for computing current absolute time offset
 	unsigned int NextSynchPRUcommand=11;// set initially to NextSynchPRUcorrection=0
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
 	//unsigned int OffsetSynchPRUBaseCorrection=262144;// Base value from where the synch offset is added or discounted to achieve periodic offset correction
@@ -72,20 +72,21 @@ private:// Variables
 	double PRUoffsetDriftErrorAbsAvg=0.0;
 	double PRUoffsetDriftErrorAbsAvgMax=65536.0; // Maximum absolute offset to correct for. It can be decreases if the handling interrupt time is improved (decreased). The longer the more correction but the longer it will wait to initiate sequence
 	// Others
-	double PRUoffsetDriftErrorLast=0;
 	double PRUoffsetDriftErrorIntegral=0;
 	double PRUoffsetDriftErrorDerivative=0;
 	double PRUoffsetDriftErrorApplied=0;
 	double PRUoffsetDriftErrorAppliedRaw=0;
 	double PRUcurrentTimerVal=0;
+	double PRUcurrentTimerValLong=0;
 	double PRUcurrentTimerValWrap=0;
+	double PRUcurrentTimerValWrapLong=0;
 	double PRUcurrentTimerValOldWrap=0;
-	double PRUcurrentTimerValOld=0;
-	double PRUoffsetDriftErrorAppliedOldRaw=0;
+	double PRUcurrentTimerValOldWrapLong=0;
 	unsigned long long int iIterPRUcurrentTimerVal=0;
 	unsigned long long int iIterPRUcurrentTimerValSynch=0;// Account for rounds entered
-	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has no tentered
-	unsigned long long int iIterPRUcurrentTimerValLast=0;
+	unsigned long long int iIterPRUcurrentTimerValSynchLong=0;// Account for long rounds entered
+	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has not entered
+	unsigned long long int iIterPRUcurrentTimerValPassLong=1;// Account for rounds that has not entered
 	double EstimateSynch=1.0;
 	double EstimateSynchAvg=1.0;
 	double EstimateSynchArray[MaxNumPulses]={EstimateSynch};// They are not all set to the value, only the first one (a function in the declarator should be used to fill them in.
@@ -111,7 +112,8 @@ private:// Variables
 	using TimePoint = std::chrono::time_point<Clock>;
 	double SynchTrigPeriod=4096.0; //For slotted analysis. It has to match to the histogram analysis
 	double MultFactorEffSynchPeriod=4.0; // When using 4 channels histogram, this value is 4.0; when using real signals this value should be 1.0 (also in QphysLayerAgent.h)
-	unsigned long long int TimePRU1synchPeriod=0; // Initialized at the beggining of GPIO.cpp// In nanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. Also, the sorter the more error in the correct estimation, since there has not elapsed enough time to compute a tendency (it also happens with PRUdetCorrRelFreq() method whre a separation TagsSeparationDetRelFreq is inserted). The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
+	unsigned long long int TimePRU1synchPeriod=500000000; // In nanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. Also, the sorter the more error in the correct estimation, since there has not elapsed enough time to compute a tendency (it also happens with PRUdetCorrRelFreq() method whre a separation TagsSeparationDetRelFreq is inserted). The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
+	unsigned long long int DistTimePRU1synchPeriod=10; // Number of passes with respect TimePRU1synchPeriod, in order to compute both the absolute time difference and the relative frequency difference
 	unsigned long long int iepPRUtimerRange32bits=4294967296; //32 bits
 	struct timespec requestWhileWait;
 	struct timespec requestCoincidenceWhileWait;

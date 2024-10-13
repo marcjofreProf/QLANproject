@@ -77,14 +77,6 @@ int exploringBB::GPIO::mem_fd = -1;// Define and initialize
  */
 GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Some variable initialization
-	
-	if (SynchCorrectionTimeFlag==true){// Time synchronization
-		TimePRU1synchPeriod=500000000;
-	}
-	else{ // Frequency synchronization
-		TimePRU1synchPeriod=5000000000;
-	}
-	
 	// Initialize structure used by prussdrv_pruintc_intc
 	// PRUSS_INTC_INITDATA is found in pruss_intc_mapping.h
 	tpruss_intc_initdata pruss_intc_initdata = PRUSS_INTC_INITDATA;
@@ -359,12 +351,16 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//pru1dataMem_int[2]// Current IEP timer sample
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[2]);
+				this->PRUcurrentTimerValWrapLong=this->PRUcurrentTimerValWrap;// Update value
 				//cout << "GPIO::pru1dataMem_int[2]: " << pru1dataMem_int[2] << endl;
 				// Correct for interrupt handling time might add a bias in the estimation/reading
 				//this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);//this->PRUcurrentTimerValWrap-duration_FinalInitialCountAuxArrayAvg/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command //this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
 				// Unwrap
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
+
+				if (this->PRUcurrentTimerValWrapLong<=this->PRUcurrentTimerValOldWrapLong){this->PRUcurrentTimerValLong=this->PRUcurrentTimerValWrapLong+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrapLong);}
+				else{this->PRUcurrentTimerValLong=this->PRUcurrentTimerValWrapLong;}
 
 				if ((this->iIterPRUcurrentTimerValSynch<static_cast<long long int>(NumSynchMeasAvgAux) and abs(duration_FinalInitialMeasTrig)>(ApproxInterruptTime/2)) or this->iIterPRUcurrentTimerValSynch<static_cast<long long int>(NumSynchMeasAvgAux/2)){// Initially compute the time for interrupt handling
 					if (this->iIterPRUcurrentTimerValSynch==(static_cast<long long int>(NumSynchMeasAvgAux)-1)){
@@ -396,48 +392,52 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					// Below for synch calculation compensation
 					duration_FinalInitialCountAuxArrayAvg=static_cast<double>(duration_FinalInitialMeasTrigAuxAvg);
 				}
-				this->TrigAuxIterCount++;
-
-				// Computations for Synch calculation for PRU0 compensation
-				// Compute Synch - Relative
-				this->EstimateSynch=fmod((static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))/(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap);// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correction).
-				// Compute Synch - Absolute
-				//this->EstimateSynch=static_cast<double>(fmodl((static_cast<long double>((this->iIterPRUcurrentTimerVal)*this->TimePRU1synchPeriod)+0.0*static_cast<long double>(duration_FinalInitialCountAux))/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))/(this->PRUcurrentTimerValWrap-0*this->PRUcurrentTimerValOldWrap));
-				this->EstimateSynchArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->EstimateSynch;
-				this->ManualSemaphoreExtra=true;
-				this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
+				this->TrigAuxIterCount++;				
 				
-				if (SynchCorrectionTimeFlag){ // Time correction
-					// Compute error - Absolute corrected error of absolute error after removing the frequency difference. It adds jitter but probably ensures that hardwware clock offsets are removed periodically (a different story is the offset due to links which is calibrated with the algortm).
-					// Dealing with lon lon int matters due to floating or not precition!!!!
-					long double PRUoffsetDriftErrorAbsAux=0.0;
-					PRUoffsetDriftErrorAbsAux=-fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+static_cast<long double>(this->PRUcurrentTimerValWrap)-static_cast<long double>(duration_FinalInitialCountAux);
-					// Below unwrap the difference
-					if (PRUoffsetDriftErrorAbsAux>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
-						PRUoffsetDriftErrorAbsAux=static_cast<long double>(iepPRUtimerRange32bits)-PRUoffsetDriftErrorAbsAux+1;
-					}	
-					else if(PRUoffsetDriftErrorAbsAux<(-static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
-						PRUoffsetDriftErrorAbsAux=-static_cast<long double>(iepPRUtimerRange32bits)-PRUoffsetDriftErrorAbsAux-1;
-					}
-					if (PRUoffsetDriftErrorAbsAux<0.0){
-						this->PRUoffsetDriftErrorAbs=static_cast<double>(-fmodl(-PRUoffsetDriftErrorAbsAux,static_cast<long double>(iepPRUtimerRange32bits)));
-					}
-					else{
-						this->PRUoffsetDriftErrorAbs=static_cast<double>(fmodl(PRUoffsetDriftErrorAbsAux,static_cast<long double>(iepPRUtimerRange32bits)));
-					}
-					//this->PRUoffsetDriftErrorAbs=this->PRUoffsetDriftErrorAbs*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(1000000000);
-					// Absolute corrected error
-					this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
-					this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,NumSynchMeasAvgAux);// Since we are applying a filter of length NumSynchMeasAvgAux, temporally it effects somehow the longer the filter. Altough it is difficult to correct
+				// Compute error - Absolute corrected error of absolute error after removing the frequency difference. It adds jitter but probably ensures that hardwware clock offsets are removed periodically (a different story is the offset due to links which is calibrated with the algortm).
+				// Dealing with lon lon int matters due to floating or not precition!!!!
+				long double PRUoffsetDriftErrorAbsAux=0.0;
+				PRUoffsetDriftErrorAbsAux=-fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+static_cast<long double>(this->PRUcurrentTimerValWrap)-static_cast<long double>(duration_FinalInitialCountAux);
+				// Below unwrap the difference
+				if (PRUoffsetDriftErrorAbsAux>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
+					PRUoffsetDriftErrorAbsAux=static_cast<long double>(iepPRUtimerRange32bits)-PRUoffsetDriftErrorAbsAux+1;
+				}	
+				else if(PRUoffsetDriftErrorAbsAux<(-static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
+					PRUoffsetDriftErrorAbsAux=-static_cast<long double>(iepPRUtimerRange32bits)-PRUoffsetDriftErrorAbsAux-1;
 				}
-				else{ // Frequency synchronization correction
+				if (PRUoffsetDriftErrorAbsAux<0.0){
+					this->PRUoffsetDriftErrorAbs=static_cast<double>(-fmodl(-PRUoffsetDriftErrorAbsAux,static_cast<long double>(iepPRUtimerRange32bits)));
+				}
+				else{
+					this->PRUoffsetDriftErrorAbs=static_cast<double>(fmodl(PRUoffsetDriftErrorAbsAux,static_cast<long double>(iepPRUtimerRange32bits)));
+				}
+				//this->PRUoffsetDriftErrorAbs=this->PRUoffsetDriftErrorAbs*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(1000000000);
+				// Absolute corrected error
+				this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
+				this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,ExtraNumSynchMeasAvgAux);// Since we are applying a filter of length NumSynchMeasAvgAux, temporally it effects somehow the longer the filter. Altough it is difficult to correct
+								
+				if (this->iIterPRUcurrentTimerValPassLong>DistTimePRU1synchPeriod){
+					// Computations for Synch calculation for PRU0 compensation
+					// Compute Synch - Relative
+					this->EstimateSynch=fmod((static_cast<double>(this->iIterPRUcurrentTimerValPassLong*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))/(this->PRUcurrentTimerValLong-this->PRUcurrentTimerValOldWrapLong);// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correction).
+					this->EstimateSynchArray[iIterPRUcurrentTimerValSynchLong%NumSynchMeasAvgAux]=this->EstimateSynch;
+					this->ManualSemaphoreExtra=true;
+					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
+
+					// Frequency synchronization correction
 					// Compute error - Relative correction of the frequency difference. This provides like the stability of the hardware clock referenced to the system clock (disciplined with network protocol)...so in the order of 10^-7
-					this->PRUoffsetDriftError=(-fmod((static_cast<double>(this->iIterPRUcurrentTimerValPass*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerVal-this->PRUcurrentTimerValOldWrap))/static_cast<long double>(TimePRU1synchPeriod); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions				
+					this->PRUoffsetDriftError=(-fmod((static_cast<double>(this->iIterPRUcurrentTimerValPassLong*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerValLong-this->PRUcurrentTimerValOldWrapLong))/static_cast<long double>(TimePRU1synchPeriod); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions				
 					
 					// Relative error average
-					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynch%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
+					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLong%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
+
+					// Update values
+					this->PRUcurrentTimerValOldWrapLong=this->PRUcurrentTimerValWrap;// Update value
+					this->iIterPRUcurrentTimerValPassLong=0; // Reset value
+					this->iIterPRUcurrentTimerValSynchLong++; // Update value
 				}
+
 				// Warm up interrupt handling for Timetagg PRU0
 				pru0dataMem_int[0]=static_cast<unsigned int>(8); // set command warm-up
 				prussdrv_pru_send_event(21);				
@@ -461,32 +461,17 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				this->release();					
 				
 				this->iIterPRUcurrentTimerValSynch++;
-				this->iIterPRUcurrentTimerValPass=1;
-				PRUoffsetDriftErrorLast=PRUoffsetDriftErrorAvg;// Update
-				iIterPRUcurrentTimerValLast=iIterPRUcurrentTimerVal;// Update		
-				this->PRUcurrentTimerValOld=this->PRUcurrentTimerValWrap;// Update
 				this->NextSynchPRUcorrection=0;
 				this->NextSynchPRUcommand=static_cast<unsigned int>(10);// set command 10, to execute synch functions no correction
 				
 				// Updates for next round				
 				this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
-				this->PRUoffsetDriftErrorAppliedOldRaw=this->PRUoffsetDriftErrorAppliedRaw;//update											
-			}
-			else{// does not enter in time
-				this->iIterPRUcurrentTimerValPass++;
-			}					
+				this->iIterPRUcurrentTimerValPass=0; // reset value										
+			}				
 		} //end if
-		else if (this->ManualSemaphoreExtra==true){
-			// Double entry for some reason. Do not do anything
-			////cout << "PRUs in use by other process TTU or SignalGen!" << endl
-			this->iIterPRUcurrentTimerValPass++;
-		}
-		else{// does not enter in time
-			this->iIterPRUcurrentTimerValPass++;
-		}
 		
 		// Information
-		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(512*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%(128*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
+		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerValSynchLong%(512*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%(128*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerVal>NumSynchMeasAvgAux){//if ((this->iIterPRUcurrentTimerVal%5==0)){
 			////cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			////cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
@@ -504,8 +489,10 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 			////cout << "this->iIterPRUcurrentTimerValSynch: "<< this->iIterPRUcurrentTimerValSynch << endl;
 		}		
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
-		this->iIterPRUcurrentTimerVal++;
-		if (this->iIterPRUcurrentTimerValSynch==(2*this->NumSynchMeasAvgAux)){
+		this->iIterPRUcurrentTimerVal++; // Increase value
+		this->iIterPRUcurrentTimerValPass++; // Increase value
+		this->iIterPRUcurrentTimerValPassLong++; // Increase value
+		if (this->iIterPRUcurrentTimerValSynchLong==(2*this->NumSynchMeasAvgAux)){
 			cout << "Hardware synchronized, now proceeding with the network synchronization managed by hosts..." << endl;
 			// Update HardwareSynchStatus			
 			this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
@@ -816,7 +803,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//  PRU long execution making sure that notification interrupts do not overlap
 	retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
 
-	/*
+	
 	//cout << "ldPRUoffsetDriftErrorAvg: " << ldPRUoffsetDriftErrorAvg << endl;
 	//cout << "dPRUoffsetDriftErrorAvg: " << dPRUoffsetDriftErrorAvg << endl;
 	cout << "AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
@@ -831,7 +818,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	////cout << "SynchRem: " << SynchRem << endl;
 	cout << "this->AdjPulseSynchCoeffAverage: " << this->AdjPulseSynchCoeffAverage << endl;
 	cout << "this->duration_FinalInitialMeasTrigAuxAvg: " << this->duration_FinalInitialMeasTrigAuxAvg << endl;
-	*/
+	
 
 	//cout << "SendTriggerSignals: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 	if (retInterruptsPRU1>0){
