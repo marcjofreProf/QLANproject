@@ -198,38 +198,31 @@ PERIODICTIMESYNCHSUB: // with command coded 8 means synch by reseting the IEP ti
 QUADEMT7:
 	MOV	r11, 0x02220111
 	MOV	r12, 0x08880444
-	JMP	PERIODICOFFSET
+	JMP	PSEUDOSYNCH
 QUADEMT6:
 	MOV	r11, 0x02200110
 	MOV	r12, 0x08800440
-	JMP	PERIODICOFFSET
+	JMP	PSEUDOSYNCH
 QUADEMT5:
 	MOV	r11, 0x02020101
 	MOV	r12, 0x08080404
-	JMP	PERIODICOFFSET
+	JMP	PSEUDOSYNCH
 QUADEMT4:
 	MOV	r11, 0x02000100
 	MOV	r12, 0x08000400
-	JMP	PERIODICOFFSET
+	JMP	PSEUDOSYNCH
 QUADEMT3:
 	MOV	r11, 0x00220011
 	MOV	r12, 0x00880044
-	JMP	PERIODICOFFSET
+	JMP	PSEUDOSYNCH
 QUADEMT2:
 	MOV	r11, 0x00200010
 	MOV	r12, 0x00800040
-	JMP	PERIODICOFFSET
+	JMP	PSEUDOSYNCH
 QUADEMT1:
 	MOV	r11, 0x00020001
 	MOV	r12, 0x00080004
-	JMP	PERIODICOFFSET
-PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
-	LBCO	r0, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
-	LSR 	r0, r0, 1 // Divide by 2 since the loop consumes to at each iteration
-	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
-PERIODICOFFSETLOOP:
-	SUB		r0, r0, 1
-	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
+	JMP	PSEUDOSYNCH
 PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM offset correction or sequence signal period
 	MOV 	r9, r7 // Save this value for cycling thorugh the sequence
@@ -248,6 +241,13 @@ PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first be
 PSEUDOSYNCHLOOP:
 	SUB		r0, r0, 1
 	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
+PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
+	LBCO	r0, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
+	LSR 	r0, r0, 1 // Divide by 2 since the loop consumes to at each iteration
+	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
+PERIODICOFFSETLOOP:
+	SUB		r0, r0, 1
+	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
 TIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
 	LBCO	r0, CONST_PRUDRAM, 20, 4 // Load from PRU RAM position the extra delay
 	LSR		r0, r0, 1// Divide by two because the TIMEOFFSETADJLOOP consumes double
