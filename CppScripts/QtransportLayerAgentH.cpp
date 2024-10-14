@@ -711,7 +711,7 @@ return 0; // All ok
 int QTLAH::RegularCheckToPerform(){
 	if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
 	// First thing to do is to know if the node below is PRU hardware synch
-	if (GPIOnodeHardwareSynched==false){// Ask the node
+	if (GPIOnodeHardwareSynched==false and HostsActiveActionsFree[0]==true){// Ask the node
 		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 		strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
 		strcat(ParamsCharArray,",");
@@ -834,7 +834,7 @@ else
 {
 	iIterPeriodicBlockTimer=0; // Reset value
 }
-if (iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer){// Try to unblock itself
+if (iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer and HostsActiveActionsFree[0]==false){// Try to unblock itself
 	// Send unblock signals
 	cout << "Host" << this->IPaddressesSockets[2] << " will unblock itself since to much time blocked" << endl;
 	int nChararray=NumConnectedHosts;
@@ -1569,7 +1569,13 @@ return 0; // All ok
 
 int QTLAH::UnBlockActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){
 	this->acquire();
-	this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);
+	try{
+		this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);
+	}
+    catch (const std::exception& e) {
+		// Handle the exception
+    	cout << "QTLAH::UnBlockActiveActionFreePreLock Exception: " << e.what() << endl;
+    }
 	this->release();
 
 return 0; // All ok
