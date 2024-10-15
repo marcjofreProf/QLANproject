@@ -118,7 +118,7 @@ private:// Variables
 	struct timespec requestWhileWait;
 	struct timespec requestCoincidenceWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
-	//TimePoint TimePointClockSendCommandFinal=std::chrono::time_point<Clock>();// For synch purposes
+	TimePoint TimePointClockSendCommandFinal=std::chrono::time_point<Clock>();// For synch purposes
 	//TimePoint TimePointClockSendCommandInitial=std::chrono::time_point<Clock>();// For synch purposes
 	//TimePoint TimePointClockPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes. Not used
 	//TimePoint TimePointClockSynchPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes. Not used
