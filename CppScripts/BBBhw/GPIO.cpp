@@ -182,11 +182,11 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	this->SendTriggerSignalsSelfTest(); // Self test initialization
 	cout << "Attention doing SendTriggerSignalsSelfTest. To be removed" << endl;	
 	*/
-	if (SynchCorrectionTimeFlag){
-		cout << "GPIO::Time synchronization periodic correction selected!" << endl;
-	}
-	else{
-		cout << "GPIO::Frequency synchronization periodic correction selected!" << endl;
+	switch (SynchCorrectionTimeFreqNoneFlag){
+		case 3:{cout << "GPIO::Time and frequency synchronization periodic correction selected!" << endl;break;}
+		case 2:{cout << "GPIO::Time synchronization periodic correction selected!" << endl;break;}
+		case 1:{cout << "GPIO::Frequency synchronization periodic correction selected!" << endl;break;}
+		default:{cout << "GPIO::None synchronization periodic correction selected!" << endl;break;}
 	}
 	cout << "Wait to proceed, calibrating synchronization!" << endl;
 	////prussdrv_pru_enable(PRU_Signal_NUM);
@@ -393,13 +393,13 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//cout << "GPIO::duration_FinalInitialMeasTrigAuxAvg: " << duration_FinalInitialMeasTrigAuxAvg << endl;			
 					// Below for synch calculation compensation
 					duration_FinalInitialCountAuxArrayAvg=static_cast<double>(duration_FinalInitialMeasTrigAuxAvg);
-					if (this->duration_FinalInitialMeasTrigAuxAvg>ApproxInterruptTime){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
+					if (this->duration_FinalInitialMeasTrigAuxAvg>ApproxInterruptTime and this->iIterPRUcurrentTimerValSynch>(2*NumSynchMeasAvgAux)){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
 							cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay! Set to nominal value of " << static_cast<int>(ApproxInterruptTime) << "..." << endl;
 						this->duration_FinalInitialMeasTrigAuxAvg=ApproxInterruptTime;// For the time being adjust it to the nominal initial value
 					}	
 				}
 				this->TrigAuxIterCount++;				
-				
+				// Short range measurements to retrieve offsets (little effected by relative frequency difference)
 				// Compute error - Absolute corrected error of absolute error after removing the frequency difference. It adds jitter but probably ensures that hardwware clock offsets are removed periodically (a different story is the offset due to links which is calibrated with the algortm).
 				// Dealing with lon lon int matters due to floating or not precition!!!!
 				long double PRUoffsetDriftErrorAbsAux=0.0;
@@ -422,7 +422,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
 				this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,ExtraNumSynchMeasAvgAux);// Since we are applying a filter of length NumSynchMeasAvgAux, temporally it effects somehow the longer the filter. Altough it is difficult to correct
 								
-				if (this->iIterPRUcurrentTimerValPassLong>DistTimePRU1synchPeriod){
+				if (this->iIterPRUcurrentTimerValPassLong>DistTimePRU1synchPeriod){// Long range measurements to retrieve relative frequency differences
 					// Computations for Synch calculation for PRU0 compensation
 					// Compute Synch - Relative
 					this->EstimateSynch=fmod((static_cast<double>(this->iIterPRUcurrentTimerValPassLong*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))/(this->PRUcurrentTimerValLong-this->PRUcurrentTimerValOldWrapLong);// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correction).
@@ -547,44 +547,32 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	///////////
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and it is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures
-	// The Absolute error is introduced at each signal trigger and timetagging sequence
-	if (SynchCorrectionTimeFlag){ // Absolute time correction
-		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg;
+	// Different modes of periodic correction
+	switch (QuadEmitDetecSelecAux){
+		case 1: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld1;break;}
+		case 2: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld2;break;}
+		case 3: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld3;break;}
+		case 4: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld4;break;}
+		case 5: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld5;break;}
+		case 6: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld6;break;}
+		case 7: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld7;break;}
+		default: {break;}
 	}
-	else{ // Frequency correction
-		switch (QuadEmitDetecSelecAux){
-			case 1: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld1;break;}
-			case 2: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld2;break;}
-			case 3: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld3;break;}
-			case 4: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld4;break;}
-			case 5: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld5;break;}
-			case 6: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld6;break;}
-			case 7: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld7;break;}
-			default: {break;}
+	ldTimePointClockTagPRUinitial=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
+	switch (SynchCorrectionTimeFreqNoneFlag){
+		case 3:{// Time and frequency correction			
+			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+static_cast<double>(ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			break;
 		}
-
-		ldTimePointClockTagPRUinitial=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
-		switch (QuadEmitDetecSelecAux){// Update value	
-			case 1: {this->QPLAFutureTimePointOld1=this->QPLAFutureTimePoint;break;}
-			case 2: {this->QPLAFutureTimePointOld2=this->QPLAFutureTimePoint;break;}
-			case 3: {this->QPLAFutureTimePointOld3=this->QPLAFutureTimePoint;break;}
-			case 4: {this->QPLAFutureTimePointOld4=this->QPLAFutureTimePoint;break;}
-			case 5: {this->QPLAFutureTimePointOld5=this->QPLAFutureTimePoint;break;}
-			case 6: {this->QPLAFutureTimePointOld6=this->QPLAFutureTimePoint;break;}
-			case 7: {this->QPLAFutureTimePointOld7=this->QPLAFutureTimePoint;break;}
-			default: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint;break;}
+		case 2:{// Time correction
+			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg;			
+			break;
 		}
-		//ldTimePointClockTagPRUinitial=(static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod))static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>((this->QPLAFutureTimePoint).time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
-		long double ldPRUoffsetDriftErrorAvg=0.0;
-		double dPRUoffsetDriftErrorAvg=0.0;
-		ldPRUoffsetDriftErrorAvg=ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg);
-		if (ldPRUoffsetDriftErrorAvg<0.0){
-			dPRUoffsetDriftErrorAvg=static_cast<double>(-fmodl(-ldPRUoffsetDriftErrorAvg,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
+		case 1:{ // Frequency correction
+			PRUoffsetDriftErrorAbsAvgAux=static_cast<double>(ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			break;
 		}
-		else{
-			dPRUoffsetDriftErrorAvg=static_cast<double>(fmodl(ldPRUoffsetDriftErrorAvg,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
-		}
-		PRUoffsetDriftErrorAbsAvgAux=dPRUoffsetDriftErrorAvg;
+		default:{PRUoffsetDriftErrorAbsAvgAux=0;break;}// None time nor frequency correction
 	}
 	if (PRUoffsetDriftErrorAbsAvgAux<0.0){
 		PRUoffsetDriftErrorAbsAvgAux=-fmod(-PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
@@ -592,6 +580,17 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	else{
 		PRUoffsetDriftErrorAbsAvgAux=fmod(PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
+	switch (QuadEmitDetecSelecAux){// Update value	
+		case 1: {this->QPLAFutureTimePointOld1=this->QPLAFutureTimePoint;break;}
+		case 2: {this->QPLAFutureTimePointOld2=this->QPLAFutureTimePoint;break;}
+		case 3: {this->QPLAFutureTimePointOld3=this->QPLAFutureTimePoint;break;}
+		case 4: {this->QPLAFutureTimePointOld4=this->QPLAFutureTimePoint;break;}
+		case 5: {this->QPLAFutureTimePointOld5=this->QPLAFutureTimePoint;break;}
+		case 6: {this->QPLAFutureTimePointOld6=this->QPLAFutureTimePoint;break;}
+		case 7: {this->QPLAFutureTimePointOld7=this->QPLAFutureTimePoint;break;}
+		default: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint;break;}
+	}
+
 	if (abs(PRUoffsetDriftErrorAbsAvgAux)>PRUoffsetDriftErrorAbsAvgMax){
 		cout << "GPIO::PRUoffsetDriftErrorAbsAvgAux magnitude is too large: " << PRUoffsetDriftErrorAbsAvgAux << "Increase PRUoffsetDriftErrorAbsAvgMax. Wrapping PRUoffsetDriftErrorAbsAvgAux around PRUoffsetDriftErrorAbsAvgMax." << endl;
 		if (PRUoffsetDriftErrorAbsAvgAux<0.0){
@@ -705,50 +704,48 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-	// The Absolute error is introduced at each signal trigger and timetagging sequence
-	if (SynchCorrectionTimeFlag){ // Absolute time correction
-		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg;
+	// Different modes of periodic correction
+	switch (QuadEmitDetecSelecAux){
+		case 1: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld1;break;}
+		case 2: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld2;break;}
+		case 3: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld3;break;}
+		case 4: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld4;break;}
+		case 5: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld5;break;}
+		case 6: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld6;break;}
+		case 7: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld7;break;}
+		default: {break;}
 	}
-	else{ // Frequency correction
-		switch (QuadEmitDetecSelecAux){
-			case 1: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld1;break;}
-			case 2: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld2;break;}
-			case 3: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld3;break;}
-			case 4: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld4;break;}
-			case 5: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld5;break;}
-			case 6: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld6;break;}
-			case 7: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld7;break;}
-			default: {break;}
+	ldTimePointClockTagPRUinitial=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
+	switch (SynchCorrectionTimeFreqNoneFlag){
+		case 3:{// Time and frequency correction			
+			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+static_cast<double>(ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			break;
 		}
-		ldTimePointClockTagPRUinitial=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
-		switch (QuadEmitDetecSelecAux){// Update value	
-			case 1: {this->QPLAFutureTimePointOld1=this->QPLAFutureTimePoint;break;}
-			case 2: {this->QPLAFutureTimePointOld2=this->QPLAFutureTimePoint;break;}
-			case 3: {this->QPLAFutureTimePointOld3=this->QPLAFutureTimePoint;break;}
-			case 4: {this->QPLAFutureTimePointOld4=this->QPLAFutureTimePoint;break;}
-			case 5: {this->QPLAFutureTimePointOld5=this->QPLAFutureTimePoint;break;}
-			case 6: {this->QPLAFutureTimePointOld6=this->QPLAFutureTimePoint;break;}
-			case 7: {this->QPLAFutureTimePointOld7=this->QPLAFutureTimePoint;break;}
-			default: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint;break;}
+		case 2:{// Time correction
+			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg;			
+			break;
 		}
-		//ldTimePointClockTagPRUinitial=(static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod))static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>((this->QPLAFutureTimePoint).time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
-		long double ldPRUoffsetDriftErrorAvg=0.0;
-		double dPRUoffsetDriftErrorAvg=0.0;
-		ldPRUoffsetDriftErrorAvg=ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg);
-		if (ldPRUoffsetDriftErrorAvg<0.0){
-			dPRUoffsetDriftErrorAvg=static_cast<double>(-fmodl(-ldPRUoffsetDriftErrorAvg,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
+		case 1:{ // Frequency correction
+			PRUoffsetDriftErrorAbsAvgAux=static_cast<double>(ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			break;
 		}
-		else{
-			dPRUoffsetDriftErrorAvg=static_cast<double>(fmodl(ldPRUoffsetDriftErrorAvg,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
-		}		
-		PRUoffsetDriftErrorAbsAvgAux=dPRUoffsetDriftErrorAvg;
+		default:{PRUoffsetDriftErrorAbsAvgAux=0;break;}// None time nor frequency correction
 	}
-	
 	if (PRUoffsetDriftErrorAbsAvgAux<0.0){
 		PRUoffsetDriftErrorAbsAvgAux=-fmod(-PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
 	else{
 		PRUoffsetDriftErrorAbsAvgAux=fmod(PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
+	}
+	switch (QuadEmitDetecSelecAux){// Update value	
+		case 1: {this->QPLAFutureTimePointOld1=this->QPLAFutureTimePoint;break;}
+		case 2: {this->QPLAFutureTimePointOld2=this->QPLAFutureTimePoint;break;}
+		case 3: {this->QPLAFutureTimePointOld3=this->QPLAFutureTimePoint;break;}
+		case 4: {this->QPLAFutureTimePointOld4=this->QPLAFutureTimePoint;break;}
+		case 5: {this->QPLAFutureTimePointOld5=this->QPLAFutureTimePoint;break;}
+		case 6: {this->QPLAFutureTimePointOld6=this->QPLAFutureTimePoint;break;}
+		case 7: {this->QPLAFutureTimePointOld7=this->QPLAFutureTimePoint;break;}
+		default: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint;break;}
 	}
 	if (abs(PRUoffsetDriftErrorAbsAvgAux)>PRUoffsetDriftErrorAbsAvgMax){
 		cout << "GPIO::PRUoffsetDriftErrorAbsAvgAux magnitude is too large: " << PRUoffsetDriftErrorAbsAvgAux << "Increase PRUoffsetDriftErrorAbsAvgMax. Wrapping PRUoffsetDriftErrorAbsAvgAux around PRUoffsetDriftErrorAbsAvgMax." << endl;
