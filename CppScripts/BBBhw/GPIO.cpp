@@ -622,7 +622,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 
 	// From this point below, the timming is very critical to have long time synchronziation stability!!!!
 	InstantCorr=static_cast<long long int>(AccumulatedErrorDrift*SynchTrigPeriod);
-	//ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(1000000000)/static_cast<long double>(PRUclockStepPeriodNanoseconds);//+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
+	ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);//+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
 	// Atenttion, since Histogram analysis has effectively 4 times the SynchTrigPeriod, for the SynchRem this period is multiplied by 4!!! It will have to be removed
 	// The relative frequency difference is not module over MultFactorEffSynchPeriod, since its value is computed over the original synch period
@@ -784,12 +784,18 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	// Atenttion, since Histogram analysis has effectively 4 times the SynchTrigPeriod, for the SynchRem this period is multiplied by 4!!! It will have to be removed
 	InstantCorr=static_cast<long long int>(AccumulatedErrorDrift*SynchTrigPeriod);
 	// The relative frequency difference is not module over MultFactorEffSynchPeriod, since its value is computed over the original synch period
-	//ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(1000000000)/static_cast<long double>(PRUclockStepPeriodNanoseconds);//+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
+	ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 	
-	ContCorr=static_cast<long long int>(static_cast<long double>(SynchTrigPeriod)*static_cast<long double>(PRUoffsetDriftErrorAvg))+InstantCorr;
+	if (SynchCorrectionTimeFreqNoneFlag==0 or SynchCorrectionTimeFreqNoneFlag==2){
+		ContCorr=InstantCorr;
+	}
+	else{
+		ContCorr=static_cast<long long int>(static_cast<long double>(SynchTrigPeriod)*static_cast<long double>(PRUoffsetDriftErrorAvg))+InstantCorr;
+	}
+
 	if (ContCorr>0){SignAuxInstantCorr=1;}
 	else if (ContCorr<0){SignAuxInstantCorr=-1;}
 	else {ContCorr=0;}
