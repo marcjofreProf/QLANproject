@@ -352,7 +352,8 @@ SIGNALON7DEL:
 //	LDI		r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 SIGNALON8:
 //	MOV		r30.w0, 0x0000 // All off
-	MOV		r5, r0 // No extra controlled delay since two instructions (equivalent to three) below as well in FINISH and one here
+	MOV		r5, r0 // No extra controlled delay since two instructions below as well in FINISH and one here
+	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 SIGNALON8DEL:
 	SUB		r5, r5, 1
 	QBNE	SIGNALON8DEL, r5, 0

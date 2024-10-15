@@ -791,10 +791,10 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 	
 	if (SynchCorrectionTimeFreqNoneFlag==0 or SynchCorrectionTimeFreqNoneFlag==2){
-		ContCorr=InstantCorr;
+		ContCorr=static_cast<long long int>(static_cast<long double>(InstantCorr)/static_cast<long double>(MultFactorEffSynchPeriod));
 	}
 	else{
-		ContCorr=static_cast<long long int>(static_cast<long double>(SynchTrigPeriod)*static_cast<long double>(PRUoffsetDriftErrorAvg))+InstantCorr;
+		ContCorr=static_cast<long long int>((static_cast<long double>(SynchTrigPeriod)*static_cast<long double>(PRUoffsetDriftErrorAvg)+static_cast<long double>(InstantCorr))/static_cast<long double>(MultFactorEffSynchPeriod));
 	}
 
 	if (ContCorr>0){SignAuxInstantCorr=1;}
