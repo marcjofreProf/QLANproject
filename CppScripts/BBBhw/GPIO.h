@@ -44,7 +44,7 @@ namespace exploringBB {
 
 private:// Variables
 	// For frequency synchronization Then, the interrogation time has to be made very large (seconds)
-	int SynchCorrectionTimeFreqNoneFlag=0; //0: No correction; 1: frequency correction; 2: Time correction; 3: time and frequency correction
+	int SynchCorrectionTimeFreqNoneFlag=3; //0: No correction; 1: frequency correction; 2: Time correction; 3: time and frequency correction
 	bool SlowMemoryPermanentStorageFlag=false; // Variable when true they are stored in a file (slower due to writting and reading) ; otherwise it uses array memory to store qubits (much faster)
 	bool ResetPeriodicallyTimerPRU1=true;// Avoiding interrupts
 	// Semaphore
