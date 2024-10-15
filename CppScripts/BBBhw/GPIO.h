@@ -244,6 +244,7 @@ private:// Variables
 	double AccumulatedErrorDrift=0.0; // For retrieved relative frequency difference from protocol
 	double AccumulatedErrorDriftAux=0.0;// For retrieved relative offset difference from protocol
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
+	bool QPLAFlagTestSynch=false;
 	// Correct Qubits relative frequency difference due to the sender
 	int TagsSeparationDetRelFreq=10; // Number of index separation to compute the slope of disadjustment in order to have accuraccy
 	double SlopeDetTagsAuxArray[MaxNumQuBitsMemStored]={0.0}; // Array in order to do the computations
@@ -260,8 +261,8 @@ public:	// Functions/Methods
 	int LOCAL_DDMinit();
 	int DDRdumpdata(int iIterRunsAux);
 	int DisablePRUs();
-	int ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux,double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber);// Read the detected timestaps in four channels
-	int SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+	int ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux,double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber, bool FlagTestSynchAux);// Read the detected timestaps in four channels
+	int SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber, bool FlagTestSynchAux); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	int SendTriggerSignalsSelfTest();//
 	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
 	int RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int TimeTaggs[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTags[QuadNumChGroups][MaxNumQuBitsMemStored]); // Reads the fstream file to retrieve number of stored timetagged qubits

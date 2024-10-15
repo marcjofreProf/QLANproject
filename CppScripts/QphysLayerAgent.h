@@ -109,6 +109,7 @@ private: //Variables/Instances
 	char IPaddressesTimePointBarrier[NumBytesBufferICPMAX] = {0};// List of IP addresses separated by "_" to send the Time Point Barrier to
 	double FineSynchAdjVal[2]={0.0};// Adjust synch trig offset and frequency
 	// Automatic calculation of synchronization
+	bool FlagTestSynch=false;
 	double MultFactorEffSynchPeriodQPLA=4.0; // When using 4 channels histogram, this value is 4.0; when using real signals this value should be 1.0 (also in GPIO.h)
 	double HistPeriodicityAux=4096.0; //Value indicated by upper agents (and uploaded to GPIO)//Period in PRU counts of the synch period/histogram
 	int CurrentSpecificLink=-1; // Identifies th eindex of the other emiter/receiver

@@ -472,6 +472,7 @@ return 0; // All ok
 
 int QPLA::SimulateEmitQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int QuadEmitDetecSelecAux){
 	this->acquire();
+	this->FlagTestSynch=false;
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
 	this->RetrieveOtherEmiterReceiverMethod(); // Identifies involved links by IPs mentioned
@@ -520,6 +521,7 @@ return 0; // return 0 is for no error
 
 int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux){
 	this->acquire();
+	this->FlagTestSynch=true;
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
 	this->RetrieveOtherEmiterReceiverMethod();
@@ -615,7 +617,7 @@ clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 // Convert duration to desired time
 unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin 
 
-PRUGPIO.SendTriggerSignals(this->QuadEmitDetecSelec,this->HistPeriodicityAux,static_cast<unsigned int>(NumberRepetitionsSignal),this->FineSynchAdjVal,TimePointFuture_time_as_count);//PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of NumQuBitsPerRun
+PRUGPIO.SendTriggerSignals(this->QuadEmitDetecSelec,this->HistPeriodicityAux,static_cast<unsigned int>(NumberRepetitionsSignal),this->FineSynchAdjVal,TimePointFuture_time_as_count,FlagTestSynch);//PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of NumQuBitsPerRun
 
  /* Very slow GPIO BBB not used anymore
  // Basic Output - Generate a pulse of 1 second period
@@ -651,6 +653,7 @@ cout << "End Emiting Qubits" << endl;
 
 int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int QuadEmitDetecSelecAux){
 	this->acquire();
+	this->FlagTestSynch=false;
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
 	this->RetrieveOtherEmiterReceiverMethod();
@@ -751,6 +754,7 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentReceiveHostIPaux, char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux){
 	//cout << "QPLA::SimulateReceiveSynchQuBit CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
 	this->acquire();
+	this->FlagTestSynch=true;
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
 	char CurrentReceiveHostIP[NumBytesBufferICPMAX]={0};
@@ -1076,7 +1080,7 @@ int QPLA::ThreadSimulateReceiveQubit(){
 	// Convert duration to desired time
 	unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin
 	for (iIterRuns=0;iIterRuns<DetRunsCount;iIterRuns++){	
-		PRUGPIO.ReadTimeStamps(iIterRuns,this->QuadEmitDetecSelec,this->HistPeriodicityAux,static_cast<unsigned int>(NumQuBitsPerRun),this->FineSynchAdjVal,TimePointFuture_time_as_count);//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
+		PRUGPIO.ReadTimeStamps(iIterRuns,this->QuadEmitDetecSelec,this->HistPeriodicityAux,static_cast<unsigned int>(NumQuBitsPerRun),this->FineSynchAdjVal,TimePointFuture_time_as_count,FlagTestSynch);//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
 	}
 	 // Basic Input 
 	 /* Very slow GPIO BBB not used anymore
@@ -1642,7 +1646,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	
 	// The SynchNetAdjAux is a value around 2.0, generally
 	double InitialCalValueHardwareSynch=(15.0/10.0)/0.5; // Value manually inserted to the factor/ratio between the automatic synch script time between tests and the time used manually to check for the factor 6.0. In this example 15.0 seconds / 10.0 seconds, and corrected with a 0.5 division factor (as for the relative frequency calculation).
-	double SynchNetAdjAux=InitialCalValueHardwareSynch*(6.0/SynchTimeTaggRefMedianAux); // Adjustment value consisting of the 6.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
+	double SynchNetAdjAux=1.0;// Deactivated InitialCalValueHardwareSynch*(6.0/SynchTimeTaggRefMedianAux); // Adjustment value consisting of the 6.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
 	
 	SynchCalcValuesArray[2]=SynchCalcValuesArray[2]*dHistPeriodicityAux; // Normalized frequency difference to the histogram period
 
