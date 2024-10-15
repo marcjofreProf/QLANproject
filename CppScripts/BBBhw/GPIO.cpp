@@ -1026,56 +1026,57 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 			}
 		}
 	}
+	if (QPLAFlagTestSynch==false){// When testing for synchronization do not correct the slope
+		for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+			if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>=TagsSeparationDetRelFreq){
+	    		unsigned long long int ULLIInitialTimeTaggs=TimeTaggs[iQuadChIter][0];// Normalize to the first reference timetag (it is not a detect qubit, but the timetagg of entering the timetagg PRU), which is a strong reference
+	    		long long int LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
+	    		long long int LLITimeTaggs[TotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
+	    		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+	    			LLITimeTaggs[i]=static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLIInitialTimeTaggs;
+	    		}
+	    		double SlopeDetTagsAux=1.0;
 
-	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-		if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>=TagsSeparationDetRelFreq){
-    		unsigned long long int ULLIInitialTimeTaggs=TimeTaggs[iQuadChIter][0];// Normalize to the first reference timetag (it is not a detect qubit, but the timetagg of entering the timetagg PRU), which is a strong reference
-    		long long int LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
-    		long long int LLITimeTaggs[TotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
-    		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-    			LLITimeTaggs[i]=static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLIInitialTimeTaggs;
-    		}
-    		double SlopeDetTagsAux=1.0;
+			    // Calculate the "x" values
+	    		long long int xAux[TotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
+	    		long long int LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
+	    		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+	    			xAux[i]=(LLITimeTaggs[i]/LLISynchTrigPeriod)*LLISynchTrigPeriod;
+	    		}
 
-		    // Calculate the "x" values
-    		long long int xAux[TotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
-    		long long int LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
-    		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-    			xAux[i]=(LLITimeTaggs[i]/LLISynchTrigPeriod)*LLISynchTrigPeriod;
-    		}
+			    // Compute the candidate slope
+	    		int iAux=0;
+	    		for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-TagsSeparationDetRelFreq);i++){
+	    			if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
+	    				SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
+	    				iAux++;
+	    			}
+	    		}
 
-		    // Compute the candidate slope
-    		int iAux=0;
-    		for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-TagsSeparationDetRelFreq);i++){
-    			if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
-    				SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
-    				iAux++;
-    			}
-    		}
+	    		SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
+			    //cout << "GPIO::SlopeDetTagsAux: " << SlopeDetTagsAux << endl;
 
-    		SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
-		    //cout << "GPIO::SlopeDetTagsAux: " << SlopeDetTagsAux << endl;
+	    		if (SlopeDetTagsAux<=0.0){
+	    			cout << "GPIO::PRUdetCorrRelFreq wrong computation of the SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << ". Not applying the correction..." << endl;
+	    			SlopeDetTagsAux=1.0;
+	    		}
+	    		cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << endl;
+			    // Un-normalize
+	    		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+	    			TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>((1.0/SlopeDetTagsAux)*static_cast<double>(LLITimeTaggs[i]))+ULLIInitialTimeTaggs;
+	    		}
 
-    		if (SlopeDetTagsAux<=0.0){
-    			cout << "GPIO::PRUdetCorrRelFreq wrong computation of the SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << ". Not applying the correction..." << endl;
-    			SlopeDetTagsAux=1.0;
-    		}
-    		cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << endl;
-		    // Un-normalize
-    		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-    			TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>((1.0/SlopeDetTagsAux)*static_cast<double>(LLITimeTaggs[i]))+ULLIInitialTimeTaggs;
-    		}
-
-		    //////////////////////////////////////////
-		    // Checks of proper values handling
-		    //long long int CheckValueAux=(static_cast<long long int>(SynchTrigPeriod/2.0)+static_cast<long long int>(TimeTaggsStored[0]))%static_cast<long long int>(SynchTrigPeriod)-static_cast<long long int>(SynchTrigPeriod/2.0);
-		    //cout << "GPIO::PRUdetCorrRelFreq::CheckValueAux: "<< CheckValueAux << endl;
-		    ////////////////////////////////////////
-		}// if
-		else if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
-			cout << "GPIO::PRUdetCorrRelFreq not enough detections " << TotalCurrentNumRecordsQuadCh[iQuadChIter] << "<" << TagsSeparationDetRelFreq << " in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;
-		}
-	} // for
+			    //////////////////////////////////////////
+			    // Checks of proper values handling
+			    //long long int CheckValueAux=(static_cast<long long int>(SynchTrigPeriod/2.0)+static_cast<long long int>(TimeTaggsStored[0]))%static_cast<long long int>(SynchTrigPeriod)-static_cast<long long int>(SynchTrigPeriod/2.0);
+			    //cout << "GPIO::PRUdetCorrRelFreq::CheckValueAux: "<< CheckValueAux << endl;
+			    ////////////////////////////////////////
+			}// if
+			else if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
+				cout << "GPIO::PRUdetCorrRelFreq not enough detections " << TotalCurrentNumRecordsQuadCh[iQuadChIter] << "<" << TagsSeparationDetRelFreq << " in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;
+			}
+		} // for
+	}
 //cout << "GPIO::PRUdetCorrRelFreq completed!" << endl;
 return 0; // All ok
 }
@@ -1182,9 +1183,7 @@ else{// Memory allocation
 }
 
 // Correct the detected qubits relative frequency difference (due to the sender node) and split between quad groups of 4 channels
-if (QPLAFlagTestSynch==false){// When testing for synchronization do not correct the slope
 	PRUdetCorrRelFreq(TotalCurrentNumRecordsQuadCh,TimeTaggs,ChannelTags);
-}
 
 return TotalCurrentNumRecords;
 }
