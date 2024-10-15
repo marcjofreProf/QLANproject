@@ -1152,12 +1152,22 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 				for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 				  // Mean averaging, not very resilent with glitches, eventhough filtered in liner regression
 				  // Median averaging
-					SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+				  if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
+						SmallOffsetDriftArrayAux[i]=-((LLIHistPeriodicityHalfAux-(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
+					}
+					else{
+						SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+					}
 				}
 			  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median averaging
 			}
 			else{
-				SmallOffsetDriftAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+				if((static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
+					SmallOffsetDriftAux=-((LLIHistPeriodicityHalfAux-(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
+				}
+				else{
+					SmallOffsetDriftAux=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+				}
 				cout << "QPLA::Using only first timetag for small offset correction!...to be deactivated" << endl;
 			}
 
