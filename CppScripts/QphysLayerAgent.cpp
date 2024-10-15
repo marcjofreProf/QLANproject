@@ -1500,8 +1500,8 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		
 		// Compute related to Period - Somehow for rel. freq. different than 0, this factor is 1/2.
 		adjFreqSynchNormRatiosArray[0]=1.0;
-		adjFreqSynchNormRatiosArray[1]=0.5;//((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
-		adjFreqSynchNormRatiosArray[2]=0.5;//((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
+		adjFreqSynchNormRatiosArray[1]=1.0;//((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
+		adjFreqSynchNormRatiosArray[2]=1.0;//((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
 
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])); //Period adjustment	
 		// Computations related to retrieve the relative frequency difference
@@ -1533,10 +1533,10 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 			SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[1];
 		}
 		if (SynchCalcValuesArray[2]<0.0){
-			SynchCalcValuesArrayFreqAux[1]=SynchCalcValuesArrayFreqAux[1]-SynchCalcValuesArrayFreqAux[0];// Frequency adjustment for negative rel. freq. difference
+			SynchCalcValuesArrayFreqAux[1]=(SynchCalcValuesArrayFreqAux[1]-SynchCalcValuesArrayFreqAux[0])/MultFactorEffSynchPeriodQPLA;// Frequency adjustment for negative rel. freq. difference
 		}
 		else if(SynchCalcValuesArray[2]>0.0){
-			SynchCalcValuesArrayFreqAux[1]=SynchCalcValuesArrayFreqAux[1]+SynchCalcValuesArrayFreqAux[0];// Frequency adjustment for negative rel. freq. difference
+			SynchCalcValuesArrayFreqAux[1]=(SynchCalcValuesArrayFreqAux[1]+SynchCalcValuesArrayFreqAux[0])/MultFactorEffSynchPeriodQPLA;// Frequency adjustment for negative rel. freq. difference
 		}
 		else{
 			SynchCalcValuesArrayFreqAux[1]=1.0;// Frequency adjustment for negative rel. freq. difference
@@ -1549,10 +1549,10 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 			SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[2]; 
 		}
 		if (SynchCalcValuesArray[2]>0.0){
-			SynchCalcValuesArrayFreqAux[2]=SynchCalcValuesArrayFreqAux[2]+SynchCalcValuesArrayFreqAux[0];// Frequency adjustment for positive rel. freq. difference
+			SynchCalcValuesArrayFreqAux[2]=(SynchCalcValuesArrayFreqAux[2]+SynchCalcValuesArrayFreqAux[0])/MultFactorEffSynchPeriodQPLA;// Frequency adjustment for positive rel. freq. difference
 		}
 		else if(SynchCalcValuesArray[2]<0.0){
-			SynchCalcValuesArrayFreqAux[2]=SynchCalcValuesArrayFreqAux[2]-SynchCalcValuesArrayFreqAux[0];// Frequency adjustment for positive rel. freq. difference
+			SynchCalcValuesArrayFreqAux[2]=(SynchCalcValuesArrayFreqAux[2]-SynchCalcValuesArrayFreqAux[0])/MultFactorEffSynchPeriodQPLA;// Frequency adjustment for positive rel. freq. difference
 		}
 		else{
 			SynchCalcValuesArrayFreqAux[2]=1.0;// Frequency adjustment for positive rel. freq. difference

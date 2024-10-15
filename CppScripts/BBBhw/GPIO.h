@@ -246,7 +246,7 @@ private:// Variables
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
 	bool QPLAFlagTestSynch=false;
 	// Correct Qubits relative frequency difference due to the sender
-	int TagsSeparationDetRelFreq=10; // Number of index separation to compute the slope of disadjustment in order to have accuraccy
+	int TagsSeparationDetRelFreq=20; // Number of index separation to compute the slope of disadjustment in order to have accuraccy
 	double SlopeDetTagsAuxArray[MaxNumQuBitsMemStored]={0.0}; // Array in order to do the computations
 	// Information and status
 	bool HardwareSynchStatus=false; // Turn to true when hardware synchronized with the PRU clock
