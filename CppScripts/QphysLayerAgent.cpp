@@ -1711,6 +1711,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				unsigned long long int xEstimateRawTimeTaggs[RawTotalCurrentNumRecordsQuadCh[iQuadChIter]]={0}; // Timetaggs of the detections raw
 				//long long int RoundingAux;
 				unsigned long long int ULLIHistPeriodicityAux=static_cast<unsigned long long int>(HistPeriodicityAux);
+				unsigned long long int ULLIHistPeriodicityHalfAux=static_cast<unsigned long long int>(HistPeriodicityAux/2);
 				for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 					/*if (i==0){
 						RoundingAux=(HistPeriodicityAux/2+RawTimeTaggs[i])%HistPeriodicityAux-HistPeriodicityAux/2;
@@ -1730,7 +1731,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 					//if (RoundingAux>=(HistPeriodicityAux/4)){RoundingAux=1;}
 					//else if (RoundingAux<=(-HistPeriodicityAux/4)){RoundingAux=-1;}
 					//else{RoundingAux=0;}
-					xEstimateRawTimeTaggs[i]=(RawTimeTaggs[iQuadChIter][i]/ULLIHistPeriodicityAux)*ULLIHistPeriodicityAux;		
+					xEstimateRawTimeTaggs[i]=((RawTimeTaggs[iQuadChIter][i]+ULLIHistPeriodicityHalfAux)/ULLIHistPeriodicityAux)*ULLIHistPeriodicityAux;	// Important to account from -Period/2 to Period/2 as the same x bin
 				}
 
 				// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
@@ -1749,7 +1750,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 			        //y_mean=DoubleMedianFilterSubArray(y_meanArray,(RawNumStoredQubits-1)); // Median average
 			        // Absolute
 				for (int i=0; i < RawTotalCurrentNumRecordsQuadCh[iQuadChIter]; i++) {
-					y_meanArray[i]=static_cast<double>(RawTimeTaggs[iQuadChIter][i]%ULLIHistPeriodicityAux);
+					y_meanArray[i]=static_cast<double>((ULLIHistPeriodicityHalfAux+RawTimeTaggs[iQuadChIter][i])%ULLIHistPeriodicityAux)-static_cast<double>(ULLIHistPeriodicityHalfAux);
 			            //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
 			            // We cannot use mean averaging since there might be outliers
 				    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
