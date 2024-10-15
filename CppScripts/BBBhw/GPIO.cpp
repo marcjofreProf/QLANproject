@@ -364,7 +364,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				else{this->PRUcurrentTimerValLong=this->PRUcurrentTimerValWrapLong;}
 
 				if (((this->iIterPRUcurrentTimerValSynch<static_cast<long long int>(NumSynchMeasAvgAux) and abs(duration_FinalInitialMeasTrig)>(ApproxInterruptTime/5)) or this->iIterPRUcurrentTimerValSynch<static_cast<long long int>(NumSynchMeasAvgAux/2)) and this->iIterPRUcurrentTimerValSynch%2==1){// Initially compute the time for interrupt handling
-					if (this->iIterPRUcurrentTimerValSynch>=(static_cast<long long int>(NumSynchMeasAvgAux)-1)){
+					if (this->iIterPRUcurrentTimerValSynch>=(static_cast<long long int>(NumSynchMeasAvgAux)-2)){
 						cout << "GPIO::PRUsignalTimerSynchJitterLessInterrupt initial time synchronization calibration not achieved! Increase number of NumSynchMeasAvgAux." << endl;
 					}
 					this->QPLAFutureTimePointOld=this->TimePointClockCurrentSynchPRU1future;// Initialization value
@@ -1183,7 +1183,7 @@ else{// Memory allocation
 }
 
 // Correct the detected qubits relative frequency difference (due to the sender node) and split between quad groups of 4 channels
-	PRUdetCorrRelFreq(TotalCurrentNumRecordsQuadCh,TimeTaggs,ChannelTags);
+PRUdetCorrRelFreq(TotalCurrentNumRecordsQuadCh,TimeTaggs,ChannelTags);
 
 return TotalCurrentNumRecords;
 }
