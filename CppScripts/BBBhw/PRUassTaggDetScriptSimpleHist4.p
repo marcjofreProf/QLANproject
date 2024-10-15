@@ -9,7 +9,7 @@
 
 // Length of acquisition:
 #define RECORDS 1964 // readings and it matches in the host c++ script. Not really used because updated from cpp host
-#define EXITCOUNTER 0x01FFFFFF // almost 10 seconds (since there are many default instructions for each iteration)
+#define EXITCOUNTER 0x07FFFFFF // almost 10 seconds (since there are many default instructions for each iteration)
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
