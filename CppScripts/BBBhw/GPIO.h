@@ -44,7 +44,7 @@ namespace exploringBB {
 
 private:// Variables
 	// For frequency synchronization Then, the interrogation time has to be made very large (seconds)
-	int SynchCorrectionTimeFreqNoneFlag=1; //0: No correction; 1: frequency correction; 2: Time correction; 3: time and frequency correction
+	int SynchCorrectionTimeFreqNoneFlag=3; //0: No correction; 1: frequency correction; 2: Time correction; 3: time and frequency correction
 	bool SlowMemoryPermanentStorageFlag=false; // Variable when true they are stored in a file (slower due to writting and reading) ; otherwise it uses array memory to store qubits (much faster)
 	bool ResetPeriodicallyTimerPRU1=true;// Avoiding interrupts
 	// Semaphore
@@ -124,6 +124,7 @@ private:// Variables
 	//TimePoint TimePointClockSynchPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes. Not used
 	TimePoint TimePointClockSynchPRUfinal=std::chrono::time_point<Clock>();// For absolute drift purposes
 	//TimePoint TimePointClockTagPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
+	long double ldTimePointClockTagPRUDiff=0.0;
 	long double ldTimePointClockTagPRUinitial=0.0;
 	//TimePoint TimePointClockTagPRUfinal=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint QPLAFutureTimePoint=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
@@ -149,7 +150,8 @@ private:// Variables
 	// Trigger Signal and Timetagging methods
 	int SynchRem=0;
 	long long int SignAuxInstantCorr=0;
-	long long int InstantCorr=0.0;	
+	long long int InstantCorr=0.0;
+	long long int ContCorr=0.0;	
 	unsigned long TimeClockMarging=100;// In nanoseconds. If too large, it disastabilizes the timming performance. It has to be smaller than the SynchTrigPeriod
 	unsigned long long int TimeClockMargingExtra=10*TimeClockMarging;// In nanoseconds
 	unsigned long TimePRUcommandDelay=250000;// In nanoseconds. If too large, it disastabilizes the timming performance. Very important parameter!!! When duration_FinalInitialMeasTrigAuxAvg properly set then is around 4000

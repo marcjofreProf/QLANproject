@@ -165,6 +165,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru1dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	pru1dataMem_int[5]=static_cast<unsigned int>(0); // set synch offset correction value
+	pru1dataMem_int[6]=static_cast<unsigned int>(SynchTrigPeriod);
 	// Load and execute the PRU program on the PRU1
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
 		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
@@ -527,9 +528,9 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 /////////////
 	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
-	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(4*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
+	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(6*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
 	this->QPLAFutureTimePointSleep=this->QPLAFutureTimePoint;// Update value
-	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(2*TimePRUcommandDelay);// Crucial to make the link between PRU clock and system clock (already well synchronized). Two memory mapping to PRU
+	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(1*TimePRUcommandDelay);// Crucial to make the link between PRU clock and system clock (already well synchronized). Two memory mapping to PRU
 	SynchRem=static_cast<int>((static_cast<long double>(1.5*MultFactorEffSynchPeriod*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));// For time stamping it waits 1.5
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(SynchRem);
 	SynchTrigPeriod=SynchTrigPeriodAux;// Histogram/Period value
@@ -558,21 +559,22 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		case 7: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld7;break;}
 		default: {break;}
 	}
-	ldTimePointClockTagPRUinitial=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
+	ldTimePointClockTagPRUDiff=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
-			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+static_cast<double>(ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
 			break;
 		}
 		case 2:{// Time correction
-			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg;			
+			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg;
+			ldTimePointClockTagPRUDiff=0;		
 			break;
 		}
 		case 1:{ // Frequency correction
-			PRUoffsetDriftErrorAbsAvgAux=static_cast<double>(ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			PRUoffsetDriftErrorAbsAvgAux=static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
 			break;
 		}
-		default:{PRUoffsetDriftErrorAbsAvgAux=0;break;}// None time nor frequency correction
+		default:{PRUoffsetDriftErrorAbsAvgAux=0;ldTimePointClockTagPRUDiff=0;break;}// None time nor frequency correction
 	}
 	if (PRUoffsetDriftErrorAbsAvgAux<0.0){
 		PRUoffsetDriftErrorAbsAvgAux=-fmod(-PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
@@ -617,10 +619,6 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	}
 	pru0dataMem_int[5]=static_cast<unsigned int>(AccumulatedErrorDriftAux); // set periodic offset correction value
 
-	// Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
-	requestCoincidenceWhileWait=CoincidenceSetWhileWait();
-	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestCoincidenceWhileWait,NULL); // Synch barrier. So that SendTriggerSignals and ReadTimeStamps of the different nodes coincide
-
 	// From this point below, the timming is very critical to have long time synchronziation stability!!!!	
 	// Atenttion, since Histogram analysis has effectively 4 times the SynchTrigPeriod, for the SynchRem this period is multiplied by 4!!! It will have to be removed
 	ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
@@ -634,8 +632,11 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(SynchTrigPeriod));
 	ldTimePointClockTagPRUinitial=ldTimePointClockTagPRUinitial+static_cast<long double>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Update the value with the rel. freq. adj.
 	pru0dataMem_int[3]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
-	pru0dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command
 
+	// Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
+	requestCoincidenceWhileWait=CoincidenceSetWhileWait();
+	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestCoincidenceWhileWait,NULL); // Synch barrier. So that SendTriggerSignals and ReadTimeStamps of the different nodes coincide	
+	pru0dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command
 	//QPLAFutureTimePoint=QPLAFutureTimePoint-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);// Actually, the time measured duration_FinalInitialMeasTrigAuxAvg is not indicative of much (only if it changes a lot to high values it means trouble)
 
 	while (Clock::now()<QPLAFutureTimePoint);// Busy wait time synch sending signals
@@ -685,9 +686,9 @@ return 0;// all ok
 int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
-	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(4*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
+	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(6*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
 	this->QPLAFutureTimePointSleep=this->QPLAFutureTimePoint;// Update value
-	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(2*TimePRUcommandDelay);// Since two memory mapping to PRU memory
+	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(1*TimePRUcommandDelay);// Since two memory mapping to PRU memory
 	SynchRem=static_cast<int>((static_cast<long double>(1.5*MultFactorEffSynchPeriod*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(SynchRem);
 	SynchTrigPeriod=SynchTrigPeriodAux;// Histogram/Period value
@@ -715,21 +716,22 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		case 7: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld7;break;}
 		default: {break;}
 	}
-	ldTimePointClockTagPRUinitial=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
+	ldTimePointClockTagPRUDiff=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
-			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+static_cast<double>(ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
 			break;
 		}
 		case 2:{// Time correction
-			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg;			
+			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg;
+			ldTimePointClockTagPRUDiff=0;	
 			break;
 		}
 		case 1:{ // Frequency correction
-			PRUoffsetDriftErrorAbsAvgAux=static_cast<double>(ldTimePointClockTagPRUinitial*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			PRUoffsetDriftErrorAbsAvgAux=static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
 			break;
 		}
-		default:{PRUoffsetDriftErrorAbsAvgAux=0;break;}// None time nor frequency correction
+		default:{PRUoffsetDriftErrorAbsAvgAux=0;ldTimePointClockTagPRUDiff=0;break;}// None time nor frequency correction
 	}
 	if (PRUoffsetDriftErrorAbsAvgAux<0.0){
 		PRUoffsetDriftErrorAbsAvgAux=-fmod(-PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
@@ -774,10 +776,6 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	}
 	pru1dataMem_int[5]=static_cast<unsigned int>(AccumulatedErrorDriftAux); // set periodic offset correction value
 
-	// Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
-	requestCoincidenceWhileWait=CoincidenceSetWhileWait();
-	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestCoincidenceWhileWait,NULL); // Synch barrier. So that SendTriggerSignals and ReadTimeStamps of the different nodes coincide
-
 	// From this point below, the timming is very critical to have long time synchronziation stability!!!!	
 	// Atenttion, since Histogram analysis has effectively 4 times the SynchTrigPeriod, for the SynchRem this period is multiplied by 4!!! It will have to be removed
 	ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
@@ -785,15 +783,26 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 	
+	ContCorr=static_cast<long long int>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg))+InstantCorr;
+	if (ContCorr>0){SignAuxInstantCorr=1;}
+	else if (ContCorr<0){SignAuxInstantCorr=-1;}
+	else {ContCorr=0;}
+	ContCorr=SignAuxInstantCorr*(abs(ContCorr)%static_cast<long long int>(SynchTrigPeriod));
+
 	if (InstantCorr>0){SignAuxInstantCorr=1;}
 	else if (InstantCorr<0){SignAuxInstantCorr=-1;}
 	else {SignAuxInstantCorr=0;}
 	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(SynchTrigPeriod));
-	ldTimePointClockTagPRUinitial=ldTimePointClockTagPRUinitial+static_cast<long double>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Update the value with the rel. freq. adj.
 	pru1dataMem_int[2]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
 
-	pru1dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command. Generate signals. Takes around 900000 clock ticks
+	// Particular for histogram, tell the adjusted period accounting for relative frequency difference
+	pru1dataMem_int[6]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+ContCorr);// Referenced to the corrected synch period
 
+	// Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
+	requestCoincidenceWhileWait=CoincidenceSetWhileWait();
+	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestCoincidenceWhileWait,NULL); // Synch barrier. So that SendTriggerSignals and ReadTimeStamps of the different nodes coincide	
+
+	pru1dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command. Generate signals. Takes around 900000 clock ticks
 	//this->QPLAFutureTimePoint=this->QPLAFutureTimePoint-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg); // Actually, the time measured duration_FinalInitialMeasTrigAuxAvg is not indicative of much (only if it changes a lot to high values it means trouble)
 
 	////if (Clock::now()<this->QPLAFutureTimePoint){cout << "Check that we have enough time" << endl;}
