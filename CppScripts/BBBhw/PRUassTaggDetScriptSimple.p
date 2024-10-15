@@ -205,7 +205,7 @@ QUADDET1:
 PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
 	LBCO	r0, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
 	LSR 	r0, r0, 1 // Divide by 2 since the loop consumes to at each iteration
-	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
+//	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
 PERIODICOFFSETLOOP:
 	SUB		r0, r0, 1
 	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
