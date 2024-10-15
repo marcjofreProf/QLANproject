@@ -143,6 +143,7 @@ private:// Variables
 	//int duration_FinalInitialDriftAuxArrayAvg=0;// For absolute drift purposes
 	double duration_FinalInitialCountAux=0.0;
 	double duration_FinalInitialCountAuxArrayAvg=0.0;
+	double duration_FinalInitialCountAuxArrayAvgInitial=0.0;
 	//int duration_FinalInitialMeasTrigAux=0;
 	int duration_FinalInitialMeasTrigAuxArray[MaxNumPulses]={0};
 	int duration_FinalInitialMeasTrigAuxAvg=0;
