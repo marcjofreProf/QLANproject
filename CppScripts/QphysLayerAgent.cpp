@@ -1418,12 +1418,8 @@ int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,
 
 	if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]>0){	
 		if (UseAllTagsForEstimation){
-		// Mean averaging
-		//for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
-		//CenterMassVal=CenterMassVal+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
-		//}
 		// Median averaging
-			for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
+		for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
 			SynchFirstTagsArrayAux[i]=static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])%LLIHistPeriodicityAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
 		}
 		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]);
@@ -1441,17 +1437,12 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 		long long int ChOffsetCorrection=0;// Variable to acomodate the 4 different channels in the periodic histogram analysis
 		if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]>0){	
 			if (UseAllTagsForEstimation){
-			// Mean averaging
-			//for (int i=0;i<(SimulateNumStoredQubitsNodeAux);i++){
-			//CenterMassVal=CenterMassVal+(1.0/((double)SimulateNumStoredQubitsNodeAux-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
-			//}
 			// Median averaging
 				for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
 					ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a states
 				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
 			}
 			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]);
-			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass];
 		}
 		else{
 			// Single value
@@ -1467,48 +1458,12 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 //this->release();
 
 if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
-	// Mean averaging
-	//double CenterMassVal=0.0;
-	//for (int i=0;i<(NumRunsPerCenterMass-1);i++){
-	//CenterMassVal=CenterMassVal+(1.0/((double)NumRunsPerCenterMass-1.0))*(((double)((static_cast<unsigned long long int>(HistPeriodicityAux)/2+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%(static_cast<unsigned long long int>(HistPeriodicityAux))))-(double)(static_cast<unsigned long long int>(HistPeriodicityAux)/2));
-	//}
-	//SynchHistCenterMassArray[iCenterMass]=CenterMassVal;
-
 	// Median averaging
 	double CenterMassValAux[NumRunsPerCenterMass-1]={0.0};	
 	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
 		CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);//static_cast<double>(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]);//static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
 	}
-	SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));
-
-	//cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
-	//cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
-	//cout << "QPLA::SynchHistCenterMassArray[2]: " << SynchHistCenterMassArray[2] << endl;
-	
-	// Analysis
-	//for (int i=0;i<(NumRunsPerCenterMass-1);i++){
-	//	cout << "(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])/LLIHistPeriodicityAux: " << (SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])/LLIHistPeriodicityAux << endl;
-	//}
-	
-	// compute the std to select the most effective - Not used
-	SynchFirstTagsArrayStd[iCenterMass]=0.0; // Reset value
-	double CurrentStdAux=0.0;
-	//cout << "QPLA::SynchHistCenterMassArray[iCenterMass]: " << SynchHistCenterMassArray[iCenterMass] << endl;
-	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
-		CurrentStdAux=static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);//static_cast<double>(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]);//static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
-		//cout << "QPLA::CurrentStdAux: " << CurrentStdAux << endl;
-		if (abs(SynchHistCenterMassArray[iCenterMass]-CurrentStdAux)>(dHistPeriodicityAux/2.0)){
-			SynchFirstTagsArrayStd[iCenterMass]+=pow(SynchHistCenterMassArray[iCenterMass]+CurrentStdAux,2.0);
-		}
-		else{
-			SynchFirstTagsArrayStd[iCenterMass]+=pow(SynchHistCenterMassArray[iCenterMass]-CurrentStdAux,2.0);
-		}
-	}
-	SynchFirstTagsArrayStd[iCenterMass]=sqrt(SynchFirstTagsArrayStd[iCenterMass]/static_cast<double>(NumRunsPerCenterMass-1));
-	
-	//cout << "QPLA::SynchFirstTagsArrayStd[0]: " << SynchFirstTagsArrayStd[0] << endl;
-	//cout << "QPLA::SynchFirstTagsArrayStd[1]: " << SynchFirstTagsArrayStd[1] << endl;
-	//cout << "QPLA::SynchFirstTagsArrayStd[2]: " << SynchFirstTagsArrayStd[2] << endl;
+	SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));	
 }
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
