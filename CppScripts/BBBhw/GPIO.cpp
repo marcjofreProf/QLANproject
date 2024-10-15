@@ -1049,8 +1049,9 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 		    // Calculate the "x" values
     		long long int xAux[TotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
     		long long int LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
+    		long long int LLISynchTrigPeriodHalf=static_cast<long long int>(SynchTrigPeriod/2.0);
     		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-    			xAux[i]=((LLITimeTaggs[i]+LLISynchTrigPeriod/2)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
+    			xAux[i]=((LLITimeTaggs[i]+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
     		}
 
 		    // Compute the candidate slope
