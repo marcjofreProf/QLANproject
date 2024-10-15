@@ -710,146 +710,146 @@ return 0; // All ok
 
 int QTLAH::RegularCheckToPerform(){
 	if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
-	// First thing to do is to know if the node below is PRU hardware synch
-	if (GPIOnodeHardwareSynched==false and HostsActiveActionsFree[0]==true){// Ask the node
-		char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-		strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,this->IPaddressesSockets[1]);
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"Control");
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"HardwareSynchNode");
-		strcat(ParamsCharArray,",");
-		strcat(ParamsCharArray,"none");
-		strcat(ParamsCharArray,",");// Very important to end the message
-		//cout << "Host sent HardwareSynchNode" << endl;
-		this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
-	}
-
-	// Second thing to do is to network synchronize the below node, when at least the node is PRU hardware synch
-	//cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
-	//cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
-	//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
-	//cout << "Host " << this->IPaddressesSockets[2] << " numHolderOtherNodesSynchNetwork: " << numHolderOtherNodesSynchNetwork << endl;
-	if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false and HostsActiveActionsFree[0]==true and CycleSynchNetworkDone==false){
-		char argsPayloadAux[NumBytesBufferICPMAX] = {0};
-		// Try to block all connected nodes
-		for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
-			if (iConnHostsNodes==0){strcpy(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
-			else{strcat(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
-			strcat(argsPayloadAux,",");
+		// First thing to do is to know if the node below is PRU hardware synch
+		if (GPIOnodeHardwareSynched==false and HostsActiveActionsFree[0]==true){// Ask the node
+			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+			strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,this->IPaddressesSockets[1]);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"Control");
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"HardwareSynchNode");
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"none");
+			strcat(ParamsCharArray,",");// Very important to end the message
+			//cout << "Host sent HardwareSynchNode" << endl;
+			this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 		}
-		this->WaitUntilActiveActionFree(argsPayloadAux,NumConnectedHosts);
-		
-		// Block only the two participating nodes in each iteration
-		//strcpy(argsPayloadAux,this->IPaddressesSockets[3+iIterNetworkSynchScan]);
-		//strcat(argsPayloadAux,",");
-		//this->WaitUntilActiveActionFree(argsPayloadAux,1);
-		
-		//cout << "argsPayloadAux: " << argsPayloadAux << endl;		
-		if (AchievedAttentionParticularHosts==true){
-			cout << "Host " << this->IPaddressesSockets[2] << " synching node " << this->IPaddressesSockets[0] << " to the network!" << endl;
-			if (FastInitialFakeSkipNetworkSynchFlag==true){ // Fake the initial synchronization step
-				numHolderOtherNodesSynchNetwork=NumConnectedHosts+1;
-				cout << "Host " << this->IPaddressesSockets[2] << " skipping network synchronization!!! to be deactivated..." << endl;
-			}
-			else{
-				this->PeriodicRequestSynchsHost();
-				numHolderOtherNodesSynchNetwork++; // Update value
-			}
 
-			CycleSynchNetworkDone=true;
-			
-			if (numHolderOtherNodesSynchNetwork==(NumConnectedHosts+1)){// All connected nodes and this host's node have been network synch, so we can reset the synch cycle 
-				CycleSynchNetworkDone=false;
-				numHolderOtherNodesSynchNetwork=0;// reset value
+		// Second thing to do is to network synchronize the below node, when at least the node is PRU hardware synch
+		//cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
+		//cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
+		//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+		//cout << "Host " << this->IPaddressesSockets[2] << " numHolderOtherNodesSynchNetwork: " << numHolderOtherNodesSynchNetwork << endl;
+		if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false and HostsActiveActionsFree[0]==true and CycleSynchNetworkDone==false){
+			char argsPayloadAux[NumBytesBufferICPMAX] = {0};
+			// Try to block all connected nodes
+			for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
+				if (iConnHostsNodes==0){strcpy(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
+				else{strcat(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
+				strcat(argsPayloadAux,",");
 			}
+			this->WaitUntilActiveActionFree(argsPayloadAux,NumConnectedHosts);
 			
-			if (InitialNetworkSynchPass<1){//the very first time, two rounds are needed to achieve a reasonable network synchronization
-				GPIOnodeNetworkSynched=false;// Do not Update value as synched
-				InitialNetworkSynchPass++;
-				cout << "Host " << this->IPaddressesSockets[2] << " first initial synch process completed...executing second process..." << endl; 
-			}
-			else{
-				GPIOnodeNetworkSynched=true;// Update value as synched
-			}
+			// Block only the two participating nodes in each iteration
+			//strcpy(argsPayloadAux,this->IPaddressesSockets[3+iIterNetworkSynchScan]);
+			//strcat(argsPayloadAux,",");
+			//this->WaitUntilActiveActionFree(argsPayloadAux,1);
 			
-			this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
+			//cout << "argsPayloadAux: " << argsPayloadAux << endl;		
+			if (AchievedAttentionParticularHosts==true){
+				cout << "Host " << this->IPaddressesSockets[2] << " synching node " << this->IPaddressesSockets[0] << " to the network!" << endl;
+				if (FastInitialFakeSkipNetworkSynchFlag==true){ // Fake the initial synchronization step
+					numHolderOtherNodesSynchNetwork=NumConnectedHosts+1;
+					cout << "Host " << this->IPaddressesSockets[2] << " skipping network synchronization!!! to be deactivated..." << endl;
+				}
+				else{
+					this->PeriodicRequestSynchsHost();
+					numHolderOtherNodesSynchNetwork++; // Update value
+				}
+
+				CycleSynchNetworkDone=true;
+				
+				if (numHolderOtherNodesSynchNetwork==(NumConnectedHosts+1)){// All connected nodes and this host's node have been network synch, so we can reset the synch cycle 
+					CycleSynchNetworkDone=false;
+					numHolderOtherNodesSynchNetwork=0;// reset value
+				}
+				
+				if (InitialNetworkSynchPass<1){//the very first time, two rounds are needed to achieve a reasonable network synchronization
+					GPIOnodeNetworkSynched=false;// Do not Update value as synched
+					InitialNetworkSynchPass++;
+					cout << "Host " << this->IPaddressesSockets[2] << " first initial synch process completed...executing second process..." << endl; 
+				}
+				else{
+					GPIOnodeNetworkSynched=true;// Update value as synched
+				}
+				
+				this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
+				iIterNetworkSynchcurrentTimerVal=0;// Reset value
+				cout << "Host " << this->IPaddressesSockets[2] << " synched node " << this->IPaddressesSockets[0] << " to the network!" << endl;
+			}
+		}
+		else{
+			iIterNetworkSynchcurrentTimerVal++; // Update value
+		}
+
+		if (iIterNetworkSynchcurrentTimerVal>MaxiIterNetworkSynchcurrentTimerVal and HostsActiveActionsFree[0]==true and string(InfoRemoteHostActiveActions[1])!=string("Block")){// Every some iterations re-synch the node through the network
+			GPIOnodeHardwareSynched=false;// Update value as not synched
+			GPIOnodeNetworkSynched=false;// Update value as not synched
 			iIterNetworkSynchcurrentTimerVal=0;// Reset value
-			cout << "Host " << this->IPaddressesSockets[2] << " synched node " << this->IPaddressesSockets[0] << " to the network!" << endl;
+			CycleSynchNetworkDone=false;// Reset value
+			cout << "Host " << this->IPaddressesSockets[2] << " will re-synch node to the network!" << endl;
+			// Some information of interest
+			// InfoRemoteHostActiveActions should never contain information when HostsActiveActionsFree[0] is true (or 1)
+			//cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+			//cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
+			//cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
 		}
-	}
-	else{
-		iIterNetworkSynchcurrentTimerVal++; // Update value
-	}
 
-	if (iIterNetworkSynchcurrentTimerVal>MaxiIterNetworkSynchcurrentTimerVal and HostsActiveActionsFree[0]==true and string(InfoRemoteHostActiveActions[1])!=string("Block")){// Every some iterations re-synch the node through the network
-		GPIOnodeHardwareSynched=false;// Update value as not synched
-		GPIOnodeNetworkSynched=false;// Update value as not synched
-		iIterNetworkSynchcurrentTimerVal=0;// Reset value
-		CycleSynchNetworkDone=false;// Reset value
-		cout << "Host " << this->IPaddressesSockets[2] << " will re-synch node to the network!" << endl;
-		// Some information of interest
-		// InfoRemoteHostActiveActions should never contain information when HostsActiveActionsFree[0] is true (or 1)
+		// Other task to perform at some point or regularly
 		//cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
 		//cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
 		//cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
+		
+		iIterPeriodicTimerVal=0;// Reset variable
+	}
+	/////////////////////////////////////////////////////////////////////////////
+	// Check if there is a malfunction with the blocks
+	int OtherHostsActiveActionsFreeAux=0;
+	for (int i=0;i<NumConnectedHosts;i++){
+		if (HostsActiveActionsFree[1+i]==false){
+			OtherHostsActiveActionsFreeAux++;
+		}
+	}
+	if (HostsActiveActionsFree[0]==true and (string(InfoRemoteHostActiveActions[0])!=string("\0") or string(InfoRemoteHostActiveActions[1])!=string("\0") or AchievedAttentionParticularHosts==true or OtherHostsActiveActionsFreeAux>0)){
+		cout << "Host " << this->IPaddressesSockets[2] << " scheduler blocking malfunction!!!...trying to correct it..." << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
+		strcpy(InfoRemoteHostActiveActions[0],"\0");
+		strcpy(InfoRemoteHostActiveActions[1],"\0");
+		cout << "Host " << this->IPaddressesSockets[2] << " AchievedAttentionParticularHosts: " << AchievedAttentionParticularHosts << endl;
+		AchievedAttentionParticularHosts=false;
+		for (int i=0;i<NumConnectedHosts;i++){
+			cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[1+i]: " << HostsActiveActionsFree[1+i] << endl;
+			HostsActiveActionsFree[1+i]=true;
+		}
+	}
+	////////////////////////////////////////////////////////////////////////////
+	// Check if there is a permanent Block at this node
+	if (string(InfoRemoteHostActiveActions[1])==string("Block") or HostsActiveActionsFree[0]==false){
+		iIterPeriodicBlockTimer++; // Counter to acknowledge how much time it has been consecutively blocked
+	}
+	else
+	{
+		iIterPeriodicBlockTimer=0; // Reset value
+	}
+	if (iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer and HostsActiveActionsFree[0]==false){// Try to unblock itself
+		// Send unblock signals
+		cout << "Host" << this->IPaddressesSockets[2] << " will unblock itself since to much time blocked" << endl;
+		int nChararray=NumConnectedHosts;
+		char ParamsCharArrayArg[NumBytesBufferICPMAX];
+		for (int i=0;i<NumConnectedHosts;i++){
+			if (i==0){strcpy(ParamsCharArrayArg,this->IPaddressesSockets[3+i]);}
+			else{strcat(ParamsCharArrayArg,this->IPaddressesSockets[3+i]);}
+			strcat(ParamsCharArrayArg,","); // IP separator
+		}
+		this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray); // Try to unblock others if needed	
+		iIterPeriodicBlockTimer=0; // Reset value
 	}
 
-	// Other task to perform at some point or regularly
-	//cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
-	//cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
-	//cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
-	
-	iIterPeriodicTimerVal=0;// Reset variable
-}
-/////////////////////////////////////////////////////////////////////////////
-// Check if there is a malfunction with the blocks
-int OtherHostsActiveActionsFreeAux=0;
-for (int i=0;i<NumConnectedHosts;i++){
-	if (HostsActiveActionsFree[1+i]==false){
-		OtherHostsActiveActionsFreeAux++;
-	}
-}
-if (HostsActiveActionsFree[0]==true and (string(InfoRemoteHostActiveActions[0])!=string("\0") or string(InfoRemoteHostActiveActions[1])!=string("\0") or AchievedAttentionParticularHosts==true or OtherHostsActiveActionsFreeAux>0)){
-	cout << "Host " << this->IPaddressesSockets[2] << " scheduler blocking malfunction!!!...trying to correct it..." << endl;
-	cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
-	cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[1]: " << InfoRemoteHostActiveActions[1] << endl;
-	strcpy(InfoRemoteHostActiveActions[0],"\0");
-	strcpy(InfoRemoteHostActiveActions[1],"\0");
-	cout << "Host " << this->IPaddressesSockets[2] << " AchievedAttentionParticularHosts: " << AchievedAttentionParticularHosts << endl;
-	AchievedAttentionParticularHosts=false;
-	for (int i=0;i<NumConnectedHosts;i++){
-		cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[1+i]: " << HostsActiveActionsFree[1+i] << endl;
-		HostsActiveActionsFree[1+i]=true;
-	}
-}
-////////////////////////////////////////////////////////////////////////////
-// Check if there is a permanent Block at this node
-if (string(InfoRemoteHostActiveActions[1])==string("Block") or HostsActiveActionsFree[0]==false){
-	iIterPeriodicBlockTimer++; // Counter to acknowledge how much time it has been consecutively blocked
-}
-else
-{
-	iIterPeriodicBlockTimer=0; // Reset value
-}
-if (iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer and HostsActiveActionsFree[0]==false){// Try to unblock itself
-	// Send unblock signals
-	cout << "Host" << this->IPaddressesSockets[2] << " will unblock itself since to much time blocked" << endl;
-	int nChararray=NumConnectedHosts;
-	char ParamsCharArrayArg[NumBytesBufferICPMAX];
-	for (int i=0;i<NumConnectedHosts;i++){
-		if (i==0){strcpy(ParamsCharArrayArg,this->IPaddressesSockets[3+i]);}
-		else{strcat(ParamsCharArrayArg,this->IPaddressesSockets[3+i]);}
-		strcat(ParamsCharArrayArg,","); // IP separator
-	}
-	this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray); // Try to unblock others if needed	
-	iIterPeriodicBlockTimer=0; // Reset value
-}
-
-iIterPeriodicTimerVal++;
-return 0; // all ok
+	iIterPeriodicTimerVal++;
+	return 0; // all ok
 }
 
 void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
@@ -1482,7 +1482,7 @@ return 0; // all ok
 }
 
 int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){
-	//cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFreePreLock" << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFreePreLock" << endl;
 	this->acquire();
 	try{
 		//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 1" << endl;
@@ -1540,7 +1540,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
     }
 	this->release();
 	//cout << "Host " << this->IPaddressesSockets[2] << " Exited release 2" << endl;
-	//cout << "Host " << this->IPaddressesSockets[2] << " Finished WaitUntilActiveActionFreePreLock" << endl;
+	cout << "Host " << this->IPaddressesSockets[2] << " Finished WaitUntilActiveActionFreePreLock" << endl;
 
 return 0; // all ok;
 
@@ -1568,6 +1568,7 @@ return 0; // All ok
 }
 
 int QTLAH::UnBlockActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){
+	cout << "Host " << this->IPaddressesSockets[2] << " Initiated UnBlockActiveActionFreePreLock" << endl;
 	this->acquire();
 	try{
 		this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);
@@ -1577,7 +1578,7 @@ int QTLAH::UnBlockActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararr
     	cout << "QTLAH::UnBlockActiveActionFreePreLock Exception: " << e.what() << endl;
     }
 	this->release();
-
+cout << "Host " << this->IPaddressesSockets[2] << " Finished UnBlockActiveActionFreePreLock" << endl;
 return 0; // All ok
 }
 
@@ -1777,6 +1778,7 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){
 	//cout << "HostAreYouFree UnBlock ParamsCharArray: " << ParamsCharArray << endl;
 	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 }
+/*
 int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
 for (int i=0;i<numForstEquivalentToSleep;i++){
 	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
@@ -1786,7 +1788,7 @@ for (int i=0;i<numForstEquivalentToSleep;i++){
 		this->m_pause(); // After procesing the request, pass to paused state
 	}
 	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
-}
+}*/
 }
 return 0; // All ok
 }
