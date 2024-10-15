@@ -789,15 +789,12 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
-	long long int FactorQPLAFlagTestSynch=1;
-	if (this->QPLAFlagTestSynch){FactorQPLAFlagTestSynch=0;}
-	else{FactorQPLAFlagTestSynch=1;}
-
+	
 	if (SynchCorrectionTimeFreqNoneFlag==0 or SynchCorrectionTimeFreqNoneFlag==2){
-		ContCorr=FactorQPLAFlagTestSynch*InstantCorr;
+		ContCorr=InstantCorr;
 	}
 	else{
-		ContCorr=static_cast<long long int>(static_cast<long double>(SynchTrigPeriod)*static_cast<long double>(PRUoffsetDriftErrorAvg))+FactorQPLAFlagTestSynch*InstantCorr;
+		ContCorr=static_cast<long long int>(static_cast<long double>(SynchTrigPeriod)*static_cast<long double>(PRUoffsetDriftErrorAvg))+InstantCorr;
 	}
 
 	if (ContCorr>0){SignAuxInstantCorr=1;}
