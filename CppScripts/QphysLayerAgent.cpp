@@ -1652,7 +1652,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	cout << "QPLA::SynchTimeTaggRefMedianAux: " << SynchTimeTaggRefMedianAux << endl;
-	cout << "QPLA::SynchNetAdjAux: " << SynchNetAdjAux << endl;
+	//cout << "QPLA::SynchNetAdjAux: " << SynchNetAdjAux << endl;
 	cout << "QPLA::SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1] << ", adjustment factor for negative rel. freq. correction" << endl;
 	cout << "QPLA::SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2] << ", adjustment factor for positive rel. freq. correction" << endl;
 	
@@ -1740,7 +1740,7 @@ return 0; // All Ok
 
 int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection window
 //this->acquire(); It is already within an acquire/release
-	if (ApplyRawQubitFilteringFlag==true){
+	if (ApplyRawQubitFilteringFlag==true and FlagTestSynch==false){
 	  this->SimulateNumStoredQubitsNode[0]=0; // Reset this value
 	  int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,RawTotalCurrentNumRecordsQuadCh,RawTimeTaggs,RawChannelTags); // Get raw values
 	  for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
@@ -1858,7 +1858,9 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 		}
 	}
 	else{ // Do not apply filtering
-		cout << "QPLA::Not applying ApplyRawQubitFilteringFlag...to be activated" << endl;
+		if (FlagTestSynch==false){
+			cout << "QPLA::Not applying ApplyRawQubitFilteringFlag...to be activated" << endl;
+		}
 		this->SimulateNumStoredQubitsNode[0]=0; // Reset this value
 	  int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,RawTotalCurrentNumRecordsQuadCh,RawTimeTaggs,RawChannelTags); // Get raw values
 	  for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
