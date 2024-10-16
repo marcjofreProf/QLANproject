@@ -1699,7 +1699,7 @@ return 0; // All Ok
 
 int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection window
 //this->acquire(); It is already within an acquire/release
-	if (ApplyRawQubitFilteringFlag==true and FlagTestSynch==false){
+	if (ApplyRawQubitFilteringFlag==true){//and FlagTestSynch==false){
 	  this->SimulateNumStoredQubitsNode[0]=0; // Reset this value
 	  int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,RawTotalCurrentNumRecordsQuadCh,RawTimeTaggs,RawChannelTags); // Get raw values
 	  for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
@@ -1757,7 +1757,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				}
         y_mean=DoubleMedianFilterSubArray(y_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average
         //x_mean=DoubleMedianFilterSubArray(x_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average. Not really needed x_mean
-        //cout << "QPLA::y_mean: " << y_mean << endl;
+        cout << "QPLA::y_mean: " << y_mean << endl;
         //cout << "QPLA::x_mean: " << x_mean << endl;
 				long long int EstInterceptVal = static_cast<long long int>(y_mean);// - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1
 				//cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
