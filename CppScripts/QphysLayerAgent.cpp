@@ -1592,7 +1592,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 			SynchTimeTaggRefMedianArrayAuxAux[i]=SynchTimeTaggRef[0][i+1]-SynchTimeTaggRef[0][i];
 		}
 		SynchTimeTaggRefMedianArrayAux[0]=LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
-		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAux[0])*(1e-9);// Conversion to seconds
+		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAux[0])*(5e-9);// Conversion to seconds from PRU clock tick
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//Period adjustment
 		
 		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];//+FreqSynchNormValuesArray[0]; // Relative Frequency adjustment
