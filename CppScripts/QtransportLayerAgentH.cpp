@@ -1732,63 +1732,63 @@ return false; // all ok
 
 int QTLAH::UnBlockYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 if ((HostsActiveActionsFree[0]==false and string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2])) or iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer){// This is the blocking host so proceed to unblock
-//int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
-//for (int i=0;i<numForstEquivalentToSleep;i++){
-//	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
-//	//cout << "this->getState(): " << this->getState() << endl;
-//	if(this->getState()==0) {
-//		this->ProcessNewMessage();
-//		this->m_pause(); // After procesing the request, pass to paused state
-//	}
-//	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
-// }
-strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
-strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
-HostsActiveActionsFree[0]=true;// This host unblocked
-IterHostsActiveActionsFreeStatus=0;// reset process
-AchievedAttentionParticularHosts=false;// Indicates that we have got NOT the attention of the hosts
+	//int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
+	//for (int i=0;i<numForstEquivalentToSleep;i++){
+	//	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+	//	//cout << "this->getState(): " << this->getState() << endl;
+	//	if(this->getState()==0) {
+	//		this->ProcessNewMessage();
+	//		this->m_pause(); // After procesing the request, pass to paused state
+	//	}
+	//	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+	// }
+	strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
+	strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
+	HostsActiveActionsFree[0]=true;// This host unblocked
+	IterHostsActiveActionsFreeStatus=0;// reset process
+	AchievedAttentionParticularHosts=false;// Indicates that we have got NOT the attention of the hosts
 
-int NumInterestIPaddressesAux=nChararray;
-for (int i=0;i<NumInterestIPaddressesAux;i++){// Reset values
-	HostsActiveActionsFree[1+i]=true;
-}
-
-// Only host who care will take action with the UnBlock message below
-//int NumInterestIPaddressesAux=nChararray;
-char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
-char ParamsCharArrayArgAux[NumBytesBufferICPMAX] = {0};
-strcpy(ParamsCharArrayArgAux,ParamsCharArrayArg);
-for (int i=0;i<NumInterestIPaddressesAux;i++){
-	if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArgAux,","));}
-	else{strcpy(interestIPaddressesSocketsAux[i],strtok(NULL,","));}
-}
-
-char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-for (int i=0;i<NumInterestIPaddressesAux;i++){
-	strcpy(ParamsCharArray,interestIPaddressesSocketsAux[i]);
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,this->IPaddressesSockets[2]);
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"Operation");
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"HostAreYouFree");
-	strcat(ParamsCharArray,",");
-	strcat(ParamsCharArray,"UnBlock");
-	strcat(ParamsCharArray,",");// Very important to end the message
-	//cout << "HostAreYouFree UnBlock ParamsCharArray: " << ParamsCharArray << endl;
-	this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
-}
-/*
-int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
-for (int i=0;i<numForstEquivalentToSleep;i++){
-	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
-	//cout << "this->getState(): " << this->getState() << endl;
-	if(this->getState()==0) {
-		this->ProcessNewMessage();
-		this->m_pause(); // After procesing the request, pass to paused state
+	int NumInterestIPaddressesAux=nChararray;
+	for (int i=0;i<NumConnectedHosts;i++){//NumInterestIPaddressesAux;i++){// Reset values
+		HostsActiveActionsFree[1+i]=true;
 	}
-	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
-}*/
+
+	// Only host who care will take action with the UnBlock message below
+	//int NumInterestIPaddressesAux=nChararray;
+	char interestIPaddressesSocketsAux[static_cast<const int>(nChararray)][IPcharArrayLengthMAX];
+	char ParamsCharArrayArgAux[NumBytesBufferICPMAX] = {0};
+	strcpy(ParamsCharArrayArgAux,ParamsCharArrayArg);
+	for (int i=0;i<NumInterestIPaddressesAux;i++){
+		if (i==0){strcpy(interestIPaddressesSocketsAux[i],strtok(ParamsCharArrayArgAux,","));}
+		else{strcpy(interestIPaddressesSocketsAux[i],strtok(NULL,","));}
+	}
+
+	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+	for (int i=0;i<NumInterestIPaddressesAux;i++){
+		strcpy(ParamsCharArray,interestIPaddressesSocketsAux[i]);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,this->IPaddressesSockets[2]);
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"Operation");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"HostAreYouFree");
+		strcat(ParamsCharArray,",");
+		strcat(ParamsCharArray,"UnBlock");
+		strcat(ParamsCharArray,",");// Very important to end the message
+		//cout << "HostAreYouFree UnBlock ParamsCharArray: " << ParamsCharArray << endl;
+		this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+	}
+	/*
+	int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
+	for (int i=0;i<numForstEquivalentToSleep;i++){
+		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+		//cout << "this->getState(): " << this->getState() << endl;
+		if(this->getState()==0) {
+			this->ProcessNewMessage();
+			this->m_pause(); // After procesing the request, pass to paused state
+		}
+		this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+	}*/
 }
 return 0; // All ok
 }
