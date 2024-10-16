@@ -987,7 +987,7 @@ if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to
 	//}
 	// Maybe the rel. freq. offset should no be transformed
 	CurrentSynchNetworkParamsLink[1]=(SynchNetworkParamsLink[CurrentSpecificLink][1]);///SynchNetworkParamsLink[CurrentSpecificLink][2]);///SynchNetTransHardwareAdjAux;
-	CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]; // Period in which it was calculated
+	CurrentSynchNetworkParamsLink[2]=0.0;//SynchNetworkParamsLink[CurrentSpecificLink][2]; // Period in which it was calculated
 	//CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];// Offset
 	//CurrentSynchNetworkParamsLink[1]=(SynchNetworkParamsLink[CurrentSpecificLink][1]/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	//CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]; // Period
@@ -1023,7 +1023,7 @@ else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has 
 	//	CurrentExtraSynchNetworkParamsLink[1]=((fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	//}
 	// Maybe the rel. freq. offset should no be transformed
-	CurrentExtraSynchNetworkParamsLink[1]=(SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1]);///SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]);///SynchNetTransHardwareAdjAux;
+	CurrentExtraSynchNetworkParamsLink[1]=0.0;//(SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1]);///SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]);///SynchNetTransHardwareAdjAux;
 	CurrentExtraSynchNetworkParamsLink[2]=SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]; // Period in which the parameters where calculated
 	// Debugging
 	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod Correction for emitter (receiver does not correct)" << endl;
@@ -1757,7 +1757,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				}
         y_mean=DoubleMedianFilterSubArray(y_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average
         //x_mean=DoubleMedianFilterSubArray(x_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average. Not really needed x_mean
-        cout << "QPLA::y_mean: " << y_mean << endl;
+        //cout << "QPLA::y_mean: " << y_mean << endl;
         //cout << "QPLA::x_mean: " << x_mean << endl;
 				long long int EstInterceptVal = static_cast<long long int>(y_mean);// - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1
 				//cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
