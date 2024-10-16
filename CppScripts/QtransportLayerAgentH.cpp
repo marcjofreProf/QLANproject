@@ -1481,10 +1481,10 @@ int QTLAH::SendKeepAliveHeartBeatsSockets(){
 return 0; // all ok
 }
 
-int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){
-	cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFreePreLock" << endl;
-	this->acquire();
+int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){	
 	try{
+		cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFreePreLock" << endl;
+		this->acquire();
 		//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 1" << endl;
 		bool FirstPassAux=true;
 		while(AchievedAttentionParticularHosts==false or FirstPassAux==true){
