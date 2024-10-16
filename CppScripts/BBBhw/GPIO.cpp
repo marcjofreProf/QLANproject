@@ -1038,8 +1038,8 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 	
 	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>=TagsSeparationDetRelFreq){
-    		unsigned long long int ULLIInitialTimeTaggs=TimeTaggs[iQuadChIter][0];// Normalize to the first reference timetag (it is not a detect qubit, but the timetagg of entering the timetagg PRU), which is a strong reference
-    		long long int LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
+    		unsigned long long int ULLIInitialTimeTaggs=0*TimeTaggs[iQuadChIter][0];// Normalize to the first reference timetag (it is not a detect qubit, but the timetagg of entering the timetagg PRU), which is a strong reference
+    		long long int LLIInitialTimeTaggs=0*static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
     		long long int LLITimeTaggs[TotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
     		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
     			LLITimeTaggs[i]=static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLIInitialTimeTaggs;
@@ -1073,7 +1073,7 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
     		cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << endl;
 		    // Un-normalize
     		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-    			TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>((1.0/SlopeDetTagsAux)*static_cast<double>(LLITimeTaggs[i]))+ULLIInitialTimeTaggs;
+    			TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long double>(1.0/SlopeDetTagsAux)*static_cast<long double>(LLITimeTaggs[i]))+ULLIInitialTimeTaggs;
     		}
 		    //////////////////////////////////////////
 		    // Checks of proper values handling
