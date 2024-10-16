@@ -1483,7 +1483,7 @@ return 0; // all ok
 
 int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){	
 	try{
-		cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFreePreLock" << endl;
+		//cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFreePreLock" << endl;
 		this->acquire();
 		//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 1" << endl;
 		bool FirstPassAux=true;
@@ -1540,7 +1540,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
     }
 	this->release();
 	//cout << "Host " << this->IPaddressesSockets[2] << " Exited release 2" << endl;
-	cout << "Host " << this->IPaddressesSockets[2] << " Finished WaitUntilActiveActionFreePreLock" << endl;
+	//cout << "Host " << this->IPaddressesSockets[2] << " Finished WaitUntilActiveActionFreePreLock" << endl;
 
 return 0; // all ok;
 
@@ -1567,10 +1567,10 @@ int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 return 0; // All ok
 }
 
-int QTLAH::UnBlockActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){
-	cout << "Host " << this->IPaddressesSockets[2] << " Initiated UnBlockActiveActionFreePreLock" << endl;
-	this->acquire();
+int QTLAH::UnBlockActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){	
 	try{
+		//cout << "Host " << this->IPaddressesSockets[2] << " Initiated UnBlockActiveActionFreePreLock" << endl;
+		this->acquire();
 		this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);
 	}
     catch (const std::exception& e) {
@@ -1578,7 +1578,7 @@ int QTLAH::UnBlockActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararr
     	cout << "QTLAH::UnBlockActiveActionFreePreLock Exception: " << e.what() << endl;
     }
 	this->release();
-cout << "Host " << this->IPaddressesSockets[2] << " Finished UnBlockActiveActionFreePreLock" << endl;
+//cout << "Host " << this->IPaddressesSockets[2] << " Finished UnBlockActiveActionFreePreLock" << endl;
 return 0; // All ok
 }
 
