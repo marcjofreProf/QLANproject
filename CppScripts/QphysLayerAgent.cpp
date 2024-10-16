@@ -986,7 +986,7 @@ if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to
 	//	CurrentSynchNetworkParamsLink[1]=((fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][1],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	//}
 	// Maybe the rel. freq. offset should no be transformed
-	CurrentSynchNetworkParamsLink[1]=(SynchNetworkParamsLink[CurrentSpecificLink][1]/SynchNetworkParamsLink[CurrentSpecificLink][2]);///SynchNetTransHardwareAdjAux;
+	CurrentSynchNetworkParamsLink[1]=(SynchNetworkParamsLink[CurrentSpecificLink][1]);///SynchNetworkParamsLink[CurrentSpecificLink][2]);///SynchNetTransHardwareAdjAux;
 	CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]; // Period in which it was calculated
 	//CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];// Offset
 	//CurrentSynchNetworkParamsLink[1]=(SynchNetworkParamsLink[CurrentSpecificLink][1]/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
@@ -1023,7 +1023,7 @@ else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has 
 	//	CurrentExtraSynchNetworkParamsLink[1]=((fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	//}
 	// Maybe the rel. freq. offset should no be transformed
-	CurrentExtraSynchNetworkParamsLink[1]=(SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1]/SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]);///SynchNetTransHardwareAdjAux;
+	CurrentExtraSynchNetworkParamsLink[1]=(SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1]);///SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]);///SynchNetTransHardwareAdjAux;
 	CurrentExtraSynchNetworkParamsLink[2]=SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]; // Period in which the parameters where calculated
 	// Debugging
 	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod Correction for emitter (receiver does not correct)" << endl;
@@ -1749,7 +1749,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 			        //y_mean=DoubleMedianFilterSubArray(y_meanArray,(RawNumStoredQubits-1)); // Median average
 			        // Absolute
 				for (int i=0; i < RawTotalCurrentNumRecordsQuadCh[iQuadChIter]; i++) {
-					y_meanArray[i]=static_cast<double>((RawTimeTaggs[iQuadChIter][i]+LLIHistPeriodicityHalfAux)%LLIHistPeriodicityAux);
+					y_meanArray[i]=static_cast<double>(RawTimeTaggs[iQuadChIter][i]%LLIHistPeriodicityAux);
 			    //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
 			    // We cannot use mean averaging since there might be outliers
 				    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);

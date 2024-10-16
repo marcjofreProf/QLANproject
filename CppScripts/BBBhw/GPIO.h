@@ -234,6 +234,7 @@ private:// Variables
 	unsigned long long int TimeTaggsLast=0;
 	unsigned long long int TimeTaggsLastStored=0;
 	unsigned long long int TimeTaggsInit=0;
+	unsigned long long int LastTimeTaggRef[1]={0};
 	// Pulses compensation
 	int NumSynchPulsesRed=0;
 	unsigned long long int SynchPulsesTags[MaxNumPulses]={0};

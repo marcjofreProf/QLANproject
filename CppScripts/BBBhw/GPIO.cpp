@@ -621,7 +621,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	pru0dataMem_int[5]=static_cast<unsigned int>(AccumulatedErrorDriftAux); // set periodic offset correction value
 
 	// From this point below, the timming is very critical to have long time synchronziation stability!!!!
-	InstantCorr=static_cast<long long int>(AccumulatedErrorDrift*SynchTrigPeriod);
+	InstantCorr=static_cast<long long int>(AccumulatedErrorDrift);
 	// Attention ldTimePointClockTagPRUinitial is needed in DDRdumpdata!!!!
 	ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);//+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
@@ -783,7 +783,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 
 	// From this point below, the timming is very critical to have long time synchronziation stability!!!!	
 	// Atenttion, since Histogram analysis has effectively 4 times the SynchTrigPeriod, for the SynchRem this period is multiplied by 4!!! It will have to be removed
-	InstantCorr=static_cast<long long int>(AccumulatedErrorDrift*SynchTrigPeriod);
+	InstantCorr=static_cast<long long int>(AccumulatedErrorDrift);
 	// The relative frequency difference is not module over MultFactorEffSynchPeriod, since its value is computed over the original synch period
 	//ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
@@ -1038,8 +1038,8 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 	
 	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>=TagsSeparationDetRelFreq){
-    		unsigned long long int ULLIInitialTimeTaggs=TimeTaggs[iQuadChIter][0];// Normalize to the first reference timetag (it is not a detect qubit, but the timetagg of entering the timetagg PRU), which is a strong reference
-    		long long int LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
+    		unsigned long long int ULLIInitialTimeTaggs=LastTimeTaggRef[0];//TimeTaggs[iQuadChIter][0];// Normalize to the first reference timetag (it is not a detect qubit, but the timetagg of entering the timetagg PRU), which is a strong reference
+    		long long int LLIInitialTimeTaggs=static_cast<long long int>(LastTimeTaggRef[0]);//static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
     		long long int LLITimeTaggs[TotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
     		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
     			LLITimeTaggs[i]=static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLIInitialTimeTaggs;
@@ -1141,9 +1141,9 @@ TotalCurrentNumRecords=0;
 return 0; // all ok
 }
 
-int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int TimeTaggs[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTags[QuadNumChGroups][MaxNumQuBitsMemStored]){
+int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRefAux, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int TimeTaggs[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTags[QuadNumChGroups][MaxNumQuBitsMemStored]){
 	if (SlowMemoryPermanentStorageFlag==true){
-	LastTimeTaggRef[0]=static_cast<unsigned long long int>(0.0*PRUclockStepPeriodNanoseconds);// Since whole number. Initiation value
+	LastTimeTaggRefAux[0]=static_cast<unsigned long long int>(0.0*PRUclockStepPeriodNanoseconds);// Since whole number. Initiation value
 	// Detection tags
 	if (streamDDRpru.is_open()){
 		streamDDRpru.close();	
@@ -1164,7 +1164,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsig
 		streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
 		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 		streamDDRpru.read(reinterpret_cast<char*>(&TimeTaggsLastStored), sizeof(TimeTaggsLastStored));
-		LastTimeTaggRef[0]=static_cast<unsigned long long int>(static_cast<long double>(TimeTaggsLastStored)*static_cast<long double>(PRUclockStepPeriodNanoseconds));// Since whole number. Initiation value
+		LastTimeTaggRefAux[0]=static_cast<unsigned long long int>(static_cast<long double>(TimeTaggsLastStored)*static_cast<long double>(PRUclockStepPeriodNanoseconds));// Since whole number. Initiation value
 		int lineCount = 0;
 		unsigned long long int ValueReadTest;		
 		int iIterMovAdjPulseSynchCoeff=0;
@@ -1187,8 +1187,9 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRef, unsig
 	    }
 	}
 else{// Memory allocation
-	LastTimeTaggRef[0]=static_cast<unsigned long long int>(static_cast<long double>(TimeTaggsLastStored)*static_cast<long double>(PRUclockStepPeriodNanoseconds));// Since whole number. It is meant for computing the time between measurements to estimate the relative frequency difference. It is for synchronization purposes which generally will be under control so even if it is a multiple adquisiton the itme difference will be mantained so it generally ok.
+	LastTimeTaggRefAux[0]=static_cast<unsigned long long int>(static_cast<long double>(TimeTaggsLastStored)*static_cast<long double>(PRUclockStepPeriodNanoseconds));// Since whole number. It is meant for computing the time between measurements to estimate the relative frequency difference. It is for synchronization purposes which generally will be under control so even if it is a multiple adquisiton the itme difference will be mantained so it generally ok.
 }
+LastTimeTaggRef[0]=LastTimeTaggRefAux[0];// The one to be used in this agent
 
 // Correct the detected qubits relative frequency difference (due to the sender node) and split between quad groups of 4 channels
 PRUdetCorrRelFreq(TotalCurrentNumRecordsQuadCh,TimeTaggs,ChannelTags);
