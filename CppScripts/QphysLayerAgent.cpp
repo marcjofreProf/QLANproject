@@ -1749,7 +1749,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 			        //y_mean=DoubleMedianFilterSubArray(y_meanArray,(RawNumStoredQubits-1)); // Median average
 			        // Absolute
 				for (int i=0; i < RawTotalCurrentNumRecordsQuadCh[iQuadChIter]; i++) {
-					y_meanArray[i]=static_cast<double>(RawTimeTaggs[iQuadChIter][i]%LLIHistPeriodicityAux);
+					y_meanArray[i]=static_cast<double>((RawTimeTaggs[iQuadChIter][i]+LLIHistPeriodicityHalfAux)%LLIHistPeriodicityAux);
 			    //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
 			    // We cannot use mean averaging since there might be outliers
 				    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
