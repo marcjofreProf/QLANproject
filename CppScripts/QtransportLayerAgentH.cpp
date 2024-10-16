@@ -1049,7 +1049,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				}
 				else{// Either the message is not from the current active hosts or there is no active host, or it is a response for this host
 					if (string(Payload)==string("true") or string(Payload)==string("false")){// Response from another host
-						if (string(Payload)==string("true")){					HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]=false;}// Mark it as Block
+						if (string(Payload)==string("true")){HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]=false;}// Mark it as Block
 						else{HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]=true;}
 						NumAnswersOtherHostsActiveActionsFree++;// Update value
 						//cout << "Response HostAreYouFree: " << IPorg << ", " << Payload << endl;

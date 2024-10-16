@@ -267,9 +267,9 @@ FINETIMEOFFSETADJLOOP:
 MANAGECALC:	
 	LBCO	r9, CONST_PRUDRAM, 24, 4 // Load from PRU RAM position the corrected period (accounting for relative frequency corrections)
 	LSR		r0, r9, 1	// Since there is a dead period betwen pulses (to do management), divide the period by 2
-	// Compute DELAY value	
-	LSR		r0, r0, 1 // Because counter counts as two
+	// Compute DELAY value
 	SUB		r0, r0, 4
+	LSR		r0, r0, 1 // Because counter counts as two	
 //BASICPSEUDOSYNCH:
 //	AND	r0, r0, 0x07 // Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) we can get a value between 0 and 7
 //	QBEQ	SIGNALON1, r0.b0, 7 // Coincides with a 7
