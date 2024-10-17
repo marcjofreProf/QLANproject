@@ -1496,7 +1496,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchTimeTaggRefMedianArrayAux[2]=LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
 		
 		long long int SynchTimeTaggRefMedianArrayAuxAuxAux=SynchTimeTaggRefMedianArrayAux[0];//LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAux,NumCalcCenterMass);
-		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAuxAuxAux)*(1e-9);// Conversion to seconds
+		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAuxAuxAux)*(5e-9);// Conversion to seconds from PRU clock tick
 		
 		// Compute related to Period - Somehow for rel. freq. different than 0, this factor is 1/2.
 		adjFreqSynchNormRatiosArray[0]=1.0;
@@ -1622,24 +1622,16 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];// Split between the four channels		
 	for (int i=0;i<NumRunsPerCenterMass;i++){
 		if ((SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))<0){
-			SynchCalcValuesArrayAux[i]=static_cast<double>((-(SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2])))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux));// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+			SynchCalcValuesArrayAux[i]=static_cast<double>((LLIHistPeriodicityHalfAux-(SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2])))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 		}
 		else{
-			SynchCalcValuesArrayAux[i]=-static_cast<double>((SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux));// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+			SynchCalcValuesArrayAux[i]=-static_cast<double>((LLIHistPeriodicityHalfAux+(SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2])))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 		}
 		//cout << "QPLA::SynchFirstTagsArrayOffsetCalc[i]: " << SynchFirstTagsArrayOffsetCalc[i] << endl;
 		//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 		//cout << "QPLA::SynchCalcValuesArrayAux[i]: " << SynchCalcValuesArrayAux[i] << endl;
 	}
 	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
-	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
-	// Convert offset to center of histogram
-	if(SynchCalcValuesArray[1]<0.0){
-		SynchCalcValuesArray[1]=fmod(-MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux+SynchCalcValuesArray[1],MultFactorEffSynchPeriodQPLA*dHistPeriodicityAux)+MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux;
-	}
-	else{
-		SynchCalcValuesArray[1]=fmod(MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux+SynchCalcValuesArray[1],MultFactorEffSynchPeriodQPLA*dHistPeriodicityAux)-MultFactorEffSynchPeriodQPLA*dHistPeriodicityHalfAux;
-	}
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	
 	// Check if nan values, then convert them to 0 and inform through the terminal
