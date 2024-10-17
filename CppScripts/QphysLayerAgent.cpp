@@ -968,7 +968,7 @@ if (CurrentSpecificLinkMultiple<0){
 double dHistPeriodicityAux=static_cast<double>(HistPeriodicityAux);
 double dHistPeriodicityHalfAux=static_cast<double>(HistPeriodicityAux/2.0);
 double SynchNetTransHardwareAdjAux=1.0;
-if (CurrentSpecificLink>=0 and (numSpecificLinkmatches==1 or numCurrentEmitReceiveIP==1) and FlagTestSynch==false){// This corresponds to RequestQubits Node to node or SendEntangled. The receiver always performs correction, so does not matter for the sender since they are zeroed
+if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP==1 and FlagTestSynch==false){// This corresponds to RequestQubits Node to node or SendEntangled. The receiver always performs correction, so does not matter for the sender since they are zeroed
 	// For receiver correction	
 	if (SynchNetworkParamsLink[CurrentSpecificLink][1]<0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1];}// For negative correction
 	else if (SynchNetworkParamsLink[CurrentSpecificLink][1]>0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2];}// For positivenegative correction
@@ -1003,7 +1003,7 @@ if (CurrentSpecificLink>=0 and (numSpecificLinkmatches==1 or numCurrentEmitRecei
 	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[1]: " << CurrentSynchNetworkParamsLink[1] << endl;
 	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[2]: " << CurrentSynchNetworkParamsLink[2] << endl;
 }
-else if (CurrentSpecificLink>=0 and (numSpecificLinkmatches>1 or numCurrentEmitReceiveIP>1) and FlagTestSynch==false){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
+else if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP>1 and FlagTestSynch==false){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
 	// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for detection to use another story is if compensating for emitter
 	// Eventually, the correction has to be from the receiver inferred
 	if ((SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1])<0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLinkMultipleIndices[0]][1];}// For negative correction
