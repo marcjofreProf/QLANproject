@@ -994,7 +994,13 @@ if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP==1 and SynchNetworkParams
 	//	CurrentSynchNetworkParamsLink[1]=((fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][1],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	//}
 	// Maybe the rel. freq. offset should no be transformed
-	CurrentSynchNetworkParamsLink[1]=(SynchNetworkParamsLink[CurrentSpecificLink][1]/SynchNetworkParamsLink[CurrentSpecificLink][2]);///SynchNetTransHardwareAdjAux;
+	//CurrentSynchNetworkParamsLink[1]=(SynchNetworkParamsLink[CurrentSpecificLink][1]/SynchNetworkParamsLink[CurrentSpecificLink][2]);///SynchNetTransHardwareAdjAux;
+	if (SynchNetworkParamsLink[CurrentSpecificLink][1]<0.0){
+		CurrentSynchNetworkParamsLink[1]=-fmod(-SynchNetworkParamsLink[CurrentSpecificLink][1],dHistPeriodicityHalfAux)/dHistPeriodicityHalfAux;
+	}
+	else{
+		CurrentSynchNetworkParamsLink[1]=fmod(SynchNetworkParamsLink[CurrentSpecificLink][1],dHistPeriodicityHalfAux)/dHistPeriodicityHalfAux;
+	}
 	CurrentSynchNetworkParamsLink[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]; // Period in which it was calculated
 	//CurrentSynchNetworkParamsLink[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];// Offset
 	//CurrentSynchNetworkParamsLink[1]=(SynchNetworkParamsLink[CurrentSpecificLink][1]/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
@@ -1031,7 +1037,13 @@ else if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP>1 and SynchNetworkPa
 	//	CurrentExtraSynchNetworkParamsLink[1]=((fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
 	//}
 	// Maybe the rel. freq. offset should no be transformed
-	CurrentExtraSynchNetworkParamsLink[1]=(SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1]/SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]);///SynchNetTransHardwareAdjAux;
+	//CurrentExtraSynchNetworkParamsLink[1]=(SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1]/SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]);///SynchNetTransHardwareAdjAux;
+	if (SynchNetworkParamsLink[CurrentSpecificLink][1]<0.0){
+		CurrentExtraSynchNetworkParamsLink[1]=-fmod(-SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityHalfAux)/dHistPeriodicityHalfAux;
+	}
+	else{
+		CurrentExtraSynchNetworkParamsLink[1]=fmod(SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityHalfAux)/dHistPeriodicityHalfAux;
+	}
 	CurrentExtraSynchNetworkParamsLink[2]=SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]; // Period in which the parameters where calculated
 	// Debugging
 	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod Correction for emitter (receiver does not correct)" << endl;
@@ -1625,8 +1637,8 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	cout << "QPLA::SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2] << ", adjustment factor for positive rel. freq. correction" << endl;
 	
 	// Offset calculation
-	cout << "QPLA::Rel. Freq. Difference zeroed...to be deactivated" << endl;
-	SynchCalcValuesArray[2]=0.0; // To be removed
+	//cout << "QPLA::Rel. Freq. Difference zeroed...to be deactivated" << endl;
+	//SynchCalcValuesArray[2]=0.0; // To be removed
 
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];// Split between the four channels		
 	for (int i=0;i<NumRunsPerCenterMass;i++){

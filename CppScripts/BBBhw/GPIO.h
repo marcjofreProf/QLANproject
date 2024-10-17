@@ -260,8 +260,7 @@ public:	// Functions/Methods
 	// PRU
 	GPIO(); // initializates PRU operation
 	int InitAgentProcess();
-	int LOCAL_DDMinit();
-	int DDRdumpdata(int iIterRunsAux);
+	int LOCAL_DDMinit();	
 	int DisablePRUs();
 	int ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux,double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber, bool FlagTestSynchAux);// Read the detected timestaps in four channels
 	int SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber, bool FlagTestSynchAux); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
@@ -321,6 +320,7 @@ private: // Functions/Methods
 	int PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int TimeTaggs[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTags[QuadNumChGroups][MaxNumQuBitsMemStored]);// Correct the detections relative frequency difference of the sender as well as separate by quad channel groups
 	// Data processing
 	unsigned short packBits(unsigned short value);
+	int DDRdumpdata(int iIterRunsAux);
 	// Non-PRU
 	int write(string path, string filename, string value);
 	int write(string path, string filename, int value);
