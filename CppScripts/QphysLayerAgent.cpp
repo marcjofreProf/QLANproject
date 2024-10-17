@@ -1026,10 +1026,10 @@ else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has 
 	CurrentExtraSynchNetworkParamsLink[1]=(SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1]/SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]);///SynchNetTransHardwareAdjAux;
 	CurrentExtraSynchNetworkParamsLink[2]=SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]; // Period in which the parameters where calculated
 	// Debugging
-	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod Correction for emitter (receiver does not correct)" << endl;
-	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[0]: " << CurrentExtraSynchNetworkParamsLink[0] << endl;
-	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[1]: " << CurrentExtraSynchNetworkParamsLink[1] << endl;
-	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[2]: " << CurrentExtraSynchNetworkParamsLink[2] << endl;
+	cout << "QPLA::RetrieveOtherEmiterReceiverMethod Correction for emitter (receiver does not correct)" << endl;
+	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[0]: " << CurrentExtraSynchNetworkParamsLink[0] << endl;
+	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[1]: " << CurrentExtraSynchNetworkParamsLink[1] << endl;
+	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[2]: " << CurrentExtraSynchNetworkParamsLink[2] << endl;
 }
 else{
 	CurrentSynchNetworkParamsLink[0]=0.0;
