@@ -609,17 +609,14 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	
 	pru0dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	// The synch offset
-	if (abs(AccumulatedErrorDriftAux)>PRUoffsetDriftErrorAbsAvgMax){
-		cout << "GPIO::AccumulatedErrorDriftAux magnitude is too large: " << AccumulatedErrorDriftAux << "Increase PRUoffsetDriftErrorAbsAvgMax." << endl;
-	}
 	if (this->AccumulatedErrorDriftAux<0.0){
-		AccumulatedErrorDriftAux=PRUoffsetDriftErrorAbsAvgMax-fmod(-this->AccumulatedErrorDriftAux,PRUoffsetDriftErrorAbsAvgMax);
+		AccumulatedErrorDriftAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)-fmod(-this->AccumulatedErrorDriftAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
 	else{
-		AccumulatedErrorDriftAux=PRUoffsetDriftErrorAbsAvgMax+fmod(this->AccumulatedErrorDriftAux,PRUoffsetDriftErrorAbsAvgMax);
+		AccumulatedErrorDriftAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)+fmod(this->AccumulatedErrorDriftAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
 	pru0dataMem_int[5]=static_cast<unsigned int>(AccumulatedErrorDriftAux); // set periodic offset correction value
-
+	// The synch rel. freq. diff. 
 	// From this point below, the timming is very critical to have long time synchronziation stability!!!!
 	InstantCorr=static_cast<long long int>(AccumulatedErrorDrift*SynchTrigPeriod);
 	// Attention ldTimePointClockTagPRUinitial is needed in DDRdumpdata!!!!
@@ -770,14 +767,11 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	pru1dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 
 	// The synch offset
-	if (abs(AccumulatedErrorDriftAux)>PRUoffsetDriftErrorAbsAvgMax){
-		cout << "GPIO::AccumulatedErrorDriftAux magnitude is too large: " << AccumulatedErrorDriftAux << ". Increase PRUoffsetDriftErrorAbsAvgMax." << endl;
-	}
 	if (this->AccumulatedErrorDriftAux<0.0){
-		AccumulatedErrorDriftAux=PRUoffsetDriftErrorAbsAvgMax-fmod(-this->AccumulatedErrorDriftAux,PRUoffsetDriftErrorAbsAvgMax);
+		AccumulatedErrorDriftAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)-fmod(-this->AccumulatedErrorDriftAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
 	else{
-		AccumulatedErrorDriftAux=PRUoffsetDriftErrorAbsAvgMax+fmod(this->AccumulatedErrorDriftAux,PRUoffsetDriftErrorAbsAvgMax);
+		AccumulatedErrorDriftAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)+fmod(this->AccumulatedErrorDriftAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
 	pru1dataMem_int[5]=static_cast<unsigned int>(AccumulatedErrorDriftAux); // set periodic offset correction value
 

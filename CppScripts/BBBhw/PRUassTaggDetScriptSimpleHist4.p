@@ -229,14 +229,14 @@ PSEUDOSYNCHLOOP:
 TIMEOFFSETADJ: // Neutralizing sender/emitter synch offset	
 	LBCO	r0, CONST_PRUDRAM, 20, 4 // Read from PRU RAM offset correction
 	LSR		r0, r0, 1// Divide by two because the TIMEOFFSETADJLOOP consumes double
-	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+//	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
 TIMEOFFSETADJLOOP:
 	SUB		r0, r0, 1
 	QBNE	TIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
 FINETIMEOFFSETADJ: // Neutralizing hardware clock relative frequency difference within this execution in terms of synch period
 	LBCO	r0, CONST_PRUDRAM, 12, 4 // Read from PRU RAM rel. freq. diff correction
 	LSR		r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
-	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+//	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
 FINETIMEOFFSETADJLOOP:
 	SUB		r0, r0, 1
 	QBNE	FINETIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0

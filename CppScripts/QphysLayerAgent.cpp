@@ -1622,10 +1622,10 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];// Split between the four channels		
 	for (int i=0;i<NumRunsPerCenterMass;i++){
 		if ((SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))<0){
-			SynchCalcValuesArrayAux[i]=static_cast<double>((LLIHistPeriodicityHalfAux-(SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2])))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+			SynchCalcValuesArrayAux[i]=static_cast<double>((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-(SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2])))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 		}
 		else{
-			SynchCalcValuesArrayAux[i]=-static_cast<double>((LLIHistPeriodicityHalfAux+(SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2])))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
+			SynchCalcValuesArrayAux[i]=-static_cast<double>((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+(SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2])))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
 		}
 		//cout << "QPLA::SynchFirstTagsArrayOffsetCalc[i]: " << SynchFirstTagsArrayOffsetCalc[i] << endl;
 		//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
