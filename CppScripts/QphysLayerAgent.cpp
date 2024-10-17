@@ -265,6 +265,8 @@ int QPLA::ProcessNewParameters(){
 		char CurrentReceiveHostIPAuxAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
 		strcpy(CurrentReceiveHostIPAuxAux,CurrentReceiveHostIP);
 		char SpecificCurrentReceiveHostIPAuxAux[IPcharArrayLengthMAX]={0};
+		cout << "QPLA::ProcessNewParameters CurrentNumIdentifiedEmitReceiveIP: " << CurrentNumIdentifiedEmitReceiveIP << endl;
+		
 		for (int j=0;j<numCurrentEmitReceiveIP;j++){
 			if (j==0){strcpy(SpecificCurrentReceiveHostIPAuxAux,strtok(CurrentReceiveHostIPAuxAux,"_"));}
 			else{strcpy(SpecificCurrentReceiveHostIPAuxAux,strtok(NULL,"_"));}
@@ -282,9 +284,12 @@ int QPLA::ProcessNewParameters(){
 					CurrentNumIdentifiedEmitReceiveIP++;
 				}
 				else{// Mal function we should not be here
-					cout << "QPLA::Number of identified emitters/receivers to this node has exceeded the expected value!!!" << endl;
+					cout << "QPLA::ProcessNewParameters Number of identified emitters/receivers to this node has exceeded the expected value!!!" << endl;
 				}
-			}	
+			}
+			else{
+				cout << "QPLA::ProcessNewParameters Link not properly identified or stored!!!" << endl;
+			}
 		}
 
 		//cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArray[iHeaders] << endl;
@@ -996,10 +1001,10 @@ if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to
 	CurrentExtraSynchNetworkParamsLink[1]=0.0;
 	CurrentExtraSynchNetworkParamsLink[2]=0.0;
 	// Debugging
-	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod Correction for receiver (emitter does not correct)" << endl;
-	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[0]: " << CurrentSynchNetworkParamsLink[0] << endl;
-	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[1]: " << CurrentSynchNetworkParamsLink[1] << endl;
-	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[2]: " << CurrentSynchNetworkParamsLink[2] << endl;
+	cout << "QPLA::RetrieveOtherEmiterReceiverMethod Correction for receiver (emitter does not correct)" << endl;
+	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[0]: " << CurrentSynchNetworkParamsLink[0] << endl;
+	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[1]: " << CurrentSynchNetworkParamsLink[1] << endl;
+	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[2]: " << CurrentSynchNetworkParamsLink[2] << endl;
 }
 else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
 	// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for detection to use another story is if compensating for emitter
@@ -1032,6 +1037,7 @@ else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has 
 	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[2]: " << CurrentExtraSynchNetworkParamsLink[2] << endl;
 }
 else{
+	cout << "QPLA::RetrieveOtherEmiterReceiverMethod No Correction present" << endl;
 	CurrentSynchNetworkParamsLink[0]=0.0;
 	CurrentSynchNetworkParamsLink[1]=0.0;
 	CurrentSynchNetworkParamsLink[2]=0.0;
