@@ -232,7 +232,7 @@ private:// Variables
 	unsigned long long int ULLIEpochReOffset=344810000000000000;// Amount to remove to timetaggs so that thier numbers are not so high and difficult to handle by other agents (value adjusted August 2024)
 	unsigned long long int OldLastTimeTagg=0;
 	unsigned long long int TimeTaggsLast=0;
-	unsigned long long int TimeTaggsLastStored=0;
+	unsigned long long int TimeTaggsLastStored[10]={0};
 	unsigned long long int TimeTaggsInit=0;
 	unsigned long long int LastTimeTaggRef[1]={0};
 	// Pulses compensation
@@ -247,7 +247,7 @@ private:// Variables
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
 	bool QPLAFlagTestSynch=false;
 	// Correct Qubits relative frequency difference due to the sender
-	int TagsSeparationDetRelFreq=1; // Number of index separation to compute the slope of disadjustment in order to have accuraccy
+	int TagsSeparationDetRelFreq=10; // Number of index separation to compute the slope of disadjustment in order to have accuraccy
 	double SlopeDetTagsAuxArray[MaxNumQuBitsMemStored]={0.0}; // Array in order to do the computations
 	// Information and status
 	bool HardwareSynchStatus=false; // Turn to true when hardware synchronized with the PRU clock

@@ -928,7 +928,8 @@ this->TimeTaggsLast=(static_cast<unsigned long long int>(ldTimePointClockTagPRUi
 //Furthermore, remove some time from epoch - in multiples of the SynchTrigPeriod, so it is easier to handle in the above agents
 this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsLast)-static_cast<long long int>((this->ULLIEpochReOffset/static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod))*static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 
-if (iIterRunsAux==0){this->TimeTaggsLastStored=this->TimeTaggsLast;TotalCurrentNumRecords=0;}// First iteration of current runs, store the value for synchronization time difference calibration
+if (iIterRunsAux==0){TotalCurrentNumRecords=0;}// First iteration of current runs, store the value for synchronization time difference calibration
+this->TimeTaggsLastStored[iIterRunsAux]=this->TimeTaggsLast;
 
 long long int LLIOldLastTimeTagg=static_cast<long long int>(OldLastTimeTagg);
 unsigned int valCycleCountPRUAux1;
@@ -1002,8 +1003,10 @@ if(valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts th
 if (SlowMemoryPermanentStorageFlag==true){
 	// Reading TimeTaggs
 	if (streamDDRpru.is_open()){	        
-		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		streamDDRpru.write(reinterpret_cast<const char*>(&TimeTaggsLastStored), sizeof(TimeTaggsLastStored));// Store this reference value
+		if (iIterRunsAux==0){
+			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+			streamDDRpru.write(reinterpret_cast<const char*>(&TimeTaggsLastStored[iIterRunsAux]), sizeof(TimeTaggsLastStored[iIterRunsAux]));// Store this reference value
+		}
 		for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 			streamDDRpru.write(reinterpret_cast<const char*>(&TimeTaggsStored[iIterDump]), sizeof(TimeTaggsStored[iIterDump]));
@@ -1165,8 +1168,8 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRefAux, un
 	if (streamDDRpru.is_open()){
 		streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
 		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		streamDDRpru.read(reinterpret_cast<char*>(&TimeTaggsLastStored), sizeof(TimeTaggsLastStored));
-		LastTimeTaggRefAux[0]=static_cast<unsigned long long int>(static_cast<long double>(TimeTaggsLastStored));// Since whole number. Initiation value
+		streamDDRpru.read(reinterpret_cast<char*>(&TimeTaggsLastStored[0]), sizeof(TimeTaggsLastStored[0]));
+		LastTimeTaggRefAux[0]=static_cast<unsigned long long int>(static_cast<long double>(TimeTaggsLastStored[0]));// Since whole number. Initiation value
 		int lineCount = 0;
 		unsigned long long int ValueReadTest;		
 		int iIterMovAdjPulseSynchCoeff=0;
@@ -1189,7 +1192,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRefAux, un
 	    }
 	}
 else{// Memory allocation
-	LastTimeTaggRefAux[0]=static_cast<unsigned long long int>(static_cast<long double>(TimeTaggsLastStored));// Since whole number. It is meant for computing the time between measurements to estimate the relative frequency difference. It is for synchronization purposes which generally will be under control so even if it is a multiple adquisiton the itme difference will be mantained so it generally ok.
+	LastTimeTaggRefAux[0]=static_cast<unsigned long long int>(static_cast<long double>(TimeTaggsLastStored[0]));// Since whole number. It is meant for computing the time between measurements to estimate the relative frequency difference. It is for synchronization purposes which generally will be under control so even if it is a multiple adquisiton the itme difference will be mantained so it generally ok.
 }
 LastTimeTaggRef[0]=LastTimeTaggRefAux[0];// The one to be used in this agent
 
