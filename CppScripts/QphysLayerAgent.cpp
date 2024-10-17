@@ -265,14 +265,14 @@ int QPLA::ProcessNewParameters(){
 		char CurrentReceiveHostIPAuxAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
 		strcpy(CurrentReceiveHostIPAuxAux,CurrentReceiveHostIP);
 		char SpecificCurrentReceiveHostIPAuxAux[IPcharArrayLengthMAX]={0};
-		cout << "QPLA::ProcessNewParameters CurrentNumIdentifiedEmitReceiveIP: " << CurrentNumIdentifiedEmitReceiveIP << endl;
-		
+		//cout << "QPLA::ProcessNewParameters CurrentNumIdentifiedEmitReceiveIP: " << CurrentNumIdentifiedEmitReceiveIP << endl;
+
 		for (int j=0;j<numCurrentEmitReceiveIP;j++){
 			if (j==0){strcpy(SpecificCurrentReceiveHostIPAuxAux,strtok(CurrentReceiveHostIPAuxAux,"_"));}
 			else{strcpy(SpecificCurrentReceiveHostIPAuxAux,strtok(NULL,"_"));}
 			for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
 				if (string(LinkIdentificationArray[i])==string(SpecificCurrentReceiveHostIPAuxAux)){// IP already present
-					if (CurrentSpecificLink<0){CurrentSpecificLink=i;}// Take the first identified, which is th eone that matters most
+					if (CurrentSpecificLink<0){CurrentSpecificLink=i;}// Take the first identified, which is the one that matters most
 					CurrentSpecificLinkMultipleIndices[numSpecificLinkmatches]=i; // For multiple links at the same time
 					numSpecificLinkmatches++;
 				}
@@ -286,9 +286,6 @@ int QPLA::ProcessNewParameters(){
 				else{// Mal function we should not be here
 					cout << "QPLA::ProcessNewParameters Number of identified emitters/receivers to this node has exceeded the expected value!!!" << endl;
 				}
-			}
-			else{
-				cout << "QPLA::ProcessNewParameters Link not properly identified or stored!!!" << endl;
 			}
 		}
 
@@ -971,7 +968,7 @@ if (CurrentSpecificLinkMultiple<0){
 double dHistPeriodicityAux=static_cast<double>(HistPeriodicityAux);
 double dHistPeriodicityHalfAux=static_cast<double>(HistPeriodicityAux/2.0);
 double SynchNetTransHardwareAdjAux=1.0;
-if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to RequestQubits Node to node or SendEntangled. The receiver always performs correction, so does not matter for the sender since they are zeroed
+if (CurrentSpecificLink>=0 and (numSpecificLinkmatches==1 or numCurrentEmitReceiveIP==1) and FlagTestSynch==false){// This corresponds to RequestQubits Node to node or SendEntangled. The receiver always performs correction, so does not matter for the sender since they are zeroed
 	// For receiver correction	
 	if (SynchNetworkParamsLink[CurrentSpecificLink][1]<0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1];}// For negative correction
 	else if (SynchNetworkParamsLink[CurrentSpecificLink][1]>0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2];}// For positivenegative correction
@@ -1006,11 +1003,11 @@ if (CurrentSpecificLink>=0 and numSpecificLinkmatches==1){// This corresponds to
 	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[1]: " << CurrentSynchNetworkParamsLink[1] << endl;
 	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[2]: " << CurrentSynchNetworkParamsLink[2] << endl;
 }
-else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
+else if (CurrentSpecificLink>=0 and (numSpecificLinkmatches>1 or numCurrentEmitReceiveIP>1) and FlagTestSynch==false){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
 	// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for detection to use another story is if compensating for emitter
 	// Eventually, the correction has to be from the receiver inferred
-	if ((SynchNetworkParamsLinkOther[CurrentSpecificLink][1])<0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1];}// For negative correction
-	else if ((SynchNetworkParamsLinkOther[CurrentSpecificLink][1])>0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2];}// For positivenegative correction
+	if ((SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1])<0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLinkMultipleIndices[0]][1];}// For negative correction
+	else if ((SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1])>0.0){SynchNetTransHardwareAdjAux=SynchAdjRelFreqCalcValuesArray[CurrentSpecificLinkMultipleIndices[0]][2];}// For positivenegative correction
 	else{SynchNetTransHardwareAdjAux=1.0;}
 	// Notice that the relative frequency and offset correction is negated (or maybe not)
 	// For receiver correction - Correction has to take place at the emitter, where the first IP identifies the single receiver
@@ -1036,11 +1033,11 @@ else if (CurrentSpecificLink>=0 and numSpecificLinkmatches>1){// correction has 
 	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[1]: " << CurrentExtraSynchNetworkParamsLink[1] << endl;
 	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[2]: " << CurrentExtraSynchNetworkParamsLink[2] << endl;
 }
-else{
-	cout << "QPLA::RetrieveOtherEmiterReceiverMethod No Correction present" << endl;
-	CurrentSynchNetworkParamsLink[0]=0.0;
-	CurrentSynchNetworkParamsLink[1]=0.0;
-	CurrentSynchNetworkParamsLink[2]=0.0;
+else{ // For instance when testing Synch mechanisms
+	cout << "QPLA::RetrieveOtherEmiterReceiverMethod No Correction present or synch mechanisms" << endl;
+	CurrentSynchNetworkParamsLink[0]=0.0; // Reset values
+	CurrentSynchNetworkParamsLink[1]=0.0; // Reset values
+	CurrentSynchNetworkParamsLink[2]=0.0; // Reset values
 	
 	CurrentExtraSynchNetworkParamsLink[0]=0.0; // Reset values
 	CurrentExtraSynchNetworkParamsLink[1]=0.0; // Reset values
