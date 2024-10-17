@@ -785,10 +785,10 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 	
 	if (SynchCorrectionTimeFreqNoneFlag==0 or SynchCorrectionTimeFreqNoneFlag==2){
-		ContCorr=InstantCorr;
+		ContCorr=0;//InstantCorr;
 	}
 	else{
-		ContCorr=static_cast<long long int>(static_cast<long double>(SynchTrigPeriod)*static_cast<long double>(PRUoffsetDriftErrorAvg))+InstantCorr;
+		ContCorr=0;//static_cast<long long int>(static_cast<long double>(SynchTrigPeriod)*static_cast<long double>(PRUoffsetDriftErrorAvg))+InstantCorr;
 	}
 
 	if (ContCorr>0){SignAuxInstantCorr=1;}
@@ -1032,7 +1032,7 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 			}
 		}
 	}
-	if (QPLAFlagTestSynch==false and GPIOFlagRelFreqTest==false){
+	if (GPIOFlagRelFreqTest==false){
 		for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 			if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>=TagsSeparationDetRelFreq){
 	    		unsigned long long int ULLIInitialTimeTaggs=LastTimeTaggRef[0];//TimeTaggs[iQuadChIter][0];// Normalize to the first reference timetag (it is not a detect qubit, but the timetagg of entering the timetagg PRU), which is a strong reference
