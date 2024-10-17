@@ -95,6 +95,7 @@ private: // Variables/Objects
 };
 	using Clock = my_clock;//
 	// Synchronization network parameters
+	double MultFactorEffSynchPeriodQTLAH=4.0; // When using 4 channels histogram, this value is 4.0; when using real signals this value should be 1.0 (also in GPIO.h)
 	double TestPeriodFactorAux=0.25; // Scales the HistPeriodicity and Number of RepetitionSignal. The larger the period, the more probable that the relative frequency difference will be well measured/Captured. The larger the resulting HistPeriodicityAuxAux the larger range of initial relative frequency difference it can be handled
 	double HistPeriodicityAuxAux=4096.0/TestPeriodFactorAux;// Histogram value by default to perform network synchronization
 	int NumberRepetitionsSignalAux=static_cast<int>(65536.0*TestPeriodFactorAux);//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
@@ -110,7 +111,7 @@ private: // Variables/Objects
 	unsigned long long int MaxiIterPeriodicBlockTimer=900000; //100000;//3600000; // Counter of how much passes the host is constantly block. If larger than , unblock itself. To know the time the value has to be divided by 1000 to have seconds.
 	bool GPIOnodeHardwareSynched=false;// Variable to know the hardware synch status of the node below. Actually, do not let many operations and controls to happen until this variable is set to true.
 	bool GPIOnodeNetworkSynched=false;// Variable to know the network synch status of the node below. Periodically turn to false, to proceed again with network synchronization
-	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0,-0.25,0.25}; // Normalized values of frequency testing// Relative frequency difference normalized
+	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0,-0.25/static_cast<double>(NumberRepetitionsSignalAux)/MultFactorEffSynchPeriodQTLAH,0.25/static_cast<double>(NumberRepetitionsSignalAux)/MultFactorEffSynchPeriodQTLAH}; // Normalized values of frequency testing// Relative frequency difference normalized
 	// Scheduler status
 	unsigned long long int iIterPeriodicTimerVal=0; // Variable to keep track of number of passes thorugh periodic checks
 	unsigned long long int MaxiIterPeriodicTimerVal=1000; // Max number of passes so that it enters the periodic checks
