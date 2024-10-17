@@ -127,8 +127,8 @@ private: //Variables/Instances
 	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,-0.25,0.25}; // Normalized values of frequency testing which are applied for calibration
 	double SynchNetAdj[2*((1LL<<LinkNumberMAX)-1)]={1.0};
 	double adjFreqSynchNormRatiosArray[NumCalcCenterMass]={1.0}; // adjusting Normalized ratios of frequency testing
-	double SynchNetworkParamsLink[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send
-	double SynchNetworkParamsLinkOther[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send from the other nodes
+	double SynchNetworkParamsLink[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send. Zerod at the begining
+	double SynchNetworkParamsLinkOther[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send from the other nodes. Zeroed at the begining
 	double CurrentSynchNetworkParamsLink[3]={0.0}; //Stores currently the network synch values of interest given the link in use for reception
 	double CurrentExtraSynchNetworkParamsLink[3]={0.0}; //Stores currently the network synch values of interest given the link in use for emission
 	double GPIOHardwareSynched=false; // Variable to monitor the hardware synch status of the GPIO process
