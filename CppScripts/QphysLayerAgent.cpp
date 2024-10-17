@@ -1004,10 +1004,10 @@ if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP==1 and SynchNetworkParams
 	CurrentExtraSynchNetworkParamsLink[1]=0.0;
 	CurrentExtraSynchNetworkParamsLink[2]=0.0;
 	// Debugging
-	cout << "QPLA::RetrieveOtherEmiterReceiverMethod Correction for receiver (emitter does not correct)" << endl;
-	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[0]: " << CurrentSynchNetworkParamsLink[0] << endl;
-	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[1]: " << CurrentSynchNetworkParamsLink[1] << endl;
-	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[2]: " << CurrentSynchNetworkParamsLink[2] << endl;
+	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod Correction for receiver (emitter does not correct)" << endl;
+	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[0]: " << CurrentSynchNetworkParamsLink[0] << endl;
+	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[1]: " << CurrentSynchNetworkParamsLink[1] << endl;
+	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentSynchNetworkParamsLink[2]: " << CurrentSynchNetworkParamsLink[2] << endl;
 }
 else if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP>1 and SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]>0.0 and FlagTestSynch==false){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
 	// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for detection to use another story is if compensating for emitter
@@ -1034,13 +1034,13 @@ else if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP>1 and SynchNetworkPa
 	CurrentExtraSynchNetworkParamsLink[1]=(SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1]/SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]);///SynchNetTransHardwareAdjAux;
 	CurrentExtraSynchNetworkParamsLink[2]=SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]; // Period in which the parameters where calculated
 	// Debugging
-	cout << "QPLA::RetrieveOtherEmiterReceiverMethod Correction for emitter (receiver does not correct)" << endl;
-	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[0]: " << CurrentExtraSynchNetworkParamsLink[0] << endl;
-	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[1]: " << CurrentExtraSynchNetworkParamsLink[1] << endl;
-	cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[2]: " << CurrentExtraSynchNetworkParamsLink[2] << endl;
+	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod Correction for emitter (receiver does not correct)" << endl;
+	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[0]: " << CurrentExtraSynchNetworkParamsLink[0] << endl;
+	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[1]: " << CurrentExtraSynchNetworkParamsLink[1] << endl;
+	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[2]: " << CurrentExtraSynchNetworkParamsLink[2] << endl;
 }
-else{ // For instance when testing Synch mechanisms
-	cout << "QPLA::RetrieveOtherEmiterReceiverMethod No Correction present or synch mechanisms" << endl;
+else{ // For instance when testing Synch mechanisms or when no previous synch parameters present (or lin not properly identified)
+	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod No Correction present or synch mechanisms" << endl;
 	CurrentSynchNetworkParamsLink[0]=0.0; // Reset values
 	CurrentSynchNetworkParamsLink[1]=0.0; // Reset values
 	CurrentSynchNetworkParamsLink[2]=0.0; // Reset values
