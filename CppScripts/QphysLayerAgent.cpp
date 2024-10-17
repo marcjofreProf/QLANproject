@@ -1052,7 +1052,9 @@ else if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP>1 and SynchNetworkPa
 	//cout << "QPLA::RetrieveOtherEmiterReceiverMethod CurrentExtraSynchNetworkParamsLink[2]: " << CurrentExtraSynchNetworkParamsLink[2] << endl;
 }
 else{ // For instance when testing Synch mechanisms or when no previous synch parameters present (or lin not properly identified)
-	cout << "QPLA::RetrieveOtherEmiterReceiverMethod No correction present or synch mechanism." << endl;
+	if (FlagTestSynch==false){
+		cout << "QPLA::RetrieveOtherEmiterReceiverMethod No synch. correction present." << endl;
+	}
 	CurrentSynchNetworkParamsLink[0]=0.0; // Reset values
 	CurrentSynchNetworkParamsLink[1]=0.0; // Reset values
 	CurrentSynchNetworkParamsLink[2]=0.0; // Reset values
