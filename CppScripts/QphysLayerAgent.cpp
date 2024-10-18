@@ -1055,7 +1055,7 @@ else{ // For instance when testing Synch mechanisms or when no previous synch pa
 	if (FlagTestSynch==false){
 		cout << "QPLA::RetrieveOtherEmiterReceiverMethod No synch. correction present." << endl;
 	}
-	CurrentSynchNetworkParamsLink[0]=0.0; // Reset values
+	CurrentSynchNetworkParamsLink[0]=0.0; // Reset valu es
 	CurrentSynchNetworkParamsLink[1]=0.0; // Reset values
 	CurrentSynchNetworkParamsLink[2]=0.0; // Reset values
 	
