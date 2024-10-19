@@ -1536,53 +1536,12 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
 		cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
 		cout << "QPLA::SynchHistCenterMassArray[2]: " << SynchHistCenterMassArray[2] << endl;
-		/*
-		if ((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])>0.0){// For negative adjustment
-			SynchCalcValuesArrayFreqAux[1]=((SynchHistCenterMassArray[1]-SynchCalcValuesArray[0])-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]);
-		}
-		else{
-			SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[1];
-		}
-		if (SynchCalcValuesArray[2]<0.0){
-			SynchCalcValuesArrayFreqAux[1]=(SynchCalcValuesArrayFreqAux[1]-SynchCalcValuesArrayFreqAux[0])/MultFactorEffSynchPeriodQPLA*adjFreqSynchNormRatiosArray[1];// Frequency adjustment for negative rel. freq. difference
-		}
-		else if(SynchCalcValuesArray[2]>0.0){
-			SynchCalcValuesArrayFreqAux[1]=(SynchCalcValuesArrayFreqAux[1]+SynchCalcValuesArrayFreqAux[0])/MultFactorEffSynchPeriodQPLA*adjFreqSynchNormRatiosArray[1];// Frequency adjustment for negative rel. freq. difference
-		}
-		else{
-			SynchCalcValuesArrayFreqAux[1]=1.0;// Frequency adjustment for negative rel. freq. difference
-		}*/
+		
+		// For negative adjustment
+		SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/SynchCalcValuesArray[0]/FreqSynchNormValuesArray[1];
 
-		if ((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])>0.0){// For negative adjustment
-			SynchCalcValuesArrayFreqAux[1]=((SynchHistCenterMassArray[1]-SynchCalcValuesArray[0])-SynchHistCenterMassArray[0])/SynchCalcValuesArray[0]/abs(FreqSynchNormValuesArray[1]);
-		}
-		else{
-			SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/SynchCalcValuesArray[0]/abs(FreqSynchNormValuesArray[1]);//+FreqSynchNormValuesArray[1];
-		}
-
-		/*
-		if ((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])<0.0){// For positive adjustment
-			SynchCalcValuesArrayFreqAux[2]=((SynchHistCenterMassArray[2]+SynchCalcValuesArray[0])-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);
-		}
-		else{
-			SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);//+FreqSynchNormValuesArray[2]; 
-		}
-		if (SynchCalcValuesArray[2]>0.0){
-			SynchCalcValuesArrayFreqAux[2]=(SynchCalcValuesArrayFreqAux[2]+SynchCalcValuesArrayFreqAux[0])/MultFactorEffSynchPeriodQPLA*adjFreqSynchNormRatiosArray[2];// Frequency adjustment for positive rel. freq. difference
-		}
-		else if(SynchCalcValuesArray[2]<0.0){
-			SynchCalcValuesArrayFreqAux[2]=(SynchCalcValuesArrayFreqAux[2]-SynchCalcValuesArrayFreqAux[0])/MultFactorEffSynchPeriodQPLA*adjFreqSynchNormRatiosArray[2];// Frequency adjustment for positive rel. freq. difference
-		}
-		else{
-			SynchCalcValuesArrayFreqAux[2]=1.0;// Frequency adjustment for positive rel. freq. difference
-		}*/
-
-		if ((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])<0.0){// For positive adjustment
-			SynchCalcValuesArrayFreqAux[2]=((SynchHistCenterMassArray[2]+SynchCalcValuesArray[0])-SynchHistCenterMassArray[0])/SynchCalcValuesArray[0]/FreqSynchNormValuesArray[2];
-		}
-		else{
-			SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/SynchCalcValuesArray[0]/FreqSynchNormValuesArray[2];//+FreqSynchNormValuesArray[2]; 
-		}
+		// For positive adjustment
+		SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/SynchCalcValuesArray[0]/FreqSynchNormValuesArray[2];
 		
 		// Storage of the adjustment depending on the relative frequency offset correction direction. Actually, we have to store both direction corrections, since for receiver correction will be one but for sendere correction will be the other direciton
 		SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][0]=1.0;// For 0 rel. freq. diff. the correction is 1.0
@@ -1681,32 +1640,8 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	
 	// Identify the specific link and store/update iteratively the values
 	
-	if (CurrentSpecificLink>=0){
-		/*// Let the other node also correct
-		if ((SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1])>(0.5*SynchCalcValuesArray[0])){
-			SynchNetworkParamsLink[CurrentSpecificLink][0]=0.5*SynchCalcValuesArray[0];
-			cout << "Limited the Network synch offset correction in this node to 0.5*HistPeriodicityAux!" << endl;
-		}
-		else if ((SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1])<(-0.5*SynchCalcValuesArray[0])){
-			SynchNetworkParamsLink[CurrentSpecificLink][0]=-0.5*SynchCalcValuesArray[0];
-			cout << "Limited the Network synch offset correction in this node to -0.5*HistPeriodicityAux!" << endl;
-		}
-		else{
-			SynchNetworkParamsLink[CurrentSpecificLink][0]=SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1];// Offset difference
-		}*/
-		SynchNetworkParamsLink[CurrentSpecificLink][0]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1];// Offset difference
-		/*// Let the other node also correct
-		if ((SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2])>0.5){
-			SynchNetworkParamsLink[CurrentSpecificLink][1]=0.5;
-			cout << "Limited the Network synch rel. freq. correction in this node to 0.5!" << endl;
-		}
-		else if ((SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2])<-0.5){
-			SynchNetworkParamsLink[CurrentSpecificLink][1]=-0.5;
-			cout << "Limited the Network synch rel. freq. correction in this node to -0.5!" << endl;
-		}
-		else{
-			SynchNetworkParamsLink[CurrentSpecificLink][1]=SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency difference
-		}*/
+	if (CurrentSpecificLink>=0){		
+		SynchNetworkParamsLink[CurrentSpecificLink][0]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1];// Offset difference		
 		SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 		SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 		SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
