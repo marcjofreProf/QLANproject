@@ -922,8 +922,7 @@ this->TimeTaggsLast=(static_cast<unsigned long long int>(ldTimePointClockTagPRUi
 //Furthermore, remove some time from epoch - in multiples of the SynchTrigPeriod, so it is easier to handle in the above agents
 this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsLast)-static_cast<long long int>((this->ULLIEpochReOffset/static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod))*static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 
-if (iIterRunsAux==0){TotalCurrentNumRecords=0;}// First iteration of current runs, store the value for synchronization time difference calibration
-this->TimeTaggsLastStored[iIterRunsAux]=this->TimeTaggsLast;
+if (iIterRunsAux==0){TimeTaggsLastStored=TimeTaggsLast;TotalCurrentNumRecords=0;}// First iteration of current runs, store the value for synchronization time difference calibration
 
 long long int LLIOldLastTimeTagg=static_cast<long long int>(OldLastTimeTagg);
 unsigned int valCycleCountPRUAux1;
@@ -931,7 +930,7 @@ unsigned int valCycleCountPRUAux2;
 //cout << "GPIO::NumQuBitsPerRun " << NumQuBitsPerRun << endl;
 //cout << "GPIO::MaxNumQuBitsMemStored " << MaxNumQuBitsMemStored << endl;
 //for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
-iIterDump=0;
+CurrentiIterDump=0;
 extendedCounterPRUholder=1;// Re-initialize at each run. 1 so that at least the first is checked and stored
 extendedCounterPRUholderOld=0;// Re-initialize at each run
 int TotalCurrentNumRecordsOld=TotalCurrentNumRecords;
@@ -962,7 +961,7 @@ while (iIterDump<NumQuBitsPerRun and extendedCounterPRUholder>extendedCounterPRU
 	//cout << "GPIO::extendedCounterPRUholder: " << extendedCounterPRUholder << endl;
 	//cout << "GPIO::extendedCounterPRUholder>0: " << (extendedCounterPRUholder>0) << endl;
 	if (TotalCurrentNumRecords<MaxNumQuBitsMemStored and extendedCounterPRUholder>0){TotalCurrentNumRecords++;}//Variable to hold the number of currently stored records in memory	
-	iIterDump++;
+	CurrentiIterDump++;
 }
 if (TotalCurrentNumRecords>MaxNumQuBitsMemStored){cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
 else if (TotalCurrentNumRecords==TotalCurrentNumRecordsOld){cout << "GPIO::No detection of qubits!" << endl;}
@@ -994,14 +993,18 @@ if(valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts th
 //cout << "GPIO::DDRdumpdata::SynchTrigPeriod: " << SynchTrigPeriod << endl;
 //cout << "GPIO::DDRdumpdata::NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
 ///////////////////////////////////////////////
-if (SlowMemoryPermanentStorageFlag==true){
+
+// Correct the detected qubits relative frequency difference (due to the sender node) and split between quad groups of 4 channels
+PRUdetCorrRelFreq(iIterRunsAux,CurrentiIterDump);
+
+if (SlowMemoryPermanentStorageFlag==true){ // We save into file the relative frequency corrected info (so it might be time disorded for different QuadNumChGroups)
 	// Reading TimeTaggs
 	if (streamDDRpru.is_open()){	        
 		if (iIterRunsAux==0){
 			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-			streamDDRpru.write(reinterpret_cast<const char*>(&TimeTaggsLastStored[iIterRunsAux]), sizeof(TimeTaggsLastStored[iIterRunsAux]));// Store this reference value
+			streamDDRpru.write(reinterpret_cast<const char*>(&TimeTaggsLast), sizeof(TimeTaggsLast));// Store this reference value
 		}
-		for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
+		for (iIterDump=0; iIterDump<CurrentiIterDump; iIterDump++){
 			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 			streamDDRpru.write(reinterpret_cast<const char*>(&TimeTaggsStored[iIterDump]), sizeof(TimeTaggsStored[iIterDump]));
 			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
@@ -1017,45 +1020,55 @@ if (SlowMemoryPermanentStorageFlag==true){
 return 0; // all ok
 }
 
-int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int TimeTaggs[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTags[QuadNumChGroups][MaxNumQuBitsMemStored]){
+int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){
 // Separate the detection by quad channels and do the processing independently
-// First (reset)compute the number of detections per quad channel
-	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-		TotalCurrentNumRecordsQuadCh[iQuadChIter]=0;
+	int CurrentiIterDumpAux=0;
+	// First (reset)compute the number of detections per quad channel
+	if (iIterRunsAux==0){ // Reset values
+		for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+			TotalCurrentNumRecordsQuadCh[iQuadChIter]=0;
+			TotalCurrentNumRecordsQuadChOld[iQuadChIter]=0;
+		}
 	}
-	for (int i=0;i<TotalCurrentNumRecords;i++){
+	else{// Update old values
+		for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+			TotalCurrentNumRecordsQuadChOld[iQuadChIter]=TotalCurrentNumRecordsQuadCh[iQuadChIter];
+		}
+	}
+	for (int i=0;i<CurrentiIterDump;i++){
 		for (unsigned short iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 			if ((ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter)))>0){  
-				TimeTaggs[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=TimeTaggsStored[i];
-				ChannelTags[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter));
+				TimeTaggsSplitted[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=TimeTaggsStored[i];
+				ChannelTagsSplitted[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter));
 				TotalCurrentNumRecordsQuadCh[iQuadChIter]++;
 			}
 		}
 	}
 	if (GPIOFlagRelFreqTest==false){
 		for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-			if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>=TagsSeparationDetRelFreq){
-	    		unsigned long long int ULLIInitialTimeTaggs=LastTimeTaggRef[0];//TimeTaggs[iQuadChIter][0];// Normalize to the first reference timetag (it is not a detect qubit, but the timetagg of entering the timetagg PRU), which is a strong reference
-	    		long long int LLIInitialTimeTaggs=static_cast<long long int>(LastTimeTaggRef[0]);//static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
+			TotalCurrentNumRecordsQuadChNewOldAux=TotalCurrentNumRecordsQuadCh[iQuadChIter]-TotalCurrentNumRecordsQuadChOld[iQuadChIter];
+			if (TotalCurrentNumRecordsQuadChNewOldAux>=TagsSeparationDetRelFreq){
+	    		unsigned long long int ULLIInitialTimeTaggs=TimeTaggsLast;//TimeTaggs[iQuadChIter][0];// Normalize to the first reference timetag (it is not a detect qubit, but the timetagg of entering the timetagg PRU), which is a strong reference
+	    		long long int LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggsLast);//static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
 	    		//cout << "GPIO::LastTimeTaggRef[0]: " << LastTimeTaggRef[0] << endl;
 	    		//cout << "GPIO::TimeTaggs[iQuadChIter][0]: " << TimeTaggs[iQuadChIter][0] << endl;
-	    		long long int LLITimeTaggs[TotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
-	    		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-	    			LLITimeTaggs[i]=static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLIInitialTimeTaggs;
+	    		long long int LLITimeTaggs[TotalCurrentNumRecordsQuadChNewOldAux]={0};
+	    		for (int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
+	    			LLITimeTaggs[i]=static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]])-LLIInitialTimeTaggs;
 	    		}
 	    		double SlopeDetTagsAux=1.0;
 
 			    // Calculate the "x" values
-	    		long long int xAux[TotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
+	    		long long int xAux[TotalCurrentNumRecordsQuadChNewOldAux]={0};
 	    		long long int LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
 	    		long long int LLISynchTrigPeriodHalf=static_cast<long long int>(SynchTrigPeriod/2.0);
-	    		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+	    		for (int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
 	    			xAux[i]=((LLITimeTaggs[i]+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
 	    		}
 
 			    // Compute the candidate slope
 	    		int iAux=0;
-	    		for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-TagsSeparationDetRelFreq);i++){
+	    		for (int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-TagsSeparationDetRelFreq);i++){
 	    			if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
 	    				SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
 	    				iAux++;
@@ -1071,8 +1084,12 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 	    		}
 	    		//cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << endl;
 			    // Un-normalize
-	    		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-	    			TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long double>(1.0/SlopeDetTagsAux)*static_cast<long double>(LLITimeTaggs[i]))+ULLIInitialTimeTaggs;
+	    		for (int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
+	    			TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]]=static_cast<unsigned long long int>(static_cast<long double>(1.0/SlopeDetTagsAux)*static_cast<long double>(LLITimeTaggs[i]))+ULLIInitialTimeTaggs;
+	    			// Also update the information in the original array
+	    			TimeTaggsStored[CurrentiIterDumpAux]=TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]];
+	    			ChannelTagsStored[CurrentiIterDumpAux]=ChannelTagsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]];
+	    			CurrentiIterDumpAux++;// update value
 	    		}
 			    //////////////////////////////////////////
 			    // Checks of proper values handling
@@ -1080,8 +1097,8 @@ int GPIO::PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned
 			    //cout << "GPIO::PRUdetCorrRelFreq::CheckValueAux: "<< CheckValueAux << endl;
 			    ////////////////////////////////////////
 			}// if
-			else if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
-				cout << "GPIO::PRUdetCorrRelFreq not enough detections " << TotalCurrentNumRecordsQuadCh[iQuadChIter] << "<" << TagsSeparationDetRelFreq << " in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;
+			else if (TotalCurrentNumRecordsQuadChNewOldAux>0){
+				cout << "GPIO::PRUdetCorrRelFreq not enough detections " << TotalCurrentNumRecordsQuadChNewOldAux << "<" << TagsSeparationDetRelFreq << " in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;
 			}
 		} // for
 	}
@@ -1144,60 +1161,77 @@ TotalCurrentNumRecords=0;
 return 0; // all ok
 }
 
-int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRefAux, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int TimeTaggs[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTags[QuadNumChGroups][MaxNumQuBitsMemStored]){
+int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRefAux, unsigned int* TotalCurrentNumRecordsQuadChAux, unsigned long long int TimeTaggsAux[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTagsAux[QuadNumChGroups][MaxNumQuBitsMemStored]){
 	if (SlowMemoryPermanentStorageFlag==true){
-	LastTimeTaggRefAux[0]=static_cast<unsigned long long int>(0.0*PRUclockStepPeriodNanoseconds);// Since whole number. Initiation value
-	// Detection tags
-	if (streamDDRpru.is_open()){
-		streamDDRpru.close();	
-		//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-	}
-
-	streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content	
-	if (!streamDDRpru.is_open()) {
-		streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content
-		if (!streamDDRpru.is_open()) {
-			cout << "Failed to re-open the streamDDRpru file." << endl;
-			return -1;
+		LastTimeTaggRefAux[0]=static_cast<unsigned long long int>(0.0*PRUclockStepPeriodNanoseconds);// Since whole number. Initiation value
+		// Detection tags
+		if (streamDDRpru.is_open()){
+			streamDDRpru.close();	
+			//streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 		}
-	}
-	streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
 
-	if (streamDDRpru.is_open()){
-		streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
+		streamDDRpru.open(string(PRUdataPATH1) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content	
+		if (!streamDDRpru.is_open()) {
+			streamDDRpru.open(string(PRUdataPATH2) + string("TimetaggingData"), std::ios::binary | std::ios::in | std::ios::out);// Open for write and read, and clears all previous content
+			if (!streamDDRpru.is_open()) {
+				cout << "Failed to re-open the streamDDRpru file." << endl;
+				return -1;
+			}
+		}
 		streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		streamDDRpru.read(reinterpret_cast<char*>(&TimeTaggsLastStored[0]), sizeof(TimeTaggsLastStored[0]));
-		LastTimeTaggRefAux[0]=static_cast<unsigned long long int>(static_cast<long double>(TimeTaggsLastStored[0]));// Since whole number. Initiation value
-		int lineCount = 0;
-		unsigned long long int ValueReadTest;		
-		int iIterMovAdjPulseSynchCoeff=0;
-		while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
-		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		    TimeTaggsStored[lineCount]=static_cast<unsigned long long int>(ValueReadTest);		    
-		    ////////////////////////////////////////////////////////////////////////////////
-		    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
-		    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTagsStored[lineCount]), sizeof(ChannelTags[lineCount]));
+
+		if (streamDDRpru.is_open()){
+			streamDDRpru.seekg(0, std::ios::beg); // the get (reading) pointer back to the start!
+			streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+			streamDDRpru.read(reinterpret_cast<char*>(&TimeTaggsLast), sizeof(TimeTaggsLastStored));
+			LastTimeTaggRefAux[0]=static_cast<unsigned long long int>(static_cast<long double>(TimeTaggsLast));// Since whole number. Initiation value
+			int lineCount = 0;
+			unsigned long long int ValueReadTest;		
+			int iIterMovAdjPulseSynchCoeff=0;
+			while (streamDDRpru.read(reinterpret_cast<char*>(&ValueReadTest), sizeof(ValueReadTest))) {// While true == not EOF
+			    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+			    TimeTaggsStored[lineCount]=static_cast<unsigned long long int>(ValueReadTest);		    
+			    ////////////////////////////////////////////////////////////////////////////////
+			    streamDDRpru.clear(); // will reset these state flags, allowing you to continue using the stream for additional I/O operations
+			    streamDDRpru.read(reinterpret_cast<char*>(&ChannelTagsStored[lineCount]), sizeof(ChannelTagsStored[lineCount]));
 	    	    //cout << "TimeTaggs[lineCount]: " << TimeTaggs[lineCount] << endl;
 	    	    //cout << "ChannelTags[lineCount]: " << ChannelTags[lineCount] << endl;
 	    	    lineCount++; // Increment line count for each line read	    
 	    	}
 	    	if (lineCount==0){cout << "RetrieveNumStoredQuBits: No timetaggs present!" << endl;}
 	    	TotalCurrentNumRecords=lineCount;
+	    	// Place the information in the structure for the upper layer agents
+	    	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+				TotalCurrentNumRecordsQuadCh[iQuadChIter]=0;
+			}
+			for (int i=0;i<TotalCurrentNumRecords;i++){
+				for (unsigned short iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+					if ((ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter)))>0){  
+						TimeTaggsSplitted[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=TimeTaggsStored[i];
+						ChannelTagsSplitted[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter));
+						TotalCurrentNumRecordsQuadCh[iQuadChIter]++;
+					}
+				}
+			}
 	    }
 	    else{
 	    	cout << "RetrieveNumStoredQuBits: BBB streamDDRpru is not open!" << endl;
 	    	return -1;
 	    }
 	}
-else{// Memory allocation
-	LastTimeTaggRefAux[0]=static_cast<unsigned long long int>(static_cast<long double>(TimeTaggsLastStored[0]));// Since whole number. It is meant for computing the time between measurements to estimate the relative frequency difference. It is for synchronization purposes which generally will be under control so even if it is a multiple adquisiton the itme difference will be mantained so it generally ok.
-}
-LastTimeTaggRef[0]=LastTimeTaggRefAux[0];// The one to be used in this agent
+	else{// Memory allocation
+		LastTimeTaggRefAux[0]=static_cast<unsigned long long int>(static_cast<long double>(TimeTaggsLastStored));// Since whole number. It is meant for computing the time between measurements to estimate the relative frequency difference. It is for synchronization purposes which generally will be under control so even if it is a multiple adquisiton the itme difference will be mantained so it generally ok.
+	}
+	// Place the information in the upper layer agent arrays
+	for (unsigned short iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){  
+			TimeTaggsAux[iQuadChIter][i]=TimeTaggsSplitted[iQuadChIter][i];
+			ChannelTagsAux[iQuadChIter][i]=ChannelTagsSplitted[iQuadChIter][i];			
+		}
+		TotalCurrentNumRecordsQuadChAux[iQuadChIter]=TotalCurrentNumRecordsQuadCh[iQuadChIter];
+	}
 
-// Correct the detected qubits relative frequency difference (due to the sender node) and split between quad groups of 4 channels
-PRUdetCorrRelFreq(TotalCurrentNumRecordsQuadCh,TimeTaggs,ChannelTags);
-
-return TotalCurrentNumRecords;
+	return TotalCurrentNumRecords;
 }
 
 int GPIO::IntMedianFilterSubArray(int* ArrayHolderAux,int MedianFilterFactor){

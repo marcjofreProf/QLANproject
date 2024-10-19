@@ -187,6 +187,7 @@ private:// Variables
 	//bool finPRU1;
 	// SHARED RAM to file dump
 	int iIterDump;
+	int CurrentiIterDump;
 	unsigned int NumSynchPulses=0;
 	unsigned short* valpHolder;
 	unsigned short* valpAuxHolder;
@@ -214,6 +215,11 @@ private:// Variables
 	int TotalCurrentNumRecords=0; ////Variable to hold the number of currently stored records in memory
 	unsigned long long int TimeTaggsStored[MaxNumQuBitsMemStored]={0};
 	unsigned short ChannelTagsStored[MaxNumQuBitsMemStored]={0};
+	unsigned long long int TimeTaggsSplitted[QuadNumChGroups][MaxNumQuBitsMemStored]={0}; // Timetaggs of the detections
+	unsigned short int ChannelTagsSplitted[QuadNumChGroups][MaxNumQuBitsMemStored]={0}; // Detection channels of the timetaggs
+	unsigned int TotalCurrentNumRecordsQuadCh[QuadNumChGroups]={0}; // Number of detections for quad channels groups
+	unsigned int TotalCurrentNumRecordsQuadChOld[QuadNumChGroups]={0}; // Number of detections for quad channels groups
+	unsigned int TotalCurrentNumRecordsQuadChNewOldAux=0; // Number of detections for quad channels groups
 	//FILE* outfile;
 	fstream streamDDRpru;
 	fstream streamSynchpru;
@@ -232,9 +238,7 @@ private:// Variables
 	unsigned long long int ULLIEpochReOffset=344810000000000000;// Amount to remove to timetaggs so that thier numbers are not so high and difficult to handle by other agents (value adjusted August 2024)
 	unsigned long long int OldLastTimeTagg=0;
 	unsigned long long int TimeTaggsLast=0;
-	unsigned long long int TimeTaggsLastStored[10]={0};
-	unsigned long long int TimeTaggsInit=0;
-	unsigned long long int LastTimeTaggRef[1]={0};
+	unsigned long long int TimeTaggsLastStored=0;
 	// Pulses compensation
 	int NumSynchPulsesRed=0;
 	unsigned long long int SynchPulsesTags[MaxNumPulses]={0};
@@ -266,7 +270,7 @@ public:	// Functions/Methods
 	int SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber, bool FlagTestSynchAux); // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	int SendTriggerSignalsSelfTest();//
 	int SendEmulateQubits(); // Emulates sending 2 entangled qubits through the 8 output pins (each qubits needs 4 pins)
-	int RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRefAux, unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int TimeTaggs[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTags[QuadNumChGroups][MaxNumQuBitsMemStored]); // Reads the fstream file to retrieve number of stored timetagged qubits
+	int RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRefAux, unsigned int* TotalCurrentNumRecordsQuadChAux, unsigned long long int TimeTaggsAux[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTagsAux[QuadNumChGroups][MaxNumQuBitsMemStored]); // Reads the fstream file to retrieve number of stored timetagged qubits
 	int ClearStoredQuBits(); // Send the writting pointer back to the beggining - effectively clearing stored QuBits
 	// Synchronization related
 	int SetSynchDriftParams(double* AccumulatedErrorDriftParamsAux);// Method to update (or reset with 0s) the synchronization parameters of the long time drift (maybe updated periodically)
@@ -317,7 +321,7 @@ private: // Functions/Methods
 	struct timespec CoincidenceSetWhileWait();
 	int PRUsignalTimerSynchJitterLessInterrupt();// Tries to avoid interrupt jitter (might not be completely absolute time// Periodic synchronizaton of the timer to control the generated signals
 	int PIDcontrolerTimeJiterlessInterrupt();
-	int PRUdetCorrRelFreq(unsigned int* TotalCurrentNumRecordsQuadCh, unsigned long long int TimeTaggs[QuadNumChGroups][MaxNumQuBitsMemStored], unsigned short int ChannelTags[QuadNumChGroups][MaxNumQuBitsMemStored]);// Correct the detections relative frequency difference of the sender as well as separate by quad channel groups
+	int PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump);// Correct the detections relative frequency difference of the sender as well as separate by quad channel groups
 	// Data processing
 	unsigned short packBits(unsigned short value);
 	int DDRdumpdata(int iIterRunsAux);
