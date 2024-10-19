@@ -1442,18 +1442,20 @@ int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,
 
 // Store the information of the start of the detection
 	SynchTimeTaggRef[iCenterMass][iNumRunsPerCenterMass]=static_cast<long long int>(RawLastTimeTaggRef[0]);
-
+	long long int ChOffsetCorrection=0;// Variable to acomodate the 4 different channels in the periodic histogram analysis
 	if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]>0){	
 		if (UseAllTagsForEstimation){
 		// Median averaging
 		for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
-			SynchFirstTagsArrayAux[i]=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
+			ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a states
+			SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%LLIHistPeriodicityAux;
 		}
 		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]);
 	}
 	else{
 		// Single value
-		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[SpecificQuadChDet][0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux; // Considering only the first timetagg. Might not be very resilence with noise
+		ChOffsetCorrection=ChannelTags[SpecificQuadChDet][0]%4;// Maps the offset correction for the different channels to detect a states
+		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][0])-ChOffsetCorrection*LLIHistPeriodicityAux)%LLIHistPeriodicityAux;
 		cout << "QPLA::Using only first timetag for network synch computations!...to be deactivated" << endl;
 	}
 	//cout << "QPLA::SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]: " << SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass] << endl;
@@ -1461,12 +1463,11 @@ int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,
 
 // If the first iteration, since no extra relative frequency difference added, store the values, for at the end compute the offset, at least within the HistPeriodicityAux
 if (iCenterMass==0){// Here the modulo is dependent n the effective period		
-		long long int ChOffsetCorrection=0;// Variable to acomodate the 4 different channels in the periodic histogram analysis
-		if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]>0){	
-			if (UseAllTagsForEstimation){
+	if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]>0){	
+		if (UseAllTagsForEstimation){
 			// Median averaging
-				for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
-					ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a states
+			for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
+				ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a states
 				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
 			}
 			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]);
@@ -1488,7 +1489,7 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	// Median averaging
 	double CenterMassValAux[NumRunsPerCenterMass-1]={0.0};	
 	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
-		CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]))%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);//static_cast<double>(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]);//static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
+		CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]))%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
 	}
 	SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));	
 }
@@ -1520,7 +1521,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		
 		long long int SynchTimeTaggRefMedianArrayAuxAuxAux=SynchTimeTaggRefMedianArrayAux[0];//LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAux,NumCalcCenterMass);
 		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAuxAuxAux)*(5e-9);// Conversion to seconds from PRU clock tick
-		
+		//
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])); //Period adjustment	
 		// Computations related to retrieve the relative frequency difference
 		// Adjustment of the coefficient into hardware
