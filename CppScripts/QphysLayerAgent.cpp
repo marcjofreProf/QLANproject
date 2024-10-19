@@ -1549,6 +1549,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchCalcValuesArray[2]=SynchCalcValuesArrayFreqAux[0]; // Here the base relative frequency difference correction is computed. then, below is computed an adjusting factor.
 
 		// The two other frequencies help calibrate the hardware constant, either for negative or for positive directions
+		/*
 		if ((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])>0.0){// For negative adjustment
 			SynchCalcValuesArrayFreqAux[1]=((SynchHistCenterMassArray[1]-SynchCalcValuesArray[0])-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]);
 		}
@@ -1563,8 +1564,15 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		}
 		else{
 			SynchCalcValuesArrayFreqAux[1]=1.0;// Frequency adjustment for negative rel. freq. difference
-		}
+		}*/
 
+		if ((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])>0.0){// For negative adjustment
+			SynchCalcValuesArrayFreqAux[1]=((SynchHistCenterMassArray[1]-SynchCalcValuesArray[0])-SynchHistCenterMassArray[0])/SynchCalcValuesArray[0];
+		}
+		else{
+			SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/SynchCalcValuesArray[0];//+FreqSynchNormValuesArray[1];
+		}
+		/*
 		if ((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])<0.0){// For positive adjustment
 			SynchCalcValuesArrayFreqAux[2]=((SynchHistCenterMassArray[2]+SynchCalcValuesArray[0])-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);
 		}
@@ -1579,6 +1587,13 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		}
 		else{
 			SynchCalcValuesArrayFreqAux[2]=1.0;// Frequency adjustment for positive rel. freq. difference
+		}*/
+
+		if ((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])<0.0){// For positive adjustment
+			SynchCalcValuesArrayFreqAux[2]=((SynchHistCenterMassArray[2]+SynchCalcValuesArray[0])-SynchHistCenterMassArray[0])/SynchCalcValuesArray[0];
+		}
+		else{
+			SynchCalcValuesArrayFreqAux[2]=(SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/SynchCalcValuesArray[0];//+FreqSynchNormValuesArray[2]; 
 		}
 		
 		// Storage of the adjustment depending on the relative frequency offset correction direction. Actually, we have to store both direction corrections, since for receiver correction will be one but for sendere correction will be the other direciton
@@ -1587,21 +1602,21 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]=SynchCalcValuesArrayFreqAux[2]; // Positive rel. freq. correction adjustment value
 				
 		if (SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]<=0.0){
-			cout << "QPLA::Bad calculation of SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1] << ". Setting it to 1.0!" << endl;
+			cout << "QPLA::Bad calculation (negative) of SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1] << ". Setting it to 1.0!" << endl;
 			SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]=1.0;
 		}
 		else if (SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]>10.0)
 		{
-			cout << "QPLA::Bad calculation of SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1] << ". Setting it to 1.0!" << endl;
+			cout << "QPLA::Bad calculation (too large) of SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1] << ". Setting it to 1.0!" << endl;
 			SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]=1.0;
 		}
 
 		if (SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]<=0.0){
-			cout << "QPLA::Bad calculation of SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2] << ". Setting it to 1.0!" << endl;
+			cout << "QPLA::Bad calculation (negative) of SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2] << ". Setting it to 1.0!" << endl;
 			SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]=1.0;
 		}
 		else if (SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]>10.0){
-			cout << "QPLA::Bad calculation of SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2] << ". Setting it to 1.0!" << endl;
+			cout << "QPLA::Bad calculation (too large) of SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2] << ". Setting it to 1.0!" << endl;
 			SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]=1.0;
 		}
 		
