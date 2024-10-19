@@ -1447,13 +1447,13 @@ int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,
 		if (UseAllTagsForEstimation){
 		// Median averaging
 		for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
-			SynchFirstTagsArrayAux[i]=static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])%LLIHistPeriodicityAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
+			SynchFirstTagsArrayAux[i]=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
 		}
 		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]);
 	}
 	else{
 		// Single value
-		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=static_cast<long long int>(TimeTaggs[SpecificQuadChDet][0])%LLIHistPeriodicityAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux; // Considering only the first timetagg. Might not be very resilence with noise
+		SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[SpecificQuadChDet][0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux; // Considering only the first timetagg. Might not be very resilence with noise
 		cout << "QPLA::Using only first timetag for network synch computations!...to be deactivated" << endl;
 	}
 	//cout << "QPLA::SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]: " << SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass] << endl;
@@ -1488,7 +1488,7 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	// Median averaging
 	double CenterMassValAux[NumRunsPerCenterMass-1]={0.0};	
 	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
-		CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);//static_cast<double>(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]);//static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
+		CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]))%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);//static_cast<double>(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]);//static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])%LLIHistPeriodicityAux)-LLIHistPeriodicityHalfAux);
 	}
 	SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));	
 }
@@ -1521,34 +1521,20 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		long long int SynchTimeTaggRefMedianArrayAuxAuxAux=SynchTimeTaggRefMedianArrayAux[0];//LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAux,NumCalcCenterMass);
 		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAuxAuxAux)*(5e-9);// Conversion to seconds from PRU clock tick
 		
-		// Compute related to Period - Somehow for rel. freq. different than 0, this factor is 1/2.
-		adjFreqSynchNormRatiosArray[0]=1.0;
-		adjFreqSynchNormRatiosArray[1]=0.5;//((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[1] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
-		adjFreqSynchNormRatiosArray[2]=0.5;//((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])/(FreqSynchNormValuesArray[2] - FreqSynchNormValuesArray[0]))/dHistPeriodicityAux;
-
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1] - adjFreqSynchNormRatiosArray[0]*FreqSynchNormValuesArray[0])); //Period adjustment	
 		// Computations related to retrieve the relative frequency difference
 		// Adjustment of the coefficient into hardware
 		//cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;	
-		
-		//cout << "QPLA::adjFreqSynchNormRatiosArray[0]: " << adjFreqSynchNormRatiosArray[0] << endl;
-		//cout << "QPLA::adjFreqSynchNormRatiosArray[1]: " << adjFreqSynchNormRatiosArray[1] << endl;
-		//cout << "QPLA::adjFreqSynchNormRatiosArray[2]: " << adjFreqSynchNormRatiosArray[2] << endl;
-		
-		// Adjustment of the adj ratios (except for 0 extra relative frequency difference		
-		//adjFreqSynchNormRatiosArray[1]=abs(adjFreqSynchNormRatiosArray[1]);
-		//adjFreqSynchNormRatiosArray[2]=abs(adjFreqSynchNormRatiosArray[2]);
-		
-		//double wholeDoublePart;
-		//adjFreqSynchNormRatiosArray[1]=modf(adjFreqSynchNormRatiosArray[1],&wholeDoublePart);
-		//adjFreqSynchNormRatiosArray[2]=modf(adjFreqSynchNormRatiosArray[2],&wholeDoublePart);
-		
+				
 		double SynchCalcValuesArrayFreqAux[NumCalcCenterMass];
 		SynchCalcValuesArrayFreqAux[0]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];//+FreqSynchNormValuesArray[0]; // Relative Frequency adjustment
 		// The retrieved frequency difference is retrieved from the no added frequency measurement		
 		SynchCalcValuesArray[2]=SynchCalcValuesArrayFreqAux[0]; // Here the base relative frequency difference correction is computed. then, below is computed an adjusting factor.
 
 		// The two other frequencies help calibrate the hardware constant, either for negative or for positive directions
+		cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
+		cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
+		cout << "QPLA::SynchHistCenterMassArray[2]: " << SynchHistCenterMassArray[2] << endl;
 		/*
 		if ((SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])>0.0){// For negative adjustment
 			SynchCalcValuesArrayFreqAux[1]=((SynchHistCenterMassArray[1]-SynchCalcValuesArray[0])-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[1]*FreqSynchNormValuesArray[1]*SynchCalcValuesArray[0]);
@@ -1572,6 +1558,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		else{
 			SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/SynchCalcValuesArray[0];//+FreqSynchNormValuesArray[1];
 		}
+
 		/*
 		if ((SynchHistCenterMassArray[2]-SynchHistCenterMassArray[0])<0.0){// For positive adjustment
 			SynchCalcValuesArrayFreqAux[2]=((SynchHistCenterMassArray[2]+SynchCalcValuesArray[0])-SynchHistCenterMassArray[0])/(adjFreqSynchNormRatiosArray[2]*FreqSynchNormValuesArray[2]*SynchCalcValuesArray[0]);
@@ -1600,7 +1587,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][0]=1.0;// For 0 rel. freq. diff. the correction is 1.0
 		SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]=SynchCalcValuesArrayFreqAux[1]; // Negative rel. freq. correction adjustment value
 		SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]=SynchCalcValuesArrayFreqAux[2]; // Positive rel. freq. correction adjustment value
-				
+		
 		if (SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]<=0.0){
 			cout << "QPLA::Bad calculation (negative) of SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]: " << SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1] << ". Setting it to 1.0!" << endl;
 			SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]=1.0;
