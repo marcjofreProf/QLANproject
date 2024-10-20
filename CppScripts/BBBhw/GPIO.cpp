@@ -562,7 +562,14 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	}
 	ldTimePointClockTagPRUDiff=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
 	LLITimePointPRUDiffSystemRelFreq=static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count());
-	QPLAFutureTimePointBusyWaitInterrupt=QPLAFutureTimePoint+std::chrono::nanoseconds(LLITimePointPRUDiffSystemRelFreq);
+	long long int WrapLLITimePointPRUDiffSystemRelFreq=static_cast<long long int>(static_cast<long double>(LLITimePointPRUDiffSystemRelFreq)*static_cast<long double>(PRUoffsetDriftErrorAvg));
+	if (WrapLLITimePointPRUDiffSystemRelFreq<0){
+		WrapLLITimePointPRUDiffSystemRelFreq=-(-WrapLLITimePointPRUDiffSystemRelFreq%static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod));
+	}
+	else{
+		WrapLLITimePointPRUDiffSystemRelFreq=(WrapLLITimePointPRUDiffSystemRelFreq%static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod));
+	}
+	QPLAFutureTimePointBusyWaitInterrupt=QPLAFutureTimePoint+std::chrono::nanoseconds(WrapLLITimePointPRUDiffSystemRelFreq);
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
 			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
@@ -722,7 +729,14 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	}
 	ldTimePointClockTagPRUDiff=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
 	LLITimePointPRUDiffSystemRelFreq=static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count());
-	QPLAFutureTimePointBusyWaitInterrupt=QPLAFutureTimePoint+std::chrono::nanoseconds(LLITimePointPRUDiffSystemRelFreq);
+	long long int WrapLLITimePointPRUDiffSystemRelFreq=static_cast<long long int>(static_cast<long double>(LLITimePointPRUDiffSystemRelFreq)*static_cast<long double>(PRUoffsetDriftErrorAvg));
+	if (WrapLLITimePointPRUDiffSystemRelFreq<0){
+		WrapLLITimePointPRUDiffSystemRelFreq=-(-WrapLLITimePointPRUDiffSystemRelFreq%static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod));
+	}
+	else{
+		WrapLLITimePointPRUDiffSystemRelFreq=(WrapLLITimePointPRUDiffSystemRelFreq%static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod));
+	}
+	QPLAFutureTimePointBusyWaitInterrupt=QPLAFutureTimePoint+std::chrono::nanoseconds(WrapLLITimePointPRUDiffSystemRelFreq);
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
 			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
