@@ -1527,7 +1527,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 			}
 			else{
 				//cout << "Host " << this->IPaddressesSockets[2] << " NOT Entering WaitUntilActiveActionFree" << endl;
-				AchievedAttentionParticularHosts=false;
+				AchievedAttentionParticularHosts=false;// reset value
 			}
 			//if (AchievedAttentionParticularHosts==false and string(InfoRemoteHostActiveActions[1])==string("Block") and string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true){// Autoblocked
 			//	this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);// Unblock
@@ -1547,6 +1547,7 @@ return 0; // all ok;
 }
 
 int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
+	AchievedAttentionParticularHosts=false;// reset value
 	//cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFree" << endl;
 	//cout << "Host " << this->IPaddressesSockets[2] << " IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 	this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
@@ -1682,6 +1683,10 @@ else{// Too many rounds, kill the process of blocking other hosts
 	
 	IterHostsActiveActionsFreeStatus=0;
 	ReWaitsAnswersHostsActiveActionsFree=0;// Reset the counter
+
+	for (int i=0;i<NumInterestIPaddressesAux;i++){// Reset values
+		HostsActiveActionsFree[1+i]=true;
+	}
 }
 
 //cout << "ReWaitsAnswersHostsActiveActionsFree: " << ReWaitsAnswersHostsActiveActionsFree << endl;
