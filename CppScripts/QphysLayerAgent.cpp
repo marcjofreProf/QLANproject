@@ -1547,9 +1547,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchCalcValuesArray[2]=SynchCalcValuesArrayFreqAux[0]; // Here the base relative frequency difference correction is computed. then, below is computed an adjusting factor.
 
 		// The two other frequencies help calibrate the hardware constant, either for negative or for positive directions
-		cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
-		cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
-		cout << "QPLA::SynchHistCenterMassArray[2]: " << SynchHistCenterMassArray[2] << endl;
+		//cout << "QPLA::SynchHistCenterMassArray[0]: " << SynchHistCenterMassArray[0] << endl;
+		//cout << "QPLA::SynchHistCenterMassArray[1]: " << SynchHistCenterMassArray[1] << endl;
+		//cout << "QPLA::SynchHistCenterMassArray[2]: " << SynchHistCenterMassArray[2] << endl;
 
 		// For negative adjustment
 		SynchCalcValuesArrayFreqAux[1]=(SynchHistCenterMassArray[1]-SynchHistCenterMassArray[0])/SynchCalcValuesArray[0]/FreqSynchNormValuesArray[1];
