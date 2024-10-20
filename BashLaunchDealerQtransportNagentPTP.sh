@@ -153,14 +153,14 @@ fi
 
 # adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
 sleep 30 # give time to time protocols to lock
-sudo adjtimex -a --force-adjust #-a --force-adjust # -f 0 
+sudo adjtimex -f 0 #-a --force-adjust # -f 0 
 
 if ! sudo crontab -l > /dev/null 2>&1; then
     sudo crontab -e
 fi
 
 line_to_check="adjtimex"
-line_to_add="30 * * * * sudo /sbin/adjtimex -a --force-adjust" #-a --force-adjust" # -f 0"
+line_to_add="30 * * * * sudo /sbin/adjtimex -f 0" #-a --force-adjust" # -f 0"
 
 sudo crontab -l | grep -q "$line_to_check"
 
