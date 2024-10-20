@@ -561,6 +561,8 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		default: {break;}
 	}
 	ldTimePointClockTagPRUDiff=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
+	LLITimePointPRUDiffSystemRelFreq=static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count());
+	QPLAFutureTimePointBusyWaitInterrupt=QPLAFutureTimePoint+std::chrono::nanoseconds(LLITimePointPRUDiffSystemRelFreq);
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
 			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
@@ -639,8 +641,8 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestCoincidenceWhileWait,NULL); // Synch barrier. So that SendTriggerSignals and ReadTimeStamps of the different nodes coincide	
 	pru0dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command
 	//QPLAFutureTimePoint=QPLAFutureTimePoint-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);// Actually, the time measured duration_FinalInitialMeasTrigAuxAvg is not indicative of much (only if it changes a lot to high values it means trouble)
-
-	while (Clock::now()<QPLAFutureTimePoint);// Busy wait time synch sending signals
+	
+	while (Clock::now()<QPLAFutureTimePointBusyWaitInterrupt);// Busy wait time synch sending signals
 	prussdrv_pru_send_event(21);
 	//this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 	//retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);// First interrupt sent to measure time
@@ -719,6 +721,8 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		default: {break;}
 	}
 	ldTimePointClockTagPRUDiff=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
+	LLITimePointPRUDiffSystemRelFreq=static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count());
+	QPLAFutureTimePointBusyWaitInterrupt=QPLAFutureTimePoint+std::chrono::nanoseconds(LLITimePointPRUDiffSystemRelFreq);
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
 			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
@@ -813,7 +817,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//this->QPLAFutureTimePoint=this->QPLAFutureTimePoint-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg); // Actually, the time measured duration_FinalInitialMeasTrigAuxAvg is not indicative of much (only if it changes a lot to high values it means trouble)
 
 	////if (Clock::now()<this->QPLAFutureTimePoint){cout << "Check that we have enough time" << endl;}
-	while (Clock::now()<this->QPLAFutureTimePoint);// Busy wait time synch sending signals
+	while (Clock::now()<this->QPLAFutureTimePointBusyWaitInterrupt);// Busy wait time synch sending signals
 	// Important, the following line at the very beggining to reduce the command jitter
 	prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 	//this->TimePointClockSynchPRUfinal=Clock::now();
