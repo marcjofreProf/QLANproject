@@ -1440,7 +1440,7 @@ int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,
 	double dHistPeriodicityHalfAux=static_cast<double>(HistPeriodicityAux/2.0);
 	long long int LLIMultFactorEffSynchPeriod=static_cast<long long int>(MultFactorEffSynchPeriodQPLA);
 
-	// To retrieve the relative frequency difference
+	// To make a strong point of all run measurement for the relative frequency difference retrieval
 	// Store the information of the start of the detection
 	SynchTimeTaggRef[iCenterMass][iNumRunsPerCenterMass]=static_cast<long long int>(RawLastTimeTaggRef[0]);
 	long long int ChOffsetCorrection=0;// Variable to acomodate the 4 different channels in the periodic histogram analysis
@@ -1486,16 +1486,23 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 
 //this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 //this->release();
-
+// To retrieve the relative frequency difference
 if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	// Median averaging
 	double CenterMassValAux[NumRunsPerCenterMass-1]={0.0};	
 	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
-		if ((SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])<0){
-			CenterMassValAux[i]=-static_cast<double>(((LLIHistPeriodicityHalfAux-(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]))%(LLIHistPeriodicityAux))-LLIHistPeriodicityHalfAux);
+		//if ((SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])<0){
+		//	CenterMassValAux[i]=-static_cast<double>(((LLIHistPeriodicityHalfAux-(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]))%(LLIHistPeriodicityAux))-LLIHistPeriodicityHalfAux);
+		//}
+		//else{
+		//	CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]))%(LLIHistPeriodicityAux))-LLIHistPeriodicityHalfAux);
+		//}
+
+		if ((SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[0][i])<0){// With respect reference of the first run with no added relative frequency difference
+			CenterMassValAux[i]=-static_cast<double>(((LLIHistPeriodicityHalfAux-(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[0][i]))%(LLIHistPeriodicityAux))-LLIHistPeriodicityHalfAux);
 		}
 		else{
-			CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]))%(LLIHistPeriodicityAux))-LLIHistPeriodicityHalfAux);
+			CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[0][i]))%(LLIHistPeriodicityAux))-LLIHistPeriodicityHalfAux);
 		}
 	}
 	SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));
@@ -1535,7 +1542,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		//cout << "QPLA::SynchCalcValuesArray[0]: " << SynchCalcValuesArray[0] << endl;	
 				
 		double SynchCalcValuesArrayFreqAux[NumCalcCenterMass];
-		SynchCalcValuesArrayFreqAux[0]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/SynchCalcValuesArray[0];//+FreqSynchNormValuesArray[0]; // Relative Frequency adjustment
+		SynchCalcValuesArrayFreqAux[0]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/static_cast<double>(SynchTimeTaggRefMedianArrayAuxAuxAux);// /SynchCalcValuesArray[0]//+FreqSynchNormValuesArray[0]; // Relative Frequency adjustment
 		// The retrieved frequency difference is retrieved from the no added frequency measurement		
 		SynchCalcValuesArray[2]=SynchCalcValuesArrayFreqAux[0]; // Here the base relative frequency difference correction is computed. then, below is computed an adjusting factor.
 
