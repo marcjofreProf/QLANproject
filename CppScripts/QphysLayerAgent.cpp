@@ -1490,15 +1490,19 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 	// Median averaging
 	double CenterMassValAux[NumRunsPerCenterMass-1]={0.0};	
-	for (int i=0;i<(NumRunsPerCenterMass-1);i++){
-		if ((SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])<0){
-			CenterMassValAux[i]=-static_cast<double>(((LLIHistPeriodicityHalfAux-(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]))%(LLIHistPeriodicityAux))-LLIHistPeriodicityHalfAux);
-		}
-		else{
-			CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]))%(LLIHistPeriodicityAux))-LLIHistPeriodicityHalfAux);
-		}
+	//for (int i=0;i<(NumRunsPerCenterMass-1);i++){
+	//	if ((SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i])<0){
+	//		CenterMassValAux[i]=-static_cast<double>(((LLIHistPeriodicityHalfAux-(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]))%(LLIHistPeriodicityAux))-LLIHistPeriodicityHalfAux);
+	//	}
+	//	else{
+	//		CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[iCenterMass][i]))%(LLIHistPeriodicityAux))-LLIHistPeriodicityHalfAux);
+	//	}
+	//}
+	//SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));
+	for (int i=0;i<NumRunsPerCenterMass;i++){
+		CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+SynchFirstTagsArray[iCenterMass][i])%(LLIHistPeriodicityAux))-LLIHistPeriodicityHalfAux);
 	}
-	SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));	
+	SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,NumRunsPerCenterMass);	
 }
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
