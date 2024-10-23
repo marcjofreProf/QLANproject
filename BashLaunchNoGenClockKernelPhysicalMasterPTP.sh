@@ -106,11 +106,11 @@ sudo /etc/init.d/rsyslog stop # stop logging
 
 # Configure SYSTEM CLOCKS: CLOCK_REALTIME and CLOCK_TAI
 # utc_offset should be 37, but seems that some slaves do not acquire it propperly, so set to zero (so TAI and UTC time will be the same)
-sudo pmc -u -b 0 -t 1 "SET GRANDMASTER_SETTINGS_NP clockClass 248 \
-        clockAccuracy 0xfe offsetScaledLogVariance 0xffff \
-        currentUtcOffset 37 leap61 0 leap59 0 currentUtcOffsetValid 1 \
-        ptpTimescale 1 timeTraceable 1 frequencyTraceable 0 \
-        timeSource 0xa0"
+#sudo pmc -u -b 0 -t 1 "SET GRANDMASTER_SETTINGS_NP clockClass 248 \
+#        clockAccuracy 0xfe offsetScaledLogVariance 0xffff \
+#        currentUtcOffset 37 leap61 0 leap59 0 currentUtcOffsetValid 1 \
+#        ptpTimescale 1 timeTraceable 1 frequencyTraceable 0 \
+#        timeSource 0xa0"
 
 # Maybe since systemd-timesyncd is disabled, then maybe adjtimex might update some needed parameters such as the difference between UTC and TAI clocks
 #sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
