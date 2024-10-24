@@ -17,7 +17,7 @@ is_rt_kernel
 is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 
 # Nicenest value [-20, 20]
-NicenestPriorValue=-20
+NicenestPriorValue=-10
 
 # Check if adjtimex is installed using dpkg
 if dpkg -l | grep -q adjtimex; then

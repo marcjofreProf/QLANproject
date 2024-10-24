@@ -3,6 +3,8 @@
 # Technical University of Catalonia - Universitat Politècnica de Catalunya
 # 2024
 
+# References: https://linuxptp.nwtime.org/documentation/default/
+
 All configured through PTP4l conf files. PTP2pc do not have configurations nor are used.
 
 Very important, if the PTP synchronization is behaving erratically. Hard reset of the BeagleBone Blacks!!! (the reset button)
