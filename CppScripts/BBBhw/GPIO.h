@@ -56,7 +56,7 @@ private:// Variables
 	long long int LostCounts=4; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
 	int ApproxInterruptTime=5000; // Typical time of interrupt time duration
 	int NumSynchMeasAvgAux=51;//51; // Num averages to compute the relative frequency difference. Better to be odd number.
-	int ExtraNumSynchMeasAvgAux=11; // Averaging for computing current absolute time offset
+	int ExtraNumSynchMeasAvgAux=41; // Averaging for computing current absolute time offset
 	unsigned int NextSynchPRUcommand=11;// set initially to NextSynchPRUcorrection=0
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
 	//unsigned int OffsetSynchPRUBaseCorrection=262144;// Base value from where the synch offset is added or discounted to achieve periodic offset correction
@@ -113,7 +113,7 @@ private:// Variables
 	double SynchTrigPeriod=4096.0; //For slotted analysis. It has to match to the histogram analysis
 	double MultFactorEffSynchPeriod=4.0; // When using 4 channels histogram, this value is 4.0; when using real signals this value should be 1.0 (also in QphysLayerAgent.h)
 	unsigned long long int TimePRU1synchPeriod=67108864; // In nanoseconds and power of 2// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. Also, the sorter the more error in the correct estimation, since there has not elapsed enough time to compute a tendency (it also happens with PRUdetCorrRelFreq() method whre a separation TagsSeparationDetRelFreq is inserted). The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
-	unsigned long long int DistTimePRU1synchPeriod=8; // Power of 2. Number of passes with respect TimePRU1synchPeriod, in order to compute both the absolute time difference and the relative frequency difference
+	unsigned long long int DistTimePRU1synchPeriod=16; // Power of 2. Number of passes with respect TimePRU1synchPeriod, in order to compute both the absolute time difference and the relative frequency difference
 	unsigned long long int iepPRUtimerRange32bits=4294967296; //32 bits
 	struct timespec requestWhileWait;
 	struct timespec requestCoincidenceWhileWait;
