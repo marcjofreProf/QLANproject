@@ -131,8 +131,8 @@ sudo chrt -f -p 1 $pidAux
 
 ## If synch to the RTC of the system, stop the NTP. The quality of the internal crystal/clock matters
 sudo timedatectl set-ntp false
-#sudo systemctl stop systemd-timesyncd # stop system synch
-#sudo systemctl disable systemd-timesyncd # start system synch
+sudo systemctl stop systemd-timesyncd # stop system synch
+sudo systemctl disable systemd-timesyncd # start system synch
 sudo nice -n $NicenestPriorValue ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m
 pidAux=$(pgrep -f "phc2sys")
 sudo chrt -f -p 1 $pidAux
