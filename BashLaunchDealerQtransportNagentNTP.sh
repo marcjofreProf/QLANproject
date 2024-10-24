@@ -18,7 +18,7 @@ is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 # Nicenest value [-20, 20]
 NicenestPriorValue=-10 # The smaller, the better
 PriorityValue=80 # The larger, the better. Above 60 is well enough
-PriorityNoSoHighValue=60 # The larger, the better.
+PriorityNoSoHighValue=75 # The larger, the better.
 
 # Check if adjtimex is installed using dpkg
 if dpkg -l | grep -q adjtimex; then

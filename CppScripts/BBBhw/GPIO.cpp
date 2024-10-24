@@ -326,6 +326,10 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//		this->PRUoffsetDriftErrorAbsArray[i]=0.0;
 				//	}
 				}
+				else if (((this->iIterPRUcurrentTimerVal*this->TimePRU1synchPeriod)%iepPRUtimerRange32bits)==0){
+					this->NextSynchPRUcorrection=static_cast<unsigned int>(0); // resetting to 0
+					this->NextSynchPRUcommand=static_cast<unsigned int>(11);// Hard setting of the time
+				}
 				
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
 				pru1dataMem_int[0]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
