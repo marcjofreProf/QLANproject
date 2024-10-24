@@ -19,14 +19,21 @@ Very important, if the PTP synchronization is behaving erratically. Hard reset o
 
 # shorter synch intervals help to reduce jitter since hardware clock is more regularly corrected and hence the stability role of the hardware clock is reduced
 
-# Maybe P2P has better time accuracy (instead of E2E), provided the network topology can support it.
+# General observations
+
+# twoStepFlag activated means that the initial first time information comes in the follow-up message (somehow it is simpler to implement because the devices do not have to timestamp+transmit this timestamp at the same message, but the message containint the information comes later).
+
+# Messages rate is very important. Range from -7 to +6.
+
+# Maybe P2P has better time accuracy (instead of E2E), provided the network topology can support it. P2P makes sense for devices in-between, that want to be transparent to PTP messages (but it is of no use of end devices like the BBB nodes).
 # In P2P mode, receiving the console message: "received PDELAY_REQ without timestamp" might be indicative of high network congestion (specially in P2P which the amount of messages increases).
 # Probably P2P the synch intervals have to be order of magnitude larger than for E2E, due to the high amount of network trafficit generates.
 # P2P seems not to work with BBB (either slave or master)
 
 # delay_filter_length is very important to be sufficiently large to not have too much jitter but small enough so that time corrections in the different slaves happen at the same time - within the time slot of interest. The jitter might come from the interconnecting interfaces in between and t the end-points (for instance a switch might add more jitter than a hub; better to use a PRP transparent switch)
 
-# Seems that P2P, either because of slave or master BBB, this inhibit_delay_req has to be 1; otherwise the master PTP indicates the message "received PDELAY_REQ without timestamp"
+# Seems that P2P, either because of slave or master BBB, this inhibit_delay_req has to be 1; otherwise the master PTP indicates the message "received PDELAY_REQ without timestamp". But inhibiting this messages, makes the protocol not to work.
+# Maybe for frequency synchronization this inhibit_delay_req can be useful, since only one way packets from the master are needed to synchronize in frequency.
 
 # Clock servo: pi, linreg, nullf
 
