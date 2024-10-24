@@ -225,7 +225,7 @@ int GPIO::InitAgentProcess(){
 /////////////////////////////////////////////////////////
 bool GPIO::setMaxRrPriority(){// For rapidly handling interrupts
 	int max_priority=sched_get_priority_max(SCHED_FIFO);
-	int Nice_priority=85;// Higher priority. Very important parameter to have stability of the measurements
+	int Nice_priority=85;// Higher priority. Very important parameter to have stability of the measurements. Larger than the priorities for clock control (ptp4l,...)
 // SCHED_RR: Round robin
 // SCHED_FIFO: First-In-First-Out
 	sched_param sch_params;
@@ -404,7 +404,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				// Compute error - Absolute corrected error of absolute error after removing the frequency difference. It adds jitter but probably ensures that hardwware clock offsets are removed periodically (a different story is the offset due to links which is calibrated with the algortm).
 				// Dealing with lon lon int matters due to floating or not precition!!!!
 				long double PRUoffsetDriftErrorAbsAux=0.0;
-				PRUoffsetDriftErrorAbsAux=-fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+static_cast<long double>(this->PRUcurrentTimerValWrap)-static_cast<long double>(duration_FinalInitialCountAuxArrayAvgInitial);
+				PRUoffsetDriftErrorAbsAux=-fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+static_cast<long double>(this->PRUcurrentTimerVal)-static_cast<long double>(duration_FinalInitialCountAuxArrayAvgInitial);
 				// Below unwrap the difference
 				if (PRUoffsetDriftErrorAbsAux>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
 					PRUoffsetDriftErrorAbsAux=static_cast<long double>(iepPRUtimerRange32bits)-PRUoffsetDriftErrorAbsAux+1;
