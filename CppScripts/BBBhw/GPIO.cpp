@@ -408,7 +408,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				// Compute error - Absolute corrected error of absolute error after removing the frequency difference. It adds jitter but probably ensures that hardwware clock offsets are removed periodically (a different story is the offset due to links which is calibrated with the algortm).
 				// Dealing with lon lon int matters due to floating or not precition!!!!
 				long double PRUoffsetDriftErrorAbsAux=0.0;
-				PRUoffsetDriftErrorAbsAux=-fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+static_cast<long double>(this->PRUcurrentTimerValWrap);//-static_cast<long double>(duration_FinalInitialCountAuxArrayAvgInitial);
+				PRUoffsetDriftErrorAbsAux=-fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod),static_cast<long double>(iepPRUtimerRange32bits))/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(this->PRUcurrentTimerValWrap);//-static_cast<long double>(duration_FinalInitialCountAuxArrayAvgInitial);
 				// Below unwrap the difference
 				if (PRUoffsetDriftErrorAbsAux>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
 					PRUoffsetDriftErrorAbsAux=static_cast<long double>(iepPRUtimerRange32bits)-PRUoffsetDriftErrorAbsAux+1;
@@ -430,14 +430,14 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				if (this->iIterPRUcurrentTimerValPassLong>DistTimePRU1synchPeriod){// Long range measurements to retrieve relative frequency differences
 					// Computations for Synch calculation for PRU0 compensation
 					// Compute Synch - Relative
-					this->EstimateSynch=fmod((static_cast<double>(this->iIterPRUcurrentTimerValPassLong*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))/(this->PRUcurrentTimerValLong-this->PRUcurrentTimerValOldWrapLong);// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correction).
+					this->EstimateSynch=(fmod((static_cast<double>(this->iIterPRUcurrentTimerValPassLong*this->TimePRU1synchPeriod)),static_cast<double>(iepPRUtimerRange32bits))/static_cast<double>(PRUclockStepPeriodNanoseconds))/(this->PRUcurrentTimerValLong-this->PRUcurrentTimerValOldWrapLong);// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correction).
 					this->EstimateSynchArray[iIterPRUcurrentTimerValSynchLong%NumSynchMeasAvgAux]=this->EstimateSynch;
 					this->ManualSemaphoreExtra=true;
 					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
 
 					// Frequency synchronization correction
 					// Compute error - Relative correction of the frequency difference. This provides like the stability of the hardware clock referenced to the system clock (disciplined with network protocol)...so in the order of 10^-7
-					this->PRUoffsetDriftError=(-fmod((static_cast<double>(this->iIterPRUcurrentTimerValPassLong*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerValLong-this->PRUcurrentTimerValOldWrapLong))/static_cast<long double>(TimePRU1synchPeriod); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions				
+					this->PRUoffsetDriftError=(-fmod((static_cast<double>(this->iIterPRUcurrentTimerValPassLong*this->TimePRU1synchPeriod)),static_cast<double>(iepPRUtimerRange32bits))/static_cast<double>(PRUclockStepPeriodNanoseconds)+(this->PRUcurrentTimerValLong-this->PRUcurrentTimerValOldWrapLong))/static_cast<long double>(TimePRU1synchPeriod); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions				
 					
 					// Relative error average
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLong%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
