@@ -326,7 +326,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//		this->PRUoffsetDriftErrorAbsArray[i]=0.0;
 				//	}
 				}
-				else if ((static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds))>static_cast<long double>(iepPRUtimerRange32bits){
+				else if ((static_cast<long double>(this->iIterPRUcurrentTimerVal+1)*static_cast<long double>(this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds))>static_cast<long double>(iepPRUtimerRange32bits)){
 					this->NextSynchPRUcorrection=static_cast<unsigned int>(0); // resetting to 0
 					this->NextSynchPRUcommand=static_cast<unsigned int>(11);// Hard setting of the time
 				}
