@@ -26,7 +26,9 @@ is_rt_kernel
 is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 
 # Nicenest value [-20, 20]
-NicenestPriorValue=-10
+NicenestPriorValue=-10 # The smaller, the better
+PriorityValue=80 # The larger, the better. Above 60 is well enough
+PriorityNoSoHighValue=40 # The larger, the better.
 
 # Check if adjtimex is installed using dpkg
 if dpkg -l | grep -q adjtimex; then
@@ -78,15 +80,11 @@ if [[ $is_rt_kernel -eq 1 ]]; then
   sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/26-rtc0")
   sudo renice -n $NicenestPriorValue $pidAux
-  # Specific to PTP
-  pidAux=$(pgrep -f "ptp0")
-  sudo renice -n $NicenestPriorValue $pidAux
-  
+  # Specific to the TI AM335
   pidAux=$(pgrep -f "irq/22-TI-am335")
   sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/22-s-TI-am3")
-  sudo renice -n $NicenestPriorValue $pidAux
-  
+  sudo renice -n $NicenestPriorValue $pidAux  
   pidAux=$(pgrep -f "irq/59-pruss_ev")
   sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/60-pruss_ev")
@@ -110,7 +108,6 @@ else
 fi
 
 pidAux=$(pidof -s ptp0)
-sudo chrt -f -p 1 $pidAux
 sudo renice -n $NicenestPriorValue $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
@@ -129,8 +126,6 @@ sudo /etc/init.d/rsyslog stop # stop logging
 #        timeSource 0xa0"
 
 sudo nice -n $NicenestPriorValue ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
-pidAux=$(pgrep -f "ptp4l")
-sudo chrt -f -p 1 $pidAux
 
 ## Maybe since systemd-timesyncd is disabled, then maybe adjtimex might update some needed parameters such as the difference between UTC and TAI clocks
 ##sudo adjtimex --print # Print something to make sure that adjtimex is installed (sudo apt-get update; sudo apt-get install adjtimex
@@ -143,8 +138,6 @@ sudo chrt -f -p 1 $pidAux
 #sudo systemctl daemon-reload
 #sudo timedatectl set-ntp true # Start NTP
 #sudo nice -n $NicenestPriorValue ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # 
-#pidAux=$(pgrep -f "phc2sys")
-#sudo chrt -f -p 1 $pidAux
 
 ## If synch to the RTC of the system, stop the NTP. The quality of the internal crystal/clock matters
 sudo timedatectl set-ntp false
@@ -153,8 +146,6 @@ sudo systemctl disable systemd-timesyncd # start system synch
 sudo systemctl stop systemd-timedated
 sudo systemctl disable systemd-timedated
 sudo nice -n $NicenestPriorValue ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m # 
-pidAux=$(pgrep -f "phc2sys")
-sudo chrt -f -p 1 $pidAux
 
 #echo 'Enabling PWM for 24 MHz ref clock'
 #sudo config-pin P8.19 pwm
@@ -223,8 +214,35 @@ BcKPDarg1=${1:-$default_arg1}
 BcKPDarg2=${2:-$default_arg2}
 BcKPDarg3=${3:-$default_arg3}
 sudo nice -n $NicenestPriorValue ./BBBclockKernelPhysical/BBBclockKernelPhysicalDaemon $BcKPDarg1 $BcKPDarg2 $BcKPDarg3 &
+
+## Update process priority values
+pidAux=$(pidof -s ptp0)
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pidof -s ptp4l)
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pidof -s phc2sys)
+sudo chrt -f -p $PriorityValue $pidAux
+if [[ $is_rt_kernel -eq 1 ]]; then
+  pidAux=$(pgrep -f "irq/59-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/60-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/61-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/62-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/63-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/64-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/65-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/66-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+fi
+
 pidAux=$(pgrep -f "BBBclockKernelPhysicalDaemon")
-sudo chrt -f -p 1 $pidAux
+sudo chrt -f -p $PriorityNoSoHighValue $pidAux
 
 read -r -p "Press Ctrl+C to kill launched processes
 " # Block operation until Ctrl+C is pressed

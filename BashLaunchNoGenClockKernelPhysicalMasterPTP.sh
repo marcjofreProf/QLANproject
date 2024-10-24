@@ -19,6 +19,7 @@ is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 # Nicenest value [-20, 20]
 NicenestPriorValue=-10 # The smaller, the better
 PriorityValue=80 # The larger, the better. Above 60 is well enough
+PriorityNoSoHighValue=40 # The larger, the better.
 
 # Check if adjtimex is installed using dpkg
 if dpkg -l | grep -q adjtimex; then
@@ -116,8 +117,6 @@ sudo /etc/init.d/rsyslog stop # stop logging
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
 
 sudo nice -n $NicenestPriorValue ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
-pidAux=$(pgrep -f "ptp4l")
-sudo chrt -f -p $PriorityValue $pidAux
 
 ### If at least the grand master is synch to NTP ((good long stability reference - but short time less stable)) - difficult then to converge because also following NTP
 #sudo systemctl enable systemd-timesyncd # start system synch
@@ -127,8 +126,7 @@ sudo chrt -f -p $PriorityValue $pidAux
 #sudo systemctl daemon-reload
 #sudo timedatectl set-ntp true # Start NTP
 #sudo nice -n $NicenestPriorValue ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP4lConfigQLANprojectMaster.cfg & -m
-#pidAux=$(pgrep -f "phc2sys")
-#sudo chrt -f -p 1 $pidAux
+
 
 ## If synch to the RTC of the system, stop the NTP. The quality of the internal crystal/clock matters
 sudo timedatectl set-ntp false
@@ -137,8 +135,6 @@ sudo systemctl disable systemd-timesyncd # start system synch
 sudo systemctl stop systemd-timedated
 sudo systemctl disable systemd-timedated
 sudo nice -n $NicenestPriorValue ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m
-pidAux=$(pgrep -f "phc2sys")
-sudo chrt -f -p $PriorityValue $pidAux
 
 # adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
 sleep 30 # give time to time protocols to lock
@@ -166,22 +162,24 @@ pidAux=$(pidof -s ptp4l)
 sudo chrt -f -p $PriorityValue $pidAux
 pidAux=$(pidof -s phc2sys)
 sudo chrt -f -p $PriorityValue $pidAux
-pidAux=$(pgrep -f "irq/59-pruss_ev")
-sudo chrt -f -p $PriorityValue $pidAux
-pidAux=$(pgrep -f "irq/60-pruss_ev")
-sudo chrt -f -p $PriorityValue $pidAux
-pidAux=$(pgrep -f "irq/61-pruss_ev")
-sudo chrt -f -p $PriorityValue $pidAux
-pidAux=$(pgrep -f "irq/62-pruss_ev")
-sudo chrt -f -p $PriorityValue $pidAux
-pidAux=$(pgrep -f "irq/63-pruss_ev")
-sudo chrt -f -p $PriorityValue $pidAux
-pidAux=$(pgrep -f "irq/64-pruss_ev")
-sudo chrt -f -p $PriorityValue $pidAux
-pidAux=$(pgrep -f "irq/65-pruss_ev")
-sudo chrt -f -p $PriorityValue $pidAux
-pidAux=$(pgrep -f "irq/66-pruss_ev")
-sudo chrt -f -p $PriorityValue $pidAux
+if [[ $is_rt_kernel -eq 1 ]]; then
+  pidAux=$(pgrep -f "irq/59-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/60-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/61-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/62-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/63-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/64-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/65-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/66-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+fi
 
 read -r -p "Press Ctrl+C to kill launched processes
 " # Block operation until Ctrl+C is pressed

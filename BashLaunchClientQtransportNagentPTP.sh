@@ -16,7 +16,9 @@ is_rt_kernel
 is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 
 # Nicenest value [-20, 20]
-NicenestPriorValue=-10
+NicenestPriorValue=-10 # The smaller, the better
+PriorityValue=80 # The larger, the better. Above 60 is well enough
+PriorityNoSoHighValue=40 # The larger, the better.
 
 # Check if adjtimex is installed using dpkg
 if dpkg -l | grep -q adjtimex; then
@@ -63,15 +65,11 @@ if [[ $is_rt_kernel -eq 1 ]]; then
   sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/26-rtc0")
   sudo renice -n $NicenestPriorValue $pidAux
-  # Specific to PTP
-  pidAux=$(pgrep -f "ptp0")
-  sudo renice -n $NicenestPriorValue $pidAux
-  
+  # Specific to the TI AM335
   pidAux=$(pgrep -f "irq/22-TI-am335")
   sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/22-s-TI-am3")
-  sudo renice -n $NicenestPriorValue $pidAux
-  
+  sudo renice -n $NicenestPriorValue $pidAux  
   pidAux=$(pgrep -f "irq/59-pruss_ev")
   sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/60-pruss_ev")
@@ -95,7 +93,6 @@ else
 fi
 
 pidAux=$(pidof -s ptp0)
-sudo chrt -f -p 1 $pidAux
 sudo renice -n $NicenestPriorValue $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
@@ -123,11 +120,8 @@ sudo systemctl disable systemd-timedated
 # 	If ethtool not installed then the utc and tai offsets are not well configured 
 #sudo adjtimex ...# manually make sure to adjust the conversion from utc to tai and viceversa
 sudo nice -n $NicenestPriorValue ./linuxptp/ptp4l -i eth0 -s -H -f PTP4lConfigQLANprojectSlave.cfg &
-pidAux=$(pgrep -f "ptp4l")
-sudo chrt -f -p 1 $pidAux
+
 sudo nice -n $NicenestPriorValue ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectSlave.cfg & # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
-pidAux=$(pgrep -f "phc2sys")
-sudo chrt -f -p 1 $pidAux
 
 if [[ $is_rt_kernel -eq 0 ]]; then
 	echo 'Enabling PRU pins'
@@ -175,11 +169,36 @@ fi
 
 echo "$line_to_add" | sudo crontab -
 
-##
-
 sudo nice -n $NicenestPriorValue ./CppScripts/QtransportLayerAgentN client 10.0.0.254 10.0.0.2 & #192.168.8.2 192.168.8.1 &
+
+## Update process priority values
+pidAux=$(pidof -s ptp0)
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pidof -s ptp4l)
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pidof -s phc2sys)
+sudo chrt -f -p $PriorityValue $pidAux
+if [[ $is_rt_kernel -eq 1 ]]; then
+  pidAux=$(pgrep -f "irq/59-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/60-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/61-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/62-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/63-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/64-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/65-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/66-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+fi
+
 pidAux=$(pgrep -f "QtransportLayerAgentN")
-sudo chrt -f -p 1 $pidAux
+sudo chrt -f -p $PriorityNoSoHighValue $pidAux
 
 read -r -p "Press Ctrl+C to kill launched processes
 " # Block operation until Ctrl+C is pressed

@@ -16,7 +16,9 @@ is_rt_kernel
 is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 
 # Nicenest value [-20, 20]
-NicenestPriorValue=-10
+NicenestPriorValue=-10 # The smaller, the better
+PriorityValue=80 # The larger, the better. Above 60 is well enough
+PriorityNoSoHighValue=40 # The larger, the better.
 
 # Check if adjtimex is installed using dpkg
 if dpkg -l | grep -q adjtimex; then
@@ -57,32 +59,31 @@ if [[ $is_rt_kernel -eq 1 ]]; then
   sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/26-rtc0")
   sudo renice -n $NicenestPriorValue $pidAux
-  
+  # Specific to the TI AM335
   pidAux=$(pgrep -f "irq/22-TI-am335")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/22-s-TI-am3")
-  sudo renice -n -20 $pidAux
-  
+  sudo renice -n $NicenestPriorValue $pidAux  
   pidAux=$(pgrep -f "irq/59-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/60-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/61-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/62-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/63-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/64-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/65-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/66-pruss_ev")
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
 else
   pidAux=$(pgrep -f "irq/66-TI-am335")
   #sudo chrt -f -p 1 $pidAux
-  sudo renice -n -20 $pidAux
+  sudo renice -n $NicenestPriorValue $pidAux
 fi
 ########################################################
 sudo /etc/init.d/rsyslog stop # stop logging
@@ -137,11 +138,36 @@ fi
 
 echo "$line_to_add" | sudo crontab -
 
-##
+sudo nice -n $NicenestPriorValue ./CppScripts/QtransportLayerAgentN dealer 10.0.0.252 10.0.0.4 & #192.168.10.2 192.168.10.1 &
 
-sudo ./CppScripts/QtransportLayerAgentN dealer 10.0.0.252 10.0.0.4 & #192.168.10.2 192.168.10.1 &
+## Update process priority values
+pidAux=$(pidof -s ptp0)
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pidof -s ptp4l)
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pidof -s phc2sys)
+sudo chrt -f -p $PriorityValue $pidAux
+if [[ $is_rt_kernel -eq 1 ]]; then
+  pidAux=$(pgrep -f "irq/59-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/60-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/61-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/62-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/63-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/64-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/65-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/66-pruss_ev")
+  sudo chrt -f -p $PriorityValue $pidAux
+fi
+
 pidAux=$(pgrep -f "QtransportLayerAgentN")
-sudo chrt -f -p 1 $pidAux
+sudo chrt -f -p $PriorityNoSoHighValue $pidAux
 
 read -r -p "Press Ctrl+C to kill launched processes
 " # Block operation until Ctrl+C is pressed
