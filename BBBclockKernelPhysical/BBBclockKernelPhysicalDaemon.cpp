@@ -87,7 +87,7 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 //////////////////////////////////////////////////////////////////////////
 bool CKPD::setMaxRrPriority(){// For rapidly handling interrupts
 int max_priority=sched_get_priority_max(SCHED_FIFO);
-int Nice_priority=85;// Higher priority. Very important parameter to have stability of the measurements
+int Nice_priority=75;// Higher priority. Very important parameter to have stability of the measurements
 // SCHED_RR: Round robin
 // SCHED_FIFO: First-In-First-Out
 sched_param sch_params;

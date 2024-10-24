@@ -225,7 +225,7 @@ int GPIO::InitAgentProcess(){
 /////////////////////////////////////////////////////////
 bool GPIO::setMaxRrPriority(){// For rapidly handling interrupts
 	int max_priority=sched_get_priority_max(SCHED_FIFO);
-	int Nice_priority=85;// Higher priority. Very important parameter to have stability of the measurements
+	int Nice_priority=75;// Higher priority. Very important parameter to have stability of the measurements
 // SCHED_RR: Round robin
 // SCHED_FIFO: First-In-First-Out
 	sched_param sch_params;
@@ -478,7 +478,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		} //end if
 		
 		// Information
-		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(16*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
+		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(4*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
 			////cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			////cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
