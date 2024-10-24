@@ -326,6 +326,10 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//		this->PRUoffsetDriftErrorAbsArray[i]=0.0;
 				//	}
 				}
+				else if ((this->iIterPRUcurrentTimerValSynchLong%DistTimePRU1synchPeriod)==0){// Reset PRU counter to remediate the relative rror of converting time with PRUclockStepPeriodNanoseconds
+					this->NextSynchPRUcorrection=static_cast<unsigned int>(0); // resetting to 0
+					this->NextSynchPRUcommand=static_cast<unsigned int>(11);// Hard setting of the time
+				}
 				
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
 				pru1dataMem_int[0]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
@@ -404,7 +408,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				// Compute error - Absolute corrected error of absolute error after removing the frequency difference. It adds jitter but probably ensures that hardwware clock offsets are removed periodically (a different story is the offset due to links which is calibrated with the algortm).
 				// Dealing with lon lon int matters due to floating or not precition!!!!
 				long double PRUoffsetDriftErrorAbsAux=0.0;
-				PRUoffsetDriftErrorAbsAux=-fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+static_cast<long double>(this->PRUcurrentTimerVal)-static_cast<long double>(duration_FinalInitialCountAuxArrayAvgInitial);
+				PRUoffsetDriftErrorAbsAux=-fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+static_cast<long double>(this->PRUcurrentTimerValWrap);//-static_cast<long double>(duration_FinalInitialCountAuxArrayAvgInitial);
 				// Below unwrap the difference
 				if (PRUoffsetDriftErrorAbsAux>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
 					PRUoffsetDriftErrorAbsAux=static_cast<long double>(iepPRUtimerRange32bits)-PRUoffsetDriftErrorAbsAux+1;
@@ -473,12 +477,16 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				
 				// Updates for next round				
 				this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
-				this->iIterPRUcurrentTimerValPass=0; // reset value										
+				this->iIterPRUcurrentTimerValPass=0; // reset value
+
+				if ((this->iIterPRUcurrentTimerValSynchLong%DistTimePRU1synchPeriod)==0){// Reset PRU counter to remediate the relative rror of converting time with PRUclockStepPeriodNanoseconds
+					this->iIterPRUcurrentTimerVal=0;// reset this value
+				}								
 			}				
 		} //end if
 		
 		// Information
-		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(4*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
+		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
 			////cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			////cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
