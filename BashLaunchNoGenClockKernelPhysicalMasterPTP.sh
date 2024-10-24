@@ -1,4 +1,5 @@
 # Just launching a PTP master
+sudo adjtimex -f 0 # REset any adjtimex previous configuration
 # Function to check for real-time kernel
 is_rt_kernel() {
   kernel_version=$(uname -r) # Get the kernel version
