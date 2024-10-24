@@ -329,6 +329,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				else if ((this->iIterPRUcurrentTimerValSynchLong%DistTimePRU1synchPeriod)==0){// Reset PRU counter to remediate the relative rror of converting time with PRUclockStepPeriodNanoseconds
 					this->NextSynchPRUcorrection=static_cast<unsigned int>(0); // resetting to 0
 					this->NextSynchPRUcommand=static_cast<unsigned int>(11);// Hard setting of the time
+					//this->iIterPRUcurrentTimerVal=0;// reset this value
 				}
 				
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
@@ -477,16 +478,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				
 				// Updates for next round				
 				this->PRUcurrentTimerValOldWrap=this->PRUcurrentTimerValWrap;// Update
-				this->iIterPRUcurrentTimerValPass=0; // reset value
-
-				if ((this->iIterPRUcurrentTimerValSynchLong%DistTimePRU1synchPeriod)==0){// Reset PRU counter to remediate the relative rror of converting time with PRUclockStepPeriodNanoseconds
-					this->iIterPRUcurrentTimerVal=0;// reset this value
-				}								
+				this->iIterPRUcurrentTimerValPass=0; // reset value							
 			}				
 		} //end if
 		
 		// Information
-		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
+		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(3*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
 			////cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			////cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
