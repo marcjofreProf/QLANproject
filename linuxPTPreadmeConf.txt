@@ -9,6 +9,8 @@ All configured through PTP4l conf files. PTP2pc do not have configurations nor a
 
 Very important, if the PTP synchronization is behaving erratically. Hard reset of the BeagleBone Blacks!!! (the reset button)
 
+Furthermore, the priority of processes ptp0, ptp4l and phc2sys is very important to bring down the delay values of the phc2sys and in turn reduce the jitter of the retrieved offset.
+
 # Master insights
 
 # With asCapable in the master configuration as false, it eliminates the message "master clock quality received is greater than configured, ignoring master!"

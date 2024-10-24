@@ -18,7 +18,7 @@ is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 
 # Nicenest value [-20, 20]
 NicenestPriorValue=-10 # The smaller, the better
-PriorityValue=60 # The larger, the better
+PriorityValue=80 # The larger, the better. Above 60 is well enough
 
 # Check if adjtimex is installed using dpkg
 if dpkg -l | grep -q adjtimex; then
@@ -66,15 +66,11 @@ if [[ $is_rt_kernel -eq 1 ]]; then
   sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/26-rtc0")
   sudo renice -n $NicenestPriorValue $pidAux
-  # Specific to PTP
-  pidAux=$(pgrep -f "ptp0")
-  sudo renice -n $NicenestPriorValue $pidAux
-  
+  # Specific to the TI AM335  
   pidAux=$(pgrep -f "irq/22-TI-am335")
   sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/22-s-TI-am3")
-  sudo renice -n $NicenestPriorValue $pidAux
-  
+  sudo renice -n $NicenestPriorValue $pidAux  
   pidAux=$(pgrep -f "irq/59-pruss_ev")
   sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/60-pruss_ev")
@@ -98,7 +94,6 @@ else
 fi
 
 pidAux=$(pidof -s ptp0)
-sudo chrt -f -p $PriorityValue $pidAux
 sudo renice -n $NicenestPriorValue $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
@@ -164,7 +159,29 @@ fi
 
 echo "$line_to_add" | sudo crontab -
 
-##
+## Update process priority values
+pidAux=$(pidof -s ptp0)
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pidof -s ptp4l)
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pidof -s phc2sys)
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pgrep -f "irq/59-pruss_ev")
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pgrep -f "irq/60-pruss_ev")
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pgrep -f "irq/61-pruss_ev")
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pgrep -f "irq/62-pruss_ev")
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pgrep -f "irq/63-pruss_ev")
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pgrep -f "irq/64-pruss_ev")
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pgrep -f "irq/65-pruss_ev")
+sudo chrt -f -p $PriorityValue $pidAux
+pidAux=$(pgrep -f "irq/66-pruss_ev")
+sudo chrt -f -p $PriorityValue $pidAux
 
 read -r -p "Press Ctrl+C to kill launched processes
 " # Block operation until Ctrl+C is pressed
