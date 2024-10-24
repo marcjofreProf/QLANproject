@@ -21,6 +21,7 @@ NicenestPriorValue=-10
 # Check if adjtimex is installed using dpkg
 if dpkg -l | grep -q adjtimex; then
     echo "adjtimex is installed."
+    sudo adjtimex -f 0 # Reset any adjtimex previous configuration
 else
     echo "adjtimex is not installed. sudo apt-get install adjtimex."
 fi
@@ -35,6 +36,8 @@ cleanup_on_SIGINT() {
   
   sudo systemctl enable --now systemd-timesyncd # start system synch
   sudo systemctl start systemd-timesyncd # start system synch
+  sudo systemctl enable systemd-timedated
+  sudo systemctl start systemd-timedated
   sudo systemctl daemon-reload
   sudo timedatectl set-ntp true # Start NTP
 
@@ -92,6 +95,8 @@ sudo /etc/init.d/rsyslog stop # stop logging
 sudo timedatectl set-ntp false # Stop NTP
 sudo systemctl stop systemd-timesyncd # stop system synch
 sudo systemctl disable systemd-timesyncd # stop system synch
+sudo systemctl stop systemd-timedated
+sudo systemctl disable systemd-timedated
 
 if [[ $is_rt_kernel -eq 0 ]]; then
 	echo 'Enabling PRU pins'

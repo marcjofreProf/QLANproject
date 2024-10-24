@@ -1,5 +1,4 @@
 # Just launching a PTP master
-sudo adjtimex -f 0 # REset any adjtimex previous configuration
 # Function to check for real-time kernel
 is_rt_kernel() {
   kernel_version=$(uname -r) # Get the kernel version
@@ -18,11 +17,13 @@ is_rt_kernel
 is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 
 # Nicenest value [-20, 20]
-NicenestPriorValue=-10
+NicenestPriorValue=-10 # The smaller, the better
+PriorityValue=60 # The larger, the better
 
 # Check if adjtimex is installed using dpkg
 if dpkg -l | grep -q adjtimex; then
     echo "adjtimex is installed."
+    sudo adjtimex -f 0 # Reset any adjtimex previous configuration
 else
     echo "adjtimex is not installed. sudo apt-get install adjtimex."
 fi
@@ -37,6 +38,8 @@ cleanup_on_SIGINT() {
   
   sudo systemctl enable --now systemd-timesyncd # start system synch
   sudo systemctl start systemd-timesyncd # start system synch
+  sudo systemctl enable systemd-timedated
+  sudo systemctl start systemd-timedated
   sudo systemctl daemon-reload
   sudo timedatectl set-ntp true # Start NTP
   echo 'Stopped PTP'
@@ -95,7 +98,7 @@ else
 fi
 
 pidAux=$(pidof -s ptp0)
-sudo chrt -f -p 1 $pidAux
+sudo chrt -f -p $PriorityValue $pidAux
 sudo renice -n $NicenestPriorValue $pidAux
 
 sudo /etc/init.d/rsyslog stop # stop logging
@@ -119,11 +122,13 @@ sudo /etc/init.d/rsyslog stop # stop logging
 
 sudo nice -n $NicenestPriorValue ./linuxptp/ptp4l -i eth0 -H -f PTP4lConfigQLANprojectMaster.cfg -m & #-m
 pidAux=$(pgrep -f "ptp4l")
-sudo chrt -f -p 1 $pidAux
+sudo chrt -f -p $PriorityValue $pidAux
 
 ### If at least the grand master is synch to NTP ((good long stability reference - but short time less stable)) - difficult then to converge because also following NTP
 #sudo systemctl enable systemd-timesyncd # start system synch
 #sudo systemctl start systemd-timesyncd # start system synch
+#sudo systemctl enable systemd-timedated
+#sudo systemctl start systemd-timedated
 #sudo systemctl daemon-reload
 #sudo timedatectl set-ntp true # Start NTP
 #sudo nice -n $NicenestPriorValue ./linuxptp/phc2sys -s CLOCK_REALTIME -c eth0 -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP4lConfigQLANprojectMaster.cfg & -m
@@ -134,9 +139,11 @@ sudo chrt -f -p 1 $pidAux
 sudo timedatectl set-ntp false
 sudo systemctl stop systemd-timesyncd # stop system synch
 sudo systemctl disable systemd-timesyncd # start system synch
+sudo systemctl stop systemd-timedated
+sudo systemctl disable systemd-timedated
 sudo nice -n $NicenestPriorValue ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectMaster.cfg -m & #-f PTP2pcConfigQLANprojectMaster.cfg & -m
 pidAux=$(pgrep -f "phc2sys")
-sudo chrt -f -p 1 $pidAux
+sudo chrt -f -p $PriorityValue $pidAux
 
 # adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
 sleep 30 # give time to time protocols to lock

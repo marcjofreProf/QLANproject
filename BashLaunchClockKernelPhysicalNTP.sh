@@ -31,6 +31,7 @@ NicenestPriorValue=-10
 # Check if adjtimex is installed using dpkg
 if dpkg -l | grep -q adjtimex; then
     echo "adjtimex is installed."
+    sudo adjtimex -f 0 # Reset any adjtimex previous configuration
 else
     echo "adjtimex is not installed. sudo apt-get install adjtimex."
 fi

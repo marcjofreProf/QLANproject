@@ -32,6 +32,7 @@ NicenestPriorValue=-10
 # Check if adjtimex is installed using dpkg
 if dpkg -l | grep -q adjtimex; then
     echo "adjtimex is installed."
+    sudo adjtimex -f 0 # Reset any adjtimex previous configuration
 else
     echo "adjtimex is not installed. sudo apt-get install adjtimex."
 fi
@@ -114,6 +115,8 @@ sudo /etc/init.d/rsyslog stop # stop logging
 sudo timedatectl set-ntp false
 sudo systemctl stop systemd-timesyncd # stop system synch
 sudo systemctl disable systemd-timesyncd # disable system synch
+sudo systemctl stop systemd-timedated
+sudo systemctl disable systemd-timedated
 
 #echo 'Enabling PWM for 24 MHz ref clock'
 #sudo config-pin P8.19 pwm
