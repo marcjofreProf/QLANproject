@@ -179,6 +179,12 @@ if [[ $is_rt_kernel -eq 1 ]]; then
   sudo chrt -f -p $PriorityValue $pidAux
   pidAux=$(pgrep -f "irq/66-pruss_ev")
   sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/41-4a100000")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/42-4a100000")
+  sudo chrt -f -p $PriorityValue $pidAux
+  pidAux=$(pgrep -f "irq/43-4a100000")
+  sudo chrt -f -p $PriorityValue $pidAux
 fi
 
 read -r -p "Press Ctrl+C to kill launched processes
