@@ -86,13 +86,13 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 
 //////////////////////////////////////////////////////////////////////////
 bool CKPD::setMaxRrPriority(){// For rapidly handling interrupts
-int max_priority=sched_get_priority_max(SCHED_RR);
-int Nice_priority=75;// Higher priority. Very important parameter to have stability of the measurements. Slightly smaller than the priorities for clock control (ptp4l,...)
+int max_priority=sched_get_priority_max(SCHED_FIFO);
+int Nice_priority=77;// Higher priority. Very important parameter to have stability of the measurements. Slightly smaller than the priorities for clock control (ptp4l,...) but larger than for the general program
 // SCHED_RR: Round robin
 // SCHED_FIFO: First-In-First-Out
 sched_param sch_params;
 sch_params.sched_priority = Nice_priority;
-if (sched_setscheduler(0,SCHED_RR,&sch_params)==-1){
+if (sched_setscheduler(0,SCHED_FIFO,&sch_params)==-1){
 	cout <<" Failed to set maximum real-time priority." << endl;
 	return false;
 }
@@ -191,7 +191,7 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME// https://opensource.com/article/17/6/timekeeping-linux-vms
-while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);// Busy waiting
+while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);//std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-Clock::now()));// Busy waiting. With a while loop rapid response, but more variation; compared to sleep_for(). Also, the ApproxInterruptTime has to be adjusted (around 6000 for while loop and around 100000 for sleep_for())
 //this->TimePointClockCurrentInitialMeas=ClockWatch::now(); //Computed in the step before
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
@@ -230,9 +230,9 @@ this->duration_FinalInitialDriftAuxArrayAvg = this->RatioAverageFactorClockQuart
 }
 }
 
-if (this->duration_FinalInitialDriftAuxArrayAvg>6000){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
-	cout << "Time for pre processing the time barrier is too long " << this->duration_FinalInitialDriftAuxArrayAvg << " ...adjust TimeClockMarging! Set to nominal value of 6000..." << endl;
-	this->duration_FinalInitialDriftAuxArrayAvg=6000;// For the time being adjust it to the nominal initial value
+if (this->duration_FinalInitialDriftAuxArrayAvg>ApproxInterruptTime){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
+	cout << "Time for pre processing the time barrier is too long " << this->duration_FinalInitialDriftAuxArrayAvg << " ...adjust TimeClockMarging! Set to nominal value of " << ApproxInterruptTime << " 6000..." << endl;
+	this->duration_FinalInitialDriftAuxArrayAvg=ApproxInterruptTime;// For the time being adjust it to the nominal initial value
 }
 
 this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
