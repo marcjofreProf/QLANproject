@@ -55,6 +55,7 @@ private:// Variables
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=4; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
 	int ApproxInterruptTime=100000; // Typical time of interrupt time duration is 5000 with simple busy wait; around 8000 with busy wait with yield; 100000 with sleep_for()
+	// To many hundreds of measurements might consume oall the CPU of the board (because median is very resource consuming).Otherwise a better algorithm (median) has to be used.
 	int NumSynchMeasAvgAux=451;//51; // Num averages to compute the relative frequency difference. Better to be odd number.
 	int ExtraNumSynchMeasAvgAux=401; // Averaging for computing current absolute time offset
 	unsigned int NextSynchPRUcommand=11;// set initially to NextSynchPRUcorrection=0
@@ -112,7 +113,7 @@ private:// Variables
 	using TimePoint = std::chrono::time_point<Clock>;
 	double SynchTrigPeriod=4096.0; //For slotted analysis. It has to match to the histogram analysis
 	double MultFactorEffSynchPeriod=4.0; // When using 4 channels histogram, this value is 4.0; when using real signals this value should be 1.0 (also in QphysLayerAgent.h)
-	unsigned long long int TimePRU1synchPeriod=10000000; // In nanoseconds and multiple of PRUclockStepPeriodNanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. Also, the sorter the more error in the correct estimation, since there has not elapsed enough time to compute a tendency (it also happens with PRUdetCorrRelFreq() method whre a separation TagsSeparationDetRelFreq is inserted). The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
+	unsigned long long int TimePRU1synchPeriod=100000000; // In nanoseconds and multiple of PRUclockStepPeriodNanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. Also, the sorter the more error in the correct estimation, since there has not elapsed enough time to compute a tendency (it also happens with PRUdetCorrRelFreq() method whre a separation TagsSeparationDetRelFreq is inserted). The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
 	unsigned long long int DistTimePRU1synchPeriod=100; // Multiple of PRUclockStepPeriodNanoseconds. Number of passes with respect TimePRU1synchPeriod, in order to compute both the absolute time difference and the relative frequency difference
 	unsigned long long int iepPRUtimerRange32bits=4294967296; //32 bits
 	struct timespec requestWhileWait;
