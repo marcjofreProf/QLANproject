@@ -54,7 +54,7 @@ private:// Variables
 	std::atomic<bool> ManualSemaphoreExtra=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=4; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
-	int ApproxInterruptTime=5000; // Typical time of interrupt time duration
+	int ApproxInterruptTime=6000; // Typical time of interrupt time duration
 	int NumSynchMeasAvgAux=1;//51; // Num averages to compute the relative frequency difference. Better to be odd number.
 	int ExtraNumSynchMeasAvgAux=1; // Averaging for computing current absolute time offset
 	unsigned int NextSynchPRUcommand=11;// set initially to NextSynchPRUcorrection=0
