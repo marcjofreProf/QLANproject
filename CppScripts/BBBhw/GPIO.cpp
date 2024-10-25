@@ -322,8 +322,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				pru1dataMem_int[0]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
 				
 				//this->TimePointClockSendCommandInitial=this->TimePointClockCurrentSynchPRU1future-0*std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
-				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
-				this->TimePointClockCurrentSynchPRU1future=Clock::now(); // Initial measurement. info. Already computed in the steps before				// Important, the following line at the very beggining to reduce the command jitter				
+				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future){//;// Busy waiting
+					// Yield the CPU to other threads
+        			std::this_thread::yield();
+				}
+				
+				//this->TimePointClockCurrentSynchPRU1future=Clock::now(); // Initial measurement. info. Already computed in the steps before				// Important, the following line at the very beggining to reduce the command jitter				
 				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
 				prussdrv_pru_send_event(22);
 				//this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.			
