@@ -224,13 +224,13 @@ int GPIO::InitAgentProcess(){
 }
 /////////////////////////////////////////////////////////
 bool GPIO::setMaxRrPriority(){// For rapidly handling interrupts
-	int max_priority=sched_get_priority_max(SCHED_RR);
-	int Nice_priority=75;// Higher priority. Very important parameter to have stability of the measurements. Slightly smaller than the priorities for clock control (ptp4l,...)
-// SCHED_RR: Round robin
-// SCHED_FIFO: First-In-First-Out
+	int max_priority=sched_get_priority_max(SCHED_FIFO);
+	int Nice_priority=77;// Higher priority. Very important parameter to have stability of the measurements. Slightly smaller than the priorities for clock control (ptp4l,...) but larger than for the general program
+	// SCHED_RR: Round robin
+	// SCHED_FIFO: First-In-First-Out
 	sched_param sch_params;
 	sch_params.sched_priority = Nice_priority;
-	if (sched_setscheduler(0,SCHED_RR,&sch_params)==-1){
+	if (sched_setscheduler(0,SCHED_FIFO,&sch_params)==-1){
 		cout <<" Failed to set maximum real-time priority." << endl;
 		return false;
 	}
@@ -322,10 +322,10 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				pru1dataMem_int[0]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
 				
 				//this->TimePointClockSendCommandInitial=this->TimePointClockCurrentSynchPRU1future-0*std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
-				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future){//;// Busy waiting
-					// Yield the CPU to other threads
-        			std::this_thread::yield();
-				}
+				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);//{//;// Busy waiting
+				//	// Yield the CPU to other threads
+        		//	std::this_thread::yield();
+				//}
 				
 				//this->TimePointClockCurrentSynchPRU1future=Clock::now(); // Initial measurement. info. Already computed in the steps before				// Important, the following line at the very beggining to reduce the command jitter				
 				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
