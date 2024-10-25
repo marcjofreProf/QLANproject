@@ -324,8 +324,9 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//this->TimePointClockSendCommandInitial=this->TimePointClockCurrentSynchPRU1future-0*std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
 				while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);// Busy waiting
 				////this->TimePointClockSendCommandInitial=Clock::now(); // Initial measurement. info. Already computed in the steps before				// Important, the following line at the very beggining to reduce the command jitter				
+				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
 				prussdrv_pru_send_event(22);
-				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.			
+				//this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.			
 				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
 				//cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 				if (retInterruptsPRU1>0){
