@@ -320,8 +320,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
 				pru1dataMem_int[0]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
-				
-				//this->TimePointClockSendCommandInitial=this->TimePointClockCurrentSynchPRU1future-0*std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);
+				// There is a big variation if the waiting function to launch the measurement is not properly done (with the appropiate tools)
+				// sleep_for seems to operate more stable although it adds a long overhead time, compared to while()
 				std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future-Clock::now()));//while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);//{//;// Busy waiting
 				//	// Yield the CPU to other threads
         		//	std::this_thread::yield();
@@ -472,7 +472,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		} //end if
 		
 		// Information
-		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(64*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
+		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(4*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
 			////cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			////cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
