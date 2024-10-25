@@ -55,7 +55,7 @@ private:// Variables
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=4; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
 	int ApproxInterruptTime=100000; // Typical time of interrupt time duration is 5000 with simple busy wait; around 8000 with busy wait with yield
-	int NumSynchMeasAvgAux=11;//51; // Num averages to compute the relative frequency difference. Better to be odd number.
+	int NumSynchMeasAvgAux=41;//51; // Num averages to compute the relative frequency difference. Better to be odd number.
 	int ExtraNumSynchMeasAvgAux=11; // Averaging for computing current absolute time offset
 	unsigned int NextSynchPRUcommand=11;// set initially to NextSynchPRUcorrection=0
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
