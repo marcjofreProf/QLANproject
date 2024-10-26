@@ -1512,7 +1512,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	long long int SynchTimeTaggRefMedianArrayAux[NumCalcCenterMass];
 	long long int SynchTimeTaggRefMedianArrayAuxAux[NumRunsPerCenterMass-1];
 	double SynchTimeTaggRefMedianAux=0.0;// AVerage values of the time interval between measurements
-	if (NumCalcCenterMass>1){// when using multiple frequencies - Much more precise, but more time
+	if (NumCalcCenterMass>1){// when using multiple frequencies - Allows retrieving hardaware adjustments to correct for relative frequency difference (but actually not needed) and takes 3 times longer the mechanism
 		if (FreqSynchNormValuesArray[1]>=0.0){
 			cout << "QPLA::FreqSynchNormValuesArray[1] is not negative (it has to be negative): " << FreqSynchNormValuesArray[1] << ". Correct using a negative value!!!" << endl;	
 		}
@@ -1592,7 +1592,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		}
 		SynchTimeTaggRefMedianArrayAux[0]=LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
 		long long int SynchTimeTaggRefMedianArrayAuxAuxAux=SynchTimeTaggRefMedianArrayAux[0];// In PRU units of time
-		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAux[0])*(5e-9);// Conversion to seconds from PRU clock tick
+		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAux[0])*(5e-9);// Conversion to seconds from PRU clock tick. For human representation.
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//Period adjustment
 		
 		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/static_cast<double>(SynchTimeTaggRefMedianArrayAuxAuxAux);// Relative frequency difference
