@@ -480,12 +480,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
 			////cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			////cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
-			cout << "PRUoffsetDriftErrorAvg: " << this->PRUoffsetDriftErrorAvg << endl;
-			cout << "PRUoffsetDriftErrorAbsAvg: " << PRUoffsetDriftErrorAbsAvg << endl;
-			cout << "duration_FinalInitialCountAuxArrayAvg: " << this->duration_FinalInitialCountAuxArrayAvg << endl;
+			cout << "PRUoffsetDriftErrorAvg (rel. freq. diff. to abs. time - unit conversion drift): " << this->PRUoffsetDriftErrorAvg*1000000000 << " ppb" << endl;
+			cout << "PRUoffsetDriftErrorAbsAvg (abs. time diff. - unit conversion drift): " << PRUoffsetDriftErrorAbsAvg << " PRU units" << endl;
+			cout << "duration_FinalInitialCountAuxArrayAvg (time to handle interrupt): " << this->duration_FinalInitialCountAuxArrayAvg << " ns" << endl;
 			////cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
 			////cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
-			cout << "EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
+			cout << "EstimateSynchAvg (ratio rel. freq. diff): " << this->EstimateSynchAvg << endl;
 			////cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
 			//if (this->EstimateSynchDirectionAvg<1.0){cout << "Clock EstimateSynch advancing" << endl;}
 			//else if (this->EstimateSynchDirectionAvg>1.0){cout << "Clock EstimateSynch delaying" << endl;}
