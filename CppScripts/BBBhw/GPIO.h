@@ -72,7 +72,6 @@ private:// Variables
 	double PRUoffsetDriftErrorAbsArray[MaxNumPulses]={0};
 	double PRUoffsetDriftErrorAbsAvg=0.0;
 	double PRUoffsetDriftErrorAbsAvgOld=0.0;
-	double PRUoffsetDriftErrorAbsAvgMax=65536.0; // Maximum absolute offset to correct for. It can be decreases if the handling interrupt time is improved (decreased). The longer the more correction but the longer it will wait to initiate sequence
 	// Others
 	double PRUoffsetDriftErrorIntegral=0;
 	double PRUoffsetDriftErrorDerivative=0;

@@ -559,7 +559,8 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		case 7: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld7;break;}
 		default: {break;}
 	}
-	ldTimePointClockTagPRUDiff=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
+	// The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of half the effective period due to interrupt alignment handling, the effective period, the time since last emission detection, then again MultFactorEffSynchPeriod*SynchTrigPeriod more or less
+	ldTimePointClockTagPRUDiff=static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
 		
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
@@ -583,6 +584,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	else{
 		PRUoffsetDriftErrorAbsAvgAux=fmod(PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
+	PRUoffsetDriftErrorAbsAvgAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)+PRUoffsetDriftErrorAbsAvgAux;
 	switch (QuadEmitDetecSelecAux){// Update value	
 		case 1: {this->QPLAFutureTimePointOld1=this->QPLAFutureTimePoint;break;}
 		case 2: {this->QPLAFutureTimePointOld2=this->QPLAFutureTimePoint;break;}
@@ -592,19 +594,6 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		case 6: {this->QPLAFutureTimePointOld6=this->QPLAFutureTimePoint;break;}
 		case 7: {this->QPLAFutureTimePointOld7=this->QPLAFutureTimePoint;break;}
 		default: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint;break;}
-	}
-
-	if (abs(PRUoffsetDriftErrorAbsAvgAux)>PRUoffsetDriftErrorAbsAvgMax){
-		cout << "GPIO::PRUoffsetDriftErrorAbsAvgAux magnitude is too large: " << PRUoffsetDriftErrorAbsAvgAux << "Increase PRUoffsetDriftErrorAbsAvgMax. Wrapping PRUoffsetDriftErrorAbsAvgAux around PRUoffsetDriftErrorAbsAvgMax." << endl;
-		if (PRUoffsetDriftErrorAbsAvgAux<0.0){
-			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax-fmod(-PRUoffsetDriftErrorAbsAvgAux,PRUoffsetDriftErrorAbsAvgMax);
-		}
-		else{
-			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+fmod(PRUoffsetDriftErrorAbsAvgAux,PRUoffsetDriftErrorAbsAvgMax);
-		}
-	}
-	else{
-		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+PRUoffsetDriftErrorAbsAvgAux;
 	}
 	
 	pru0dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
@@ -718,7 +707,8 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		case 7: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld7;break;}
 		default: {break;}
 	}
-	ldTimePointClockTagPRUDiff=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
+	// The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of half the effective period due to interrupt alignment handling, the effective period, the time since last emission detection, then again MultFactorEffSynchPeriod*SynchTrigPeriod more or less
+	ldTimePointClockTagPRUDiff=static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
 		
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
@@ -742,6 +732,8 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	else{
 		PRUoffsetDriftErrorAbsAvgAux=fmod(PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
+	PRUoffsetDriftErrorAbsAvgAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)+PRUoffsetDriftErrorAbsAvgAux;
+	
 	switch (QuadEmitDetecSelecAux){// Update value	
 		case 1: {this->QPLAFutureTimePointOld1=this->QPLAFutureTimePoint;break;}
 		case 2: {this->QPLAFutureTimePointOld2=this->QPLAFutureTimePoint;break;}
@@ -751,18 +743,6 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		case 6: {this->QPLAFutureTimePointOld6=this->QPLAFutureTimePoint;break;}
 		case 7: {this->QPLAFutureTimePointOld7=this->QPLAFutureTimePoint;break;}
 		default: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint;break;}
-	}
-	if (abs(PRUoffsetDriftErrorAbsAvgAux)>PRUoffsetDriftErrorAbsAvgMax){
-		cout << "GPIO::PRUoffsetDriftErrorAbsAvgAux magnitude is too large: " << PRUoffsetDriftErrorAbsAvgAux << "Increase PRUoffsetDriftErrorAbsAvgMax. Wrapping PRUoffsetDriftErrorAbsAvgAux around PRUoffsetDriftErrorAbsAvgMax." << endl;
-		if (PRUoffsetDriftErrorAbsAvgAux<0.0){
-			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax-fmod(-PRUoffsetDriftErrorAbsAvgAux,PRUoffsetDriftErrorAbsAvgMax);
-		}
-		else{
-			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+fmod(PRUoffsetDriftErrorAbsAvgAux,PRUoffsetDriftErrorAbsAvgMax);
-		}
-	}
-	else{
-		PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvgMax+PRUoffsetDriftErrorAbsAvgAux;
 	}
 
 	pru1dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
