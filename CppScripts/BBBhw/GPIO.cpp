@@ -322,6 +322,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				pru1dataMem_int[0]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
 				// There is a big variation if the waiting function to launch the measurement is not properly done (with the appropiate tools)
 				// sleep_for seems to operate more stable although it adds a long overhead time, compared to while()
+				// sleep_for takes longer in average maybe because it has to re-load all the context and so forth after each sleep...
 				std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future-Clock::now()));//while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);//{//;// Busy waiting
 				//	// Yield the CPU to other threads
         		//	std::this_thread::yield();
@@ -416,7 +417,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				// Absolute corrected error
 				this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
 				this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,ExtraNumSynchMeasAvgAux);// Since we are applying a filter of length NumSynchMeasAvgAux, temporally it effects somehow the longer the filter. Altough it is difficult to correct
-								
+					
 				if (this->iIterPRUcurrentTimerValPassLong>DistTimePRU1synchPeriod){// Long range measurements to retrieve relative frequency differences
 					// Computations for Synch calculation for PRU0 compensation
 					// Compute Synch - Relative
@@ -430,12 +431,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//this->PRUoffsetDriftError=(-fmod((static_cast<double>(this->iIterPRUcurrentTimerValPassLong*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerValLong-this->PRUcurrentTimerValOldWrapLong))/static_cast<long double>(TimePRU1synchPeriod); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions
 					
 					// Compute error - Relative correction of the frequency difference of the absolute time. This provides like the stability of the hardware clock referenced to the system clock (disciplined with network protocol)...so in the order of 10^-7
-					this->PRUoffsetDriftError=(this->PRUoffsetDriftErrorAbsAvgOld-this->PRUoffsetDriftErrorAbsAvg)/static_cast<double>(this->iIterPRUcurrentTimerValPassLong*TimePRU1synchPeriod);
+					this->PRUoffsetDriftError=static_cast<long double>(this->PRUoffsetDriftErrorAbsAvgOld-this->PRUoffsetDriftErrorAbsAvg)/static_cast<long double>(this->iIterPRUcurrentTimerValPassLong*TimePRU1synchPeriod);
 					this->PRUoffsetDriftErrorAbsAvgOld=this->PRUoffsetDriftErrorAbsAvg;// Update value
 
 					// Relative error average
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLong%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
-					this->PRUoffsetDriftErrorAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
+					this->PRUoffsetDriftErrorAvg=LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
 
 					// Update values
 					this->PRUcurrentTimerValOldWrapLong=this->PRUcurrentTimerValWrap;// Update value
@@ -800,11 +801,11 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
 	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
 	
-	if (SynchCorrectionTimeFreqNoneFlag==0 or SynchCorrectionTimeFreqNoneFlag==2){ // It has to be a much finer control at PRU level (and also this level) in order to be able to compensate for the very low hardware wandering/drift.
-		ContCorr=0;//InstantCorr;
-	}
-	else{
+	if (SynchCorrectionTimeFreqNoneFlag==1 or SynchCorrectionTimeFreqNoneFlag==3){ // It has to be a much finer control at PRU level (and also this level) in order to be able to compensate for the very low hardware wandering/drift.
 		ContCorr=0;//static_cast<long long int>(static_cast<long double>(SynchTrigPeriod)*static_cast<long double>(PRUoffsetDriftErrorAvg))+InstantCorr;
+	}
+	else{// Do not apply relative frequency correction in the PRU script
+		ContCorr=0;
 	}
 
 	if (ContCorr>0){SignAuxInstantCorr=1;}
@@ -1284,6 +1285,24 @@ int GPIO::IntBubbleSort(int* arr,int MedianFilterFactor) {
     return 0; // All ok
 }
 
+long double GPIO::LongDoubleMedianFilterSubArray(long double* ArrayHolderAux,int MedianFilterFactor){
+	if (MedianFilterFactor<=1){
+		return ArrayHolderAux[0];
+	}
+	else{
+		// Step 1: Copy the array to a temporary array
+		long double temp[MedianFilterFactor]={0.0};
+		for(int i = 0; i < MedianFilterFactor; i++) {
+			temp[i] = ArrayHolderAux[i];
+		}
+		
+    	// Step 2: Sort the temporary array
+		this->LongDoubleBubbleSort(temp,MedianFilterFactor);
+    	// If odd, middle number
+		return temp[MedianFilterFactor/2];
+	}
+}
+
 double GPIO::DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor){
 	if (MedianFilterFactor<=1){
 		return ArrayHolderAux[0];
@@ -1300,6 +1319,22 @@ double GPIO::DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterF
     // If odd, middle number
 		return temp[MedianFilterFactor/2];
 	}
+}
+
+// Function to implement Bubble Sort
+int GPIO::LongDoubleBubbleSort(long double* arr,int MedianFilterFactor) {
+	long double temp=0.0;
+	for (int i = 0; i < MedianFilterFactor-1; i++) {
+		for (int j = 0; j < MedianFilterFactor-i-1; j++) {
+			if (arr[j] > arr[j+1]) {
+                // Swap arr[j] and arr[j+1]
+				temp = arr[j];
+				arr[j] = arr[j+1];
+				arr[j+1] = temp;
+			}
+		}
+	}
+    return 0; // All ok
 }
 
 // Function to implement Bubble Sort

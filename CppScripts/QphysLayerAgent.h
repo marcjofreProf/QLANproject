@@ -24,7 +24,7 @@ Header declaration file for Quantum physical Layer Agent
 #define MaxNumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 #define NumQubitsMemoryBuffer 1*MaxNumQuBitsPerRun// In multiples of NumQuBitsPerRun (e.g., 1964, 3928, ...). Maximum buffer size
 // Synchronization
-#define NumCalcCenterMass 3 // 1 // Number of centers of mass to measure to compute the synchronization
+#define NumCalcCenterMass 1 // 1 // 3 // Number of centers of mass to measure to compute the synchronization. // With 3, it also computes hardware calibration of the detunnings
 #define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
 // String operations
@@ -124,7 +124,7 @@ private: //Variables/Instances
 	double SynchHistCenterMassArray[NumCalcCenterMass]={0.0}; // Array containing the needed center of mass for the histograms of the synchronization
 	double SynchCalcValuesArray[3]={0.0,0.0,0.0}; // Computed values for achieving synchronization protocol
 	double SynchAdjRelFreqCalcValuesArray[2*((1LL<<LinkNumberMAX)-1)][3]={1.0}; // Computed hardware values for adjusting the application of the computed rel.freq. correction. The order is, 0 index is 0 rel. freq. correction (so 1.0), adjustment value for negative correction for index 1 and adjustment value for positive correction for index 2.
-	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0,-0.25,0.25}; // Updated from QPTLH agent. Normalized values of frequency testing which are applied for calibration
+	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0};//,-0.25,0.25}; // Updated from QPTLH agent. Normalized values of frequency testing which are applied for calibration
 	double SynchNetAdj[2*((1LL<<LinkNumberMAX)-1)]={1.0};
 	double SynchNetworkParamsLink[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send. Zerod at the begining
 	double SynchNetworkParamsLinkOther[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send from the other nodes. Zeroed at the begining

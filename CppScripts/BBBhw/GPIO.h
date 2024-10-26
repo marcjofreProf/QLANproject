@@ -64,9 +64,9 @@ private:// Variables
 	double PRUoffsetDriftErrorAbsAvgAux=0.0;
 	//bool IEPtimerPRUreset=false;	
 	// Relative error
-	double PRUoffsetDriftError=0;
-	double PRUoffsetDriftErrorArray[MaxNumPulses]={0};
-	double PRUoffsetDriftErrorAvg=0.0;
+	long double PRUoffsetDriftError=0;
+	long double PRUoffsetDriftErrorArray[MaxNumPulses]={0};
+	long double PRUoffsetDriftErrorAvg=0.0;
 	// Absolute corrected error
 	double PRUoffsetDriftErrorAbs=0;
 	double PRUoffsetDriftErrorAbsArray[MaxNumPulses]={0};
@@ -337,9 +337,11 @@ private: // Functions/Methods
 	friend void* threadedPoll(void *value);
 	friend void* threadedToggle(void *value);
 	// Median filter
+	long double LongDoubleMedianFilterSubArray(long double* ArrayHolderAux,int MedianFilterFactor);
 	double DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor);
 	int IntMedianFilterSubArray(int* ArrayHolderAux,int MedianFilterFactor);
 	double DoubleMeanFilterSubArray(double* ArrayHolderAux,int MeanFilterFactor);
+	int LongDoubleBubbleSort(long double* arr,int MedianFilterFactor);
 	int DoubleBubbleSort(double* arr,int MedianFilterFactor);
 	int IntBubbleSort(int* arr,int MedianFilterFactor);
 };
