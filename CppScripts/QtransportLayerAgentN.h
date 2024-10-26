@@ -108,7 +108,7 @@ private: // Variables/Objects
 	double QLLAFineSynchAdjVal[2]={0};// Adjust synch trig offset and frequency
 	// Synchronization test frequencies and others
 	int QLLANumRunsPerCenterMass=0;
-	double QLLAFreqSynchNormValuesArray[NumCalcCenterMass]={0.0};//,0.35,0.70}; // Normalized values of frequency testing// Relative frequency difference normalized
+	double QLLAFreqSynchNormValuesArray[NumCalcCenterMass]={0.0};//,-0.25,0.25}; // Normalized values of frequency testing// Relative frequency difference normalized
 	bool GPIOnodeHardwareSynched=false;// Indicates if the node is hardware PRU synchronized.
 	unsigned long long int iIterPeriodicTimerVal=0; // Variable to keep track of number of passes thorugh periodic checks
 	unsigned long long int MaxiIterPeriodicTimerVal=2000; // Max number of passes so that it enters the periodic checks
