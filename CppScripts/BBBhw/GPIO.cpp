@@ -560,15 +560,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		default: {break;}
 	}
 	ldTimePointClockTagPRUDiff=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
-	LLITimePointPRUDiffSystemRelFreq=static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count());
-	long long int WrapLLITimePointPRUDiffSystemRelFreq=static_cast<long long int>(static_cast<long double>(LLITimePointPRUDiffSystemRelFreq)*static_cast<long double>(PRUoffsetDriftErrorAvg));
-	if (WrapLLITimePointPRUDiffSystemRelFreq<0){
-		WrapLLITimePointPRUDiffSystemRelFreq=-(-WrapLLITimePointPRUDiffSystemRelFreq%static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod));
-	}
-	else{
-		WrapLLITimePointPRUDiffSystemRelFreq=(WrapLLITimePointPRUDiffSystemRelFreq%static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod));
-	}
-	QPLAFutureTimePointBusyWaitInterrupt=QPLAFutureTimePoint+std::chrono::nanoseconds(WrapLLITimePointPRUDiffSystemRelFreq);
+		
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
 			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
@@ -648,7 +640,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	pru0dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command
 	//QPLAFutureTimePoint=QPLAFutureTimePoint-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);// Actually, the time measured duration_FinalInitialMeasTrigAuxAvg is not indicative of much (only if it changes a lot to high values it means trouble)
 	
-	while (Clock::now()<QPLAFutureTimePointBusyWaitInterrupt);// Busy wait time synch sending signals
+	while (Clock::now()<QPLAFutureTimePoint);// Busy wait time synch sending signals. With while loop, it is more aggresive to take control (hence fall within the correct interrupt period) but has more variation (but it does not matter since there will be the proceedure to synch in the PRU)
 	prussdrv_pru_send_event(21);
 	//this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 	//retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);// First interrupt sent to measure time
@@ -727,15 +719,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		default: {break;}
 	}
 	ldTimePointClockTagPRUDiff=static_cast<long double>(PRUoffsetDriftErrorAbsAvgMax)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
-	LLITimePointPRUDiffSystemRelFreq=static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count());
-	long long int WrapLLITimePointPRUDiffSystemRelFreq=static_cast<long long int>(static_cast<long double>(LLITimePointPRUDiffSystemRelFreq)*static_cast<long double>(PRUoffsetDriftErrorAvg));
-	if (WrapLLITimePointPRUDiffSystemRelFreq<0){
-		WrapLLITimePointPRUDiffSystemRelFreq=-(-WrapLLITimePointPRUDiffSystemRelFreq%static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod));
-	}
-	else{
-		WrapLLITimePointPRUDiffSystemRelFreq=(WrapLLITimePointPRUDiffSystemRelFreq%static_cast<long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod));
-	}
-	QPLAFutureTimePointBusyWaitInterrupt=QPLAFutureTimePoint+std::chrono::nanoseconds(WrapLLITimePointPRUDiffSystemRelFreq);
+		
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
 			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
@@ -830,7 +814,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//this->QPLAFutureTimePoint=this->QPLAFutureTimePoint-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg); // Actually, the time measured duration_FinalInitialMeasTrigAuxAvg is not indicative of much (only if it changes a lot to high values it means trouble)
 
 	////if (Clock::now()<this->QPLAFutureTimePoint){cout << "Check that we have enough time" << endl;}
-	while (Clock::now()<this->QPLAFutureTimePointBusyWaitInterrupt);// Busy wait time synch sending signals
+	while (Clock::now()<this->QPLAFutureTimePoint);// Busy wait time synch sending signals. With while loop, it is more aggresive to take control (hence fall within the correct interrupt period) but has more variation (but it does not matter since there will be the proceedure to synch in the PRU)
 	// Important, the following line at the very beggining to reduce the command jitter
 	prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 	//this->TimePointClockSynchPRUfinal=Clock::now();

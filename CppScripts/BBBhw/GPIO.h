@@ -127,11 +127,10 @@ private:// Variables
 	TimePoint TimePointClockSynchPRUfinal=std::chrono::time_point<Clock>();// For absolute drift purposes
 	//TimePoint TimePointClockTagPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
 	long double ldTimePointClockTagPRUDiff=0.0;
-	long long int LLITimePointPRUDiffSystemRelFreq=0;
 	long double ldTimePointClockTagPRUinitial=0.0;
 	//TimePoint TimePointClockTagPRUfinal=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint QPLAFutureTimePoint=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
-	TimePoint QPLAFutureTimePointBusyWaitInterrupt=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
+	//TimePoint QPLAFutureTimePointBusyWaitInterrupt=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
 	TimePoint QPLAFutureTimePointOld=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
 	TimePoint QPLAFutureTimePointOld1=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
 	TimePoint QPLAFutureTimePointOld2=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
