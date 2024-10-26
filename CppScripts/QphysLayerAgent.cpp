@@ -1591,11 +1591,12 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 			SynchTimeTaggRefMedianArrayAuxAux[i]=SynchTimeTaggRef[0][i+1]-SynchTimeTaggRef[0][i];
 		}
 		SynchTimeTaggRefMedianArrayAux[0]=LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
+		long long int SynchTimeTaggRefMedianArrayAuxAuxAux=SynchTimeTaggRefMedianArrayAux[0];// In PRU units of time
 		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAux[0])*(5e-9);// Conversion to seconds from PRU clock tick
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//Period adjustment
 		
-		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/static_cast<double>(SynchTimeTaggRefMedianAux);// Relative frequency difference
-		
+		SynchCalcValuesArray[2]=(SynchHistCenterMassArray[0]-FreqSynchNormValuesArray[0]*SynchCalcValuesArray[0])/static_cast<double>(SynchTimeTaggRefMedianArrayAuxAuxAux);// Relative frequency difference
+
 		// Hardware rel. freq. diff. adjustment can not be computed with only one frequency testing, so setting them to 1.0
 		SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][0]=1.0;// For 0 rel. freq. diff. the correction is 1.0
 		SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][1]=1.0;// For negative rel. freq. diff. the correction is 1.0
