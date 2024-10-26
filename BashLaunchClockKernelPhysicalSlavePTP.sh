@@ -28,7 +28,7 @@ is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 # Nicenest value [-20, 20]
 NicenestPriorValue=-10 # The smaller, the better
 PriorityValue=80 # The larger, the better. Above 60 is well enough
-PriorityNoSoHighValue=75 # The larger, the better.
+PriorityNoSoHighValue=20 # The larger, the better.
 
 # Check if adjtimex is installed using dpkg
 if dpkg -l | grep -q adjtimex; then
@@ -227,12 +227,12 @@ if [[ $is_rt_kernel -eq 1 ]]; then
   sudo chrt -f -p $PriorityValue $pidAux
   pidAux=$(pgrep -f "irq/66-pruss_ev")
   sudo chrt -f -p $PriorityValue $pidAux
-  pidAux=$(pgrep -f "irq/41-4a100000")
-  sudo chrt -f -p $PriorityValue $pidAux
-  pidAux=$(pgrep -f "irq/42-4a100000")
-  sudo chrt -f -p $PriorityValue $pidAux
-  pidAux=$(pgrep -f "irq/43-4a100000")
-  sudo chrt -f -p $PriorityValue $pidAux
+  #pidAux=$(pgrep -f "irq/41-4a100000")
+  #sudo chrt -f -p $PriorityValue $pidAux
+  #pidAux=$(pgrep -f "irq/42-4a100000")
+  #sudo chrt -f -p $PriorityValue $pidAux
+  #pidAux=$(pgrep -f "irq/43-4a100000")
+  #sudo chrt -f -p $PriorityValue $pidAux
 fi
 
 pidAux=$(pgrep -f "BBBclockKernelPhysicalDaemon")
