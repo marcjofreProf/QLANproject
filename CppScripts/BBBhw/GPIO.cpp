@@ -480,12 +480,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(2*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
 			////cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			////cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
-			cout << "PRUoffsetDriftErrorAvg (rel. freq. diff. to abs. time - unit conversion drift): " << this->PRUoffsetDriftErrorAvg*1000000000 << " ppb" << endl;
-			cout << "PRUoffsetDriftErrorAbsAvg (abs. time diff. - unit conversion drift): " << PRUoffsetDriftErrorAbsAvg << " PRU units" << endl;
-			cout << "duration_FinalInitialCountAuxArrayAvg (time to handle interrupt): " << this->duration_FinalInitialCountAuxArrayAvg << " ns" << endl;
+			cout << "Rel. freq. diff. to abs. time - unit conversion drift: " << this->PRUoffsetDriftErrorAvg*1000000000 << " ppb" << endl;
+			cout << "Abs. time diff. - unit conversion drift: " << PRUoffsetDriftErrorAbsAvg << " PRU units" << endl;
+			cout << "Time to handle interrupt: " << this->duration_FinalInitialCountAuxArrayAvg << " ns" << endl;
 			////cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
 			////cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
-			cout << "EstimateSynchAvg (ratio rel. freq. diff): " << this->EstimateSynchAvg << endl;
+			cout << "Ratio rel. freq. diff: " << this->EstimateSynchAvg << endl;
 			////cout << "EstimateSynchDirectionAvg: " << this->EstimateSynchDirectionAvg << endl;
 			//if (this->EstimateSynchDirectionAvg<1.0){cout << "Clock EstimateSynch advancing" << endl;}
 			//else if (this->EstimateSynchDirectionAvg>1.0){cout << "Clock EstimateSynch delaying" << endl;}
@@ -560,7 +560,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		default: {break;}
 	}
 	// The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of half the effective period due to interrupt alignment handling, the effective period, the time since last emission detection, then again MultFactorEffSynchPeriod*SynchTrigPeriod more or less
-	ldTimePointClockTagPRUDiff=static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
+	ldTimePointClockTagPRUDiff=static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+0.0*static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
 		
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
@@ -597,6 +597,27 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	}
 	
 	pru0dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Now, The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of the effective period, and the period
+	ldTimePointClockTagPRUDiff=static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(SynchTrigPeriod);// update value		
+		
+	switch (SynchCorrectionTimeFreqNoneFlag){
+		case 3:{// Time and frequency correction			
+			AccumulatedErrorDriftAux=AccumulatedErrorDriftAux+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			break;
+		}
+		case 2:{// Time correction
+			AccumulatedErrorDriftAux=AccumulatedErrorDriftAux;
+			ldTimePointClockTagPRUDiff=0;	
+			break;
+		}
+		case 1:{ // Frequency correction
+			AccumulatedErrorDriftAux=static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			break;
+		}
+		default:{AccumulatedErrorDriftAux=0;ldTimePointClockTagPRUDiff=0;break;}// None time nor frequency correction
+	}
+
 	// The synch offset
 	if (this->AccumulatedErrorDriftAux<0.0){
 		AccumulatedErrorDriftAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)-fmod(-this->AccumulatedErrorDriftAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
@@ -708,7 +729,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		default: {break;}
 	}
 	// The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of half the effective period due to interrupt alignment handling, the effective period, the time since last emission detection, then again MultFactorEffSynchPeriod*SynchTrigPeriod more or less
-	ldTimePointClockTagPRUDiff=static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
+	ldTimePointClockTagPRUDiff=static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+0.0*static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
 		
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
@@ -733,7 +754,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		PRUoffsetDriftErrorAbsAvgAux=fmod(PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
 	PRUoffsetDriftErrorAbsAvgAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)+PRUoffsetDriftErrorAbsAvgAux;
-	
+
 	switch (QuadEmitDetecSelecAux){// Update value	
 		case 1: {this->QPLAFutureTimePointOld1=this->QPLAFutureTimePoint;break;}
 		case 2: {this->QPLAFutureTimePointOld2=this->QPLAFutureTimePoint;break;}
@@ -746,8 +767,28 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	}
 
 	pru1dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
-
+	////////////////////////////////////////////////////////////////////////////////////////////
 	// The synch offset
+	// Now, The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of the effective period, and the period
+	ldTimePointClockTagPRUDiff=static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(SynchTrigPeriod);// update value		
+		
+	switch (SynchCorrectionTimeFreqNoneFlag){
+		case 3:{// Time and frequency correction			
+			AccumulatedErrorDriftAux=AccumulatedErrorDriftAux+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			break;
+		}
+		case 2:{// Time correction
+			AccumulatedErrorDriftAux=AccumulatedErrorDriftAux;
+			ldTimePointClockTagPRUDiff=0;	
+			break;
+		}
+		case 1:{ // Frequency correction
+			AccumulatedErrorDriftAux=static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			break;
+		}
+		default:{AccumulatedErrorDriftAux=0;ldTimePointClockTagPRUDiff=0;break;}// None time nor frequency correction
+	}
+
 	if (this->AccumulatedErrorDriftAux<0.0){
 		AccumulatedErrorDriftAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)-fmod(-this->AccumulatedErrorDriftAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
 	}
