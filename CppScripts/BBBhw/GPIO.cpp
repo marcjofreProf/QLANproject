@@ -437,23 +437,24 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLong%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					//this->PRUoffsetDriftErrorAvg=LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
 
-					if ((iIterPRUcurrentTimerValSynchLong%static_cast<unsigned long long int>(NumSynchMeasAvgAux/2)==0 and CountPRUcurrentTimerValSynchLong!=0){
-						this->PRUoffsetDriftError=static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg-this->PRUoffsetDriftErrorAbsAvgOld)/static_cast<long double>(this->CountPRUcurrentTimerValSynchLong*TimePRU1synchPeriod);
-						this->PRUoffsetDriftErrorAbsAvgOld=this->PRUoffsetDriftErrorAbsAvg;// Update value
-						//// Relative error average
-						this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLongExtra%ExtraExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError;
-						this->PRUoffsetDriftErrorAvg=LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraExtraNumSynchMeasAvgAux);
-						CountPRUcurrentTimerValSynchLong=0;// Update value
-						iIterPRUcurrentTimerValSynchLongExtra++;// Update value
-					}
-					else{
-						CountPRUcurrentTimerValSynchLong+=iIterPRUcurrentTimerValPassLong;
-					}
-
 					// Update values
 					this->PRUcurrentTimerValOldWrapLong=this->PRUcurrentTimerValWrap;// Update value
 					this->iIterPRUcurrentTimerValPassLong=0; // Reset value
 					this->iIterPRUcurrentTimerValSynchLong++; // Update value
+				}
+
+				//// Compute error - Relative correction of the frequency difference of the absolute time. This provides like the stability of the hardware clock referenced to the system clock (disciplined with network protocol)...so in the order of ppb
+				if ((iIterPRUcurrentTimerValSynch%static_cast<unsigned long long int>(2*NumSynchMeasAvgAux/ExtraExtraNumSynchMeasAvgAux))==0 and CountPRUcurrentTimerValSynchLong!=0){
+					this->PRUoffsetDriftError=static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg-this->PRUoffsetDriftErrorAbsAvgOld)/static_cast<long double>(this->CountPRUcurrentTimerValSynchLong*TimePRU1synchPeriod);
+					this->PRUoffsetDriftErrorAbsAvgOld=this->PRUoffsetDriftErrorAbsAvg;// Update value
+					//// Relative error average
+					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLongExtra%ExtraExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError;
+					this->PRUoffsetDriftErrorAvg=LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraExtraNumSynchMeasAvgAux);
+					CountPRUcurrentTimerValSynchLong=0;// Update value
+					iIterPRUcurrentTimerValSynchLongExtra++;// Update value
+				}
+				else{
+					CountPRUcurrentTimerValSynchLong+=iIterPRUcurrentTimerValPassLong;
 				}
 
 				// Warm up interrupt handling for Timetagg PRU0
