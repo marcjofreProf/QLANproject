@@ -493,7 +493,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 			////cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			////cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "GPIO::Information about synchronization:" << endl;
-			cout << "GPIO::Rel. freq. diff. to abs. time - unit conversion drift: " << this->PRUoffsetDriftErrorAvg*1000000000000 << " ppb" << endl;
+			cout << "GPIO::Rel. freq. diff. to abs. time - unit conversion drift: " << this->PRUoffsetDriftErrorAvg*1000000000 << " ppb" << endl;
 			cout << "GPIO::Abs. time diff. - unit conversion drift: " << PRUoffsetDriftErrorAbsAvg << " PRU units" << endl;
 			cout << "GPIO::Time to handle interrupt: " << this->duration_FinalInitialCountAuxArrayAvg << " ns" << endl;
 			////cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
