@@ -437,7 +437,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLong%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					//this->PRUoffsetDriftErrorAvg=LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
 
-					if ((iIterPRUcurrentTimerValSynchLong%NumSynchMeasAvgAux)==0 and CountPRUcurrentTimerValSynchLong!=0){
+					if ((iIterPRUcurrentTimerValSynchLong%static_cast<unsigned long long int>(NumSynchMeasAvgAux/2)==0 and CountPRUcurrentTimerValSynchLong!=0){
 						this->PRUoffsetDriftError=static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg-this->PRUoffsetDriftErrorAbsAvgOld)/static_cast<long double>(this->CountPRUcurrentTimerValSynchLong*TimePRU1synchPeriod);
 						this->PRUoffsetDriftErrorAbsAvgOld=this->PRUoffsetDriftErrorAbsAvg;// Update value
 						//// Relative error average
