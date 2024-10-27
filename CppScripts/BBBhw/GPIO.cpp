@@ -447,6 +447,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				if ((iIterPRUcurrentTimerValSynch%static_cast<unsigned long long int>(2*DistTimePRU1synchPeriod*NumSynchMeasAvgAux/ExtraExtraNumSynchMeasAvgAux))==0 and CountPRUcurrentTimerValSynchLong!=0){
 					this->PRUoffsetDriftError=static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg-this->PRUoffsetDriftErrorAbsAvgOld)/static_cast<long double>(this->CountPRUcurrentTimerValSynchLong*TimePRU1synchPeriod);
 					this->PRUoffsetDriftErrorAbsAvgOld=this->PRUoffsetDriftErrorAbsAvg;// Update value
+
+					
 					//// Relative error average
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLongExtra%ExtraExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					this->PRUoffsetDriftErrorAvg=LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraExtraNumSynchMeasAvgAux);
@@ -454,7 +456,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					iIterPRUcurrentTimerValSynchLongExtra++;// Update value
 				}
 				else{
-					CountPRUcurrentTimerValSynchLong+=iIterPRUcurrentTimerValPassLong;
+					CountPRUcurrentTimerValSynchLong+=iIterPRUcurrentTimerValPass;
 				}
 
 				// Warm up interrupt handling for Timetagg PRU0
