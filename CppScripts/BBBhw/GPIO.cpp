@@ -445,10 +445,23 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 
 				//// Compute error - Relative correction of the frequency difference of the absolute time. This provides like the stability of the hardware clock referenced to the system clock (disciplined with network protocol)...so in the order of ppb
 				if ((iIterPRUcurrentTimerValSynch%static_cast<unsigned long long int>(2*DistTimePRU1synchPeriod*NumSynchMeasAvgAux/ExtraExtraNumSynchMeasAvgAux))==0 and CountPRUcurrentTimerValSynchLong!=0){
-					this->PRUoffsetDriftError=static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg-this->PRUoffsetDriftErrorAbsAvgOld)/static_cast<long double>(this->CountPRUcurrentTimerValSynchLong*TimePRU1synchPeriod);
+					this->PRUoffsetDriftError=static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg-this->PRUoffsetDriftErrorAbsAvgOld);
 					this->PRUoffsetDriftErrorAbsAvgOld=this->PRUoffsetDriftErrorAbsAvg;// Update value
 
-					
+					// Below unwrap the difference
+					if (this->PRUoffsetDriftError>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
+						this->PRUoffsetDriftError=static_cast<long double>(iepPRUtimerRange32bits)-this->PRUoffsetDriftError+1;
+					}	
+					else if(this->PRUoffsetDriftError<(-static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
+						this->PRUoffsetDriftError=-static_cast<long double>(iepPRUtimerRange32bits)-this->PRUoffsetDriftError-1;
+					}
+					if (this->PRUoffsetDriftError<0.0){
+						this->PRUoffsetDriftError=static_cast<double>(-fmodl(-this->PRUoffsetDriftError,static_cast<long double>(iepPRUtimerRange32bits)));
+					}
+					else{
+						this->PRUoffsetDriftError=static_cast<double>(fmodl(this->PRUoffsetDriftError,static_cast<long double>(iepPRUtimerRange32bits)));
+					}
+					this->PRUoffsetDriftError=this->PRUoffsetDriftError/static_cast<long double>(this->CountPRUcurrentTimerValSynchLong*TimePRU1synchPeriod);// Normalize to the measurement time
 					//// Relative error average
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLongExtra%ExtraExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					this->PRUoffsetDriftErrorAvg=LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraExtraNumSynchMeasAvgAux);
