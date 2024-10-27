@@ -86,6 +86,7 @@ private:// Variables
 	unsigned long long int iIterPRUcurrentTimerVal=0;
 	unsigned long long int iIterPRUcurrentTimerValSynch=0;// Account for rounds entered
 	unsigned long long int iIterPRUcurrentTimerValSynchLong=0;// Account for long rounds entered
+	unsigned long long int CountPRUcurrentTimerValSynchLong=0;// Account for long 
 	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has not entered
 	unsigned long long int iIterPRUcurrentTimerValPassLong=1;// Account for rounds that has not entered
 	double EstimateSynch=1.0;
