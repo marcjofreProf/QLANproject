@@ -28,9 +28,12 @@ using std::fstream;
 #define MaxNumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 #define MaxNumQuBitsMemStored 1*MaxNumQuBitsPerRun // Maximum size of the array for memory storing qubits (timetaggs and channels)
 #define MaxNumPulses	8192	// Used in the averaging of time synchronization arrays
-#define PRUclockStepPeriodNanoseconds		5.00000//4.99999 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
+#define PRUclockStepPeriodNanoseconds		5.00000 //4.99999 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
 #define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
+#define NumSynchMeasAvgAux 	351 //51; // Num averages to compute the relative frequency difference. Better to be odd number.
+#define ExtraNumSynchMeasAvgAux 	301 // Averaging for computing current absolute time offset
+#define ExtraExtraNumSynchMeasAvgAux 	1 // Averaging for computing current relative frequency diference
 
 namespace exploringBB {
 
@@ -56,8 +59,6 @@ private:// Variables
 	long long int LostCounts=4; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
 	int ApproxInterruptTime=100000; // Typical time of interrupt time duration is 5000 with simple busy wait; around 8000 with busy wait with yield; 100000 with sleep_for()
 	// To many hundreds of measurements might consume oall the CPU of the board (because median is very resource consuming).Otherwise a better algorithm (median) has to be used.
-	int NumSynchMeasAvgAux=351;//51; // Num averages to compute the relative frequency difference. Better to be odd number.
-	int ExtraNumSynchMeasAvgAux=301; // Averaging for computing current absolute time offset
 	unsigned int NextSynchPRUcommand=11;// set initially to NextSynchPRUcorrection=0
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
 	//unsigned int OffsetSynchPRUBaseCorrection=262144;// Base value from where the synch offset is added or discounted to achieve periodic offset correction
@@ -65,11 +66,11 @@ private:// Variables
 	//bool IEPtimerPRUreset=false;	
 	// Relative error
 	long double PRUoffsetDriftError=0;
-	long double PRUoffsetDriftErrorArray[MaxNumPulses]={0};
+	long double PRUoffsetDriftErrorArray[ExtraExtraNumSynchMeasAvgAux]={0};
 	long double PRUoffsetDriftErrorAvg=0.0;
 	// Absolute corrected error
 	double PRUoffsetDriftErrorAbs=0;
-	double PRUoffsetDriftErrorAbsArray[MaxNumPulses]={0};
+	double PRUoffsetDriftErrorAbsArray[ExtraNumSynchMeasAvgAux]={0};
 	double PRUoffsetDriftErrorAbsAvg=0.0;
 	double PRUoffsetDriftErrorAbsAvgOld=0.0;
 	// Others
@@ -86,12 +87,13 @@ private:// Variables
 	unsigned long long int iIterPRUcurrentTimerVal=0;
 	unsigned long long int iIterPRUcurrentTimerValSynch=0;// Account for rounds entered
 	unsigned long long int iIterPRUcurrentTimerValSynchLong=0;// Account for long rounds entered
+	unsigned long long int iIterPRUcurrentTimerValSynchLongExtra=0;
 	unsigned long long int CountPRUcurrentTimerValSynchLong=0;// Account for long 
 	unsigned long long int iIterPRUcurrentTimerValPass=1;// Account for rounds that has not entered
 	unsigned long long int iIterPRUcurrentTimerValPassLong=1;// Account for rounds that has not entered
 	double EstimateSynch=1.0;
 	double EstimateSynchAvg=1.0;
-	double EstimateSynchArray[MaxNumPulses]={EstimateSynch};// They are not all set to the value, only the first one (a function in the declarator should be used to fill them in.
+	double EstimateSynchArray[NumSynchMeasAvgAux]={EstimateSynch};// They are not all set to the value, only the first one (a function in the declarator should be used to fill them in.
 	// Time/synchronization management
 	struct my_clock
 	{

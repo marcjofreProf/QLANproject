@@ -441,9 +441,10 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 						this->PRUoffsetDriftError=static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg-this->PRUoffsetDriftErrorAbsAvgOld)/static_cast<long double>(this->CountPRUcurrentTimerValSynchLong*TimePRU1synchPeriod);
 						this->PRUoffsetDriftErrorAbsAvgOld=this->PRUoffsetDriftErrorAbsAvg;// Update value
 						//// Relative error average
-						//this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLong%NumSynchMeasAvgAux]=this->PRUoffsetDriftError;
-						this->PRUoffsetDriftErrorAvg=this->PRUoffsetDriftError;//LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,NumSynchMeasAvgAux);
+						this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLongExtra%ExtraExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError;
+						this->PRUoffsetDriftErrorAvg=LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraExtraNumSynchMeasAvgAux);
 						CountPRUcurrentTimerValSynchLong=0;// Update value
+						iIterPRUcurrentTimerValSynchLongExtra++;// Update value
 					}
 					else{
 						CountPRUcurrentTimerValSynchLong+=iIterPRUcurrentTimerValPassLong;
@@ -510,7 +511,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		this->iIterPRUcurrentTimerVal++; // Increase value
 		this->iIterPRUcurrentTimerValPass++; // Increase value
 		this->iIterPRUcurrentTimerValPassLong++; // Increase value
-		if (this->iIterPRUcurrentTimerValSynchLong==(2*this->NumSynchMeasAvgAux) and HardwareSynchStatus==false){
+		if (this->iIterPRUcurrentTimerValSynchLong==(2*NumSynchMeasAvgAux) and HardwareSynchStatus==false){
 			cout << "Hardware synchronized, now proceeding with the network synchronization managed by hosts..." << endl;
 			// Update HardwareSynchStatus			
 			this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
