@@ -21,10 +21,11 @@ sys.path.append(pathScriptBelowAgentScript)
 
 import QtransportLayerAgent
 
-sTimeOutRequestQSLA=300.0 # Time to wait (in seconds) to proceed with a request before doing something
+sTimeOutRequestQSLA=600.0 # Time to wait (in seconds) to proceed with a request before doing something
 
 class QSLA:
-    def __init__(self,ParamsDescendingCharArrayInitAux,ParamsAscendingCharArrayInitAux): # Constructor of this class        
+    def __init__(self,ParamsDescendingCharArrayInitAux,ParamsAscendingCharArrayInitAux): # Constructor of this class
+            signal.signal(signal.SIGALRM, self.QSLA_timeout_handler)       
             # save the parameters of initialization
             self.ParamsDescendingCharArrayInit=ParamsDescendingCharArrayInitAux
             self.ParamsAscendingCharArrayInit=ParamsAscendingCharArrayInitAux
@@ -32,13 +33,13 @@ class QSLA:
             self.InitAgentBelow()
     
     ##############################################################
-    # Methods
-    def QSLA_timeout_handler(signum, frame):
-        raise TimeoutError("Execution timed out")
-    
+    # Methods    
     def InitAgentBelow(self,):
         self.QTLAagent = QtransportLayerAgent.QTLAH(0,self.ParamsDescendingCharArrayInit,self.ParamsAscendingCharArrayInit) # Create instance of the Agent below
     
+    def QSLA_timeout_handler(self, signum, frame):        
+        raise TimeoutError("QSLA::TimeOut")
+
     def ListCharArrayParser(self,ListCharArrayAux):
         # Actually concatenating a python list of strings to a single string
         ParsedCharArrayAux=",".join(ListCharArrayAux)+","
@@ -51,18 +52,19 @@ class QSLA:
     def SendMessageAgent(self,ParamsDescendingCharArray): # Send message to the below Agent
         self.QTLAagent.SendMessageAgent(ParamsDescendingCharArray)
     
-    def WaitUntilActiveActionFreePreLock(self,ParamsCharArrayArg,nChararray):
-        signal.signal(signal.SIGALRM, timeout_handler)
-        signal.alarm(sTimeOutRequestQSLA)  # Set the time out in seconds
+    def WaitUntilActiveActionFreePreLock(self,ParamsCharArrayArg,nChararray):        
+        signal.alarm(int(sTimeOutRequestQSLA))  # Set the time out in seconds        
         try: # Long-running operation
             self.QTLAagent.WaitUntilActiveActionFreePreLock(ParamsCharArrayArg,nChararray)
         except TimeoutError:
             print('QSLA::Execution time out. Restarting/Reconnecting QtransportLayerAgent agent.')
-            self.__del__() # destruct QtransportLayerAgent agent
+            del self.QTLAagent # destruct QtransportLayerAgent agent          
             # Restart/Reconnect QtransportLayerAgent agent
             self.InitAgentBelow()
             self.InitAgentProcess()
             self.QTLAagent.WaitUntilActiveActionFreePreLock(ParamsCharArrayArg,nChararray)
+        finally:
+            signal.alarm(0)  # Disable the alarm
 
     def UnBlockActiveActionFreePreLock(self,ParamsCharArrayArg,nChararray):
         self.QTLAagent.UnBlockActiveActionFreePreLock(ParamsCharArrayArg,nChararray)
