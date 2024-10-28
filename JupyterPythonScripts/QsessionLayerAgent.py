@@ -25,7 +25,6 @@ sTimeOutRequestQSLA=600.0 # Time to wait (in seconds) to proceed with a request 
 
 class QSLA:
     def __init__(self,ParamsDescendingCharArrayInitAux,ParamsAscendingCharArrayInitAux): # Constructor of this class
-            signal.signal(signal.SIGALRM, self.QSLA_timeout_handler)       
             # save the parameters of initialization
             self.ParamsDescendingCharArrayInit=ParamsDescendingCharArrayInitAux
             self.ParamsAscendingCharArrayInit=ParamsAscendingCharArrayInitAux
@@ -52,7 +51,8 @@ class QSLA:
     def SendMessageAgent(self,ParamsDescendingCharArray): # Send message to the below Agent
         self.QTLAagent.SendMessageAgent(ParamsDescendingCharArray)
     
-    def WaitUntilActiveActionFreePreLock(self,ParamsCharArrayArg,nChararray):        
+    def WaitUntilActiveActionFreePreLock(self,ParamsCharArrayArg,nChararray):
+        signal.signal(signal.SIGALRM, self.QSLA_timeout_handler)       
         signal.alarm(int(sTimeOutRequestQSLA))  # Set the time out in seconds        
         try: # Long-running operation
             self.QTLAagent.WaitUntilActiveActionFreePreLock(ParamsCharArrayArg,nChararray)
