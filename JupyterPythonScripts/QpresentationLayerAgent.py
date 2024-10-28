@@ -8,7 +8,11 @@
 #
 # Script Quantum LAN presentation layer
 #####################################################
-
+# Notes:
+# When using the Sublime Text editor, I was able to select the segment of my code that was giving me the inconsistent use of tabs and spaces in indentation error and select:
+#
+# Menu View → Indentation → convert indentation to spaces
+#####################################################
 import sys, os
 import time
 import numpy as np

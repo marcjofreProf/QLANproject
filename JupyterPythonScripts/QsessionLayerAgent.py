@@ -21,7 +21,7 @@ sys.path.append(pathScriptBelowAgentScript)
 
 import QtransportLayerAgent
 
-sTimeOutRequestQSLA=30.0 # Time to wait (in seconds) to proceed with a request before doing something
+sTimeOutRequestQSLA=300.0 # Time to wait (in seconds) to proceed with a request before doing something
 
 class QSLA:
     def __init__(self,ParamsDescendingCharArrayInitAux,ParamsAscendingCharArrayInitAux): # Constructor of this class        
@@ -53,7 +53,7 @@ class QSLA:
     
     def WaitUntilActiveActionFreePreLock(self,ParamsCharArrayArg,nChararray):
         signal.signal(signal.SIGALRM, timeout_handler)
-        signal.alarm(sTimeOutRequestQSLA)  # Set a 5-second timeout
+        signal.alarm(sTimeOutRequestQSLA)  # Set the time out in seconds
         try: # Long-running operation
             self.QTLAagent.WaitUntilActiveActionFreePreLock(ParamsCharArrayArg,nChararray)
         except TimeoutError:
