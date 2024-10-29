@@ -337,6 +337,8 @@ private: // Functions/Methods
 	//int unexportGPIO(); Not currently used - legacy
 	friend void* threadedPoll(void *value);
 	friend void* threadedToggle(void *value);
+	// Mean filter
+	long double LongDoubleMeanFilterSubArray(long double* ArrayHolderAux,int MeanFilterFactor);
 	// Median filter
 	long double LongDoubleMedianFilterSubArray(long double* ArrayHolderAux,int MedianFilterFactor);
 	double DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor);

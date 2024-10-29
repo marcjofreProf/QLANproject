@@ -464,7 +464,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->PRUoffsetDriftError=this->PRUoffsetDriftError/static_cast<long double>(this->CountPRUcurrentTimerValSynchLong*TimePRU1synchPeriod);// Normalize to the measurement time
 					//// Relative error average
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLongExtra%ExtraExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError;
-					this->PRUoffsetDriftErrorAvg=LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraExtraNumSynchMeasAvgAux);
+					this->PRUoffsetDriftErrorAvg=LongDoubleMeanFilterSubArray(PRUoffsetDriftErrorArray,ExtraExtraNumSynchMeasAvgAux);// Mean averaging
 					CountPRUcurrentTimerValSynchLong=0;// Update value
 					iIterPRUcurrentTimerValSynchLongExtra++;// Update value
 				}
@@ -1317,6 +1317,20 @@ int GPIO::IntBubbleSort(int* arr,int MedianFilterFactor) {
 		}
 	}
     return 0; // All ok
+}
+
+long double GPIO::LongDoubleMeanFilterSubArray(long double* ArrayHolderAux,int MeanFilterFactor){
+	if (MeanFilterFactor<=1){
+		return ArrayHolderAux[0];
+	}
+	else{
+		long double temp=0.0;
+		for(int i = 0; i < MeanFilterFactor; i++) {
+			temp += ArrayHolderAux[i];
+		}
+		
+		return temp/static_cast<long double>(MeanFilterFactor);
+	}
 }
 
 long double GPIO::LongDoubleMedianFilterSubArray(long double* ArrayHolderAux,int MedianFilterFactor){
