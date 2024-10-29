@@ -132,16 +132,16 @@ INITIATIONS:
 	// Initializations
 	LDI	r30, 0 // All signal pins down
 	LDI	r4, 0 // zeroing
-	MOV	r1, NUM_REPETITIONS// Initial initialization jus tin case// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
-	MOV	r6, DELAYHALFMODULE
-	MOV	r7, DELAYMODULE
+//	MOV	r1, NUM_REPETITIONS// Initial initialization jus tin case// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
+//	MOV	r6, DELAYHALFMODULE
+//	MOV	r7, DELAYMODULE
 	LDI	r0, 0 // Ensure reset commands
-	LDI	r9, DELAY
-	LDI	r14, 1 // ON state
-	LDI	r15, 1 // OFF state
-	LDI r16, 0 // Periodic offset and frequency correction
-	LDI	r17, 0 // synch offset correction
-	LDI r18, 0 // synch frequency correction
+//	LDI	r9, DELAY
+//	LDI	r14, 1 // ON state
+//	LDI	r15, 1 // OFF state
+//	LDI r16, 0 // Periodic offset and frequency correction
+//	LDI	r17, 0 // synch offset correction
+//	LDI r18, 0 // synch frequency correction
 	
 	MOV	r11, 0x02220111
 	MOV	r12, 0x08880444
@@ -269,8 +269,8 @@ MANAGECALC: // To be develop to correct for intra pulses frequency variation
 	LSR		r9, r9, 1 // Because counter counts as two	
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	// Since this script produces a sequence of four different values, we need to multiply the period by 4 to have the effective period for this script
-	LSL		r7, r7, 2 // Specific of this script because analysing a signal with an effective period 4 times the original period
 	/////////////////////////////////////////////////////////////
+	LSL		r7, r7, 2 // Specific of this script because analysing a signal with an effective period 4 times the original period
 	SUB		r6, r7, 1 // Generate the value for r6
 ABSSYNCH:	// From this point synchronization is very important. If the previous operations takes longer than the period below to synch, in the cpp script it can be added some extra periods to compensate for frequency relative offset
 	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4. Read the IEP counter
