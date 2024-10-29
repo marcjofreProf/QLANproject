@@ -33,7 +33,7 @@ using std::fstream;
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
 #define NumSynchMeasAvgAux 	351 //51; // Num averages to compute the relative frequency difference. Better to be odd number.
 #define ExtraNumSynchMeasAvgAux 	301 // Averaging for computing current absolute time offset
-#define ExtraExtraNumSynchMeasAvgAux 	4 // Averaging for computing current relative frequency diference
+#define ExtraExtraNumSynchMeasAvgAux 	1 // Averaging for computing current relative frequency diference
 
 namespace exploringBB {
 
@@ -115,6 +115,7 @@ private:// Variables
 	using Clock = my_clock;//Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
 	using TimePoint = std::chrono::time_point<Clock>;
 	double SynchTrigPeriod=4096.0; //For slotted analysis. It has to match to the histogram analysis
+	double SigONPeriod=50; // ON time (duty cycle) of the signal, in PRU time
 	double MultFactorEffSynchPeriod=4.0; // When using 4 channels histogram, this value is 4.0; when using real signals this value should be 1.0 (also in QphysLayerAgent.h)
 	unsigned long long int TimePRU1synchPeriod=100000000; // In nanoseconds and multiple of PRUclockStepPeriodNanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. Also, the sorter the more error in the correct estimation, since there has not elapsed enough time to compute a tendency (it also happens with PRUdetCorrRelFreq() method whre a separation TagsSeparationDetRelFreq is inserted). The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
 	unsigned long long int DistTimePRU1synchPeriod=10; // Multiple of PRUclockStepPeriodNanoseconds. Number of passes with respect TimePRU1synchPeriod, in order to compute both the absolute time difference and the relative frequency difference
@@ -133,7 +134,7 @@ private:// Variables
 	//TimePoint TimePointClockTagPRUfinal=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint QPLAFutureTimePoint=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
 	//TimePoint QPLAFutureTimePointBusyWaitInterrupt=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
-	//TimePoint QPLAFutureTimePointOld=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
+	TimePoint QPLAFutureTimePointOld=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
 	//TimePoint QPLAFutureTimePointOld1=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
 	//TimePoint QPLAFutureTimePointOld2=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
 	//TimePoint QPLAFutureTimePointOld3=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
@@ -179,7 +180,7 @@ private:// Variables
 	//bool finPRU0;
 	// PRU Signal
 	unsigned int NumberRepetitionsSignal=65536;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
-	unsigned int TTGcoincWin=50;// Timetagging coincidence window length In PRU units. It reduces time resolution of the detected qubits.
+	unsigned int TTGcoincWin=10;// Timetagging coincidence window length In PRU units. It reduces time resolution of the detected qubits.
 	unsigned int SigLength=25;// Signal duration length In PRU nits. The larger more likely to make a coincidence in the time tagging unit
 	unsigned int NumQuBitsPerRun=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 	int retInterruptsPRU1;
