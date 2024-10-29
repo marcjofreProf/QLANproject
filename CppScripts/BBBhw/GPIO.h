@@ -33,7 +33,7 @@ using std::fstream;
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
 #define NumSynchMeasAvgAux 	351 //51; // Num averages to compute the relative frequency difference. Better to be odd number.
 #define ExtraNumSynchMeasAvgAux 	301 // Averaging for computing current absolute time offset
-#define ExtraExtraNumSynchMeasAvgAux 	51 // Averaging for computing current relative frequency diference
+#define ExtraExtraNumSynchMeasAvgAux 	1 // Averaging for computing current relative frequency diference
 
 namespace exploringBB {
 
@@ -68,6 +68,7 @@ private:// Variables
 	long double PRUoffsetDriftError=0;
 	long double PRUoffsetDriftErrorArray[ExtraExtraNumSynchMeasAvgAux]={0};
 	long double PRUoffsetDriftErrorAvg=0.0;
+	long double PRUoffsetDriftErrorAvgThresh=10e-9; //Threshold value to not apply relative frequency difference
 	// Absolute corrected error
 	double PRUoffsetDriftErrorAbs=0;
 	double PRUoffsetDriftErrorAbsArray[ExtraNumSynchMeasAvgAux]={0};
