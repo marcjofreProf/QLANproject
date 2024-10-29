@@ -80,6 +80,9 @@
 
 // r14 is reserved for ON state time
 // r15 is reserved for OFF state time
+// r16 is reserved for periodic offset and frequency correction
+// r17 is reserved for synch offset correction
+// r18 is reserved for synch frequency correction
 
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
@@ -136,6 +139,9 @@ INITIATIONS:
 	LDI	r9, DELAY
 	LDI	r14, 1 // ON state
 	LDI	r15, 1 // OFF state
+	LDI r16, 0 // Periodic offset and frequency correction
+	LDI	r17, 0 // synch offset correction
+	LDI r18, 0 // synch frequency correction
 	
 	MOV	r11, 0x02220111
 	MOV	r12, 0x08880444
@@ -243,12 +249,31 @@ PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first be
 	LSR		r15, r15, 1 // Divide by two because loop consumes double
 	SUB 	r15, r15, 4 // Substract 4 because is the compensation value
 	ADD 	r15, r15, 1 // ADD 1 to not have a substraction below zero which halts
+PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
+	LBCO	r16, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
+	LSR 	r16, r16, 1 // Divide by 2 since the loop consumes to at each iteration
+	ADD 	r16, r16, 1 // ADD 1 to not have a substraction below zero which halts
+TIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
+	LBCO	r17, CONST_PRUDRAM, 20, 4 // Load from PRU RAM position the extra delay
+	LSR		r17, r17, 1// Divide by two because the TIMEOFFSETADJLOOP consumes double
+	ADD		r17, r17, 1// ADD 1 to not have a substraction below zero which halts
+FINETIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
+	LBCO	r18, CONST_PRUDRAM, 8, 4 // Load from PRU RAM position the extra delay
+	LSR		r18, r18, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
+	ADD		r18, r18, 1// ADD 1 to not have a substraction below zero which halts
+MANAGECALC: // To be develop to correct for intra pulses frequency variation
+	LBCO	r9, CONST_PRUDRAM, 24, 4 // Load from PRU RAM position the corrected period (accounting for relative frequency corrections)
+	LSR		r9, r9, 1	// Since there is a dead period betwen pulses (to do management), divide the period by 2
+	// Compute DELAY value
+	SUB		r9, r9, 4
+	LSR		r9, r9, 1 // Because counter counts as two	
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	// Since this script produces a sequence of four different values, we need to multiply the period by 4 to have the effective period for this script
 	LSL		r7, r7, 2 // Specific of this script because analysing a signal with an effective period 4 times the original period
 	/////////////////////////////////////////////////////////////
 	SUB		r6, r7, 1 // Generate the value for r6
-	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
+ABSSYNCH:	// From this point synchronization is very important. If the previous operations takes longer than the period below to synch, in the cpp script it can be added some extra periods to compensate for frequency relative offset
+	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4. Read the IEP counter
 	AND		r0, r0, r6 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
 	//LDI	r0, 0 // To remove previous values
 	//LBCO	r0.w0, CONST_IETREG, 0xC, 2// Trick since for period of 65536 we can directly implement module reading 2 bytes
@@ -258,33 +283,15 @@ PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first be
 PSEUDOSYNCHLOOP:
 	SUB		r0, r0, 1
 	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
-PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
-	LBCO	r0, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
-	LSR 	r0, r0, 1 // Divide by 2 since the loop consumes to at each iteration
-	ADD 	r0, r0, 1 // ADD 1 to not have a substraction below zero which halts
 PERIODICOFFSETLOOP:
-	SUB		r0, r0, 1
-	QBNE	PERIODICOFFSETLOOP, r0, 0 // Coincides with a 0
-TIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
-	LBCO	r0, CONST_PRUDRAM, 20, 4 // Load from PRU RAM position the extra delay
-	LSR		r0, r0, 1// Divide by two because the TIMEOFFSETADJLOOP consumes double
-	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+	SUB		r16, r16, 1
+	QBNE	PERIODICOFFSETLOOP, r16, 0 // Coincides with a 0
 TIMEOFFSETADJLOOP:
-	SUB		r0, r0, 1
-	QBNE	TIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
-FINETIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
-	LBCO	r0, CONST_PRUDRAM, 8, 4 // Load from PRU RAM position the extra delay
-	LSR		r0, r0, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
-	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
+	SUB		r17, r17, 1
+	QBNE	TIMEOFFSETADJLOOP, r17, 0 // Coincides with a 0
 FINETIMEOFFSETADJLOOP:
-	SUB		r0, r0, 1
-	QBNE	FINETIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
-MANAGECALC:
-	LBCO	r9, CONST_PRUDRAM, 24, 4 // Load from PRU RAM position the corrected period (accounting for relative frequency corrections)
-	LSR		r0, r9, 1	// Since there is a dead period betwen pulses (to do management), divide the period by 2
-	// Compute DELAY value
-	SUB		r0, r0, 4
-	LSR		r0, r0, 1 // Because counter counts as two	
+	SUB		r18, r18, 1
+	QBNE	FINETIMEOFFSETADJLOOP, r18, 0 // Coincides with a 0
 //BASICPSEUDOSYNCH:
 //	AND	r0, r0, 0x07 // Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) we can get a value between 0 and 7
 //	QBEQ	SIGNALON1, r0.b0, 7 // Coincides with a 7
