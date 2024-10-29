@@ -144,8 +144,9 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures, with overflow clock
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru0dataMem_int[3]=static_cast<unsigned int>(0);
-	pru0dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
+	pru0dataMem_int[4]=static_cast<unsigned int>(this->PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	pru0dataMem_int[5]=static_cast<unsigned int>(0); // set synch offset correction value
+	pru0dataMem_int[6]=static_cast<unsigned int>(this->TTGcoincWin); // set coincidence window length
 	//if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
 	//	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
 	//		perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
@@ -163,7 +164,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 	pru1dataMem_int[2]=static_cast<unsigned int>(0);// Referenced to the synch trig period
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
-	pru1dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
+	pru1dataMem_int[4]=static_cast<unsigned int>(this->PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	pru1dataMem_int[5]=static_cast<unsigned int>(0); // set synch offset correction value
 	pru1dataMem_int[6]=static_cast<unsigned int>(SynchTrigPeriod);
 	// Load and execute the PRU program on the PRU1
@@ -674,6 +675,8 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(SynchTrigPeriod));
 	
 	pru0dataMem_int[3]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
+
+	pru0dataMem_int[6]=static_cast<unsigned int>(this->TTGcoincWin); // set coincidence window length
 
 	// Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
 	requestCoincidenceWhileWait=CoincidenceSetWhileWait();

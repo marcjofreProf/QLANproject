@@ -54,6 +54,7 @@
 // r19 might be used for some intermediate operations
 
 // r20 reserved for exit counter
+// r21 reserved for Coincidence window length
 
 //// If using IET timer (potentially adjusted to synchronization protocols)
 // We can use Constant table pointers C26
@@ -120,6 +121,7 @@ INITIATIONS:// This is only run once
 	LDI	r18, 0
 	LDI	r19, 0
 	MOV r20, EXITCOUNTER // Maximum value to start with to exit if nothing happens
+	LDI r21, 1 // Coincidence window length
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
@@ -236,7 +238,11 @@ FINETIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference w
 FINETIMEOFFSETADJLOOP:
 	SUB		r0, r0, 1
 	QBNE	FINETIMEOFFSETADJLOOP, r0, 0 // Coincides with a 0
-FIRSTREF:	
+FIRSTREF:
+// Do final loadings of parameters for operation. For instance the coincidence window length
+	LBCO	r21, CONST_PRUDRAM, 24, 4 // Read from PRU RAM the coincidence window length
+	LSR 	r21, r21, 1// Divide by 2 since the loop consumes double
+	ADD		r21, r21, 1// ADD 1 to not have a substraction below zero which halts
 	// Store a calibration timetagg
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
 	SBCO	r5, CONST_PRUDRAM, 8, 4// Calibration time tag (together with the acumulated synchronization error)
@@ -255,10 +261,18 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Then measure wha should be 1 (for edge detection)
 	MOV		r6.w2, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. TAkes a lot of time and so it is skew with respect the bits from r31
 	MOV		r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)
+	// Implement a coincidence window, effectively increasing the window length but introduces jitter
+PRECOINCWIN:
+	MOV		r0, r21 // Load again the value of half the iwndow length
+COINCWINLOOP:
+	SUB		r0, r0, 1
+	QBNE	COINCWINLOOP, r0, 0 // Coincides with a 0
+COINCWIN:
+	MOV		r19.w2, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts.
+	MOV		r19.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0), increases the windows length but improves probability of detection
+	OR		r6, r6, r19 // Combine the possibilities of reading on these bits.
+	// End coincidence window
 	AND		r6, r6, r11 // Mask to make sure there are no other info
-	// The two lines below augment, if needed, the readings on the general r31 bits - altough it produces skews
-//	MOV	r19.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0), increases the windows length but improves probability of detection
-//	OR	r6, r6, r19 // Combine the possibilities of reading on these bits.
 	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections	
 	// Combining all reading pins
 	LSR		r17.b1, r16.b3, 2
