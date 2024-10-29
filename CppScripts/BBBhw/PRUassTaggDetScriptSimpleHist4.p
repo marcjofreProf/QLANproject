@@ -267,7 +267,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	MOV		r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)
 	// Implement a coincidence window, effectively increasing the window length but introduces jitter
 PRECOINCWIN:
-	MOV		r0, r21 // Load again the value of half the iwndow length
+	MOV		r0, r21 // Load again the value of half the window length
 COINCWINLOOP:
 	SUB		r0, r0, 1
 	QBNE	COINCWINLOOP, r0, 0 // Coincides with a 0
