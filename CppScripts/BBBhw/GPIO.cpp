@@ -326,7 +326,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				// sleep_for seems to operate more stable although it adds a long overhead time, compared to while()
 				// sleep_for takes longer in average maybe because it has to re-load all the context and so forth after each sleep...
 				//std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future-Clock::now()));//while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);//{//;// Busy waiting
-				std::this_thread::sleep_until(this->TimePointClockCurrentSynchPRU1future);
+				std::this_thread::sleep_until(this->TimePointClockCurrentSynchPRU1future); // Better to use sleep_until because it will adapt to changes in the current itme by the time synchronization protocol
 				//	// Yield the CPU to other threads
         		//	std::this_thread::yield();
 				//}				
@@ -472,7 +472,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//// Relative error average
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLongExtra%ExtraExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					this->PRUoffsetDriftErrorAvg=LongDoubleMeanFilterSubArray(PRUoffsetDriftErrorArray,ExtraExtraNumSynchMeasAvgAux);// averaging
-					if (abs(this->PRUoffsetDriftErrorAvg)<this->PRUoffsetDriftErrorAvgThresh){this->PRUoffsetDriftErrorAvg=0.0;}// Do not apply relative frequency difference if it is below a certain value
+					//if (abs(this->PRUoffsetDriftErrorAvg)<this->PRUoffsetDriftErrorAvgThresh){this->PRUoffsetDriftErrorAvg=0.0;}// Do not apply relative frequency difference if it is below a certain value
 					CountPRUcurrentTimerValSynchLong=0;// Update value
 					iIterPRUcurrentTimerValSynchLongExtra++;// Update value
 				}
