@@ -325,7 +325,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				// There is a big variation if the waiting function to launch the measurement is not properly done (with the appropiate tools)
 				// sleep_for seems to operate more stable although it adds a long overhead time, compared to while()
 				// sleep_for takes longer in average maybe because it has to re-load all the context and so forth after each sleep...
-				std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future-Clock::now()));//while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);//{//;// Busy waiting
+				//std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future-Clock::now()));//while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);//{//;// Busy waiting
+				std::this_thread::sleep_until(this->TimePointClockCurrentSynchPRU1future);
 				//	// Yield the CPU to other threads
         		//	std::this_thread::yield();
 				//}				
