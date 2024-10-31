@@ -393,7 +393,7 @@ FINISHLOOP:
 	// The following lines do not consume "signal speed"
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Notification sent at the beginning of the signal//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
-	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
+	JMP		CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 
 EXIT:
 	MOV	r31.b0, PRU1_ARM_INTERRUPT+16
