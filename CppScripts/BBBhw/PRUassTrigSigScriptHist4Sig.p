@@ -245,10 +245,10 @@ PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first be
 	SUB 	r15, r7, r14 // OFF state time
 	LSR		r14, r14, 1 // Divide by two because loop consumes double
 	SUB 	r14, r14, 4 // Substract 4 because is the compensation value
-	ADD 	r14, r14, 1 // ADD 1 to not have a substraction below zero which halts
+//	ADD 	r14, r14, 1 // ADD 1 to not have a substraction below zero which halts
 	LSR		r15, r15, 1 // Divide by two because loop consumes double
 	SUB 	r15, r15, 4 // Substract 4 because is the compensation value
-	ADD 	r15, r15, 1 // ADD 1 to not have a substraction below zero which halts
+//	ADD 	r15, r15, 1 // ADD 1 to not have a substraction below zero which halts
 PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
 	LBCO	r16, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
 	LSR 	r16, r16, 1 // Divide by 2 since the loop consumes to at each iteration
