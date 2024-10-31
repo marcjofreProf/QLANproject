@@ -263,10 +263,10 @@ FINETIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference w
 	ADD		r18, r18, 1// ADD 1 to not have a substraction below zero which halts
 MANAGECALC: // To be develop to correct for intra pulses frequency variation
 	LBCO	r9, CONST_PRUDRAM, 24, 4 // Load from PRU RAM position the corrected period (accounting for relative frequency corrections)
-	LSR		r9, r9, 1	// Since there is a dead period betwen pulses (to do management), divide the period by 2
-	// Compute DELAY value
-	SUB		r9, r9, 4
-	LSR		r9, r9, 1 // Because counter counts as two	
+//	LSR		r9, r9, 1	// Since there is a dead period betwen pulses (to do management), divide the period by 2
+//	// Compute DELAY value
+//	SUB		r9, r9, 4
+//	LSR		r9, r9, 1 // Because counter counts as two	
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	// Since this script produces a sequence of four different values, we need to multiply the period by 4 to have the effective period for this script
 	/////////////////////////////////////////////////////////////
