@@ -213,6 +213,7 @@ QUADDET1:
 	MOV		r11, 0x00000072 // detection mask
 	JMP		PSEUDOSYNCH
 PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to receiving at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering through an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
+	MOV 	r20, EXITCOUNTER // Reload value
 	// Read the number of RECORDS from positon 0 of PRU1 DATA RAM and stored it
 	LBCO	r10, CONST_PRUDRAM, 8, 4 // Read from PRU RAM offset signal period	
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
