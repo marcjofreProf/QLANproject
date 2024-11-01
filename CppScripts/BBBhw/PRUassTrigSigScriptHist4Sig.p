@@ -23,7 +23,6 @@
 #define INS_PER_US		200		// 5ns per instruction for Beaglebone black
 #define INS_PER_DELAY_LOOP	2		// two instructions per delay loop
 #define NUM_REPETITIONS		1024	//Not used 4294967295	// Maximum value possible storable to limit the number of cycles in 32 bits register. This is wuite limited in number but very controllable (maybe more than one register can be used). This defines the Maximum Transmission Unit - coul dbe named Quantum MTU (defined together with the clock)
-#define DELAY 2046//It has to be related to an even power of 2!!! Example 1022=(2048-4)/2; DELAY=(DELAYMODULE-4)/2. How to do it. From DELAYMODULE Substract 4 and divide by 2 for the common cost commands. // Assuming that QBNE always consumes one clock (check experimentally). It has to be a power of 2 to be able to do module in assembler. The original value is DELAYMODULE divided by 8.
 #define DELAYMODULE	4096// Slightly above the std jitter of the 24 MHz hardware clock//65536 // Not used. The whole histogram period. It has to be divisible by the 2^32 total clock register.
 #define DELAYHALFMODULE	4095//65535 // Not used. One unit less than DELAYMODULE the power of two required of the period of the histogram which is 65535-1=2^16-1.
 
@@ -129,19 +128,19 @@ INITIATIONS:
 	MOV	r2, 0x22000
 	MOV	r3, 0x2200C
 	
-	// Initializations
+	// Initializations - some, just in case
 	LDI	r30, 0 // All signal pins down
 	LDI	r4, 0 // zeroing
-//	MOV	r1, NUM_REPETITIONS// Initial initialization jus tin case// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
-//	MOV	r6, DELAYHALFMODULE
-//	MOV	r7, DELAYMODULE
+	MOV	r1, NUM_REPETITIONS// Initial initialization jus tin case// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
+	MOV	r6, DELAYHALFMODULE
+	MOV	r7, DELAYMODULE
 	LDI	r0, 0 // Ensure reset commands
-//	LDI	r9, DELAY
-//	LDI	r14, 1 // ON state
-//	LDI	r15, 1 // OFF state
-//	LDI r16, 0 // Periodic offset and frequency correction
-//	LDI	r17, 0 // synch offset correction
-//	LDI r18, 0 // synch frequency correction
+	LDI	r9, 0
+	LDI	r14, 10 // ON state
+	LDI	r15, 10 // OFF state
+	LDI r16, 0 // Periodic offset and frequency correction
+	LDI	r17, 0 // synch offset correction
+	LDI r18, 0 // synch frequency correction
 	
 	MOV	r11, 0x02220111
 	MOV	r12, 0x08880444
