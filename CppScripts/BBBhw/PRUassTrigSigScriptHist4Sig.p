@@ -136,8 +136,8 @@ INITIATIONS:
 	MOV	r7, DELAYMODULE
 	LDI	r0, 0 // Ensure reset commands
 	LDI	r9, 0
-	LDI	r14, 10 // ON state
-	LDI	r15, 10 // OFF state
+	LDI	r14, 6 // ON state
+	LDI	r15, 6 // OFF state
 	LDI r16, 0 // Periodic offset and frequency correction
 	LDI	r17, 0 // synch offset correction
 	LDI r18, 0 // synch frequency correction
@@ -242,11 +242,11 @@ PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first be
 	LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM sequence signal period
 	LBCO	r14, CONST_PRUDRAM, 28, 4 // ON state time
 	SUB 	r15, r7, r14 // OFF state time
-	LSR		r14, r14, 1 // Divide by two because loop consumes double
 	SUB 	r14, r14, 4 // Substract 4 because is the compensation value
+	LSR		r14, r14, 1 // Divide by two because loop consumes double	
 //	ADD 	r14, r14, 1 // ADD 1 to not have a substraction below zero which halts. Do not add 1 because it adds a relative frequency difference
-	LSR		r15, r15, 1 // Divide by two because loop consumes double
 	SUB 	r15, r15, 4 // Substract 4 because is the compensation value
+	LSR		r15, r15, 1 // Divide by two because loop consumes double	
 //	ADD 	r15, r15, 1 // ADD 1 to not have a substraction below zero which halts. Do not add 1 because it adds a relative frequency difference
 PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
 	LBCO	r16, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
