@@ -857,10 +857,10 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		// Then, it is divided by 4 because it is histogram analysis
 		// Then, it is divided by the period length
 		ContCorr=static_cast<unsigned int>((1.0/abs(AccumulatedErrorDriftPRUoffsetDriftErrorAvg))/static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod));//static_cast<long long int>(static_cast<long double>(SynchTrigPeriod)*static_cast<long double>(PRUoffsetDriftErrorAvg))+InstantCorr;
-		if (AccumulatedErrorDriftPRUoffsetDriftErrorAvg>0.0){
+		if (AccumulatedErrorDriftPRUoffsetDriftErrorAvg<0.0){
 			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4-4)/2.0+1.0);// 1 positive unit intra pulses reltive frequency difference correction
 		}
-		else if(AccumulatedErrorDriftPRUoffsetDriftErrorAvg<0.0){
+		else if(AccumulatedErrorDriftPRUoffsetDriftErrorAvg>0.0){
 			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4-4)/2.0-1.0);// 1 negative unit intra pulses reltive frequency difference correction
 		}
 		else{
