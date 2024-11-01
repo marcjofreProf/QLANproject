@@ -1591,6 +1591,8 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchAdjRelFreqCalcValuesArray[CurrentSpecificLink][2]=1.0;// For positive rel. freq. diff. the correction is 1.0
 	}
 	
+	if (abs(SynchCalcValuesArray[2])<SynchCalcValuesFreqThresh){SynchCalcValuesArray[2]=0.0;}// Zero the retrieved frequency difference because it is too small
+
 	// The SynchNetAdjAux is a value around 2.0, generally
 	double InitialCalValueHardwareSynch=(15.0/10.0)/0.5; // Value manually inserted to the factor/ratio between the automatic synch script time between tests and the time used manually to check for the factor 6.0. In this example 15.0 seconds / 10.0 seconds, and corrected with a 0.5 division factor (as for the relative frequency calculation).
 	double SynchNetAdjAux=1.0;// Deactivated InitialCalValueHardwareSynch*(6.0/SynchTimeTaggRefMedianAux); // Adjustment value consisting of the 6.0 of the GPIO and divided by the time measurement interval (around 30 seconds), to not produce further skews
