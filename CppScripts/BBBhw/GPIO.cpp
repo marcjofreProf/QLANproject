@@ -193,7 +193,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	cout << "Wait to proceed, calibrating synchronization!" << endl;
 	////prussdrv_pru_enable(PRU_Signal_NUM);
-	sleep(10);// Give some time to load programs in PRUs and initiate. Very important, otherwise bad values might be retrieved
+	sleep(90); // Give some time to load programs in PRUs and the synch protocols to initiate and lock after prioritazion and adjtimex. Very important, otherwise bad values might be retrieved
 	
 	// Reset values of the sharedMem_int at the beggining
 	for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
