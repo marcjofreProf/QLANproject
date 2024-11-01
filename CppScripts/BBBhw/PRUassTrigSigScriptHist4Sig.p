@@ -145,7 +145,7 @@ INITIATIONS:
 	LDI	r17, 0 // synch offset correction
 	LDI r18, 0 // synch frequency correction
 	MOV	r19, 0xFFFFFFFF // update counter of when to correct intra relative frequency difference
-	LDI	r20, 1
+	MOV	r20, DELAYMODULE
 	
 	MOV	r11, 0x02220111
 	MOV	r12, 0x08880444
