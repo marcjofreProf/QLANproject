@@ -856,7 +856,8 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		// Then, invert the value, since it will tell the number of PRU units so that this value produces 1 PRU unit difference (either positive of negative).
 		// Then, it is divided by 4 because it is histogram analysis
 		// Then, it is divided by the period length
-		ContCorr=static_cast<unsigned int>((1.0/abs(AccumulatedErrorDriftPRUoffsetDriftErrorAvg))/static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod));//static_cast<long long int>(static_cast<long double>(SynchTrigPeriod)*static_cast<long double>(PRUoffsetDriftErrorAvg))+InstantCorr;
+		if (AccumulatedErrorDriftPRUoffsetDriftErrorAvg==0){ContCorr=static_cast<unsigned int>(4294967295);}
+		else{ContCorr=static_cast<unsigned int>((1.0/abs(AccumulatedErrorDriftPRUoffsetDriftErrorAvg))/static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod));}//static_cast<long long int>(static_cast<long double>(SynchTrigPeriod)*static_cast<long double>(PRUoffsetDriftErrorAvg))+InstantCorr;
 		if (AccumulatedErrorDriftPRUoffsetDriftErrorAvg<0.0){
 			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4-4)/2.0+1.0);// 1 positive unit intra pulses reltive frequency difference correction
 		}
