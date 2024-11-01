@@ -188,7 +188,7 @@ if [[ $is_rt_kernel -eq 1 ]]; then
 fi
 
 # Once priorities have been set, hence synch-protocols fine adjusted, adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
-sleep 30 # give time to time protocols to lock
+sleep 60 # give time to time protocols to lock
 sudo adjtimex -a --force-adjust #-a --force-adjust # -f 0
 
 if ! sudo crontab -l > /dev/null 2>&1; then

@@ -167,7 +167,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 		}
 	}
 	//prussdrv_pru_enable(PRU_ClockPhys_NUM);
-	sleep(90);// Give some time to load programs in PRUs and the synch protocols to initiate and lock after prioritazion and adjtimex. Very important, otherwise bad values might be retrieved
+	sleep(150);// Give some time to load programs in PRUs and the synch protocols to initiate and lock after prioritazion and adjtimex. Very important, otherwise bad values might be retrieved
 	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread. It stalls operation RealTime Kernel (commented, then)
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=ClockWatch::now();
