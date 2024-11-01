@@ -69,6 +69,7 @@ private:// Variables
 	long double PRUoffsetDriftErrorArray[ExtraExtraNumSynchMeasAvgAux]={0};
 	long double PRUoffsetDriftErrorAvg=0.0;
 	long double PRUoffsetDriftErrorAvgThresh=10e-9; //Threshold value to not apply relative frequency difference
+	double AccumulatedErrorDriftThresh=500e-9; //Threshold value to not apply relative frequency difference
 	// Absolute corrected error
 	double PRUoffsetDriftErrorAbs=0;
 	double PRUoffsetDriftErrorAbsArray[ExtraNumSynchMeasAvgAux]={0};
@@ -116,7 +117,7 @@ private:// Variables
 	using Clock = my_clock;//Clock = std::chrono::system_clock;// Since we use a time sleep, it might make sense a system_clock//tai_clock, system_clock or steady_clock;
 	using TimePoint = std::chrono::time_point<Clock>;
 	double SynchTrigPeriod=4096.0; //For slotted analysis. It has to match to the histogram analysis
-	double SigONPeriod=12.0; // ON time (duty cycle) of the signal, in PRU time. It cannot be smaller than 6. It has to be multiple of 2.
+	double SigONPeriod=10.0; // ON time (duty cycle) of the signal, in PRU time. It cannot be smaller than 6. It has to be multiple of 2. Somehow, it cannot be very large because the PRUs stall (maybe a voltage issue or device tree overlay...)
 	double MultFactorEffSynchPeriod=4.0; // When using 4 channels histogram, this value is 4.0; when using real signals this value should be 1.0 (also in QphysLayerAgent.h)
 	unsigned long long int TimePRU1synchPeriod=100000000; // In nanoseconds and multiple of PRUclockStepPeriodNanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. Also, the sorter the more error in the correct estimation, since there has not elapsed enough time to compute a tendency (it also happens with PRUdetCorrRelFreq() method whre a separation TagsSeparationDetRelFreq is inserted). The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
 	unsigned long long int DistTimePRU1synchPeriod=10; // Multiple of PRUclockStepPeriodNanoseconds. Number of passes with respect TimePRU1synchPeriod, in order to compute both the absolute time difference and the relative frequency difference
@@ -159,7 +160,8 @@ private:// Variables
 	int SynchRem=0;
 	long long int SignAuxInstantCorr=0;
 	long long int InstantCorr=0.0;
-	long long int ContCorr=0.0;	
+	unsigned int ContCorr=4294967295; // By default very large (the maximum value of unsigned int), so that it never corrects
+	unsigned int ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4-4)/2.0);
 	unsigned long TimeClockMarging=0;// In nanoseconds. If too large, it disastabilizes the timming performance. It has to be smaller than the SynchTrigPeriod
 	unsigned long TimePRUcommandDelay=250000;//250000;// In nanoseconds. If too large, it disastabilizes the timming performance. Very important parameter!!! When duration_FinalInitialMeasTrigAuxAvg properly set then is around 4000
 	unsigned long long int TimeElpasedNow_time_as_count=0;

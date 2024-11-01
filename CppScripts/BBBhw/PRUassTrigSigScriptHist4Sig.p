@@ -68,7 +68,7 @@
 // r5 reserved for delay count
 // r6 reserved for half period of delay module
 // r7 reserved for period of delay module
-// r9 reserved for DELAY value
+// r9 reserved for count value of when it need to be corrected the intra relative frequency difference
 
 // r10 is arbitrary used for operations
 
@@ -82,6 +82,9 @@
 // r16 is reserved for periodic offset and frequency correction
 // r17 is reserved for synch offset correction
 // r18 is reserved for synch frequency correction
+
+// r19 is reserved for counter of when to correct the intra relative frequency difference
+// r20 is reserved for storing the absolute correction value for intra relative frequency difference correction
 
 // r28 is mainly used for LED indicators operations
 // r29 is mainly used for LED indicators operations
@@ -135,12 +138,14 @@ INITIATIONS:
 	MOV	r6, DELAYHALFMODULE
 	MOV	r7, DELAYMODULE
 	LDI	r0, 0 // Ensure reset commands
-	LDI	r9, 0
+	MOV	r9, 0xFFFFFFFF
 	LDI	r14, 6 // ON state
 	LDI	r15, 6 // OFF state
 	LDI r16, 0 // Periodic offset and frequency correction
 	LDI	r17, 0 // synch offset correction
 	LDI r18, 0 // synch frequency correction
+	MOV	r19, 0xFFFFFFFF // update counter of when to correct intra relative frequency difference
+	LDI	r20, 1
 	
 	MOV	r11, 0x02220111
 	MOV	r12, 0x08880444
@@ -261,11 +266,9 @@ FINETIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference w
 	LSR		r18, r18, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
 	ADD		r18, r18, 1// ADD 1 to not have a substraction below zero which halts
 MANAGECALC: // To be develop to correct for intra pulses frequency variation
-	LBCO	r9, CONST_PRUDRAM, 24, 4 // Load from PRU RAM position the corrected period (accounting for relative frequency corrections)
-//	LSR		r9, r9, 1	// Since there is a dead period betwen pulses (to do management), divide the period by 2
-//	// Compute DELAY value
-//	SUB		r9, r9, 4
-//	LSR		r9, r9, 1 // Because counter counts as two	
+	LBCO	r9, CONST_PRUDRAM, 24, 4 // Load from PRU RAM position the count of when to correct intra relative frequency difference
+	MOV 	r19, r9 // update counter of when to correct intra relative frequency difference
+	LBCO	r20, CONST_PRUDRAM, 32, 4 // Load from PRU RAM position the absolute correction to correct for intra relative frequency difference
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	// Since this script produces a sequence of four different values, we need to multiply the period by 4 to have the effective period for this script
 	/////////////////////////////////////////////////////////////
@@ -311,12 +314,22 @@ SIGNALON1DEL:
 	SUB		r5, r5, 1
 	QBNE	SIGNALON1DEL, r5, 0
 //	LDI		r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
-SIGNALON2:
+SIGNALON2: // Make use of this dead time to instantly correct for intra relative frequency sifference
 	MOV		r30.w0, 0x0000 // All off
 	MOV		r5, r15
-	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 //	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+	SUB 	r19, r19, 1 // Decrement counter of when to correct for intra relative frequency difference
+//	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+	QBNE	SIGNALON2DEL, r19, 0 // If it does not coincide with a zero, jump to SIGNALON2DEL
+//	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+INTRACORRFREQ:
+	MOV		r19, r9 // REload the counter value
+	MOV		r5, r20 // Reload the exclusive value for this correction
+INTRACORRFREQLOOP:
+	SUB		r5, r5, 1
+	QBNE	INTRACORRFREQLOOP, r5, 0
+	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+	JMP		SIGNALON3
 SIGNALON2DEL:
 	SUB		r5, r5, 1
 	QBNE	SIGNALON2DEL, r5, 0
