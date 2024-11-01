@@ -329,7 +329,7 @@ INTRACORRFREQLOOP:
 	SUB		r5, r5, 1
 	QBNE	INTRACORRFREQLOOP, r5, 0
 	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-	JMP		SIGNALON3
+	QBEQ	SIGNALON3, r4, 0 //JMP		SIGNALON3
 SIGNALON2DEL:
 	SUB		r5, r5, 1
 	QBNE	SIGNALON2DEL, r5, 0
