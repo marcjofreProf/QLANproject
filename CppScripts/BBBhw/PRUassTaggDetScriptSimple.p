@@ -107,29 +107,28 @@ INITIATIONS:// This is only run once
 //      LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 	// Using cycle counter
-	MOV	r12, 0x22000
-	MOV	r13, 0x2200C
+	MOV		r12, 0x22000
+	MOV		r13, 0x2200C
 	// Initializations
 	LDI 	r5, 0 // Initialize for the first time r5
-	LDI	r6, 0 // Initialization
-	LDI	r16, 0 // Initialization
-	LDI	r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
+	LDI		r6, 0 // Initialization
+	LDI		r16, 0 // Initialization
+	LDI		r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 //	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 	// Initializations for faster execution
-	LDI	r7, 0 // Register for clearing other registers
+	LDI		r7, 0 // Register for clearing other registers
 	// Initiate to zero for counters of skew and offset
-	LDI	r8, 0
-//	LDI	r9, 0 // Extra adjustment of intra pulse relative frequency difference
-	MOV	r14, 0xFFFFFFFF
-	MOV	r11, 0xC000C0FF // detection mask. Bits might be moved out of position
-	LDI	r17, 0
-	LDI	r18, 0
-	LDI	r19, 0
-	MOV r20, EXITCOUNTER // Maximum value to start with to exit if nothing happens
-//	LDI r21, 1 // Coincidence window length
-//	LDI r22, 0 // Periodic offset and frequency correction
-//	LDI	r23, 0 // synch offset correction
-//	LDI r24, 0 // synch frequency correction
+	LDI		r8, 0
+	MOV		r14, 0xFFFFFFFF
+	MOV		r11, 0xC000C0FF // detection mask. Bits might be moved out of position
+	LDI		r17, 0
+	LDI		r18, 0
+	LDI		r19, 0
+	MOV 	r20, EXITCOUNTER // Maximum value to start with to exit if nothing happens
+	LDI 	r21, 1 // Coincidence window length
+	LDI 	r22, 1 // Periodic offset and frequency correction
+	LDI		r23, 1 // synch offset correction
+	LDI 	r24, 1 // synch frequency correction
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
