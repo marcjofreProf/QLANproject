@@ -187,24 +187,25 @@ if [[ $is_rt_kernel -eq 1 ]]; then
   #sudo chrt -f -p $PriorityValue $pidAux
 fi
 
-# Once priorities have been set, hence synch-protocols fine adjusted, adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
-sleep 60 # give time to time protocols to lock
-sudo adjtimex -a --force-adjust #-a --force-adjust # -f 0
-
-if ! sudo crontab -l > /dev/null 2>&1; then
-    sudo crontab -e
-fi
-
-line_to_check="adjtimex"
-line_to_add="30 * * * * sudo /sbin/adjtimex -a --force-adjust" #-a --force-adjust" #-f 0"
-
-sudo crontab -l | grep -q "$line_to_check"
-
-if [ $? -eq 0 ]; then
-  sudo crontab -l | grep -v "$line_to_check" | sudo crontab -
-fi
-
-echo "$line_to_add" | sudo crontab -
+# Maybe using adjtimex is bad idea because it is an extra layer not controlled by synchronization protocols
+## Once priorities have been set, hence synch-protocols fine adjusted, adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
+#sleep 60 # give time to time protocols to lock
+#sudo adjtimex -a --force-adjust #-a --force-adjust # -f 0#
+#
+#if ! sudo crontab -l > /dev/null 2>&1; then
+#    sudo crontab -e
+#fi
+#
+#line_to_check="adjtimex"
+#line_to_add="30 * * * * sudo /sbin/adjtimex -a --force-adjust" #-a --force-adjust" #-f 0"
+#
+#sudo crontab -l | grep -q "$line_to_check"
+#
+#if [ $? -eq 0 ]; then
+#  sudo crontab -l | grep -v "$line_to_check" | sudo crontab -
+#fi
+#
+#echo "$line_to_add" | sudo crontab -
 
 read -r -p "Press Ctrl+C to kill launched processes
 " # Block operation until Ctrl+C is pressed
