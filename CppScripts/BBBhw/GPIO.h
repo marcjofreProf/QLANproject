@@ -32,8 +32,8 @@ using std::fstream;
 #define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
 #define NumSynchMeasAvgAux 	351 //51; // Num averages to compute the relative frequency difference. Better to be odd number.
-#define ExtraNumSynchMeasAvgAux 	150 // Averaging for computing current absolute time offset
-#define ExtraExtraNumSynchMeasAvgAux 	1 // Averaging for computing current relative frequency diference
+#define ExtraNumSynchMeasAvgAux 	351 // Averaging for computing current absolute time offset
+#define ExtraExtraNumSynchMeasAvgAux 	5 // Averaging for computing current relative frequency diference
 
 namespace exploringBB {
 
