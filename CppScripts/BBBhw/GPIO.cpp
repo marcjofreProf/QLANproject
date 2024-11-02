@@ -682,8 +682,8 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(SynchTrigPeriod));
 	
 	pru0dataMem_int[3]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
-
-	pru0dataMem_int[6]=static_cast<unsigned int>(this->TTGcoincWin); // set coincidence window length
+	if (QPLAFlagTestSynchAux==true){pru0dataMem_int[6]=static_cast<unsigned int>(2);}// Minimum width for the timetagging coincidence window, to have accuracy
+	else{pru0dataMem_int[6]=static_cast<unsigned int>(this->TTGcoincWin);} // set coincidence window length
 
 	// Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
 	requestCoincidenceWhileWait=CoincidenceSetWhileWait();
