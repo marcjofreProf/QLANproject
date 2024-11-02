@@ -119,7 +119,7 @@ private:// Variables
 	double SynchTrigPeriod=4096.0; //For slotted analysis. It has to match to the histogram analysis
 	double SigONPeriod=10.0; // ON time (duty cycle) of the signal, in PRU time. It cannot be smaller than 6. It has to be multiple of 2. Somehow, it cannot be very large because the PRUs stall (maybe a voltage issue or device tree overlay...)
 	double MultFactorEffSynchPeriod=4.0; // When using 4 channels histogram, this value is 4.0; when using real signals this value should be 1.0 (also in QphysLayerAgent.h)
-	unsigned long long int TimePRU1synchPeriod=200000000; // In nanoseconds and multiple of PRUclockStepPeriodNanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. Also, the sorter the more error in the correct estimation, since there has not elapsed enough time to compute a tendency (it also happens with PRUdetCorrRelFreq() method whre a separation TagsSeparationDetRelFreq is inserted). The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
+	unsigned long long int TimePRU1synchPeriod=100000000; // In nanoseconds and multiple of PRUclockStepPeriodNanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. Also, the sorter the more error in the correct estimation, since there has not elapsed enough time to compute a tendency (it also happens with PRUdetCorrRelFreq() method whre a separation TagsSeparationDetRelFreq is inserted). The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
 	unsigned long long int DistTimePRU1synchPeriod=10; // Multiple of PRUclockStepPeriodNanoseconds. Number of passes with respect TimePRU1synchPeriod, in order to compute both the absolute time difference and the relative frequency difference
 	unsigned long long int iepPRUtimerRange32bits=4294967296; //32 bits
 	struct timespec requestWhileWait;
@@ -174,7 +174,7 @@ private:// Variables
 	long long int valCarryOnCycleCountPRU=0; // 64 bits
 	// PRU timetagger
 	int retInterruptsPRU0;
-	int WaitTimeInterruptPRU0=7500000; //up to 20000000 with Simple TTG. In microseconds. Although the longer the more innacurraccy in the synch routine
+	int WaitTimeInterruptPRU0=15000000; //up to 20000000 with Simple TTG. In microseconds. Although the longer the more innacurraccy in the synch routine
 	//TimePoint TimePointClockNowPRU0;
 	//unsigned long long int TimeNow_time_as_countPRU0;	
 	//TimePoint FutureTimePointPRU0;
@@ -186,7 +186,7 @@ private:// Variables
 	unsigned int TTGcoincWin=10;// It cannot be smaller than 2. Timetagging coincidence window length In PRU units. It reduces time resolution of the detected qubits.
 	unsigned int NumQuBitsPerRun=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 	int retInterruptsPRU1;
-	int WaitTimeInterruptPRU1=7500000; // In microseconds. Signal generation
+	int WaitTimeInterruptPRU1=15000000; // In microseconds. Signal generation
 	//int WaitTimeToFutureTimePointPRU1=1000;// The internal PRU counter (as it is all programmed) can hold around 5s before overflowing. Hence, accounting for sending the command, it is reasonable to say that the timer should last 5s, not more otherwise the synch calculation error overflows as well and things go bad.
 	//TimePoint TimePointClockNowPRU1;
 	//unsigned long long int TimeNow_time_as_countPRU1;	
