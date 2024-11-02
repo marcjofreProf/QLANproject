@@ -1,5 +1,5 @@
 // Program to compute the interrupt frequency of the OS
-// Compile as gcc OS-frequency-test.c
+// Compile as gcc OS-frequency-test.c in the intended machine
 // Execute in the intended machine as ./a.out
 
 #include <signal.h>
