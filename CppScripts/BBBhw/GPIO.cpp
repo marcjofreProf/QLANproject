@@ -335,7 +335,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
 				prussdrv_pru_send_event(22);
 				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.			
-				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
+				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRUShort);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
 				//cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 				if (retInterruptsPRU1>0){
 					prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -484,7 +484,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				// Warm up interrupt handling for Timetagg PRU0
 				pru0dataMem_int[0]=static_cast<unsigned int>(8); // set command warm-up
 				prussdrv_pru_send_event(21);				
-				retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);				
+				retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRUShort);				
 
 				//cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
 				if (retInterruptsPRU0>0){
