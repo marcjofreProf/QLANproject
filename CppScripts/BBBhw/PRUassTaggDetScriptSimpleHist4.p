@@ -69,7 +69,8 @@
 // r29 is mainly used for LED indicators operations
 // r30 is reserved for output pins
 // r31 is reserved for inputs pin
-INITIATIONS:// This is only run once    
+INITIATIONS:// This is only run once
+	LED_OFF
 	LBCO	r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
 	// OCP master port is the protocol to enable communication between the PRUs and the host processor
 	CLR	r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
@@ -321,10 +322,10 @@ FINISH:
 	JMP 	CMDLOOP // finished, wait for next command. So it continuosly loops	
 EXIT:
 	// Send notification (interrupt) to Host for program completion
-	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
-	// Halt the processor
-	HALT
+	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16	
+	HALT // Halt the processor
 
 ERR:
 	LED_ON
-	JMP ERR
+	JMP INITIATIONS
+//	JMP ERR
