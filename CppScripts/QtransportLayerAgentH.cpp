@@ -944,346 +944,352 @@ return 0; // All OK
 }
 
 int QTLAH::ProcessNewMessage(){
-//cout << "Host ReadBuffer: " << this->ReadBuffer << endl;
-// Parse the message information
+try{
+	//cout << "Host ReadBuffer: " << this->ReadBuffer << endl;
+	// Parse the message information
 	char ReadBufferAuxOriginal[NumBytesBufferICPMAX] = {0};
-strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
+	strcpy(ReadBufferAuxOriginal,this->ReadBuffer); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
 
-int NumQintupleComas=this->countQintupleComas(ReadBufferAuxOriginal);
-if (NumQintupleComas>20){NumQintupleComas=NumProcessMessagesConcurrentMax;}// Limit the total number that can be proceessed, avoiding cascades
-//cout << "NumQintupleComas: " << NumQintupleComas << endl;
-//NumQintupleComas=1;
-for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
-	char IPdest[NumBytesBufferICPMAX] = {0};
-	char IPorg[NumBytesBufferICPMAX] = {0};
-	char Type[NumBytesBufferICPMAX] = {0};
-	char Command[NumBytesBufferICPMAX] = {0};
-	char Payload[NumBytesBufferICPMAX] = {0};
-	char ReadBufferAux[NumBytesBufferICPMAX] = {0};
-	strcpy(ReadBufferAux,ReadBufferAuxOriginal); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
-	for (int iIterDump=0;iIterDump<(5*iIterMessages);iIterDump++){
-		if (iIterDump==0){strtok(ReadBufferAux,",");}
-		else{strtok(NULL,",");}
-	}
-	if (iIterMessages==0){strcpy(IPdest,strtok(ReadBufferAux,","));}
-	else{strcpy(IPdest,strtok(NULL,","));}
-	strcpy(IPorg,strtok(NULL,","));
-	strcpy(Type,strtok(NULL,","));
-	strcpy(Command,strtok(NULL,","));
-	strcpy(Payload,strtok(NULL,","));
-	
+	int NumQintupleComas=this->countQintupleComas(ReadBufferAuxOriginal);
+	if (NumQintupleComas>20){NumQintupleComas=NumProcessMessagesConcurrentMax;}// Limit the total number that can be proceessed, avoiding cascades
 	//cout << "NumQintupleComas: " << NumQintupleComas << endl;
-	//cout << "iIterMessages: " << iIterMessages << endl;
-	//cout << "IPdest: " << IPdest << endl;
-	//cout << "IPorg: " << IPorg << endl;
-	//cout << "Type: " << Type << endl;
-	//cout << "Command: " << Command << endl;
-	//cout << "Payload: " << Payload << endl;
+	//NumQintupleComas=1;
+	for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
+		char IPdest[NumBytesBufferICPMAX] = {0};
+		char IPorg[NumBytesBufferICPMAX] = {0};
+		char Type[NumBytesBufferICPMAX] = {0};
+		char Command[NumBytesBufferICPMAX] = {0};
+		char Payload[NumBytesBufferICPMAX] = {0};
+		char ReadBufferAux[NumBytesBufferICPMAX] = {0};
+		strcpy(ReadBufferAux,ReadBufferAuxOriginal); // Otherwise the strtok puts the pointer at the end and then ReadBuffer is empty
+		for (int iIterDump=0;iIterDump<(5*iIterMessages);iIterDump++){
+			if (iIterDump==0){strtok(ReadBufferAux,",");}
+			else{strtok(NULL,",");}
+		}
+		if (iIterMessages==0){strcpy(IPdest,strtok(ReadBufferAux,","));}
+		else{strcpy(IPdest,strtok(NULL,","));}
+		strcpy(IPorg,strtok(NULL,","));
+		strcpy(Type,strtok(NULL,","));
+		strcpy(Command,strtok(NULL,","));
+		strcpy(Payload,strtok(NULL,","));
+		
+		//cout << "NumQintupleComas: " << NumQintupleComas << endl;
+		//cout << "iIterMessages: " << iIterMessages << endl;
+		//cout << "IPdest: " << IPdest << endl;
+		//cout << "IPorg: " << IPorg << endl;
+		//cout << "Type: " << Type << endl;
+		//cout << "Command: " << Command << endl;
+		//cout << "Payload: " << Payload << endl;
 
-	// Identify what to do and execute it
-	if (string(Type)==string("Operation")){// Operation message. 
-		//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
-		if(string(IPdest)==string(this->IPaddressesSockets[1]) or string(IPdest)==string(this->IPaddressesSockets[2])){// Information for this host
-			if (string(Command)==string("SimulateNumStoredQubitsNode")){// Reply message. Expected/awaiting message
-				//cout << "We are here NumStoredQubitsNode" << endl;
-				//cout << "Payload: " << Payload << endl;
-				int NumSubPayloads=this->countColons(Payload);
-				//cout << "NumSubPayloads: " << NumSubPayloads << endl;
-				char SubPayload[NumBytesBufferICPMAX] = {0};						
-				for (int i=0;i<NumSubPayloads;i++){					
-					if (i==0){						
-						strcpy(SubPayload,strtok(Payload,":"));
-						this->SimulateNumStoredQubitsNodeParamsIntArray[0]=atoi(SubPayload);
-						//cout << "atoi(SubPayload): " << atoi(SubPayload) << endl;
+		// Identify what to do and execute it
+		if (string(Type)==string("Operation")){// Operation message. 
+			//cout << "this->ReadBuffer: " << this->ReadBuffer << endl;
+			if(string(IPdest)==string(this->IPaddressesSockets[1]) or string(IPdest)==string(this->IPaddressesSockets[2])){// Information for this host
+				if (string(Command)==string("SimulateNumStoredQubitsNode")){// Reply message. Expected/awaiting message
+					//cout << "We are here NumStoredQubitsNode" << endl;
+					//cout << "Payload: " << Payload << endl;
+					int NumSubPayloads=this->countColons(Payload);
+					//cout << "NumSubPayloads: " << NumSubPayloads << endl;
+					char SubPayload[NumBytesBufferICPMAX] = {0};						
+					for (int i=0;i<NumSubPayloads;i++){					
+						if (i==0){						
+							strcpy(SubPayload,strtok(Payload,":"));
+							this->SimulateNumStoredQubitsNodeParamsIntArray[0]=atoi(SubPayload);
+							//cout << "atoi(SubPayload): " << atoi(SubPayload) << endl;
+						}
+						else{
+							strcpy(SubPayload,strtok(NULL,":"));
+							this->TimeTaggsDetAnalytics[i-1]=stod(SubPayload);
+							//cout << "stof(SubPayload): " << stod(SubPayload) << endl;
+						}
+					}
+
+					this->InfoSimulateNumStoredQubitsNodeFlag=true;
+					//cout << "SimulateNumStoredQubitsNode finished parsing values" << endl;		
+				}
+				else if (string(Command)==string("SimulateSynchParamsNode")){// Reply message. Expected/awaiting message
+					//cout << "We are here SimulateSynchParamsNode" << endl;
+					//cout << "Payload: " << Payload << endl;
+					int NumSubPayloads=this->countColons(Payload);
+					//cout << "NumSubPayloads: " << NumSubPayloads << endl;
+					char SubPayload[NumBytesBufferICPMAX] = {0};						
+					for (int i=0;i<(NumSubPayloads-1);i++){				
+						if (i==0){						
+							strcpy(SubPayload,strtok(Payload,":"));
+						}
+						else{
+							strcpy(SubPayload,strtok(NULL,":"));
+						}
+						this->TimeTaggsDetSynchParams[i]=stod(SubPayload);
+						//cout << "stod(SubPayload): " << stod(SubPayload) << endl;
+					}
+
+					this->InfoSimulateNumStoredQubitsNodeFlag=true;
+					//cout << "SimulateSynchParamsNode finished parsing values" << endl;		
+				}
+				else if (string(Command)==string("HardwareSynchNode")){
+					if (string(Payload)==string("true")){
+						// If received is because node is hardware synched
+						GPIOnodeHardwareSynched=true;
+						cout << "Node " << this->IPaddressesSockets[0] << " hardware synched. Proceed with the network synchronization..." << endl;
 					}
 					else{
-						strcpy(SubPayload,strtok(NULL,":"));
-						this->TimeTaggsDetAnalytics[i-1]=stod(SubPayload);
-						//cout << "stof(SubPayload): " << stod(SubPayload) << endl;
+						// If received is because node is NOT hardware synched
+						GPIOnodeHardwareSynched=false;
+						cout << "Node " << this->IPaddressesSockets[0] << " hardware NOT synched..." << endl;
 					}
 				}
+				else if (string(Command)==string("HostAreYouFree")){// Operations regarding availability request by other hosts
+					// Different operation with respect the host that has sent the request				
+					if (string(InfoRemoteHostActiveActions[0])==string(IPorg)){// Is the message from the current active host?
+						if (string(Payload)==string("UnBlock")){// UnBlock
+							strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
+							strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
+							HostsActiveActionsFree[0]=true; // Set the host as free
+						}
+					}
+					else{// Either the message is not from the current active hosts or there is no active host, or it is a response for this host
+						if (string(Payload)==string("true") or string(Payload)==string("false")){// Response from another host
+							if (string(Payload)==string("true")){HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]=false;}// Mark it as Block
+							else{HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]=true;}
+							NumAnswersOtherHostsActiveActionsFree++;// Update value
+							//cout << "Response HostAreYouFree: " << IPorg << ", " << Payload << endl;
+						}
+						else if (HostsActiveActionsFree[0]==true and string(Payload)==string("Block") and GPIOnodeHardwareSynched==true){// Block
+							strcpy(InfoRemoteHostActiveActions[0],IPorg);// Copy the identification of the host
+							strcpy(InfoRemoteHostActiveActions[1],"Block");// Set status to Preventive
+							HostsActiveActionsFree[0]=false; // Set the host as not free
+							// Respond with message saying that available
+							char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+							strcpy(ParamsCharArray,IPorg);// Send to what was the origin
+							strcat(ParamsCharArray,",");
+							strcat(ParamsCharArray,IPdest);// From what was the origin
+							strcat(ParamsCharArray,",");
+							strcat(ParamsCharArray,"Operation");
+							strcat(ParamsCharArray,",");
+							strcat(ParamsCharArray,Command);
+							strcat(ParamsCharArray,",");
+							strcat(ParamsCharArray,"true");
+							strcat(ParamsCharArray,",");// Very important to end the message
+							//cout << "Operation HostAreYouFree Preventive" << endl;	
+							this->ICPdiscoverSend(ParamsCharArray);
+						}
+						else if ((HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false) and string(Payload)==string("Block")){// Not free. Respond that not free (either because not free, or not finalized with synchronizations)
+							// Respond with message saying that not available
+							// Respond with message saying that available
+							char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+							strcpy(ParamsCharArray,IPorg);// Send to what was the origin
+							strcat(ParamsCharArray,",");
+							strcat(ParamsCharArray,IPdest);// From what was the origin
+							strcat(ParamsCharArray,",");
+							strcat(ParamsCharArray,Type);
+							strcat(ParamsCharArray,",");
+							strcat(ParamsCharArray,Command);
+							strcat(ParamsCharArray,",");
+							strcat(ParamsCharArray,"false");
+							strcat(ParamsCharArray,",");// Very important to end the message
+							//cout << "Operation Message forward ParamsCharArray: " << ParamsCharArray << endl;	
+							this->ICPdiscoverSend(ParamsCharArray);
+						}
+						else if (string(Payload)==string("UnBlock")){// Apparently not needed, but just in case
+							//Do not act on UnBlock petitions from other hosts since another active petition has been already proceesses
+							
+						}
+						else{// Non of the above, which is a malfunction						
+							cout << "Host HostAreYouFree not handled!" << endl;
+							cout << "IPdest: " << IPdest << ", IPorg: " << IPorg << ", Type: " << Type << ", Command: " << Command << " , Payload: " << Payload << endl;
+						}
+					}
 
-				this->InfoSimulateNumStoredQubitsNodeFlag=true;
-				//cout << "SimulateNumStoredQubitsNode finished parsing values" << endl;		
-			}
-			else if (string(Command)==string("SimulateSynchParamsNode")){// Reply message. Expected/awaiting message
-				//cout << "We are here SimulateSynchParamsNode" << endl;
-				//cout << "Payload: " << Payload << endl;
-				int NumSubPayloads=this->countColons(Payload);
-				//cout << "NumSubPayloads: " << NumSubPayloads << endl;
-				char SubPayload[NumBytesBufferICPMAX] = {0};						
-				for (int i=0;i<(NumSubPayloads-1);i++){				
-					if (i==0){						
-						strcpy(SubPayload,strtok(Payload,":"));
-					}
-					else{
-						strcpy(SubPayload,strtok(NULL,":"));
-					}
-					this->TimeTaggsDetSynchParams[i]=stod(SubPayload);
-					//cout << "stod(SubPayload): " << stod(SubPayload) << endl;
 				}
-
-				this->InfoSimulateNumStoredQubitsNodeFlag=true;
-				//cout << "SimulateSynchParamsNode finished parsing values" << endl;		
-			}
-			else if (string(Command)==string("HardwareSynchNode")){
-				if (string(Payload)==string("true")){
-					// If received is because node is hardware synched
-					GPIOnodeHardwareSynched=true;
-					cout << "Node " << this->IPaddressesSockets[0] << " hardware synched. Proceed with the network synchronization..." << endl;
-				}
+				else if (string(Command)==string("print")){
+					cout << "Host " << this->IPaddressesSockets[2] << " New Message: "<< Payload << endl;
+				}				
 				else{
-					// If received is because node is NOT hardware synched
-					GPIOnodeHardwareSynched=false;
-					cout << "Node " << this->IPaddressesSockets[0] << " hardware NOT synched..." << endl;
-				}
+					cout << "Host " << this->IPaddressesSockets[2] << " does not have this Operational message: "<< Command << endl;
+				}			
 			}
-			else if (string(Command)==string("HostAreYouFree")){// Operations regarding availability request by other hosts
-				// Different operation with respect the host that has sent the request				
-				if (string(InfoRemoteHostActiveActions[0])==string(IPorg)){// Is the message from the current active host?
-					if (string(Payload)==string("UnBlock")){// UnBlock
-						strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
-						strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
-						HostsActiveActionsFree[0]=true; // Set the host as free
-					}
-				}
-				else{// Either the message is not from the current active hosts or there is no active host, or it is a response for this host
-					if (string(Payload)==string("true") or string(Payload)==string("false")){// Response from another host
-						if (string(Payload)==string("true")){HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]=false;}// Mark it as Block
-						else{HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]=true;}
-						NumAnswersOtherHostsActiveActionsFree++;// Update value
-						//cout << "Response HostAreYouFree: " << IPorg << ", " << Payload << endl;
-					}
-					else if (HostsActiveActionsFree[0]==true and string(Payload)==string("Block") and GPIOnodeHardwareSynched==true){// Block
-						strcpy(InfoRemoteHostActiveActions[0],IPorg);// Copy the identification of the host
-						strcpy(InfoRemoteHostActiveActions[1],"Block");// Set status to Preventive
-						HostsActiveActionsFree[0]=false; // Set the host as not free
-						// Respond with message saying that available
-						char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-						strcpy(ParamsCharArray,IPorg);// Send to what was the origin
+			else if (string(IPdest)!=string(this->IPaddressesSockets[1]) and string(IPdest)!=string(this->IPaddressesSockets[2])){// Message not for this host, forward it			
+				char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+				strcpy(ParamsCharArray,IPdest);
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,IPorg);
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,Type);
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,Command);
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,Payload);
+				strcat(ParamsCharArray,",");// Very important to end the message
+				//cout << "Operation Message forward ParamsCharArray: " << ParamsCharArray << endl;	
+				this->ICPdiscoverSend(ParamsCharArray);
+			}				
+			else{//Default
+				cout << "Operational message to host not handled: "<< Payload << endl;
+			}
+		}
+		else if(string(Type)==string("Control")){//Control message are not meant for host, so forward it accordingly
+			if (string(IPorg)==string(this->IPaddressesSockets[0])){ // If it comes from its attached node and is a control message then it is not for this host, forward it to other hosts' nodes
+			// The node of a host is always identified in the Array in position 0
+			  //cout << "Host " << this->IPaddressesSockets[2] << " retransmit params from node " << this->IPaddressesSockets[0] <<": " << Payload << endl;			    
+				int socket_fd_conn;
+			    // Mount message
+			    // Notice that nodes Control (and only Control messages, Operational messages do not have this) messages meant to other nodes through their respective hosts have a composed payload, where the first part has the other host's node to whom the message has to be forwarded (at least up to its host - the host of the node sending the message). Hence, the Payload has to be processed a bit.
+			    for (int iIterOpHost=0;iIterOpHost<NumConnectedHosts;iIterOpHost++){// Manually set - This should be programmed in order to scale
+			    	char PayLoadReassembled[NumBytesPayloadBuffer] = {0};
+	    	    char PayLoadProc1[NumBytesPayloadBuffer] = {0};// To process the "_" level
+	    	    char PayLoadProc1Aux[NumBytesPayloadBuffer] = {0};// To process the "_" level Aux
+	    	    char PayloadAux[NumBytesPayloadBuffer] = {0};
+				    // Process the payload first
+			    	char IPaddressesSocketsAux[IPcharArrayLengthMAX] = {0};
+	    	    strcpy(IPaddressesSocketsAux,this->IPaddressesSockets[iIterOpHost+3]);
+	    	    bool NonEmptyPayloadAux=false;
+				    // Analyze if there are messages for host this->IPaddressesSockets[iIterOpHost+3]
+				    // Payload message is like: Trans;Header_Payload1:Payload2:_Header_Payload_;Header_Payload_Header_Payload_;Net;none_none_;Link;none_none_;Phys;none_none_; 
+
+				    for (int iIterNodeAgents=0;iIterNodeAgents<4;iIterNodeAgents++){// Discard the first Layer Name = Trans
+				      strcpy(PayloadAux,Payload);// Make a copy of the original Payload
+				    	for (int iIterPayloadDump=0;iIterPayloadDump<(2*iIterNodeAgents);iIterPayloadDump++){// Reposition the pointer of strtok
+				    		if (iIterPayloadDump==0){strtok(PayloadAux,";");}
+				    		else{strtok(NULL,";");}
+				    	}
+				    	if (iIterNodeAgents==0){
+				    		strcpy(PayLoadReassembled,strtok(PayloadAux,";"));
+				    	}
+				    	else{// Discard the following Layer Names = Net; Link; Phys
+				    		strcat(PayLoadReassembled,strtok(NULL,";"));			    		
+				    	}
+				    	strcat(PayLoadReassembled,";");// Finish with semicolon
+				    	//cout << "QTLAH::PayLoadReassembled: " << PayLoadReassembled << endl;
+				    	strcpy(PayLoadProc1,strtok(NULL,";"));// To process the "_" level
+				    	if (string(PayLoadProc1)!=string("") and string(PayLoadProc1)!=string("none_none_")){// There is data to process
+				    		int NumSubPayloads=countQuadrupleUnderscores(PayLoadProc1);//
+				    		//cout << "NumSubPayloads: " << NumSubPayloads << endl;
+				    		//cout << "PayLoadProc1: " << PayLoadProc1 << endl;
+				    		int NumInterestSubPayloads=0;
+				    		for (int iIterSubPayloads=0;iIterSubPayloads<NumSubPayloads;iIterSubPayloads++){
+				    			if (iIterSubPayloads==0){strtok(PayLoadProc1,"_");}// Discard because it should be IPdest
+				    			else{strtok(NULL,"_");}// Discard because it should be IPdest
+				    			strcpy(PayLoadProc1Aux,strtok(NULL,"_"));// Indicates the IP	
+				    			//cout << "PayLoadProc1Aux: " << PayLoadProc1Aux << endl;			    						    				    			
+				    			if (string(IPaddressesSocketsAux)==string(PayLoadProc1Aux)){// Param message meant for the host's node of current interest
+				    				strcat(PayLoadReassembled,strtok(NULL,"_"));
+				    				strcat(PayLoadReassembled,"_");	// Finish with underscore
+				    				strcat(PayLoadReassembled,strtok(NULL,"_"));
+				    				strcat(PayLoadReassembled,"_");	// Finish with underscore
+				    				NumInterestSubPayloads++;
+				    				NonEmptyPayloadAux=true;
+				    			}
+					    		else{// Discard params because not meant for the IP of interest
+					    			strtok(NULL,"_");
+					    			strtok(NULL,"_");
+					    		}
+					    	}
+				    		if (NumInterestSubPayloads==0){// Just put "none_none_" if empty; none of the parameters was for the IP checked
+				    			strcat(PayLoadReassembled,"none_none_");
+				    		}
+				    		
+				    	}
+				    	else{// Just copy "none_none_"
+				    		strcat(PayLoadReassembled,PayLoadProc1);			    		
+				    	}
+				    	strcat(PayLoadReassembled,";");	// Finish with semicolon	    			    				    
+				    }
+				    //cout << "Host's node Control Message original Payload: " << Payload << endl;
+				    //cout << "Host's node Control Message reassembled Payload: " << PayLoadReassembled << endl;
+				    
+				    // Actually mount the reassembled message
+				    char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+						strcpy(ParamsCharArray,IPaddressesSocketsAux);//IPdest);
 						strcat(ParamsCharArray,",");
-						strcat(ParamsCharArray,IPdest);// From what was the origin
-						strcat(ParamsCharArray,",");
-						strcat(ParamsCharArray,"Operation");
-						strcat(ParamsCharArray,",");
-						strcat(ParamsCharArray,Command);
-						strcat(ParamsCharArray,",");
-						strcat(ParamsCharArray,"true");
-						strcat(ParamsCharArray,",");// Very important to end the message
-						//cout << "Operation HostAreYouFree Preventive" << endl;	
-						this->ICPdiscoverSend(ParamsCharArray);
-					}
-					else if ((HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false) and string(Payload)==string("Block")){// Not free. Respond that not free (either because not free, or not finalized with synchronizations)
-						// Respond with message saying that not available
-						// Respond with message saying that available
-						char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-						strcpy(ParamsCharArray,IPorg);// Send to what was the origin
-						strcat(ParamsCharArray,",");
-						strcat(ParamsCharArray,IPdest);// From what was the origin
+						strcat(ParamsCharArray,IPorg);
 						strcat(ParamsCharArray,",");
 						strcat(ParamsCharArray,Type);
 						strcat(ParamsCharArray,",");
 						strcat(ParamsCharArray,Command);
 						strcat(ParamsCharArray,",");
-						strcat(ParamsCharArray,"false");
+						strcat(ParamsCharArray,PayLoadReassembled);//Payload);
 						strcat(ParamsCharArray,",");// Very important to end the message
-						//cout << "Operation Message forward ParamsCharArray: " << ParamsCharArray << endl;	
-						this->ICPdiscoverSend(ParamsCharArray);
-					}
-					else if (string(Payload)==string("UnBlock")){// Apparently not needed, but just in case
-						//Do not act on UnBlock petitions from other hosts since another active petition has been already proceesses
-						
-					}
-					else{// Non of the above, which is a malfunction						
-						cout << "Host HostAreYouFree not handled!" << endl;
-						cout << "IPdest: " << IPdest << ", IPorg: " << IPorg << ", Type: " << Type << ", Command: " << Command << " , Payload: " << Payload << endl;
+						//cout << "Node message to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
+						//cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
+					if(NonEmptyPayloadAux){// Non-empty, hence send
+						strcpy(this->SendBuffer,ParamsCharArray);			
+					    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
+						    socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
+						    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);//this->IPaddressesSockets[3]);
+						  }
+					    else{ //host acts as server		    
+						    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
+						    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);//this->IPaddressesSockets[3]);
+						  }
+						}
+			     } // end for	    
+			   }	
+			else{// It does not come from its node and it is a control message, so it has to forward to its node
+			   // The node of a host is always identified in the Array in position 0	
+			    //cout << "SendBuffer: " << this->SendBuffer << endl;
+			    // Mount message
+				char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+				strcpy(ParamsCharArray,IPdest);
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,IPorg);
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,Type);
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,Command);
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,Payload);
+				strcat(ParamsCharArray,",");// Very important to end the message
+				//cout << "ParamsCharArray: " << ParamsCharArray << endl;
+				strcpy(this->SendBuffer,ParamsCharArray);
+			    int socket_fd_conn=this->socket_fdArray[0];  // the host always acts as client to the node, so it needs the socket descriptor (it applies both to TCP and UDP)
+			    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
+			    // Just to keep track of things
+			    if (string(Command)==string("SimulateSendSynchQubits")){// Count how many order of synch network from other hosts received
+			    	// First way of counting
+			    	numHolderOtherNodesSendSynchQubits++;
+			    	//cout << "Another node " << IPorg << " requesting synch qubits! " << "numHolderOtherNodesSendSynchQubits: " << numHolderOtherNodesSendSynchQubits << endl;
+			    	// Second way of counting for superior resilence and avoid being blocked
+			    	// PArtially decoding the Payload with the information of the current iterators of the network synching process
+			    	char PayloadAux[NumBytesBufferICPMAX] = {0}; // Copy the Payload to not correct it when reading with strtok
+			    	strcpy(PayloadAux,Payload);	
+			    	strtok(PayloadAux,";");// skip content//strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
+				//char PayloadAuxAux[NumBytesPayloadBuffer]={0};
+				strtok(NULL,";");// skip content//strcpy(PayloadAux,strtok(NULL,";"));
+				strtok(NULL,";");// skip content //this->QLLANumRunsPerCenterMass=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+				int iCenterMassAux=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+				int iNumRunsPerCenterMassAux=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+				//this->QLLAFreqSynchNormValuesArray[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+				//this->QLLAFreqSynchNormValuesArray[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+				//this->QLLAFreqSynchNormValuesArray[2]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+				//this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+				//this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
+				if (numHolderOtherNodesSendSynchQubits>=(NumCalcCenterMass*NumRunsPerCenterMass) or (iCenterMassAux==(NumCalcCenterMass-1) and iNumRunsPerCenterMassAux==(NumRunsPerCenterMass-1))){
+			    		numHolderOtherNodesSendSynchQubits=0;// reset value
+			    		numHolderOtherNodesSynchNetwork++;// Count the number of other nodes that run network synch
+			    		cout << "Another pair of nodes " << IPorg << " and " << IPdest << " synch iteration completed!" << endl;
+			    		if (numHolderOtherNodesSynchNetwork==(NumConnectedHosts+1)){// All connected nodes and this host's node have been netwrok synch, so we can reset the synch cycle 
+			    			CycleSynchNetworkDone=false;
+						numHolderOtherNodesSynchNetwork=0;// reset value
 					}
 				}
-
-			}
-			else if (string(Command)==string("print")){
-				cout << "Host " << this->IPaddressesSockets[2] << " New Message: "<< Payload << endl;
-			}				
-			else{
-				cout << "Host " << this->IPaddressesSockets[2] << " does not have this Operational message: "<< Command << endl;
-			}			
-		}
-		else if (string(IPdest)!=string(this->IPaddressesSockets[1]) and string(IPdest)!=string(this->IPaddressesSockets[2])){// Message not for this host, forward it			
-			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-			strcpy(ParamsCharArray,IPdest);
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,IPorg);
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,Type);
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,Command);
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,Payload);
-			strcat(ParamsCharArray,",");// Very important to end the message
-			//cout << "Operation Message forward ParamsCharArray: " << ParamsCharArray << endl;	
-			this->ICPdiscoverSend(ParamsCharArray);
-		}				
-		else{//Default
-			cout << "Operational message to host not handled: "<< Payload << endl;
-		}
+			}		    
+		}  
 	}
-	else if(string(Type)==string("Control")){//Control message are not meant for host, so forward it accordingly
-		if (string(IPorg)==string(this->IPaddressesSockets[0])){ // If it comes from its attached node and is a control message then it is not for this host, forward it to other hosts' nodes
-		// The node of a host is always identified in the Array in position 0
-		  //cout << "Host " << this->IPaddressesSockets[2] << " retransmit params from node " << this->IPaddressesSockets[0] <<": " << Payload << endl;			    
-			int socket_fd_conn;
-		    // Mount message
-		    // Notice that nodes Control (and only Control messages, Operational messages do not have this) messages meant to other nodes through their respective hosts have a composed payload, where the first part has the other host's node to whom the message has to be forwarded (at least up to its host - the host of the node sending the message). Hence, the Payload has to be processed a bit.
-		    for (int iIterOpHost=0;iIterOpHost<NumConnectedHosts;iIterOpHost++){// Manually set - This should be programmed in order to scale
-		    	char PayLoadReassembled[NumBytesPayloadBuffer] = {0};
-    	    char PayLoadProc1[NumBytesPayloadBuffer] = {0};// To process the "_" level
-    	    char PayLoadProc1Aux[NumBytesPayloadBuffer] = {0};// To process the "_" level Aux
-    	    char PayloadAux[NumBytesPayloadBuffer] = {0};
-			    // Process the payload first
-		    	char IPaddressesSocketsAux[IPcharArrayLengthMAX] = {0};
-    	    strcpy(IPaddressesSocketsAux,this->IPaddressesSockets[iIterOpHost+3]);
-    	    bool NonEmptyPayloadAux=false;
-			    // Analyze if there are messages for host this->IPaddressesSockets[iIterOpHost+3]
-			    // Payload message is like: Trans;Header_Payload1:Payload2:_Header_Payload_;Header_Payload_Header_Payload_;Net;none_none_;Link;none_none_;Phys;none_none_; 
-
-			    for (int iIterNodeAgents=0;iIterNodeAgents<4;iIterNodeAgents++){// Discard the first Layer Name = Trans
-			      strcpy(PayloadAux,Payload);// Make a copy of the original Payload
-			    	for (int iIterPayloadDump=0;iIterPayloadDump<(2*iIterNodeAgents);iIterPayloadDump++){// Reposition the pointer of strtok
-			    		if (iIterPayloadDump==0){strtok(PayloadAux,";");}
-			    		else{strtok(NULL,";");}
-			    	}
-			    	if (iIterNodeAgents==0){
-			    		strcpy(PayLoadReassembled,strtok(PayloadAux,";"));
-			    	}
-			    	else{// Discard the following Layer Names = Net; Link; Phys
-			    		strcat(PayLoadReassembled,strtok(NULL,";"));			    		
-			    	}
-			    	strcat(PayLoadReassembled,";");// Finish with semicolon
-			    	//cout << "QTLAH::PayLoadReassembled: " << PayLoadReassembled << endl;
-			    	strcpy(PayLoadProc1,strtok(NULL,";"));// To process the "_" level
-			    	if (string(PayLoadProc1)!=string("") and string(PayLoadProc1)!=string("none_none_")){// There is data to process
-			    		int NumSubPayloads=countQuadrupleUnderscores(PayLoadProc1);//
-			    		//cout << "NumSubPayloads: " << NumSubPayloads << endl;
-			    		//cout << "PayLoadProc1: " << PayLoadProc1 << endl;
-			    		int NumInterestSubPayloads=0;
-			    		for (int iIterSubPayloads=0;iIterSubPayloads<NumSubPayloads;iIterSubPayloads++){
-			    			if (iIterSubPayloads==0){strtok(PayLoadProc1,"_");}// Discard because it should be IPdest
-			    			else{strtok(NULL,"_");}// Discard because it should be IPdest
-			    			strcpy(PayLoadProc1Aux,strtok(NULL,"_"));// Indicates the IP	
-			    			//cout << "PayLoadProc1Aux: " << PayLoadProc1Aux << endl;			    						    				    			
-			    			if (string(IPaddressesSocketsAux)==string(PayLoadProc1Aux)){// Param message meant for the host's node of current interest
-			    				strcat(PayLoadReassembled,strtok(NULL,"_"));
-			    				strcat(PayLoadReassembled,"_");	// Finish with underscore
-			    				strcat(PayLoadReassembled,strtok(NULL,"_"));
-			    				strcat(PayLoadReassembled,"_");	// Finish with underscore
-			    				NumInterestSubPayloads++;
-			    				NonEmptyPayloadAux=true;
-			    			}
-				    		else{// Discard params because not meant for the IP of interest
-				    			strtok(NULL,"_");
-				    			strtok(NULL,"_");
-				    		}
-				    	}
-			    		if (NumInterestSubPayloads==0){// Just put "none_none_" if empty; none of the parameters was for the IP checked
-			    			strcat(PayLoadReassembled,"none_none_");
-			    		}
-			    		
-			    	}
-			    	else{// Just copy "none_none_"
-			    		strcat(PayLoadReassembled,PayLoadProc1);			    		
-			    	}
-			    	strcat(PayLoadReassembled,";");	// Finish with semicolon	    			    				    
-			    }
-			    //cout << "Host's node Control Message original Payload: " << Payload << endl;
-			    //cout << "Host's node Control Message reassembled Payload: " << PayLoadReassembled << endl;
-			    
-			    // Actually mount the reassembled message
-			    char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-					strcpy(ParamsCharArray,IPaddressesSocketsAux);//IPdest);
-					strcat(ParamsCharArray,",");
-					strcat(ParamsCharArray,IPorg);
-					strcat(ParamsCharArray,",");
-					strcat(ParamsCharArray,Type);
-					strcat(ParamsCharArray,",");
-					strcat(ParamsCharArray,Command);
-					strcat(ParamsCharArray,",");
-					strcat(ParamsCharArray,PayLoadReassembled);//Payload);
-					strcat(ParamsCharArray,",");// Very important to end the message
-					//cout << "Node message to redirect at host ParamsCharArray: " << ParamsCharArray << endl;
-					//cout << "IPaddressesSocketsAux: " << IPaddressesSocketsAux << endl;
-				if(NonEmptyPayloadAux){// Non-empty, hence send
-					strcpy(this->SendBuffer,ParamsCharArray);			
-				    if (string(this->SCmode[1])==string("client") or string(SOCKtype)=="SOCK_DGRAM"){//host acts as client
-					    socket_fd_conn=this->socket_fdArray[1];   // host acts as client to the other host, so it needs the socket descriptor (it applies both to TCP and UDP) 
-					    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);//this->IPaddressesSockets[3]);
-					  }
-				    else{ //host acts as server		    
-					    socket_fd_conn=this->new_socketArray[1];  // host acts as server to the other host, so it needs the socket connection   
-					    this->ICPmanagementSend(socket_fd_conn,IPaddressesSocketsAux);//this->IPaddressesSockets[3]);
-					  }
-					}
-		     } // end for	    
-		   }	
-		else{// It does not come from its node and it is a control message, so it has to forward to its node
-		   // The node of a host is always identified in the Array in position 0	
-		    //cout << "SendBuffer: " << this->SendBuffer << endl;
-		    // Mount message
-			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-			strcpy(ParamsCharArray,IPdest);
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,IPorg);
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,Type);
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,Command);
-			strcat(ParamsCharArray,",");
-			strcat(ParamsCharArray,Payload);
-			strcat(ParamsCharArray,",");// Very important to end the message
-			//cout << "ParamsCharArray: " << ParamsCharArray << endl;
-			strcpy(this->SendBuffer,ParamsCharArray);
-		    int socket_fd_conn=this->socket_fdArray[0];  // the host always acts as client to the node, so it needs the socket descriptor (it applies both to TCP and UDP)
-		    this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
-		    // Just to keep track of things
-		    if (string(Command)==string("SimulateSendSynchQubits")){// Count how many order of synch network from other hosts received
-		    	// First way of counting
-		    	numHolderOtherNodesSendSynchQubits++;
-		    	//cout << "Another node " << IPorg << " requesting synch qubits! " << "numHolderOtherNodesSendSynchQubits: " << numHolderOtherNodesSendSynchQubits << endl;
-		    	// Second way of counting for superior resilence and avoid being blocked
-		    	// PArtially decoding the Payload with the information of the current iterators of the network synching process
-		    	char PayloadAux[NumBytesBufferICPMAX] = {0}; // Copy the Payload to not correct it when reading with strtok
-		    	strcpy(PayloadAux,Payload);	
-		    	strtok(PayloadAux,";");// skip content//strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
-			//char PayloadAuxAux[NumBytesPayloadBuffer]={0};
-			strtok(NULL,";");// skip content//strcpy(PayloadAux,strtok(NULL,";"));
-			strtok(NULL,";");// skip content //this->QLLANumRunsPerCenterMass=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
-			int iCenterMassAux=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
-			int iNumRunsPerCenterMassAux=atoi(strtok(NULL,";"));// Copy this first to not lose strtok pointer
-			//this->QLLAFreqSynchNormValuesArray[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
-			//this->QLLAFreqSynchNormValuesArray[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
-			//this->QLLAFreqSynchNormValuesArray[2]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
-			//this->QLLAFineSynchAdjVal[0]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
-			//this->QLLAFineSynchAdjVal[1]=atof(strtok(NULL,";"));// Copy this first to not lose strtok pointer
-			if (numHolderOtherNodesSendSynchQubits>=(NumCalcCenterMass*NumRunsPerCenterMass) or (iCenterMassAux==(NumCalcCenterMass-1) and iNumRunsPerCenterMassAux==(NumRunsPerCenterMass-1))){
-		    		numHolderOtherNodesSendSynchQubits=0;// reset value
-		    		numHolderOtherNodesSynchNetwork++;// Count the number of other nodes that run network synch
-		    		cout << "Another pair of nodes " << IPorg << " and " << IPdest << " synch iteration completed!" << endl;
-		    		if (numHolderOtherNodesSynchNetwork==(NumConnectedHosts+1)){// All connected nodes and this host's node have been netwrok synch, so we can reset the synch cycle 
-		    			CycleSynchNetworkDone=false;
-					numHolderOtherNodesSynchNetwork=0;// reset value
-				}
-			}
-		}		    
-	}  
+	else if(string(Type)==string("KeepAlive")){
+			//cout << "Message to Host HeartBeat: "<< Payload << endl;
+	}
+		else{// 
+			cout << "Message not handled by host: "<< Payload << endl;
+		}  
+	}// for
 }
-else if(string(Type)==string("KeepAlive")){
-		//cout << "Message to Host HeartBeat: "<< Payload << endl;
+catch (const std::exception& e) {
+// Handle the exception
+	cout << "QTLAH::ProcessNewMessage Exception: " << e.what() << endl;
 }
-	else{// 
-		cout << "Message not handled by host: "<< Payload << endl;
-	}  
-}// for
-// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
-memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
+	// Never memset this->ReadBuffer!!! Important, otherwise the are kernel failures
+	memset(this->ReadBuffer, 0, sizeof(this->ReadBuffer));// Reset buffer
 return 0; // All OK
 }
 
