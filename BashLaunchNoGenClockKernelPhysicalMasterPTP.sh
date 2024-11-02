@@ -164,9 +164,9 @@ pidAux=$(pidof -s phc2sys)
 sudo chrt -f -p $PriorityValue $pidAux
 if [[ $is_rt_kernel -eq 1 ]]; then
   pidAux=$(pgrep -f "irq/25-rtc0")
-  chrt -f -p $PriorityValue $pidAux
+  sudo chrt -f -p $PriorityValue $pidAux
   pidAux=$(pgrep -f "irq/26-rtc0")
-  chrt -f -p $PriorityValue $pidAux
+  sudo chrt -f -p $PriorityValue $pidAux
   pidAux=$(pgrep -f "irq/59-pruss_ev")
   sudo chrt -f -p $PriorityValue $pidAux
   pidAux=$(pgrep -f "irq/60-pruss_ev")
