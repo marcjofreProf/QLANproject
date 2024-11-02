@@ -172,7 +172,7 @@ private:// Variables
 	//static int chunk;
 	static unsigned int *sharedMem_int,*pru0dataMem_int,*pru1dataMem_int;
 	long long int valCarryOnCycleCountPRU=0; // 64 bits
-	int WaitTimeInterruptPRUShort=25000; // For the continuous periodic synchronization
+	int WaitTimeInterruptPRUShort=25000; // For the continuous periodic synchronization. VEry important to achieve good stability and accuracy.
 	// PRU timetagger
 	int retInterruptsPRU0;
 	int WaitTimeInterruptPRU0=7500000; //up to 20000000 with Simple TTG. In microseconds. Although the longer the more innacurraccy in the synch routine
