@@ -326,5 +326,5 @@ EXIT:
 	HALT // Halt the processor
 ERR:
 	LED_ON
-	JMP INITIATIONS
-//	JMP ERR
+//	JMP INITIATIONS
+	JMP ERR
