@@ -320,9 +320,7 @@ FINISH:
 EXIT:
 	// Send notification (interrupt) to Host for program completion
 	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
-//	JMP INITIATIONS	
 	HALT // Halt the processor
-
 ERR:
 	LED_ON
 	JMP INITIATIONS

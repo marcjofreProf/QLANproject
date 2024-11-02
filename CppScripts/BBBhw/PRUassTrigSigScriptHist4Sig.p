@@ -92,7 +92,6 @@
 // r31 is reserved for inputs pins
 INITIATIONS:
 	SET     r30.t11	// enable the data bus for initiating the OCP master. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-	
 	LED_OFF
 //	MOV r1, GPIO2_BANK | GPIO_SETDATAOUToffset  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
 //	MOV r2, GPIO2_BANK | GPIO_CLEARDATAOUToffset // load the address we wish to cleare to r2. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
@@ -413,10 +412,9 @@ FINISHLOOP:
 EXIT:
 	MOV		r31.b0, PRU1_ARM_INTERRUPT+16
 	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-	JMP INITIATIONS
 	HALT
 
 ERR:	// Signal error
 	LED_ON
 	JMP INITIATIONS
-//	JMP ERR
+	JMP ERR
