@@ -734,13 +734,18 @@ int QTLAH::RegularCheckToPerform(){
 		//cout << "Host " << this->IPaddressesSockets[2] << " numHolderOtherNodesSynchNetwork: " << numHolderOtherNodesSynchNetwork << endl;
 		if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false and HostsActiveActionsFree[0]==true and CycleSynchNetworkDone==false){
 			char argsPayloadAux[NumBytesBufferICPMAX] = {0};
-			// Try to block all connected nodes
-			for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
-				if (iConnHostsNodes==0){strcpy(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
-				else{strcat(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
-				strcat(argsPayloadAux,",");
+				// Try to block all connected nodes
+				for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
+					if (iConnHostsNodes==0){strcpy(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
+					else{strcat(argsPayloadAux,this->IPaddressesSockets[3+iConnHostsNodes]);}
+					strcat(argsPayloadAux,",");
+				}
+			if (FastInitialFakeSkipNetworkSynchFlag==true){// Skip network synchronization and thus blocking all other involved hosts
+				AchievedAttentionParticularHosts=true;
 			}
-			this->WaitUntilActiveActionFree(argsPayloadAux,NumConnectedHosts);
+			else{				
+				this->WaitUntilActiveActionFree(argsPayloadAux,NumConnectedHosts);
+			}
 			
 			// Block only the two participating nodes in each iteration
 			//strcpy(argsPayloadAux,this->IPaddressesSockets[3+iIterNetworkSynchScan]);
@@ -774,8 +779,9 @@ int QTLAH::RegularCheckToPerform(){
 				else{
 					GPIOnodeNetworkSynched=true;// Update value as synched
 				}
-				
-				this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
+				if (FastInitialFakeSkipNetworkSynchFlag==false){
+					this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
+				}
 				iIterNetworkSynchcurrentTimerVal=0;// Reset value
 				cout << "Host " << this->IPaddressesSockets[2] << " synched node " << this->IPaddressesSockets[0] << " to the network!" << endl;
 			}
