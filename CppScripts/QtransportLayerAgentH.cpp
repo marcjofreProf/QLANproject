@@ -779,7 +779,10 @@ int QTLAH::RegularCheckToPerform(){
 				else{
 					GPIOnodeNetworkSynched=true;// Update value as synched
 				}
-				if (FastInitialFakeSkipNetworkSynchFlag==false){
+				if (FastInitialFakeSkipNetworkSynchFlag==true){
+					AchievedAttentionParticularHosts=false;					
+				}
+				else{
 					this->UnBlockActiveActionFree(argsPayloadAux,NumConnectedHosts);
 				}
 				iIterNetworkSynchcurrentTimerVal=0;// Reset value
