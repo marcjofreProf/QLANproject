@@ -269,7 +269,7 @@ struct timespec GPIO::SemaphoreSetWhileWait(){
 	struct timespec requestSemaphoreWhileWaitAux;	
 	auto duration_since_epochFutureTimePointAux=QPLAFutureTimePoint.time_since_epoch();
 	// Convert duration to desired time
-	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePointAux).count(); // Add an offset, since the final barrier is implemented with a busy wait
+	long long int TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePointAux).count())-static_cast<long long int>(TimePRU1synchPeriod); // Add an offset, since the final barrier is implemented with a busy wait
 
 	requestSemaphoreWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
 	requestSemaphoreWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
@@ -280,7 +280,7 @@ struct timespec GPIO::CoincidenceSetWhileWait(){
 	struct timespec requestCoincidenceWhileWaitAux;	
 	auto duration_since_epochFutureTimePointAux=QPLAFutureTimePointSleep.time_since_epoch();
 	// Convert duration to desired time
-	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePointAux).count(); // Add an offset, since the final barrier is implemented with a busy wait
+	long long int TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePointAux).count()); // Add an offset, since the final barrier is implemented with a busy wait
 
 	requestCoincidenceWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
 	requestCoincidenceWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
@@ -293,7 +293,7 @@ struct timespec GPIO::SetWhileWait(){
 	
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentSynchPRU1future.time_since_epoch();
 	// Convert duration to desired time
-	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count()-(2*TimePRUcommandDelay); // Add an offset, since the final barrier is implemented with a busy wait
+	long long int TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count())-static_cast<long long int>(2*TimePRUcommandDelay); // Add an offset, since the final barrier is implemented with a busy wait
 	//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
 
 	requestWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
