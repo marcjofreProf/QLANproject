@@ -265,6 +265,17 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 //this->valueSemaphore.fetch_add(1,std::memory_order_release);
 }
 //////////////////////////////////////////////
+struct timespec GPIO::SemaphoreSetWhileWait(){
+	struct timespec requestSemaphoreWhileWaitAux;	
+	auto duration_since_epochFutureTimePointAux=QPLAFutureTimePoint.time_since_epoch();
+	// Convert duration to desired time
+	unsigned long long int TimePointClockCurrentFinal_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePointAux).count(); // Add an offset, since the final barrier is implemented with a busy wait
+
+	requestSemaphoreWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
+	requestSemaphoreWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
+	return requestSemaphoreWhileWaitAux;
+}
+
 struct timespec GPIO::CoincidenceSetWhileWait(){
 	struct timespec requestCoincidenceWhileWaitAux;	
 	auto duration_since_epochFutureTimePointAux=QPLAFutureTimePointSleep.time_since_epoch();
@@ -566,6 +577,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 	this->QPLAFlagTestSynch=QPLAFlagTestSynchAux;
 	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
+	requestSemaphoreWhileWait=SemaphoreSetWhileWait();
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(8*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
 	this->QPLAFutureTimePointSleep=this->QPLAFutureTimePoint;// Update value
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(1*TimePRUcommandDelay);// Crucial to make the link between PRU clock and system clock (already well synchronized). Two memory mapping to PRU
@@ -577,6 +589,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
 	AccumulatedErrorDrift=FineSynchAdjValAux[1]; // Synch trig frequency
 	QuadEmitDetecSelecGPIO=QuadEmitDetecSelecAux;// Update value
+	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestSemaphoreWhileWait,NULL); // Synch barrier. so the time within acquired semaphore is not so large
 	//while (this->ManualSemaphoreExtra);// Wait until periodic synch method finishes
 	while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	this->ManualSemaphoreExtra=true;
@@ -727,11 +740,11 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		cout << "PRU0 interrupt poll error" << endl;
 	}
 
-	this->DDRdumpdata(iIterRunsAux); // Pre-process tags. Needs to access memory of PRU, so better within the controlled acquired environment
-
 	this->ManualSemaphore=false;
 	this->ManualSemaphoreExtra=false;
 	this->release();
+
+	this->DDRdumpdata(iIterRunsAux); // Pre-process tags. Needs to access memory of PRU, so better within the controlled acquired environment
 return 0;// all ok
 }
 
@@ -739,6 +752,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 	this->QPLAFlagTestSynch=QPLAFlagTestSynchAux;
 	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
+	requestSemaphoreWhileWait=SemaphoreSetWhileWait();
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(8*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
 	this->QPLAFutureTimePointSleep=this->QPLAFutureTimePoint;// Update value
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(1*TimePRUcommandDelay);// Since two memory mapping to PRU memory
@@ -749,6 +763,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
 	AccumulatedErrorDrift=FineSynchAdjValAux[1]; // Synch trig frequency
 	QuadEmitDetecSelecGPIO=QuadEmitDetecSelecAux;// Update value
+	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestSemaphoreWhileWait,NULL); // Synch barrier. so the time within acquired semaphore is not so large
 	while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	this->ManualSemaphoreExtra=true;
 	this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization

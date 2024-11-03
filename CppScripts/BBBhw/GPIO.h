@@ -124,6 +124,7 @@ private:// Variables
 	unsigned long long int iepPRUtimerRange32bits=4294967296; //32 bits
 	struct timespec requestWhileWait;
 	struct timespec requestCoincidenceWhileWait;
+	struct timespec requestSemaphoreWhileWait;
 	TimePoint TimePointClockCurrentSynchPRU1future=std::chrono::time_point<Clock>();// For synch purposes
 	TimePoint TimePointClockSendCommandFinal=std::chrono::time_point<Clock>();// For synch purposes
 	//TimePoint TimePointClockSendCommandInitial=std::chrono::time_point<Clock>();// For synch purposes
@@ -329,6 +330,7 @@ private: // Functions/Methods
 	// PRU synchronization
 	struct timespec SetWhileWait();
 	struct timespec CoincidenceSetWhileWait();
+	struct timespec SemaphoreSetWhileWait();
 	int PRUsignalTimerSynchJitterLessInterrupt();// Tries to avoid interrupt jitter (might not be completely absolute time// Periodic synchronizaton of the timer to control the generated signals
 	int PIDcontrolerTimeJiterlessInterrupt();
 	int PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump);// Correct the detections relative frequency difference of the sender as well as separate by quad channel groups
