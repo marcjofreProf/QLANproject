@@ -740,9 +740,10 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		cout << "PRU0 interrupt poll error" << endl;
 	}
 
-	this->ManualSemaphore=false;
-	this->ManualSemaphoreExtra=false;
-	this->release();
+	// Freeing the semaphore is done in the proper line inside DDRdumpdata
+	//this->ManualSemaphore=false;
+	//this->ManualSemaphoreExtra=false;
+	//this->release();
 
 	this->DDRdumpdata(iIterRunsAux); // Pre-process tags. Needs to access memory of PRU, so better within the controlled acquired environment
 return 0;// all ok
@@ -1070,6 +1071,12 @@ else if (TotalCurrentNumRecords==TotalCurrentNumRecordsOld){cout << "GPIO::No de
 for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
 	sharedMem_int[OFFSET_SHAREDRAM+iIterDump]=static_cast<unsigned int>(0x00000000); // Put it all to zeros
 }
+
+// Freeeing the semaphore block after all the access to the PRU shared memory
+this->ManualSemaphore=false;
+this->ManualSemaphoreExtra=false;
+this->release();
+
 // Notify lost of track of counts due to timer overflow - Not really used
 //if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
 //else{this->AfterCountsThreshold=this->valThresholdResetCounts+5;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust

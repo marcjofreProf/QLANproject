@@ -97,7 +97,7 @@ INITIATIONS:
 		
 	LBCO	r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
 	// OCP master port is the protocol to enable communication between the PRUs and the host processor
-	CLR	r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
+	CLR		r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
 	SBCO	r0, CONST_PRUCFG, 4, 4
 
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
@@ -407,13 +407,13 @@ FINISHLOOP:
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Notification sent at the beginning of the signal//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
 	JMP		CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
-
 EXIT:
-	MOV		r31.b0, PRU1_ARM_INTERRUPT+16
+//	MOV		r31.b0, PRU1_ARM_INTERRUPT+16
 	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	HALT
 
 ERR:	// Signal error
 	LED_ON
 //	JMP INITIATIONS
-	JMP ERR
+//	JMP ERR
+	HALT
