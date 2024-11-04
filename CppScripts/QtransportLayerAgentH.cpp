@@ -1502,7 +1502,13 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		this->acquire();
 		//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 1" << endl;
 		bool FirstPassAux=true;
-		while(AchievedAttentionParticularHosts==false or FirstPassAux==true){
+		int MaxNumPassesCheckBlockAux=0;
+		int NumPassesCheckBlockAux=0;
+		while((AchievedAttentionParticularHosts==false or FirstPassAux==true) and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux){
+			NumPassesCheckBlockAux++;
+			if (NumPassesCheckBlockAux>=MaxNumPassesCheckBlockAux){// Not the best solution, but avoid for ever block
+				cout << "QTLAH::WaitUntilActiveActionFreePreLock Malfunction. Host " << this->IPaddressesSockets[2] << " will proceed eventhough Blocking not achieved!" << endl;
+			}
 			//cout << "Host " << this->IPaddressesSockets[2] << " Entered While 1" << endl;
 			if (FirstPassAux==false){
 				cout << "Host " << this->IPaddressesSockets[2] << " trying to get attention from other involved hosts!" << endl;
