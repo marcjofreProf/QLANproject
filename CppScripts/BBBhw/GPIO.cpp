@@ -358,6 +358,24 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 					cout << "PRU1 interrupt error" << endl;
 				}
+				/*
+				// Warm up interrupt handling for Timetagg PRU0
+				pru0dataMem_int[0]=static_cast<unsigned int>(8); // set command warm-up
+				prussdrv_pru_send_event(21);				
+				retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRUShort);				
+
+				//cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
+				if (retInterruptsPRU0>0){
+					prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+				}
+				else if (retInterruptsPRU0==0){
+					prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+					cout << "GPIO::PRU0 warm-up took to much time for the TimeTagg. Reset PRUO if necessary." << endl;		
+				}
+				else{
+					prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
+					cout << "PRU0 interrupt poll error" << endl;
+				}*/
 
 				//pru1dataMem_int[2]// Current IEP timer sample
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
@@ -491,23 +509,6 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					CountPRUcurrentTimerValSynchLong+=iIterPRUcurrentTimerValPass;
 				}
 
-				// Warm up interrupt handling for Timetagg PRU0
-				pru0dataMem_int[0]=static_cast<unsigned int>(8); // set command warm-up
-				prussdrv_pru_send_event(21);				
-				retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRUShort);				
-
-				//cout << "retInterruptsPRU0: " << retInterruptsPRU0 << endl;
-				if (retInterruptsPRU0>0){
-					prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-				}
-				else if (retInterruptsPRU0==0){
-					prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-					cout << "GPIO::PRU0 warm-up took to much time for the TimeTagg. Reset PRUO if necessary." << endl;		
-				}
-				else{
-					prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
-					cout << "PRU0 interrupt poll error" << endl;
-				}
 				//	
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
