@@ -132,9 +132,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	LOCAL_DDMinit(); // DDR (Double Data Rate): A class of memory technology used in DRAM where data is transferred on both the rising and falling edges of the clock signal, effectively doubling the data rate without increasing the clock frequency.
 	// Here we can update memory space assigned address
 	valpHolder=(unsigned short*)&sharedMem_int[OFFSET_SHAREDRAM];
-	valpAuxHolder=valpHolder+4+6*NumQuBitsPerRun;// 6* since each detection also includes the channels (2 Bytes) and 4 bytes for 32 bits counter, and plus 4 since the first tag is captured at the very beggining
+	//valpAuxHolder=valpHolder+4+6*NumQuBitsPerRun;// 6* since each detection also includes the channels (2 Bytes) and 4 bytes for 32 bits counter, and plus 4 since the first tag is captured at the very beggining
 	CalpHolder=(unsigned int*)&pru0dataMem_int[2];// First tagg captured at the very beggining
-	synchpHolder=(unsigned int*)&pru0dataMem_int[3];// Starts at 12
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Timetagging
@@ -585,7 +584,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(SynchRem);
 	SynchTrigPeriod=SynchTrigPeriodAux;// Histogram/Period value
 	NumQuBitsPerRun=NumQuBitsPerRunAux;
-	valpAuxHolder=valpHolder+4+6*NumQuBitsPerRun;// 6* since each detection also includes the channels (2 Bytes) and 4 bytes for 32 bits counter, and plus 4 since the first tag is captured at the very beggining
+	//valpAuxHolder=valpHolder+4+6*NumQuBitsPerRun;// 6* since each detection also includes the channels (2 Bytes) and 4 bytes for 32 bits counter, and plus 4 since the first tag is captured at the very beggining
 	AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
 	AccumulatedErrorDrift=FineSynchAdjValAux[1]; // Synch trig frequency
 	QuadEmitDetecSelecGPIO=QuadEmitDetecSelecAux;// Update value
@@ -990,7 +989,7 @@ cout << "GPIO::Reading timetags" << endl;
 // Reading data from PRU shared and own RAMs
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=valpHolder; // Coincides with SHARED in PRUassTaggDetScript.p
-valpAux=valpAuxHolder;
+//valpAux=valpAuxHolder;
 //synchp=synchpHolder;
 //for each capture bursts, at the beggining is stored the overflow counter of 32 bits. From there, each capture consists of 32 bits of the DWT_CYCCNT register and 8 bits of the channels detected (40 bits per detection tag).
 // The shared memory space has 12KB=12×1024bytes=12×1024×8bits=98304bits.
@@ -1005,11 +1004,11 @@ valpAux=valpAuxHolder;
 //valpAux++;// 1 times 8 bits
 //valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<24;
 //valpAux++;// 1 times 8 bits
-// When unsigned short
-valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
-valpAux++;// 1 times 16 bits
-valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<16;
-valpAux++;// 1 times 16 bits
+// When unsigned short - Not used
+//valThresholdResetCounts=static_cast<unsigned int>(*valpAux);
+//valpAux++;// 1 times 16 bits
+//valThresholdResetCounts=valThresholdResetCounts | (static_cast<unsigned int>(*valpAux))<<16;
+//valpAux++;// 1 times 16 bits
 //cout << "valThresholdResetCounts: " << valThresholdResetCounts << endl;
 //////////////////////////////////////////////////////////////////////////////
 

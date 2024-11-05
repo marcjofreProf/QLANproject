@@ -201,16 +201,11 @@ private:// Variables
 	int CurrentiIterDump;
 	unsigned int NumSynchPulses=0;
 	unsigned short* valpHolder;
-	unsigned short* valpAuxHolder;
+	//unsigned short* valpAuxHolder;
 	unsigned int* CalpHolder; // 32 bits
-	unsigned int* synchpHolder; // 32 bits
 	unsigned short* valp; // 16 bits
-	unsigned short* valpAux; // 16 bits
-	unsigned int* synchp; // 32 bits
+	//unsigned short* valpAux; // 16 bits
 	unsigned int valCycleCountPRU=0; // 32 bits // Made relative to each acquisition run
-	unsigned int valOverflowCycleCountPRU=0; // 32 bits
-	unsigned int valOverflowCycleCountPRUold=0; // 32 bits
-	int AboveThresoldCycleCountPRUCompValue=8;//Value adjusted experimentally when PRU clock goes aboe 0x80000000. Not used
 	//unsigned int valIEPtimerFinalCounts; // 32 bits
 	unsigned long long int extendedCounterPRU=0; // 64 bits
 	unsigned long long int extendedCounterPRUholder=0; // 64 bits.
@@ -218,10 +213,10 @@ private:// Variables
 	unsigned long long int extendedCounterPRUaux=0; // 64 bits
 	//unsigned char val; // 8 bits
 	unsigned short valBitsInterest=0; // 16 bits, 2 bytes
-	unsigned int valSkewCounts=0;
-	unsigned int valThresholdResetCounts=0;
-	unsigned long long int auxUnskewingFactorResetCycle=0;
-	unsigned int AfterCountsThreshold=0;
+	//unsigned int valSkewCounts=0;
+	//unsigned int valThresholdResetCounts=0;
+	//unsigned long long int auxUnskewingFactorResetCycle=0;
+	//unsigned int AfterCountsThreshold=0;
 	// Memory storage
 	int TotalCurrentNumRecords=0; ////Variable to hold the number of currently stored records in memory
 	unsigned long long int TimeTaggsStored[MaxNumQuBitsMemStored]={0};

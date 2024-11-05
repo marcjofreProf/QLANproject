@@ -37,7 +37,6 @@
 // r5 reserved for holding the DWT_CYCCNT count value
 // r6 reserved because detected channels are concatenated with r5 in the write to SHARED RAM
 // r7 reserved for 0 value (zeroing registers)
-// r8 reserved for cycle count final threshold reset
 
 // r10 is arbitrary used for operations
 
@@ -46,7 +45,6 @@
 // We cannot use Constan table pointers since the base addresses are too far
 // r12 reserved for 0x22000 Control register
 // r13 reserved for 0x2200C DWT_CYCCNT
-// r14 reserved for storing the substraction of offset value
 
 // r16 reserved for raising edge detection operation together with r6
 // r17 might be used for some intermediate operations
@@ -117,9 +115,6 @@ INITIATIONS:// This is only run once
 //	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
 	// Initializations for faster execution
 	LDI		r7, 0 // Register for clearing other registers
-	// Initiate to zero for counters of skew and offset
-	LDI		r8, 0
-	MOV		r14, 0xFFFFFFFF
 	MOV		r11, 0xC000C0FF // detection mask. Bits might be moved out of position
 	LDI		r17, 0
 	LDI		r18, 0
@@ -131,12 +126,12 @@ INITIATIONS:// This is only run once
 	LDI 	r24, 1 // synch frequency correction
 	
 	// Initial Re-initialization of DWT_CYCCNT
-	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+	LBBO	r2.b0, r12, 0, 1 // r2 maps b0 control register
 	CLR		r2.t3
-	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
+	SBBO	r2.b0, r12, 0, 1 // stops DWT_CYCCNT
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
-	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
-	SET		r2.t3
+	LBBO	r2.b0, r12, 0, 1 // r2 maps b0 control register
+//	SET		r2.t3
 	//SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT. We start it when the commands enters
 		
 	// Initial Re-initialization for IET counter. Used in the other PRU1
@@ -170,12 +165,12 @@ WARMUP:
 	JMP 	CMDLOOP // finished, wait for next command. So it continuosly loops	
 DWTSTART:
 	// Re-start DWT_CYCNT
-	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
-	CLR		r2.t3
-	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
-	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
+//	LBBO	r2.b0, r12, 0, 1 // r2 maps b0 control register
+//	CLR		r2.t3
+//	SBBO	r2.b0, r12, 0, 1 // stops DWT_CYCCNT
+//	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	SET		r2.t3
-	SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT
+	SBBO	r2.b0, r12, 0, 1 // Enables DWT_CYCCNT
 	LDI		r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV 	r20, EXITCOUNTER // Maximum value to start with to exit if nothing happens
 	//CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
@@ -303,18 +298,15 @@ TIMETAG:
 	QBNE 	WAIT_FOR_EVENT, r4, 0 // loop if we've not finished
 FINISH:
 	// Faster Concatenated Checks writting	
-	SBCO 	r8, CONST_PRUSHAREDRAM, r1, 4 // writes values of r8
 	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	////////////////////////////////////////
-	MOV		r31.b0, PRU0_ARM_INTERRUPT+16// Notification sent at the beginning of the signal//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	// STOP DWT_CYCNT
-	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+	LBBO	r2.b0, r12, 0, 1 // r2 maps b0 control register
 	CLR		r2.t3
-	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
+	SBBO	r2.b0, r12, 0, 1 // stops DWT_CYCCNT
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF	
-	LBBO	r14, r13, 0, 4//LBCO	r9, CONST_IETREG, 0xC, 4 // read IEP	 // LBBO	r9, r13, 0, 4 // read DWT_CYCNT
-	SUB		r8, r14, r5 // Use the last value of DWT_CYCNT
+	MOV		r31.b0, PRU0_ARM_INTERRUPT+16// Notification sent at the beginning of the signal//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	JMP 	CMDLOOP // finished, wait for next command. So it continuosly loops	
 EXIT:
 	// Send notification (interrupt) to Host for program completion
