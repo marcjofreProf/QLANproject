@@ -1068,10 +1068,12 @@ if (TotalCurrentNumRecords>MaxNumQuBitsMemStored){cout << "GPIO::We have reached
 else if (TotalCurrentNumRecords==TotalCurrentNumRecordsOld){cout << "GPIO::No detection of qubits!" << endl;}
 //cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
 cout << "GPIO::Clearing PRU timetags" << endl;
-// Reset values of the sharedMem_int after each iteration
-for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
-	sharedMem_int[OFFSET_SHAREDRAM+iIterDump]=static_cast<unsigned int>(0x00000000); // Put it all to zeros
-}
+//// Reset values of the sharedMem_int after each iteration
+//for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
+//	sharedMem_int[OFFSET_SHAREDRAM+iIterDump]=static_cast<unsigned int>(0x00000000); // Put it all to zeros
+//}
+// Actually only needed to zero the first memory position
+sharedMem_int[OFFSET_SHAREDRAM+0]=static_cast<unsigned int>(0x00000000); // Put it all to zeros
 
 // Freeeing the semaphore block after all the access to the PRU shared memory
 this->ManualSemaphore=false;
