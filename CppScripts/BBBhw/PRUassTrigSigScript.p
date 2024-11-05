@@ -73,7 +73,7 @@
 // r30 is reserved for output pins
 // r31 is reserved for inputs pins
 INITIATIONS:
-	SET     r30.t11	// enable the data bus for initiating the OCP master. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+//	SET     r30.t11	// enable the data bus for initiating the OCP master. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 ///	MOV r1, GPIO2_BANK | GPIO_SETDATAOUToffset  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
 //	MOV r2, GPIO2_BANK | GPIO_CLEARDATAOUToffset // load the address we wish to cleare to r2. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
 		
@@ -119,7 +119,7 @@ INITIATIONS:
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
-	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+//	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 
 CMDLOOP:
 	QBBC	CMDLOOP, r31, 31
@@ -127,8 +127,8 @@ CMDLOOP:
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction	
-	LBCO 	r1, CONST_PRUDRAM, 0, 4// Read the number of NUM_REPETITIONS from positon 0 of PRU1 DATA RAM and stored it
 	SBCO	r4.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes. Reset the command
+	LBCO 	r1, CONST_PRUDRAM, 0, 4// Read the number of NUM_REPETITIONS from positon 0 of PRU1 DATA RAM and stored it
 	//MOV	r31.b0, PRU1_ARM_INTERRUPT+16// Here send interrupt to host to measure time
 //PSEUDOSYNCH:
 //	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
@@ -160,7 +160,7 @@ FINISHLOOP:
 
 EXIT:
 //	MOV	r31.b0, PRU1_ARM_INTERRUPT+16
-	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+//	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	HALT
 
 ERR:	// Signal error

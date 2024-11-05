@@ -91,7 +91,7 @@
 // r30 is reserved for output pins
 // r31 is reserved for inputs pins
 INITIATIONS:
-	SET     r30.t11	// enable the data bus for initiating the OCP master. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+//	SET     r30.t11	// enable the data bus for initiating the OCP master. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 //	MOV r1, GPIO2_BANK | GPIO_SETDATAOUToffset  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
 //	MOV r2, GPIO2_BANK | GPIO_CLEARDATAOUToffset // load the address we wish to cleare to r2. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
 		
@@ -152,17 +152,15 @@ INITIATIONS:
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
-	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+//	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 
 CMDLOOP:
 	QBBC	CMDLOOP, r31, 31
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 4, and 1 bytes
-	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction	
-	// Read the number of NUM_REPETITIONS from positon 0 of PRU1 DATA RAM and stored it
-	LBCO 	r1, CONST_PRUDRAM, 4, 4 // Load number of repetitons of the signal
-	SBCO	r4.b0, CONST_PRUDRAM, 0, 1 // We remove the command from the host (in case there is a reset from host, we are saved) 1 bytes.	
+	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
+	SBCO	r4.b0, CONST_PRUDRAM, 0, 1 // We remove the command from the host (in case there is a reset from host, we are saved) 1 bytes.
 	//MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Here send interrupt to host to measure time
 	// Start executing
 	//CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
@@ -245,6 +243,7 @@ QUADEMT1:
 	MOV	r12, 0x00080004
 	JMP	PSEUDOSYNCH
 PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
+	LBCO 	r1, CONST_PRUDRAM, 4, 4 // Load number of repetitons of the signal
 	LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM sequence signal period
 	LBCO	r14, CONST_PRUDRAM, 28, 4 // ON state time
 	SUB 	r15, r7, r14 // OFF state time
@@ -409,7 +408,7 @@ FINISHLOOP:
 	JMP		CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 EXIT:
 //	MOV		r31.b0, PRU1_ARM_INTERRUPT+16
-	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+//	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	HALT
 
 ERR:	// Signal error

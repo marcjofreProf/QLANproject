@@ -155,12 +155,12 @@ CMDLOOP:
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 0, and 1 bytes. It is the command to start
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
+	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start
 	//MOV 	r31.b0, PRU0_ARM_INTERRUPT+16// Here send interrupt to host to measure time
 INITCMDSEL:
 	QBEQ	WARMUP, r0.b0, 8 // 8 command is just warm up interruptions
 	JMP		DWTSTART// command is generate taggs
-WARMUP:
-	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start
+WARMUP:	
 	MOV		r31.b0, PRU0_ARM_INTERRUPT+16// Send end interrupt
 	JMP 	CMDLOOP // finished, wait for next command. So it continuosly loops	
 DWTSTART:
@@ -173,9 +173,6 @@ DWTSTART:
 	SBBO	r2.b0, r12, 0, 1 // Enables DWT_CYCCNT
 	LDI		r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV 	r20, EXITCOUNTER // Maximum value to start with to exit if nothing happens
-	//CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-	// Some loadings and resets	
-	SBCO	r7.b0, CONST_PRUDRAM, 0, 1 // Store a 0 in CONST_PRUDRAM with offset 0, and 1 bytes. Reset the command to start
 CMDSEL:// Identify the command number to generate the mask of interest for checking detections
 	QBEQ	QUADDET1, r0.b0, 1 // 1 command is detect signals first lower quad group channel
 	QBEQ	QUADDET2, r0.b0, 2 // 2 command is detect signals second lower quad group channel
@@ -310,7 +307,6 @@ FINISH:
 	JMP 	CMDLOOP // finished, wait for next command. So it continuosly loops	
 EXIT:
 	// Send notification (interrupt) to Host for program completion
-	MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	HALT // Halt the processor
 ERR:
 	LED_ON
