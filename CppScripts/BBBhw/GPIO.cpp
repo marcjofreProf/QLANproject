@@ -986,6 +986,7 @@ return HardwareSynchStatusAux; // All Ok
 //PRU0 - Operation - getting iputs
 
 int GPIO::DDRdumpdata(int iIterRunsAux){
+cout << "GPIO::Reading timetags" << endl;
 // Reading data from PRU shared and own RAMs
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=valpHolder; // Coincides with SHARED in PRUassTaggDetScript.p
@@ -1066,7 +1067,7 @@ while (CurrentiIterDump<NumQuBitsPerRun and extendedCounterPRUholder>extendedCou
 if (TotalCurrentNumRecords>MaxNumQuBitsMemStored){cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
 else if (TotalCurrentNumRecords==TotalCurrentNumRecordsOld){cout << "GPIO::No detection of qubits!" << endl;}
 //cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
-
+cout << "GPIO::Clearing PRU timetags" << endl;
 // Reset values of the sharedMem_int after each iteration
 for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
 	sharedMem_int[OFFSET_SHAREDRAM+iIterDump]=static_cast<unsigned int>(0x00000000); // Put it all to zeros
