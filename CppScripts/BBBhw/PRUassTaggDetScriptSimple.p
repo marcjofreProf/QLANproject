@@ -9,7 +9,7 @@
 
 // Length of acquisition:
 #define RECORDS 1964 // readings and it matches in the host c++ script. Not really used because updated from cpp host
-#define EXITCOUNTER 0x00FFFFFF // almost 10 seconds (since there are many default instructions for each iteration). Very important not to have errors of not enough timetags provided a given time
+#define EXITCOUNTER 0x00BFFFFF // almost 10 seconds (since there are many default instructions for each iteration). Very important not to have errors of not enough timetags provided a given time
 
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
@@ -241,7 +241,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	MOV		r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)
 	// Implement a coincidence window, effectively increasing the window length but introduces jitter
 PRECOINCWIN:
-	LDI		r0, r21 // Load again the value of the window length
+	MOV		r0, r21 // Load again the value of the window length
 COINCWINLOOP:
 	SUB		r0, r0, 1
 	QBNE	COINCWINLOOP, r0, 0 // Coincides with a 0
