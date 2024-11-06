@@ -161,7 +161,7 @@ private:// Variables
 	int SynchRem=0;
 	long double InstantCorr=0.0;
 	unsigned int ContCorr=4294967295; // By default very large (the maximum value of unsigned int), so that it never corrects
-	unsigned int ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4-4)/2.0);
+	unsigned int ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0);
 	unsigned long TimeClockMarging=0;// In nanoseconds. If too large, it disastabilizes the timming performance. It has to be smaller than the SynchTrigPeriod
 	unsigned long TimePRUcommandDelay=250000;//250000;// In nanoseconds. If too large, it disastabilizes the timming performance. Very important parameter!!! When duration_FinalInitialMeasTrigAuxAvg properly set then is around 4000
 	unsigned long long int TimeElpasedNow_time_as_count=0;
@@ -175,7 +175,7 @@ private:// Variables
 	int WaitTimeInterruptPRUShort=25000; // For the continuous periodic synchronization. VEry important to achieve good stability and accuracy.
 	// PRU timetagger
 	int retInterruptsPRU0;
-	int WaitTimeInterruptPRU0=7500000; //up to 20000000 with Simple TTG. In microseconds. Although the longer the more innacurraccy in the synch routine
+	int WaitTimeInterruptPRU0=15000000; //up to 20000000 with Simple TTG. In microseconds. Important to be larger than the exit counter (equivalent time) to not produce memory collisions when attemping to read with DDRdump)...
 	//TimePoint TimePointClockNowPRU0;
 	//unsigned long long int TimeNow_time_as_countPRU0;	
 	//TimePoint FutureTimePointPRU0;
