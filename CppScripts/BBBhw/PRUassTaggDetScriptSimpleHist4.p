@@ -112,7 +112,7 @@ INITIATIONS:// This is only run once
 	LDI 	r5, 0 // Initialize for the first time r5
 	LDI		r6, 0 // Initialization
 	LDI		r16, 0 // Initialization
-	LDI		r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
+	LDI		r1, 4 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV		r4, RECORDS // This will be the loop counter to read the entire set of data
 	// Initializations for faster execution
 	LDI		r7, 0 // Register for clearing other registers
@@ -172,7 +172,7 @@ DWTSTART:
 //	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	SET		r2.t3
 	SBBO	r2.b0, r12, 0, 1 // Enables DWT_CYCCNT
-	LDI		r1, 0 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
+	LDI		r1, 4 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV 	r20, EXITCOUNTER // Maximum value to start with to exit if nothing happens
 CMDSEL:// Identify the command number to generate the mask of interest for checking detections
 	QBEQ	QUADDET1, r0.b0, 1 // 1 command is detect signals first lower quad group channel
@@ -248,7 +248,7 @@ FINETIMEOFFSETADJLOOP:
 FIRSTREF:
 	// Store a calibration timetagg
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
-	SBCO	r5, CONST_PRUDRAM, 8, 4// Calibration time tag (together with the acumulated synchronization error)
+	SBCO	r5, CONST_PRUSHAREDRAM, 0, 4// Calibration time tag (together with the acumulated synchronization error)
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register
 	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.

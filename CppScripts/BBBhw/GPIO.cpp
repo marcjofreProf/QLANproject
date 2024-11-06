@@ -131,9 +131,9 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
         // Initialize DDM
 	LOCAL_DDMinit(); // DDR (Double Data Rate): A class of memory technology used in DRAM where data is transferred on both the rising and falling edges of the clock signal, effectively doubling the data rate without increasing the clock frequency.
 	// Here we can update memory space assigned address
-	valpHolder=(unsigned short*)&sharedMem_int[OFFSET_SHAREDRAM];
+	valpHolder=(unsigned short*)&sharedMem_int[OFFSET_SHAREDRAM+1];
 	//valpAuxHolder=valpHolder+4+6*NumQuBitsPerRun;// 6* since each detection also includes the channels (2 Bytes) and 4 bytes for 32 bits counter, and plus 4 since the first tag is captured at the very beggining
-	CalpHolder=(unsigned int*)&pru0dataMem_int[2];// First tagg captured at the very beggining
+	CalpHolder=(unsigned int*)&sharedMem_int[OFFSET_SHAREDRAM];//(unsigned int*)&pru0dataMem_int[2];// First tagg captured at the very beggining
 	
 	// Launch the PRU0 (timetagging) and PR1 (generating signals) codes but put them in idle mode, waiting for command
 	// Timetagging
@@ -197,7 +197,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	
 	// Reset values of the sharedMem_int at the beggining
 	for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
-		sharedMem_int[OFFSET_SHAREDRAM+iIterDump]=static_cast<unsigned int>(0x00000000); // Put it all to zeros
+		sharedMem_int[OFFSET_SHAREDRAM+1+iIterDump]=static_cast<unsigned int>(0x00000000); // Put it all to zeros
 	}
 	  /*// Doing debbuging checks - Debugging 1	  
 	  std::thread threadReadTimeStampsAux=std::thread(&GPIO::ReadTimeStamps,this);
@@ -1073,7 +1073,7 @@ cout << "GPIO::Clearing PRU timetags" << endl;
 //	sharedMem_int[OFFSET_SHAREDRAM+iIterDump]=static_cast<unsigned int>(0x00000000); // Put it all to zeros
 //}
 // Actually only needed to zero the first memory position
-sharedMem_int[OFFSET_SHAREDRAM+0]=static_cast<unsigned int>(0x00000000); // Put it all to zeros
+sharedMem_int[OFFSET_SHAREDRAM+1]=static_cast<unsigned int>(0x00000000); // Put it all to zeros
 
 // Freeeing the semaphore block after all the access to the PRU shared memory
 this->ManualSemaphore=false;
