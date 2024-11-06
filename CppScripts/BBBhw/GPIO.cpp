@@ -572,6 +572,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 	this->QPLAFlagTestSynch=QPLAFlagTestSynchAux;
 	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
+	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint-std::chrono::nanoseconds(static_cast<unsigned long long int>(2.0*MultFactorEffSynchPeriod*SynchTrigPeriod));// Timetagger starts listening 2 periods in advance to avoid interrupt and signals to arrive concurrently at the timetagger
 	requestSemaphoreWhileWait=SemaphoreSetWhileWait();
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(6*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
 	this->QPLAFutureTimePointSleep=this->QPLAFutureTimePoint;// Update value
@@ -827,18 +828,18 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 			ContCorr=static_cast<unsigned int>(AccumulatedErrorDriftPRUoffsetDriftErrorAvgAux);
 		}
 		if (AccumulatedErrorDriftPRUoffsetDriftErrorAvg<0.0){
-			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4-4)/2.0+1.0);// 1 positive unit intra pulses reltive frequency difference correction
+			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0+1.0);// 1 positive unit intra pulses reltive frequency difference correction
 		}
 		else if(AccumulatedErrorDriftPRUoffsetDriftErrorAvg>0.0){
-			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4-4)/2.0-1.0);// 1 negative unit intra pulses reltive frequency difference correction
+			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0-1.0);// 1 negative unit intra pulses reltive frequency difference correction
 		}
 		else{
-			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4-4)/2.0);// No intra pulses reltive frequency difference correction
+			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0);// No intra pulses reltive frequency difference correction
 		}
 	}
 	else{// Do not apply relative frequency correction in the PRU script
 		ContCorr=static_cast<unsigned int>(4294967295);
-		ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4-4)/2.0);// No intra pulses reltive frequency difference correction
+		ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0);// No intra pulses reltive frequency difference correction
 	}
 
 	// Accounting for the effective offset and frequency correction
@@ -937,7 +938,7 @@ return HardwareSynchStatusAux; // All Ok
 //PRU0 - Operation - getting iputs
 
 int GPIO::DDRdumpdata(int iIterRunsAux){
-cout << "GPIO::Reading timetags" << endl;
+//cout << "GPIO::Reading timetags" << endl;
 // Reading data from PRU shared and own RAMs
 //DDR_regaddr = (short unsigned int*)ddrMem + OFFSET_DDR;
 valp=valpHolder; // Coincides with SHARED in PRUassTaggDetScript.p
@@ -1018,7 +1019,7 @@ while (CurrentiIterDump<NumQuBitsPerRun and extendedCounterPRUholder>extendedCou
 if (TotalCurrentNumRecords>MaxNumQuBitsMemStored){cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
 else if (TotalCurrentNumRecords==TotalCurrentNumRecordsOld){cout << "GPIO::No detection of qubits!" << endl;}
 //cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
-cout << "GPIO::Clearing PRU timetags" << endl;
+//cout << "GPIO::Clearing PRU timetags" << endl;
 //// Reset values of the sharedMem_int after each iteration
 //for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
 //	sharedMem_int[OFFSET_SHAREDRAM+iIterDump]=static_cast<unsigned int>(0x00000000); // Put it all to zeros

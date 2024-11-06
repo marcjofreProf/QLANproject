@@ -241,7 +241,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	MOV		r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)
 	// Implement a coincidence window, effectively increasing the window length but introduces jitter
 PRECOINCWIN:
-	MOV		r0, r21 // Load again the value of half the iwndow length
+	LDI		r0, r21 // Load again the value of the window length
 COINCWINLOOP:
 	SUB		r0, r0, 1
 	QBNE	COINCWINLOOP, r0, 0 // Coincides with a 0
@@ -252,7 +252,7 @@ COINCWIN:
 	// End coincidence window
 	AND		r6, r6, r11 // Mask to make sure there are no other info
 	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections	
-	// Combining all reading pins
+	// Combining all reading pins - for isolated ones in the other (bits 15 and 14)
 	LSR		r17.b1, r16.b3, 2
 	LSR		r18.b1, r6.b3, 2
 	OR		r16, r16, r17// Combine the registers
