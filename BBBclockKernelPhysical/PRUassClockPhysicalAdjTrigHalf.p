@@ -145,9 +145,9 @@ CMDLOOP:
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
-	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
-	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes. Remove the command
+	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
+	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period	
 //PSEUDOSYNCH:// Only needed at the beggining to remove the slow drift	
 //	LBBO	r0, r7, 0, 4// read the DWT_CYCCNT
 //	MOV	r8, CYCLESRESYNCH
@@ -176,11 +176,12 @@ FINISHLOOP:
 
 EXIT:
 	// Send notification (interrupt) to Host for program completion
-	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
+//	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
 	// Halt the processor
 	HALT
 
 ERR:	// Signal error
 	LED_ON
-	JMP ERR
+//	JMP ERR
+	HALT
 
