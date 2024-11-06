@@ -25,6 +25,10 @@ is_rt_kernel
 # Set variable based on function return value
 is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 
+#############################################################################################
+# Define the scheduler configuration to increase the determinisms of the process of interest
+#sudo sysctl sysctl -w kernel.sched_child_runs_first=1
+
 # Nicenest value [-20, 20]
 NicenestPriorValue=-10 # The smaller, the better
 PriorityValue=80 # The larger, the better. Above 60 is well enough

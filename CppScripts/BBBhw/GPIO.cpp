@@ -297,6 +297,7 @@ struct timespec GPIO::SetWhileWait(){
 }
 
 int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
+	try{
 	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread. It stalls operation RealTime Kernel (commented, then)
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
 	//SynchRem=static_cast<int>((static_cast<long double>(iepPRUtimerRange32bits)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(iepPRUtimerRange32bits)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
@@ -551,6 +552,13 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		}
 	}// end while
 
+	}
+      catch (const std::exception& e) {
+	// Handle the exception
+      	this->release();
+      	cout << "GPIO::PRUsignalTimerSynchJitterLessInterrupt Exception: " << e.what() << endl;
+      }
+
 return 0; // All ok
 }
 
@@ -569,6 +577,7 @@ return 0; // All ok
 
 int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux, double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber, bool QPLAFlagTestSynchAux){// Read the detected timestaps in four channels
 /////////////
+	try{
 	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 	this->QPLAFlagTestSynch=QPLAFlagTestSynchAux;
 	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
@@ -722,10 +731,18 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	//this->release();
 
 	this->DDRdumpdata(iIterRunsAux); // Pre-process tags. Needs to access memory of PRU, so better within the controlled acquired environment
+
+	}
+      catch (const std::exception& e) {
+	// Handle the exception
+      	this->release();
+      	cout << "GPIO::ReadTimeStamps Exception: " << e.what() << endl;
+     }
 return 0;// all ok
 }
 
 int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber, bool QPLAFlagTestSynchAux){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
+	try{
 	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 	this->QPLAFlagTestSynch=QPLAFlagTestSynchAux;
 	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
@@ -907,6 +924,13 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	this->ManualSemaphore=false;
 	this->ManualSemaphoreExtra=false;
 	this->release();
+
+	}
+      catch (const std::exception& e) {
+	// Handle the exception
+      	this->release();
+      	cout << "GPIO::SendTriggerSignals Exception: " << e.what() << endl;
+     }
 
 return 0;// all ok	
 }
