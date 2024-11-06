@@ -296,7 +296,7 @@ else if (PRU1QuarterClocksAux<this->MinNumPeriodColcksPRUnoHalt){PRU1QuarterCloc
 
 this->CounterHandleInterruptSynchPRU++;// Update counter
 
-if (this->CounterHandleInterruptSynchPRU%128==0){
+if (this->CounterHandleInterruptSynchPRU%30==0){
 	this->CounterHandleInterruptSynchPRU=0;// Reset value
 	if (PlotPIDHAndlerInfo){	
 	//cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
