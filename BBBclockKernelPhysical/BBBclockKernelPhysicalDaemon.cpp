@@ -656,6 +656,10 @@ int main(int argc, char const * argv[]){
 		CKPDagent.RatioAverageFactorClockQuarterPeriod=stod(argv[2]);
 	}
 	}
+
+	if (strcmp(argv[3],"true")){CKPDagent.PlotPIDHAndlerInfo=true;}// true or false to output information
+	else{CKPDagent.PlotPIDHAndlerInfo=false;}
+
 	 } catch(const std::invalid_argument& e) {
             cout << "Invalid argument: Could not convert to double." << endl;
         } catch(const std::out_of_range& e) {
