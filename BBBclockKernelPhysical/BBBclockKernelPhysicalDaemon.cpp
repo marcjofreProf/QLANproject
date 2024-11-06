@@ -657,10 +657,10 @@ int main(int argc, char const * argv[]){
 	}
 	}
 
-	cout << "argv[3]: " << argv[3] << endl;
-	cout << "strcmp(argv[3],true): " << strcmp(argv[3],"true") << endl;
+	//cout << "argv[3]: " << argv[3] << endl;
+	//cout << "strcmp(argv[3],true): " << strcmp(argv[3],"true") << endl;
 
-	if (strcmp(argv[3],"true")){CKPDagent.PlotPIDHAndlerInfo=true;}// true or false to output information
+	if (strcmp(argv[3],"true")==0){CKPDagent.PlotPIDHAndlerInfo=true;}// true or false to output information
 	else{CKPDagent.PlotPIDHAndlerInfo=false;}
 
 	 } catch(const std::invalid_argument& e) {
