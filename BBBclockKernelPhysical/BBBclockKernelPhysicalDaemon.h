@@ -41,7 +41,7 @@ public: //Variables
 	unsigned long long int MedianFilterFactor=1; // When using median filter
 	unsigned long long int MeanFilterFactor=1; // When using mean filter
 	unsigned long long int AppliedMeanFilterFactor=CyclesAvgErrorApplied; // When using mean filter
-	bool PlotPIDHAndlerInfo=false;
+	bool PlotPIDHAndlerInfo=false; // plot information of interest (it can be done with the launching script)
 	double NumClocksQuarterPeriodPRUclock=0.25*(static_cast<double>(ClockPeriodNanoseconds))/(static_cast<double>(PRUclockStepPeriodNanoseconds));// set the number of clocks that defines the Quarter period of the clock.
 	double NumClocksQuarterPeriodPRUclockOld=0.0;
 	double NumClocksQuarterPeriodPRUclockUpdated=0.0;

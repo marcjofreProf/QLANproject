@@ -6,7 +6,7 @@
 # Define default values (access by position)
 default_arg1="0.0"
 default_arg2="1"
-default_arg3="false"
+default_arg3="true"
 
 # Function to check for real-time kernel
 is_rt_kernel() {
