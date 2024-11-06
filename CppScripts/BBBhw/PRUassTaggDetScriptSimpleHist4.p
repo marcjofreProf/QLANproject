@@ -55,8 +55,6 @@
 // r21 reserved for Coincidence window length
 
 // r22 is reserved for periodic offset and frequency correction
-// r23 is reserved for synch offset correction
-// r24 is reserved for synch frequency correction
 
 //// If using IET timer (potentially adjusted to synchronization protocols)
 // We can use Constant table pointers C26
@@ -123,8 +121,6 @@ INITIATIONS:// This is only run once
 	MOV 	r20, EXITCOUNTER // Maximum value to start with to exit if nothing happens
 	LDI 	r21, 1 // Coincidence window length
 	LDI 	r22, 1 // Periodic offset and frequency correction
-	LDI		r23, 1 // synch offset correction
-	LDI 	r24, 1 // synch frequency correction
 	
 	// Initial Re-initialization of DWT_CYCCNT
 	LBBO	r2.b0, r12, 0, 1 // r2 maps b0 control register
@@ -212,21 +208,9 @@ PSEUDOSYNCH:// Neutralizing interrupt jitter time // I belive this synch first b
 	LSL		r10, r10, 2 // Specific of this script because analysing a signal with an effective period 4 times the original period
 	SUB		r3, r10, 1 // Generate the value for r3 from r10
 PERIODICOFFSET: // Neutralizing hardware clock relative frequency difference and offset drift//
-	LBCO	r22, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
-	LSR 	r22, r22, 1 // Divide by 2 since the loop consumes two at each iteration
-	ADD 	r22, r22, 1 // ADD 1 to not have a substraction below zero which halts
-TIMEOFFSETADJ: // Neutralizing sender/emitter synch offset	
-	LBCO	r23, CONST_PRUDRAM, 20, 4 // Read from PRU RAM offset correction
-	LSR		r23, r23, 1// Divide by two because the TIMEOFFSETADJLOOP consumes double
-	ADD		r23, r23, 1// ADD 1 to not have a substraction below zero which halts
-FINETIMEOFFSETADJ: // Neutralizing hardware clock relative frequency difference within this execution in terms of synch period
-	LBCO	r24, CONST_PRUDRAM, 12, 4 // Read from PRU RAM rel. freq. diff correction
-	LSR		r24, r24, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
-	ADD		r24, r24, 1// ADD 1 to not have a substraction below zero which halts
+	LBCO	r22, CONST_PRUDRAM, 12, 4 // Read from PRU RAM periodic offset correction
 	// Do final loadings of parameters for operation. For instance the coincidence window length
-	LBCO	r21, CONST_PRUDRAM, 24, 4 // Read from PRU RAM the coincidence window length
-	LSR 	r21, r21, 1// Divide by 2 since the loop consumes double
-	ADD		r21, r21, 1// ADD 1 to not have a substraction below zero which halts
+	LBCO	r21, CONST_PRUDRAM, 16, 4 // Read from PRU RAM the coincidence window length
 ABSSYNCH:	// From this point synchronization is very important. If the previous operations takes longer than the period below to synch, in the cpp script it can be added some extra periods to compensate for frequency relative offset
 	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
 	AND		r0, r0, r3 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
@@ -239,12 +223,6 @@ PSEUDOSYNCHLOOP:
 PERIODICOFFSETLOOP:
 	SUB		r22, r22, 1
 	QBNE	PERIODICOFFSETLOOP, r22, 0 // Coincides with a 0
-TIMEOFFSETADJLOOP:
-	SUB		r23, r23, 1
-	QBNE	TIMEOFFSETADJLOOP, r23, 0 // Coincides with a 0
-FINETIMEOFFSETADJLOOP:
-	SUB		r24, r24, 1
-	QBNE	FINETIMEOFFSETADJLOOP, r24, 0 // Coincides with a 0
 FIRSTREF:
 	// Store a calibration timetagg
 	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT

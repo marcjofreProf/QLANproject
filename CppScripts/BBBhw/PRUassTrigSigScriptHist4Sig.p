@@ -80,8 +80,6 @@
 // r14 is reserved for ON state time
 // r15 is reserved for OFF state time
 // r16 is reserved for periodic offset and frequency correction
-// r17 is reserved for synch offset correction
-// r18 is reserved for synch frequency correction
 
 // r19 is reserved for counter of when to correct the intra relative frequency difference
 // r20 is reserved for storing the absolute correction value for intra relative frequency difference correction
@@ -141,8 +139,6 @@ INITIATIONS:
 	LDI	r14, 6 // ON state
 	LDI	r15, 6 // OFF state
 	LDI r16, 0 // Periodic offset and frequency correction
-	LDI	r17, 0 // synch offset correction
-	LDI r18, 0 // synch frequency correction
 	MOV	r19, 0xFFFFFFFF // update counter of when to correct intra relative frequency difference
 	MOV	r20, DELAYMODULE
 	
@@ -245,7 +241,7 @@ QUADEMT1:
 PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	LBCO 	r1, CONST_PRUDRAM, 4, 4 // Load number of repetitons of the signal
 	LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM sequence signal period
-	LBCO	r14, CONST_PRUDRAM, 28, 4 // ON state time
+	LBCO	r14, CONST_PRUDRAM, 20, 4 // ON state time
 	SUB 	r15, r7, r14 // OFF state time
 	SUB 	r14, r14, 4 // Substract 4 because is the compensation value
 	LSR		r14, r14, 1 // Divide by two because loop consumes double	
@@ -254,21 +250,11 @@ PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first be
 	LSR		r15, r15, 1 // Divide by two because loop consumes double	
 //	ADD 	r15, r15, 1 // ADD 1 to not have a substraction below zero which halts. Do not add 1 because it adds a relative frequency difference
 PERIODICOFFSET:// Neutralizing hardware clock relative frequency difference and offset drift//
-	LBCO	r16, CONST_PRUDRAM, 16, 4 // Read from PRU RAM periodic offset correction
-	LSR 	r16, r16, 1 // Divide by 2 since the loop consumes to at each iteration
-	ADD 	r16, r16, 1 // ADD 1 to not have a substraction below zero which halts
-TIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
-	LBCO	r17, CONST_PRUDRAM, 20, 4 // Load from PRU RAM position the extra delay
-	LSR		r17, r17, 1// Divide by two because the TIMEOFFSETADJLOOP consumes double
-	ADD		r17, r17, 1// ADD 1 to not have a substraction below zero which halts
-FINETIMEOFFSETADJ:// Neutralizing hardware clock relative frequency difference within thhis execution in terms of synch period
-	LBCO	r18, CONST_PRUDRAM, 8, 4 // Load from PRU RAM position the extra delay
-	LSR		r18, r18, 1// Divide by two because the FINETIMEOFFSETADJLOOP consumes double
-	ADD		r18, r18, 1// ADD 1 to not have a substraction below zero which halts
+	LBCO	r16, CONST_PRUDRAM, 8, 4 // Read from PRU RAM periodic offset correction
 MANAGECALC: // To be develop to correct for intra pulses frequency variation
-	LBCO	r9, CONST_PRUDRAM, 24, 4 // Load from PRU RAM position the count of when to correct intra relative frequency difference
+	LBCO	r9, CONST_PRUDRAM, 16, 4 // Load from PRU RAM position the count of when to correct intra relative frequency difference
 	MOV 	r19, r9 // update counter of when to correct intra relative frequency difference
-	LBCO	r20, CONST_PRUDRAM, 32, 4 // Load from PRU RAM position the absolute correction to correct for intra relative frequency difference
+	LBCO	r20, CONST_PRUDRAM, 24, 4 // Load from PRU RAM position the absolute correction to correct for intra relative frequency difference
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	// Since this script produces a sequence of four different values, we need to multiply the period by 4 to have the effective period for this script
 	/////////////////////////////////////////////////////////////
@@ -288,12 +274,6 @@ PSEUDOSYNCHLOOP:
 PERIODICOFFSETLOOP:
 	SUB		r16, r16, 1
 	QBNE	PERIODICOFFSETLOOP, r16, 0 // Coincides with a 0
-TIMEOFFSETADJLOOP:
-	SUB		r17, r17, 1
-	QBNE	TIMEOFFSETADJLOOP, r17, 0 // Coincides with a 0
-FINETIMEOFFSETADJLOOP:
-	SUB		r18, r18, 1
-	QBNE	FINETIMEOFFSETADJLOOP, r18, 0 // Coincides with a 0
 //BASICPSEUDOSYNCH:
 //	AND	r0, r0, 0x07 // Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) we can get a value between 0 and 7
 //	QBEQ	SIGNALON1, r0.b0, 7 // Coincides with a 7

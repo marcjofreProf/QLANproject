@@ -62,7 +62,7 @@ private:// Variables
 	unsigned int NextSynchPRUcommand=11;// set initially to NextSynchPRUcorrection=0
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
 	//unsigned int OffsetSynchPRUBaseCorrection=262144;// Base value from where the synch offset is added or discounted to achieve periodic offset correction
-	double PRUoffsetDriftErrorAbsAvgAux=0.0;
+	long double PRUoffFreqTotalAux=0.0;
 	//bool IEPtimerPRUreset=false;	
 	// Relative error
 	long double PRUoffsetDriftError=0;
@@ -159,8 +159,7 @@ private:// Variables
 	unsigned long long int TrigAuxIterCount=0;
 	// Trigger Signal and Timetagging methods
 	int SynchRem=0;
-	long long int SignAuxInstantCorr=0;
-	long long int InstantCorr=0.0;
+	long double InstantCorr=0.0;
 	unsigned int ContCorr=4294967295; // By default very large (the maximum value of unsigned int), so that it never corrects
 	unsigned int ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4-4)/2.0);
 	unsigned long TimeClockMarging=0;// In nanoseconds. If too large, it disastabilizes the timming performance. It has to be smaller than the SynchTrigPeriod
@@ -185,7 +184,7 @@ private:// Variables
 	//bool finPRU0;
 	// PRU Signal
 	unsigned int NumberRepetitionsSignal=65536;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
-	unsigned int TTGcoincWin=10;// It cannot be smaller than 2. Timetagging coincidence window length In PRU units. It reduces time resolution of the detected qubits.
+	unsigned int TTGcoincWin=1;// It cannot be smaller than 1. Timetagging coincidence window length In PRU units. It reduces time resolution of the detected qubits.
 	unsigned int NumQuBitsPerRun=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=7500000; // In microseconds. Signal generation

@@ -142,10 +142,8 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	pru0dataMem_int[0]=static_cast<unsigned int>(0); // set no command
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures, with overflow clock
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
-	pru0dataMem_int[3]=static_cast<unsigned int>(0);
-	pru0dataMem_int[4]=static_cast<unsigned int>(this->PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
-	pru0dataMem_int[5]=static_cast<unsigned int>(0); // set synch offset correction value
-	pru0dataMem_int[6]=static_cast<unsigned int>(this->TTGcoincWin); // set coincidence window length
+	pru0dataMem_int[3]=static_cast<unsigned int>(1);
+	pru0dataMem_int[4]=static_cast<unsigned int>(this->TTGcoincWin); // set coincidence window length
 	//if (prussdrv_exec_program(PRU_Operation_NUM, "./CppScripts/BBBhw/PRUassTaggDetScript.bin") == -1){
 	//	if (prussdrv_exec_program(PRU_Operation_NUM, "./BBBhw/PRUassTaggDetScript.bin") == -1){
 	//		perror("prussdrv_exec_program non successfull writing of PRUassTaggDetScript.bin");
@@ -161,13 +159,11 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	// Generate signals
 	pru1dataMem_int[0]=static_cast<unsigned int>(0); // set no command
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
-	pru1dataMem_int[2]=static_cast<unsigned int>(0);// Referenced to the synch trig period
+	pru1dataMem_int[2]=static_cast<unsigned int>(1);// Referenced to the synch trig period
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
-	pru1dataMem_int[4]=static_cast<unsigned int>(this->PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
-	pru1dataMem_int[5]=static_cast<unsigned int>(0); // set synch offset correction value
-	pru1dataMem_int[6]=static_cast<unsigned int>(this->ContCorr);
-	pru1dataMem_int[7]=static_cast<unsigned int>(this->SigONPeriod);
-	pru1dataMem_int[8]=static_cast<unsigned int>(this->ContCorrSign);
+	pru1dataMem_int[4]=static_cast<unsigned int>(this->ContCorr);
+	pru1dataMem_int[5]=static_cast<unsigned int>(this->SigONPeriod);
+	pru1dataMem_int[6]=static_cast<unsigned int>(this->ContCorrSign);
 	// Load and execute the PRU program on the PRU1
 	if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./CppScripts/BBBhw/PRUassTrigSigScript.bin") == -1){
 		if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScriptHist4Sig.bin") == -1){//if (prussdrv_exec_program(PRU_Signal_NUM, "./BBBhw/PRUassTrigSigScript.bin") == -1){
@@ -381,7 +377,6 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[2]);
 				this->PRUcurrentTimerValWrapLong=this->PRUcurrentTimerValWrap;// Update value
-				//cout << "GPIO::pru1dataMem_int[2]: " << pru1dataMem_int[2] << endl;
 				// Correct for interrupt handling time might add a bias in the estimation/reading
 				//this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);//this->PRUcurrentTimerValWrap-duration_FinalInitialCountAuxArrayAvg/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command //this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
 				// Unwrap
@@ -578,7 +573,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	this->QPLAFlagTestSynch=QPLAFlagTestSynchAux;
 	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
 	requestSemaphoreWhileWait=SemaphoreSetWhileWait();
-	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(8*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
+	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(6*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
 	this->QPLAFutureTimePointSleep=this->QPLAFutureTimePoint;// Update value
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(1*TimePRUcommandDelay);// Crucial to make the link between PRU clock and system clock (already well synchronized). Two memory mapping to PRU
 	SynchRem=static_cast<int>((static_cast<long double>(1.5*MultFactorEffSynchPeriod*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));// For time stamping it waits 1.5
@@ -615,27 +610,20 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
-			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			PRUoffFreqTotalAux=static_cast<long double>(PRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
 			break;
 		}
 		case 2:{// Time correction
-			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg;
-			ldTimePointClockTagPRUDiff=0;		
+			PRUoffFreqTotalAux=static_cast<long double>(PRUoffsetDriftErrorAbsAvg);
 			break;
 		}
 		case 1:{ // Frequency correction
-			PRUoffsetDriftErrorAbsAvgAux=static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			PRUoffFreqTotalAux=ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
 			break;
 		}
-		default:{PRUoffsetDriftErrorAbsAvgAux=0;ldTimePointClockTagPRUDiff=0;break;}// None time nor frequency correction
+		default:{PRUoffFreqTotalAux=0.0;break;}// None time nor frequency correction
 	}
-	if (PRUoffsetDriftErrorAbsAvgAux<0.0){
-		PRUoffsetDriftErrorAbsAvgAux=-fmod(-PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
-	}
-	else{
-		PRUoffsetDriftErrorAbsAvgAux=fmod(PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
-	}
-	PRUoffsetDriftErrorAbsAvgAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)+PRUoffsetDriftErrorAbsAvgAux;
+	
 	//switch (QuadEmitDetecSelecAux){// Update value	
 	//	case 1: {this->QPLAFutureTimePointOld1=this->QPLAFutureTimePoint;break;}
 	//	case 2: {this->QPLAFutureTimePointOld2=this->QPLAFutureTimePoint;break;}
@@ -647,56 +635,46 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	//	default: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint;break;}
 	//}
 	
-	pru0dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Now, The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of the effective period, and the period
-	ldTimePointClockTagPRUDiff=static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(SynchTrigPeriod);// update value		
-		
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
-			AccumulatedErrorDriftAux=AccumulatedErrorDriftAux+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
 			break;
 		}
 		case 2:{// Time correction
-			AccumulatedErrorDriftAux=AccumulatedErrorDriftAux;
-			ldTimePointClockTagPRUDiff=0;	
+			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux);
 			break;
 		}
 		case 1:{ // Frequency correction
-			AccumulatedErrorDriftAux=AccumulatedErrorDriftAux+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
 			break;
 		}
-		default:{AccumulatedErrorDriftAux=AccumulatedErrorDriftAux;ldTimePointClockTagPRUDiff=0;break;}// None time nor frequency correction
+		default:{PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux);break;}// None time nor frequency correction
 	}
 
-	// The synch offset
-	if (this->AccumulatedErrorDriftAux<0.0){
-		AccumulatedErrorDriftAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)-fmod(-this->AccumulatedErrorDriftAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
-	}
-	else{
-		AccumulatedErrorDriftAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)+fmod(this->AccumulatedErrorDriftAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
-	}
-	pru0dataMem_int[5]=static_cast<unsigned int>(AccumulatedErrorDriftAux); // set periodic offset correction value
 	// The synch rel. freq. diff. 
 	// From this point below, the timming is very critical to have long time synchronziation stability!!!!
 	if (abs(AccumulatedErrorDrift)<AccumulatedErrorDriftThresh){AccumulatedErrorDrift=0.0;}// Do not apply computed synch relative frequency difference
-	InstantCorr=static_cast<long long int>(AccumulatedErrorDrift*SynchTrigPeriod);
+	PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDrift*SynchTrigPeriod);
 	// Attention ldTimePointClockTagPRUinitial is needed in DDRdumpdata!!!!
 	ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);//+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
-	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
-	// Atenttion, since Histogram analysis has effectively 4 times the SynchTrigPeriod, for the SynchRem this period is multiplied by 4!!! It will have to be removed
-	// The relative frequency difference is not module over MultFactorEffSynchPeriod, since its value is computed over the original synch period
-	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
-	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
-
-	if (InstantCorr>0){SignAuxInstantCorr=1;}
-	else if (InstantCorr<0){SignAuxInstantCorr=-1;}
-	else {SignAuxInstantCorr=0;}
-	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(SynchTrigPeriod));
 	
-	pru0dataMem_int[3]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
-	if (QPLAFlagTestSynchAux==true){pru0dataMem_int[6]=static_cast<unsigned int>(2);}// Minimum width for the timetagging coincidence window, to have accuracy
-	else{pru0dataMem_int[6]=static_cast<unsigned int>(this->TTGcoincWin);} // set coincidence window length
+	// Accounting for the effective offset and frequency correction
+	if (PRUoffFreqTotalAux<0.0){
+		PRUoffFreqTotalAux=-fmodl(-PRUoffFreqTotalAux,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod));
+	}
+	else{
+		PRUoffFreqTotalAux=fmodl(PRUoffFreqTotalAux,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod));
+	}
+	// Prepare the overall correction for PRU loops (so divide by 2)
+	PRUoffFreqTotalAux=(static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+PRUoffFreqTotalAux)/2.0;
+	if (PRUoffFreqTotalAux<=0.0){PRUoffFreqTotalAux=1.0;}
+
+	pru0dataMem_int[3]=static_cast<unsigned int>(PRUoffFreqTotalAux);
+
+	if (QPLAFlagTestSynchAux==true){pru0dataMem_int[4]=static_cast<unsigned int>(1);}// Minimum width for the timetagging coincidence window, to have accuracy
+	else{pru0dataMem_int[4]=static_cast<unsigned int>(this->TTGcoincWin);} // set coincidence window length
 
 	// Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
 	requestCoincidenceWhileWait=CoincidenceSetWhileWait();
@@ -754,7 +732,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	this->QPLAFlagTestSynch=QPLAFlagTestSynchAux;
 	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
 	requestSemaphoreWhileWait=SemaphoreSetWhileWait();
-	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(8*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
+	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(6*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
 	this->QPLAFutureTimePointSleep=this->QPLAFutureTimePoint;// Update value
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(1*TimePRUcommandDelay);// Since two memory mapping to PRU memory
 	SynchRem=static_cast<int>((static_cast<long double>(1.5*MultFactorEffSynchPeriod*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
@@ -773,7 +751,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	// Apply a slotted synch configuration (like synchronized Ethernet)
 	this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
-	pru1dataMem_int[7]=static_cast<unsigned int>(this->SigONPeriod);// ON time in PRU units
+	pru1dataMem_int[5]=static_cast<unsigned int>(this->SigONPeriod);// ON time in PRU units
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 	// Different modes of periodic correction
 	//switch (QuadEmitDetecSelecAux){
@@ -791,27 +769,19 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
-			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			PRUoffFreqTotalAux=static_cast<long double>(PRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
 			break;
 		}
 		case 2:{// Time correction
-			PRUoffsetDriftErrorAbsAvgAux=PRUoffsetDriftErrorAbsAvg;
-			ldTimePointClockTagPRUDiff=0;	
+			PRUoffFreqTotalAux=static_cast<long double>(PRUoffsetDriftErrorAbsAvg);
 			break;
 		}
 		case 1:{ // Frequency correction
-			PRUoffsetDriftErrorAbsAvgAux=static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			PRUoffFreqTotalAux=ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
 			break;
 		}
-		default:{PRUoffsetDriftErrorAbsAvgAux=0;ldTimePointClockTagPRUDiff=0;break;}// None time nor frequency correction
+		default:{PRUoffFreqTotalAux=0.0;break;}// None time nor frequency correction
 	}
-	if (PRUoffsetDriftErrorAbsAvgAux<0.0){
-		PRUoffsetDriftErrorAbsAvgAux=-fmod(-PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
-	}
-	else{
-		PRUoffsetDriftErrorAbsAvgAux=fmod(PRUoffsetDriftErrorAbsAvgAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
-	}
-	PRUoffsetDriftErrorAbsAvgAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)+PRUoffsetDriftErrorAbsAvgAux;
 
 	//switch (QuadEmitDetecSelecAux){// Update value	
 	//	case 1: {this->QPLAFutureTimePointOld1=this->QPLAFutureTimePoint;break;}
@@ -824,46 +794,29 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//	default: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint;break;}
 	//}
 
-	pru1dataMem_int[4]=static_cast<unsigned int>(PRUoffsetDriftErrorAbsAvgAux); // set periodic offset correction value
 	////////////////////////////////////////////////////////////////////////////////////////////
 	// The synch offset
-	// Now, The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of the effective period, and the period
-	ldTimePointClockTagPRUDiff=static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(SynchTrigPeriod);// update value		
-		
+	// Now, The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of the effective period, and the period		
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
-			AccumulatedErrorDriftAux=AccumulatedErrorDriftAux+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
 			break;
 		}
 		case 2:{// Time correction
-			AccumulatedErrorDriftAux=AccumulatedErrorDriftAux;
-			ldTimePointClockTagPRUDiff=0;	
+			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux);
 			break;
 		}
 		case 1:{ // Frequency correction
-			AccumulatedErrorDriftAux=AccumulatedErrorDriftAux+static_cast<double>(ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg));
+			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
 			break;
 		}
-		default:{AccumulatedErrorDriftAux=AccumulatedErrorDriftAux;ldTimePointClockTagPRUDiff=0;break;}// None time nor frequency correction
+		default:{PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux);break;}// None time nor frequency correction
 	}
-
-	if (this->AccumulatedErrorDriftAux<0.0){
-		AccumulatedErrorDriftAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)-fmod(-this->AccumulatedErrorDriftAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
-	}
-	else{
-		AccumulatedErrorDriftAux=(MultFactorEffSynchPeriod*SynchTrigPeriod)+fmod(this->AccumulatedErrorDriftAux,MultFactorEffSynchPeriod*SynchTrigPeriod);
-	}
-	pru1dataMem_int[5]=static_cast<unsigned int>(AccumulatedErrorDriftAux); // set periodic offset correction value
 
 	// From this point below, the timming is very critical to have long time synchronziation stability!!!!	
 	// Atenttion, since Histogram analysis has effectively 4 times the SynchTrigPeriod, for the SynchRem this period is multiplied by 4!!! It will have to be removed
 	if (abs(AccumulatedErrorDrift)<AccumulatedErrorDriftThresh){AccumulatedErrorDrift=0.0;}// Do not apply computed synch relative frequency difference
-	InstantCorr=static_cast<long long int>(AccumulatedErrorDrift*SynchTrigPeriod);
-	// The relative frequency difference is not module over MultFactorEffSynchPeriod, since its value is computed over the original synch period
-	//ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
-	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
-	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(SynchTrigPeriod)*fmodl(ldTimePointClockTagPRUinitial,static_cast<long double>(SynchTrigPeriod)));
-	//InstantCorr=static_cast<long long int>(static_cast<long double>((1.0/6.0)*AccumulatedErrorDrift)*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)*fmodl((ldTimePointClockTagPRUinitial/static_cast<long double>(1000000000)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
+	PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDrift*SynchTrigPeriod);
 	
 	if (SynchCorrectionTimeFreqNoneFlag==1 or SynchCorrectionTimeFreqNoneFlag==3){ // It has to be a much finer control at PRU level (and also this level) in order to be able to compensate for the very low hardware wandering/drift.
 		// Compute the number of quarter passes since it is histogram analysis of 4 symbols to add/substract 1 PRU unit of compensation
@@ -895,15 +848,20 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4-4)/2.0);// No intra pulses reltive frequency difference correction
 	}
 
-	if (InstantCorr>0){SignAuxInstantCorr=1;}
-	else if (InstantCorr<0){SignAuxInstantCorr=-1;}
-	else {SignAuxInstantCorr=0;}
-	InstantCorr=SignAuxInstantCorr*(abs(InstantCorr)%static_cast<long long int>(SynchTrigPeriod));
-	pru1dataMem_int[2]=static_cast<unsigned int>(static_cast<long long int>(SynchTrigPeriod)+InstantCorr);// Referenced to the synch trig period
-
+	// Accounting for the effective offset and frequency correction
+	if (PRUoffFreqTotalAux<0.0){
+		PRUoffFreqTotalAux=-fmodl(-PRUoffFreqTotalAux,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod));
+	}
+	else{
+		PRUoffFreqTotalAux=fmodl(PRUoffFreqTotalAux,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod));
+	}
+	// Prepare the overall correction for PRU loops (so divide by 2)
+	PRUoffFreqTotalAux=(static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+PRUoffFreqTotalAux)/2.0;
+	if (PRUoffFreqTotalAux<=0.0){PRUoffFreqTotalAux=1.0;}
+	pru1dataMem_int[2]=static_cast<unsigned int>(PRUoffFreqTotalAux);
 	// Particular for histogram, tell the adjusted period accounting for relative frequency difference
-	pru1dataMem_int[6]=static_cast<unsigned int>(ContCorr);// Referenced to the corrected synch period
-	pru1dataMem_int[8]=static_cast<unsigned int>(ContCorrSign);// Referenced to the corrected synch period
+	pru1dataMem_int[4]=static_cast<unsigned int>(ContCorr);// Referenced to the corrected synch period
+	pru1dataMem_int[6]=static_cast<unsigned int>(ContCorrSign);// Referenced to the corrected synch period
 
 	// Sleep barrier to synchronize the different nodes at this point, so the below calculations and entry times coincide
 	requestCoincidenceWhileWait=CoincidenceSetWhileWait();
