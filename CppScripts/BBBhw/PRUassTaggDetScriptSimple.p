@@ -285,9 +285,9 @@ FINISH:
 	JMP 	CMDLOOP // finished, wait for next command. So it continuosly loops	
 EXIT:
 	// Send notification (interrupt) to Host for program completion
-//	HALT // Halt the processor
+	HALT // Halt the processor
 ERR:
 	LED_ON
 //	JMP INITIATIONS
-	JMP ERR
-//	HALT
+//	JMP ERR
+	HALT

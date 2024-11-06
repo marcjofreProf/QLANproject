@@ -287,9 +287,9 @@ FINISH:
 	MOV		r31.b0, PRU0_ARM_INTERRUPT+16// Notification sent at the beginning of the signal//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	JMP 	CMDLOOP // finished, wait for next command. So it continuosly loops	
 EXIT:
-//	HALT // Halt the processor
+	HALT // Halt the processor
 ERR:
 	LED_ON
 //	JMP INITIATIONS
-	JMP ERR
-//	HALT
+//	JMP ERR
+	HALT

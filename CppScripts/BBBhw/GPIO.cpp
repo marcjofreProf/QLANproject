@@ -637,9 +637,10 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Now, The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of the effective period, and the period
+	if (abs(AccumulatedErrorDrift)<AccumulatedErrorDriftThresh){AccumulatedErrorDrift=0.0;}// Do not apply computed synch relative frequency difference
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
-			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
+			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(AccumulatedErrorDrift)*ldTimePointClockTagPRUDiff;
 			break;
 		}
 		case 2:{// Time correction
@@ -647,18 +648,14 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 			break;
 		}
 		case 1:{ // Frequency correction
-			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
+			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDrift)*ldTimePointClockTagPRUDiff;
 			break;
 		}
-		default:{PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux);break;}// None time nor frequency correction
+		default:{PRUoffFreqTotalAux+=0.0;break;}// None time nor frequency correction
 	}
-
-	// The synch rel. freq. diff. 
-	// From this point below, the timming is very critical to have long time synchronziation stability!!!!
-	if (abs(AccumulatedErrorDrift)<AccumulatedErrorDriftThresh){AccumulatedErrorDrift=0.0;}// Do not apply computed synch relative frequency difference
-	PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDrift*SynchTrigPeriod);
+	
 	// Attention ldTimePointClockTagPRUinitial is needed in DDRdumpdata!!!!
-	ldTimePointClockTagPRUinitial=static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);//+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
+	ldTimePointClockTagPRUinitial=2.0*static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);//+static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod);// Time point after all PRU synch steps. The periodic synch offset is not accounted for
 	
 	// Accounting for the effective offset and frequency correction
 	if (PRUoffFreqTotalAux<0.0){
@@ -797,9 +794,10 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	////////////////////////////////////////////////////////////////////////////////////////////
 	// The synch offset
 	// Now, The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of the effective period, and the period		
+	if (abs(AccumulatedErrorDrift)<AccumulatedErrorDriftThresh){AccumulatedErrorDrift=0.0;}// Do not apply computed synch relative frequency difference
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
-			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
+			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(AccumulatedErrorDrift)*ldTimePointClockTagPRUDiff;
 			break;
 		}
 		case 2:{// Time correction
@@ -807,17 +805,12 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 			break;
 		}
 		case 1:{ // Frequency correction
-			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
+			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDrift)*ldTimePointClockTagPRUDiff;
 			break;
 		}
-		default:{PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux);break;}// None time nor frequency correction
+		default:{PRUoffFreqTotalAux+=0.0;break;}// None time nor frequency correction
 	}
-
-	// From this point below, the timming is very critical to have long time synchronziation stability!!!!	
-	// Atenttion, since Histogram analysis has effectively 4 times the SynchTrigPeriod, for the SynchRem this period is multiplied by 4!!! It will have to be removed
-	if (abs(AccumulatedErrorDrift)<AccumulatedErrorDriftThresh){AccumulatedErrorDrift=0.0;}// Do not apply computed synch relative frequency difference
-	PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDrift*SynchTrigPeriod);
-	
+		
 	if (SynchCorrectionTimeFreqNoneFlag==1 or SynchCorrectionTimeFreqNoneFlag==3){ // It has to be a much finer control at PRU level (and also this level) in order to be able to compensate for the very low hardware wandering/drift.
 		// Compute the number of quarter passes since it is histogram analysis of 4 symbols to add/substract 1 PRU unit of compensation
 		long double AccumulatedErrorDriftPRUoffsetDriftErrorAvg=static_cast<long double>(AccumulatedErrorDrift)+PRUoffsetDriftErrorAvg;
