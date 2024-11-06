@@ -409,10 +409,9 @@ FINISHLOOP:
 EXIT:
 //	MOV		r31.b0, PRU1_ARM_INTERRUPT+16
 //	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-	HALT
-
+//	HALT
 ERR:	// Signal error
 	LED_ON
 //	JMP INITIATIONS
-//	JMP ERR
-	HALT
+	JMP ERR
+//	HALT
