@@ -89,7 +89,7 @@
 // r30 is reserved for output pins
 // r31 is reserved for inputs pins
 INITIATIONS:
-//	SET     r30.t11	// enable the data bus for initiating the OCP master. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	SET     r30.t11	// enable the data bus for initiating the OCP master. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 //	MOV r1, GPIO2_BANK | GPIO_SETDATAOUToffset  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
 //	MOV r2, GPIO2_BANK | GPIO_CLEARDATAOUToffset // load the address we wish to cleare to r2. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
 		
@@ -148,8 +148,6 @@ INITIATIONS:
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
-//	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-
 CMDLOOP:
 	QBBC	CMDLOOP, r31, 31
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
@@ -172,23 +170,26 @@ CMDSEL:
 	QBEQ	PERIODICTIMESYNCHADD, r0.b0, 9 // 9 command is measure IEP timer status and so a addition correction
 	QBEQ	PERIODICTIMESYNCHCHECK, r0.b0, 10 // 10 command is measure IEP timer status and so a check
 	QBEQ	PERIODICTIMESYNCHSET, r0.b0, 11 // 11 command is measure IEP timer set synch
-PERIODICTIMESYNCHSET: // with command coded 11 means setting synch	
+PERIODICTIMESYNCHSET: // with command coded 11 means setting synch
+	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	SBCO	r4.b0, CONST_IETREG, 0, 1 // Stop the counter
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
 	//LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM value
 	SBCO	r4, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	SBCO	r13.b0, CONST_IETREG, 0, 1 // Enable the counter
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
-	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
+	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP		CMDLOOP
 PERIODICTIMESYNCHCHECK: // with command coded 10 means chech synch only	(but also store the offset correction value)
+	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
-	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP		CMDLOOP
 PERIODICTIMESYNCHADD: // with command coded 9 means synch by reseting the IEP timer
+	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
 	LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM value
 	ADD		r0, r0, r7 // Apply correction
@@ -196,10 +197,11 @@ PERIODICTIMESYNCHADD: // with command coded 9 means synch by reseting the IEP ti
 	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	//SBCO	r13.b0, CONST_IETREG, 0, 1 // Enable the counter
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
-	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
+	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.	
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP		CMDLOOP
 PERIODICTIMESYNCHSUB: // with command coded 8 means synch by reseting the IEP timer
+	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LBCO	r0, CONST_IETREG, 0xC, 4 // Sample IEP counter periodically
 	LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM value
 	SUB		r0, r0, r7 // Apply correction
@@ -207,7 +209,7 @@ PERIODICTIMESYNCHSUB: // with command coded 8 means synch by reseting the IEP ti
 	SBCO	r0, CONST_IETREG, 0xC, 4 // Correct IEP counter periodically
 	//SBCO	r13.b0, CONST_IETREG, 0, 1 // Enable the counter
 	SBCO	r0, CONST_PRUDRAM, 8, 4 // Store in PRU RAM position the IEP current sample
-	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP		CMDLOOP
 QUADEMT7:
@@ -239,6 +241,7 @@ QUADEMT1:
 	MOV	r12, 0x00080004
 	JMP	PSEUDOSYNCH
 PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
+	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LBCO 	r1, CONST_PRUDRAM, 4, 4 // Load number of repetitons of the signal
 	LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM sequence signal period
 	LBCO	r14, CONST_PRUDRAM, 20, 4 // ON state time
@@ -383,7 +386,7 @@ FINISH:
 //	QBNE 	DELAYOFF, r0, 0
 FINISHLOOP:
 	// The following lines do not consume "signal speed"
-	//SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Notification sent at the beginning of the signal//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
 	JMP		CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
 EXIT:

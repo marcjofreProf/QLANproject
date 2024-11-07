@@ -73,7 +73,7 @@
 // r30 is reserved for output pins
 // r31 is reserved for inputs pins
 INITIATIONS:
-//	SET     r30.t11	// enable the data bus for initiating the OCP master. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+	SET     r30.t11	// enable the data bus for initiating the OCP master. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 ///	MOV r1, GPIO2_BANK | GPIO_SETDATAOUToffset  // load the address to we wish to set to r1. Note that the operation GPIO2_BANK+GPIO_SETDATAOUT is performed by the assembler at compile time and the resulting constant value is used. The addition is NOT done at runtime by the PRU!
 //	MOV r2, GPIO2_BANK | GPIO_CLEARDATAOUToffset // load the address we wish to cleare to r2. Note that every bit that is a 1 will turn off the associated GPIO we do NOT write a 0 to turn it off. 0's are simply ignored.
 		
@@ -119,8 +119,6 @@ INITIATIONS:
 //	LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 
-//	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-
 CMDLOOP:
 	QBBC	CMDLOOP, r31, 31
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
@@ -132,6 +130,7 @@ CMDLOOP2:// Double verification of host sending start command
 	//MOV	r31.b0, PRU1_ARM_INTERRUPT+16// Here send interrupt to host to measure time
 //PSEUDOSYNCH:
 //	// To give some sense of synchronization with the other PRU time tagging, wait for DWT_CYCNT or IEP timer (which has been enabled and keeps disciplined with IEP timer counter by the other PRU)
+	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 //	LBBO	r0.b0, r3, 0, 1//LBBO	r0.b0, r3, 0, 1//LBCO	r0.b0, CONST_IETREG, 0xC, 1
 //	AND	r0, r0, 0x03 // Since the signals have a minimum period of 4 clock cycles
 //	QBEQ	SIGNALON, r0.b0, 3 // Coincides with a 3
@@ -154,6 +153,7 @@ SIGNALOFF:
 //	QBNE 	DELAYOFF, r0, 0
 FINISHLOOP:
 	// The following lines do not consume "signal speed"
+	SET     r30.t11	// enable the data bus for initiating the OCP master. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Notification sent at the beginning of the signal//SBCO	r5.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished.This can be substituted by an interrupt: MOV 	r31.b0, PRU1_ARM_INTERRUPT+16
 	//MOV	r1, r5// Cannot be done with LDI instruction because it may be a value larger than 65535. load r3 with the number of cycles. For the time being only up to 65535 ->develop so that it can be higher
 	JMP	CMDLOOP // Might consume more than one clock (maybe 3) but always the same amount
