@@ -581,7 +581,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 	this->QPLAFlagTestSynch=QPLAFlagTestSynchAux;
 	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
-	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint-std::chrono::nanoseconds(static_cast<unsigned long long int>(2.0*MultFactorEffSynchPeriod*SynchTrigPeriod*PRUclockStepPeriodNanoseconds));// Timetagger starts listening 2 periods in advance to avoid interrupt and signals to arrive concurrently at the timetagger
+	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint-std::chrono::nanoseconds(static_cast<unsigned long long int>(10.0*MultFactorEffSynchPeriod*SynchTrigPeriod*PRUclockStepPeriodNanoseconds));// Timetagger starts listening 2 periods in advance to avoid interrupt and signals to arrive concurrently at the timetagger
 	requestSemaphoreWhileWait=SemaphoreSetWhileWait();
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(6*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
 	this->QPLAFutureTimePointSleep=this->QPLAFutureTimePoint;// Update value
