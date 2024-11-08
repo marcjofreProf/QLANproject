@@ -235,7 +235,7 @@ this->duration_FinalInitialDriftAuxArrayAvg = this->RatioAverageFactorClockQuart
 }
 
 if (this->duration_FinalInitialDriftAuxArrayAvg>ApproxInterruptTime){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
-	cout << "Time for pre processing the time barrier is too long " << this->duration_FinalInitialDriftAuxArrayAvg << " ...adjust TimeClockMarging! Set to nominal value of " << ApproxInterruptTime << " 6000..." << endl;
+	cout << "Time for pre processing the time barrier is too long " << this->duration_FinalInitialDriftAuxArrayAvg << " ...adjust TimeClockMarging! Set to nominal value of " << ApproxInterruptTime << "..." << endl;
 	this->duration_FinalInitialDriftAuxArrayAvg=ApproxInterruptTime;// For the time being adjust it to the nominal initial value
 }
 
