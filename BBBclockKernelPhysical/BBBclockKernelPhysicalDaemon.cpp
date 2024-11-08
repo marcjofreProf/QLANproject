@@ -193,7 +193,7 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME// https://opensource.com/article/17/6/timekeeping-linux-vms
-while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);//std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-Clock::now()));// Busy waiting. With a while loop rapid response, but more variation; compared to sleep_for(). Also, the ApproxInterruptTime has to be adjusted (around 6000 for while loop and around 100000 for sleep_for())
+//while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);//std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-Clock::now()));// Busy waiting. With a while loop rapid response, but more variation; compared to sleep_for(). Also, the ApproxInterruptTime has to be adjusted (around 6000 for while loop and around 100000 for sleep_for())
 //std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-ClockWatch::now()));
 //std::this_thread::sleep_until(this->TimePointClockCurrentInitialMeas); // Better to use sleep_until because it will adapt to changes in the current time by the time synchronization protocol
 //this->TimePointClockCurrentInitialMeas=ClockWatch::now(); //Computed in the step before
@@ -342,7 +342,7 @@ struct timespec CKPD::SetWhileWait(){
 		
 	auto duration_since_epochFutureTimePoint=this->TimePointClockCurrentFinal.time_since_epoch();
 	// Convert duration to desired time
-	long long int TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count())-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
+	long long int TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
 	//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
 
 	requestWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
