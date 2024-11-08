@@ -193,6 +193,7 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME// https://opensource.com/article/17/6/timekeeping-linux-vms
+while(ClockWatch::now() < this->PreTimePointClockCurrentInitialMeas);
 while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);//std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-Clock::now()));// Busy waiting. With a while loop rapid response, but more variation; compared to sleep_for(). Also, the ApproxInterruptTime has to be adjusted (around 6000 for while loop and around 100000 for sleep_for())
 //std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-ClockWatch::now()));
 //std::this_thread::sleep_until(this->TimePointClockCurrentInitialMeas); // Better to use sleep_until because it will adapt to changes in the current time by the time synchronization protocol
@@ -241,7 +242,7 @@ if (this->duration_FinalInitialDriftAuxArrayAvg>ApproxInterruptTime){// Much lon
 
 this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 this->TimePointClockCurrentInitialMeas=this->TimePointClockCurrentFinal;//-std::chrono::nanoseconds(this->duration_FinalInitialDriftAuxArrayAvg);// Actually, the time measured duration_FinalInitialDriftAuxArrayAvg is not indicative of much (only if it changes a lot to high values it means trouble)
-
+this->PreTimePointClockCurrentInitialMeas=this->TimePointClockCurrentInitialMeas-std::chrono::nanoseconds(2*this->ApproxInterruptTime);
 // Compute error
 if (retInterruptsPRU1>0){
 	// Compute clocks adjustment
