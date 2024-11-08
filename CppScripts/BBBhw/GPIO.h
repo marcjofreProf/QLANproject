@@ -31,6 +31,7 @@ using std::fstream;
 #define PRUclockStepPeriodNanoseconds		5.00000 //4.99999 // Very critical parameter experimentally assessed. PRU clock cycle time in nanoseconds. Specs says 5ns, but maybe more realistic is the 24 MHz clock is a bit higher and then multiplied by 8
 #define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
+// Num averages below is critical not to get system stall (since performing median averagins is very resource consuming)
 #define NumSynchMeasAvgAux 	175 //351; // Num averages to compute the relative frequency difference. Better to be odd number.
 #define ExtraNumSynchMeasAvgAux 	175 // 351 // Averaging for computing current absolute time offset
 #define ExtraExtraNumSynchMeasAvgAux 	5 // Averaging for computing current relative frequency diference
