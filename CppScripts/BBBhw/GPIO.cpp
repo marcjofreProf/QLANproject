@@ -209,7 +209,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	  prussdrv_pru_disable(PRU_Operation_NUM);  
 	  prussdrv_exit();*/
 	  ///////////////////////////////////////////////////////
-	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread (only applied to the periodic thread). But it stalls operation in RealTime kernel.
+	//this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread (only applied to the periodic thread). But it stalls operation in RealTime kernel.
 	//////////////////////////////////////////////////////////
 }
 
@@ -223,7 +223,7 @@ int GPIO::InitAgentProcess(){
 /////////////////////////////////////////////////////////
 bool GPIO::setMaxRrPriority(){// For rapidly handling interrupts
 	int max_priority=sched_get_priority_max(SCHED_FIFO);
-	int Nice_priority=77;// Higher priority. Very important parameter to have stability of the measurements. Slightly smaller than the priorities for clock control (ptp4l,...) but larger than for the general program
+	int Nice_priority=85;// Higher priority. Very important parameter to have stability of the measurements. Slightly larger than the priorities for clock control (ptp4l,...) but larger than for the general program
 	// SCHED_RR: Round robin
 	// SCHED_FIFO: First-In-First-Out
 	sched_param sch_params;
