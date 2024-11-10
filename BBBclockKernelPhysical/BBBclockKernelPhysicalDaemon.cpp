@@ -194,7 +194,7 @@ return 0;// all ok
 }
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME// https://opensource.com/article/17/6/timekeeping-linux-vms
+clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME// https://opensource.com/article/17/6/timekeeping-linux-vms
 
 while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);//std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-Clock::now()));// Busy waiting. With a while loop rapid response, but more variation; compared to sleep_for(). Also, the ApproxInterruptTime has to be adjusted (around 6000 for while loop and around 100000 for sleep_for())
 //std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-ClockWatch::now()));
@@ -442,7 +442,7 @@ int CKPD::RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep){
 struct timespec ts;
 ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
 ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
-clock_nanosleep(CLOCK_REALTIME, 0, &ts, NULL); //
+clock_nanosleep(CLOCK_TAI, 0, &ts, NULL); //
 
 return 0; // All ok
 }
