@@ -613,7 +613,7 @@ else{
 	requestWhileWait = this->GetFutureTimePointOtherNode();
 }
 this->acquire();// So that there are no segmentatoin faults by grabbing the CLOCK REALTIME and also this has maximum priority
-clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
+//clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);// Synch barrier
 //while (Clock::now() < this->FutureTimePoint);// Busy wait.
 
 // After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
@@ -627,28 +627,6 @@ unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cas
 
 PRUGPIO.SendTriggerSignals(this->QuadEmitDetecSelec,this->HistPeriodicityAux,static_cast<unsigned int>(NumberRepetitionsSignal),this->FineSynchAdjVal,TimePointFuture_time_as_count,FlagTestSynch);//PRUGPIO->SendTriggerSignals(); // It is long enough emitting sufficient qubits for the receiver to get the minimum amount of multiples of NumQuBitsPerRun
 
- /* Very slow GPIO BBB not used anymore
- // Basic Output - Generate a pulse of 1 second period
- ////clock_nanosleep(CLOCK_TAI,0,&requestQuarterPeriod,NULL);
- //TimePointFuture_time_as_count+=(long)QuBitsNanoSecQuarterPeriodInt[0];
- //requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
-//requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
-//clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);
- for (int iIterWrite=0;iIterWrite<NumQubitsMemoryBuffer;iIterWrite++){
-	 outGPIO->streamOutWrite(HIGH);//outGPIO.setValue(HIGH);
-	 //clock_nanosleep(CLOCK_TAI,0,&requestHalfPeriod,NULL);
-	 TimePointFuture_time_as_count+=(long)QuBitsNanoSecHalfPeriodInt[0];
-	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
-	requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
-	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);
-	 outGPIO->streamOutWrite(LOW);//outGPIO.setValue(LOW);
-	 //clock_nanosleep(CLOCK_TAI,0,&requestHalfPeriod,NULL);
-	 TimePointFuture_time_as_count+=(long)QuBitsNanoSecHalfPeriodInt[0];
-	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
-	requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
-	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);
- }
- */
 this->PurgeExtraordinaryTimePointsNodes();
 this->RunThreadSimulateEmitQuBitFlag=true;//enable again that this thread can again be called. It is okey since it entered a block semaphore part and then no other sempahored part will run until this one finishes. At the same time, returning to true at this point allows the read to not go out of scope and losing this flag parameter
 this->release();
@@ -1081,7 +1059,7 @@ int QPLA::ThreadSimulateReceiveQubit(){
 	}
 	this->acquire();
 	// So that there are no segmentation faults by grabbing the CLOCK REALTIME and also this has maximum priority
-	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrier
+	//clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrier
 	//while (Clock::now() < this->FutureTimePoint);// Busy wait 
 
 	// After passing the TimePoint barrier, in terms of synchronizaton to the action in synch, it is desired to have the minimum indispensable number of lines of code (each line of code adds time jitter)
@@ -1097,32 +1075,7 @@ int QPLA::ThreadSimulateReceiveQubit(){
 	for (iIterRuns=0;iIterRuns<DetRunsCount;iIterRuns++){	
 		PRUGPIO.ReadTimeStamps(iIterRuns,this->QuadEmitDetecSelec,this->HistPeriodicityAux,static_cast<unsigned int>(NumQuBitsPerRun),this->FineSynchAdjVal,TimePointFuture_time_as_count,FlagTestSynch);//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
 	}
-	 // Basic Input 
-	 /* Very slow GPIO BBB not used anymore
-	 ////clock_nanosleep(CLOCK_TAI,0,&requestQuarterPeriod,NULL);
-	 TimePointFuture_time_as_count+=(long)QuBitsNanoSecQuarterPeriodInt[0];
-	 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
-	requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
-	clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);
-	 for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){	 
-		 SimulateQuBitValueArray[iIterRead]=inGPIO->streamInRead();//getValue();
-		 //clock_nanosleep(CLOCK_TAI,0,&requestPeriod,NULL);	
-		 TimePointFuture_time_as_count+=(long)QuBitsNanoSecPeriodInt[0];
-		 requestWhileWait.tv_sec=(int)(TimePointFuture_time_as_count/((long)1000000000));
-		requestWhileWait.tv_nsec=(long)(TimePointFuture_time_as_count%(long)1000000000);
-		clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL); 
-	 }
-	 */
-	 /*
-	 // Basic input
-	 // Count received QuBits
-	 for (int iIterRead=0;iIterRead<NumQubitsMemoryBuffer;iIterRead++){// Count how many qubits 
-	 	if (SimulateQuBitValueArray[iIterRead]==1){
-	 		SimulateNumStoredQubitsNodeAux++;
-	 	} 	
-	 }
-	 */
-
+	
 	this->LinearRegressionQuBitFilter();// Retrieve raw detected qubits and channel tags
 	this->PurgeExtraordinaryTimePointsNodes();
 	this->RunThreadSimulateReceiveQuBitFlag=true;//enable again that this thread can again be called
@@ -1799,7 +1752,7 @@ int QPLA::RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep){
 	struct timespec ts;
 	ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
 	ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
-clock_nanosleep(CLOCK_TAI, 0, &ts, NULL); //
+clock_nanosleep(CLOCK_REALTIME, 0, &ts, NULL); //
 
 return 0; // All ok
 }
