@@ -172,7 +172,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	sleep(150);// Give some time to load programs in PRUs and the synch protocols to initiate and lock after prioritazion and adjtimex. Very important, otherwise bad values might be retrieved
 	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread. It stalls operation RealTime Kernel (commented, then)
 	// Timer management
-	tfd = timerfd_create(CLOCK_TAI,  0);
+	tfd = timerfd_create(CLOCK_REALTIME,  0);
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=ClockWatch::now();
 	// Absolute time reference	
