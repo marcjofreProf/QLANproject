@@ -295,23 +295,23 @@ struct timespec GPIO::SetWhileWait(){
 	requestWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
 
 	// Set the timer to expire at the desired time
-	//TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
+	TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
 	//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
 	
-    //TimerTimeout.tv_sec = (int)(this->TimePRU1synchPeriod/((long)1000000000)); 
-    //TimerTimeout.tv_usec = (long)(this->TimePRU1synchPeriod%(long)1000000000);
+    TimerTimeout.tv_sec = (int)(this->TimePRU1synchPeriod/((long)1000000000)); 
+    TimerTimeout.tv_usec = (long)(this->TimePRU1synchPeriod%(long)1000000000);
 
-    //struct itimerspec its;
-    //its.it_interval.tv_sec = 0;  // No interval, one-shot timer
-    //its.it_interval.tv_nsec = 0;
-    //its.it_value.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
-	//its.it_value.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
+    struct itimerspec its;
+    its.it_interval.tv_sec = 0;  // No interval, one-shot timer
+    its.it_interval.tv_nsec = 0;
+    its.it_value.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
+	its.it_value.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
 
-	//timerfd_settime(this->tfd, TFD_TIMER_ABSTIME, &its, NULL);
+	timerfd_settime(this->tfd, TFD_TIMER_ABSTIME, &its, NULL);
 
 	// Watch timefd file descriptor
-    //FD_ZERO(&rfds);
-    //FD_SET(this->tfd, &rfds);
+    FD_ZERO(&rfds);
+    FD_SET(this->tfd, &rfds);
 
 	return requestWhileWaitAux;
 }
@@ -357,8 +357,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				// sleep_for takes longer in average maybe because it has to re-load all the context and so forth after each sleep...
 				//std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future-Clock::now()));//while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);//{//;// Busy waiting
 				
-				std::this_thread::sleep_until(this->TimePointClockCurrentSynchPRU1future); // Better to use sleep_until because it will adapt to changes in the current time by the time synchronization protocol
-				//select(tfd+1, &rfds, NULL, NULL, &TimerTimeout);//TimerTFDretval = select(tfd+1, &rfds, NULL, NULL, NULL); /* Last parameter = NULL --> wait forever */
+				//std::this_thread::sleep_until(this->TimePointClockCurrentSynchPRU1future); // Better to use sleep_until because it will adapt to changes in the current time by the time synchronization protocol
+				select(tfd+1, &rfds, NULL, NULL, &TimerTimeout);//TimerTFDretval = select(tfd+1, &rfds, NULL, NULL, NULL); /* Last parameter = NULL --> wait forever */
 				
 				//	// Yield the CPU to other threads
         		//	std::this_thread::yield();
@@ -402,9 +402,18 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//pru1dataMem_int[2]// Current IEP timer sample
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[2]);
-				this->PRUcurrentTimerValWrapLong=this->PRUcurrentTimerValWrap;// Update value
+				
 				// Correct for interrupt handling time might add a bias in the estimation/reading
-				//this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);//this->PRUcurrentTimerValWrap-duration_FinalInitialCountAuxArrayAvg/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command //this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
+				duration_FinalInitialCountAux=static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future).count());
+				this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-(duration_FinalInitialCountAux-duration_FinalInitialCountAuxArrayAvg)/static_cast<double>(PRUclockStepPeriodNanoseconds);//this->PRUcurrentTimerValWrap-duration_FinalInitialCountAuxArrayAvg/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command //this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
+				if (this->PRUcurrentTimerValWrap<0.0){
+					this->PRUcurrentTimerValWrap=static_cast<double>(-fmod(-this->PRUcurrentTimerValWrap,static_cast<double>(iepPRUtimerRange32bits)));
+				}
+				else{
+					this->PRUcurrentTimerValWrap=static_cast<double>(fmod(this->PRUcurrentTimerValWrap,static_cast<double>(iepPRUtimerRange32bits)));
+				}
+				
+				this->PRUcurrentTimerValWrapLong=this->PRUcurrentTimerValWrap;// Update value
 				// Unwrap
 				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
