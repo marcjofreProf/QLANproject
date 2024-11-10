@@ -171,6 +171,8 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	//prussdrv_pru_enable(PRU_ClockPhys_NUM);
 	sleep(150);// Give some time to load programs in PRUs and the synch protocols to initiate and lock after prioritazion and adjtimex. Very important, otherwise bad values might be retrieved
 	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread. It stalls operation RealTime Kernel (commented, then)
+	// Timer management
+	tfd = timerfd_create(CLOCK_TAI,  0);
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=ClockWatch::now();
 	// Absolute time reference	
@@ -197,6 +199,7 @@ while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);//std::this_th
 //std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-ClockWatch::now()));
 //std::this_thread::sleep_until(this->TimePointClockCurrentInitialMeas); // Better to use sleep_until because it will adapt to changes in the current time by the time synchronization protocol
 //this->TimePointClockCurrentInitialMeas=ClockWatch::now(); //Computed in the step before
+retval = select(tfd+1, &rfds, NULL, NULL, NULL); /* Last parameter = NULL --> wait forever */
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
 //retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// First interrupt sent to measure time
@@ -347,6 +350,24 @@ struct timespec CKPD::SetWhileWait(){
 
 	requestWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
 	requestWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
+
+	// Set the timer to expire at the desired time
+	TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
+	//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
+
+    struct itimerspec its;
+    its.it_interval.tv_sec = 0;  // No interval, one-shot timer
+    its.it_interval.tv_nsec = 0;
+    its.it_value.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
+	its.it_value.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
+
+	timerfd_settime(tfd, TFD_TIMER_ABSTIME, &its, NULL);
+
+	/* Watch timefd file descriptor */
+    FD_ZERO(&rfds);
+    FD_SET(0, &rfds);
+    FD_SET(tfd, &rfds);
+
 	return requestWhileWaitAux;
 }
 
