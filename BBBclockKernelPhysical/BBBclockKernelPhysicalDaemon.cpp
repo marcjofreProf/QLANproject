@@ -194,11 +194,13 @@ return 0;// all ok
 }
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
-clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME// https://opensource.com/article/17/6/timekeeping-linux-vms
+//clock_nanosleep(CLOCK_TAI,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME// https://opensource.com/article/17/6/timekeeping-linux-vms
+
 //while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);//std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-Clock::now()));// Busy waiting. With a while loop rapid response, but more variation; compared to sleep_for(). Also, the ApproxInterruptTime has to be adjusted (around 6000 for while loop and around 100000 for sleep_for())
 //std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-ClockWatch::now()));
 //std::this_thread::sleep_until(this->TimePointClockCurrentInitialMeas); // Better to use sleep_until because it will adapt to changes in the current time by the time synchronization protocol
 //this->TimePointClockCurrentInitialMeas=ClockWatch::now(); //Computed in the step before
+
 select(tfd+1, &rfds, NULL, NULL, NULL);//TimerTFDretval = select(tfd+1, &rfds, NULL, NULL, NULL); /* Last parameter = NULL --> wait forever */
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
@@ -361,12 +363,11 @@ struct timespec CKPD::SetWhileWait(){
     its.it_value.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
 	its.it_value.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
 
-	timerfd_settime(tfd, TFD_TIMER_ABSTIME, &its, NULL);
+	timerfd_settime(this->tfd, TFD_TIMER_ABSTIME, &its, NULL);
 
 	/* Watch timefd file descriptor */
     FD_ZERO(&rfds);
-    FD_SET(0, &rfds);
-    FD_SET(tfd, &rfds);
+    FD_SET(this->tfd, &rfds);
 
 	return requestWhileWaitAux;
 }
