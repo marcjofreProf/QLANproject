@@ -157,6 +157,7 @@ private:// Variables
 	int tfd; // Timer
 	fd_set rfds;
 	int TimerTFDretval;
+	struct timeval TimerTimeout;
 	////
 	double duration_FinalInitialCountAux=0.0;
 	double duration_FinalInitialCountAuxArrayAvg=0.0;

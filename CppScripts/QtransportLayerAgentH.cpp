@@ -703,7 +703,7 @@ int QTLAH::ICPmanagementSend(int socket_fd_conn,char* IPaddressesSockets) {
   	struct timespec ts;
   	ts.tv_sec=(int)(TimeNanoSecondsSleep/((long)1000000000));
   	ts.tv_nsec=(long)(TimeNanoSecondsSleep%(long)1000000000);
-clock_nanosleep(CLOCK_TAI, 0, &ts, NULL); //
+clock_nanosleep(CLOCK_REALTIME, 0, &ts, NULL); //
 
 return 0; // All ok
 }
