@@ -201,7 +201,7 @@ int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems phy
 //std::this_thread::sleep_until(this->TimePointClockCurrentInitialMeas); // Better to use sleep_until because it will adapt to changes in the current time by the time synchronization protocol
 //this->TimePointClockCurrentInitialMeas=ClockWatch::now(); //Computed in the step before
 
-select(tfd+1, &rfds, NULL, NULL, NULL);//TimerTFDretval = select(tfd+1, &rfds, NULL, NULL, NULL); /* Last parameter = NULL --> wait forever */
+select(tfd+1, &rfds, NULL, NULL, &TimerTimeout);//TimerTFDretval = select(tfd+1, &rfds, NULL, NULL, NULL); /* Last parameter = NULL --> wait forever */
 // Important, the following line at the very beggining to reduce the command jitter
 prussdrv_pru_send_event(22);
 //retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// First interrupt sent to measure time
@@ -356,6 +356,9 @@ struct timespec CKPD::SetWhileWait(){
 	// Set the timer to expire at the desired time
 	TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
 	//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
+	
+    TimerTimeout.tv_sec = (int)(this->TimeAdjPeriod/((long)1000000000)); 
+    TimerTimeout.tv_usec = (long)(this->TimeAdjPeriod%(long)1000000000);
 
     struct itimerspec its;
     its.it_interval.tv_sec = 0;  // No interval, one-shot timer
@@ -606,6 +609,7 @@ CKPD::~CKPD() {
 	prussdrv_exit();
 	//munmap(ddrMem, 0x0FFFFFFF);
 	//close(mem_fd); // Device
+	close(tfd);// close the time descriptor
 }
 
 }

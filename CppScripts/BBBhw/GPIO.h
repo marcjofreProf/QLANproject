@@ -14,6 +14,9 @@
 #include <atomic>
 // Time/synchronization management
 #include <chrono>
+// Timer management
+#include <sys/timerfd.h>
+#include <sys/select.h>
 
 using namespace std;
 
@@ -151,6 +154,10 @@ private:// Variables
 	//int duration_FinalInitialDriftAux=0;// For absolute drift purposes	
 	//int duration_FinalInitialDriftAuxArray[MaxNumPulses]={0};// For absolute drift purposes
 	//int duration_FinalInitialDriftAuxArrayAvg=0;// For absolute drift purposes
+	int tfd; // Timer
+	fd_set rfds;
+	int TimerTFDretval;
+	////
 	double duration_FinalInitialCountAux=0.0;
 	double duration_FinalInitialCountAuxArrayAvg=0.0;
 	double duration_FinalInitialCountAuxArrayAvgInitial=0.0;

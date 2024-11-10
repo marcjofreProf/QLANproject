@@ -80,6 +80,7 @@ private:// Variables
 	int tfd; // Timer
 	fd_set rfds;
 	int TimerTFDretval;
+	struct timeval TimerTimeout;
 	using TimePointWatch = std::chrono::time_point<ClockWatch>;
 	//using TimePointChrono = std::chrono::time_point<ClockChrono>;
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds; // Initial value to 1 s

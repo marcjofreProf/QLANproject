@@ -1809,6 +1809,7 @@ GPIO::~GPIO() {
 	this->DisablePRUs();
 	//fclose(outfile); 
 	prussdrv_exit();
+	close(tfd);// close the time descriptor
 	//munmap(ddrMem, 0x0FFFFFFF);
 	//close(mem_fd); // Device
 	//if(munmap(pru_int, PRU_LEN)) {
