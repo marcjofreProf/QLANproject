@@ -35,8 +35,8 @@ using std::fstream;
 #define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
 // Num averages below is critical not to get system stall (since performing median averagins is very resource consuming)
-#define NumSynchMeasAvgAux 	175 //351; // Num averages to compute the relative frequency difference. Better to be odd number.
-#define ExtraNumSynchMeasAvgAux 	175 // 351 // Averaging for computing current absolute time offset
+#define NumSynchMeasAvgAux 	201 //351; // Num averages to compute the relative frequency difference. Better to be odd number.
+#define ExtraNumSynchMeasAvgAux 	201 // 351 // Averaging for computing current absolute time offset
 #define ExtraExtraNumSynchMeasAvgAux 	5 // Averaging for computing current relative frequency diference
 
 namespace exploringBB {
@@ -72,7 +72,7 @@ private:// Variables
 	long double PRUoffsetDriftError=0;
 	long double PRUoffsetDriftErrorArray[ExtraExtraNumSynchMeasAvgAux]={0};
 	long double PRUoffsetDriftErrorAvg=0.0;
-	long double PRUoffsetDriftErrorAvgThresh=1e-8; //Threshold value to not apply relative frequency difference
+	long double PRUoffsetDriftErrorAvgThresh=5e-8; //Threshold value to not apply relative frequency difference
 	double AccumulatedErrorDriftThresh=1e-7; //Threshold value to not apply relative frequency difference
 	// Absolute corrected error
 	double PRUoffsetDriftErrorAbs=0;
