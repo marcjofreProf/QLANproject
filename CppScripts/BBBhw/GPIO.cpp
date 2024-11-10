@@ -407,7 +407,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				duration_FinalInitialCountAux=static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future).count());
 				this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-(duration_FinalInitialCountAux-duration_FinalInitialCountAuxArrayAvg)/static_cast<double>(PRUclockStepPeriodNanoseconds);//this->PRUcurrentTimerValWrap-duration_FinalInitialCountAuxArrayAvg/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command //this->PRUcurrentTimerValWrap-duration_FinalInitialCountAux/static_cast<double>(PRUclockStepPeriodNanoseconds);// Remove time for sending command
 				if (this->PRUcurrentTimerValWrap<0.0){
-					this->PRUcurrentTimerValWrap=static_cast<double>(-fmod(-this->PRUcurrentTimerValWrap,static_cast<double>(iepPRUtimerRange32bits)));
+					this->PRUcurrentTimerValWrap=static_cast<double>(static_cast<double>(iepPRUtimerRange32bits)-fmod(-this->PRUcurrentTimerValWrap,static_cast<double>(iepPRUtimerRange32bits)));
 				}
 				else{
 					this->PRUcurrentTimerValWrap=static_cast<double>(fmod(this->PRUcurrentTimerValWrap,static_cast<double>(iepPRUtimerRange32bits)));
