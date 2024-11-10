@@ -357,20 +357,20 @@ struct timespec CKPD::SetWhileWait(){
 	TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
 	//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
 	
-    TimerTimeout.tv_sec = (int)(this->TimeAdjPeriod/((long)1000000000)); 
-    TimerTimeout.tv_usec = (long)(this->TimeAdjPeriod%(long)1000000000);
+    //TimerTimeout.tv_sec = (int)(this->TimeAdjPeriod/((long)1000000000)); 
+    //TimerTimeout.tv_usec = (long)(this->TimeAdjPeriod%(long)1000000000);
+	//
+    //struct itimerspec its;
+    //its.it_interval.tv_sec = 0;  // No interval, one-shot timer
+    //its.it_interval.tv_nsec = 0;
+    //its.it_value.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
+	//its.it_value.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
 
-    struct itimerspec its;
-    its.it_interval.tv_sec = 0;  // No interval, one-shot timer
-    its.it_interval.tv_nsec = 0;
-    its.it_value.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
-	its.it_value.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
+	//timerfd_settime(this->tfd, TFD_TIMER_ABSTIME, &its, NULL);
 
-	timerfd_settime(this->tfd, TFD_TIMER_ABSTIME, &its, NULL);
-
-	/* Watch timefd file descriptor */
-    FD_ZERO(&rfds);
-    FD_SET(this->tfd, &rfds);
+	// Watch timefd file descriptor
+    //FD_ZERO(&rfds);
+    //FD_SET(this->tfd, &rfds);
 
 	return requestWhileWaitAux;
 }
