@@ -893,6 +893,10 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0);// No intra pulses reltive frequency difference correction
 	}
 
+	// Test
+	ContCorr=static_cast<unsigned int>(4294967295);
+	ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0);
+
 	// Accounting for the effective offset and frequency correction
 	if (PRUoffFreqTotalAux<0.0){
 		PRUoffFreqTotalAux=-fmodl(-PRUoffFreqTotalAux,static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod));
