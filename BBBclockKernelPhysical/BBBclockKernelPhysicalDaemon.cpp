@@ -353,12 +353,13 @@ struct timespec CKPD::SetWhileWait(){
 	requestWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
 	requestWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
 
+	// Timer sets an interrupt that if not commented (when not in use) produces a long reaction time in the while loop (busy wait)
 	// Set the timer to expire at the desired time
 	TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
 	//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
 	
-    //TimerTimeout.tv_sec = (int)(this->TimeAdjPeriod/((long)1000000000)); 
-    //TimerTimeout.tv_usec = (long)(this->TimeAdjPeriod%(long)1000000000);
+    //TimerTimeout.tv_sec = (int)((2*this->TimeClockMarging)/((long)1000000000)); 
+    //TimerTimeout.tv_usec = (long)((2*this->TimeClockMarging)%(long)1000000000);
 	//
     //struct itimerspec its;
     //its.it_interval.tv_sec = 0;  // No interval, one-shot timer

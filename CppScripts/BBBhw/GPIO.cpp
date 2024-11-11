@@ -294,12 +294,12 @@ struct timespec GPIO::SetWhileWait(){
 	requestWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
 	requestWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
 
-	// Set the timer to expire at the desired time
+	// Timer sets an interrupt that if not commented (when not in use) produces a long reaction time in the while loop (busy wait)
 	TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
 	//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
 	
-    TimerTimeout.tv_sec = (int)(this->TimePRU1synchPeriod/((long)1000000000)); 
-    TimerTimeout.tv_usec = (long)(this->TimePRU1synchPeriod%(long)1000000000);
+    TimerTimeout.tv_sec = (int)((5*TimePRUcommandDelay)/((long)1000000000)); 
+    TimerTimeout.tv_usec = (long)((5*TimePRUcommandDelay)%(long)1000000000);
 
     struct itimerspec its;
     its.it_interval.tv_sec = 0;  // No interval, one-shot timer
@@ -412,13 +412,13 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				else{
 					this->PRUcurrentTimerValWrap=static_cast<double>(fmod(this->PRUcurrentTimerValWrap,static_cast<double>(iepPRUtimerRange32bits)));
 				}
-				
+
 				this->PRUcurrentTimerValWrapLong=this->PRUcurrentTimerValWrap;// Update value
 				// Unwrap
-				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrap);}
+				if (this->PRUcurrentTimerValWrap<=this->PRUcurrentTimerValOldWrap){this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap+(static_cast<double>(iepPRUtimerRange32bits)-this->PRUcurrentTimerValOldWrap);}
 				else{this->PRUcurrentTimerVal=this->PRUcurrentTimerValWrap;}
 
-				if (this->PRUcurrentTimerValWrapLong<=this->PRUcurrentTimerValOldWrapLong){this->PRUcurrentTimerValLong=this->PRUcurrentTimerValWrapLong+(0xFFFFFFFF-this->PRUcurrentTimerValOldWrapLong);}
+				if (this->PRUcurrentTimerValWrapLong<=this->PRUcurrentTimerValOldWrapLong){this->PRUcurrentTimerValLong=this->PRUcurrentTimerValWrapLong+(static_cast<double>(iepPRUtimerRange32bits)-this->PRUcurrentTimerValOldWrapLong);}
 				else{this->PRUcurrentTimerValLong=this->PRUcurrentTimerValWrapLong;}
 
 				this->QPLAFutureTimePointOld=this->TimePointClockCurrentSynchPRU1future;// update value
