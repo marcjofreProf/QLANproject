@@ -294,7 +294,7 @@ struct timespec GPIO::SetWhileWait(){
 	requestWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
 	requestWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
 
-	/*// Timer sets an interrupt that if not commented (when not in use) produces a long reaction time in the while loop (busy wait)
+	// Timer sets an interrupt that if not commented (when not in use) produces a long reaction time in the while loop (busy wait)
 	TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
 	//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
 	
@@ -311,7 +311,7 @@ struct timespec GPIO::SetWhileWait(){
 
 	// Watch timefd file descriptor
     FD_ZERO(&rfds);
-    FD_SET(this->tfd, &rfds);*/
+    FD_SET(this->tfd, &rfds);
 
 	return requestWhileWaitAux;
 }
@@ -323,7 +323,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 	//SynchRem=static_cast<int>((static_cast<long double>(iepPRUtimerRange32bits)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(iepPRUtimerRange32bits)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 	//this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(SynchRem);
 	// Timer management
-	//tfd = timerfd_create(CLOCK_REALTIME,  0);
+	tfd = timerfd_create(CLOCK_REALTIME,  0);
 	int duration_FinalInitialMeasTrig=2*ApproxInterruptTime;
 	unsigned long long int ULLISynchRem=(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod)+1)*static_cast<unsigned long long int>(TimePRU1synchPeriod);
 	std::chrono::nanoseconds duration_back(ULLISynchRem);
@@ -357,8 +357,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				// sleep_for takes longer in average maybe because it has to re-load all the context and so forth after each sleep...
 				//std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentSynchPRU1future-Clock::now()));//while(Clock::now() < this->TimePointClockCurrentSynchPRU1future);//{//;// Busy waiting
 				
-				std::this_thread::sleep_until(this->TimePointClockCurrentSynchPRU1future); // Better to use sleep_until because it will adapt to changes in the current time by the time synchronization protocol
-				//select(tfd+1, &rfds, NULL, NULL, &TimerTimeout);//TimerTFDretval = select(tfd+1, &rfds, NULL, NULL, NULL); /* Last parameter = NULL --> wait forever */
+				//std::this_thread::sleep_until(this->TimePointClockCurrentSynchPRU1future); // Better to use sleep_until because it will adapt to changes in the current time by the time synchronization protocol
+				select(tfd+1, &rfds, NULL, NULL, &TimerTimeout);//TimerTFDretval = select(tfd+1, &rfds, NULL, NULL, NULL); /* Last parameter = NULL --> wait forever */
 				
 				//	// Yield the CPU to other threads
         		//	std::this_thread::yield();
@@ -1844,7 +1844,7 @@ GPIO::~GPIO() {
 	this->DisablePRUs();
 	//fclose(outfile); 
 	prussdrv_exit();
-	//close(tfd);// close the time descriptor
+	close(tfd);// close the time descriptor
 	//munmap(ddrMem, 0x0FFFFFFF);
 	//close(mem_fd); // Device
 	//if(munmap(pru_int, PRU_LEN)) {

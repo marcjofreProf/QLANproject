@@ -154,10 +154,10 @@ private:// Variables
 	//int duration_FinalInitialDriftAux=0;// For absolute drift purposes	
 	//int duration_FinalInitialDriftAuxArray[MaxNumPulses]={0};// For absolute drift purposes
 	//int duration_FinalInitialDriftAuxArrayAvg=0;// For absolute drift purposes
-	//int tfd; // Timer. Attention: // close the time descriptor in the destructor
-	//fd_set rfds;
-	//int TimerTFDretval;
-	//struct timeval TimerTimeout;
+	int tfd; // Timer. Attention: // close the time descriptor in the destructor
+	fd_set rfds;
+	int TimerTFDretval;
+	struct timeval TimerTimeout;
 	////
 	double duration_FinalInitialCountAux=0.0;
 	double duration_FinalInitialCountAuxArrayAvg=0.0;
