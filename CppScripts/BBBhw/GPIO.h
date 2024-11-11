@@ -156,6 +156,7 @@ private:// Variables
 	//int duration_FinalInitialDriftAuxArrayAvg=0;// For absolute drift purposes
 	int tfd; // Timer. Attention: // close the time descriptor in the destructor
 	fd_set rfds;
+	uint64_t TimerExpirations;
 	int TimerTFDretval;
 	struct timeval TimerTimeout;
 	////
@@ -290,6 +291,7 @@ public:	// Functions/Methods
 	int SetSynchDriftParams(double* AccumulatedErrorDriftParamsAux);// Method to update (or reset with 0s) the synchronization parameters of the long time drift (maybe updated periodically)
 	bool GetHardwareSynchStatus();// To provide information to the above agent when asked
 	// Non PRU
+	/*
 	virtual int getNumber() { return number; }
 	// General Input and Output Settings
 	virtual int setDirection(GPIO_DIRECTION);
@@ -321,7 +323,7 @@ public:	// Functions/Methods
 	virtual int waitForEdge(); // waits until button is pressed
 	virtual int waitForEdge(CallbackType callback); // threaded with callback
 	virtual void waitForEdgeCancel() { this->threadRunning = false; }
-
+	*/
 	~GPIO();  //destructor
 
 private: // Functions/Methods
@@ -341,13 +343,13 @@ private: // Functions/Methods
 	unsigned short packBits(unsigned short value);
 	int DDRdumpdata(int iIterRunsAux);
 	// Non-PRU
-	int write(string path, string filename, string value);
-	int write(string path, string filename, int value);
-	string read(string path, string filename);
+	//int write(string path, string filename, string value);
+	//int write(string path, string filename, int value);
+	//string read(string path, string filename);
 	//int exportGPIO(); Not currently used - legacy
 	//int unexportGPIO(); Not currently used - legacy
-	friend void* threadedPoll(void *value);
-	friend void* threadedToggle(void *value);
+	//friend void* threadedPoll(void *value);
+	//friend void* threadedToggle(void *value);
 	// Mean filter
 	long double LongDoubleMeanFilterSubArray(long double* ArrayHolderAux,int MeanFilterFactor);
 	// Median filter

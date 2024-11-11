@@ -20,6 +20,7 @@ Script for PRU real-time handling
 #include<sys/epoll.h>
 #include<thread>
 #include<pthread.h>
+#include<unistd.h>
 // Handling priority in task manager
 #include<sched.h>
 // Time/synchronization management
@@ -379,6 +380,10 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				else{
 					prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
 					cout << "PRU1 interrupt error" << endl;
+				}
+				// Clear the timer
+				if (FD_ISSET(tfd, &rfds)){
+					read(tfd,&TimerExpirations,sizeof(TimerExpirations));
 				}
 				/*
 				// Warm up interrupt handling for Timetagg PRU0
@@ -1577,35 +1582,35 @@ GPIO::GPIO(int number) {
 	usleep(250000); // 250ms delay
 }
 
-int GPIO::write(string path, string filename, string value){
-	ofstream fs;
-	fs.open((path + filename).c_str());
-	if (!fs.is_open()){
-		perror("GPIO: write failed to open file ");
-		return -1;
-	}
-	fs << value;
-	fs.close();
-	return 0;
-}
+//int GPIO::write(string path, string filename, string value){
+//	ofstream fs;
+//	fs.open((path + filename).c_str());
+//	if (!fs.is_open()){
+//		perror("GPIO: write failed to open file ");
+//		return -1;
+//	}
+//	fs << value;
+//	fs.close();
+//	return 0;
+//}
 
-string GPIO::read(string path, string filename){
-	ifstream fs;
-	fs.open((path + filename).c_str());
-	if (!fs.is_open()){
-		perror("GPIO: read failed to open file ");
-	}
-	string input;
-	getline(fs,input);
-	fs.close();
-	return input;
-}
+//string GPIO::read(string path, string filename){
+//	ifstream fs;
+//	fs.open((path + filename).c_str());
+//	if (!fs.is_open()){
+//		perror("GPIO: read failed to open file ");
+//	}
+//	string input;
+//	getline(fs,input);
+//	fs.close();
+//	return input;
+//}
 
-int GPIO::write(string path, string filename, int value){
-	stringstream s;
-	s << value;
-	return this->write(path,filename,s.str());
-}
+//int GPIO::write(string path, string filename, int value){
+//	stringstream s;
+//	s << value;
+//	return this->write(path,filename,s.str());
+//}
 
 //int GPIO::exportGPIO(){
 //   return this->write(GPIO_PATH, "export", this->number);
@@ -1614,7 +1619,7 @@ int GPIO::write(string path, string filename, int value){
 //int GPIO::unexportGPIO(){
 //   return this->write(GPIO_PATH, "unexport", this->number);
 //}
-
+/*
 int GPIO::setDirection(GPIO_DIRECTION dir){
 	switch(dir){
 	case INPUT: return this->write(this->path, "direction", "in");
@@ -1829,7 +1834,7 @@ int GPIO::waitForEdge(CallbackType callback){
 	}
 	return 0;
 }
-
+*/
 int GPIO::DisablePRUs(){
 // Disable PRU and close memory mappings
 	prussdrv_pru_disable(PRU_Signal_NUM);
