@@ -72,8 +72,8 @@ private:// Variables
 	long double PRUoffsetDriftError=0;
 	long double PRUoffsetDriftErrorArray[ExtraExtraNumSynchMeasAvgAux]={0};
 	long double PRUoffsetDriftErrorAvg=0.0;
-	long double PRUoffsetDriftErrorAvgThresh=1e-7; //Threshold value to not apply relative frequency difference
-	double AccumulatedErrorDriftThresh=5e-7; //Threshold value to not apply relative frequency difference
+	long double PRUoffsetDriftErrorAvgThresh=5e-8; //Threshold value to not apply relative frequency difference
+	double AccumulatedErrorDriftThresh=1e-7; //Threshold value to not apply relative frequency difference
 	// Absolute corrected error
 	double PRUoffsetDriftErrorAbs=0;
 	double PRUoffsetDriftErrorAbsArray[ExtraNumSynchMeasAvgAux]={0};
