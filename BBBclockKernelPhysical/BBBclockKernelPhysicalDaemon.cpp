@@ -172,7 +172,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	sleep(150);// Give some time to load programs in PRUs and the synch protocols to initiate and lock after prioritazion and adjtimex. Very important, otherwise bad values might be retrieved
 	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread. It stalls operation RealTime Kernel (commented, then)
 	// Timer management
-	tfd = timerfd_create(CLOCK_REALTIME,  0);
+	//tfd = timerfd_create(CLOCK_REALTIME,  0);
 	// first time to get TimePoints for clock adjustment
 	this->TimePointClockCurrentInitial=ClockWatch::now();
 	// Absolute time reference	
@@ -355,7 +355,7 @@ struct timespec CKPD::SetWhileWait(){
 
 	// Timer sets an interrupt that if not commented (when not in use) produces a long reaction time in the while loop (busy wait)
 	// Set the timer to expire at the desired time
-	TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
+	//TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
 	//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
 	
     //TimerTimeout.tv_sec = (int)((2*this->TimeClockMarging)/((long)1000000000)); 
@@ -610,7 +610,7 @@ CKPD::~CKPD() {
 	prussdrv_exit();
 	//munmap(ddrMem, 0x0FFFFFFF);
 	//close(mem_fd); // Device
-	close(tfd);// close the time descriptor
+	//close(tfd);// close the time descriptor
 }
 
 }

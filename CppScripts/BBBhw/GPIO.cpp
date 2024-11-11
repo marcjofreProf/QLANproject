@@ -323,7 +323,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 	//SynchRem=static_cast<int>((static_cast<long double>(iepPRUtimerRange32bits)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(iepPRUtimerRange32bits)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 	//this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(SynchRem);
 	// Timer management
-	tfd = timerfd_create(CLOCK_REALTIME,  0);
+	//tfd = timerfd_create(CLOCK_REALTIME,  0);
 	int duration_FinalInitialMeasTrig=2*ApproxInterruptTime;
 	unsigned long long int ULLISynchRem=(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod)+1)*static_cast<unsigned long long int>(TimePRU1synchPeriod);
 	std::chrono::nanoseconds duration_back(ULLISynchRem);
@@ -892,10 +892,6 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		ContCorr=static_cast<unsigned int>(4294967295);
 		ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0);// No intra pulses reltive frequency difference correction
 	}
-
-	// Test
-	ContCorr=static_cast<unsigned int>(4294967295);
-	ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0);
 
 	// Accounting for the effective offset and frequency correction
 	if (PRUoffFreqTotalAux<0.0){
@@ -1847,7 +1843,7 @@ GPIO::~GPIO() {
 	this->DisablePRUs();
 	//fclose(outfile); 
 	prussdrv_exit();
-	close(tfd);// close the time descriptor
+	//close(tfd);// close the time descriptor
 	//munmap(ddrMem, 0x0FFFFFFF);
 	//close(mem_fd); // Device
 	//if(munmap(pru_int, PRU_LEN)) {

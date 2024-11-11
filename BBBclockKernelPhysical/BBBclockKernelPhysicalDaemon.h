@@ -77,10 +77,10 @@ private:// Variables
 	};
 	using ClockWatch = my_clock;//std::chrono::system_clock;// Since we do not need time sleep, it might make sense to use steady_clock;//system_clock; //system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)
 	//using ClockChrono = std::chrono::steady_clock;//Probably is also better to also measure with system_clock. system_clock;steady_clock;high_resolution_clock// Might seem that for measuring cycles (like a chronometer) steady_clock is better, system_clock is much better than steady_clock aimed at measuring absolute time (like a watch)	
-	int tfd; // Timer
-	fd_set rfds;
-	int TimerTFDretval;
-	struct timeval TimerTimeout;
+	//int tfd; // Timer. Attention: // close the time descriptor in the destructor
+	//fd_set rfds;
+	//int TimerTFDretval;
+	//struct timeval TimerTimeout;
 	using TimePointWatch = std::chrono::time_point<ClockWatch>;
 	//using TimePointChrono = std::chrono::time_point<ClockChrono>;
 	unsigned long long int TimePointClockCurrentFinalInitialAdj_time_as_count=ClockPeriodNanoseconds; // Initial value to 1 s
