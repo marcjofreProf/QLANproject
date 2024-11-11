@@ -403,16 +403,16 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//pru1dataMem_int[3]// Correction to apply to IEP timer
 				this->PRUcurrentTimerValWrap=static_cast<double>(pru1dataMem_int[2]);
 				
-				// Correct for interrupt handling time might add a bias in the estimation/reading
+				/*// Correct for interrupt handling time might add a bias in the estimation/reading
 				duration_FinalInitialCountAux=static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockSendCommandFinal-this->TimePointClockCurrentSynchPRU1future).count());
 				// If we assume that the larger part of the latency from the barrier wakeup to the actual interrupt handling is the awakening, we can try to substract his time.
-				this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-(duration_FinalInitialCountAux-duration_FinalInitialCountAuxArrayAvg)/static_cast<double>(PRUclockStepPeriodNanoseconds);
+				this->PRUcurrentTimerValWrap=this->PRUcurrentTimerValWrap-(duration_FinalInitialCountAux-0.0*duration_FinalInitialCountAuxArrayAvg)/static_cast<double>(PRUclockStepPeriodNanoseconds);
 				if (this->PRUcurrentTimerValWrap<0.0){
 					this->PRUcurrentTimerValWrap=static_cast<double>(static_cast<double>(iepPRUtimerRange32bits)-fmod(-this->PRUcurrentTimerValWrap,static_cast<double>(iepPRUtimerRange32bits)));
 				}
 				else{
 					this->PRUcurrentTimerValWrap=static_cast<double>(fmod(this->PRUcurrentTimerValWrap,static_cast<double>(iepPRUtimerRange32bits)));
-				}
+				}*/
 
 				this->PRUcurrentTimerValWrapLong=this->PRUcurrentTimerValWrap;// Update value
 				// Unwrap
