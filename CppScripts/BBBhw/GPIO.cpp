@@ -364,10 +364,9 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//	// Yield the CPU to other threads
         		//	std::this_thread::yield();
 				//}				
-				//this->TimePointClockCurrentSynchPRU1future=Clock::now(); // Initial measurement. info. Already computed in the steps before				// Important, the following line at the very beggining to reduce the command jitter				
-				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
+				//this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
 				prussdrv_pru_send_event(22);
-				//this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.			
+				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.			
 				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRUShort);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
 				//cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 				if (retInterruptsPRU1>0){
@@ -1170,7 +1169,8 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){
 		}
 	}
 	if (GPIOFlagRelFreqTest==false){
-		for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+		//for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+			int iQuadChIter=QuadEmitDetecSelecGPIO;// Only process the expected channel group
 			TotalCurrentNumRecordsQuadChNewOldAux=TotalCurrentNumRecordsQuadCh[iQuadChIter]-TotalCurrentNumRecordsQuadChOld[iQuadChIter];
 			if (TotalCurrentNumRecordsQuadChNewOldAux>=TagsSeparationDetRelFreq){
 	    		unsigned long long int ULLIInitialTimeTaggs=TimeTaggsLast;//TimeTaggs[iQuadChIter][0];// Normalize to the first reference timetag (it is not a detect qubit, but the timetagg of entering the timetagg PRU), which is a strong reference
@@ -1225,7 +1225,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){
 			else if (TotalCurrentNumRecordsQuadChNewOldAux>0){
 				cout << "GPIO::PRUdetCorrRelFreq not enough detections " << TotalCurrentNumRecordsQuadChNewOldAux << "<" << TagsSeparationDetRelFreq << " in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;
 			}
-		} // for
+		//} // for
 	}
 	else{
 		if (GPIOFlagRelFreqTest==true){cout << "GPIO::PRUdetCorrRelFreq deactivated..." << endl;}
