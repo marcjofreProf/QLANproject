@@ -337,7 +337,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 	this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Resetting to 0
 	this->NextSynchPRUcommand=static_cast<unsigned int>(11); // set command 11, do absolute correction
 	while(true){
-		//if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(2*TimePRUcommandDelay))){clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);}		
+		//iclock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 		// In C++, when evaluating a compound condition with && (logical AND), the expressions are evaluated from left to right, and the evaluation stops as soon as the result is determined.
 		if (clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphoreExtra==false){// It was possible to execute when needed, and still on time to be executed (otherwise skip it to not produce accumulations)			
 			//cout << "Resetting PRUs timer!" << endl;
