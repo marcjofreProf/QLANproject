@@ -173,7 +173,7 @@ private:// Variables
 	unsigned int ContCorr=4294967295; // By default very large (the maximum value of unsigned int), so that it never corrects
 	unsigned int ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0);
 	unsigned long TimeClockMarging=0;// In nanoseconds. If too large, it disastabilizes the timming performance. It has to be smaller than the SynchTrigPeriod
-	unsigned long TimePRUcommandDelay=200000;//250000;// In nanoseconds. If too large, it disastabilizes the timming performance. Very important parameter!!! When duration_FinalInitialMeasTrigAuxAvg properly set then is around 4000
+	unsigned long TimePRUcommandDelay=250000;//250000;// In nanoseconds. If too large, it disastabilizes the timming performance. Very important parameter!!! When duration_FinalInitialMeasTrigAuxAvg properly set then is around 4000
 	unsigned long long int TimeElpasedNow_time_as_count=0;
 	// PRU
 	static int mem_fd;
