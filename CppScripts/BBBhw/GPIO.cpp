@@ -337,7 +337,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 	this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Resetting to 0
 	this->NextSynchPRUcommand=static_cast<unsigned int>(11); // set command 11, do absolute correction
 	while(true){
-		//if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(2*TimePRUcommandDelay))){clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);}		
+		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(2*TimePRUcommandDelay))){clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);}		
 		if (this->ManualSemaphoreExtra==false and Clock::now()<this->TimePointClockCurrentSynchPRU1future){// It was possible to execute when needed, and still on time to be executed (otherwise skip it to not produce accumulations)			
 			//cout << "Resetting PRUs timer!" << endl;
 			//if (clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false and this->ResetPeriodicallyTimerPRU1){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).//https://opensource.com/article/17/6/timekeeping-linux-vms

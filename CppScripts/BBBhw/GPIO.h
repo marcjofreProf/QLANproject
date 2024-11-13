@@ -61,7 +61,7 @@ private:// Variables
 	std::atomic<bool> ManualSemaphoreExtra=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=4; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
-	int ApproxInterruptTime=500000; // Typical time of interrupt time duration is 5000 with simple busy wait; around 8000 with busy wait with yield; 100000 with sleep_for()
+	int ApproxInterruptTime=300000; // Typical time of interrupt time duration is 5000 with simple busy wait; around 8000 with busy wait with yield; 100000 with sleep_for()
 	// To many hundreds of measurements might consume oall the CPU of the board (because median is very resource consuming).Otherwise a better algorithm (median) has to be used.
 	unsigned int NextSynchPRUcommand=11;// set initially to NextSynchPRUcorrection=0
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
@@ -72,7 +72,7 @@ private:// Variables
 	long double PRUoffsetDriftError=0;
 	long double PRUoffsetDriftErrorArray[ExtraExtraNumSynchMeasAvgAux]={0};
 	long double PRUoffsetDriftErrorAvg=0.0;
-	long double PRUoffsetDriftErrorAvgThresh=5e-8; //Threshold value to not apply relative frequency difference
+	long double PRUoffsetDriftErrorAvgThresh=1e-8; //Threshold value to not apply relative frequency difference
 	double AccumulatedErrorDriftThresh=1e-7; //Threshold value to not apply relative frequency difference
 	// Absolute corrected error
 	double PRUoffsetDriftErrorAbs=0;
@@ -173,7 +173,7 @@ private:// Variables
 	unsigned int ContCorr=4294967295; // By default very large (the maximum value of unsigned int), so that it never corrects
 	unsigned int ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0);
 	unsigned long TimeClockMarging=0;// In nanoseconds. If too large, it disastabilizes the timming performance. It has to be smaller than the SynchTrigPeriod
-	unsigned long TimePRUcommandDelay=250000;//250000;// In nanoseconds. If too large, it disastabilizes the timming performance. Very important parameter!!! When duration_FinalInitialMeasTrigAuxAvg properly set then is around 4000
+	unsigned long TimePRUcommandDelay=200000;//250000;// In nanoseconds. If too large, it disastabilizes the timming performance. Very important parameter!!! When duration_FinalInitialMeasTrigAuxAvg properly set then is around 4000
 	unsigned long long int TimeElpasedNow_time_as_count=0;
 	// PRU
 	static int mem_fd;

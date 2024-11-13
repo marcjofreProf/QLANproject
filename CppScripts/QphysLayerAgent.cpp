@@ -1302,7 +1302,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 			TimeTaggsDetAnalytics[7]=static_cast<double>(TimeTaggs[iQuadChIter][0]);
 			for (int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){
 				if (i==0){cout << "TimeTaggs[iQuadChIter][1]-TimeTaggs[iQuadChIter][0]: " << static_cast<long long int>(TimeTaggs[iQuadChIter][1])-static_cast<long long int>(TimeTaggs[iQuadChIter][0]) << endl;}
-				else if(i==(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-2)){cout << "TimeTaggs[iQuadChIter][i+1]-TimeTaggs[iQuadChIter][i]: " << static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i]) << endl;}
+				else if(i==(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-2) and RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>2){cout << "TimeTaggs[iQuadChIter][i+1]-TimeTaggs[iQuadChIter][i]: " << static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i]) << endl;}
 
 				TimeTaggsDetAnalytics[5]+=(1.0/(static_cast<double>(SimulateNumStoredQubitsNodeMinus1Aux)))*((static_cast<double>((static_cast<long long int>(HistPeriodicityAux)/2+static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i]))%(static_cast<long long int>(HistPeriodicityAux))))-static_cast<double>(static_cast<long long int>(HistPeriodicityAux)/2));
 			}
