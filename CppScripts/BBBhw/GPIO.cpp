@@ -337,12 +337,10 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 	this->NextSynchPRUcorrection=static_cast<unsigned int>(0);// Resetting to 0
 	this->NextSynchPRUcommand=static_cast<unsigned int>(11); // set command 11, do absolute correction
 	while(true){
-		clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
-		if (this->ManualSemaphoreExtra==false){	
+		//clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
+		//if (this->ManualSemaphoreExtra==false){	
 		// In C++, when evaluating a compound condition with && (logical AND), the expressions are evaluated from left to right, and the evaluation stops as soon as the result is determined.
-		//if (clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphoreExtra==false){// It was possible to execute when needed, and still on time to be executed (otherwise skip it to not produce accumulations)
-			//cout << "Resetting PRUs timer!" << endl;
-			//if (clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphore==false and this->ResetPeriodicallyTimerPRU1){// Synch barrier. CLOCK_TAI (with steady_clock) instead of CLOCK_REALTIME (with system_clock).//https://opensource.com/article/17/6/timekeeping-linux-vms
+		if (clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphoreExtra==false){// It was possible to execute when needed, and still on time to be executed (otherwise skip it to not produce accumulations)
 			if (this->ResetPeriodicallyTimerPRU1){
 				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
@@ -568,7 +566,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 			cout << "GPIO::Information about synchronization:" << endl;
 			cout << "GPIO::Rel. freq. diff. to abs. time - unit conversion drift: " << this->PRUoffsetDriftErrorAvg*1000000000 << " ppb" << endl;
 			cout << "GPIO::Abs. time diff. - unit conversion drift: " << PRUoffsetDriftErrorAbsAvg << " PRU units" << endl;
-			cout << "GPIO::Time to handle interrupt: " << this->duration_FinalInitialCountAuxArrayAvg << " ns" << endl;
+			cout << "GPIO::INDICATIVE only!!! Time to handle interrupt: " << this->duration_FinalInitialCountAuxArrayAvg << " ns" << endl; // Alarge variation does not imply that the correction offset (time and frequency) are wrong!!!!
 			////cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
 			////cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 			cout << "GPIO::Ratio rel. freq. diff: " << this->EstimateSynchAvg << endl;
