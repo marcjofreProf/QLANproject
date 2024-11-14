@@ -324,7 +324,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 	//SynchRem=static_cast<int>((static_cast<long double>(iepPRUtimerRange32bits)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(iepPRUtimerRange32bits)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 	//this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(SynchRem);
 	// Timer management
-	tfd = timerfd_create(CLOCK_REALTIME,  0);
+	tfd = timerfd_create(CLOCK_REALTIME, TFD_NONBLOCK);
 	int duration_FinalInitialMeasTrig=2*ApproxInterruptTime;
 	unsigned long long int ULLISynchRem=(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod)+1)*static_cast<unsigned long long int>(TimePRU1synchPeriod);
 	std::chrono::nanoseconds duration_back(ULLISynchRem);
@@ -340,7 +340,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		//clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);
 		//if (this->ManualSemaphoreExtra==false){	
 		// In C++, when evaluating a compound condition with && (logical AND), the expressions are evaluated from left to right, and the evaluation stops as soon as the result is determined.
-		if (clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphoreExtra==false){// It was possible to execute when needed, and still on time to be executed (otherwise skip it to not produce accumulations)
+		if (Clock::now()<(this->TimePointClockCurrentSynchPRU1future-std::chrono::nanoseconds(3*TimePRUcommandDelay)) and clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL)==0 and this->ManualSemaphoreExtra==false){// It was possible to execute when needed, and still on time to be executed (otherwise skip it to not produce accumulations)
 			if (this->ResetPeriodicallyTimerPRU1){
 				this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 				this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
@@ -558,6 +558,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				this->iIterPRUcurrentTimerValPass=0; // reset value							
 			}				
 		} //end if
+		else{
+			// Clear the timer
+			if (FD_ISSET(tfd, &rfds)){
+				read(tfd,&TimerExpirations,sizeof(TimerExpirations));
+			}
+		}
 		
 		// Information
 		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(1*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
