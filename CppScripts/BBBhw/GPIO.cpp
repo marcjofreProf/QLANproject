@@ -471,20 +471,20 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				// Dealing with lon lon int matters due to floating or not precition!!!!
 				long double PRUoffsetDriftErrorAbsAux=0.0;
 				PRUoffsetDriftErrorAbsAux=-fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+static_cast<long double>(this->PRUcurrentTimerValWrap);//-static_cast<long double>(duration_FinalInitialCountAuxArrayAvgInitial);
-				this->PRUoffsetDriftErrorAbs=static_cast<double>(PRUoffsetDriftErrorAbsAux);//
+				//this->PRUoffsetDriftErrorAbs=static_cast<double>(PRUoffsetDriftErrorAbsAux);//
 				//// Below unwrap the difference
-				//if (PRUoffsetDriftErrorAbsAux>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
-				//	PRUoffsetDriftErrorAbsAux=static_cast<long double>(iepPRUtimerRange32bits)-PRUoffsetDriftErrorAbsAux+1;
-				//}	
-				//else if(PRUoffsetDriftErrorAbsAux<(-static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
-				//	PRUoffsetDriftErrorAbsAux=-static_cast<long double>(iepPRUtimerRange32bits)-PRUoffsetDriftErrorAbsAux-1;
-				//}
-				//if (PRUoffsetDriftErrorAbsAux<0.0){
-				//	this->PRUoffsetDriftErrorAbs=static_cast<double>(-fmodl(-PRUoffsetDriftErrorAbsAux,static_cast<long double>(iepPRUtimerRange32bits)));
-				//}
-				//else{
-				//	this->PRUoffsetDriftErrorAbs=static_cast<double>(fmodl(PRUoffsetDriftErrorAbsAux,static_cast<long double>(iepPRUtimerRange32bits)));
-				//}
+				if (PRUoffsetDriftErrorAbsAux>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
+					PRUoffsetDriftErrorAbsAux=-(static_cast<long double>(iepPRUtimerRange32bits)-PRUoffsetDriftErrorAbsAux);
+				}	
+				else if(PRUoffsetDriftErrorAbsAux<(-static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
+					PRUoffsetDriftErrorAbsAux=-(-static_cast<long double>(iepPRUtimerRange32bits)-PRUoffsetDriftErrorAbsAux);
+				}
+				if (PRUoffsetDriftErrorAbsAux<0.0){
+					this->PRUoffsetDriftErrorAbs=static_cast<double>(-fmodl(-PRUoffsetDriftErrorAbsAux,static_cast<long double>(iepPRUtimerRange32bits)));
+				}
+				else{
+					this->PRUoffsetDriftErrorAbs=static_cast<double>(fmodl(PRUoffsetDriftErrorAbsAux,static_cast<long double>(iepPRUtimerRange32bits)));
+				}
 				
 				// Absolute corrected error
 				this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
