@@ -78,7 +78,7 @@ private:// Variables
 	double PRUoffsetDriftErrorAbs=0;
 	double PRUoffsetDriftErrorAbsArray[ExtraNumSynchMeasAvgAux]={0};
 	double PRUoffsetDriftErrorAbsAvg=0.0;
-	double PRUoffsetDriftErrorAbsAvgOld=0.0;
+	long double PRUoffsetDriftErrorAbsAvgOld=0.0;
 	// Others
 	double PRUoffsetDriftErrorIntegral=0;
 	double PRUoffsetDriftErrorDerivative=0;
