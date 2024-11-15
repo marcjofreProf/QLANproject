@@ -21,6 +21,9 @@ Script for PRU real-time handling
 #include<thread>
 #include<pthread.h>
 #include<unistd.h>
+// Watchdog
+#include <sys/ioctl.h>
+#include <linux/watchdog.h>
 // Handling priority in task manager
 #include<sched.h>
 // Time/synchronization management
@@ -182,13 +185,22 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	this->SendTriggerSignalsSelfTest(); // Self test initialization
 	cout << "Attention doing SendTriggerSignalsSelfTest. To be removed" << endl;	
 	*/
+
+	// Configure a watchdog - if the system stalls it will automatically softreboot it after 300 seconds (of not answering)
+	int fd = open("/dev/watchdog", O_WRONLY);
+	int WDtimeout=300;// seconds
+	ioctl(fd,WDIOC_SETTIMEOUT,&WDtimeout);
+	close(fd);
+	cout << "GPIO::Enabled WATCHDOG with timeoout of " << WDtimeout << "s (software reset)."<< endl;
+
+	// Selection of the periodic synchronization correction
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{cout << "GPIO::Time and frequency synchronization periodic correction selected!" << endl;break;}
 		case 2:{cout << "GPIO::Time synchronization periodic correction selected!" << endl;break;}
 		case 1:{cout << "GPIO::Frequency synchronization periodic correction selected!" << endl;break;}
 		default:{cout << "GPIO::None synchronization periodic correction selected!" << endl;break;}
 	}
-	cout << "Wait to proceed, calibrating synchronization!" << endl;
+	cout << "Wait to proceed, calibrating synchronization!..." << endl;
 	////prussdrv_pru_enable(PRU_Signal_NUM);
 	sleep(150); // Give some time to load programs in PRUs and the synch protocols to initiate and lock after prioritazion and adjtimex. Very important, otherwise bad values might be retrieved
 	

@@ -43,6 +43,6 @@ Furthermore, the priority of processes ptp0, ptp4l and phc2sys is very important
 
 # Write phase mode not supported in BBB
 # Required to quickly correct Time Jumps in slave
-# step threshold: long values produces large jumps every now and then but allow better precition (less jitter). So it is a trade-off. Very important parameter, that probably has to be larger than the stability of the hardware clock since then it is tru behaviour.
+# step threshold: long values produces large jumps every now and then but allow better precition (less jitter). So it is a trade-off. Very important parameter, that probably has to be larger than the stability of the hardware clock since then it is tru behaviour. VEry important parameter!!!! It cannot be too low!!!
 # Maybe, for frequency synchronization this value can be low (e.g., 1 us). Instead for Time Synchronization this values should be larger (e.g., 10-20 us)
 
