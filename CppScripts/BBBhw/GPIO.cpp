@@ -522,10 +522,10 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 
 					// Below unwrap the difference
 					if (this->PRUoffsetDriftError>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
-						this->PRUoffsetDriftError=static_cast<long double>(iepPRUtimerRange32bits)-this->PRUoffsetDriftError+1;
+						this->PRUoffsetDriftError=-(static_cast<long double>(iepPRUtimerRange32bits)-this->PRUoffsetDriftError);
 					}	
 					else if(this->PRUoffsetDriftError<(-static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
-						this->PRUoffsetDriftError=-static_cast<long double>(iepPRUtimerRange32bits)-this->PRUoffsetDriftError-1;
+						this->PRUoffsetDriftError=-(-static_cast<long double>(iepPRUtimerRange32bits)-this->PRUoffsetDriftError);
 					}
 					if (this->PRUoffsetDriftError<0.0){
 						this->PRUoffsetDriftError=static_cast<double>(-fmodl(-this->PRUoffsetDriftError,static_cast<long double>(iepPRUtimerRange32bits)));
