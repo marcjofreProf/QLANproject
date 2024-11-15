@@ -187,10 +187,9 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	*/
 
 	// Configure a watchdog - if the system stalls it will automatically softreboot it after 300 seconds (of not answering)
-	int fd = open("/dev/watchdog", O_WRONLY);
-	int WDtimeout=300;// seconds
-	ioctl(fd,WDIOC_SETTIMEOUT,&WDtimeout);
-	close(fd);
+	fdWDtimeout = open("/dev/watchdog", O_WRONLY);
+	ioctl(fdWDtimeout,WDIOC_SETTIMEOUT,&WDtimeout);
+	WDiterMax=WDtimeout*1000000000/TimePRU1synchPeriod/2; // REnew the keep alive for the watchdog after half the time
 	cout << "GPIO::Enabled WATCHDOG with timeoout of " << WDtimeout << "s (software reset)."<< endl;
 
 	// Selection of the periodic synchronization correction
@@ -557,6 +556,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					CountPRUcurrentTimerValSynchLong+=iIterPRUcurrentTimerValPass;
 				}
 
+				// Keep watchdog alive - do it when protected by semaphore to not introduce interrupt signals in other times that could alterate timmin gfuncitonalities
+				if(WDiter>WDiterMax){
+					ioctl(fdWDtimeout, WDIOC_KEEPALIVE);
+					WDiter=0; // REset watchdog counter
+				}
+
 				//	
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
@@ -585,7 +590,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 			cout << "GPIO::Information about synchronization:" << endl;
 			cout << "GPIO::Rel. freq. diff. to abs. time - unit conversion drift: " << this->PRUoffsetDriftErrorAvg*1000000000 << " ppb" << endl;
 			cout << "GPIO::Abs. time diff. - unit conversion drift: " << PRUoffsetDriftErrorAbsAvg << " PRU units" << endl;
-			cout << "GPIO::INDICATIVE only!!! Time to handle interrupt: " << this->duration_FinalInitialCountAuxArrayAvg << " ns" << endl; // Alarge variation does not imply that the correction offset (time and frequency) are wrong!!!!
+			cout << "GPIO::INDICATIVE only!!! Time to handle interrupt: " << this->duration_FinalInitialCountAuxArrayAvg << " ns" << endl; // A large variation does not imply that the correction offset (time and frequency) are wrong!!!!
 			////cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
 			////cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 			cout << "GPIO::Ratio rel. freq. diff: " << this->EstimateSynchAvg << endl;
@@ -597,10 +602,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 			////cout << "this->iIterPRUcurrentTimerValPass: "<< this->iIterPRUcurrentTimerValPass << endl;
 			////cout << "this->iIterPRUcurrentTimerValSynch: "<< this->iIterPRUcurrentTimerValSynch << endl;
 		}		
+		// RE-upload some variables
 		this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
 		this->iIterPRUcurrentTimerVal++; // Increase value
 		this->iIterPRUcurrentTimerValPass++; // Increase value
 		this->iIterPRUcurrentTimerValPassLong++; // Increase value
+		this->WDiter++; // Increase value
 		if (this->iIterPRUcurrentTimerValSynchLong==(2*NumSynchMeasAvgAux) and HardwareSynchStatus==false){
 			cout << "Hardware synchronized, now proceeding with the network synchronization managed by hosts..." << endl;
 			// Update HardwareSynchStatus			
@@ -1869,6 +1876,7 @@ GPIO::~GPIO() {
 	//fclose(outfile); 
 	prussdrv_exit();
 	close(tfd);// close the time descriptor
+	close(fdWDtimeout); //close the watchdog file descriptor
 	//munmap(ddrMem, 0x0FFFFFFF);
 	//close(mem_fd); // Device
 	//if(munmap(pru_int, PRU_LEN)) {
