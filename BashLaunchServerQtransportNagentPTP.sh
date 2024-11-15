@@ -20,6 +20,22 @@ NicenestPriorValue=-10 # The smaller, the better
 PriorityValue=75 # The larger, the better. Above 60 is well enough
 PriorityNoSoHighValue=50 # The larger, the better.
 
+# Check if watchdog is installed using dpkg
+if dpkg -l | grep -q watchdog; then
+    echo "watchdog is installed."
+    sudo systemctl enable --now watchdog
+else
+    echo "whatchdog is not installed. sudo apt watchdog and configure it"
+fi
+
+# Check if watchdog is installed using dpkg
+if dpkg -l | grep -q watchdog; then
+    echo "watchdog is installed."
+    sudo systemctl enable --now watchdog
+else
+    echo "whatchdog is not installed. sudo apt watchdog and configure it"
+fi
+
 # Check if adjtimex is installed using dpkg
 if dpkg -l | grep -q adjtimex; then
     echo "adjtimex is installed."

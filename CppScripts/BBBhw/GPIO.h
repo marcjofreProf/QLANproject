@@ -100,11 +100,6 @@ private:// Variables
 	double EstimateSynch=1.0;
 	double EstimateSynchAvg=1.0;
 	double EstimateSynchArray[NumSynchMeasAvgAux]={EstimateSynch};// They are not all set to the value, only the first one (a function in the declarator should be used to fill them in.
-	// Watch dog timer
-	int fdWDtimeout; //file descriptor to the watchdog. It is closed in the destructor
-	int WDtimeout=300; // seconds. Time for the watchdog to soft reset the hardware
-	unsigned int WDiter=0; // Number of passes
-	unsigned int WDiterMax; // Define the number of WDiter passes to send thhe keep alive signal
 	// Time/synchronization management
 	struct my_clock
 	{

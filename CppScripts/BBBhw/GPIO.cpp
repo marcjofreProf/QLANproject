@@ -186,12 +186,6 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	cout << "Attention doing SendTriggerSignalsSelfTest. To be removed" << endl;	
 	*/
 
-	// Configure a watchdog - if the system stalls it will automatically softreboot it after 300 seconds (of not answering)
-	fdWDtimeout = open("/dev/watchdog", O_WRONLY);
-	ioctl(fdWDtimeout,WDIOC_SETTIMEOUT,&WDtimeout);
-	WDiterMax=WDtimeout*1000000000/TimePRU1synchPeriod/2; // REnew the keep alive for the watchdog after half the time
-	cout << "GPIO::Enabled WATCHDOG with timeoout of " << WDtimeout << "s (software reset)."<< endl;
-
 	// Selection of the periodic synchronization correction
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{cout << "GPIO::Time and frequency synchronization periodic correction selected!" << endl;break;}
@@ -556,12 +550,6 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					CountPRUcurrentTimerValSynchLong+=iIterPRUcurrentTimerValPass;
 				}
 
-				// Keep watchdog alive - do it when protected by semaphore to not introduce interrupt signals in other times that could alterate timmin gfuncitonalities
-				if(WDiter>WDiterMax){
-					ioctl(fdWDtimeout, WDIOC_KEEPALIVE);
-					WDiter=0; // REset watchdog counter
-				}
-
 				//	
 				this->ManualSemaphoreExtra=false;
 				this->ManualSemaphore=false;
@@ -607,7 +595,6 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		this->iIterPRUcurrentTimerVal++; // Increase value
 		this->iIterPRUcurrentTimerValPass++; // Increase value
 		this->iIterPRUcurrentTimerValPassLong++; // Increase value
-		this->WDiter++; // Increase value
 		if (this->iIterPRUcurrentTimerValSynchLong==(2*NumSynchMeasAvgAux) and HardwareSynchStatus==false){
 			cout << "Hardware synchronized, now proceeding with the network synchronization managed by hosts..." << endl;
 			// Update HardwareSynchStatus			
@@ -1876,7 +1863,6 @@ GPIO::~GPIO() {
 	//fclose(outfile); 
 	prussdrv_exit();
 	close(tfd);// close the time descriptor
-	close(fdWDtimeout); //close the watchdog file descriptor
 	//munmap(ddrMem, 0x0FFFFFFF);
 	//close(mem_fd); // Device
 	//if(munmap(pru_int, PRU_LEN)) {
