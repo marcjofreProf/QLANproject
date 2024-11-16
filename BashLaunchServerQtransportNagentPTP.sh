@@ -28,14 +28,6 @@ else
     echo "whatchdog is not installed. sudo apt watchdog and configure it"
 fi
 
-# Check if watchdog is installed using dpkg
-if dpkg -l | grep -q watchdog; then
-    echo "watchdog is installed."
-    sudo systemctl enable --now watchdog
-else
-    echo "whatchdog is not installed. sudo apt watchdog and configure it"
-fi
-
 # Check if adjtimex is installed using dpkg
 if dpkg -l | grep -q adjtimex; then
     echo "adjtimex is installed."
