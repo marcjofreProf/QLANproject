@@ -309,8 +309,8 @@ struct timespec GPIO::SetWhileWait(){
 	    TimerTimeout.tv_usec = (long)((5*TimePRUcommandDelay)%(long)1000000000);
 
 	    struct itimerspec its;
-	    its.it_interval.tv_sec = (int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));  // Periodic interval expiration // Make it periodic to try to be more deterministic. No interval, one-shot timer
-	    its.it_interval.tv_nsec = (long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
+	    its.it_interval.tv_sec = (int)(TimePRU1synchPeriod/((long)1000000000));  // Periodic interval expiration // Make it periodic to try to be more deterministic. No interval, one-shot timer
+	    its.it_interval.tv_nsec = (long)(TimePRU1synchPeriod%(long)1000000000);
 	    its.it_value.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000)); // Initial expiration
 		its.it_value.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
 
