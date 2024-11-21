@@ -470,8 +470,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->duration_FinalInitialMeasTrigAuxArray[TrigAuxIterCount%NumSynchMeasAvgAux]=duration_FinalInitialMeasTrig;
 					this->duration_FinalInitialMeasTrigAuxAvg=this->IntMedianFilterSubArray(this->duration_FinalInitialMeasTrigAuxArray,NumSynchMeasAvgAux);
 					//cout << "GPIO::duration_FinalInitialMeasTrigAuxAvg: " << duration_FinalInitialMeasTrigAuxAvg << endl;			
-					if (this->duration_FinalInitialMeasTrigAuxAvg>ApproxInterruptTime and this->iIterPRUcurrentTimerValSynch>(2*NumSynchMeasAvgAux)){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
-						cout << "GPIO::Time for pre processing the time barrier is too long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay! Set to nominal value of " << static_cast<int>(ApproxInterruptTime) << "..." << endl;
+					if (abs(this->duration_FinalInitialMeasTrigAuxAvg)>ApproxInterruptTime and this->iIterPRUcurrentTimerValSynch>(2*NumSynchMeasAvgAux)){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
+						cout << "GPIO::Time for pre processing the time barrier is too short/long " << this->duration_FinalInitialMeasTrigAuxAvg << " ...adjust TimePRUcommandDelay! Set to nominal value of " << static_cast<int>(ApproxInterruptTime) << "..." << endl;
 						this->duration_FinalInitialMeasTrigAuxAvg=ApproxInterruptTime;// For the time being adjust it to the nominal initial value
 					}
 					duration_FinalInitialCountAuxArrayAvg=static_cast<double>(duration_FinalInitialMeasTrigAuxAvg);
