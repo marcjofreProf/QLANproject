@@ -300,24 +300,26 @@ struct timespec GPIO::SetWhileWait(){
 	requestWhileWaitAux.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
 	requestWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
 
-	// Timer sets an interrupt that if not commented (when not in use) produces a long reaction time in the while loop (busy wait)
-	TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
-	//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
-	
-    TimerTimeout.tv_sec = (int)((5*TimePRUcommandDelay)/((long)1000000000)); 
-    TimerTimeout.tv_usec = (long)((5*TimePRUcommandDelay)%(long)1000000000);
+	// Timer file descriptor sets an interrupt that if not commented (when not in use) produces a long reaction time in the while loop (busy wait)
+	if (this->iIterPRUcurrentTimerVal==0){ // Needed to configure it only at the first iteration
+		TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
+		//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
+		
+	    TimerTimeout.tv_sec = (int)((5*TimePRUcommandDelay)/((long)1000000000)); 
+	    TimerTimeout.tv_usec = (long)((5*TimePRUcommandDelay)%(long)1000000000);
 
-    struct itimerspec its;
-    its.it_interval.tv_sec = 0;  // No interval, one-shot timer
-    its.it_interval.tv_nsec = 0;
-    its.it_value.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));
-	its.it_value.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
+	    struct itimerspec its;
+	    its.it_interval.tv_sec = (int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000));  // Periodic interval expiration // Make it periodic to try to be more deterministic. No interval, one-shot timer
+	    its.it_interval.tv_nsec = (long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
+	    its.it_value.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000)); // Initial expiration
+		its.it_value.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
 
-	timerfd_settime(this->tfd, TFD_TIMER_ABSTIME, &its, NULL);
+		timerfd_settime(this->tfd, TFD_TIMER_ABSTIME, &its, NULL);
 
-	// Watch timefd file descriptor
-    FD_ZERO(&rfds);
-    FD_SET(this->tfd, &rfds);
+		// Watch timefd file descriptor
+	    FD_ZERO(&rfds);
+	    FD_SET(this->tfd, &rfds);
+	}
 
 	return requestWhileWaitAux;
 }
@@ -330,6 +332,10 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 	//this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(SynchRem);
 	// Timer management
 	tfd = timerfd_create(CLOCK_REALTIME, TFD_NONBLOCK);
+	if (tfd==-1){
+		cout << "GPIO::PRUsignalTimerSynchJitterLessInterrupt Failed to create timerfd!!!" << endl;
+		exit(EXIT_SUCCESS);
+	}
 	int duration_FinalInitialMeasTrig=2*ApproxInterruptTime;
 	unsigned long long int ULLISynchRem=(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod)+1)*static_cast<unsigned long long int>(TimePRU1synchPeriod);
 	std::chrono::nanoseconds duration_back(ULLISynchRem);
@@ -576,7 +582,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		}
 		
 		// Information
-		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(512*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
+		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(1*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
 			////cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			////cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "GPIO::Information about synchronization:" << endl;
