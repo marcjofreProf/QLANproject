@@ -227,9 +227,9 @@ int GPIO::InitAgentProcess(){
 	return 0; //All OK
 }
 /////////////////////////////////////////////////////////
-bool GPIO::setMaxRrPriority(){// For rapidly handling interrupts
+bool GPIO::setMaxRrPriority(int PriorityValAux){// For rapidly handling interrupts
 	int max_priority=sched_get_priority_max(SCHED_FIFO);
-	int Nice_priority=73;// Higher priority. Very important parameter to have stability of the measurements. Slightly smaller than the priorities for clock control (ptp4l,...) but larger than for the general program
+	int Nice_priority=PriorityValAux;//73;// Higher priority. Very important parameter to have stability of the measurements. Slightly smaller than the priorities for clock control (ptp4l,...) but larger than for the general program
 	// SCHED_RR: Round robin
 	// SCHED_FIFO: First-In-First-Out
 	sched_param sch_params;
@@ -326,7 +326,7 @@ struct timespec GPIO::SetWhileWait(){
 
 int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 	try{
-	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread. It stalls operation RealTime Kernel (commented, then)
+	this->setMaxRrPriority(PriorityValRegular);// For rapidly handling interrupts, for the main instance and the periodic thread. It stalls operation RealTime Kernel (commented, then)
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
 	//SynchRem=static_cast<int>((static_cast<long double>(iepPRUtimerRange32bits)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(iepPRUtimerRange32bits)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 	//this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(SynchRem);
@@ -364,6 +364,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
 				pru1dataMem_int[0]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
+				// Set top priority
+				this->setMaxRrPriority(PriorityValTop);
 				// There is a big variation if the waiting function to launch the measurement is not properly done (with the appropiate tools)
 				// sleep_for seems to operate more stable although it adds a long overhead time, compared to while()
 				// sleep_for takes longer in average maybe because it has to re-load all the context and so forth after each sleep...
@@ -377,7 +379,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//}				
 				//this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
 				prussdrv_pru_send_event(22);
-				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.			
+				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
+				this->setMaxRrPriority(PriorityValRegular);		
 				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRUShort);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)
 				//cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 				if (retInterruptsPRU1>0){
@@ -751,10 +754,13 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestCoincidenceWhileWait,NULL); // Synch barrier. So that SendTriggerSignals and ReadTimeStamps of the different nodes coincide	
 	pru0dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command
 	//QPLAFutureTimePoint=QPLAFutureTimePoint-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);// Actually, the time measured duration_FinalInitialMeasTrigAuxAvg is not indicative of much (only if it changes a lot to high values it means trouble)
-	
+	// Set top priority
+	this->setMaxRrPriority(PriorityValTop);
 	while (Clock::now()<QPLAFutureTimePoint);// Busy wait time synch sending signals. With while loop, it is more aggresive to take control (hence fall within the correct interrupt period) but has more variation (but it does not matter since there will be the proceedure to synch in the PRU)
 	prussdrv_pru_send_event(21);
 	//this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
+	// Set regular priority
+	this->setMaxRrPriority(PriorityValRegular);
 	//retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);// First interrupt sent to measure time
 	//  PRU long execution making sure that notification interrupts do not overlap
 	retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
@@ -946,12 +952,15 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 
 	pru1dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command. Generate signals. Takes around 900000 clock ticks
 	//this->QPLAFutureTimePoint=this->QPLAFutureTimePoint-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg); // Actually, the time measured duration_FinalInitialMeasTrigAuxAvg is not indicative of much (only if it changes a lot to high values it means trouble)
-
+	// Set top priority
+	this->setMaxRrPriority(PriorityValTop);
 	////if (Clock::now()<this->QPLAFutureTimePoint){cout << "Check that we have enough time" << endl;}
 	while (Clock::now()<this->QPLAFutureTimePoint);// Busy wait time synch sending signals. With while loop, it is more aggresive to take control (hence fall within the correct interrupt period) but has more variation (but it does not matter since there will be the proceedure to synch in the PRU)
 	// Important, the following line at the very beggining to reduce the command jitter
 	prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 	//this->TimePointClockSynchPRUfinal=Clock::now();
+	// Set regular priority
+	this->setMaxRrPriority(PriorityValRegular);
 	// Here there should be the instruction command to tell PRU1 to start generating signals
 	// We have to define a command, compatible with the memory space of PRU0 to tell PRU1 to initiate signals
 	//  PRU long execution making sure that notification interrupts do not overlap

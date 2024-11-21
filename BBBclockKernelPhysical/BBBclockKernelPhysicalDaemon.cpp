@@ -87,9 +87,9 @@ this->valueSemaphore.store(true,std::memory_order_release); // Make sure it stay
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool CKPD::setMaxRrPriority(){// For rapidly handling interrupts
+bool CKPD::setMaxRrPriority(int PriorityValAux){// For rapidly handling interrupts
 int max_priority=sched_get_priority_max(SCHED_FIFO);
-int Nice_priority=73;// Higher priority. Very important parameter to have stability of the measurements. Slightly smaller than the priorities for clock control (ptp4l,...) but larger than for the general program
+int Nice_priority=PriorityValAux;//73;// Higher priority. Very important parameter to have stability of the measurements. Slightly smaller than the priorities for clock control (ptp4l,...) but larger than for the general program
 // SCHED_RR: Round robin
 // SCHED_FIFO: First-In-First-Out
 sched_param sch_params;
@@ -170,7 +170,7 @@ CKPD::CKPD(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	//prussdrv_pru_enable(PRU_ClockPhys_NUM);
 	sleep(150);// Give some time to load programs in PRUs and the synch protocols to initiate and lock after prioritazion and adjtimex. Very important, otherwise bad values might be retrieved
-	this->setMaxRrPriority();// For rapidly handling interrupts, for the main instance and the periodic thread. It stalls operation RealTime Kernel (commented, then)
+	this->setMaxRrPriority(PriorityValRegular);// For rapidly handling interrupts, for the main instance and the periodic thread. It stalls operation RealTime Kernel (commented, then)
 	// Timer management
 	//tfd = timerfd_create(CLOCK_REALTIME,  0);
 	// first time to get TimePoints for clock adjustment
@@ -195,7 +195,8 @@ return 0;// all ok
 
 int CKPD::HandleInterruptSynchPRU(){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL);//CLOCK_TAI,CLOCK_REALTIME// https://opensource.com/article/17/6/timekeeping-linux-vms
-
+// Set top priority
+this->setMaxRrPriority(PriorityValTop);
 while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);//std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-Clock::now()));// Busy waiting. With a while loop rapid response, but more variation; compared to sleep_for(). Also, the ApproxInterruptTime has to be adjusted (around 6000 for while loop and around 100000 for sleep_for())
 //std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(this->TimePointClockCurrentInitialMeas-ClockWatch::now()));
 //std::this_thread::sleep_until(this->TimePointClockCurrentInitialMeas); // Better to use sleep_until because it will adapt to changes in the current time by the time synchronization protocol
@@ -206,6 +207,8 @@ while(ClockWatch::now() < this->TimePointClockCurrentInitialMeas);//std::this_th
 prussdrv_pru_send_event(22);
 //retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);// First interrupt sent to measure time
 this->TimePointClockCurrentFinalMeas=ClockWatch::now(); //Masure time to act
+// Set regular priority
+this->setMaxRrPriority(PriorityValRegular);
 // PRU long code running which ensures that it does not overlap in terms of interrupts of the subsequent executions
 retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRU1);
 

@@ -54,6 +54,9 @@ private:// Variables
 	int SynchCorrectionTimeFreqNoneFlag=3; //0: No correction; 1: frequency correction; 2: Time correction; 3: time and frequency correction
 	bool SlowMemoryPermanentStorageFlag=false; // Variable when true they are stored in a file (slower due to writting and reading) ; otherwise it uses array memory to store qubits (much faster)
 	bool ResetPeriodicallyTimerPRU1=true;// Avoiding interrupts
+	// Priority values
+	int PriorityValRegular=73; // Regular priority during most of the operation
+	int PriorityValTop=90; // Top priority for critical operations
 	// Semaphore
 	unsigned long long int UnTrapSemaphoreValueMaxCounter=10000000;//MAx counter trying to acquire semaphore, then force release
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
@@ -333,7 +336,7 @@ public:	// Functions/Methods
 
 private: // Functions/Methods
 	// Task manager priority
-	bool setMaxRrPriority();
+	bool setMaxRrPriority(int PriorityValAux);
 	// Sempahore
 	void acquire();
 	void release();

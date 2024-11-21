@@ -55,6 +55,9 @@ private:// Variables
 	unsigned long long int UnTrapSemaphoreValueMaxCounter=10000000;//MAx counter trying to acquire semaphore, then force release
 	int ApproxInterruptTime=6000;
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
+	// Priority values
+	int PriorityValRegular=73; // Regular priority during most of the operation
+	int PriorityValTop=90; // Top priority for critical operations
 	// Time/synchronization management
 	unsigned long long int CounterHandleInterruptSynchPRU=0;
 	unsigned long long int CounterHandleInterruptSynchPRUlast=0;
@@ -161,7 +164,7 @@ public:	// Functions/Methods
 
 private: // Functions/Methods
 	// Task manager priority
-	bool setMaxRrPriority();
+	bool setMaxRrPriority(int PriorityValAux);
 	// Handling errors
 	static void SignalINTHandler(int s); // Handler for socket SIGPIPE signal error
 	static void SignalPIPEHandler(int s); // Handler for socket SIGPIPE signal error	
