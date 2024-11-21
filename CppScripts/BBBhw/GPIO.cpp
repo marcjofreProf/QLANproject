@@ -736,6 +736,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 
 	pru0dataMem_int[3]=static_cast<unsigned int>(PRUoffFreqTotalAux);
 
+	// Different time tagging window size, when synching with respect normal operation.
 	if (QPLAFlagTestSynchAux==true){pru0dataMem_int[4]=static_cast<unsigned int>(1);}// Minimum width for the timetagging coincidence window, to have accuracy
 	else{pru0dataMem_int[4]=static_cast<unsigned int>(this->TTGcoincWin);} // set coincidence window length
 
@@ -821,8 +822,11 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	// Apply a slotted synch configuration (like synchronized Ethernet)
 	this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
+	// Different Signal ON time, when synching with respect normal operation.
+	if (QPLAFlagTestSynchAux==true){pru1dataMem_int[5]=static_cast<unsigned int>(6);}// Minimum width time on, to have accuracy
+	else{pru1dataMem_int[5]=static_cast<unsigned int>(this->SigONPeriod);} // signal width time on in regular operation
+
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->SynchTrigPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
-	pru1dataMem_int[5]=static_cast<unsigned int>(this->SigONPeriod);// ON time in PRU units
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 	// Different modes of periodic correction
 	//switch (QuadEmitDetecSelecAux){
