@@ -1216,7 +1216,7 @@ TimeTaggsDetAnalytics[7]=0.0;
 // Param 1: Num detections channel 2
 // Param 2: Num detections channel 3
 // Param 3: Num detections channel 4
-// Param 4: Multidetection events
+// Param 4: Multidetection events (coincidences)
 // Param 5: Mean time difference between tags
 // Param 6: std time difference between tags
 // Param 7: time value first count tags
@@ -1226,6 +1226,26 @@ if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubit
 
 // Generally mean averaging can be used since outliers (either noise or glitches) have been removed in LinearRegressionQuBitFilter
 if (SimulateNumStoredQubitsNodeAux>1){
+	// Multicoincidence analysis - Brute force for 3 quad channels
+	//for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+	//	if (((ChannelTags[iQuadChIter][i]&0x0001)+((ChannelTags[iQuadChIter][i]>>1)&0x0001)+((ChannelTags[iQuadChIter][i]>>2)&0x0001)+((ChannelTags[iQuadChIter][i]>>3)&0x0001)+((ChannelTags[iQuadChIter][i]>>4)&0x0001)+((ChannelTags[iQuadChIter][i]>>5)&0x0001)+((ChannelTags[iQuadChIter][i]>>6)&0x0001)+((ChannelTags[iQuadChIter][i]>>7)&0x0001)+((ChannelTags[iQuadChIter][i]>>8)&0x0001)+((ChannelTags[iQuadChIter][i]>>9)&0x0001)+((ChannelTags[iQuadChIter][i]>>10)&0x0001)+((ChannelTags[iQuadChIter][i]>>11)&0x0001))>1){
+	//		TimeTaggsDetAnalytics[4]+=1.0;
+	//	}
+	//}
+	for (int i = 0; i < QuadNumChGroups; ++i) {
+        for (int j = 0; j < SimulateNumStoredQubitsNodeAux; ++j) {
+            for (int k = i; k < QuadNumChGroups; ++k) {
+                for (int l = 0; l < SimulateNumStoredQubitsNodeAux; ++l) {
+                    if (i != k || j != l) { // Avoid self-comparison
+                        if (TimeTaggs[i][j] == TimeTaggs[k][l]) {
+                            TimeTaggsDetAnalytics[4]+=1.0;; // Repetition found
+                        }
+                    }
+                }
+            }
+        }
+    }
+  // Individual quad channels analysis
 	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
       TimeTaggsDetAnalytics[7]=static_cast<double>(TimeTaggs[iQuadChIter][0]);// Timetag of the first capture
@@ -1237,9 +1257,6 @@ if (SimulateNumStoredQubitsNodeAux>1){
       	if ((ChannelTags[iQuadChIter][i]>>2)&0x0001==1 or (ChannelTags[iQuadChIter][i]>>6)&0x0001==1 or (ChannelTags[iQuadChIter][i]>>10)&0x0001==1){TimeTaggsDetAnalytics[2]++;}
       	if ((ChannelTags[iQuadChIter][i]>>3)&0x0001==1 or (ChannelTags[iQuadChIter][i]>>7)&0x0001==1 or (ChannelTags[iQuadChIter][i]>>11)&0x0001==1){TimeTaggsDetAnalytics[3]++;}
 
-      	if (((ChannelTags[iQuadChIter][i]&0x0001)+((ChannelTags[iQuadChIter][i]>>1)&0x0001)+((ChannelTags[iQuadChIter][i]>>2)&0x0001)+((ChannelTags[iQuadChIter][i]>>3)&0x0001)+((ChannelTags[iQuadChIter][i]>>4)&0x0001)+((ChannelTags[iQuadChIter][i]>>5)&0x0001)+((ChannelTags[iQuadChIter][i]>>6)&0x0001)+((ChannelTags[iQuadChIter][i]>>7)&0x0001)+((ChannelTags[iQuadChIter][i]>>8)&0x0001)+((ChannelTags[iQuadChIter][i]>>9)&0x0001)+((ChannelTags[iQuadChIter][i]>>10)&0x0001)+((ChannelTags[iQuadChIter][i]>>11)&0x0001))>1){
-      		TimeTaggsDetAnalytics[4]=static_cast<double>(TimeTaggsDetAnalytics[4])+1.0;
-      	}
         if (i>0){//Compute the mean value
         	TimeTaggsDetAnalytics[5]+=(1.0/(static_cast<double>(SimulateNumStoredQubitsNodeMinus1Aux)))*(static_cast<double>(TimeTaggs[iQuadChIter][i]-TimeTaggs[iQuadChIter][i-1]));
 
@@ -1340,27 +1357,27 @@ return SimulateNumStoredQubitsNodeAux;
 
 int QPLA::GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams){
 	this->acquire();
-while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
-this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
+	while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
+	this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
 
-if (CurrentSpecificLink>=0){
-	double dHistPeriodicityAux=static_cast<double>(HistPeriodicityAux);
-	double dHistPeriodicityHalfAux=static_cast<double>(HistPeriodicityAux/2.0);
-	double SynchNetTransHardwareAdjAux=1.0;// Not retrieving the rel. freq. difference whether positive correction or negative
-	TimeTaggsDetSynchParams[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];//(fmodl(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/(dHistPeriodicityAux); // Offset in the period it was computed
-	TimeTaggsDetSynchParams[1]=SynchNetworkParamsLink[CurrentSpecificLink][1];//((fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][1],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux); // Relative frequency difference
-	TimeTaggsDetSynchParams[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]; // Period in which it was calculated
-}
-else{
-	TimeTaggsDetSynchParams[0]=0.0;
-	TimeTaggsDetSynchParams[1]=0.0;
-	TimeTaggsDetSynchParams[2]=0.0;
-}
+	if (CurrentSpecificLink>=0){
+		double dHistPeriodicityAux=static_cast<double>(HistPeriodicityAux);
+		double dHistPeriodicityHalfAux=static_cast<double>(HistPeriodicityAux/2.0);
+		double SynchNetTransHardwareAdjAux=1.0;// Not retrieving the rel. freq. difference whether positive correction or negative
+		TimeTaggsDetSynchParams[0]=SynchNetworkParamsLink[CurrentSpecificLink][0];//(fmodl(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][0],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/(dHistPeriodicityAux); // Offset in the period it was computed
+		TimeTaggsDetSynchParams[1]=SynchNetworkParamsLink[CurrentSpecificLink][1];//((fmod(dHistPeriodicityHalfAux+SynchNetworkParamsLink[CurrentSpecificLink][1],dHistPeriodicityAux)-dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux); // Relative frequency difference
+		TimeTaggsDetSynchParams[2]=SynchNetworkParamsLink[CurrentSpecificLink][2]; // Period in which it was calculated
+	}
+	else{
+		TimeTaggsDetSynchParams[0]=0.0;
+		TimeTaggsDetSynchParams[1]=0.0;
+		TimeTaggsDetSynchParams[2]=0.0;
+	}
 
-this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
-this->release();
+	this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
+	this->release();
 
-return 0; // All ok
+	return 0; // All ok
 }
 
 int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,int iNumRunsPerCenterMass){

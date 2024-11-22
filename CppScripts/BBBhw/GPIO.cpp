@@ -1180,7 +1180,7 @@ if (SlowMemoryPermanentStorageFlag==true){ // We save into file the relative fre
 return 0; // all ok
 }
 
-int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){
+int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct relative frequency difference due to the sender
 // Separate the detection by quad channels and do the processing independently
 	int CurrentiIterDumpAux=0;
 	// First (reset)compute the number of detections per quad channel
