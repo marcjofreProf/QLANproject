@@ -57,7 +57,7 @@ private:// Variables
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	// Priority values
 	int PriorityValRegular=40; // Regular priority during most of the operation
-	int PriorityValTop=90; // Top priority for critical operations
+	int PriorityValTop=85; // Top priority for critical operations
 	// Time/synchronization management
 	unsigned long long int CounterHandleInterruptSynchPRU=0;
 	unsigned long long int CounterHandleInterruptSynchPRUlast=0;
