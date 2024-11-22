@@ -243,7 +243,7 @@ this->duration_FinalInitialDriftAuxArrayAvg = this->RatioAverageFactorClockQuart
 }
 
 if (this->duration_FinalInitialDriftAuxArrayAvg>ApproxInterruptTime){// Much longer than for client node (which typically is below 5000) maybe because more effort to serve PTP messages
-	cout << "Time for pre processing the time barrier is too long " << this->duration_FinalInitialDriftAuxArrayAvg << " ...adjust TimeClockMarging! Set to nominal value of " << ApproxInterruptTime << "..." << endl;
+	cout << "Time for pre processing the time barrier is too long " << this->duration_FinalInitialDriftAuxArrayAvg << " ns ...adjust TimeClockMarging! Set to nominal value of " << ApproxInterruptTime << " ns ..." << endl;
 	this->duration_FinalInitialDriftAuxArrayAvg=ApproxInterruptTime;// For the time being adjust it to the nominal initial value
 }
 
@@ -314,7 +314,7 @@ if (this->CounterHandleInterruptSynchPRU%30==0){
 	//cout << "pru0dataMem_int[1]: " << pru0dataMem_int[1] << endl;
 	//cout << "this->NumClocksQuarterPeriodPRUclock: " << this->NumClocksQuarterPeriodPRUclock << endl;
 	// Not used cout << "this->TimePointClockCurrentFinalInitialAdj_time_as_count: " << this->TimePointClockCurrentFinalInitialAdj_time_as_count << endl;
-	cout << "this->duration_FinalInitialDriftAuxArrayAvg: " << this->duration_FinalInitialDriftAuxArrayAvg << endl;
+	cout << "this->duration_FinalInitialDriftAuxArrayAvg: " << this->duration_FinalInitialDriftAuxArrayAvg << " ns." << endl;
 	cout << "this->TimePointClockCurrentAdjError: " << this->TimePointClockCurrentAdjError << endl;
 	cout << "this->TimePointClockCurrentAdjFilError: " << this->TimePointClockCurrentAdjFilError << endl;
 	cout << "this->TimePointClockCurrentAdjFilErrorApplied: " << this->TimePointClockCurrentAdjFilErrorApplied << endl;

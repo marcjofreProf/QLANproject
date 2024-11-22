@@ -591,7 +591,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 			cout << "GPIO::Information about synchronization:" << endl;
 			cout << "GPIO::Rel. freq. diff. to abs. time - unit conversion drift: " << this->PRUoffsetDriftErrorAvg*1000000000 << " ppb" << endl;
 			cout << "GPIO::Abs. time diff. - unit conversion drift: " << PRUoffsetDriftErrorAbsAvg << " PRU units" << endl;
-			cout << "GPIO::INDICATIVE only!!! Time to handle interrupt: " << this->duration_FinalInitialCountAuxArrayAvg << " ns" << endl; // A large variation does not imply that the correction offset (time and frequency) are wrong!!!!
+			cout << "GPIO::INDICATIVE only!!! Time to handle interrupt: " << this->duration_FinalInitialCountAuxArrayAvg << " ns." << endl; // A large variation does not imply that the correction offset (time and frequency) are wrong!!!!
 			////cout << "PRUoffsetDriftErrorIntegral: " << this->PRUoffsetDriftErrorIntegral << endl;
 			////cout << "PRUoffsetDriftErrorAppliedRaw: " << this->PRUoffsetDriftErrorAppliedRaw << endl;
 			cout << "GPIO::Ratio rel. freq. diff: " << this->EstimateSynchAvg << endl;
