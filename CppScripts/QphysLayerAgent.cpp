@@ -1723,9 +1723,10 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 		}
 	}
 	else{ // Do not apply filtering
-		if (FlagTestSynch==false){
-			cout << "QPLA::Not applying ApplyRawQubitFilteringFlag...to be activated" << endl;
-		}
+		//if (FlagTestSynch==false){
+		//	cout << "QPLA::Not applying ApplyRawQubitFilteringFlag...to be activated" << endl;
+		//}
+		cout << "QPLA::Not applying ApplyRawQubitFilteringFlag...to be activated" << endl;
 		this->SimulateNumStoredQubitsNode[0]=0; // Reset this value
 	  int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,RawTotalCurrentNumRecordsQuadCh,RawTimeTaggs,RawChannelTags); // Get raw values
 	  for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
