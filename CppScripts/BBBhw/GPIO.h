@@ -55,7 +55,7 @@ private:// Variables
 	bool SlowMemoryPermanentStorageFlag=false; // Variable when true they are stored in a file (slower due to writting and reading) ; otherwise it uses array memory to store qubits (much faster)
 	bool ResetPeriodicallyTimerPRU1=true;// Avoiding interrupts
 	// Priority values
-	int PriorityValRegular=73; // Regular priority during most of the operation
+	int PriorityValRegular=40; // Regular priority during most of the operation
 	int PriorityValTop=90; // Top priority for critical operations
 	// Semaphore
 	unsigned long long int UnTrapSemaphoreValueMaxCounter=10000000;//MAx counter trying to acquire semaphore, then force release

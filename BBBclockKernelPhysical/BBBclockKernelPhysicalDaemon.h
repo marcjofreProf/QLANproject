@@ -56,7 +56,7 @@ private:// Variables
 	int ApproxInterruptTime=6000;
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	// Priority values
-	int PriorityValRegular=73; // Regular priority during most of the operation
+	int PriorityValRegular=40; // Regular priority during most of the operation
 	int PriorityValTop=90; // Top priority for critical operations
 	// Time/synchronization management
 	unsigned long long int CounterHandleInterruptSynchPRU=0;
