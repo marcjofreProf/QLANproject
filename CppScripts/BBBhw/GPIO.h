@@ -56,7 +56,7 @@ private:// Variables
 	bool ResetPeriodicallyTimerPRU1=true;// Avoiding interrupts
 	// Priority values
 	int PriorityValRegular=40; // Regular priority during most of the operation
-	int PriorityValTop=85; // Top priority for critical operations
+	int PriorityValTop=80; // Top priority for critical operations
 	// Semaphore
 	unsigned long long int UnTrapSemaphoreValueMaxCounter=10000000;//MAx counter trying to acquire semaphore, then force release
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
