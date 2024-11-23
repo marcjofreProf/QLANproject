@@ -89,6 +89,8 @@ sleep 1 # wait 1 second to make sure to kill the old processes
 # Set realtime priority with chrt -f and priority 0
 ########################################################
 if [[ $is_rt_kernel -eq 1 ]]; then
+  pidAux=$(pgrep -f "ksoftirqd/0")
+  sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/25-rtc0")
   sudo renice -n $NicenestPriorValue $pidAux
   pidAux=$(pgrep -f "irq/26-rtc0")
@@ -223,6 +225,8 @@ sudo chrt -f -p $PriorityValue $pidAux
 pidAux=$(pidof -s phc2sys)
 sudo chrt -f -p $PriorityValue $pidAux
 if [[ $is_rt_kernel -eq 1 ]]; then
+  pidAux=$(pgrep -f "ksoftirqd/0")
+  sudo chrt -f -p $PriorityValue $pidAux
   pidAux=$(pgrep -f "irq/25-rtc0")
   sudo chrt -f -p $PriorityValue $pidAux
   pidAux=$(pgrep -f "irq/26-rtc0")
