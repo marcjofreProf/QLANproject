@@ -167,7 +167,7 @@ DELAYON:
 	QBNE	DELAYON, r1, LOSTCLOCKCOUNTS1
 
 SIGNALOFF:
-	MOV	r30.b0, AllOutputInterestPinsLow // write the contents to magic r30 byte 0
+	MOV		r30.b0, AllOutputInterestPinsLow // write the contents to magic r30 byte 0
 
 FINISHLOOP:
 //	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period updated

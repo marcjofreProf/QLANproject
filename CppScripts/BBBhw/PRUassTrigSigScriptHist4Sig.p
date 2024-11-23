@@ -159,6 +159,7 @@ CMDLOOP2:// Double verification of host sending start command
 	// Start executing
 	//CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 CMDSEL:
+	QBEQ	PERIODICTIMESYNCHCHECK, r0.b0, 10 // 10 command is measure IEP timer status and so a check
 	QBEQ	QUADEMT1, r0.b0, 1 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
 	QBEQ	QUADEMT2, r0.b0, 2 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
 	QBEQ	QUADEMT3, r0.b0, 3 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
@@ -167,8 +168,7 @@ CMDSEL:
 	QBEQ	QUADEMT6, r0.b0, 6 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
 	QBEQ	QUADEMT7, r0.b0, 7 // QBEQ	PSEUDOSYNCH, r0.b0, 1 // 1 command is generate signals
 	QBEQ	PERIODICTIMESYNCHSUB, r0.b0, 8 // 8 command is measure IEP timer status and so a substraction correction
-	QBEQ	PERIODICTIMESYNCHADD, r0.b0, 9 // 9 command is measure IEP timer status and so a addition correction
-	QBEQ	PERIODICTIMESYNCHCHECK, r0.b0, 10 // 10 command is measure IEP timer status and so a check
+	QBEQ	PERIODICTIMESYNCHADD, r0.b0, 9 // 9 command is measure IEP timer status and so a addition correction	
 	QBEQ	PERIODICTIMESYNCHSET, r0.b0, 11 // 11 command is measure IEP timer set synch
 PERIODICTIMESYNCHSET: // with command coded 11 means setting synch
 	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
