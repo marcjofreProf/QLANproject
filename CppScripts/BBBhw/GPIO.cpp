@@ -1146,7 +1146,7 @@ while (CurrentiIterDumpAux<NumQuBitsPerRun and extendedCounterPRUholder>extended
 	// Check that it belong to a channel of interest
 	cout << "GPIO::ChannelTagsStored[TotalCurrentNumRecords]: " << ChannelTagsStored[TotalCurrentNumRecords] << endl;
 	cout << "GPIO::ValidTagMask: " << ValidTagMask << endl;
-	if (ChannelTagsStored[TotalCurrentNumRecords]&ValidTagMask>0){ValidTag=true;}
+	if ((ChannelTagsStored[TotalCurrentNumRecords]&ValidTagMask)>0){ValidTag=true;}
 	else{ValidTag=false;}
 	cout << "GPIO::ValidTag: " << ValidTag << endl;
 	//cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
