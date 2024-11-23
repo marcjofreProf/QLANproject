@@ -142,10 +142,10 @@ CMDLOOP:
 	QBBC	CMDLOOP, r31, 31	//Reception or not of the host interrupt
 	// We remove the interrupt from the host (in case there is a reset from host, we are saved)
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
-//CMDLOOP2:// Double verification of host sending start command
-//	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
-//	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
-//	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes. Remove the command
+CMDLOOP2:// Double verification of host sending start command
+	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
+	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
+	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes. Remove the command
 //	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
 //	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period	
 //PSEUDOSYNCH:// Only needed at the beggining to remove the slow drift	
