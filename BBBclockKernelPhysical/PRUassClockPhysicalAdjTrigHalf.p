@@ -147,7 +147,8 @@ CMDLOOP2:// Double verification of host sending start command
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes. Remove the command
 //	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
-//	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period	
+//	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period
+	MOV 	r1, PRU1QuarterClocks
 //PSEUDOSYNCH:// Only needed at the beggining to remove the slow drift	
 //	LBBO	r0, r7, 0, 4// read the DWT_CYCCNT
 //	MOV	r8, CYCLESRESYNCH
