@@ -1083,10 +1083,11 @@ unsigned int valCycleCountPRUAux2;
 //cout << "GPIO::MaxNumQuBitsMemStored " << MaxNumQuBitsMemStored << endl;
 //for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 CurrentiIterDump=0;
+int CurrentiIterDumpAux=0;
 extendedCounterPRUholder=1;// Re-initialize at each run. 1 so that at least the first is checked and stored
 extendedCounterPRUholderOld=0;// Re-initialize at each run
 int TotalCurrentNumRecordsOld=TotalCurrentNumRecords;
-while (CurrentiIterDump<NumQuBitsPerRun and extendedCounterPRUholder>extendedCounterPRUholderOld){// Do it until a timetagg is smaller in value than the previous one, because it means that it could not achieve to capture NumQuBitsPerRun
+while (CurrentiIterDumpAux<NumQuBitsPerRun and extendedCounterPRUholder>extendedCounterPRUholderOld){// Do it until a timetagg is smaller in value than the previous one, because it means that it could not achieve to capture NumQuBitsPerRun
 	extendedCounterPRUholderOld=extendedCounterPRUholder;
 	// When unsigned short
 	//valCycleCountPRU=static_cast<unsigned int>(0);// Reset value
@@ -1113,6 +1114,7 @@ while (CurrentiIterDump<NumQuBitsPerRun and extendedCounterPRUholder>extendedCou
 	//cout << "GPIO::extendedCounterPRUholder: " << extendedCounterPRUholder << endl;
 	//cout << "GPIO::extendedCounterPRUholder>0: " << (extendedCounterPRUholder>0) << endl;
 	if (TotalCurrentNumRecords<MaxNumQuBitsMemStored and extendedCounterPRUholder>0){TotalCurrentNumRecords++;CurrentiIterDump++;}//Variable to hold the number of currently stored records in memory	
+	CurrentiIterDumpAux++; //Safety variable
 }
 if (TotalCurrentNumRecords>MaxNumQuBitsMemStored){cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
 else if (TotalCurrentNumRecords==TotalCurrentNumRecordsOld){cout << "GPIO::No detection of qubits!" << endl;}
