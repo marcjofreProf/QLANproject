@@ -1660,7 +1660,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 					//if (RoundingAux>=(HistPeriodicityAux/4)){RoundingAux=1;}
 					//else if (RoundingAux<=(-HistPeriodicityAux/4)){RoundingAux=-1;}
 					//else{RoundingAux=0;}
-					xEstimateRawTimeTaggs[i]=(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])/LLIHistPeriodicityAux)*LLIHistPeriodicityAux;	// Important to account from -Period/2 to Period/2 as the same x bin
+					xEstimateRawTimeTaggs[i]=((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])+LLIHistPeriodicityHalfAux)/LLIHistPeriodicityAux)*LLIHistPeriodicityAux;	// Important to account from -Period/2 to Period/2 as the same x bin
 				}
 
 				// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
@@ -1679,7 +1679,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 			        //y_mean=DoubleMedianFilterSubArray(y_meanArray,(RawNumStoredQubits-1)); // Median average
 			        // Absolute
 				for (int i=0; i < RawTotalCurrentNumRecordsQuadCh[iQuadChIter]; i++) {
-					y_meanArray[i]=static_cast<double>(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])%LLIHistPeriodicityAux);
+					y_meanArray[i]=static_cast<double>((LLIHistPeriodicityHalfAux+static_cast<long long int>(RawTimeTaggs[iQuadChIter][i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
 			    //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
 			    // We cannot use mean averaging since there might be outliers
 				    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
