@@ -1233,7 +1233,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 	//	}
 	//}
 	for (int i = 0; i < (QuadNumChGroups-1); i++) {
-        for (int j = i+1; j < (QuadNumChGroups-1); j++) {
+        for (int j = i+1; j < (QuadNumChGroups); j++) {
             for (int k = 0; k < RawTotalCurrentNumRecordsQuadCh[i]; k++){
 	            	for (int l = 0; l < RawTotalCurrentNumRecordsQuadCh[j]; l++){
 		                if (TimeTaggs[i][k] == TimeTaggs[j][l] and TimeTaggs[i][k]!=0) {
@@ -1660,7 +1660,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 					//if (RoundingAux>=(HistPeriodicityAux/4)){RoundingAux=1;}
 					//else if (RoundingAux<=(-HistPeriodicityAux/4)){RoundingAux=-1;}
 					//else{RoundingAux=0;}
-					xEstimateRawTimeTaggs[i]=(RawTimeTaggs[iQuadChIter][i]/LLIHistPeriodicityAux)*LLIHistPeriodicityAux;	// Important to account from -Period/2 to Period/2 as the same x bin
+					xEstimateRawTimeTaggs[i]=(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])/LLIHistPeriodicityAux)*LLIHistPeriodicityAux;	// Important to account from -Period/2 to Period/2 as the same x bin
 				}
 
 				// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
@@ -1679,7 +1679,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 			        //y_mean=DoubleMedianFilterSubArray(y_meanArray,(RawNumStoredQubits-1)); // Median average
 			        // Absolute
 				for (int i=0; i < RawTotalCurrentNumRecordsQuadCh[iQuadChIter]; i++) {
-					y_meanArray[i]=static_cast<double>(RawTimeTaggs[iQuadChIter][i]%LLIHistPeriodicityAux);
+					y_meanArray[i]=static_cast<double>(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])%LLIHistPeriodicityAux);
 			    //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
 			    // We cannot use mean averaging since there might be outliers
 				    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
