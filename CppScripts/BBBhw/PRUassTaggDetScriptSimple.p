@@ -237,7 +237,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	SUB 	r20, r20, 1 // Substract 1 to the exit counter
 	QBEQ 	FINISH, r20, 0 // When this exit counter reaches 0 (almost 10 seconds, it oculd be up to almost 20 seconds) exit the program
 	// Give some time - while doing operations
-	//QBGT 	WAIT_FOR_EVENT, r16, 0 // Do not lose time with the below if all channels are not zero (very restrictive (but maybe good for coincidence)). If there is a faulty value/line always ON (this might render to 0 detections always)!!!
+	QBGT 	WAIT_FOR_EVENT, r16, 0 // Do not lose time with the below if all channels are not zero (very restrictive (but maybe good for coincidence)). If there is a faulty value/line always ON (this might render to 0 detections always)!!!
 	// Then measure wha should be 1 (for edge detection)
 	MOV		r6.w2, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. TAkes a lot of time and so it is skew with respect the bits from r31
 	MOV		r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)
