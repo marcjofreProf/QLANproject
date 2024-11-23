@@ -1144,11 +1144,11 @@ while (CurrentiIterDumpAux<NumQuBitsPerRun and extendedCounterPRUholder>extended
 	ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
 	valp++;// 1 times 16 bits
 	// Check that it belong to a channel of interest
-	cout << "GPIO::ChannelTagsStored[TotalCurrentNumRecords]: " << ChannelTagsStored[TotalCurrentNumRecords] << endl;
-	cout << "GPIO::ValidTagMask: " << ValidTagMask << endl;
+	//cout << "GPIO::ChannelTagsStored[TotalCurrentNumRecords]: " << ChannelTagsStored[TotalCurrentNumRecords] << endl;
+	//cout << "GPIO::ValidTagMask: " << ValidTagMask << endl;
 	if ((ChannelTagsStored[TotalCurrentNumRecords]&ValidTagMask)>0){ValidTag=true;}
 	else{ValidTag=false;}
-	cout << "GPIO::ValidTag: " << ValidTag << endl;
+	//cout << "GPIO::ValidTag: " << ValidTag << endl;
 	//cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
 	//cout << "GPIO::extendedCounterPRUholder: " << extendedCounterPRUholder << endl;
 	//cout << "GPIO::extendedCounterPRUholder>0: " << (extendedCounterPRUholder>0) << endl;
@@ -1237,9 +1237,9 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 	}
 	for (int i=0;i<CurrentiIterDump;i++){
 		for (unsigned short iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-			if ((ChannelTagsStored[i]&(0x000F<<static_cast<unsigned short int>(4*iQuadChIter)))>0){  
+			if ((ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter)))>0){  
 				TimeTaggsSplitted[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=TimeTaggsStored[i];
-				ChannelTagsSplitted[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=ChannelTagsStored[i]&(0x000F<<static_cast<unsigned short int>(4*iQuadChIter));
+				ChannelTagsSplitted[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter));
 				TotalCurrentNumRecordsQuadCh[iQuadChIter]++;
 			}
 		}
@@ -1247,8 +1247,8 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		//int iQuadChIter=QuadEmitDetecSelecGPIO;// Only process the expected channel group
 		TotalCurrentNumRecordsQuadChNewOldAux=TotalCurrentNumRecordsQuadCh[iQuadChIter]-TotalCurrentNumRecordsQuadChOld[iQuadChIter];
-		cout << "GPIO::PRUdetCorrRelFreq iQuadChIter: " << iQuadChIter << endl;
-		cout << "GPIO::PRUdetCorrRelFreq TotalCurrentNumRecordsQuadChNewOldAux: " << TotalCurrentNumRecordsQuadChNewOldAux << endl;
+		//cout << "GPIO::PRUdetCorrRelFreq iQuadChIter: " << iQuadChIter << endl;
+		//cout << "GPIO::PRUdetCorrRelFreq TotalCurrentNumRecordsQuadChNewOldAux: " << TotalCurrentNumRecordsQuadChNewOldAux << endl;
 		if (TotalCurrentNumRecordsQuadChNewOldAux>=TagsSeparationDetRelFreq){
     		unsigned long long int ULLIInitialTimeTaggs=TimeTaggsLast;//TimeTaggs[iQuadChIter][0];// Normalize to the first reference timetag (it is not a detect qubit, but the timetagg of entering the timetagg PRU), which is a strong reference
     		long long int LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggsLast);//static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
