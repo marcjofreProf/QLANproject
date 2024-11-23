@@ -1144,14 +1144,12 @@ while (CurrentiIterDumpAux<NumQuBitsPerRun and extendedCounterPRUholder>extended
 	ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
 	valp++;// 1 times 16 bits
 	// Check that it belong to a channel of interest
-	if (ChannelTagsStored[TotalCurrentNumRecords]&ValidTagMask>0){
-		ValidTag=true;
-	}
+	if (ChannelTagsStored[TotalCurrentNumRecords]&ValidTagMask>0){ValidTag=true;}
 	else{ValidTag=false;}
 	//cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
 	//cout << "GPIO::extendedCounterPRUholder: " << extendedCounterPRUholder << endl;
 	//cout << "GPIO::extendedCounterPRUholder>0: " << (extendedCounterPRUholder>0) << endl;
-	if (TotalCurrentNumRecords<MaxNumQuBitsMemStored and extendedCounterPRUholder>0 and ValidTag){TotalCurrentNumRecords++;CurrentiIterDump++;}//Variable to hold the number of currently stored records in memory	
+	if (TotalCurrentNumRecords<MaxNumQuBitsMemStored and extendedCounterPRUholder>0 and ValidTag==true){TotalCurrentNumRecords++;CurrentiIterDump++;}//Variable to hold the number of currently stored records in memory	
 	CurrentiIterDumpAux++; //Safety variable
 }
 if (TotalCurrentNumRecords>MaxNumQuBitsMemStored){cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
