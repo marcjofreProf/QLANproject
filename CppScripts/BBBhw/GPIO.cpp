@@ -1086,7 +1086,7 @@ CurrentiIterDump=0;
 int CurrentiIterDumpAux=0;
 bool ValidTag=false;
 unsigned short ValidTagMask=0;
-switch (SynchCorrectionTimeFreqNoneFlag){
+switch (QuadEmitDetecSelecGPIO){
 	case 7:{// Time and frequency correction			
 		ValidTagMask=0x0FFF;
 		break;
@@ -1144,9 +1144,11 @@ while (CurrentiIterDumpAux<NumQuBitsPerRun and extendedCounterPRUholder>extended
 	ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
 	valp++;// 1 times 16 bits
 	// Check that it belong to a channel of interest
-	cout << "ChannelTagsStored[TotalCurrentNumRecords]: " << ChannelTagsStored[TotalCurrentNumRecords] << endl;
+	cout << "GPIO::ChannelTagsStored[TotalCurrentNumRecords]: " << ChannelTagsStored[TotalCurrentNumRecords] << endl;
+	cout << "GPIO::ValidTagMask: " << ValidTagMask << endl;
 	if (ChannelTagsStored[TotalCurrentNumRecords]&ValidTagMask>0){ValidTag=true;}
 	else{ValidTag=false;}
+	cout << "GPIO::ValidTag: " << ValidTag << endl;
 	//cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
 	//cout << "GPIO::extendedCounterPRUholder: " << extendedCounterPRUholder << endl;
 	//cout << "GPIO::extendedCounterPRUholder>0: " << (extendedCounterPRUholder>0) << endl;
