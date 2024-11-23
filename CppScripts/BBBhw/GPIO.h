@@ -35,9 +35,9 @@ using std::fstream;
 #define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
 // Num averages below is critical not to get system stall (since performing median averagins is very resource consuming)
-#define NumSynchMeasAvgAux 	201 //351; // Num averages to compute the relative frequency difference. Better to be odd number.
-#define ExtraNumSynchMeasAvgAux 	201 // 351 // Averaging for computing current absolute time offset
-#define ExtraExtraNumSynchMeasAvgAux 	151 // Averaging for computing current relative frequency diference
+#define NumSynchMeasAvgAux 	151 //351; // Num averages to compute the relative frequency difference. Better to be odd number.
+#define ExtraNumSynchMeasAvgAux 	151 // 351 // Averaging for computing current absolute time offset
+#define ExtraExtraNumSynchMeasAvgAux 	101 // Averaging for computing current relative frequency diference
 
 namespace exploringBB {
 
@@ -55,8 +55,8 @@ private:// Variables
 	bool SlowMemoryPermanentStorageFlag=false; // Variable when true they are stored in a file (slower due to writting and reading) ; otherwise it uses array memory to store qubits (much faster)
 	bool ResetPeriodicallyTimerPRU1=true;// Avoiding interrupts
 	// Priority values
-	int PriorityValRegular=40; // Regular priority during most of the operation
-	int PriorityValTop=73; // Top priority for critical operations
+	int PriorityValRegular=60; // Regular priority during most of the operation
+	int PriorityValTop=85; // Top priority for critical operations
 	// Semaphore
 	unsigned long long int UnTrapSemaphoreValueMaxCounter=10000000;//MAx counter trying to acquire semaphore, then force release
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
