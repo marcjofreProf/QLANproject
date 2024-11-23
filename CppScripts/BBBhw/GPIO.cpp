@@ -1259,7 +1259,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 		}// if
 		else {//(TotalCurrentNumRecordsQuadChNewOldAux>0 or GPIOFlagRelFreqTest==true){
 			if (TotalCurrentNumRecordsQuadChNewOldAux>0 and GPIOFlagRelFreqTest==false){cout << "GPIO::PRUdetCorrRelFreq not enough detections " << TotalCurrentNumRecordsQuadChNewOldAux << "<" << TagsSeparationDetRelFreq << " in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;}
-			else {cout << "GPIO::PRUdetCorrRelFreq deactivated..." << endl;}//GPIOFlagRelFreqTest==true
+			else if (GPIOFlagRelFreqTest==true){cout << "GPIO::PRUdetCorrRelFreq deactivated..." << endl;}//GPIOFlagRelFreqTest==true
 			if (TotalCurrentNumRecordsQuadChNewOldAux>0){
 				for (int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
 	    			// Also update the information in the original array
