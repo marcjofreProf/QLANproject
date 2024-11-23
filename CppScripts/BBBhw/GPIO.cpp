@@ -1235,9 +1235,9 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 	}
 	for (int i=0;i<CurrentiIterDump;i++){
 		for (unsigned short iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-			if ((ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter)))>0){  
+			if ((ChannelTagsStored[i]&(0x000F<<static_cast<unsigned short int>(4*iQuadChIter)))>0){  
 				TimeTaggsSplitted[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=TimeTaggsStored[i];
-				ChannelTagsSplitted[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter));
+				ChannelTagsSplitted[iQuadChIter][TotalCurrentNumRecordsQuadCh[iQuadChIter]]=ChannelTagsStored[i]&(0x000F<<static_cast<unsigned short int>(4*iQuadChIter));
 				TotalCurrentNumRecordsQuadCh[iQuadChIter]++;
 			}
 		}
