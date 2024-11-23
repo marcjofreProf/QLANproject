@@ -1232,16 +1232,14 @@ if (SimulateNumStoredQubitsNodeAux>1){
 	//		TimeTaggsDetAnalytics[4]+=1.0;
 	//	}
 	//}
-	for (int i = 0; i < QuadNumChGroups; ++i) {
-        for (int j = 0; j < SimulateNumStoredQubitsNodeAux; ++j) {
-            for (int k = i; k < QuadNumChGroups; ++k) {
-                for (int l = 0; l < SimulateNumStoredQubitsNodeAux; ++l) {
-                    if (i != k or j != l) { // Avoid self-comparison
-                        if (TimeTaggs[i][j] == TimeTaggs[k][l] and TimeTaggs[i][j]!=0) {
-                            TimeTaggsDetAnalytics[4]+=1.0;; // Repetition found
-                        }
-                    }
-                }
+	for (int i = 0; i < (QuadNumChGroups-1); i++) {
+        for (int j = i+1; j < (QuadNumChGroups-1); j++) {
+            for (int k = 0; k < RawTotalCurrentNumRecordsQuadCh[i]; k++){
+	            	for (int l = 0; l < RawTotalCurrentNumRecordsQuadCh[j]; l++){
+		                if (TimeTaggs[i][k] == TimeTaggs[j][l] and TimeTaggs[i][k]!=0) {
+		                    TimeTaggsDetAnalytics[4]+=1.0;; // Repetition found
+		                }
+	              }
             }
         }
     }
