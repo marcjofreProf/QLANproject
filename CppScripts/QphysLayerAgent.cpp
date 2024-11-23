@@ -1235,7 +1235,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 	for (int i = 0; i < QuadNumChGroups; ++i) {
         for (int j = 0; j < SimulateNumStoredQubitsNodeAux; ++j) {
             for (int k = i; k < QuadNumChGroups; ++k) {
-                for (int l = j; l < SimulateNumStoredQubitsNodeAux; ++l) {
+                for (int l = 0; l < SimulateNumStoredQubitsNodeAux; ++l) {
                     if (i != k or j != l) { // Avoid self-comparison
                         if (TimeTaggs[i][j] == TimeTaggs[k][l] and TimeTaggs[i][j]!=0) {
                             TimeTaggsDetAnalytics[4]+=1.0;; // Repetition found
