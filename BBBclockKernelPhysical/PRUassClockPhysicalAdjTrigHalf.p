@@ -16,7 +16,7 @@
 
 #define GPIO_CLEARDATAOUToffset 0x190 //We set a GPIO low by writing to this offset. In the 32 bit value we write, if a bit is 1 the 
 // GPIO goes low. If a bit is 0 it is ignored.
-#define PRU1QuarterClocks	50000000
+#define PRU1QuarterClocks	10
 // adjust to longest path so that the period of the signal is exact. The longest path is when in the OFF state the system has to check for an interrupt
 #define LOSTCLOCKCOUNTS1	7 // estimation of clocks lost
 
@@ -78,13 +78,13 @@ INITIATIONS:
 		
 	LBCO	r0, CONST_PRUCFG, 4, 4 // Enable OCP master port
 	// OCP master port is the protocol to enable communication between the PRUs and the host processor
-	CLR	r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
+	CLR		r0, r0, 4         // Clear SYSCFG[STANDBY_INIT] to enable OCP master port
 	SBCO	r0, CONST_PRUCFG, 4, 4
 
 	// Configure the programmable pointer register for PRU by setting c24_pointer // related to pru data RAM. Where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
-	MOV	r0, OWN_RAM | OWN_RAMoffset
-	MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
+	MOV		r0, OWN_RAM | OWN_RAMoffset
+	MOV		r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
 	SBBO	r0, r10, 0, 4//SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU1 Data RAM into C24
 	
 	// Configure the programmable pointer register for PRU by setting c28_pointer[15:0] // related to shared RAM
@@ -142,12 +142,12 @@ CMDLOOP:
 	QBBC	CMDLOOP, r31, 31	//Reception or not of the host interrupt
 	// We remove the interrupt from the host (in case there is a reset from host, we are saved)
 	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
-CMDLOOP2:// Double verification of host sending start command
-	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
-	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
-	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes. Remove the command
-	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
-	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period	
+//CMDLOOP2:// Double verification of host sending start command
+//	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
+//	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
+//	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes. Remove the command
+//	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
+//	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period	
 //PSEUDOSYNCH:// Only needed at the beggining to remove the slow drift	
 //	LBBO	r0, r7, 0, 4// read the DWT_CYCCNT
 //	MOV	r8, CYCLESRESYNCH
@@ -160,7 +160,7 @@ CMDLOOP2:// Double verification of host sending start command
 //	QBNE	PSEUDOSYNCHLOOP, r0, 0 // Coincides with a 0
 	//MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Here send interrupt to host to measure time
 SIGNALON:
-	MOV	r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
+	MOV		r30.b0, AllOutputInterestPinsHigh // write the contents to magic r30 output byte 0
 DELAYON:
 	SUB 	r1, r1, 1
 	QBNE	DELAYON, r1, LOSTCLOCKCOUNTS1

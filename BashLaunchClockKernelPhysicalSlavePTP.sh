@@ -31,7 +31,7 @@ is_rt_kernel=$?  # $? stores the exit code of the last command (function)
 
 # Nicenest value [-20, 20]
 NicenestPriorValue=-10 # The smaller, the better
-PriorityValue=75 # The larger, the better. Above 60 is well enough
+PriorityValue=85 # The larger, the better. Above 60 is well enough
 PriorityNoSoHighValue=50 # The larger, the better.
 
 # Check if watchdog is installed using dpkg
