@@ -1204,8 +1204,8 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 			}
 		}
 	}
-	//for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-		int iQuadChIter=QuadEmitDetecSelecGPIO;// Only process the expected channel group
+	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+		//int iQuadChIter=QuadEmitDetecSelecGPIO;// Only process the expected channel group
 		TotalCurrentNumRecordsQuadChNewOldAux=TotalCurrentNumRecordsQuadCh[iQuadChIter]-TotalCurrentNumRecordsQuadChOld[iQuadChIter];
 		if (TotalCurrentNumRecordsQuadChNewOldAux>=TagsSeparationDetRelFreq and GPIOFlagRelFreqTest==false){
     		unsigned long long int ULLIInitialTimeTaggs=TimeTaggsLast;//TimeTaggs[iQuadChIter][0];// Normalize to the first reference timetag (it is not a detect qubit, but the timetagg of entering the timetagg PRU), which is a strong reference
@@ -1258,16 +1258,18 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 		    ////////////////////////////////////////
 		}// if
 		else {//(TotalCurrentNumRecordsQuadChNewOldAux>0 or GPIOFlagRelFreqTest==true){
-			if (TotalCurrentNumRecordsQuadChNewOldAux>=0 and GPIOFlagRelFreqTest==false){cout << "GPIO::PRUdetCorrRelFreq not enough detections " << TotalCurrentNumRecordsQuadChNewOldAux << "<" << TagsSeparationDetRelFreq << " in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;}
+			if (TotalCurrentNumRecordsQuadChNewOldAux>0 and GPIOFlagRelFreqTest==false){cout << "GPIO::PRUdetCorrRelFreq not enough detections " << TotalCurrentNumRecordsQuadChNewOldAux << "<" << TagsSeparationDetRelFreq << " in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;}
 			else {cout << "GPIO::PRUdetCorrRelFreq deactivated..." << endl;}//GPIOFlagRelFreqTest==true
-			for (int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
-    			// Also update the information in the original array
-    			TimeTaggsStored[CurrentiIterDumpAux]=TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]];
-    			ChannelTagsStored[CurrentiIterDumpAux]=ChannelTagsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]];
-    			CurrentiIterDumpAux++;// update value
-    		}
+			if (TotalCurrentNumRecordsQuadChNewOldAux>0){
+				for (int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
+	    			// Also update the information in the original array
+	    			TimeTaggsStored[CurrentiIterDumpAux]=TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]];
+	    			ChannelTagsStored[CurrentiIterDumpAux]=ChannelTagsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]];
+	    			CurrentiIterDumpAux++;// update value
+	    		}
+	    	}
 		}
-		//} // for
+		} // for
 //cout << "GPIO::PRUdetCorrRelFreq completed!" << endl;
 return 0; // All ok
 }
