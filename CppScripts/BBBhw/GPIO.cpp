@@ -1084,6 +1084,39 @@ unsigned int valCycleCountPRUAux2;
 //for (iIterDump=0; iIterDump<NumQuBitsPerRun; iIterDump++){
 CurrentiIterDump=0;
 int CurrentiIterDumpAux=0;
+bool ValidTag=false;
+unsigned short ValidTagMask=0;
+switch (SynchCorrectionTimeFreqNoneFlag){
+	case 7:{// Time and frequency correction			
+		ValidTagMask=0x0FFF;
+		break;
+	}
+	case 6:{// Time and frequency correction			
+		ValidTagMask=0x0FF0;
+		break;
+	}
+	case 5:{// Time and frequency correction			
+		ValidTagMask=0x0F0F;
+		break;
+	}
+	case 4:{// Time and frequency correction			
+		ValidTagMask=0x0F00;
+		break;
+	}
+	case 3:{// Time and frequency correction			
+		ValidTagMask=0x00FF;
+		break;
+	}
+	case 2:{// Time correction
+		ValidTagMask=0x00F0;
+		break;
+	}
+	case 1:{ // Frequency correction
+		ValidTagMask=0x000F;
+		break;
+	}
+	default:{ValidTagMask=0x0000;break;}// None time nor frequency correction
+}
 extendedCounterPRUholder=1;// Re-initialize at each run. 1 so that at least the first is checked and stored
 extendedCounterPRUholderOld=0;// Re-initialize at each run
 int TotalCurrentNumRecordsOld=TotalCurrentNumRecords;
@@ -1110,10 +1143,15 @@ while (CurrentiIterDumpAux<NumQuBitsPerRun and extendedCounterPRUholder>extended
 	// When unsigned short
 	ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
 	valp++;// 1 times 16 bits
+	// Check that it belong to a channel of interest
+	if (ChannelTagsStored[TotalCurrentNumRecords]&ValidTagMask>0){
+		ValidTag=true;
+	}
+	else{ValidTag=false;}
 	//cout << "GPIO::TotalCurrentNumRecords: " << TotalCurrentNumRecords << endl;
 	//cout << "GPIO::extendedCounterPRUholder: " << extendedCounterPRUholder << endl;
 	//cout << "GPIO::extendedCounterPRUholder>0: " << (extendedCounterPRUholder>0) << endl;
-	if (TotalCurrentNumRecords<MaxNumQuBitsMemStored and extendedCounterPRUholder>0){TotalCurrentNumRecords++;CurrentiIterDump++;}//Variable to hold the number of currently stored records in memory	
+	if (TotalCurrentNumRecords<MaxNumQuBitsMemStored and extendedCounterPRUholder>0 and ValidTag){TotalCurrentNumRecords++;CurrentiIterDump++;}//Variable to hold the number of currently stored records in memory	
 	CurrentiIterDumpAux++; //Safety variable
 }
 if (TotalCurrentNumRecords>MaxNumQuBitsMemStored){cout << "GPIO::We have reached the maximum number of qubits storage!" << endl;}
