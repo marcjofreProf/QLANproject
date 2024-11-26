@@ -18,7 +18,7 @@
 // GPIO goes low. If a bit is 0 it is ignored.
 #define PRU1QuarterClocks	10
 // adjust to longest path so that the period of the signal is exact. The longest path is when in the OFF state the system has to check for an interrupt
-#define LOSTCLOCKCOUNTS1	7 // estimation of clocks lost
+#define LOSTCLOCKCOUNTS1	0 // estimation of clocks lost
 
 // Refer to this mapping in the file - pruss_intc_mapping.h
 #define PRU0_PRU1_INTERRUPT     17
@@ -41,7 +41,7 @@
 // Beaglebone Black has 32 bit registers (for instance Beaglebone AI has 64 bits and more than 2 PRU)
 #define AllOutputInterestPinsHigh 0xFF// For the defined output pins to set them high in block (and not the ones that are allocated by other processes)
 #define AllOutputInterestPinsLow 0x00// For the defined output pins to set them low in block (and not the ones that are allocated by other processes)
-
+#define PRECMDLOOPcounts	10 // preloop to not always be checking interrupt signal
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
 .macro LED_OFF
@@ -139,13 +139,15 @@ INITIATIONS:
 //	LED_OFF	// just for signaling initiations
 
 CMDLOOP:
+	LDI		r0, PRECMDLOOPcounts
+PRECMDLOOP:
+	SUB		r0, r0, 1
+	QBNE	PRECMDLOOP, r0, 0
+CHECKCMDINT:
 	QBBC	CMDLOOP, r31, 31	//Reception or not of the host interrupt
-	// We remove the interrupt from the host (in case there is a reset from host, we are saved)
-	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 4, 1 // Load to r0 the content of CONST_PRUDRAM with offset 8, and 4 bytes
-	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
-	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes. Remove the command
+	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction	
 //	// Read the number of clocks that defines the period from positon 0 of PRU1 DATA RAM and stored it
 //	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period
 	MOV 	r1, PRU1QuarterClocks
@@ -170,7 +172,10 @@ SIGNALOFF:
 	MOV		r30.b0, AllOutputInterestPinsLow // write the contents to magic r30 byte 0
 
 FINISHLOOP:
+	// We remove the interrupt from the host (in case there is a reset from host, we are saved)
+	SBCO	r4.b0, C0, 0x24, 1 // Reset host interrupt
 //	LBCO 	r1, CONST_PRUDRAM, 0, 4 // Value of quarter period updated
+	SBCO	r4.b0, CONST_PRUDRAM, 4, 1 // Store a 0 in CONST_PRUDRAM with offset 8, and 4 bytes. Remove the command
 	// Send notification (interrupt) to Host for program completion
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Notification sent at the beginning of the signal
 	JMP	CMDLOOP
