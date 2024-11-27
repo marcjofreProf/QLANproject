@@ -1,4 +1,13 @@
 # Just launching a PTP master
+
+# Stop superflous processes to stop
+sudo systemctl stop nginx
+sudo systemctl stop wpa_supplicant
+sudo systemctl stop avahi-daemon
+pidAux=$(pgrep -f "systemd-journal")
+sudo kill $pidAux
+sudo systemctl stop haveged
+
 # Function to check for real-time kernel
 is_rt_kernel() {
   kernel_version=$(uname -r) # Get the kernel version
