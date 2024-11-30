@@ -337,7 +337,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		exit(EXIT_SUCCESS);
 	}
 	int duration_FinalInitialMeasTrig=2*ApproxInterruptTime;
-	unsigned long long int ULLISynchRem=static_cast<unsigned long long int>(10*TimePRU1synchPeriod)+(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod)+1)*static_cast<unsigned long long int>(TimePRU1synchPeriod);
+	unsigned long long int ULLISynchRem=(static_cast<unsigned long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<unsigned long long int>(TimePRU1synchPeriod)+1)*static_cast<unsigned long long int>(TimePRU1synchPeriod);
 	std::chrono::nanoseconds duration_back(ULLISynchRem);
 	this->TimePointClockCurrentSynchPRU1future=Clock::time_point(duration_back);	
 	this->requestWhileWait = this->SetWhileWait();// Used with non-busy wait
