@@ -1161,7 +1161,10 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 			long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftAux+SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 		  //long long int LLISmallOffsetDriftAux=static_cast<long long int>(SmallOffsetDriftAux);
 			for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-				TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
+				if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink)>0){
+					TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
+				}
+				else{TimeTaggs[iQuadChIter][i]=0;}
 			}
 
 		  if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/2.0)){// Large step
@@ -1694,7 +1697,8 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
 				    //x_mean += static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
 				}
-        y_mean=DoubleMedianFilterSubArray(y_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average
+        //y_mean=DoubleMedianFilterSubArray(y_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average
+        y_mean=DoubleMeanFilterSubArray(y_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average
         //x_mean=DoubleMedianFilterSubArray(x_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average. Not really needed x_mean
         //cout << "QPLA::y_mean: " << y_mean << endl;
         //cout << "QPLA::x_mean: " << x_mean << endl;
@@ -1872,6 +1876,22 @@ void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
   	}
     return 0; // All ok
   }
+
+  double QPLA::DoubleMeanFilterSubArray(double* ArrayHolderAux,int MeanFilterFactor){
+		if (MeanFilterFactor<=1){
+			return ArrayHolderAux[0];
+		}
+		else{
+		// Step 1: Copy the array to a temporary array
+			double temp=0.0;
+			for(int i = 0; i < MeanFilterFactor; i++) {
+				temp = temp + ArrayHolderAux[i];
+			}
+			
+			temp=temp/((double)(MeanFilterFactor));
+			return temp;
+		}
+	}
 
   unsigned long long int QPLA::ULLIMedianFilterSubArray(unsigned long long int* ArrayHolderAux,int MedianFilterFactor){
   	if (MedianFilterFactor<=1){

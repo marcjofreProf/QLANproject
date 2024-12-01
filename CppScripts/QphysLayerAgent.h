@@ -230,6 +230,7 @@ private: // Functions/Methods
 	int HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,int iNumRunsPerCenterMass); // Calculate the histogram center given a period and a list of timetaggs
 	int SmallDriftContinuousCorrection();// Methods to keep track of the small offset correction at each measurement (but not in the network synch)
 	double DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor);
+	double DoubleMeanFilterSubArray(double* ArrayHolderAux,int MeanFilterFactor);
 	int DoubleBubbleSort(double* arr,int MedianFilterFactor);
 	unsigned long long int ULLIMedianFilterSubArray(unsigned long long int* ArrayHolderAux,int MedianFilterFactor);
 	int ULLIBubbleSort(unsigned long long int* arr,int MedianFilterFactor);

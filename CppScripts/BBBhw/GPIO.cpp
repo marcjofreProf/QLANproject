@@ -502,7 +502,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				
 				// Absolute corrected error
 				this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
-				this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,ExtraNumSynchMeasAvgAux);// Since we are applying a filter of length NumSynchMeasAvgAux, temporally it effects somehow the longer the filter. Altough it is difficult to correct
+				this->PRUoffsetDriftErrorAbsAvg=DoubleMeanFilterSubArray(PRUoffsetDriftErrorAbsArray,ExtraNumSynchMeasAvgAux);// Since we are applying a filter of length NumSynchMeasAvgAux, temporally it effects somehow the longer the filter. Altough it is difficult to correct
 				// The absolute time error has a natural wander due to the fact that the conversion from PRU ticks to real time (and viceversa is not exactly PRUclockStepPeriodNanoseconds). Therefore, an effective relative frequency difference is present that it can be accounted for (this relative frequency difference is computed below).
 				if (this->iIterPRUcurrentTimerValPassLong>DistTimePRU1synchPeriod){// Long range measurements to retrieve relative frequency differences
 					// Computations for Synch calculation for PRU0 compensation
@@ -510,7 +510,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->EstimateSynch=fmod((static_cast<double>(this->iIterPRUcurrentTimerValPassLong*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))/(this->PRUcurrentTimerValLong-this->PRUcurrentTimerValOldWrapLong);// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correction).
 					this->EstimateSynchArray[iIterPRUcurrentTimerValSynchLong%NumSynchMeasAvgAux]=this->EstimateSynch;
 					this->ManualSemaphoreExtra=true;
-					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
+					this->EstimateSynchAvg=DoubleMeanFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
 
 					// Frequency synchronization correction
 					// Compute error - Relative correction of the frequency difference. This provides like the stability of the hardware clock referenced to the system clock (disciplined with network protocol)...so in the order of 10^-7
@@ -552,7 +552,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					
 					//// Relative error average
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLongExtra%ExtraExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError;
-					this->PRUoffsetDriftErrorAvg=LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraExtraNumSynchMeasAvgAux);// averaging
+					this->PRUoffsetDriftErrorAvg=LongDoubleMeanFilterSubArray(PRUoffsetDriftErrorArray,ExtraExtraNumSynchMeasAvgAux);// averaging
 					
 					if (abs(this->PRUoffsetDriftErrorAvg)<this->PRUoffsetDriftErrorAvgThresh and this->iIterPRUcurrentTimerValSynchLong>(1.5*NumSynchMeasAvgAux)){this->PRUoffsetDriftErrorAvg=0.0;}// Do not apply relative frequency difference if it is below a certain value
 					
@@ -1432,6 +1432,20 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRefAux, un
 	}
 
 	return TotalCurrentNumRecords;
+}
+
+int GPIO::IntMeanFilterSubArray(int* ArrayHolderAux,int MeanFilterFactor){
+	if (MeanFilterFactor<=1){
+		return ArrayHolderAux[0];
+	}
+	else{
+		int temp=0.0;
+		for(int i = 0; i < MeanFilterFactor; i++) {
+			temp += ArrayHolderAux[i];
+		}
+		
+		return temp/static_cast<int>(MeanFilterFactor);
+	}
 }
 
 int GPIO::IntMedianFilterSubArray(int* ArrayHolderAux,int MedianFilterFactor){
