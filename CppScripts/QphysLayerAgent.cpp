@@ -67,6 +67,10 @@ QPLA::QPLA() {// Constructor
 		  ReferencePointSmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
 		  // Filtering qubits
 		  NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][i]=false; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
+		  for (int j=0;j<NumSmallOffsetDriftAux;j++){
+		  	SmallOffsetDriftAuxArray[iQuadChIter][i][j]=0;
+		  }
+		  IterSmallOffsetDriftAuxArray[iQuadChIter][i]=0;
 		}
 	}
 	for (int i=0;i<LinkNumberMAX;i++){
@@ -1166,6 +1170,11 @@ if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		  	cout << "QPLA::Applying SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
 		  }
 		  
+		  // Median filter the SmallOffsetDriftAux to avoid to much induced artificial jitter
+		  SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux]=SmallOffsetDriftAux;
+		  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]++;// Update value
+		  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]=IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux;// Wrap value
+		  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Median filter
 		  // Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
 		  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;// Just for monitoring purposes
 		  long long int SignAuxInstantCorr=0;
