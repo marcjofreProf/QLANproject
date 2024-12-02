@@ -704,7 +704,8 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 	char charNum[NumBytesPayloadBuffer] = {0};
 	char CurrentReceiveHostIP[NumBytesPayloadBuffer]={0};
 	strcpy(CurrentReceiveHostIP,strtok(CurrentReceiveHostIPaux,"_"));
-	//cout << "QPLA::SetSynchParamsOtherNode CurrentReceiveHostIP: " << CurrentReceiveHostIP << endl;
+	cout << "QPLA::SetSynchParamsOtherNode CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
+	cout << "QPLA::SetSynchParamsOtherNode CurrentReceiveHostIP: " << CurrentReceiveHostIP << endl;
 	int numUnderScores=countUnderscores(this->CurrentEmitReceiveIP); // Which means the number of IP addresses to send the synch information
 	char CurrentEmitReceiveIPAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
 	strcpy(CurrentEmitReceiveIPAux,this->CurrentEmitReceiveIP);
@@ -1217,18 +1218,19 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				}// end if				
 			}// end for			
 			// Send the updated values to the respective nodes
-			if (CurrentSpecificLinkMultiple>-1){	
+			if (CurrentSpecificLinkMultiple>-1){
+					cout << "QPLA::ListCombinationSpecificLink[CurrentSpecificLinkMultiple]: " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
 					this->SetSynchParamsOtherNode(ListCombinationSpecificLink[CurrentSpecificLinkMultiple]); // Tell the synchronization information to the other nodes		
 			}
+		}
+		else{// Mal function we should not be here
+			cout << "QPLA::The Emitter nodes have not been previously identified, so no small offset drift correction applied" << endl;
+		}
 	}
-	else{// Mal function we should not be here
-		cout << "QPLA::The Emitter nodes have not been previously identified, so no small offset drift correction applied" << endl;
+	else
+	{
+		cout << "QPLA::Not applying ApplyProcQubitsSmallTimeOffsetContinuousCorrection small drift offset correction...to be activated..." << endl;
 	}
-}
-else
-{
-	cout << "QPLA::Not applying ApplyProcQubitsSmallTimeOffsetContinuousCorrection small drift offset correction...to be activated..." << endl;
-}
 //cout << "QPLA::SmallDriftContinuousCorrection completed!" << endl;
 return 0; // All Ok
 }
