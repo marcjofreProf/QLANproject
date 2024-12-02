@@ -711,12 +711,11 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 	int CurrentSpecificLinkAux=-1;
 	for (int iIterIPaddr=0;iIterIPaddr<numUnderScores;iIterIPaddr++){// Iterate over the different nodes to tell
 		// Mount the Parameters message for the other node
-		if (iIterIPaddr==0){
-			strcpy(ParamsCharArray,"IPdest_");// Initiates the ParamsCharArray, so use strcpy
+		strcpy(ParamsCharArray,"IPdest_");
+		if (iIterIPaddr==0){			
 			strcpy(ParamsCharArrayAux,strtok(CurrentEmitReceiveIPAux,"_"));			
 		} 
 		else{
-			strcat(ParamsCharArray,"IPdest_");// Continues the ParamsCharArray, so use strcat
 			strcpy(ParamsCharArrayAux,strtok(NULL,"_"));			
 		}
 		strcat(ParamsCharArray,ParamsCharArrayAux);// Indicate the address to send the Synch parameters information
@@ -743,10 +742,11 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 		strcat(ParamsCharArray,charNum);
 		strcat(ParamsCharArray,":"); // Final :
 		strcat(ParamsCharArray,"_"); // Final _
+		this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 	} // end for to the different addresses to send the params information
 	//cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
 	//this->acquire(); // important not to do it
-	this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
+	
 	//this->release(); // Important not to do it
 	//this->RelativeNanoSleepWait((unsigned int)(100*(unsigned int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));// Give some time to be able to send the above message
 	return 0; // All Ok
