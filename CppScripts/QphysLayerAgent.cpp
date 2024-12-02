@@ -74,6 +74,7 @@ QPLA::QPLA() {// Constructor
 		}
 	}
 	for (int i=0;i<LinkNumberMAX;i++){
+		QuadChannelParamsLink[i]=-1;// Reset values
 		for (int j=0;j<3;j++){
 			SynchNetworkParamsLink[i][j]=0.0; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send. Zerod at the begining
 			SynchNetworkParamsLinkOther[i][j]=0.0; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send from the other nodes. Zeroed at the begining
@@ -1122,20 +1123,16 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 
 	// Apply the small offset drift correction
 	if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
-		if (CurrentSpecificLinkMultiple>-1){// The specific identification IP is present
-			char ParamsCharArray[NumBytesPayloadBuffer] = {0};
-			strcpy(ParamsCharArray,ListCombinationSpecificLink[CurrentSpecificLinkMultiple]);
-			char ParamsCharArrayAux[NumBytesPayloadBuffer] = {0};
-			strcpy(ParamsCharArrayAux,strtok(ParamsCharArray,"_"));
-			// Re-identify CurrentSpecificLinkAux
-			int CurrentSpecificLinkAux=-1;
-			for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
-				if (string(LinkIdentificationArray[i])==string(ParamsCharArrayAux)){// IP already present
-					if (CurrentSpecificLinkAux<0){CurrentSpecificLinkAux=i;}// Take the first identified, which is th eone that matters most
-				}
-			}
+		if (CurrentSpecificLinkMultiple>-1){// The specific identification IP is present			
 			for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){				
 				if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
+					// Re-identify CurrentSpecificLinkAux
+					int CurrentSpecificLinkAux=-1;
+					for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
+						if (QuadChannelParamsLink[i]==iQuadChIter){
+							if (CurrentSpecificLinkAux<0){CurrentSpecificLinkAux=i;}// Take the first identified, which is th eone that matters most
+						}
+					}
 				  // If it is the first time, annotate the relative time offset with respect HostPeriodicityAux
 				  ReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=0;// Reset value. ReferencePointSmallOffset could be used to allocate multiple channels separated by time
 				  if (NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]==false){			
@@ -1201,36 +1198,26 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux]=SmallOffsetDriftAux;
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]++;// Update value
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]=IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux;// Wrap value
-				  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Median filter
+				  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Median filter				  
+				  // Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
+				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;// Just for monitoring purposes
 				  // Update information to the other node about synch parameters				  
-				  if (CurrentSpecificLinkAux>=0){		
-						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=SynchNetworkParamsLink[CurrentSpecificLinkAux][0]-static_cast<double>(SmallOffsetDriftAux);// Offset difference		
+				  if (CurrentSpecificLinkAux>-1){		
+						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=SynchNetworkParamsLink[CurrentSpecificLinkAux][0]-static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]);// Offset difference		
 						//SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 						//SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 						//SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
 					}
-				  // Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
-				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;// Just for monitoring purposes
 				  long long int SignAuxInstantCorr=0;
 				  if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]>0){SignAuxInstantCorr=1;}
 				  else if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]<0){SignAuxInstantCorr=-1;}
 				  else {SignAuxInstantCorr=0;}
 				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SignAuxInstantCorr*(abs(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux);
 				  //SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
-				}// end if
-				// Re-identify CurrentSpecificLinkAux
-				if (QuadChannelParamsLink[CurrentSpecificLinkAux]==iQuadChIter and CurrentSpecificLinkAux>-1){
-					CurrentSpecificLinkAux=-1;
-					strcpy(ParamsCharArrayAux,strtok(NULL,"_"));
-					for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
-						if (string(LinkIdentificationArray[i])==string(ParamsCharArrayAux)){// IP already present
-							if (CurrentSpecificLinkAux<0){CurrentSpecificLinkAux=i;}// Take the first identified, which is th eone that matters most
-						}
-					}
-				}
+				}// end if				
 			}// end for			
 			// Send the updated values to the respective nodes
-			if (CurrentSpecificLinkMultiple>=0){	
+			if (CurrentSpecificLinkMultiple>-1){	
 					this->SetSynchParamsOtherNode(ListCombinationSpecificLink[CurrentSpecificLinkMultiple]); // Tell the synchronization information to the other nodes		
 			}
 	}
