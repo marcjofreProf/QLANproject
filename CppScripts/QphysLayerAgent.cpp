@@ -300,7 +300,7 @@ int QPLA::ProcessNewParameters(){
 			}
 		}
 
-		//cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArray[iHeaders] << endl;
+		cout << "QPLA::ValuesCharArray[iHeaders]: " << ValuesCharArray[iHeaders] << endl;
 		strcpy(ValuesCharArrayiHeadersAux,ValuesCharArray[iHeaders]); // Copy it to manipulate without losing information
 		strcpy(CurrentReceiveHostIP,strtok(ValuesCharArrayiHeadersAux,":")); // Identifies index position for storage
 		cout << "QPLA::Receiving synch. parameters from other node " << CurrentReceiveHostIP << endl;
@@ -728,7 +728,6 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 			strcat(ParamsCharArray,"OtherClientNodeSynchParams_"); // Continues the ParamsCharArray, so use strcat
 			// The values to send separated by :
 			strcat(ParamsCharArray,CurrentHostIP); // IP of sender (this node host)
-			strcat(ParamsCharArray,"_");// Add underscore separator
 			strcat(ParamsCharArray,":");
 			sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLinkAux][0]); // Offset
 			strcat(ParamsCharArray,charNum);
@@ -740,6 +739,7 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 			strcat(ParamsCharArray,charNum);
 			strcat(ParamsCharArray,":"); // Final :
 			strcat(ParamsCharArray,"_"); // Final _
+			cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
 			this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 		} // end for to the different addresses to send the params information
 	}
