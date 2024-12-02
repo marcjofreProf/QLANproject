@@ -305,7 +305,7 @@ int QPLA::ProcessNewParameters(){
 		strcpy(CurrentReceiveHostIP,strtok(ValuesCharArrayiHeadersAux,":")); // Identifies index position for storage
 		cout << "QPLA::Receiving synch. parameters from other node " << CurrentReceiveHostIP << endl;
 		
-		if (CurrentSpecificLink>=0 and CurrentSpecificLink<LinkNumberMAX){
+		if (CurrentSpecificLink>-1 and CurrentSpecificLink<LinkNumberMAX){
 			//cout << "QPLA::ProcessNewParameters CurrentSpecificLink " << CurrentSpecificLink << endl;
 			SynchNetworkParamsLinkOther[CurrentSpecificLink][0]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Synch offset
 			SynchNetworkParamsLinkOther[CurrentSpecificLink][1]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Relative frequency difference.
@@ -705,41 +705,43 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 	char CurrentEmitReceiveIPAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
 	strcpy(CurrentEmitReceiveIPAux,this->CurrentEmitReceiveIP);
 	int CurrentSpecificLinkAux=-1;
-	for (int iIterIPaddr=0;iIterIPaddr<numUnderScores;iIterIPaddr++){// Iterate over the different nodes to tell
-		// Mount the Parameters message for the other node
-		strcpy(ParamsCharArray,"IPdest_");
-		if (iIterIPaddr==0){			
-			strcpy(ParamsCharArrayAux,strtok(CurrentEmitReceiveIPAux,"_"));			
-		} 
-		else{
-			strcpy(ParamsCharArrayAux,strtok(NULL,"_"));			
-		}
-		strcat(ParamsCharArray,ParamsCharArrayAux);// Indicate the address to send the Synch parameters information
-		cout << "QPLA::Sending synch. parameters to node " << ParamsCharArray << endl;
-		// Re-identify CurrentSpecificLinkAux
-		CurrentSpecificLinkAux=-1;
-		for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
-			if (string(LinkIdentificationArray[i])==string(ParamsCharArrayAux)){// IP already present
-				if (CurrentSpecificLinkAux<0){CurrentSpecificLinkAux=i;}// Take the first identified, which is th eone that matters most
+	if (!string(CurrentHostIP).empty()){// Send things if an initial syncronization calibration has happen since among other things it will have th eIP of the host of the node
+		for (int iIterIPaddr=0;iIterIPaddr<numUnderScores;iIterIPaddr++){// Iterate over the different nodes to tell
+			// Mount the Parameters message for the other node
+			strcpy(ParamsCharArray,"IPdest_");
+			if (iIterIPaddr==0){			
+				strcpy(ParamsCharArrayAux,strtok(CurrentEmitReceiveIPAux,"_"));			
+			} 
+			else{
+				strcpy(ParamsCharArrayAux,strtok(NULL,"_"));			
 			}
-		}
-		strcat(ParamsCharArray,"_");// Add underscore separator
-		strcat(ParamsCharArray,"OtherClientNodeSynchParams_"); // Continues the ParamsCharArray, so use strcat
-		// The values to send separated by :
-		strcat(ParamsCharArray,CurrentHostIP); // IP of sender (this node host)
-		strcat(ParamsCharArray,":");
-		sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLinkAux][0]); // Offset
-		strcat(ParamsCharArray,charNum);
-		strcat(ParamsCharArray,":");
-		sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLinkAux][1]); // Relative frequency difference
-		strcat(ParamsCharArray,charNum);
-		strcat(ParamsCharArray,":");
-		sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLinkAux][2]); // Period
-		strcat(ParamsCharArray,charNum);
-		strcat(ParamsCharArray,":"); // Final :
-		strcat(ParamsCharArray,"_"); // Final _
-		this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
-	} // end for to the different addresses to send the params information
+			strcat(ParamsCharArray,ParamsCharArrayAux);// Indicate the address to send the Synch parameters information
+			cout << "QPLA::Sending synch. parameters to node " << ParamsCharArray << endl;
+			// Re-identify CurrentSpecificLinkAux
+			CurrentSpecificLinkAux=-1;
+			for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
+				if (string(LinkIdentificationArray[i])==string(ParamsCharArrayAux)){// IP already present
+					if (CurrentSpecificLinkAux<0){CurrentSpecificLinkAux=i;}// Take the first identified, which is th eone that matters most
+				}
+			}
+			strcat(ParamsCharArray,"_");// Add underscore separator
+			strcat(ParamsCharArray,"OtherClientNodeSynchParams_"); // Continues the ParamsCharArray, so use strcat
+			// The values to send separated by :
+			strcat(ParamsCharArray,CurrentHostIP); // IP of sender (this node host)
+			strcat(ParamsCharArray,":");
+			sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLinkAux][0]); // Offset
+			strcat(ParamsCharArray,charNum);
+			strcat(ParamsCharArray,":");
+			sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLinkAux][1]); // Relative frequency difference
+			strcat(ParamsCharArray,charNum);
+			strcat(ParamsCharArray,":");
+			sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLinkAux][2]); // Period
+			strcat(ParamsCharArray,charNum);
+			strcat(ParamsCharArray,":"); // Final :
+			strcat(ParamsCharArray,"_"); // Final _
+			this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
+		} // end for to the different addresses to send the params information
+	}
 	//cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
 	//this->acquire(); // important not to do it
 	
