@@ -129,6 +129,7 @@ private: //Variables/Instances
 	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0};//,-0.25,0.25}; // Updated from QPTLH agent. Normalized values of frequency testing which are applied for calibration
 	double SynchNetAdj[2*((1LL<<LinkNumberMAX)-1)]={1.0};
 	double SynchNetworkParamsLink[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send. Zerod at the begining
+	int QuadChannelParamsLink[LinkNumberMAX]={0};// Identifies the independently associated quad cahnnel number
 	double SynchNetworkParamsLinkOther[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send from the other nodes. Zeroed at the begining
 	double CurrentSynchNetworkParamsLink[3]={0.0}; //Stores currently the network synch values of interest given the link in use for reception
 	double CurrentExtraSynchNetworkParamsLink[3]={0.0}; //Stores currently the network synch values of interest given the link in use for emission

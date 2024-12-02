@@ -699,6 +699,7 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 	//cout << "QPLA::SetSynchParamsOtherNode CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
 	// Tell to the other nodes
 	char ParamsCharArray[NumBytesPayloadBuffer] = {0};
+	char ParamsCharArrayAux[NumBytesPayloadBuffer] = {0};
 	char charNum[NumBytesPayloadBuffer] = {0};
 	char CurrentReceiveHostIP[NumBytesPayloadBuffer]={0};
 	strcpy(CurrentReceiveHostIP,strtok(CurrentReceiveHostIPaux,"_"));
@@ -706,29 +707,38 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 	int numUnderScores=countUnderscores(this->CurrentEmitReceiveIP); // Which means the number of IP addresses to send the synch information
 	char CurrentEmitReceiveIPAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
 	strcpy(CurrentEmitReceiveIPAux,this->CurrentEmitReceiveIP);
+	int CurrentSpecificLinkAux=-1;
 	for (int iIterIPaddr=0;iIterIPaddr<numUnderScores;iIterIPaddr++){// Iterate over the different nodes to tell
 		// Mount the Parameters message for the other node
 		if (iIterIPaddr==0){
 			strcpy(ParamsCharArray,"IPdest_");// Initiates the ParamsCharArray, so use strcpy
-			strcat(ParamsCharArray,strtok(CurrentEmitReceiveIPAux,"_"));// Indicate the address to send the Synch parameters information
+			strcpy(ParamsCharArrayAux,strtok(CurrentEmitReceiveIPAux,"_"));			
 		} 
 		else{
 			strcat(ParamsCharArray,"IPdest_");// Continues the ParamsCharArray, so use strcat
-			strcat(ParamsCharArray,strtok(NULL,"_"));// Indicate the address to send the Synch parameters information
+			strcpy(ParamsCharArrayAux,strtok(NULL,"_"));			
 		}
+		strcat(ParamsCharArray,ParamsCharArrayAux);// Indicate the address to send the Synch parameters information
 		cout << "QPLA::Sending synch. parameters to node " << ParamsCharArray << endl;
+		// Re-identify CurrentSpecificLinkAux
+		CurrentSpecificLinkAux=-1;
+		for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
+			if (string(LinkIdentificationArray[i])==string(ParamsCharArrayAux)){// IP already present
+				if (CurrentSpecificLinkAux<0){CurrentSpecificLinkAux=i;}// Take the first identified, which is th eone that matters most
+			}
+		}
 		strcat(ParamsCharArray,"_");// Add underscore separator
 		strcat(ParamsCharArray,"OtherClientNodeSynchParams_"); // Continues the ParamsCharArray, so use strcat
 		// The values to send separated by :
 		strcat(ParamsCharArray,CurrentReceiveHostIP); // IP of sender (this node host)
 		strcat(ParamsCharArray,":");
-		sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLink][0]); // Offset
+		sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLinkAux][0]); // Offset
 		strcat(ParamsCharArray,charNum);
 		strcat(ParamsCharArray,":");
-		sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLink][1]); // Relative frequency difference
+		sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLinkAux][1]); // Relative frequency difference
 		strcat(ParamsCharArray,charNum);
 		strcat(ParamsCharArray,":");
-		sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLink][2]); // Period
+		sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLinkAux][2]); // Period
 		strcat(ParamsCharArray,charNum);
 		strcat(ParamsCharArray,":"); // Final :
 		strcat(ParamsCharArray,"_"); // Final _
@@ -761,6 +771,9 @@ int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentRece
 	if (SpecificQuadChDet<0){
 		SpecificQuadChDet=7;
 		cout << "QPLA::SimulateReceiveSynchQuBit wrongly identified single specific quad group channel...setting it to index 7 (all channels)" << endl;
+	}
+	if (CurrentSpecificLink>=0){
+		QuadChannelParamsLink[CurrentSpecificLink]=SpecificQuadChDet;
 	}
 	strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 	this->NumQuBitsPerRun=numReqQuBitsAux;				
@@ -1098,97 +1111,129 @@ return GPIOHardwareSynchedAux;
 }
 
 int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drifts because it is assumed that qubists fall within their histogram period
-int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];// Number of qubits to process
+	int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];// Number of qubits to process
 
-// Check that we now exceed the QuBits buffer size
-if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
-else if (SimulateNumStoredQubitsNodeAux==1){
-	cout << "QPLA::SmallDriftContinuousCorrection not executing since 0 qubits detected!" << endl;
-	return 0;
-}
+	// Check that we now exceed the QuBits buffer size
+	if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
+	else if (SimulateNumStoredQubitsNodeAux==1){
+		cout << "QPLA::SmallDriftContinuousCorrection not executing since 0 qubits detected!" << endl;
+		return 0;
+	}
 
-// Apply the small offset drift correction
-if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){	
-	if (CurrentSpecificLinkMultiple>-1){// The specific identification IP is present
-		for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-			if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
-		  // If it is the first time, annotate the relative time offset with respect HostPeriodicityAux
-		  ReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=0;// Reset value. ReferencePointSmallOffset could be used to allocate multiple channels separated by time
-		  if (NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]==false){			
-			  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=0;// Reset value
-			  NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=true;// Update value, so that it is not run again
-			}	
-		  // First compute the relative new time offset from last iteration
-			long long int SmallOffsetDriftAux=0;
-			long long int SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
-			long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);	
-			long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
-			if (UseAllTagsForEstimation){
-				long long int SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0};				
-				for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-				  // Mean averaging, not very resilent with glitches, eventhough filtered in liner regression
-				  // Median averaging
-				  if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
-						SmallOffsetDriftArrayAux[i]=-((LLIHistPeriodicityHalfAux-(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
+	// Apply the small offset drift correction
+	if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
+		if (CurrentSpecificLinkMultiple>-1){// The specific identification IP is present
+			char ParamsCharArray[NumBytesPayloadBuffer] = {0};
+			strcpy(ParamsCharArray,ListCombinationSpecificLink[CurrentSpecificLinkMultiple]);
+			char ParamsCharArrayAux[NumBytesPayloadBuffer] = {0};
+			strcpy(ParamsCharArrayAux,strtok(ParamsCharArray,"_"));
+			// Re-identify CurrentSpecificLinkAux
+			int CurrentSpecificLinkAux=-1;
+			for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
+				if (string(LinkIdentificationArray[i])==string(ParamsCharArrayAux)){// IP already present
+					if (CurrentSpecificLinkAux<0){CurrentSpecificLinkAux=i;}// Take the first identified, which is th eone that matters most
+				}
+			}
+			for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){				
+				if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
+				  // If it is the first time, annotate the relative time offset with respect HostPeriodicityAux
+				  ReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=0;// Reset value. ReferencePointSmallOffset could be used to allocate multiple channels separated by time
+				  if (NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]==false){			
+					  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=0;// Reset value
+					  NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=true;// Update value, so that it is not run again
+					}
+				  // First compute the relative new time offset from last iteration
+					long long int SmallOffsetDriftAux=0;
+					long long int SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
+					long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);	
+					long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
+					if (UseAllTagsForEstimation){
+						long long int SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0};				
+						for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+						  // Mean averaging, not very resilent with glitches, eventhough filtered in liner regression
+						  // Median averaging
+						  if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
+								SmallOffsetDriftArrayAux[i]=-((LLIHistPeriodicityHalfAux-(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
+							}
+							else{
+								SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+							}
+						}
+					  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median averaging
 					}
 					else{
-						SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+						if((static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
+							SmallOffsetDriftAux=-((LLIHistPeriodicityHalfAux-(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
+						}
+						else{
+							SmallOffsetDriftAux=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+						}
+						cout << "QPLA::Using only first timetag for small offset correction!...to be deactivated" << endl;
+					}
+
+				  //cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
+				  //cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
+				  //////////////////////////////////////////
+				  // Checks of proper values handling
+				  //long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
+				  //long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2);
+				  //long long int CheckValueAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+				  //cout << "QPLA::SmallDriftContinuousCorrection::CheckValueAux: "<< CheckValueAux << endl;
+				  //cout << "QPLA::SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink: " << SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink << endl;
+				  ////////////////////////////////////////
+
+					long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftAux+SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
+				  //long long int LLISmallOffsetDriftAux=static_cast<long long int>(SmallOffsetDriftAux);
+					for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+						if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink)>0){
+							TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
+						}
+						else{TimeTaggs[iQuadChIter][i]=0;}
+					}
+
+				  if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/2.0)){// Large step
+				  	cout << "QPLA::SmallDriftContinuousCorrection iQuadChIter: " << iQuadChIter << endl;
+				  	cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
+				  	cout << "QPLA::Applying SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
+				  }
+				  
+				  // Median filter the SmallOffsetDriftAux to avoid to much induced artificial jitter
+				  SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux]=SmallOffsetDriftAux;
+				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]++;// Update value
+				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]=IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux;// Wrap value
+				  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Median filter
+				  // Update information to the other node about synch parameters				  
+				  if (CurrentSpecificLinkAux>=0){		
+						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=SynchNetworkParamsLink[CurrentSpecificLinkAux][0]-static_cast<double>(SmallOffsetDriftAux);// Offset difference		
+						//SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
+						//SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
+						//SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
+					}
+				  // Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
+				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;// Just for monitoring purposes
+				  long long int SignAuxInstantCorr=0;
+				  if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]>0){SignAuxInstantCorr=1;}
+				  else if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]<0){SignAuxInstantCorr=-1;}
+				  else {SignAuxInstantCorr=0;}
+				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SignAuxInstantCorr*(abs(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux);
+				  //SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+				}// end if
+				// Re-identify CurrentSpecificLinkAux
+				if (QuadChannelParamsLink[CurrentSpecificLinkAux]==iQuadChIter and CurrentSpecificLinkAux>-1){
+					CurrentSpecificLinkAux=-1;
+					strcpy(ParamsCharArrayAux,strtok(NULL,"_"));
+					for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
+						if (string(LinkIdentificationArray[i])==string(ParamsCharArrayAux)){// IP already present
+							if (CurrentSpecificLinkAux<0){CurrentSpecificLinkAux=i;}// Take the first identified, which is th eone that matters most
+						}
 					}
 				}
-			  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median averaging
+			}// end for			
+			// Send the updated values to the respective nodes
+			if (CurrentSpecificLinkMultiple>=0){	
+					this->SetSynchParamsOtherNode(ListCombinationSpecificLink[CurrentSpecificLinkMultiple]); // Tell the synchronization information to the other nodes		
 			}
-			else{
-				if((static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
-					SmallOffsetDriftAux=-((LLIHistPeriodicityHalfAux-(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
-				}
-				else{
-					SmallOffsetDriftAux=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
-				}
-				cout << "QPLA::Using only first timetag for small offset correction!...to be deactivated" << endl;
-			}
-
-		  //cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
-		  //cout << "QPLA::Applying SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
-		  //////////////////////////////////////////
-		  // Checks of proper values handling
-		  //long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
-		  //long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2);
-		  //long long int CheckValueAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
-		  //cout << "QPLA::SmallDriftContinuousCorrection::CheckValueAux: "<< CheckValueAux << endl;
-		  //cout << "QPLA::SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink: " << SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink << endl;
-		  ////////////////////////////////////////
-
-			long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftAux+SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
-		  //long long int LLISmallOffsetDriftAux=static_cast<long long int>(SmallOffsetDriftAux);
-			for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-				if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink)>0){
-					TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
-				}
-				else{TimeTaggs[iQuadChIter][i]=0;}
-			}
-
-		  if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/2.0)){// Large step
-		  	cout << "QPLA::SmallDriftContinuousCorrection iQuadChIter: " << iQuadChIter << endl;
-		  	cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
-		  	cout << "QPLA::Applying SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
-		  }
-		  
-		  // Median filter the SmallOffsetDriftAux to avoid to much induced artificial jitter
-		  SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux]=SmallOffsetDriftAux;
-		  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]++;// Update value
-		  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]=IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux;// Wrap value
-		  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Median filter
-		  // Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
-		  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;// Just for monitoring purposes
-		  long long int SignAuxInstantCorr=0;
-		  if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]>0){SignAuxInstantCorr=1;}
-		  else if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]<0){SignAuxInstantCorr=-1;}
-		  else {SignAuxInstantCorr=0;}
-		  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SignAuxInstantCorr*(abs(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux);
-		  //SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
-		}
 	}
-}
 	else{// Mal function we should not be here
 		cout << "QPLA::The Emitter nodes have not been previously identified, so no small offset drift correction applied" << endl;
 	}
@@ -1631,8 +1676,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 		SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 		SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
-		this->SetSynchParamsOtherNode(CurrentReceiveHostIPaux); // Tell the synchronization information to the other nodes
-		
+		this->SetSynchParamsOtherNode(CurrentReceiveHostIPaux); // Tell the synchronization information to the other nodes		
 	}
 	cout << "QPLA::Synchronization parameters updated for this node" << endl;
 }
