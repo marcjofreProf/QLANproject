@@ -696,16 +696,11 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 	return 0; // return 0 is for no error
 }
 
-int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is responsability of the host to distribute this synch information to the other involved nodes	
-	//cout << "QPLA::SetSynchParamsOtherNode CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
+int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distribute this synch information to the other involved nodes	
 	// Tell to the other nodes
 	char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 	char ParamsCharArrayAux[NumBytesPayloadBuffer] = {0};
 	char charNum[NumBytesPayloadBuffer] = {0};
-	char CurrentReceiveHostIP[NumBytesPayloadBuffer]={0};
-	strcpy(CurrentReceiveHostIP,strtok(CurrentReceiveHostIPaux,"_"));
-	cout << "QPLA::SetSynchParamsOtherNode CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
-	cout << "QPLA::SetSynchParamsOtherNode CurrentReceiveHostIP: " << CurrentReceiveHostIP << endl;
 	int numUnderScores=countUnderscores(this->CurrentEmitReceiveIP); // Which means the number of IP addresses to send the synch information
 	char CurrentEmitReceiveIPAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
 	strcpy(CurrentEmitReceiveIPAux,this->CurrentEmitReceiveIP);
@@ -731,7 +726,7 @@ int QPLA::SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux){// It is respon
 		strcat(ParamsCharArray,"_");// Add underscore separator
 		strcat(ParamsCharArray,"OtherClientNodeSynchParams_"); // Continues the ParamsCharArray, so use strcat
 		// The values to send separated by :
-		strcat(ParamsCharArray,CurrentReceiveHostIP); // IP of sender (this node host)
+		strcat(ParamsCharArray,CurrentHostIP); // IP of sender (this node host)
 		strcat(ParamsCharArray,":");
 		sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLinkAux][0]); // Offset
 		strcat(ParamsCharArray,charNum);
@@ -760,7 +755,8 @@ int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentRece
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
 	char CurrentReceiveHostIP[NumBytesBufferICPMAX]={0};
-	strcpy(CurrentReceiveHostIP,CurrentReceiveHostIPaux);
+	strcpy(CurrentReceiveHostIP,CurrentReceiveHostIPaux);	
+	strcpy(CurrentHostIP,CurrentReceiveHostIP);// Identifies the Host IP of the current node
 	this->RetrieveOtherEmiterReceiverMethod();
 	// Retrieve the involved single specific quad group channel if possible
 	QuadEmitDetecSelec=QuadEmitDetecSelecAux; // Identifies the quad groups channels to detect
@@ -1219,8 +1215,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 			}// end for			
 			// Send the updated values to the respective nodes
 			if (CurrentSpecificLinkMultiple>-1){
-					cout << "QPLA::ListCombinationSpecificLink[CurrentSpecificLinkMultiple]: " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
-					this->SetSynchParamsOtherNode(ListCombinationSpecificLink[CurrentSpecificLinkMultiple]); // Tell the synchronization information to the other nodes		
+					this->SetSynchParamsOtherNode(); // Tell the synchronization information to the other nodes		
 			}
 		}
 		else{// Mal function we should not be here
@@ -1664,8 +1659,8 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchNetworkParamsLink[CurrentSpecificLink][0]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1];// Offset difference		
 		SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 		SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
-		SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
-		this->SetSynchParamsOtherNode(CurrentReceiveHostIPaux); // Tell the synchronization information to the other nodes		
+		SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;		
+		this->SetSynchParamsOtherNode(); // Tell the synchronization information to the other nodes		
 	}
 	cout << "QPLA::Synchronization parameters updated for this node" << endl;
 }

@@ -108,6 +108,7 @@ private: //Variables/Instances
 	unsigned long long int OldLastTimeTagg=0;
 	// Above agents passed values to this agent
 	char ModeActivePassive[NumBytesPayloadBuffer] = {0};// "Active" or "Passive"
+	char CurrentHostIP[NumBytesPayloadBuffer]={0};// Identifies the host IP of the current node
 	char IPaddressesTimePointBarrier[NumBytesBufferICPMAX] = {0};// List of IP addresses separated by "_" to send the Time Point Barrier to
 	double FineSynchAdjVal[2]={0.0};// Adjust synch trig offset and frequency
 	// Automatic calculation of synchronization
@@ -226,7 +227,7 @@ private: // Functions/Methods
 	struct timespec GetFutureTimePointOtherNode();
 	// Synchronization primitives
 	unsigned long long int IPtoNumber(char* IPaddressAux);
-	int SetSynchParamsOtherNode(char* CurrentReceiveHostIPaux);// Tell the other nodes about the synchronization information calculated
+	int SetSynchParamsOtherNode();// Tell the other nodes about the synchronization information calculated
 	int RetrieveOtherEmiterReceiverMethod();// Stores and retrieves the current other emiter receiver
 	int HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,int iNumRunsPerCenterMass); // Calculate the histogram center given a period and a list of timetaggs
 	int SmallDriftContinuousCorrection();// Methods to keep track of the small offset correction at each measurement (but not in the network synch)
