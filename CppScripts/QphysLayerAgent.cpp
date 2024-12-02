@@ -728,6 +728,7 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 			strcat(ParamsCharArray,"OtherClientNodeSynchParams_"); // Continues the ParamsCharArray, so use strcat
 			// The values to send separated by :
 			strcat(ParamsCharArray,CurrentHostIP); // IP of sender (this node host)
+			strcat(ParamsCharArray,"_");// Add underscore separator
 			strcat(ParamsCharArray,":");
 			sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLinkAux][0]); // Offset
 			strcat(ParamsCharArray,charNum);

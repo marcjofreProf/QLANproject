@@ -64,7 +64,7 @@ private:// Variables
 	std::atomic<bool> ManualSemaphoreExtra=false;
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=4; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
-	int ApproxInterruptTime=150000; // Important to control the kernel_scheduler (an not get negative times). Typical time of interrupt time duration is 5000 with simple busy wait; around 8000 with busy wait with yield; 100000 with sleep_for()
+	int ApproxInterruptTime=300000; // Important to control the kernel_scheduler (an not get negative times). Typical time of interrupt time duration is 5000 with simple busy wait; around 8000 with busy wait with yield; 100000 with sleep_for()
 	// To many hundreds of measurements might consume oall the CPU of the board (because median is very resource consuming).Otherwise a better algorithm (median) has to be used.
 	unsigned int NextSynchPRUcommand=11;// set initially to NextSynchPRUcorrection=0
 	unsigned int NextSynchPRUcorrection=0;// Correction or sequence signal value
