@@ -711,8 +711,7 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 		strcpy(CurrentHostIPAux,CurrentHostIP);
 		strcpy(CurrentHostIPAuxAux,strtok(CurrentHostIPAux,"_"));
 		for (int iIterIPaddr=0;iIterIPaddr<numUnderScores;iIterIPaddr++){// Iterate over the different nodes to tell
-			// Mount the Parameters message for the other node
-			
+			// Mount the Parameters message for the other node			
 			if (iIterIPaddr==0){
 				strcpy(ParamsCharArray,"IPdest_");
 				strcpy(ParamsCharArrayAux,strtok(CurrentEmitReceiveIPAux,"_"));			
@@ -722,7 +721,7 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 				strcpy(ParamsCharArrayAux,strtok(NULL,"_"));			
 			}
 			strcat(ParamsCharArray,ParamsCharArrayAux);// Indicate the address to send the Synch parameters information
-			cout << "QPLA::Sending synch. parameters to node " << ParamsCharArray << endl;
+			cout << "QPLA::Sending synch. parameters to node " << ParamsCharArrayAux << endl;
 			// Re-identify CurrentSpecificLinkAux
 			CurrentSpecificLinkAux=-1;
 			for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
