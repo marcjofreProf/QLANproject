@@ -1216,10 +1216,10 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 						//SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 						//SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 						//SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
+						// Split the effor between sender and receiver for constantly correcting the synch parameters
+						SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=static_cast<long long int>(SplitEmitReceiverSmallOffsetDriftPerLink*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]));
 					}
-					// Split the effor between sender and receiver for constantly correcting the synch parameters
-					SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=static_cast<long long int>(SplitEmitReceiverSmallOffsetDriftPerLink*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]));
-				  long long int SignAuxInstantCorr=0;
+					long long int SignAuxInstantCorr=0;
 				  if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]>0){SignAuxInstantCorr=1;}
 				  else if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]<0){SignAuxInstantCorr=-1;}
 				  else {SignAuxInstantCorr=0;}
