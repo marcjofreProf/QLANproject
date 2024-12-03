@@ -306,6 +306,7 @@ struct timespec GPIO::SetWhileWait(){
 
 	// Timer file descriptor sets an interrupt that if not commented (when not in use) produces a long reaction time in the while loop (busy wait)
 	//if (this->iIterPRUcurrentTimerVal==0){ // Needed to configure it only at the first iteration
+	// By forcing it to renew the timerfd everytime, the awakenen time is not advanced (which probably is better)
 		TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
 		//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
 		
@@ -382,10 +383,13 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
         		//	std::this_thread::yield();
 				//}				
 				//this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
+				// Probably by measuring the time of more relevant functions (generation of interrupt; and reception from PRU of its interrupt, it does a better job of estimating the real thing)
 				prussdrv_pru_send_event(22);
+				//this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
+				//this->setMaxRrPriority(PriorityValRegular);
+				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRUShort);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)										
 				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
 				this->setMaxRrPriority(PriorityValRegular);
-				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRUShort);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)										
 				//cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 				if (retInterruptsPRU1>0){
 					prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
