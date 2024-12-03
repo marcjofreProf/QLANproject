@@ -701,15 +701,18 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 	char ParamsCharArray[NumBytesPayloadBuffer] = {0};
 	char ParamsCharArrayAux[NumBytesPayloadBuffer] = {0};
 	char CurrentHostIPAux[NumBytesPayloadBuffer] = {0};
+	char CurrentHostIPAuxAux[NumBytesPayloadBuffer] = {0};
 	char charNum[NumBytesPayloadBuffer] = {0};
 	int numUnderScores=countUnderscores(this->CurrentEmitReceiveIP); // Which means the number of IP addresses to send the synch information
 	char CurrentEmitReceiveIPAux[NumBytesBufferICPMAX]={0}; // Copy to not destroy original
 	strcpy(CurrentEmitReceiveIPAux,this->CurrentEmitReceiveIP);
 	int CurrentSpecificLinkAux=-1;
 	if (!string(CurrentHostIP).empty()){// Send things if an initial syncronization calibration has happen since among other things it will have th eIP of the host of the node
+		strcpy(CurrentHostIPAux,CurrentHostIP);
+		strcpy(CurrentHostIPAuxAux,strtok(CurrentHostIPAux,"_"));
 		for (int iIterIPaddr=0;iIterIPaddr<numUnderScores;iIterIPaddr++){// Iterate over the different nodes to tell
 			// Mount the Parameters message for the other node
-			strcpy(CurrentHostIPAux,CurrentHostIP);
+			
 			if (iIterIPaddr==0){
 				strcpy(ParamsCharArray,"IPdest_");
 				strcpy(ParamsCharArrayAux,strtok(CurrentEmitReceiveIPAux,"_"));			
@@ -730,7 +733,7 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 			strcat(ParamsCharArray,"_");// Add underscore separator
 			strcat(ParamsCharArray,"OtherClientNodeSynchParams_"); // Continues the ParamsCharArray, so use strcat
 			// The values to send separated by :
-			strcat(ParamsCharArray,strtok(CurrentHostIPAux,"_")); // IP of sender (this node host)
+			strcat(ParamsCharArray,CurrentHostIPAuxAux); // IP of sender (this node host)
 			strcat(ParamsCharArray,":");
 			sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLinkAux][0]); // Offset
 			strcat(ParamsCharArray,charNum);
