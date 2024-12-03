@@ -673,7 +673,7 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 	if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 	this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 	std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
-	threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
+	threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();	
 	this->SmallDriftContinuousCorrection();// Run after threadSimulateReceiveQuBitRefAux
 	}
 	else{
@@ -708,13 +708,14 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 	int CurrentSpecificLinkAux=-1;
 	if (!string(CurrentHostIP).empty()){// Send things if an initial syncronization calibration has happen since among other things it will have th eIP of the host of the node
 		for (int iIterIPaddr=0;iIterIPaddr<numUnderScores;iIterIPaddr++){// Iterate over the different nodes to tell
-			strcpy(ParamsCharArray,"IPdest_");
 			// Mount the Parameters message for the other node
 			strcpy(CurrentHostIPAux,CurrentHostIP);
-			if (iIterIPaddr==0){			
+			if (iIterIPaddr==0){
+				strcpy(ParamsCharArray,"IPdest_");
 				strcpy(ParamsCharArrayAux,strtok(CurrentEmitReceiveIPAux,"_"));			
 			} 
 			else{
+				strcat(ParamsCharArray,"IPdest_");
 				strcpy(ParamsCharArrayAux,strtok(NULL,"_"));			
 			}
 			strcat(ParamsCharArray,ParamsCharArrayAux);// Indicate the address to send the Synch parameters information
@@ -740,10 +741,10 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 			sprintf(charNum, "%.8f",SynchNetworkParamsLink[CurrentSpecificLinkAux][2]); // Period
 			strcat(ParamsCharArray,charNum);
 			strcat(ParamsCharArray,":"); // Final :
-			strcat(ParamsCharArray,"_"); // Final _
-			//cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
-			this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
+			strcat(ParamsCharArray,"_"); // Final _			
 		} // end for to the different addresses to send the params information
+		//cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
+		this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 	}
 	//cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
 	//this->acquire(); // important not to do it
@@ -1660,7 +1661,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	
 	// Identify the specific link and store/update iteratively the values
 	
-	if (CurrentSpecificLink>=0){		
+	if (CurrentSpecificLink>-1){		
 		SynchNetworkParamsLink[CurrentSpecificLink][0]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1];// Offset difference		
 		SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 		SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
