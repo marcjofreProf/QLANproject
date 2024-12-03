@@ -201,6 +201,10 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
 		sharedMem_int[OFFSET_SHAREDRAM+1+iIterDump]=static_cast<unsigned int>(0x00000000); // Put it all to zeros
 	}
+	// Some array initializations
+	for (int i=0;i<MaxNumPulses;i++){
+		duration_FinalInitialMeasTrigAuxArray[i]=0;
+	}
 	  /*// Doing debbuging checks - Debugging 1	  
 	  std::thread threadReadTimeStampsAux=std::thread(&GPIO::ReadTimeStamps,this);
 	  std::thread threadSendTriggerSignalsAux=std::thread(&GPIO::SendTriggerSignals,this);
@@ -586,7 +590,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		}
 		
 		// Information
-		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(1*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
+		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(512*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
 			////cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			////cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "GPIO::Information about synchronization:" << endl;

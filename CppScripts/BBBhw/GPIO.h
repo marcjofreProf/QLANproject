@@ -170,7 +170,7 @@ private:// Variables
 	double duration_FinalInitialCountAuxArrayAvg=0.0;
 	double duration_FinalInitialCountAuxArrayAvgInitial=0.0;
 	//int duration_FinalInitialMeasTrigAux=0;
-	int duration_FinalInitialMeasTrigAuxArray[MaxNumPulses]={0};
+	int duration_FinalInitialMeasTrigAuxArray[MaxNumPulses]={0}; // Zeroed when creating the instance
 	int duration_FinalInitialMeasTrigAuxAvg=0;
 	unsigned long long int TrigAuxIterCount=0;
 	// Trigger Signal and Timetagging methods
