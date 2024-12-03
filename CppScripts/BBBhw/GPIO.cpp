@@ -305,7 +305,7 @@ struct timespec GPIO::SetWhileWait(){
 	requestWhileWaitAux.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
 
 	// Timer file descriptor sets an interrupt that if not commented (when not in use) produces a long reaction time in the while loop (busy wait)
-	if (this->iIterPRUcurrentTimerVal==0){ // Needed to configure it only at the first iteration
+	//if (this->iIterPRUcurrentTimerVal==0){ // Needed to configure it only at the first iteration
 		TimePointClockCurrentFinal_time_as_count = static_cast<long long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count());//-static_cast<long long int>(this->TimeClockMarging); // Add an offset, since the final barrier is implemented with a busy wait 
 		//cout << "TimePointClockCurrentFinal_time_as_count: " << TimePointClockCurrentFinal_time_as_count << endl;
 		
@@ -315,15 +315,15 @@ struct timespec GPIO::SetWhileWait(){
 	    struct itimerspec its;
 	    its.it_interval.tv_sec = (int)(static_cast<unsigned long long int>(static_cast<int>(TimePRU1synchPeriod)-duration_FinalInitialMeasTrigAuxAvg)/((long)1000000000));  // Periodic interval expiration // Make it periodic to try to be more deterministic. No interval, one-shot timer
 	    its.it_interval.tv_nsec = (long)(static_cast<unsigned long long int>(static_cast<int>(TimePRU1synchPeriod)-duration_FinalInitialMeasTrigAuxAvg)%(long)1000000000);
-	    its.it_value.tv_sec=(int)(TimePointClockCurrentFinal_time_as_count/((long)1000000000)); // Initial expiration
-		its.it_value.tv_nsec=(long)(TimePointClockCurrentFinal_time_as_count%(long)1000000000);
+	    its.it_value.tv_sec=(int)((TimePointClockCurrentFinal_time_as_count-static_cast<long long int>(duration_FinalInitialMeasTrigAuxAvg))/((long)1000000000)); // Initial expiration
+		its.it_value.tv_nsec=(long)((TimePointClockCurrentFinal_time_as_count-static_cast<long long int>(duration_FinalInitialMeasTrigAuxAvg))%(long)1000000000);
 
 		timerfd_settime(this->tfd, TFD_TIMER_ABSTIME, &its, NULL);
 
 		// Watch timefd file descriptor
 	    FD_ZERO(&rfds);
 	    FD_SET(this->tfd, &rfds);
-	}
+	//}
 
 	return requestWhileWaitAux;
 }
