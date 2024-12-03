@@ -64,6 +64,7 @@ QPLA::QPLA() {// Constructor
 	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		for (int i=0;i<CombinationLinksNumAux;i++){
 		  SmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
+		  oldSmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Old Values, Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
 		  ReferencePointSmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
 		  // Filtering qubits
 		  NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][i]=false; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
@@ -1210,7 +1211,8 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SmallOffsetDriftAux;// Update value
 				  // Update information to the other node about synch parameters				  
 				  if (CurrentSpecificLinkAux>-1){		
-						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=SynchNetworkParamsLink[CurrentSpecificLinkAux][0]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]);// Offset difference		
+						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=SynchNetworkParamsLink[CurrentSpecificLinkAux][0]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]);// Offset difference		
+						oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 						//SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 						//SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 						//SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
