@@ -745,7 +745,7 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 			strcat(ParamsCharArray,":"); // Final :
 			strcat(ParamsCharArray,"_"); // Final _			
 		} // end for to the different addresses to send the params information
-		//cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
+		cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
 		this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 	}
 	//cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
