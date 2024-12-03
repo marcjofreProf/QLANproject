@@ -1200,12 +1200,14 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  }
 				  
 				  // Median filter the SmallOffsetDriftAux to avoid to much induced artificial jitter
-				  SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux]=SmallOffsetDriftAux;
+				  // Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
+				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;// Just for monitoring purposes
+
+				  SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux]=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]++;// Update value
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]=IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux;// Wrap value
 				  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Median filter				  
-				  // Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
-				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux;// Just for monitoring purposes
+				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SmallOffsetDriftAux;// Update value
 				  // Update information to the other node about synch parameters				  
 				  if (CurrentSpecificLinkAux>-1){		
 						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=SynchNetworkParamsLink[CurrentSpecificLinkAux][0]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]);// Offset difference		
