@@ -143,6 +143,7 @@ private: //Variables/Instances
 	long long int SmallOffsetDriftAuxArray[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)][NumSmallOffsetDriftAux]={0}; // Array to filter the SmallOffsetDriftAux
 	int IterSmallOffsetDriftAuxArray[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Array storing the index of the new value
 	// the following arrays are initialized to zero in the Agent creator
+	double SplitEmitReceiverSmallOffsetDriftPerLink=0.5; // Splitting ratio between the effort of the emitter and receiver of constantly updateing the synch values
 	long long int SmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
 	long long int ReferencePointSmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
 	// Filtering qubits
