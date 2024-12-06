@@ -13,6 +13,7 @@ Agent script for Quantum Physical Layer
 #include<stdio.h>
 #include<string.h>
 #include<bitset>
+#include <algorithm> // For std::nth_element
 // Time/synchronization management
 #include <chrono>
 
@@ -1891,16 +1892,25 @@ void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
   		return ArrayHolderAux[0];
   	}
   	else{
-	// Step 1: Copy the array to a temporary array
+			/* // Non-efficient code
+			// Step 1: Copy the array to a temporary array
   		double temp[MedianFilterFactor]={0.0};
   		for(int i = 0; i < MedianFilterFactor; i++) {
   			temp[i] = ArrayHolderAux[i];
   		}
 
-    // Step 2: Sort the temporary array
+    	// Step 2: Sort the temporary array
   		this->DoubleBubbleSort(temp,MedianFilterFactor);
-    // If odd, middle number
-  		return temp[MedianFilterFactor/2];
+    	// If odd, middle number
+  		return temp[MedianFilterFactor/2];*/
+
+  		// Efficient code
+			// Step 1: Find the median element without fully sorting
+	    int midIndex = MedianFilterFactor / 2;
+	    std::nth_element(ArrayHolderAux, ArrayHolderAux + midIndex, ArrayHolderAux + MedianFilterFactor);
+
+	    // Step 2: Return the median
+	    return ArrayHolderAux[midIndex];
   	}
   }
 
@@ -1941,16 +1951,24 @@ void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
   		return ArrayHolderAux[0];
   	}
   	else{
-	// Step 1: Copy the array to a temporary array
+  		/* // Non-efficient code
+			// Step 1: Copy the array to a temporary array
   		unsigned long long int temp[MedianFilterFactor]={0};
   		for(int i = 0; i < MedianFilterFactor; i++) {
   			temp[i] = ArrayHolderAux[i];
   		}
+	    // Step 2: Sort the temporary array
+	  	this->ULLIBubbleSort(temp,MedianFilterFactor);
+	    // If odd, middle number
+	  	return temp[MedianFilterFactor/2];*/
 
-    // Step 2: Sort the temporary array
-  		this->ULLIBubbleSort(temp,MedianFilterFactor);
-    // If odd, middle number
-  		return temp[MedianFilterFactor/2];
+	  	// Efficient code
+			// Step 1: Find the median element without fully sorting
+	    int midIndex = MedianFilterFactor / 2;
+	    std::nth_element(ArrayHolderAux, ArrayHolderAux + midIndex, ArrayHolderAux + MedianFilterFactor);
+
+	    // Step 2: Return the median
+	    return ArrayHolderAux[midIndex];
   	}
   }
 
@@ -1975,16 +1993,24 @@ void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
   		return ArrayHolderAux[0];
   	}
   	else{
-	// Step 1: Copy the array to a temporary array
+  		/* // Non-efficient code
+			// Step 1: Copy the array to a temporary array
   		long long int temp[MedianFilterFactor]={0};
   		for(int i = 0; i < MedianFilterFactor; i++) {
   			temp[i] = ArrayHolderAux[i];
   		}
-
-    // Step 2: Sort the temporary array
+  		// Step 2: Sort the temporary array
   		this->LLIBubbleSort(temp,MedianFilterFactor);
-    // If odd, middle number
-  		return temp[MedianFilterFactor/2];
+    	// If odd, middle number
+  		return temp[MedianFilterFactor/2];*/
+
+  		// Efficient code
+			// Step 1: Find the median element without fully sorting
+	    int midIndex = MedianFilterFactor / 2;
+	    std::nth_element(ArrayHolderAux, ArrayHolderAux + midIndex, ArrayHolderAux + MedianFilterFactor);
+
+	    // Step 2: Return the median
+	    return ArrayHolderAux[midIndex];
   	}
   }
 

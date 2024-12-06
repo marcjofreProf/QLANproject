@@ -21,6 +21,7 @@ Script for PRU real-time handling
 #include<thread>
 #include<pthread.h>
 #include<unistd.h>
+#include <algorithm> // For std::nth_element
 // Watchdog
 #include <sys/ioctl.h>
 #include <linux/watchdog.h>
@@ -1462,16 +1463,25 @@ int GPIO::IntMedianFilterSubArray(int* ArrayHolderAux,int MedianFilterFactor){
 		return ArrayHolderAux[0];
 	}
 	else{
-	// Step 1: Copy the array to a temporary array
+		/*
+		// Non-efficient code
+		// Step 1: Copy the array to a temporary array
 		int temp[MedianFilterFactor]={0};
 		for(int i = 0; i < MedianFilterFactor; i++) {
 			temp[i] = ArrayHolderAux[i];
-		}
-		
-    // Step 2: Sort the temporary array
+		}		
+    	// Step 2: Sort the temporary array
 		this->IntBubbleSort(temp,MedianFilterFactor);
-    // If odd, middle number
-		return temp[MedianFilterFactor/2];
+    	// If odd, middle number
+		return temp[MedianFilterFactor/2];*/
+
+		// Efficient code
+		// Step 1: Find the median element without fully sorting
+	    int midIndex = MedianFilterFactor / 2;
+	    std::nth_element(ArrayHolderAux, ArrayHolderAux + midIndex, ArrayHolderAux + MedianFilterFactor);
+
+	    // Step 2: Return the median
+	    return ArrayHolderAux[midIndex];
 	}
 }
 
@@ -1510,6 +1520,7 @@ long double GPIO::LongDoubleMedianFilterSubArray(long double* ArrayHolderAux,int
 		return ArrayHolderAux[0];
 	}
 	else{
+		/* // Non-efficient code
 		// Step 1: Copy the array to a temporary array
 		long double temp[MedianFilterFactor]={0.0};
 		for(int i = 0; i < MedianFilterFactor; i++) {
@@ -1519,7 +1530,15 @@ long double GPIO::LongDoubleMedianFilterSubArray(long double* ArrayHolderAux,int
     	// Step 2: Sort the temporary array
 		this->LongDoubleBubbleSort(temp,MedianFilterFactor);
     	// If odd, middle number
-		return temp[MedianFilterFactor/2];
+		return temp[MedianFilterFactor/2];*/
+
+		// Efficient code
+		// Step 1: Find the median element without fully sorting
+	    int midIndex = MedianFilterFactor / 2;
+	    std::nth_element(ArrayHolderAux, ArrayHolderAux + midIndex, ArrayHolderAux + MedianFilterFactor);
+
+	    // Step 2: Return the median
+	    return ArrayHolderAux[midIndex];
 	}
 }
 
@@ -1528,16 +1547,24 @@ double GPIO::DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterF
 		return ArrayHolderAux[0];
 	}
 	else{
-	// Step 1: Copy the array to a temporary array
+		/* // Non-efficient code
+		// Step 1: Copy the array to a temporary array
 		double temp[MedianFilterFactor]={0.0};
 		for(int i = 0; i < MedianFilterFactor; i++) {
 			temp[i] = ArrayHolderAux[i];
-		}
-		
-    // Step 2: Sort the temporary array
+		}		
+	    // Step 2: Sort the temporary array
 		this->DoubleBubbleSort(temp,MedianFilterFactor);
-    // If odd, middle number
-		return temp[MedianFilterFactor/2];
+	    // If odd, middle number
+		return temp[MedianFilterFactor/2];*/
+
+		// Efficient code
+		// Step 1: Find the median element without fully sorting
+	    int midIndex = MedianFilterFactor / 2;
+	    std::nth_element(ArrayHolderAux, ArrayHolderAux + midIndex, ArrayHolderAux + MedianFilterFactor);
+
+	    // Step 2: Return the median
+	    return ArrayHolderAux[midIndex];
 	}
 }
 
