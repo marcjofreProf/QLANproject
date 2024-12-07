@@ -152,7 +152,7 @@ private: //Variables/Instances
 	// Filtering qubits
 	bool ApplyRawQubitFilteringFlag=true;// Variable to select or unselect the filtering of raw qubits thorugh LinearRegressionQuBitFilter function
 	long long int FilteringAcceptWindowSize=250; // Equivalent to around 3 times the time jitter
-	double SynchCalcValuesFreqThresh=1e-7; //Threshold value to not apply relative frequency difference
+	double SynchCalcValuesFreqThresh=2e-7; //Threshold value to not apply relative frequency difference
 	bool UseAllTagsForEstimation=true; // When false, use only the first tag (not resilent because it could be a remaining noise tag), when true it uses all tags of the run
 	//int iCenterMassAuxiliarTest=0;
 	//int iNumRunsPerCenterMassAuxiliarTest=0;
