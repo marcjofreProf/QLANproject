@@ -692,14 +692,26 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	//}
 	// The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of half the effective period due to interrupt alignment handling, the effective period, the time since last emission detection, then again MultFactorEffSynchPeriod*SynchTrigPeriod more or less
 	ldTimePointClockTagPRUDiff=static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
-		
+	// There is an intrinsic limitation estimating PRUoffsetDriftErrorAbsAvg, which is impaired by the time jitter of handling the interrupt to check the curren tPRU clock.
+	// At some point, it could be that the PRU clock is more stable than this jitter (even more so if SyncE synchronizaed the clocks).
+	// Then, for the triggering of the signals, it is better to truncate this value to a sub multiple of the SynchTrigPeriod; and let the qubits handle the time offset synchronization from this point onwards
+	// The qubits continuously correct for the time offset difference due to the QPLA function (SmallDriftContinuousCorrection) that after each masurements send to the sender the correction estimated to the time offfseet
+	// With godd enough hardware clocks, the jitter is limited by the BBB kernel determinisms, in the order of 5us. With hundreds of averaging it is reduced this jitter around 10 times (since it scales as sqrt(NumberAveraging))
+	// Therefore, the truncation could be a submultiple of SynchTrigPeriod which is slightly larger than the averaged interrupt jitter (around 500ns, which in PRU units would be 100)
+	// Better to be a number multiple of power of 2 and larger than this minim jitter PRU value
+	if (PRUoffsetDriftErrorAbsAvg<0.0){
+		truncatedPRUoffsetDriftErrorAbsAvg=round(PRUoffsetDriftErrorAbsAvg/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
+	}
+	else{
+		truncatedPRUoffsetDriftErrorAbsAvg=-round(-PRUoffsetDriftErrorAbsAvg/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
+	}
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
-			PRUoffFreqTotalAux=static_cast<long double>(PRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
+			PRUoffFreqTotalAux=static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
 			break;
 		}
 		case 2:{// Time correction
-			PRUoffFreqTotalAux=static_cast<long double>(PRUoffsetDriftErrorAbsAvg);
+			PRUoffFreqTotalAux=static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg);
 			break;
 		}
 		case 1:{ // Frequency correction
@@ -863,14 +875,26 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//}
 	// The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of half the effective period due to interrupt alignment handling, the effective period, the time since last emission detection, then again MultFactorEffSynchPeriod*SynchTrigPeriod more or less
 	ldTimePointClockTagPRUDiff=static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value		
-		
+	// There is an intrinsic limitation estimating PRUoffsetDriftErrorAbsAvg, which is impaired by the time jitter of handling the interrupt to check the curren tPRU clock.
+	// At some point, it could be that the PRU clock is more stable than this jitter (even more so if SyncE synchronizaed the clocks).
+	// Then, for the triggering of the signals, it is better to truncate this value to a sub multiple of the SynchTrigPeriod; and let the qubits handle the time offset synchronization from this point onwards
+	// The qubits continuously correct for the time offset difference due to the QPLA function (SmallDriftContinuousCorrection) that after each masurements send to the sender the correction estimated to the time offfseet
+	// With godd enough hardware clocks, the jitter is limited by the BBB kernel determinisms, in the order of 5us. With hundreds of averaging it is reduced this jitter around 10 times (since it scales as sqrt(NumberAveraging))
+	// Therefore, the truncation could be a submultiple of SynchTrigPeriod which is slightly larger than the averaged interrupt jitter (around 500ns, which in PRU units would be 100)
+	// Better to be a number multiple of power of 2 and larger than this minim jitter PRU value
+	if (PRUoffsetDriftErrorAbsAvg<0.0){
+		truncatedPRUoffsetDriftErrorAbsAvg=round(PRUoffsetDriftErrorAbsAvg/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
+	}
+	else{
+		truncatedPRUoffsetDriftErrorAbsAvg=-round(-PRUoffsetDriftErrorAbsAvg/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
+	}
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
-			PRUoffFreqTotalAux=static_cast<long double>(PRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
+			PRUoffFreqTotalAux=static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
 			break;
 		}
 		case 2:{// Time correction
-			PRUoffFreqTotalAux=static_cast<long double>(PRUoffsetDriftErrorAbsAvg);
+			PRUoffFreqTotalAux=static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg);
 			break;
 		}
 		case 1:{ // Frequency correction
