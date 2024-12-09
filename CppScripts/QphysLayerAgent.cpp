@@ -1203,9 +1203,13 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  
 				  // Median filter the SmallOffsetDriftAux to avoid to much induced artificial jitter
 				  // Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
-				  if (CurrentSpecificLinkAux>-1){
+				  if (CurrentSpecificLinkAux>-1 and SplitEmitReceiverSmallOffsetDriftPerLink>0.0){
 				  	SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=static_cast<long long int>((1.0/SplitEmitReceiverSmallOffsetDriftPerLink)*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]))+SmallOffsetDriftAux;// Just for monitoring purposes
 				  }
+				  else if (CurrentSpecificLinkAux>-1 and SplitEmitReceiverSmallOffsetDriftPerLink==0.0){
+				  		SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
+				  }
+
 				  SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux]=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]++;// Update value
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]=IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux;// Wrap value

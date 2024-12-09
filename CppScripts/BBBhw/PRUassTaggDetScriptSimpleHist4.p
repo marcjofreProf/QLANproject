@@ -7,6 +7,7 @@
 
 #include "PRUassTaggDetScript.hp"
 
+#define LASTSHAREDRAM 4800 //12000/4 // Address of the last posi iton of the shared RAM
 // Length of acquisition:
 #define RECORDS 1964 // readings and it matches in the host c++ script. Not really used because updated from cpp host
 #define EXITCOUNTER 0x000FFFFF // almost 10 seconds (since there are many default instructions for each iteration). Very important to be short enough (given the rate of timetags) so that the host code does not try to read the stored timetags before this script finishing (otherwise halting issues)
@@ -280,6 +281,9 @@ FINISH:
 	// Faster Concatenated Checks writting	
 	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	////////////////////////////////////////	
+	// Indicate number of captures left
+	MOV		r0, LASTSHAREDRAM // Load the address of the last position to indicate measurements left
+	SBCO 	r4, CONST_PRUSHAREDRAM, r0, 4
 	// STOP DWT_CYCNT
 	LBBO	r2.b0, r12, 0, 1 // r2 maps b0 control register
 	CLR		r2.t3
