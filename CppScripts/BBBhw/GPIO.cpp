@@ -53,7 +53,7 @@ Script for PRU real-time handling
 #define OFFSET_DDR 0x00001000
 #define SHAREDRAM 0x00010000 // Already initiated at this position with LOCAL_DDMinit
 #define OFFSET_SHAREDRAM 0x00000000 //Global Memory Map (from the perspective of the host) equivalent with 0x00002000
-#define LAST_SHAREDRAMPOS AM33XX_PRUSS_SHAREDRAM_SIZE/4 //Num address postion to the last one
+#define LAST_SHAREDRAMPOS 4796 // (AM33XX_PRUSS_SHAREDRAM_SIZE)/4-4 //Num address postion to the last one
 #define PRU0_DATARAM 0x00000000 //Global Memory Map (from the perspective of the host)// Already initiated at this position with LOCAL_DDMinit
 #define PRU1_DATARAM 0x00002000 //Global Memory Map (from the perspective of the host)// Already initiated at this position with LOCAL_DDMinit
 #define DATARAMoffset 0x00000200 // Offset from Base OWN_RAM to avoid collision with some data. // Already initiated at this position with LOCAL_DDMinit

@@ -7,7 +7,7 @@
 
 #include "PRUassTaggDetScript.hp"
 
-#define LASTSHAREDRAM 4800 //12000/4 // Address of the last posi iton of the shared RAM
+#define LASTSHAREDRAM 4796 //12000/4-4 // Address of the last posi iton of the shared RAM
 // Length of acquisition:
 #define RECORDS 1964 // readings and it matches in the host c++ script. Not really used because updated from cpp host
 #define EXITCOUNTER 0x000FFFFF // almost 10 seconds (since there are many default instructions for each iteration). Very important to be short enough (given the rate of timetags) so that the host code does not try to read the stored timetags before this script finishing (otherwise halting issues)
