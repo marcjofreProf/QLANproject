@@ -1155,7 +1155,7 @@ extendedCounterPRUholder=1;// Re-initialize at each run. 1 so that at least the 
 extendedCounterPRUholderOld=0;// Re-initialize at each run
 int TotalCurrentNumRecordsOld=TotalCurrentNumRecords;
 int PendingNumQuBitsPerRun=static_cast<int>(sharedMem_int[OFFSET_SHAREDRAM+LAST_SHAREDRAMPOS]);
-cout << "GPIO::DDRdumpdata NumQuBitsPerRun-PendingNumQuBitsPerRun: " << (NumQuBitsPerRun-PendingNumQuBitsPerRun) << endl;
+//cout << "GPIO::DDRdumpdata NumQuBitsPerRun-PendingNumQuBitsPerRun: " << (NumQuBitsPerRun-PendingNumQuBitsPerRun) << endl;
 while (CurrentiIterDumpAux<NumQuBitsPerRun and extendedCounterPRUholder>extendedCounterPRUholderOld and (NumQuBitsPerRun-PendingNumQuBitsPerRun)>CurrentiIterDump){// Do it until a timetagg is smaller in value than the previous one, because it means that it could not achieve to capture NumQuBitsPerRun
 	extendedCounterPRUholderOld=extendedCounterPRUholder;
 	// When unsigned short
