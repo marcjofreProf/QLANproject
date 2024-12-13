@@ -27,7 +27,7 @@ Header declaration file for Quantum physical Layer Agent
 #define NumCalcCenterMass 1 // 1 // 3 // Number of centers of mass to measure to compute the synchronization. // With 3, it also computes hardware calibration of the detunnings
 #define NumRunsPerCenterMass 6 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
-#define NumSmallOffsetDriftAux 5 // Length of samples to filter the small time offset continuous correction
+#define NumSmallOffsetDriftAux 51 // Length of samples to filter the small time offset continuous correction
 // String operations
 #include<string>
 #include<fstream>
@@ -53,7 +53,7 @@ namespace nsQphysLayerAgent {
 private: //Variables/Instances	
 	int NumberRepetitionsSignal=32768;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	int NumQuBitsPerRun=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)	
-	long long int CoincidenceWindowPRU=250;//Size of the coincidence window for evaluating coincidences in PRU time, reñated to jitter and the fact that there are inter corrections for each quad channel
+	long long int CoincidenceWindowPRU=150;//Size of the coincidence window for evaluating coincidences in PRU time, related to jitter and the fact that there are inter corrections for each quad channel
 	int numberLinks=0;// Number of full duplex links directly connected to this physical quantum node
 	unsigned long long int RawLastTimeTaggRef[1]={0}; // Timetaggs of the start of the detection in units of Time (not PRU time)
 	unsigned long long int RawTimeTaggs[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections raw
@@ -143,7 +143,7 @@ private: //Variables/Instances
 	long long int SmallOffsetDriftAuxArray[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)][NumSmallOffsetDriftAux]={0}; // Array to filter the SmallOffsetDriftAux
 	int IterSmallOffsetDriftAuxArray[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Array storing the index of the new value
 	// the following arrays are initialized to zero in the Agent creator
-	double SplitEmitReceiverSmallOffsetDriftPerLink=0.05; // Splitting ratio between the effort of the emitter and receiver of constantly updateing the synch values
+	double SplitEmitReceiverSmallOffsetDriftPerLink=0.01; // Splitting ratio between the effort of the emitter and receiver of constantly updateing the synch values
 	long long int SmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
 	long long int oldSmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Old valuesIdentified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
 	long long int ReferencePointSmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
@@ -151,7 +151,7 @@ private: //Variables/Instances
 	bool NonInitialReferencePointSmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={false}; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
 	// Filtering qubits
 	bool ApplyRawQubitFilteringFlag=true;// Variable to select or unselect the filtering of raw qubits thorugh LinearRegressionQuBitFilter function
-	long long int FilteringAcceptWindowSize=250; // Equivalent to around 3 times the time jitter
+	long long int FilteringAcceptWindowSize=250; // Equivalent to around 3 times the time jitter. In PRU time
 	double SynchCalcValuesFreqThresh=5e-7; //Threshold value to not apply relative frequency difference
 	bool UseAllTagsForEstimation=true; // When false, use only the first tag (not resilent because it could be a remaining noise tag), when true it uses all tags of the run
 	//int iCenterMassAuxiliarTest=0;
