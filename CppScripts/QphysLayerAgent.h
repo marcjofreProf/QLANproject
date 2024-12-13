@@ -27,7 +27,7 @@ Header declaration file for Quantum physical Layer Agent
 #define NumCalcCenterMass 1 // 1 // 3 // Number of centers of mass to measure to compute the synchronization. // With 3, it also computes hardware calibration of the detunnings
 #define NumRunsPerCenterMass 6 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
-#define NumSmallOffsetDriftAux 51 // Length of samples to filter the small time offset continuous correction
+#define NumSmallOffsetDriftAux 15 // Length of samples to filter the small time offset continuous correction
 // String operations
 #include<string>
 #include<fstream>
