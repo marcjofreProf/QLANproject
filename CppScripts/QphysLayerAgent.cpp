@@ -750,7 +750,7 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 		//cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
 		this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 	}
-	//cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
+	cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
 	//this->acquire(); // important not to do it
 	
 	//this->release(); // Important not to do it
