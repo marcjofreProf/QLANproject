@@ -1271,6 +1271,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 			TotalCurrentNumRecordsQuadChOld[iQuadChIter]=TotalCurrentNumRecordsQuadCh[iQuadChIter];
 		}
 	}
+	// The separate the raw timetagging detectin for each quad channel (since it quad channel will have to correct for a different relative frequency difference)
 	for (int i=0;i<CurrentiIterDump;i++){
 		for (unsigned short iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 			if ((ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter)))>0){  
