@@ -145,7 +145,7 @@ private: //Variables/Instances
 	long long int SmallOffsetDriftAuxArray[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)][NumSmallOffsetDriftAux]={0}; // Array to filter the SmallOffsetDriftAux
 	int IterSmallOffsetDriftAuxArray[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Array storing the index of the new value
 	// the following arrays are initialized to zero in the Agent creator. PID system develop
-	bool ApplyPIDOffsetContinuousCorrection=true; // Correct at the transmitter the instantaneous offset retrieved
+	bool ApplyPIDOffsetContinuousCorrection=false; // Correct at the transmitter the instantaneous offset retrieved
 	double SplitEmitReceiverSmallOffsetDriftPerLink=1.0; // This is the proportional factor. Splitting ratio between the effort of the emitter and receiver of constantly updateing the synch values. The closer to 0 the more aggresive
 	double SplitEmitReceiverSmallOffsetDriftPerLinkP=1.0; // Proportional values for th ePID
 	double SplitEmitReceiverSmallOffsetDriftPerLinkI=0.0; // Integral values for th ePID
