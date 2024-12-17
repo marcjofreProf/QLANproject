@@ -765,7 +765,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	}
 	// Prepare the overall correction for PRU loops (so divide by 2)
 	PRUoffFreqTotalAux=(static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)+PRUoffFreqTotalAux)/2.0;
-	if (PRUoffFreqTotalAux<=0.0){PRUoffFreqTotalAux=1.0;}
+	if (PRUoffFreqTotalAux<=0.0){PRUoffFreqTotalAux=1.0;}// To avoid having PRU stall
 
 	pru0dataMem_int[3]=static_cast<unsigned int>(PRUoffFreqTotalAux);
 

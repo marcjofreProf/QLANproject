@@ -82,7 +82,7 @@ private:// Variables
 	double PRUoffsetDriftErrorAbsArray[ExtraNumSynchMeasAvgAux]={0};
 	double PRUoffsetDriftErrorAbsAvg=0.0;
 	double truncatedPRUoffsetDriftErrorAbsAvg=0.0;
-	double truncatedSynchTrigPeriod=512.0; // Multiple of power of 2, and related to the averaged interrupt jitter (in PRU units).
+	double truncatedSynchTrigPeriod=1024.0; // Multiple of power of 2, and related to the averaged interrupt jitter (in PRU units). Since otherwise it adds noise. The larger with respect the averaged jitter (of measuring the curren tPRU counter) the more offset residual error that the QPLA PID will have to correct for
 	long double PRUoffsetDriftErrorAbsAvgOld=0.0;
 	// Others
 	double PRUoffsetDriftErrorIntegral=0;
