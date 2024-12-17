@@ -332,7 +332,7 @@ struct timespec GPIO::SetWhileWait(){
 
 int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 	try{
-	this->setMaxRrPriority(PriorityValRegular);// For rapidly handling interrupts, for the main instance and the periodic thread. It stalls operation RealTime Kernel (commented, then)
+	this->setMaxRrPriority(PriorityValTop);// For rapidly handling interrupts, for the main instance and the periodic thread. It stalls operation RealTime Kernel (commented, then)
 	this->TimePointClockCurrentSynchPRU1future=Clock::now();// First time
 	//SynchRem=static_cast<int>((static_cast<long double>(iepPRUtimerRange32bits)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(TimePointClockCurrentSynchPRU1future.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(iepPRUtimerRange32bits)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 	//this->TimePointClockCurrentSynchPRU1future=this->TimePointClockCurrentSynchPRU1future+std::chrono::nanoseconds(SynchRem);
@@ -370,8 +370,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				
 				pru1dataMem_int[3]=static_cast<unsigned int>(this->NextSynchPRUcorrection);// apply correction.
 				pru1dataMem_int[0]=static_cast<unsigned int>(this->NextSynchPRUcommand); // apply command
-				// Set top priority
-				this->setMaxRrPriority(PriorityValTop);
+				// Not a good strategy to keep changing the priority since ther kernel scheduler is not capable to adapt ot it.
+				//this->setMaxRrPriority(PriorityValTop);// Set top priority
 				// There is a big variation if the waiting function to launch the measurement is not properly done (with the appropiate tools)
 				// sleep_for seems to operate more stable although it adds a long overhead time, compared to while()
 				// sleep_for takes longer in average maybe because it has to re-load all the context and so forth after each sleep...
@@ -387,10 +387,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				// Probably by measuring the time of more relevant functions (generation of interrupt; and reception from PRU of its interrupt, it does a better job of estimating the real thing)
 				prussdrv_pru_send_event(22);
 				//this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
-				//this->setMaxRrPriority(PriorityValRegular);
+				// Not a good strategy to keep changing the priority since ther kernel scheduler is not capable to adapt ot it.
+				//this->setMaxRrPriority(PriorityValRegular); // Set regular priority
 				retInterruptsPRU1=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_1,WaitTimeInterruptPRUShort);// timeout is sufficiently large because it it adjusted when generating signals, not synch whiis very fast (just reset the timer)										
 				this->TimePointClockSendCommandFinal=Clock::now(); // Final measurement.
-				this->setMaxRrPriority(PriorityValRegular);
+				// Not a good strategy to keep changing the priority since ther kernel scheduler is not capable to adapt ot it.
+				//this->setMaxRrPriority(PriorityValRegular);// Set regular priority
 				//cout << "PRUsignalTimerSynch: retInterruptsPRU1: " << retInterruptsPRU1 << endl;
 				if (retInterruptsPRU1>0){
 					prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);// So it has time to clear the interrupt for the later iterations
@@ -595,7 +597,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		}
 		
 		// Information
-		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(512*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
+		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(1*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
 			////cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			////cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "GPIO::Information about synchronization:" << endl;
@@ -1287,6 +1289,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 		//cout << "GPIO::PRUdetCorrRelFreq iQuadChIter: " << iQuadChIter << endl;
 		//cout << "GPIO::PRUdetCorrRelFreq TotalCurrentNumRecordsQuadChNewOldAux: " << TotalCurrentNumRecordsQuadChNewOldAux << endl;
 		if (TotalCurrentNumRecordsQuadChNewOldAux>=TagsSeparationDetRelFreq){
+			// Good strategy to substrat the system absolute time which is multiple to the effective period, since we want to see the deviation with respect this reference values
     		unsigned long long int ULLIInitialTimeTaggs=TimeTaggsLast;//TimeTaggs[iQuadChIter][0];// Normalize to the first reference timetag (it is not a detect qubit, but the timetagg of entering the timetagg PRU), which is a strong reference
     		long long int LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggsLast);//static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
     		//cout << "GPIO::LastTimeTaggRef[0]: " << LastTimeTaggRef[0] << endl;

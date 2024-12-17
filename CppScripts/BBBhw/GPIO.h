@@ -37,7 +37,7 @@ using std::fstream;
 // Num averages below is critical not to get system stall (since performing median averagins is very resource consuming)
 #define NumSynchMeasAvgAux 	191 //351; // Num averages to compute the relative frequency difference. Better to be odd number.
 #define ExtraNumSynchMeasAvgAux 	191 // 351 // Averaging for computing current absolute time offset
-#define ExtraExtraNumSynchMeasAvgAux 	111 // Averaging for computing current relative frequency diference
+#define ExtraExtraNumSynchMeasAvgAux 	151 // Averaging for computing current relative frequency diference
 
 namespace exploringBB {
 
@@ -277,7 +277,7 @@ private:// Variables
 	bool QPLAFlagTestSynch=false;
 	bool GPIOFlagRelFreqTest=false; // To deactive slope correction of the emitter, for testing purpouses
 	// Correct Qubits relative frequency difference due to the sender
-	int TagsSeparationDetRelFreq=10; // Number of index separation to compute the slope of disadjustment in order to have accuraccy
+	int TagsSeparationDetRelFreq=4*10; // Number of index separation to compute the slope of disadjustment in order to have accuraccy. Times 4 to account the possibility that all tags arrive to the same detector
 	double SlopeDetTagsAuxArray[MaxNumQuBitsMemStored]={0.0}; // Array in order to do the computations
 	// Information and status
 	bool HardwareSynchStatus=false; // Turn to true when hardware synchronized with the PRU clock
