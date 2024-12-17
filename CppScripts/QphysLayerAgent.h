@@ -131,6 +131,7 @@ private: //Variables/Instances
 	double FreqSynchNormValuesArray[NumCalcCenterMass]={0.0};//,-0.25,0.25}; // Updated from QPTLH agent. Normalized values of frequency testing which are applied for calibration
 	double SynchNetAdj[2*((1LL<<LinkNumberMAX)-1)]={1.0};
 	double SynchNetworkParamsLink[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send. Zerod at the begining
+	double originalSynchNetworkParamsLink[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send. Zerod at the begining
 	int QuadChannelParamsLink[LinkNumberMAX]={0};// Identifies the independently associated quad cahnnel number
 	double SynchNetworkParamsLinkOther[LinkNumberMAX][3]={0.0}; // Stores the synchronizatoin parameters corrections to apply depending on the node to whom receive or send from the other nodes. Zeroed at the begining
 	double CurrentSynchNetworkParamsLink[3]={0.0}; //Stores currently the network synch values of interest given the link in use for reception
@@ -144,10 +145,13 @@ private: //Variables/Instances
 	long long int SmallOffsetDriftAuxArray[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)][NumSmallOffsetDriftAux]={0}; // Array to filter the SmallOffsetDriftAux
 	int IterSmallOffsetDriftAuxArray[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Array storing the index of the new value
 	// the following arrays are initialized to zero in the Agent creator. PID system develop
-	double SplitEmitReceiverSmallOffsetDriftPerLink=0.1; // This is the proportional factor. Splitting ratio between the effort of the emitter and receiver of constantly updateing the synch values. The closer to 1 the more aggresive
+	bool ApplyPIDOffsetContinuousCorrection=false; // Correct at the transmitter the instantaneous offset retrieved
+	double SplitEmitReceiverSmallOffsetDriftPerLink=0.9; // This is the proportional factor. Splitting ratio between the effort of the emitter and receiver of constantly updateing the synch values. The closer to 0 the more aggresive
+	double SplitEmitReceiverSmallOffsetDriftPerLinkP=0.1; // Proportional values for th ePID
 	double SplitEmitReceiverSmallOffsetDriftPerLinkI=0.001; // Integral values for th ePID
 	double SplitEmitReceiverSmallOffsetDriftPerLinkD=0.01; // Derivative value for the PID
 	long long int SmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
+	long long int SmallOffsetDriftPerLinkError[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Integral value of PID. Idnetified each link and the accumulated error for the PID
 	long long int oldSmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Old valuesIdentified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
 	long long int ReferencePointSmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
 	// Filtering qubits

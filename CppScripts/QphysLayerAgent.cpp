@@ -65,6 +65,7 @@ QPLA::QPLA() {// Constructor
 	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		for (int i=0;i<CombinationLinksNumAux;i++){
 		  SmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
+		  SmallOffsetDriftPerLinkError[iQuadChIter][i]=0.0; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
 		  oldSmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Old Values, Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
 		  ReferencePointSmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
 		  // Filtering qubits
@@ -1172,7 +1173,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 						else{
 							SmallOffsetDriftAux=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
 						}
-						cout << "QPLA::Using only first timetag for small offset correction!...to be deactivated" << endl;
+						cout << "QPLA::SmallDriftContinuousCorrection Using only first timetag for small offset correction!...to be deactivated" << endl;
 					}
 
 				  //cout << "QPLA::Applying SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;
@@ -1203,28 +1204,33 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  
 				  // Median filter the SmallOffsetDriftAux to avoid to much induced artificial jitter
 				  // Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
-				  if (CurrentSpecificLinkAux>-1 and SplitEmitReceiverSmallOffsetDriftPerLink>0.0){
-				  	SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=static_cast<long long int>((1.0/SplitEmitReceiverSmallOffsetDriftPerLink)*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]))+SmallOffsetDriftAux;// Just for monitoring purposes
-				  }
-				  else if (CurrentSpecificLinkAux>-1 and SplitEmitReceiverSmallOffsetDriftPerLink==0.0){
-				  		SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
-				  }
-				  // Implement PID
+				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+SmallOffsetDriftAux;
+				  
+				  
 				  SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux]=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]++;// Update value
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]=IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux;// Wrap value
 				  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Median filter				  
 				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SmallOffsetDriftAux;// Update value
+
+				  // Implement PID
+				  SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]; // Integral value of the PID
+
 				  // Update information to the other node about synch parameters				  
-				  if (CurrentSpecificLinkAux>-1){		
-						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=SynchNetworkParamsLink[CurrentSpecificLinkAux][0]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]);// Offset difference		
-						oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
+				  if (CurrentSpecificLinkAux>-1 && ApplyPIDOffsetContinuousCorrection==true){
+				  	// Implement PID
+						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*(SplitEmitReceiverSmallOffsetDriftPerLinkP*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])+SplitEmitReceiverSmallOffsetDriftPerLinkI*static_cast<double>(SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])+SplitEmitReceiverSmallOffsetDriftPerLinkD*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]));// Offset difference
 						//SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 						//SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 						//SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
+						oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=static_cast<long long int>((SplitEmitReceiverSmallOffsetDriftPerLinkP*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])+SplitEmitReceiverSmallOffsetDriftPerLinkI*static_cast<double>(SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])+SplitEmitReceiverSmallOffsetDriftPerLinkD*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])));
 						// Split the effor between sender and receiver for constantly correcting the synch parameters
-						SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=static_cast<long long int>(SplitEmitReceiverSmallOffsetDriftPerLink*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]));
+						SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=static_cast<long long int>(SplitEmitReceiverSmallOffsetDriftPerLink*(SplitEmitReceiverSmallOffsetDriftPerLinkP*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])+SplitEmitReceiverSmallOffsetDriftPerLinkI*static_cast<double>(SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])+SplitEmitReceiverSmallOffsetDriftPerLinkD*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])));
 					}
+					else{
+						cout << "QPLA::SmallDriftContinuousCorrection not implementing continuous re-offset PID...it should be activated..." << endl;
+						oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
+						}
 					long long int SignAuxInstantCorr=0;
 				  if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]>0){SignAuxInstantCorr=1;}
 				  else if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]<0){SignAuxInstantCorr=-1;}
@@ -1679,6 +1685,9 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		SynchNetworkParamsLink[CurrentSpecificLink][0]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][0]+SynchCalcValuesArray[1];// Offset difference		
 		SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 		SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
+		originalSynchNetworkParamsLink[CurrentSpecificLink][0]=SynchNetworkParamsLink[CurrentSpecificLink][0];
+		originalSynchNetworkParamsLink[CurrentSpecificLink][1]=SynchNetworkParamsLink[CurrentSpecificLink][1];
+		originalSynchNetworkParamsLink[CurrentSpecificLink][2]=SynchNetworkParamsLink[CurrentSpecificLink][2];
 		SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;		
 		this->SetSynchParamsOtherNode(); // Tell the synchronization information to the other nodes		
 	}
