@@ -1232,7 +1232,7 @@ if(valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts th
 //cout << "GPIO::DDRdumpdata::NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
 ///////////////////////////////////////////////
 
-// Correct the detected qubits relative frequency difference (due to the sender node) and split between quad groups of 4 channels
+// Correct the detected qubits relative frequency difference (due to the sender node) and split between quad groups of 4 channels. Computed at each iteration so that the time span is not too large
 PRUdetCorrRelFreq(iIterRunsAux,CurrentiIterDump);
 
 if (SlowMemoryPermanentStorageFlag==true){ // We save into file the relative frequency corrected info (so it might be time disorded for different QuadNumChGroups)
@@ -1506,12 +1506,17 @@ int GPIO::IntMedianFilterSubArray(int* ArrayHolderAux,int MedianFilterFactor){
 		return temp[MedianFilterFactor/2];*/
 
 		// Efficient code
+		// Step 0. Copy the array otherwise the original is modified!
+		int ArrayHolderAuxTemp[MedianFilterFactor];
+		for(int i = 0; i < MedianFilterFactor; i++) {
+			ArrayHolderAuxTemp[i] = ArrayHolderAux[i];
+		}
 		// Step 1: Find the median element without fully sorting
 	    int midIndex = MedianFilterFactor / 2;
-	    std::nth_element(ArrayHolderAux, ArrayHolderAux + midIndex, ArrayHolderAux + MedianFilterFactor);
+	    std::nth_element(ArrayHolderAuxTemp, ArrayHolderAuxTemp + midIndex, ArrayHolderAuxTemp + MedianFilterFactor);
 
 	    // Step 2: Return the median
-	    return ArrayHolderAux[midIndex];
+	    return ArrayHolderAuxTemp[midIndex];
 	}
 }
 
@@ -1563,12 +1568,17 @@ long double GPIO::LongDoubleMedianFilterSubArray(long double* ArrayHolderAux,int
 		return temp[MedianFilterFactor/2];*/
 
 		// Efficient code
+		// Step 0. Copy the array otherwise the original is modified!
+		long double ArrayHolderAuxTemp[MedianFilterFactor];
+		for(int i = 0; i < MedianFilterFactor; i++) {
+			ArrayHolderAuxTemp[i] = ArrayHolderAux[i];
+		}
 		// Step 1: Find the median element without fully sorting
 	    int midIndex = MedianFilterFactor / 2;
-	    std::nth_element(ArrayHolderAux, ArrayHolderAux + midIndex, ArrayHolderAux + MedianFilterFactor);
+	    std::nth_element(ArrayHolderAuxTemp, ArrayHolderAuxTemp + midIndex, ArrayHolderAuxTemp + MedianFilterFactor);
 
 	    // Step 2: Return the median
-	    return ArrayHolderAux[midIndex];
+	    return ArrayHolderAuxTemp[midIndex];
 	}
 }
 
@@ -1589,12 +1599,17 @@ double GPIO::DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterF
 		return temp[MedianFilterFactor/2];*/
 
 		// Efficient code
+		// Step 0. Copy the array otherwise the original is modified!
+		double ArrayHolderAuxTemp[MedianFilterFactor];
+		for(int i = 0; i < MedianFilterFactor; i++) {
+			ArrayHolderAuxTemp[i] = ArrayHolderAux[i];
+		}
 		// Step 1: Find the median element without fully sorting
 	    int midIndex = MedianFilterFactor / 2;
-	    std::nth_element(ArrayHolderAux, ArrayHolderAux + midIndex, ArrayHolderAux + MedianFilterFactor);
+	    std::nth_element(ArrayHolderAuxTemp, ArrayHolderAuxTemp + midIndex, ArrayHolderAuxTemp + MedianFilterFactor);
 
 	    // Step 2: Return the median
-	    return ArrayHolderAux[midIndex];
+	    return ArrayHolderAuxTemp[midIndex];
 	}
 }
 

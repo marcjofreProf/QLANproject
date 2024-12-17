@@ -1909,12 +1909,16 @@ void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
   		return temp[MedianFilterFactor/2];*/
 
   		// Efficient code
+  		int ArrayHolderAuxTemp[MedianFilterFactor];
+			for(int i = 0; i < MedianFilterFactor; i++) {
+				ArrayHolderAuxTemp[i] = ArrayHolderAux[i];
+			}
 			// Step 1: Find the median element without fully sorting
 	    int midIndex = MedianFilterFactor / 2;
-	    std::nth_element(ArrayHolderAux, ArrayHolderAux + midIndex, ArrayHolderAux + MedianFilterFactor);
+	    std::nth_element(ArrayHolderAuxTemp, ArrayHolderAuxTemp + midIndex, ArrayHolderAuxTemp + MedianFilterFactor);
 
 	    // Step 2: Return the median
-	    return ArrayHolderAux[midIndex];
+	    return ArrayHolderAuxTemp[midIndex];
   	}
   }
 
@@ -1967,12 +1971,16 @@ void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
 	  	return temp[MedianFilterFactor/2];*/
 
 	  	// Efficient code
+	  	unsigned long long int ArrayHolderAuxTemp[MedianFilterFactor];
+			for(int i = 0; i < MedianFilterFactor; i++) {
+				ArrayHolderAuxTemp[i] = ArrayHolderAux[i];
+			}
 			// Step 1: Find the median element without fully sorting
 	    int midIndex = MedianFilterFactor / 2;
-	    std::nth_element(ArrayHolderAux, ArrayHolderAux + midIndex, ArrayHolderAux + MedianFilterFactor);
+	    std::nth_element(ArrayHolderAuxTemp, ArrayHolderAuxTemp + midIndex, ArrayHolderAuxTemp + MedianFilterFactor);
 
 	    // Step 2: Return the median
-	    return ArrayHolderAux[midIndex];
+	    return ArrayHolderAuxTemp[midIndex];
   	}
   }
 
@@ -2009,12 +2017,16 @@ void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
   		return temp[MedianFilterFactor/2];*/
 
   		// Efficient code
+  		long long int ArrayHolderAuxTemp[MedianFilterFactor];
+			for(int i = 0; i < MedianFilterFactor; i++) {
+				ArrayHolderAuxTemp[i] = ArrayHolderAux[i];
+			}
 			// Step 1: Find the median element without fully sorting
 	    int midIndex = MedianFilterFactor / 2;
-	    std::nth_element(ArrayHolderAux, ArrayHolderAux + midIndex, ArrayHolderAux + MedianFilterFactor);
+	    std::nth_element(ArrayHolderAuxTemp, ArrayHolderAuxTemp + midIndex, ArrayHolderAuxTemp + MedianFilterFactor);
 
 	    // Step 2: Return the median
-	    return ArrayHolderAux[midIndex];
+	    return ArrayHolderAuxTemp[midIndex];
   	}
   }
 

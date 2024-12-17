@@ -37,7 +37,7 @@ using std::fstream;
 // Num averages below is critical not to get system stall (since performing median averagins is very resource consuming)
 #define NumSynchMeasAvgAux 	191 //351; // Num averages to compute the relative frequency difference. Better to be odd number.
 #define ExtraNumSynchMeasAvgAux 	191 // 351 // Averaging for computing current absolute time offset
-#define ExtraExtraNumSynchMeasAvgAux 	151 // Averaging for computing current relative frequency diference
+#define ExtraExtraNumSynchMeasAvgAux 	131 // Averaging for computing current relative frequency diference
 
 namespace exploringBB {
 
@@ -75,7 +75,7 @@ private:// Variables
 	long double PRUoffsetDriftError=0;
 	long double PRUoffsetDriftErrorArray[ExtraExtraNumSynchMeasAvgAux]={0};
 	long double PRUoffsetDriftErrorAvg=0.0;
-	long double PRUoffsetDriftErrorAvgThresh=1e-8; //Threshold value to not apply relative frequency difference
+	long double PRUoffsetDriftErrorAvgThresh=2e-8; //Threshold value to not apply relative frequency difference
 	double AccumulatedErrorDriftThresh=1e-7; //Threshold value to not apply relative frequency difference
 	// Absolute corrected error
 	double PRUoffsetDriftErrorAbs=0;
