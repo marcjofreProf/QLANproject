@@ -750,7 +750,7 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 		//cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
 		this->SetSendParametersAgent(ParamsCharArray);// Send parameter to the other nodes
 	}
-	//cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
+	cout << "QPLA::SetSynchParamsOtherNode ParamsCharArray: " << ParamsCharArray << endl;
 	//this->acquire(); // important not to do it
 	
 	//this->release(); // Important not to do it
@@ -1209,7 +1209,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  else if (CurrentSpecificLinkAux>-1 and SplitEmitReceiverSmallOffsetDriftPerLink==0.0){
 				  		SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 				  }
-
+				  // Implement PID
 				  SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux]=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]++;// Update value
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]=IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux;// Wrap value
@@ -1231,7 +1231,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  else {SignAuxInstantCorr=0;}
 				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SignAuxInstantCorr*(abs(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux);
 				  //SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
-				}// end if				
+				}// end if				 
 			}// end for			
 			// Send the updated values to the respective nodes
 			if (CurrentSpecificLinkMultiple>-1){
