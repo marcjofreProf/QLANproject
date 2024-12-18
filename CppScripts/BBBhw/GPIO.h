@@ -195,7 +195,7 @@ private:// Variables
 	int WaitTimeInterruptPRUShort=25000; // For the continuous periodic synchronization. VEry important to achieve good stability and accuracy.
 	// PRU timetagger
 	int retInterruptsPRU0;
-	int WaitTimeInterruptPRU0=25000000; //up to 20000000 with Simple TTG. In microseconds. Important to be larger than the exit counter (equivalent time) to not produce memory collisions when attemping to read with DDRdump)...
+	int WaitTimeInterruptPRU0=7500000; //up to 20000000 with Simple TTG. In microseconds. Important to be larger than the exit counter (equivalent time) to not produce memory collisions when attemping to read with DDRdump)...
 	//TimePoint TimePointClockNowPRU0;
 	//unsigned long long int TimeNow_time_as_countPRU0;	
 	//TimePoint FutureTimePointPRU0;
