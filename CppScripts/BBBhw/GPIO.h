@@ -85,7 +85,7 @@ private:// Variables
 	double SynchTrigPeriod=4096.0; //For slotted analysis. It has to match to the histogram analysis
 	// The below number, the smaller the more fine grain so it will react faster to hardware PRU counter changes (so faster) but probably more jitter
 	// The longer (way more than the averaged jtter) it will have less jittter provided that the IEP counter is stable enough so that the absolute offset error is PID corrected with the QPLA
-	double truncatedSynchTrigPeriod=SynchTrigPeriod/4.0; // Multiple of power of 2, and related to the averaged interrupt jitter (in PRU units). Since otherwise it adds noise. The larger with respect the averaged jitter (of measuring the curren tPRU counter) the more offset residual error that the QPLA PID will have to correct for
+	double truncatedSynchTrigPeriod=SynchTrigPeriod/8.0; // Multiple of power of 2, and related to the averaged interrupt jitter (in PRU units). Since otherwise it adds noise. The larger with respect the averaged jitter (of measuring the curren tPRU counter) the more offset residual error that the QPLA PID will have to correct for
 	long double PRUoffsetDriftErrorAbsAvgOld=0.0;
 	// Others
 	double PRUoffsetDriftErrorIntegral=0;
