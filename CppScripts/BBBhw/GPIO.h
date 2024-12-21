@@ -84,6 +84,7 @@ private:// Variables
 	double truncatedPRUoffsetDriftErrorAbsAvg=0.0;
 	double truncatedPRUoffsetDriftErrorAbsAvgOld=0.0;
 	double PRUoffsetDriftErrorAbsAvgOldTruncated=0.0;
+	double GuardPeriod=4096.0; // Time period in PRU units fo guard time. The guard time is limitted by the interrupt handling jitter.
 	double SynchTrigPeriod=4096.0; //For slotted analysis. It has to match to the histogram analysis
 	// The below number, the smaller the more fine grain so it will react faster to hardware PRU counter changes (so faster) but probably more jitter
 	// The longer (way more than the averaged jtter) it will have less jittter provided that the IEP counter is stable enough so that the absolute offset error is PID corrected with the QPLA

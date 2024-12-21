@@ -656,8 +656,14 @@ return 0; // All ok
 int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumQuBitsPerRunAux, double* FineSynchAdjValAux, unsigned long long int QPLAFutureTimePointNumber, bool QPLAFlagTestSynchAux){// Read the detected timestaps in four channels
 /////////////
 	try{
-	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 	this->QPLAFlagTestSynch=QPLAFlagTestSynchAux;
+	SynchTrigPeriod=SynchTrigPeriodAux;// Histogram/Period value
+	NumQuBitsPerRun=NumQuBitsPerRunAux;
+	//valpAuxHolder=valpHolder+4+6*NumQuBitsPerRun;// 6* since each detection also includes the channels (2 Bytes) and 4 bytes for 32 bits counter, and plus 4 since the first tag is captured at the very beggining
+	AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
+	AccumulatedErrorDrift=FineSynchAdjValAux[1]; // Synch trig frequency
+	QuadEmitDetecSelecGPIO=QuadEmitDetecSelecAux;// Update value
+	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint-std::chrono::nanoseconds(static_cast<unsigned long long int>(2.0*MultFactorEffSynchPeriod*SynchTrigPeriod*PRUclockStepPeriodNanoseconds));// Timetagger starts listening 2 periods in advance to avoid interrupt and signals to arrive concurrently at the timetagger
 	requestSemaphoreWhileWait=SemaphoreSetWhileWait();
@@ -666,12 +672,6 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(1*TimePRUcommandDelay);// Crucial to make the link between PRU clock and system clock (already well synchronized). Two memory mapping to PRU
 	SynchRem=static_cast<int>((static_cast<long double>(1.5*MultFactorEffSynchPeriod*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));// For time stamping it waits 1.5
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(SynchRem);
-	SynchTrigPeriod=SynchTrigPeriodAux;// Histogram/Period value
-	NumQuBitsPerRun=NumQuBitsPerRunAux;
-	//valpAuxHolder=valpHolder+4+6*NumQuBitsPerRun;// 6* since each detection also includes the channels (2 Bytes) and 4 bytes for 32 bits counter, and plus 4 since the first tag is captured at the very beggining
-	AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
-	AccumulatedErrorDrift=FineSynchAdjValAux[1]; // Synch trig frequency
-	QuadEmitDetecSelecGPIO=QuadEmitDetecSelecAux;// Update value
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestSemaphoreWhileWait,NULL); // Synch barrier. so the time within acquired semaphore is not so large
 	//while (this->ManualSemaphoreExtra);// Wait until periodic synch method finishes
 	while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
@@ -846,8 +846,13 @@ return 0;// all ok
 
 int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAux,unsigned int NumberRepetitionsSignalAux,double* FineSynchAdjValAux,unsigned long long int QPLAFutureTimePointNumber, bool QPLAFlagTestSynchAux){ // Uses output pins to clock subsystems physically generating qubits or entangled qubits
 	try{
-	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 	this->QPLAFlagTestSynch=QPLAFlagTestSynchAux;
+	SynchTrigPeriod=SynchTrigPeriodAux;// Histogram/Period value
+	NumberRepetitionsSignal=static_cast<unsigned int>(NumberRepetitionsSignalAux);// Number of repetitions to send signals
+	AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
+	AccumulatedErrorDrift=FineSynchAdjValAux[1]; // Synch trig frequency
+	QuadEmitDetecSelecGPIO=QuadEmitDetecSelecAux;// Update value
+	std::chrono::nanoseconds duration_back(QPLAFutureTimePointNumber);
 	this->QPLAFutureTimePoint=Clock::time_point(duration_back);
 	requestSemaphoreWhileWait=SemaphoreSetWhileWait();
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(6*TimePRUcommandDelay);// Give some margin so that ReadTimeStamps and coincide in the respective methods of GPIO. Only for th einitial run, since the TimeStaps are run once (to enter the acquire in GPIO). What consumes time is writting to PRU, then times 4 since 4 writings to PRU before sleep in GPIO
@@ -855,11 +860,6 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(1*TimePRUcommandDelay);// Since two memory mapping to PRU memory
 	SynchRem=static_cast<int>((static_cast<long double>(1.5*MultFactorEffSynchPeriod*SynchTrigPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(SynchRem);
-	SynchTrigPeriod=SynchTrigPeriodAux;// Histogram/Period value
-	NumberRepetitionsSignal=static_cast<unsigned int>(NumberRepetitionsSignalAux);// Number of repetitions to send signals
-	AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
-	AccumulatedErrorDrift=FineSynchAdjValAux[1]; // Synch trig frequency
-	QuadEmitDetecSelecGPIO=QuadEmitDetecSelecAux;// Update value
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestSemaphoreWhileWait,NULL); // Synch barrier. so the time within acquired semaphore is not so large
 	while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	this->ManualSemaphoreExtra=true;
