@@ -709,13 +709,14 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	//	truncatedPRUoffsetDriftErrorAbsAvg=round((PRUoffsetDriftErrorAbsAvg)/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
 	//}
 	// Smart version of the truncation - avoid being at the border of transition
-	if ((PRUoffsetDriftErrorAbsAvg-truncatedPRUoffsetDriftErrorAbsAvgOld)<0.0){
-		truncatedPRUoffsetDriftErrorAbsAvg=-round((-(PRUoffsetDriftErrorAbsAvg-truncatedPRUoffsetDriftErrorAbsAvgOld)+truncatedSynchTrigPeriod/2.0)/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
+	if (abs(PRUoffsetDriftErrorAbsAvg-PRUoffsetDriftErrorAbsAvgOldTruncated)>truncatedSynchTrigPeriod){
+		truncatedPRUoffsetDriftErrorAbsAvg=round(PRUoffsetDriftErrorAbsAvg/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
 	}
 	else{
-		truncatedPRUoffsetDriftErrorAbsAvg=round(((PRUoffsetDriftErrorAbsAvg-truncatedPRUoffsetDriftErrorAbsAvgOld)+truncatedSynchTrigPeriod/2.0)/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
+		truncatedPRUoffsetDriftErrorAbsAvg=truncatedPRUoffsetDriftErrorAbsAvgOld;
 	}
-	truncatedPRUoffsetDriftErrorAbsAvgOld=PRUoffsetDriftErrorAbsAvg;// Update value
+	PRUoffsetDriftErrorAbsAvgOldTruncated=PRUoffsetDriftErrorAbsAvg;// Update value
+	truncatedPRUoffsetDriftErrorAbsAvgOld=truncatedPRUoffsetDriftErrorAbsAvg; // Update value
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
 			PRUoffFreqTotalAux=static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
@@ -900,13 +901,15 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//	truncatedPRUoffsetDriftErrorAbsAvg=round((PRUoffsetDriftErrorAbsAvg+truncatedSynchTrigPeriod/2.0)/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
 	//}
 	// Smart version of the truncation - avoid being at the border of transition
-	if ((PRUoffsetDriftErrorAbsAvg-truncatedPRUoffsetDriftErrorAbsAvgOld)<0.0){
-		truncatedPRUoffsetDriftErrorAbsAvg=-round((-(PRUoffsetDriftErrorAbsAvg-truncatedPRUoffsetDriftErrorAbsAvgOld)+truncatedSynchTrigPeriod/2.0)/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
+	// Smart version of the truncation - avoid being at the border of transition
+	if (abs(PRUoffsetDriftErrorAbsAvg-PRUoffsetDriftErrorAbsAvgOldTruncated)>truncatedSynchTrigPeriod){
+		truncatedPRUoffsetDriftErrorAbsAvg=round(PRUoffsetDriftErrorAbsAvg/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
 	}
 	else{
-		truncatedPRUoffsetDriftErrorAbsAvg=round(((PRUoffsetDriftErrorAbsAvg-truncatedPRUoffsetDriftErrorAbsAvgOld)+truncatedSynchTrigPeriod/2.0)/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
+		truncatedPRUoffsetDriftErrorAbsAvg=truncatedPRUoffsetDriftErrorAbsAvgOld;
 	}
-	truncatedPRUoffsetDriftErrorAbsAvgOld=PRUoffsetDriftErrorAbsAvg;// Update value
+	PRUoffsetDriftErrorAbsAvgOldTruncated=PRUoffsetDriftErrorAbsAvg;// Update value
+	truncatedPRUoffsetDriftErrorAbsAvgOld=truncatedPRUoffsetDriftErrorAbsAvg; // Update value
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
 			PRUoffFreqTotalAux=static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
