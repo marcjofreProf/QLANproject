@@ -134,8 +134,10 @@ private:// Variables
 	// PRU length of signal ON behaves differently whe synching compared to regular operation
 	// Account that this value is divided by two in the PRU assembler, so put the actual value wanted
 	// SigONPeriod should be an even number
+	double minSigONPeriod=6.0; // Signal ON period at synchronization procedure
 	double SigONPeriod=34.0; // Half the time jitter in PRU units // ON time (duty cycle) of the signal, in PRU time. It cannot be smaller than 6. It has to be multiple of 2. Somehow, it cannot be very large because the PRUs stall (maybe a voltage issue or device tree overlay...)
 	double MultFactorEffSynchPeriod=4.0; // When using 4 channels histogram, this value is 4.0; when using real signals this value should be 1.0 (also in QphysLayerAgent.h)
+	double SigOFFPeriod=SynchTrigPeriod-SigONPeriod; // It has to be positive
 	unsigned long long int TimePRU1synchPeriod=100000000; // In nanoseconds and multiple of PRUclockStepPeriodNanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. Also, the sorter the more error in the correct estimation, since there has not elapsed enough time to compute a tendency (it also happens with PRUdetCorrRelFreq() method whre a separation TagsSeparationDetRelFreq is inserted). The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
 	unsigned long long int DistTimePRU1synchPeriod=10; // Multiple of PRUclockStepPeriodNanoseconds. Number of passes with respect TimePRU1synchPeriod, in order to compute both the absolute time difference and the relative frequency difference
 	unsigned long long int iepPRUtimerRange32bits=4294967296; //32 bits

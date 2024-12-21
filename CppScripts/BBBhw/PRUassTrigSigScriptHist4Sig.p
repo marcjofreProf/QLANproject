@@ -243,9 +243,9 @@ QUADEMT1:
 PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LBCO 	r1, CONST_PRUDRAM, 4, 4 // Load number of repetitons of the signal
-	LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM sequence signal period
+	LBCO	r7, CONST_PRUDRAM, 12, 4 // Read from PRU RAM sequence guard period
 	LBCO	r14, CONST_PRUDRAM, 20, 4 // ON state time
-	SUB 	r15, r7, r14 // OFF state time
+	LBCO	r15, CONST_PRUDRAM, 28, 4 // OFF state time
 	SUB 	r14, r14, 4 // Substract 4 because is the compensation value
 	LSR		r14, r14, 1 // Divide by two because loop consumes double	
 //	ADD 	r14, r14, 1 // ADD 1 to not have a substraction below zero which halts. Do not add 1 because it adds a relative frequency difference
