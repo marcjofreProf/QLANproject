@@ -702,8 +702,12 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	// With godd enough hardware clocks, the jitter is limited by the BBB kernel determinisms, in the order of 5us. With hundreds of averaging it is reduced this jitter around 10 times (since it scales as sqrt(NumberAveraging))
 	// Therefore, the truncation could be a submultiple of SynchTrigPeriod which is slightly larger than the averaged interrupt jitter (around 500ns, which in PRU units would be 100)
 	// Better to be a number multiple of power of 2 and larger than this minim jitter PRU value
-	truncatedPRUoffsetDriftErrorAbsAvg=round((PRUoffsetDriftErrorAbsAvg)/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
-	
+	if (PRUoffsetDriftErrorAbsAvg<0.0){
+		truncatedPRUoffsetDriftErrorAbsAvg=-round((-PRUoffsetDriftErrorAbsAvg)/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
+	}
+	else{
+		truncatedPRUoffsetDriftErrorAbsAvg=round((PRUoffsetDriftErrorAbsAvg)/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
+	}
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
 			PRUoffFreqTotalAux=static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
@@ -881,8 +885,12 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	// With godd enough hardware clocks, the jitter is limited by the BBB kernel determinisms, in the order of 5us. With hundreds of averaging it is reduced this jitter around 10 times (since it scales as sqrt(NumberAveraging))
 	// Therefore, the truncation could be a submultiple of SynchTrigPeriod which is slightly larger than the averaged interrupt jitter (around 500ns, which in PRU units would be 100)
 	// Better to be a number multiple of power of 2 and larger than this minim jitter PRU value
-	truncatedPRUoffsetDriftErrorAbsAvg=round((PRUoffsetDriftErrorAbsAvg)/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
-	
+	if (PRUoffsetDriftErrorAbsAvg<0.0){
+		truncatedPRUoffsetDriftErrorAbsAvg=-round((-PRUoffsetDriftErrorAbsAvg+truncatedSynchTrigPeriod/2.0)/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
+	}
+	else{
+		truncatedPRUoffsetDriftErrorAbsAvg=round((PRUoffsetDriftErrorAbsAvg+truncatedSynchTrigPeriod/2.0)/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
+	}
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
 			PRUoffFreqTotalAux=static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
