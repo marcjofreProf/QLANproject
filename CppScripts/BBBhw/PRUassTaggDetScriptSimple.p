@@ -203,7 +203,7 @@ PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first be
 	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LBCO	r4, CONST_PRUDRAM, 4, 4 // Load to r4 the content of CONST_PRUDRAM with offset 4, and 4 bytes. It is the number of RECORDS
 	// Read the number of RECORDS from positon 0 of PRU1 DATA RAM and stored it
-	LBCO	r10, CONST_PRUDRAM, 8, 4 // Read from PRU RAM offset signal period	
+	LBCO	r10, CONST_PRUDRAM, 8, 4 // Read from PRU RAM offset guard period	
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	SUB		r3, r10, 1 // Generate the value for r3 from r10
 PERIODICOFFSET: // Neutralizing hardware clock relative frequency difference and offset drift//
