@@ -74,8 +74,8 @@ INITIATIONS:// This is only run once
     
 	// Configure the programmable pointer register for PRU by setting c24_pointer[3:0] // related to pru data RAM, where the commands will be found
 	// This will make C24 point to 0x00000000 (PRU data RAM).
-	MOV	r0, OWN_RAM | OWN_RAMoffset// | OWN_RAMoffset // When using assembler, the PRU does not put data in the first addresses of OWN_RAM (when using c++ PRU direct programming the PRU  might use some initial addresses of OWN_RAM space
-	MOV	r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
+	MOV		r0, OWN_RAM | OWN_RAMoffset// | OWN_RAMoffset // When using assembler, the PRU does not put data in the first addresses of OWN_RAM (when using c++ PRU direct programming the PRU  might use some initial addresses of OWN_RAM space
+	MOV		r10, 0x24000+0x20// | C24add//CONST_PRUDRAM
 	SBBO	r0, r10, 0, 4//SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C24
 	
 //	// This will make C26 point to 0x0002E000 (IEP).
@@ -85,8 +85,8 @@ INITIATIONS:// This is only run once
 	// Configure the programmable pointer register for PRU by setting c28_pointer[15:0] // related to shared RAM
 	// This will make C28 point to 0x00010000 (PRU shared RAM).
 	// http://www.embedded-things.com/bbb/understanding-bbb-pru-shared-memory-access/	
-	MOV	r0, SHARED_RAM // 0x100                  // Set C28 to point to shared RAM
-	MOV	r14, 0x22000+0x28//PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
+	MOV		r0, SHARED_RAM // 0x100                  // Set C28 to point to shared RAM
+	MOV		r14, 0x22000+0x28//PRU0_CTRL | C28add //CONST_PRUSHAREDRAM
 	SBBO 	r0, r14, 0, 4//SBCO	r0, CONST_PRUSHAREDRAM, 0, 4 //SBBO r0, r10, 0, 4
 		
 //	// Configure the programmable pointer register for PRU by setting c31_pointer[15:0] // related to ddr.
@@ -104,14 +104,15 @@ INITIATIONS:// This is only run once
 //      LED_ON	// just for signaling initiations
 //	LED_OFF	// just for signaling initiations
 	// Using cycle counter
-	MOV		r12, 0x22000
-	MOV		r13, 0x2200C
-	// Initializations
+	MOV	r12, 0x22000
+	MOV	r13, 0x2200C
+
+	// Initializations - some, just in case
 	LDI 	r5, 0 // Initialize for the first time r5
 	LDI		r6, 0 // Initialization
 	LDI		r16, 0 // Initialization
 	LDI		r1, 4 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
-//	MOV	r4, RECORDS // This will be the loop counter to read the entire set of data
+	MOV		r4, RECORDS // This will be the loop counter to read the entire set of data
 	// Initializations for faster execution
 	LDI		r7, 0 // Register for clearing other registers
 	MOV		r11, 0xC000C0FF // detection mask. Bits might be moved out of position
@@ -129,7 +130,7 @@ INITIATIONS:// This is only run once
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	LBBO	r2.b0, r12, 0, 1 // r2 maps b0 control register
 //	SET		r2.t3
-	//SBBO	r2, r12, 0, 1 // Enables DWT_CYCCNT. We start it when the commands enters
+	//SBBO	r2.b0, r12, 0, 1 // Enables DWT_CYCCNT. We start it when the commands enters
 		
 	// Initial Re-initialization for IET counter. Used in the other PRU1
 	// The Clock gating Register controls the state of Clock Management
@@ -162,9 +163,9 @@ WARMUP:
 	JMP 	CMDLOOP // finished, wait for next command. So it continuosly loops	
 DWTSTART:
 	// Re-start DWT_CYCNT
-//	LBBO	r2.b0, r12, 0, 1 // r2 maps b0 control register
+//	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 //	CLR		r2.t3
-//	SBBO	r2.b0, r12, 0, 1 // stops DWT_CYCCNT
+//	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
 //	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	SET		r2.t3
 	SBBO	r2.b0, r12, 0, 1 // Enables DWT_CYCCNT
@@ -199,11 +200,11 @@ QUADDET2:
 QUADDET1:
 	MOV		r11, 0x00000072 // detection mask
 	JMP		PSEUDOSYNCH
-PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to receiving at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering through an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
+PSEUDOSYNCH:// Neutralizing interrupt jitter time // I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to receiving at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering through an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	LBCO	r4, CONST_PRUDRAM, 4, 4 // Load to r4 the content of CONST_PRUDRAM with offset 4, and 4 bytes. It is the number of RECORDS
 	// Read the number of RECORDS from positon 0 of PRU1 DATA RAM and stored it
-	LBCO	r10, CONST_PRUDRAM, 8, 4 // Read from PRU RAM offset guard period	
+	LBCO	r10, CONST_PRUDRAM, 8, 4 // Read from PRU RAM guard period	
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
 	SUB		r3, r10, 1 // Generate the value for r3 from r10
 PERIODICOFFSET: // Neutralizing hardware clock relative frequency difference and offset drift//
@@ -238,7 +239,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	SUB 	r20, r20, 1 // Substract 1 to the exit counter
 	QBEQ 	FINISH, r20, 0 // When this exit counter reaches 0 (almost 10 seconds, it oculd be up to almost 20 seconds) exit the program
 	// Give some time - while doing operations
-	//QBGT 	WAIT_FOR_EVENT, r16, 0 // Do not lose time with the below if all channels are not zero (very restrictive (but maybe good for coincidence)). If there is a faulty value/line always ON (this might render to 0 detections always)!!!
+	//QBGT 	WAIT_FOR_EVENT, r16, 0 // Do not lose time with the below if all channels are not zero (very restrictive (but maybe good for coincidence)). If there is a faulty value/line always ON (this might render to 0 detections alw
 	// Then measure wha should be 1 (for edge detection)
 	MOV		r6.w2, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. TAkes a lot of time and so it is skew with respect the bits from r31
 	MOV		r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)
@@ -277,7 +278,7 @@ TIMETAG:
 FINISH:
 	// Faster Concatenated Checks writting	
 	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-	////////////////////////////////////////
+	////////////////////////////////////////	
 	// Indicate number of captures left
 	MOV		r0, LASTSHAREDRAM // Load the address of the last position to indicate measurements left
 	SBCO 	r4, CONST_PRUSHAREDRAM, r0, 4
@@ -286,7 +287,7 @@ FINISH:
 	CLR		r2.t3
 	SBBO	r2.b0, r12, 0, 1 // stops DWT_CYCCNT
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
-	//LED_OFF	
+	//LED_OFF
 	MOV		r31.b0, PRU0_ARM_INTERRUPT+16// Notification sent at the beginning of the signal//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
 	JMP 	CMDLOOP // finished, wait for next command. So it continuosly loops	
 EXIT:

@@ -259,15 +259,10 @@ MANAGECALC: // To be develop to correct for intra pulses frequency variation
 	MOV 	r19, r9 // update counter of when to correct intra relative frequency difference
 	LBCO	r20, CONST_PRUDRAM, 24, 4 // Load from PRU RAM position the absolute correction to correct for intra relative frequency difference
 	// To give some sense of synchronization with the other PRU time tagging, wait for IEP timer (which has been enabled and nobody resets it and so it wraps around)
-	// Since this script produces a sequence of four different values, we need to multiply the period by 4 to have the effective period for this script
-	/////////////////////////////////////////////////////////////
-	LSL		r7, r7, 2 // Specific of this script because analysing a signal with an effective period 4 times the original period
 	SUB		r6, r7, 1 // Generate the value for r6
 ABSSYNCH:	// From this point synchronization is very important. If the previous operations takes longer than the period below to synch, in the cpp script it can be added some extra periods to compensate for frequency relative offset
 	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4. Read the IEP counter
 	AND		r0, r0, r6 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
-	//LDI	r0, 0 // To remove previous values
-	//LBCO	r0.w0, CONST_IETREG, 0xC, 2// Trick since for period of 65536 we can directly implement module reading 2 bytes
 	SUB		r0, r7, r0 // Substract to find how long to wait	
 	LSR		r0, r0, 1// Divide by two because the PSEUDOSYNCHLOOP consumes double
 	ADD		r0, r0, 1// ADD 1 to not have a substraction below zero which halts
