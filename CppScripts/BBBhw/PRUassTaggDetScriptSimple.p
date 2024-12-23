@@ -128,7 +128,7 @@ INITIATIONS:// This is only run once
 	CLR		r2.t3
 	SBBO	r2.b0, r12, 0, 1 // stops DWT_CYCCNT
 	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
-	LBBO	r2.b0, r12, 0, 1 // r2 maps b0 control register
+//	LBBO	r2.b0, r12, 0, 1 // r2 maps b0 control register
 //	SET		r2.t3
 	//SBBO	r2.b0, r12, 0, 1 // Enables DWT_CYCCNT. We start it when the commands enters
 		
