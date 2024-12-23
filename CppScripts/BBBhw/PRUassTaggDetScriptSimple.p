@@ -163,7 +163,7 @@ WARMUP:
 	JMP 	CMDLOOP // finished, wait for next command. So it continuosly loops	
 DWTSTART:
 	// Re-start DWT_CYCNT
-//	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
+	LBBO	r2, r12, 0, 1 // r2 maps b0 control register
 //	CLR		r2.t3
 //	SBBO	r2, r12, 0, 1 // stops DWT_CYCCNT
 //	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
@@ -286,6 +286,7 @@ FINISH:
 	LBBO	r2.b0, r12, 0, 1 // r2 maps b0 control register
 	CLR		r2.t3
 	SBBO	r2.b0, r12, 0, 1 // stops DWT_CYCCNT
+	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF
 	MOV		r31.b0, PRU0_ARM_INTERRUPT+16// Notification sent at the beginning of the signal//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16

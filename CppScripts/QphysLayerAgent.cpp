@@ -521,7 +521,7 @@ std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQ
 threadSimulateEmitQuBitRefAux.join();//threadSimulateEmitQuBitRefAux.detach();
 }
 else{
-	cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
+	cout << "QPLA::Not possible to launch ThreadSimulateEmitQuBit!" << endl;
 }
 this->release();
 /*
@@ -585,7 +585,7 @@ std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQ
 threadSimulateEmitQuBitRefAux.join();//threadSimulateEmitQuBitRefAux.detach();//threadSimulateEmitQuBitRefAux.join();//
 }
 else{		
-	cout << "Not possible to launch ThreadSimulateEmitQuBit" << endl;
+	cout << "QPLA::Not possible to launch ThreadSimulateEmitQuBit!" << endl;
 }
 
 this->release();
@@ -680,7 +680,7 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 	this->SmallDriftContinuousCorrection();// Run after threadSimulateReceiveQuBitRefAux
 	}
 	else{
-		cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
+		cout << "QPLA::Not possible to launch ThreadSimulateReceiveQubit!" << endl;
 	}
 	this->release();
 	/*
@@ -823,7 +823,7 @@ std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateRe
 threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
 }
 else{
-	cout << "Not possible to launch ThreadSimulateReceiveQubit" << endl;
+	cout << "QPLA::Not possible to launch ThreadSimulateReceiveQubit!" << endl;
 }
 //cout << "QPLA::HistCalcPeriodTimeTags CurrentReceiveHostIP: " << CurrentReceiveHostIP << endl;
 this->HistCalcPeriodTimeTags(CurrentReceiveHostIP,iCenterMass,iNumRunsPerCenterMass);// Compute synch values
