@@ -556,7 +556,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic=PRUoffsetDriftErrorAbsAvg;// Update value
 					truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic=truncatedPRUoffsetDriftErrorAbsAvg; // Update value
 					// RElative implementation
-					this->PRUoffsetDriftError=this->PRUoffsetDriftErrorAbsAvgOld-static_cast<long double>(this->truncatedPRUoffsetDriftErrorAbsAvg);
+					this->PRUoffsetDriftError=this->PRUoffsetDriftErrorAbsAvgOld-static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg);
 					this->PRUoffsetDriftErrorAbsAvgOld=static_cast<long double>(this->truncatedPRUoffsetDriftErrorAbsAvg);// Update value
 
 					// Below unwrap the difference
