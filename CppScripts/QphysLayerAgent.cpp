@@ -2,7 +2,7 @@
 Dept. Network Engineering
 Universitat Politècnica de Catalunya - Technical University of Catalonia
 
-Modified: 2024
+Modified: 2025
 Created: 2024
 
 Agent script for Quantum Physical Layer
@@ -1215,11 +1215,12 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 
 				  // Implement PID
 				  SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]; // Integral value of the PID
-
+				  cout << "QPLA::SmallDriftContinuousCorrection PID Integral SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 				  // Update information to the other node about synch parameters				  
 				  if (CurrentSpecificLinkAux>-1 && ApplyPIDOffsetContinuousCorrection==true){
 				  	// Implement PID
 				  	double SmallOffsetDriftPerLinkPIDvalAux=SplitEmitReceiverSmallOffsetDriftPerLinkP*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])+SplitEmitReceiverSmallOffsetDriftPerLinkI*static_cast<double>(SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])+SplitEmitReceiverSmallOffsetDriftPerLinkD*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]);
+				  	cout << "QPLA::SmallDriftContinuousCorrection PID total SmallOffsetDriftPerLinkPIDvalAux: " << SmallOffsetDriftPerLinkPIDvalAux << endl;
 				  	//if (SmallOffsetDriftPerLinkPIDvalAux<0.0){
 				  	//	SmallOffsetDriftPerLinkPIDvalAux=-fmod(-SmallOffsetDriftPerLinkPIDvalAux,HistPeriodicityAux);
 				  	//}

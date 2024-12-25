@@ -1,8 +1,13 @@
-/*
- * Marc Jofre
- * Technical University of Catalonia
- * 2024
- */
+/* Author: Prof. Marc Jofre
+Dept. Network Engineering
+Universitat Politècnica de Catalunya - Technical University of Catalonia
+
+Modified: 2025
+Created: 2024
+
+Header declaration file for handling PRU
+
+*/
 
 #ifndef GPIO_H_
 #define GPIO_H_

@@ -2,7 +2,7 @@
 Dept. Network Engineering
 Universitat Politècnica de Catalunya - Technical University of Catalonia
 
-Modified: 2024
+Modified: 2025
 Created: 2024
 
 Header declaration file for Quantum physical Layer Agent
