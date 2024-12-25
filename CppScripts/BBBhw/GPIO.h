@@ -44,7 +44,7 @@ using std::fstream;
 #define ExtraNumSynchMeasAvgAux 	191 // 351 // Averaging for computing current absolute time offset
 // The calculation of the relative frequency difference is important.
 // The periodic checking is every 100000000, where the relative frequency calculation is done every fraction of NumSynchMeasAvgAux. There is a trade-off between not taking to long to calculate the relative frequency edifference because then we are probably exceeding the IEP counter range, but we want it to be long enough to produce little error in the calculation. Furthermore, there is an averaging of different calculation sof the relative frequency difference.
-#define ExtraExtraNumSynchMeasAvgAux 	41 // Averaging for computing current relative frequency diference.
+#define ExtraExtraNumSynchMeasAvgAux 	91 // Averaging for computing current relative frequency diference.
 
 namespace exploringBB {
 
