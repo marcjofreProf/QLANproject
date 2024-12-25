@@ -89,8 +89,12 @@ private:// Variables
 	double PRUoffsetDriftErrorAbsArray[ExtraNumSynchMeasAvgAux]={0};
 	double PRUoffsetDriftErrorAbsAvg=0.0;
 	double truncatedPRUoffsetDriftErrorAbsAvg=0.0;
-	double truncatedPRUoffsetDriftErrorAbsAvgOld=0.0;
-	double PRUoffsetDriftErrorAbsAvgOldTruncated=0.0;
+	double truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic=0.0;
+	double truncatedPRUoffsetDriftErrorAbsAvgOldRecv=0.0;
+	double truncatedPRUoffsetDriftErrorAbsAvgOldEmit=0.0;
+	double PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic=0.0;
+	double PRUoffsetDriftErrorAbsAvgOldTruncatedRecv=0.0;
+	double PRUoffsetDriftErrorAbsAvgOldTruncatedEmit=0.0;
 	double GuardPeriod=16384.0; // Time period in PRU units fo guard time. The guard time is limitted by the interrupt handling jitter. It has to be a power of 2!!!
 	double SynchTrigPeriod=4096.0; //For slotted analysis. It has to match to the histogram analysis
 	// The below number, the smaller the more fine grain so it will react faster to hardware PRU counter changes (so faster) but probably more jitter
