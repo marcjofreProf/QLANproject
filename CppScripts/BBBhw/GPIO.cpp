@@ -517,6 +517,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				// Absolute corrected error
 				this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
 				this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,ExtraNumSynchMeasAvgAux);// Since we are applying a filter of length NumSynchMeasAvgAux, temporally it effects somehow the longer the filter. Altough it is difficult to correct
+				
 				// The absolute time error has a natural wander due to the fact that the conversion from PRU ticks to real time (and viceversa is not exactly PRUclockStepPeriodNanoseconds). Therefore, an effective relative frequency difference is present that it can be accounted for (this relative frequency difference is computed below).
 				if (this->iIterPRUcurrentTimerValPassLong>DistTimePRU1synchPeriod){// Long range measurements to retrieve relative frequency differences
 					// Computations for Synch calculation for PRU0 compensation
@@ -577,6 +578,16 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLongExtra%ExtraExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					this->PRUoffsetDriftErrorAvg=LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraExtraNumSynchMeasAvgAux);// averaging
 					
+					// Smart version of the truncation - avoid being at the border of transition
+					if (abs(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorAvgOldTruncatedPeriodic)>truncatedSynchTrigPeriodPeriodic){
+						PRUoffsetDriftErrorAvg=round(PRUoffsetDriftErrorAvg/truncatedSynchTrigPeriodPeriodic)*truncatedSynchTrigPeriodPeriodic;
+					}
+					else{
+						PRUoffsetDriftErrorAvg=truncatedPRUoffsetDriftErrorAvgOldPeriodic;
+					}
+					PRUoffsetDriftErrorAvgOldTruncatedPeriodic=PRUoffsetDriftErrorAvg;// Update value
+					truncatedPRUoffsetDriftErrorAvgOldPeriodic=PRUoffsetDriftErrorAvg; // Update value
+
 					if (abs(this->PRUoffsetDriftErrorAvg)<this->PRUoffsetDriftErrorAvgThresh and this->iIterPRUcurrentTimerValSynchLong>(1.5*NumSynchMeasAvgAux)){this->PRUoffsetDriftErrorAvg=0.0;}// Do not apply relative frequency difference if it is below a certain value
 					
 					CountPRUcurrentTimerValSynchLong=0;// Update value
@@ -608,7 +619,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 		}
 		
 		// Information
-		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(1*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
+		if (this->ResetPeriodicallyTimerPRU1 and (this->iIterPRUcurrentTimerVal%(512*NumSynchMeasAvgAux)==0) and this->iIterPRUcurrentTimerValSynchLong>NumSynchMeasAvgAux){
 			////cout << "PRUcurrentTimerVal: " << this->PRUcurrentTimerVal << endl;
 			////cout << "PRUoffsetDriftError: " << this->PRUoffsetDriftError << endl;
 			cout << "GPIO::Information about synchronization:" << endl;

@@ -44,7 +44,7 @@ using std::fstream;
 #define ExtraNumSynchMeasAvgAux 	191 // 351 // Averaging for computing current absolute time offset
 // The calculation of the relative frequency difference is important.
 // The periodic checking is every 100000000, where the relative frequency calculation is done every fraction of NumSynchMeasAvgAux. There is a trade-off between not taking to long to calculate the relative frequency edifference because then we are probably exceeding the IEP counter range, but we want it to be long enough to produce little error in the calculation. Furthermore, there is an averaging of different calculation sof the relative frequency difference.
-#define ExtraExtraNumSynchMeasAvgAux 	21 // Averaging for computing current relative frequency diference.
+#define ExtraExtraNumSynchMeasAvgAux 	41 // Averaging for computing current relative frequency diference.
 
 namespace exploringBB {
 
@@ -89,9 +89,11 @@ private:// Variables
 	double PRUoffsetDriftErrorAbsArray[ExtraNumSynchMeasAvgAux]={0};
 	double PRUoffsetDriftErrorAbsAvg=0.0;
 	double truncatedPRUoffsetDriftErrorAbsAvg=0.0;
+	double truncatedPRUoffsetDriftErrorAvgOldPeriodic=0.0;
 	double truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic=0.0;
 	double truncatedPRUoffsetDriftErrorAbsAvgOldRecv=0.0;
 	double truncatedPRUoffsetDriftErrorAbsAvgOldEmit=0.0;
+	double PRUoffsetDriftErrorAvgOldTruncatedPeriodic=0.0;
 	double PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic=0.0;
 	double PRUoffsetDriftErrorAbsAvgOldTruncatedRecv=0.0;
 	double PRUoffsetDriftErrorAbsAvgOldTruncatedEmit=0.0;
@@ -100,7 +102,7 @@ private:// Variables
 	// The below number, the smaller the more fine grain so it will react faster to hardware PRU counter changes (so faster) but probably more jitter
 	// The longer (way more than the averaged jtter) it will have less jittter provided that the IEP counter is stable enough so that the absolute offset error is PID corrected with the QPLA
 	double truncatedSynchTrigPeriod=512.0; // Multiple of power of 2, and related to the averaged interrupt jitter (in PRU units). Since otherwise it adds noise. The larger with respect the averaged jitter (of measuring the curren tPRU counter) the more offset residual error that the QPLA PID will have to correct for
-	double truncatedSynchTrigPeriodPeriodic=4.0;// Multiple of pwer of 2, for the periodic monitoring to content the relative frequency difference. Gives stability to the calculation of the relative frequency difference.
+	double truncatedSynchTrigPeriodPeriodic=8.0;// Multiple of pwer of 2, for the periodic monitoring to content the relative frequency difference. Gives stability to the calculation of the relative frequency difference.
 	long double PRUoffsetDriftErrorAbsAvgOld=0.0;
 	// Others
 	double PRUoffsetDriftErrorIntegral=0;
