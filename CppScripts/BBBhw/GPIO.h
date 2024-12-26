@@ -89,11 +89,11 @@ private:// Variables
 	double PRUoffsetDriftErrorAbsArray[ExtraNumSynchMeasAvgAux]={0};
 	double PRUoffsetDriftErrorAbsAvg=0.0;
 	double truncatedPRUoffsetDriftErrorAbsAvg=0.0;
-	double truncatedPRUoffsetDriftErrorAvgOldPeriodic=0.0;
+	long double truncatedPRUoffsetDriftErrorAvgOldPeriodic=0.0;
 	double truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic=0.0;
 	double truncatedPRUoffsetDriftErrorAbsAvgOldRecv=0.0;
 	double truncatedPRUoffsetDriftErrorAbsAvgOldEmit=0.0;
-	double PRUoffsetDriftErrorAvgOldTruncatedPeriodic=0.0;
+	long double PRUoffsetDriftErrorAvgOldTruncatedPeriodic=0.0;
 	double PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic=0.0;
 	double PRUoffsetDriftErrorAbsAvgOldTruncatedRecv=0.0;
 	double PRUoffsetDriftErrorAbsAvgOldTruncatedEmit=0.0;
