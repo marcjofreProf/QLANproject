@@ -547,17 +547,17 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				//// Compute error - Relative correction of the frequency difference of the absolute time. This provides like the stability of the hardware clock referenced to the system clock (disciplined with network protocol)...so in the order of ppb
 				if ((iIterPRUcurrentTimerValSynch%static_cast<unsigned long long int>(NumSynchMeasAvgAux/ExtraExtraNumSynchMeasAvgAux))==0 and CountPRUcurrentTimerValSynchLong!=0){
 					// Smart version of the truncation - avoid being at the border of transition
-					if (abs(PRUoffsetDriftErrorAbsAvg-PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic)>truncatedSynchTrigPeriodPeriodic){
-						truncatedPRUoffsetDriftErrorAbsAvg=round(PRUoffsetDriftErrorAbsAvg/truncatedSynchTrigPeriodPeriodic)*truncatedSynchTrigPeriodPeriodic;
-					}
-					else{
-						truncatedPRUoffsetDriftErrorAbsAvg=truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic;
-					}
-					PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic=PRUoffsetDriftErrorAbsAvg;// Update value
-					truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic=truncatedPRUoffsetDriftErrorAbsAvg; // Update value
+					//if (abs(PRUoffsetDriftErrorAbsAvg-PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic)>truncatedSynchTrigPeriodPeriodic){
+					//	truncatedPRUoffsetDriftErrorAbsAvg=round(PRUoffsetDriftErrorAbsAvg/truncatedSynchTrigPeriodPeriodic)*truncatedSynchTrigPeriodPeriodic;
+					//}
+					//else{
+					//	truncatedPRUoffsetDriftErrorAbsAvg=truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic;
+					//}
+					//PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic=PRUoffsetDriftErrorAbsAvg;// Update value
+					//truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic=truncatedPRUoffsetDriftErrorAbsAvg; // Update value
 					// RElative implementation
-					this->PRUoffsetDriftError=this->PRUoffsetDriftErrorAbsAvgOld-static_cast<long double>(this->truncatedPRUoffsetDriftErrorAbsAvg);
-					this->PRUoffsetDriftErrorAbsAvgOld=static_cast<long double>(this->truncatedPRUoffsetDriftErrorAbsAvg);// Update value
+					this->PRUoffsetDriftError=this->PRUoffsetDriftErrorAbsAvgOld-static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg);
+					this->PRUoffsetDriftErrorAbsAvgOld=static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg);// Update value
 
 					// Below unwrap the difference
 					if (this->PRUoffsetDriftError>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
@@ -579,14 +579,14 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->PRUoffsetDriftErrorAvg=LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraExtraNumSynchMeasAvgAux);// averaging
 					
 					// Smart version of the truncation - avoid being at the border of transition
-					if (abs(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorAvgOldTruncatedPeriodic)>truncatedSynchTrigPeriodPeriodic){
-						PRUoffsetDriftErrorAvg=round(PRUoffsetDriftErrorAvg/truncatedSynchTrigPeriodPeriodic)*truncatedSynchTrigPeriodPeriodic;
-					}
-					else{
-						PRUoffsetDriftErrorAvg=truncatedPRUoffsetDriftErrorAvgOldPeriodic;
-					}
-					PRUoffsetDriftErrorAvgOldTruncatedPeriodic=PRUoffsetDriftErrorAvg;// Update value
-					truncatedPRUoffsetDriftErrorAvgOldPeriodic=PRUoffsetDriftErrorAvg; // Update value
+					//if (abs(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorAvgOldTruncatedPeriodic)>truncatedSynchTrigPeriodPeriodic){
+					//	PRUoffsetDriftErrorAvg=round(PRUoffsetDriftErrorAvg/truncatedSynchTrigPeriodPeriodic)*truncatedSynchTrigPeriodPeriodic;
+					//}
+					//else{
+					//	PRUoffsetDriftErrorAvg=truncatedPRUoffsetDriftErrorAvgOldPeriodic;
+					//}
+					//PRUoffsetDriftErrorAvgOldTruncatedPeriodic=PRUoffsetDriftErrorAvg;// Update value
+					//truncatedPRUoffsetDriftErrorAvgOldPeriodic=PRUoffsetDriftErrorAvg; // Update value
 
 					if (abs(this->PRUoffsetDriftErrorAvg)<this->PRUoffsetDriftErrorAvgThresh and this->iIterPRUcurrentTimerValSynchLong>(1.5*NumSynchMeasAvgAux)){this->PRUoffsetDriftErrorAvg=0.0;}// Do not apply relative frequency difference if it is below a certain value
 					
