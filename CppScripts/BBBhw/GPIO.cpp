@@ -580,7 +580,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					
 					// Smart version of the truncation - avoid being at the border of transition
 					if (abs(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorAvgOldTruncatedPeriodic)>static_cast<long double>(truncatedSynchTrigPeriodPeriodic)){
-						PRUoffsetDriftErrorAvg=round(PRUoffsetDriftErrorAvg/static_cast<long double>(truncatedSynchTrigPeriodPeriodic))*static_cast<long double>(truncatedSynchTrigPeriodPeriodic);
+						PRUoffsetDriftErrorAvg=roundl(PRUoffsetDriftErrorAvg*1000000000.0/static_cast<long double>(truncatedSynchTrigPeriodPeriodic))*static_cast<long double>(truncatedSynchTrigPeriodPeriodic)/1000000000.0;
 					}
 					else{
 						PRUoffsetDriftErrorAvg=truncatedPRUoffsetDriftErrorAvgOldPeriodic;
