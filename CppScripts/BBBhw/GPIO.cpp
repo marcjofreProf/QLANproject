@@ -556,7 +556,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic=PRUoffsetDriftErrorAbsAvg;// Update value
 					//truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic=truncatedPRUoffsetDriftErrorAbsAvg; // Update value
 					// RElative implementation
-					this->PRUoffsetDriftError=(this->PRUoffsetDriftErrorAbsAvgOld+(static_cast<long double>(this->CountPRUcurrentTimerValSynchLong)*static_cast<long double>(TimePRU1synchPeriod)))-static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg);
+					this->PRUoffsetDriftError=(this->PRUoffsetDriftErrorAbsAvgOld+(static_cast<long double>(this->CountPRUcurrentTimerValSynchLong)*static_cast<long double>(TimePRU1synchPeriod))/static_cast<long double>(PRUclockStepPeriodNanoseconds))-static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg);
 					this->PRUoffsetDriftErrorAbsAvgOld=static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg);// Update value
 
 					// Below unwrap the difference
@@ -579,7 +579,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->PRUoffsetDriftErrorAvg=LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraExtraNumSynchMeasAvgAux);// averaging
 					
 					//cout << "GPI::PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
-					PRUoffsetDriftErrorAvg=PRUoffsetDriftErrorAvg*1000000000.0;// Make it integer like
+					//PRUoffsetDriftErrorAvg=PRUoffsetDriftErrorAvg*1000000000.0;// Make it integer like
 					cout << "GPI::PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << " ppb" << endl;
 					// Smart version of the truncation - avoid being at the border of transition
 					if (abs(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorAvgOldTruncatedPeriodic)>static_cast<long double>(truncatedSynchTrigPeriodPeriodic)){
@@ -590,7 +590,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					}
 					PRUoffsetDriftErrorAvgOldTruncatedPeriodic=PRUoffsetDriftErrorAvg;// Update value
 					truncatedPRUoffsetDriftErrorAvgOldPeriodic=PRUoffsetDriftErrorAvg; // Update value
-					PRUoffsetDriftErrorAvg=PRUoffsetDriftErrorAvg/1000000000.0;// Scale it back
+					//PRUoffsetDriftErrorAvg=PRUoffsetDriftErrorAvg/1000000000.0;// Scale it back
 
 					if (abs(this->PRUoffsetDriftErrorAvg)<this->PRUoffsetDriftErrorAvgThresh and this->iIterPRUcurrentTimerValSynchLong>(1.5*NumSynchMeasAvgAux)){this->PRUoffsetDriftErrorAvg=0.0;}// Do not apply relative frequency difference if it is below a certain value
 					
