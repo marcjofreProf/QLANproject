@@ -1212,16 +1212,16 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  // Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
 				  cout << "QPLA::SmallDriftContinuousCorrection oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 				  cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
-				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+SmallOffsetDriftAux;
+				  //SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+SmallOffsetDriftAux;
 				  				  
-				  SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux]=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
+				  SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux]=SmallOffsetDriftAux;//SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]++;// Update value
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]=IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux;// Wrap value
 				  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Median filter				  
-				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SmallOffsetDriftAux;// Update value
+				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+SmallOffsetDriftAux;// Update value
 
 				  // Implement PID
-				  SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]+=0.0*SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]; // Integral value of the PID
+				  SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux; // Integral value of the PID
 				  cout << "QPLA::SmallDriftContinuousCorrection PID Integral SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 				  // Update information to the other node about synch parameters				  
 				  if (CurrentSpecificLinkAux>-1 && ApplyPIDOffsetContinuousCorrection==true){
