@@ -524,7 +524,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					// Compute Synch - Relative
 					this->EstimateSynch=fmod((static_cast<double>(this->iIterPRUcurrentTimerValPassLong*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))/(this->PRUcurrentTimerValLong-this->PRUcurrentTimerValOldWrapLong);// Only correct for PRUcurrentTimerValOld with the PRUoffsetDriftErrorAppliedOldRaw to be able to measure the real synch drift and measure it (not affected by the correction).
 					this->EstimateSynchArray[iIterPRUcurrentTimerValSynchLong%NumSynchMeasAvgAux]=this->EstimateSynch;
-					this->ManualSemaphoreExtra=true;
+					//this->ManualSemaphoreExtra=true;
 					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
 
 					// Frequency synchronization correction
@@ -556,8 +556,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic=PRUoffsetDriftErrorAbsAvg;// Update value
 					//truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic=truncatedPRUoffsetDriftErrorAbsAvg; // Update value
 					// RElative implementation
-					this->PRUoffsetDriftError=(this->PRUoffsetDriftErrorAbsAvgOld+(static_cast<long double>(this->CountPRUcurrentTimerValSynchLong)*static_cast<long double>(TimePRU1synchPeriod))/static_cast<long double>(PRUclockStepPeriodNanoseconds))-static_cast<long double>(this->PRUoffsetDriftErrorAbs);
-					this->PRUoffsetDriftErrorAbsAvgOld=static_cast<long double>(this->PRUoffsetDriftErrorAbs);// Update value
+					//this->PRUoffsetDriftError=(this->PRUoffsetDriftErrorAbsAvgOld+(static_cast<long double>(this->CountPRUcurrentTimerValSynchLong)*static_cast<long double>(TimePRU1synchPeriod))/static_cast<long double>(PRUclockStepPeriodNanoseconds))-static_cast<long double>(this->PRUoffsetDriftErrorAbs);
+					//this->PRUoffsetDriftErrorAbsAvgOld=static_cast<long double>(this->PRUoffsetDriftErrorAbs);// Update value
 					/*
 					// Below unwrap the difference
 					if (this->PRUoffsetDriftError>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
@@ -572,7 +572,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					else{
 						this->PRUoffsetDriftError=static_cast<double>(fmodl(this->PRUoffsetDriftError,static_cast<long double>(iepPRUtimerRange32bits)));
 					}*/
-					this->PRUoffsetDriftError=1.0-this->PRUoffsetDriftError/(static_cast<long double>(this->CountPRUcurrentTimerValSynchLong)*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds));// Normalize to the measurement time
+					this->PRUoffsetDriftError=1.0-this->EstimateSynch;//PRUoffsetDriftError/(static_cast<long double>(this->CountPRUcurrentTimerValSynchLong)*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds));// Normalize to the measurement time
 					
 					//// Relative error average
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLongExtra%ExtraExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError;
