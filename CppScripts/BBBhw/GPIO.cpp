@@ -527,7 +527,15 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//this->ManualSemaphoreExtra=true;
 					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
 					this->EstimateSynchAvg=this->EstimateSynchAvg*1000000000.0;
-					cout << "GPIO::EstimateSynchAvg: " << EstimateSynchAvg << endl;
+					cout << "GPIO::EstimateSynchAvg: " << this->EstimateSynchAvg << endl;
+					if (abs(EstimateSynchAvg-PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic)>truncatedSynchTrigPeriodPeriodic){
+						EstimateSynchAvg=round(EstimateSynchAvg/truncatedSynchTrigPeriodPeriodic)*truncatedSynchTrigPeriodPeriodic;
+					}
+					else{
+						EstimateSynchAvg=truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic;
+					}
+					PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic=EstimateSynchAvg;// Update value
+					truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic=EstimateSynchAvg; // Update value
 					this->EstimateSynchAvg=this->EstimateSynchAvg/1000000000.0;
 					// Frequency synchronization correction
 					// Compute error - Relative correction of the frequency difference. This provides like the stability of the hardware clock referenced to the system clock (disciplined with network protocol)...so in the order of 10^-7
