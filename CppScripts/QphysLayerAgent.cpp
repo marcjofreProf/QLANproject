@@ -1165,6 +1165,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 							}
 						}
 					  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median averaging
+					  cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftAux: " << SmallOffsetDriftAux << endl;
 					}
 					else{
 						if((static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
@@ -1186,14 +1187,17 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  //cout << "QPLA::SmallDriftContinuousCorrection::CheckValueAux: "<< CheckValueAux << endl;
 				  //cout << "QPLA::SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink: " << SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink << endl;
 				  ////////////////////////////////////////
-
+					// Apply insitu correction
 					long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftAux+SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 				  //long long int LLISmallOffsetDriftAux=static_cast<long long int>(SmallOffsetDriftAux);
 					for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-						if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink)>0){
+						if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink)>=0){
 							TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
 						}
-						else{TimeTaggs[iQuadChIter][i]=0;}
+						else{
+							TimeTaggs[iQuadChIter][i]=0;
+							cout << "QPLA::SmallDriftContinuousCorrection static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink: " << static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink << " negative!!!...we sould not be here!!" << endl;
+						}
 					}
 
 				  if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/2.0)){// Large step
