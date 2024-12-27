@@ -1209,6 +1209,8 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  
 				  // Median filter the SmallOffsetDriftAux to avoid to much induced artificial jitter
 				  // Update new value, just for monitoring of the wander - last value. With an acumulation sign it acumulates
+				  cout << "QPLA::SmallDriftContinuousCorrection oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
+				  cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+SmallOffsetDriftAux;
 				  				  
 				  SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux]=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
@@ -1243,6 +1245,9 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 					}
 					else{
 						cout << "QPLA::SmallDriftContinuousCorrection not implementing continuous re-offset PID...it should be activated..." << endl;
+						if (CurrentSpecificLinkAux<=-1){
+							cout << "QPLA::SmallDriftContinuousCorrection Network synchronization needed..." << endl;
+						}
 						oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 					}
 					long long int SignAuxInstantCorr=0;
