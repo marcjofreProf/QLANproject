@@ -1132,8 +1132,9 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 	// Apply the small offset drift correction
 	if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		if (CurrentSpecificLinkMultiple>-1){// The specific identification IP is present			
-			for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){				
+			for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){	
 				if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
+					cout << "QPLA::SmallDriftContinuousCorrection iter iQuadChIter: " << iQuadChIter << endl;
 					// Re-identify CurrentSpecificLinkAux
 					int CurrentSpecificLinkAux=-1;
 					for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
@@ -1220,7 +1221,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SmallOffsetDriftAux;// Update value
 
 				  // Implement PID
-				  SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]; // Integral value of the PID
+				  SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]+=0.0*SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]; // Integral value of the PID
 				  cout << "QPLA::SmallDriftContinuousCorrection PID Integral SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 				  // Update information to the other node about synch parameters				  
 				  if (CurrentSpecificLinkAux>-1 && ApplyPIDOffsetContinuousCorrection==true){
