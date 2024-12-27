@@ -526,7 +526,9 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					this->EstimateSynchArray[iIterPRUcurrentTimerValSynchLong%NumSynchMeasAvgAux]=this->EstimateSynch;
 					//this->ManualSemaphoreExtra=true;
 					this->EstimateSynchAvg=DoubleMedianFilterSubArray(EstimateSynchArray,NumSynchMeasAvgAux);
-
+					this->EstimateSynchAvg=this->EstimateSynchAvg*1000000000.0;
+					cout << "GPIO::EstimateSynchAvg: " << EstimateSynchAvg << endl;
+					this->EstimateSynchAvg=this->EstimateSynchAvg/1000000000.0;
 					// Frequency synchronization correction
 					// Compute error - Relative correction of the frequency difference. This provides like the stability of the hardware clock referenced to the system clock (disciplined with network protocol)...so in the order of 10^-7
 					//this->PRUoffsetDriftError=(-fmod((static_cast<double>(this->iIterPRUcurrentTimerValPassLong*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerValLong-this->PRUcurrentTimerValOldWrapLong))/static_cast<long double>(TimePRU1synchPeriod); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions
