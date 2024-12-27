@@ -1225,7 +1225,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  // Update information to the other node about synch parameters				  
 				  if (CurrentSpecificLinkAux>-1 && ApplyPIDOffsetContinuousCorrection==true){
 				  	// Implement PID
-				  	double SmallOffsetDriftPerLinkPIDvalAux=SplitEmitReceiverSmallOffsetDriftPerLinkP*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])+SplitEmitReceiverSmallOffsetDriftPerLinkI*static_cast<double>(SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])+SplitEmitReceiverSmallOffsetDriftPerLinkD*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]);
+				  	double SmallOffsetDriftPerLinkPIDvalAux=SplitEmitReceiverSmallOffsetDriftPerLinkP*static_cast<double>(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])+SplitEmitReceiverSmallOffsetDriftPerLinkI*static_cast<double>(SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])+SplitEmitReceiverSmallOffsetDriftPerLinkD*static_cast<double>(-SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]);
 				  	//cout << "QPLA::SmallDriftContinuousCorrection PID total SmallOffsetDriftPerLinkPIDvalAux: " << SmallOffsetDriftPerLinkPIDvalAux << endl;
 				  	//if (SmallOffsetDriftPerLinkPIDvalAux<0.0){
 				  	//	SmallOffsetDriftPerLinkPIDvalAux=-fmod(-SmallOffsetDriftPerLinkPIDvalAux,HistPeriodicityAux);
