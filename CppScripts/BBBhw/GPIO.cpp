@@ -718,19 +718,20 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->GuardPeriod);// Indicate guard period of the sequence signal, so that it falls correctly and it is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures
 	// Different modes of periodic correction
-	//switch (QuadEmitDetecSelecAux){
-	//	case 1: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld1;break;}
-	//	case 2: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld2;break;}
-	//	case 3: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld3;break;}
-	//	case 4: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld4;break;}
-	//	case 5: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld5;break;}
-	//	case 6: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld6;break;}
-	//	case 7: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld7;break;}
-	//	default: {break;}
-	//}
+	switch (QuadEmitDetecSelecAux){
+		case 1: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld1;break;}
+		case 2: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld2;break;}
+		case 3: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld3;break;}
+		case 4: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld4;break;}
+		case 5: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld5;break;}
+		case 6: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld6;break;}
+		case 7: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld7;break;}
+		default: {break;}
+	}
 	// The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of half the effective guard period due to interrupt alignment handling, the effective period, the time since last emission detection, then again MultFactorEffSynchPeriod*SynchTrigPeriod more or less
 	// Correcting for relative frequency difference is an approximation game (due to all the variable involved). The best is to have all hardware clocks so in-phase synchronized that there is no relative frequency difference.
-	ldTimePointClockTagPRUDiff=static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*GuardPeriod)+0.5*NumSynchMeasAvgAux*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds);//static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
+	//ldTimePointClockTagPRUDiff=static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*GuardPeriod)+0.5*NumSynchMeasAvgAux*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds);//static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
+	ldTimePointClockTagPRUDiff=static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*GuardPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
 	// There is an intrinsic limitation estimating PRUoffsetDriftErrorAbsAvg, which is impaired by the time jitter of handling the interrupt to check the curren tPRU clock.
 	// At some point, it could be that the PRU clock is more stable than this jitter (even more so if SyncE synchronizaed the clocks).
 	// Then, for the triggering of the signals, it is better to truncate this value to a sub multiple of the SynchTrigPeriod; and let the qubits handle the time offset synchronization from this point onwards
@@ -769,16 +770,16 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 		default:{PRUoffFreqTotalAux=0.0;break;}// None time nor frequency correction
 	}
 	
-	//switch (QuadEmitDetecSelecAux){// Update value	
-	//	case 1: {this->QPLAFutureTimePointOld1=this->QPLAFutureTimePoint;break;}
-	//	case 2: {this->QPLAFutureTimePointOld2=this->QPLAFutureTimePoint;break;}
-	//	case 3: {this->QPLAFutureTimePointOld3=this->QPLAFutureTimePoint;break;}
-	//	case 4: {this->QPLAFutureTimePointOld4=this->QPLAFutureTimePoint;break;}
-	//	case 5: {this->QPLAFutureTimePointOld5=this->QPLAFutureTimePoint;break;}
-	//	case 6: {this->QPLAFutureTimePointOld6=this->QPLAFutureTimePoint;break;}
-	//	case 7: {this->QPLAFutureTimePointOld7=this->QPLAFutureTimePoint;break;}
-	//	default: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint;break;}
-	//}
+	switch (QuadEmitDetecSelecAux){// Update value	
+		case 1: {this->QPLAFutureTimePointOld1=this->QPLAFutureTimePoint;break;}
+		case 2: {this->QPLAFutureTimePointOld2=this->QPLAFutureTimePoint;break;}
+		case 3: {this->QPLAFutureTimePointOld3=this->QPLAFutureTimePoint;break;}
+		case 4: {this->QPLAFutureTimePointOld4=this->QPLAFutureTimePoint;break;}
+		case 5: {this->QPLAFutureTimePointOld5=this->QPLAFutureTimePoint;break;}
+		case 6: {this->QPLAFutureTimePointOld6=this->QPLAFutureTimePoint;break;}
+		case 7: {this->QPLAFutureTimePointOld7=this->QPLAFutureTimePoint;break;}
+		default: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint;break;}
+	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Now, The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of the effective period, and the period
@@ -912,18 +913,19 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->GuardPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
 	// Different modes of periodic correction
-	//switch (QuadEmitDetecSelecAux){
-	//	case 1: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld1;break;}
-	//	case 2: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld2;break;}
-	//	case 3: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld3;break;}
-	//	case 4: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld4;break;}
-	//	case 5: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld5;break;}
-	//	case 6: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld6;break;}
-	//	case 7: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld7;break;}
-	//	default: {break;}
-	//}
+	switch (QuadEmitDetecSelecAux){
+		case 1: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld1;break;}
+		case 2: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld2;break;}
+		case 3: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld3;break;}
+		case 4: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld4;break;}
+		case 5: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld5;break;}
+		case 6: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld6;break;}
+		case 7: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld7;break;}
+		default: {break;}
+	}
 	// The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of half the effective period due to interrupt alignment handling, the effective period, the time since last emission detection, then again MultFactorEffSynchPeriod*SynchTrigPeriod more or less
-	ldTimePointClockTagPRUDiff=static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*GuardPeriod)+0.5*NumSynchMeasAvgAux*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds);//static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
+	//ldTimePointClockTagPRUDiff=static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*GuardPeriod)+0.5*NumSynchMeasAvgAux*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds);//static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
+	ldTimePointClockTagPRUDiff=static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*GuardPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
 	// There is an intrinsic limitation estimating PRUoffsetDriftErrorAbsAvg, which is impaired by the time jitter of handling the interrupt to check the curren tPRU clock.
 	// At some point, it could be that the PRU clock is more stable than this jitter (even more so if SyncE synchronizaed the clocks).
 	// Then, for the triggering of the signals, it is better to truncate this value to a sub multiple of the SynchTrigPeriod; and let the qubits handle the time offset synchronization from this point onwards
@@ -963,16 +965,16 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		default:{PRUoffFreqTotalAux=0.0;break;}// None time nor frequency correction
 	}
 
-	//switch (QuadEmitDetecSelecAux){// Update value	
-	//	case 1: {this->QPLAFutureTimePointOld1=this->QPLAFutureTimePoint;break;}
-	//	case 2: {this->QPLAFutureTimePointOld2=this->QPLAFutureTimePoint;break;}
-	//	case 3: {this->QPLAFutureTimePointOld3=this->QPLAFutureTimePoint;break;}
-	//	case 4: {this->QPLAFutureTimePointOld4=this->QPLAFutureTimePoint;break;}
-	//	case 5: {this->QPLAFutureTimePointOld5=this->QPLAFutureTimePoint;break;}
-	//	case 6: {this->QPLAFutureTimePointOld6=this->QPLAFutureTimePoint;break;}
-	//	case 7: {this->QPLAFutureTimePointOld7=this->QPLAFutureTimePoint;break;}
-	//	default: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint;break;}
-	//}
+	switch (QuadEmitDetecSelecAux){// Update value	
+		case 1: {this->QPLAFutureTimePointOld1=this->QPLAFutureTimePoint;break;}
+		case 2: {this->QPLAFutureTimePointOld2=this->QPLAFutureTimePoint;break;}
+		case 3: {this->QPLAFutureTimePointOld3=this->QPLAFutureTimePoint;break;}
+		case 4: {this->QPLAFutureTimePointOld4=this->QPLAFutureTimePoint;break;}
+		case 5: {this->QPLAFutureTimePointOld5=this->QPLAFutureTimePoint;break;}
+		case 6: {this->QPLAFutureTimePointOld6=this->QPLAFutureTimePoint;break;}
+		case 7: {this->QPLAFutureTimePointOld7=this->QPLAFutureTimePoint;break;}
+		default: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePoint;break;}
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
 	// The synch offset
