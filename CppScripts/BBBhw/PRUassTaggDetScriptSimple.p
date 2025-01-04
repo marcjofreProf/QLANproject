@@ -214,7 +214,7 @@ PERIODICOFFSET: // Neutralizing hardware clock relative frequency difference and
 	// Do final loadings of parameters for operation. For instance the coincidence window length
 	LBCO	r21, CONST_PRUDRAM, 16, 4 // Read from PRU RAM the coincidence window length
 ABSSYNCH:	// From this point synchronization is very important. If the previous operations takes longer than the period below to synch, in the cpp script it can be added some extra periods to compensate for frequency relative offset
-	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4
+	LBCO	r0, CONST_IETREG, 0xC, 4//LBCO	r0, CONST_IETREG, 0xC, 4//LBBO	r0, r3, 0, 4//LBCO	r0.b0, CONST_IETREG, 0xC, 4. With LBCO it is a fast read.
 	AND		r0, r0, r3 //Maybe it can not be done because larger than 255. Implement module of power of 2 on the histogram period// Since the signals have a minimum period of 2 clock cycles and there are 4 combinations (Ch1, Ch2, Ch3, Ch4, NoCh) but with a long periodicity of for example 1024 we can get a value between 0 and 7
 	SUB		r0, r10, r0 // Substract to find how long to wait	
 	LSR		r0, r0, 1// Divide by two because the PSEUDOSYNCHLOOP consumes double
@@ -263,19 +263,20 @@ POSTZERO:	// Give another chance to detect a zero to increase true counts (and e
 	MOV 	r23.w0, r31.w0 // This wants to be zeros for edge detection (bits 15, 14 and 7 to 0)	
 	AND		r16, r16, r23// Combine the two measurements
 	// End post zero
+COMBINATIONEDGE:
 	AND		r16, r16, r11 // Mask to make sure there are no other info
 	// Combining all reading pins - for isolated ones in the other (bits 15 and 14)
 	LSR		r17.b1, r16.b3, 2
 	LSR		r18.b1, r6.b3, 2
 	OR		r16, r16, r17// Combine the registers
 	OR		r6, r6, r18// Combine the registers
-	// Edge detection with the pins of interest
-	NOT		r16.w0, r16.w0 // 0s converted to 1s. This step can be placed here to increase chances of detection.	
-	AND		r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge
+	// Edge detection with the pins of interest. It can be extended to all pins reading
+	NOT		r16, r16 //NOT r16.w0, r16.w0 // 0s converted to 1s. This step can be placed here to increase chances of detection.	
+	AND		r6, r6, r16 //AND r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge
 CHECKDET:		
-	QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 //all the b0 above can be converted to w0 to capture more channels, but then in the channel tag recorded has to be increaed and appropiatelly handled in c++ (also the number of tags per run has to be reduced)
+	QBEQ 	WAIT_FOR_EVENT, r6, 0//QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 //all the b0 above can be converted to w0 to capture more channels, but then in the channel tag recorded has to be increaed and appropiatelly handled in c++ (also the number of tags per run has to be reduced)
 	// If the program reaches this point, at least one of the bits is high
-	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
+	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT. Very important to reduce jitter
 TIMETAG:
 	// Faster Concatenated Time counter and Detection channels
 	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 6 // Put contents of r5 and r6.w0 of DWT_CYCCNT into the address offset at r1.

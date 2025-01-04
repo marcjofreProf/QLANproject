@@ -47,14 +47,14 @@
 // *** LED routines, so that LED USR0 can be used for some simple debugging
 // *** Affects: r28, r29. Each PRU has its of 32 registers
 .macro LED_OFF
-	MOV	r28, 1<<21
-	MOV	r29, GPIO2_BANK | GPIO_CLEARDATAOUToffset
+	MOV		r28, 1<<21
+	MOV		r29, GPIO2_BANK | GPIO_CLEARDATAOUToffset
 	SBBO	r28, r29, 0, 4
 .endm
 
 .macro LED_ON
-	MOV	r28, 1<<21
-	MOV	r29, GPIO2_BANK | GPIO_SETDATAOUToffset
+	MOV		r28, 1<<21
+	MOV		r29, GPIO2_BANK | GPIO_SETDATAOUToffset
 	SBBO	r28, r29, 0, 4
 .endm
 
