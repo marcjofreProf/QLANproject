@@ -56,6 +56,7 @@
 // r21 reserved for Coincidence window length
 
 // r22 is reserved for periodic offset and frequency correction
+// r23 is reserved for second try for zero detection in the edge detector
 
 //// If using IET timer (potentially adjusted to synchronization protocols)
 // We can use Constant table pointers C26
@@ -111,6 +112,7 @@ INITIATIONS:// This is only run once
 	LDI 	r5, 0 // Initialize for the first time r5
 	LDI		r6, 0 // Initialization
 	LDI		r16, 0 // Initialization
+	LDI		r23, 0 // Initialization
 	LDI		r1, 4 //MOV	r1, 0  // reset r1 address to point at the beggining of PRU shared RAM
 	MOV		r4, RECORDS // This will be the loop counter to read the entire set of data
 	// Initializations for faster execution
@@ -233,8 +235,7 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Measuring all pins of interest
 	// First measure what whould be zero (for edge detection)
 	MOV		r16.w2, r30.w0 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. Limits the pulse rate to 50 MHz. Takes a lot of time and so it is skew with respect the bits from r31
-	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection (bits 15, 14 and 7 to 0)
-	AND		r16, r16, r11 // Mask to make sure there are no other info
+	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection (bits 15, 14 and 7 to 0)	
 	// Give some time - while doing operations
 	SUB 	r20, r20, 1 // Substract 1 to the exit counter
 	QBEQ 	FINISH, r20, 0 // When this exit counter reaches 0 (almost 10 seconds, it oculd be up to almost 20 seconds) exit the program
@@ -255,7 +256,14 @@ COINCWIN:
 	OR		r6, r6, r19 // Combine the possibilities of reading on these bits.
 	// End coincidence window
 	AND		r6, r6, r11 // Mask to make sure there are no other info
-	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections	
+	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections
+POSTZERO:	// Give another chance to detect a zero to increase true counts (and even coincidences)
+	// Second measure what whould be zero (for edge detection)
+	MOV		r23.w2, r30.w0 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. Limits the pulse rate to 50 MHz. Takes a lot of time and so it is skew with respect the bits from r31
+	MOV 	r23.w0, r31.w0 // This wants to be zeros for edge detection (bits 15, 14 and 7 to 0)	
+	AND		r16, r16, r23// Combine the two measurements
+	// End post zero
+	AND		r16, r16, r11 // Mask to make sure there are no other info
 	// Combining all reading pins - for isolated ones in the other (bits 15 and 14)
 	LSR		r17.b1, r16.b3, 2
 	LSR		r18.b1, r6.b3, 2
