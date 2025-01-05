@@ -1443,10 +1443,14 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 		}
 		//////////////////////////////////////////////////////////////////////////
 		// Check. It can be commented for normal operation
+		CheckOnceAux=false; //bool CheckOnceAux=false;
 		for (int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-1);i++){		
 			if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
-				cout << "GPIO::PRUdetCorrRelFreq disorded TimeTaggsSplitted after processing!!! for iQuadChIter: " << iQuadChIter << endl;
+				CheckOnceAux=true;
 			}
+		}
+		if (CheckOnceAux==true){
+			cout << "GPIO::PRUdetCorrRelFreq disorded TimeTaggsSplitted after processing!!! for iQuadChIter: " << iQuadChIter << endl;
 		}
 		/////////////////////////////////////////////////////////////////////////
 		} // for
