@@ -1309,14 +1309,14 @@ PRUdetCorrRelFreq(iIterRunsAux,CurrentiIterDump);
 //		cout << "GPIO::DDRdumpdata disorded tags after PRUdetCorrRelFreq!!!" << endl;
 //	}
 //}
-
-for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-	for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
-		if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
-			cout << "GPIO::DDRdumpdata disorded TimeTaggsSplitted!!! for iQuadChIter: " << iQuadChIter << endl;
-		}
-	}
-}
+//
+//for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+//	for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
+//		if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
+//			cout << "GPIO::DDRdumpdata disorded TimeTaggsSplitted!!! for iQuadChIter: " << iQuadChIter << endl;
+//		}
+//	}
+//}
 ///////////////////////////////////////////////
 
 if (SlowMemoryPermanentStorageFlag==true){ // We save into file the relative frequency corrected info (so it might be time disorded for different QuadNumChGroups)
@@ -1370,6 +1370,14 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		//int iQuadChIter=QuadEmitDetecSelecGPIO;// Only process the expected channel group
 		TotalCurrentNumRecordsQuadChNewOldAux=TotalCurrentNumRecordsQuadCh[iQuadChIter]-TotalCurrentNumRecordsQuadChOld[iQuadChIter];
+		//////////////////////////////////////////////////////////////////////////
+		// Check. It can be commented for normal operation
+		for (int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-1);i++){		
+			if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
+				cout << "GPIO::PRUdetCorrRelFreq disorded TimeTaggsSplitted before processing!!! for iQuadChIter: " << iQuadChIter << endl;
+			}
+		}
+		/////////////////////////////////////////////////////////////////////////
 		//cout << "GPIO::PRUdetCorrRelFreq iQuadChIter: " << iQuadChIter << endl;
 		//cout << "GPIO::PRUdetCorrRelFreq TotalCurrentNumRecordsQuadChNewOldAux: " << TotalCurrentNumRecordsQuadChNewOldAux << endl;
 		if (TotalCurrentNumRecordsQuadChNewOldAux>=TagsSeparationDetRelFreq){
@@ -1428,6 +1436,14 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 			if (TotalCurrentNumRecordsQuadChNewOldAux>0 and GPIOFlagRelFreqTest==false){cout << "GPIO::PRUdetCorrRelFreq not enough detections " << TotalCurrentNumRecordsQuadChNewOldAux << "<" << TagsSeparationDetRelFreq << " in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;}
 			else if (GPIOFlagRelFreqTest==true){cout << "GPIO::PRUdetCorrRelFreq deactivated..." << endl;}
 		}
+		//////////////////////////////////////////////////////////////////////////
+		// Check. It can be commented for normal operation
+		for (int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-1);i++){		
+			if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
+				cout << "GPIO::PRUdetCorrRelFreq disorded TimeTaggsSplitted after processing!!! for iQuadChIter: " << iQuadChIter << endl;
+			}
+		}
+		/////////////////////////////////////////////////////////////////////////
 		} // for
 //cout << "GPIO::PRUdetCorrRelFreq completed!" << endl;
 return 0; // All ok
