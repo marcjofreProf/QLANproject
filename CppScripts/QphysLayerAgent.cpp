@@ -1828,6 +1828,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
 					for (int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
 						if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i]))<=0){
+							cout << "QPLA::LinearRegressionQuBitFilter disorded TimeTaggs after processing!!! for i: " << i << ". Involved values TimeTaggs[iQuadChIter][i+1]: " << static_cast<long long int>(TimeTaggs[iQuadChIter][i+1]) << " and static_cast<long long int>(TimeTaggs[iQuadChIter][i]): " << static_cast<long long int>(TimeTaggs[iQuadChIter][i]) << endl;
 							CheckOnceAux=true;
 						}
 					}
