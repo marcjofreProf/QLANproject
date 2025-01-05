@@ -1311,13 +1311,18 @@ PRUdetCorrRelFreq(iIterRunsAux,CurrentiIterDump);
 //	}
 //}
 //
+bool CheckOnceAux=false; //bool CheckOnceAux=false; 
 for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+	CheckOnceAux=false;
 	if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
 		for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
 			if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
-				cout << "GPIO::DDRdumpdata disorded TimeTaggsSplitted!!! for iQuadChIter: " << iQuadChIter << endl;
+				CheckOnceAux=true;
 			}
 		}
+	}
+	if (CheckOnceAux==true){
+		cout << "GPIO::DDRdumpdata disorded TimeTaggsSplitted!!! for iQuadChIter: " << iQuadChIter << endl;
 	}
 }
 ///////////////////////////////////////////////
@@ -1431,7 +1436,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     		for (int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
     			//TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]]=static_cast<unsigned long long int>(static_cast<long long int>(static_cast<long double>(1.0/SlopeDetTagsAux)*static_cast<long double>(LLITimeTaggs[i]))+LLIInitialTimeTaggs);
     			// Also update the information in the original array
-    			TimeTaggsStored[CurrentiIterDumpAux]=TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]];
+    			//TimeTaggsStored[CurrentiIterDumpAux]=TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]]; // Bad idea because it becomes disorded
     			ChannelTagsStored[CurrentiIterDumpAux]=ChannelTagsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]];
     			CurrentiIterDumpAux++;// update value
     		}
