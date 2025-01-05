@@ -1311,20 +1311,20 @@ PRUdetCorrRelFreq(iIterRunsAux,CurrentiIterDump);
 //	}
 //}
 //
-bool CheckOnceAux=false; //bool CheckOnceAux=false; 
-for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-	CheckOnceAux=false;
-	if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
-		for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
-			if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
-				CheckOnceAux=true;
-			}
-		}
-	}
-	if (CheckOnceAux==true){
-		cout << "GPIO::DDRdumpdata disorded TimeTaggsSplitted!!! for iQuadChIter: " << iQuadChIter << endl;
-	}
-}
+//bool CheckOnceAux=false; //bool CheckOnceAux=false; 
+//for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+//	CheckOnceAux=false;
+//	if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
+//		for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
+//			if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
+//				CheckOnceAux=true;
+//			}
+//		}
+//	}
+//	if (CheckOnceAux==true){
+//		cout << "GPIO::DDRdumpdata disorded TimeTaggsSplitted!!! for iQuadChIter: " << iQuadChIter << endl;
+//	}
+//}
 ///////////////////////////////////////////////
 
 if (SlowMemoryPermanentStorageFlag==true){ // We save into file the relative frequency corrected info (so it might be time disorded for different QuadNumChGroups)
@@ -1592,18 +1592,18 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRefAux, un
 
 		//////////////////////////////////////////////////////////////////////////
 		// Check. It can be commented for normal operation
-		bool CheckOnceAux=false; //bool CheckOnceAux=false;
-		if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
-			for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
-				if ((static_cast<long long int>(TimeTaggsAux[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsAux[iQuadChIter][i]))<=0){
-					cout << "GPIO::RetrieveNumStoredQuBits disorded TimeTaggsAux before processing!!! for i: " << i << ". Involved values TimeTaggsAux[iQuadChIter][i+1]: " << static_cast<long long int>(TimeTaggsAux[iQuadChIter][i+1]) << " and static_cast<long long int>(TimeTaggsAux[iQuadChIter][i]): " << static_cast<long long int>(TimeTaggsAux[iQuadChIter][i]) << endl;
-					CheckOnceAux=true;
-				}
-			}
-			if (CheckOnceAux==true){
-				cout << "GPIO::RetrieveNumStoredQuBits disorded TimeTaggsAux before processing!!! for iQuadChIter: " << iQuadChIter << endl;
-			}
-		}
+		//bool CheckOnceAux=false; //bool CheckOnceAux=false;
+		//if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
+		//	for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
+		//		if ((static_cast<long long int>(TimeTaggsAux[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsAux[iQuadChIter][i]))<=0){
+		//			cout << "GPIO::RetrieveNumStoredQuBits disorded TimeTaggsAux before processing!!! for i: " << i << ". Involved values TimeTaggsAux[iQuadChIter][i+1]: " << static_cast<long long int>(TimeTaggsAux[iQuadChIter][i+1]) << " and static_cast<long long int>(TimeTaggsAux[iQuadChIter][i]): " << static_cast<long long int>(TimeTaggsAux[iQuadChIter][i]) << endl;
+		//			CheckOnceAux=true;
+		//		}
+		//	}
+		//	if (CheckOnceAux==true){
+		//		cout << "GPIO::RetrieveNumStoredQuBits disorded TimeTaggsAux before processing!!! for iQuadChIter: " << iQuadChIter << endl;
+		//	}
+		//}
 		/////////////////////////////////////////////////////////////////////////
 	}
 
