@@ -1311,13 +1311,13 @@ PRUdetCorrRelFreq(iIterRunsAux,CurrentiIterDump);
 //	}
 //}
 //
-//for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-//	for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
-//		if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
-//			cout << "GPIO::DDRdumpdata disorded TimeTaggsSplitted!!! for iQuadChIter: " << iQuadChIter << endl;
-//		}
-//	}
-//}
+for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+	for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
+		if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
+			cout << "GPIO::DDRdumpdata disorded TimeTaggsSplitted!!! for iQuadChIter: " << iQuadChIter << endl;
+		}
+	}
+}
 ///////////////////////////////////////////////
 
 if (SlowMemoryPermanentStorageFlag==true){ // We save into file the relative frequency corrected info (so it might be time disorded for different QuadNumChGroups)
