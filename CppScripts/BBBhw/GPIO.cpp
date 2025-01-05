@@ -537,6 +537,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic=EstimateSynchAvg;// Update value
 					truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic=EstimateSynchAvg; // Update value
 					this->EstimateSynchAvg=this->EstimateSynchAvg/1000000000.0;
+					if (this->EstimateSynchAvg>1.5 or this->EstimateSynchAvg<0.5){this->EstimateSynchAvg=1.0;}// Robustness
 					// Frequency synchronization correction
 					// Compute error - Relative correction of the frequency difference. This provides like the stability of the hardware clock referenced to the system clock (disciplined with network protocol)...so in the order of 10^-7
 					//this->PRUoffsetDriftError=(-fmod((static_cast<double>(this->iIterPRUcurrentTimerValPassLong*this->TimePRU1synchPeriod))/static_cast<double>(PRUclockStepPeriodNanoseconds),static_cast<double>(iepPRUtimerRange32bits))+(this->PRUcurrentTimerValLong-this->PRUcurrentTimerValOldWrapLong))/static_cast<long double>(TimePRU1synchPeriod); // The multiplication by SynchTrigPeriod is done before applying it in the Triggering and TimeTagging functions
@@ -713,7 +714,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	this->ManualSemaphoreExtra=true;
 	this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
-	this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;// Acquire this value for the this tag reading set
+	this->AdjPulseSynchCoeffAverage=static_cast<long double>(this->EstimateSynchAvg);// Acquire this value for the this tag reading set
 	///////////
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->GuardPeriod);// Indicate guard period of the sequence signal, so that it falls correctly and it is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures
@@ -904,7 +905,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	//this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	// Apply a slotted synch configuration (like synchronized Ethernet)
-	this->AdjPulseSynchCoeffAverage=this->EstimateSynchAvg;
+	this->AdjPulseSynchCoeffAverage=static_cast<long double>(this->EstimateSynchAvg);
 	// Different Signal ON time, when synching with respect normal operation.
 	if (QPLAFlagTestSynchAux==true){pru1dataMem_int[5]=static_cast<unsigned int>(minSigONPeriod);this->SigOFFPeriod=this->SynchTrigPeriod-minSigONPeriod;}// Minimum width time on, to have accuracy
 	else{pru1dataMem_int[5]=static_cast<unsigned int>(this->SigONPeriod);this->SigOFFPeriod=this->SynchTrigPeriod-this->SigONPeriod;} // signal width time on in regular operation
@@ -1235,7 +1236,7 @@ while (CurrentiIterDumpAux<NumQuBitsPerRun and extendedCounterPRUholder>extended
 	extendedCounterPRUholder=static_cast<unsigned long long int>(valCycleCountPRU);//extendedCounterPRUaux + static_cast<unsigned long long int>(valCycleCountPRU);
 	//if (iIterDump==0 or iIterDump== 512 or iIterDump==1023){cout << "extendedCounterPRU: " << extendedCounterPRU << endl;}
 	// Apply system clock corrections
-	TimeTaggsStored[TotalCurrentNumRecords]=static_cast<unsigned long long int>(static_cast<double>(static_cast<long long int>(extendedCounterPRUholder)-LLIOldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error	    
+	TimeTaggsStored[TotalCurrentNumRecords]=static_cast<unsigned long long int>(static_cast<long double>(static_cast<long long int>(extendedCounterPRUholder)-LLIOldLastTimeTagg)*AdjPulseSynchCoeffAverage)+TimeTaggsLast;	// The fist OldLastTimeTagg and TimeTaggsLast of the iteration is compensated for with the calibration tag together with the accumulated synchronization error	    
 	//////////////////////////////////////////////////////////////		
 	// When unsigned short
 	ChannelTagsStored[TotalCurrentNumRecords]=this->packBits(static_cast<unsigned short>(*valp)); // we're just interested in 12 bits which we have to re-order
@@ -1372,18 +1373,18 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 		TotalCurrentNumRecordsQuadChNewOldAux=TotalCurrentNumRecordsQuadCh[iQuadChIter]-TotalCurrentNumRecordsQuadChOld[iQuadChIter];
 		//////////////////////////////////////////////////////////////////////////
 		// Check. It can be commented for normal operation
-		cout << "GPIO::PRUdetCorrRelFreq TotalCurrentNumRecordsQuadChNewOldAux: " << TotalCurrentNumRecordsQuadChNewOldAux << endl;
-		bool CheckOnceAux=false;
-		if (TotalCurrentNumRecordsQuadChNewOldAux>1){
-			for (int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-1);i++){		
-				if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
-					CheckOnceAux=true;
-				}
-			}
-			if (CheckOnceAux==true){
-				cout << "GPIO::PRUdetCorrRelFreq disorded TimeTaggsSplitted before processing!!! for iQuadChIter: " << iQuadChIter << endl;
-			}
-		}
+		//cout << "GPIO::PRUdetCorrRelFreq TotalCurrentNumRecordsQuadChNewOldAux: " << TotalCurrentNumRecordsQuadChNewOldAux << endl;
+		//bool CheckOnceAux=false;
+		//if (TotalCurrentNumRecordsQuadChNewOldAux>1){
+		//	for (int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-1);i++){		
+		//		if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
+		//			CheckOnceAux=true;
+		//		}
+		//	}
+		//	if (CheckOnceAux==true){
+		//		cout << "GPIO::PRUdetCorrRelFreq disorded TimeTaggsSplitted before processing!!! for iQuadChIter: " << iQuadChIter << endl;
+		//	}
+		//}
 		/////////////////////////////////////////////////////////////////////////
 		//cout << "GPIO::PRUdetCorrRelFreq iQuadChIter: " << iQuadChIter << endl;
 		//cout << "GPIO::PRUdetCorrRelFreq TotalCurrentNumRecordsQuadChNewOldAux: " << TotalCurrentNumRecordsQuadChNewOldAux << endl;
@@ -1445,17 +1446,17 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 		}
 		//////////////////////////////////////////////////////////////////////////
 		// Check. It can be commented for normal operation
-		CheckOnceAux=false; //bool CheckOnceAux=false;
-		if (TotalCurrentNumRecordsQuadChNewOldAux>1){
-			for (int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-1);i++){		
-				if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
-					CheckOnceAux=true;
-				}
-			}
-			if (CheckOnceAux==true){
-				cout << "GPIO::PRUdetCorrRelFreq disorded TimeTaggsSplitted after processing!!! for iQuadChIter: " << iQuadChIter << endl;
-			}
-		}
+		//CheckOnceAux=false; //bool CheckOnceAux=false;
+		//if (TotalCurrentNumRecordsQuadChNewOldAux>1){
+		//	for (int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-1);i++){		
+		//		if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
+		//			CheckOnceAux=true;
+		//		}
+		//	}
+		//	if (CheckOnceAux==true){
+		//		cout << "GPIO::PRUdetCorrRelFreq disorded TimeTaggsSplitted after processing!!! for iQuadChIter: " << iQuadChIter << endl;
+		//	}
+		//}
 		/////////////////////////////////////////////////////////////////////////
 		} // for
 //cout << "GPIO::PRUdetCorrRelFreq completed!" << endl;

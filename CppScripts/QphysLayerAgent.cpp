@@ -1723,7 +1723,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 	  for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 	  	//cout << "QPLA::RawTotalCurrentNumRecordsQuadCh[iQuadChIter] " << RawTotalCurrentNumRecordsQuadCh[iQuadChIter] << endl;
 	  	if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
-				// If the SNR is not well above 20 dB or 30dB, this methods perform really bad
+				// If the SNR is not well above 20dB or 30dB, this methods perform really bad
 				// Estimate the x values for the linear regression from the y values (RawTimeTaggs)
 				long long int xEstimateRawTimeTaggs[RawTotalCurrentNumRecordsQuadCh[iQuadChIter]]={0}; // Timetaggs of the detections raw
 				//long long int RoundingAux;
@@ -1822,8 +1822,22 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				//long long int CheckValueAux=(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
 				//cout << "QPLA::LinearRegressionQuBitFilter::CheckValueAux: "<< CheckValueAux << endl;
 				////////////////////////////////////////
+				//////////////////////////////////////////////////////////////////////////
+				// Check. It can be commented for normal operation
+				bool CheckOnceAux=false; //bool CheckOnceAux=false;
+				if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
+					for (int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
+						if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i]))<=0){
+							CheckOnceAux=true;
+						}
+					}
+					if (CheckOnceAux==true){
+						cout << "QPLA::LinearRegressionQuBitFilter disorded TimeTaggs after processing!!! for iQuadChIter: " << iQuadChIter << endl;
+					}
+				}
+				/////////////////////////////////////////////////////////////////////////
 			}
-		}
+		}// for
 	}
 	else{ // Do not apply filtering
 		//if (FlagTestSynch==false){

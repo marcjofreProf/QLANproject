@@ -291,7 +291,7 @@ private:// Variables
 	unsigned long long int SynchPulsesTagsUsed[MaxNumPulses]={0};
 	double PeriodCountsPulseAdj=(((1.0/(double)(PulseFreq))*1e9)/((double)(PRUclockStepPeriodNanoseconds)));// Not used
 	double AdjPulseSynchCoeff=1.0;
-	double AdjPulseSynchCoeffAverage=1.0;
+	long double AdjPulseSynchCoeffAverage=1.0;
 	double AccumulatedErrorDrift=0.0; // For retrieved relative frequency difference from protocol
 	double AccumulatedErrorDriftAux=0.0;// For retrieved relative offset difference from protocol
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
