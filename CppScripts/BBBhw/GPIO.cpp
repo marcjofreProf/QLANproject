@@ -1315,7 +1315,7 @@ bool CheckOnceAux=false; //bool CheckOnceAux=false;
 for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 	CheckOnceAux=false;
 	if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
-		for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
+		for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
 			if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
 				CheckOnceAux=true;
 			}
@@ -1401,7 +1401,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     		//cout << "GPIO::LastTimeTaggRef[0]: " << LastTimeTaggRef[0] << endl;
     		//cout << "GPIO::TimeTaggs[iQuadChIter][0]: " << TimeTaggs[iQuadChIter][0] << endl;
     		long long int LLITimeTaggs[TotalCurrentNumRecordsQuadChNewOldAux]={0};
-    		for (int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
+    		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
     			LLITimeTaggs[i]=static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]])-LLIInitialTimeTaggs;
     		}
     		double SlopeDetTagsAux=1.0;
@@ -1410,13 +1410,13 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     		long long int xAux[TotalCurrentNumRecordsQuadChNewOldAux]={0};
     		long long int LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
     		long long int LLISynchTrigPeriodHalf=static_cast<long long int>(SynchTrigPeriod/2.0);
-    		for (int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
+    		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
     			xAux[i]=((LLITimeTaggs[i]+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
     		}
 
 		    // Compute the candidate slope
     		int iAux=0;
-    		for (int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-TagsSeparationDetRelFreq);i++){
+    		for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-TagsSeparationDetRelFreq);i++){
     			if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
     				SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
     				iAux++;
@@ -1433,7 +1433,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     		
     		//cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << endl;
 		    // Un-normalize
-    		for (int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
+    		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
     			TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]]=static_cast<unsigned long long int>(static_cast<long long int>(static_cast<long double>(1.0/SlopeDetTagsAux)*static_cast<long double>(LLITimeTaggs[i]))+LLIInitialTimeTaggs);
     			// Also update the information in the original array - Bad idea because they become disorded
     			//TimeTaggsStored[CurrentiIterDumpAux]=TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]]; 
@@ -1584,7 +1584,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRefAux, un
 	}
 	// Place the information in the upper layer agent arrays
 	for (unsigned short iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-		for (int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){  
+		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadCh[iQuadChIter];i++){  
 			TimeTaggsAux[iQuadChIter][i]=TimeTaggsSplitted[iQuadChIter][i];
 			ChannelTagsAux[iQuadChIter][i]=ChannelTagsSplitted[iQuadChIter][i];			
 		}
@@ -1594,7 +1594,7 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRefAux, un
 		// Check. It can be commented for normal operation
 		bool CheckOnceAux=false; //bool CheckOnceAux=false;
 		if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
-			for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
+			for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
 				if ((static_cast<long long int>(TimeTaggsAux[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsAux[iQuadChIter][i]))<=0){
 					cout << "GPIO::RetrieveNumStoredQuBits disorded TimeTaggsAux before processing!!! for i: " << i << ". Involved values TimeTaggsAux[iQuadChIter][i+1]: " << static_cast<long long int>(TimeTaggsAux[iQuadChIter][i+1]) << " and static_cast<long long int>(TimeTaggsAux[iQuadChIter][i]): " << static_cast<long long int>(TimeTaggsAux[iQuadChIter][i]) << endl;
 					CheckOnceAux=true;
