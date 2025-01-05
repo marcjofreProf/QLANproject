@@ -45,7 +45,7 @@
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
 // r12 reserved for 0x22000 Control register
-// Not really - r13 reserved for 0x2200C DWT_CYCCNT
+// r13 reserved for 0x2200C DWT_CYCCNT
 
 // r16 reserved for raising edge detection operation together with r6
 // r17 might be used for some intermediate operations
@@ -106,7 +106,7 @@ INITIATIONS:// This is only run once
 //	LED_OFF	// just for signaling initiations
 	// Using DWT cycle counter
 	MOV	r12, 0x22000
-	//MOV	r13, 0x2200C // Actual value of the DWT_CYCNT. Maybe it can be referenced from CONST_PRUCFG | 0xC
+	MOV	r13, 0x2200C // Actual value of the DWT_CYCNT. Maybe it can be referenced from CONST_PRUCFG | 0xC
 
 	// Initializations - some, just in case
 	LDI 	r5, 0 // Initialize for the first time r5
@@ -129,7 +129,7 @@ INITIATIONS:// This is only run once
 	LBBO	r2.b0, r12, 0, 1 // r2 maps b0 control register
 	CLR		r2.t3
 	SBBO	r2.b0, r12, 0, 1 // stops DWT_CYCCNT
-	SBCO	r7, CONST_PRUCFG, 0xC, 4 // reset DWT_CYCNT // SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
+	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 //	LBBO	r2.b0, r12, 0, 1 // r2 maps b0 control register
 //	SET		r2.t3
 	//SBBO	r2.b0, r12, 0, 1 // Enables DWT_CYCCNT. We start it when the commands enters
@@ -227,7 +227,7 @@ PERIODICOFFSETLOOP:
 	QBNE	PERIODICOFFSETLOOP, r22, 0 // Coincides with a 0
 FIRSTREF:
 	// Store a calibration timetagg
-	LBCO	r5, CONST_PRUCFG, 0xC, 4 // Read the value of DWT_CYCNT  // LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
+	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT
 	SBCO	r5, CONST_PRUSHAREDRAM, 0, 4// Calibration time tag (together with the acumulated synchronization error)
 WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happen
 	// Load the value of R31 into a working register
@@ -276,7 +276,7 @@ COMBINATIONEDGE:
 CHECKDET:		
 	QBEQ 	WAIT_FOR_EVENT, r6, 0//QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 //all the b0 above can be converted to w0 to capture more channels, but then in the channel tag recorded has to be increaed and appropiatelly handled in c++ (also the number of tags per run has to be reduced)
 	// If the program reaches this point, at least one of the bits is high
-	LBCO	r5, CONST_PRUCFG, 0xC, 4 // Read the value of DWT_CYCNT.  LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT. Very important to reduce jitter
+	LBBO	r5, r13, 0, 4 // Read the value of DWT_CYCNT. Very important to reduce jitter
 TIMETAG:
 	// Faster Concatenated Time counter and Detection channels
 	SBCO 	r5, CONST_PRUSHAREDRAM, r1, 6 // Put contents of r5 and r6.w0 of DWT_CYCCNT into the address offset at r1.
@@ -295,7 +295,7 @@ FINISH:
 	LBBO	r2.b0, r12, 0, 1 // r2 maps b0 control register
 	CLR		r2.t3
 	SBBO	r2.b0, r12, 0, 1 // stops DWT_CYCCNT
-	SBCO	r7, CONST_PRUCFG, 0xC, 4 // reset DWT_CYCNT  SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
+	SBBO	r7, r13, 0, 4 // reset DWT_CYCNT
 	//LED_ON // For signaling the end visually and also to give time to put the command in the OWN-RAM memory
 	//LED_OFF
 	MOV		r31.b0, PRU0_ARM_INTERRUPT+16// Notification sent at the beginning of the signal//SBCO 	r17.b0, CONST_PRUDRAM, 4, 1 // Put contents of r0 into CONST_PRUDRAM// code 1 means that we have finished. This can be substituted by an interrupt: MOV 	r31.b0, PRU0_ARM_INTERRUPT+16
