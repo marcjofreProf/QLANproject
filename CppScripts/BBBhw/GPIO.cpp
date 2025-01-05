@@ -1303,17 +1303,17 @@ PRUdetCorrRelFreq(iIterRunsAux,CurrentiIterDump);
 
 ///////////////////////////////////////////////
 // Check that TimeTaggsStored are increasingly ordered. This can be commented, it is just for checking
-//
-for (int i=0;i<(CurrentiIterDump-1);i++){
-	if ((static_cast<long long int>(TimeTaggsStored[i+1])-static_cast<long long int>(TimeTaggsStored[i]))<=0){
-		cout << "GPIO::DDRdumpdata disorded tags after PRUdetCorrRelFreq!!!" << endl;
-	}
-}
+// TimeTaggsStored will be disordered
+//for (int i=0;i<(CurrentiIterDump-1);i++){
+//	if ((static_cast<long long int>(TimeTaggsStored[i+1])-static_cast<long long int>(TimeTaggsStored[i]))<=0){
+//		cout << "GPIO::DDRdumpdata disorded tags after PRUdetCorrRelFreq!!!" << endl;
+//	}
+//}
 
 for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 	for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
 		if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
-			cout << "GPIO::DDRdumpdata disorded TimeTaggsStored!!!" << endl;
+			cout << "GPIO::DDRdumpdata disorded TimeTaggsSplitted!!! for iQuadChIter: " << iQuadChIter << endl;
 		}
 	}
 }
