@@ -19,6 +19,7 @@
 // In the context of the AM335x Programmable Real-time Units (PRUs), "CXX" generally refers to the Constant Table Pointer Registers, such as C24, C25, C26, C27, C28, C29, C30, and C31. Notice though that they can only be used in combination of sequential pairs.
 //These registers are a key feature of the PRU's architecture, designed to facilitate efficient access to various memory regions and peripherals within the device. Each PRU core in the AM335x processors has its own set of these constant table registers.
 // these are like registers but constants, no operations can be performed, so they are good for storing addresses of interest
+// https://beagleboard.narkive.com/tLk0orkL/pru-c-project-from-device-tree-to-program-execution
 #define CONST_PRUCFG         C4
 #define CONST_PRUDRAM        C24 // mapping PRU own RAM
 #define CONST_IETREG         C26 // points to 0x0002E000

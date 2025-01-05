@@ -826,12 +826,12 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	pru0dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command
 	//QPLAFutureTimePoint=QPLAFutureTimePoint-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg);// Actually, the time measured duration_FinalInitialMeasTrigAuxAvg is not indicative of much (only if it changes a lot to high values it means trouble)
 	// Set top priority
-	this->setMaxRrPriority(PriorityValTop);
+	//this->setMaxRrPriority(PriorityValTop);
 	while (Clock::now()<QPLAFutureTimePoint);// Busy wait time synch sending signals. With while loop, it is more aggresive to take control (hence fall within the correct interrupt period) but has more variation (but it does not matter since there will be the proceedure to synch in the PRU)
 	prussdrv_pru_send_event(21);
 	//this->TimePointClockTagPRUfinal=Clock::now();// Compensate for delays
 	// Set regular priority
-	this->setMaxRrPriority(PriorityValRegular);
+	//this->setMaxRrPriority(PriorityValRegular);
 	//retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);// First interrupt sent to measure time
 	//  PRU long execution making sure that notification interrupts do not overlap
 	retInterruptsPRU0=prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0,WaitTimeInterruptPRU0);
@@ -1048,14 +1048,14 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	pru1dataMem_int[0]=static_cast<unsigned int>(QuadEmitDetecSelecAux); // set command. Generate signals. Takes around 900000 clock ticks
 	//this->QPLAFutureTimePoint=this->QPLAFutureTimePoint-std::chrono::nanoseconds(duration_FinalInitialMeasTrigAuxAvg); // Actually, the time measured duration_FinalInitialMeasTrigAuxAvg is not indicative of much (only if it changes a lot to high values it means trouble)
 	// Set top priority
-	this->setMaxRrPriority(PriorityValTop);
+	//this->setMaxRrPriority(PriorityValTop);
 	////if (Clock::now()<this->QPLAFutureTimePoint){cout << "Check that we have enough time" << endl;}
 	while (Clock::now()<this->QPLAFutureTimePoint);// Busy wait time synch sending signals. With while loop, it is more aggresive to take control (hence fall within the correct interrupt period) but has more variation (but it does not matter since there will be the proceedure to synch in the PRU)
 	// Important, the following line at the very beggining to reduce the command jitter
 	prussdrv_pru_send_event(22);//Send host arm to PRU1 interrupt
 	//this->TimePointClockSynchPRUfinal=Clock::now();
 	// Set regular priority
-	this->setMaxRrPriority(PriorityValRegular);
+	//this->setMaxRrPriority(PriorityValRegular);
 	// Here there should be the instruction command to tell PRU1 to start generating signals
 	// We have to define a command, compatible with the memory space of PRU0 to tell PRU1 to initiate signals
 	//  PRU long execution making sure that notification interrupts do not overlap
@@ -1290,7 +1290,14 @@ if(valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts th
 //cout << "GPIO::DDRdumpdata::SynchTrigPeriod: " << SynchTrigPeriod << endl;
 //cout << "GPIO::DDRdumpdata::NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
 ///////////////////////////////////////////////
-
+// Check that timetaggs are increasingly ordered. This can be commented, it is just for checking
+//
+for (int i=0;i<(CurrentiIterDump-1);i++){
+	if ((static_cast<long long int>(TimeTaggsStored[i+1])-static_cast<long long int>(TimeTaggsStored[i]))<=0){
+		cout << "GPIO::DDRdumpdata disorded tags!!!" << endl;
+	}
+}
+///////////////////////////////////////////////
 // Correct the detected qubits relative frequency difference (due to the sender node) and split between quad groups of 4 channels. Computed at each iteration so that the time span is not too large
 PRUdetCorrRelFreq(iIterRunsAux,CurrentiIterDump);
 
