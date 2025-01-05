@@ -1374,13 +1374,15 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 		// Check. It can be commented for normal operation
 		cout << "GPIO::PRUdetCorrRelFreq TotalCurrentNumRecordsQuadChNewOldAux: " << TotalCurrentNumRecordsQuadChNewOldAux << endl;
 		bool CheckOnceAux=false;
-		for (int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-1);i++){		
-			if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
-				CheckOnceAux=true;
+		if (TotalCurrentNumRecordsQuadChNewOldAux>1){
+			for (int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-1);i++){		
+				if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
+					CheckOnceAux=true;
+				}
 			}
-		}
-		if (CheckOnceAux==true){
-			cout << "GPIO::PRUdetCorrRelFreq disorded TimeTaggsSplitted before processing!!! for iQuadChIter: " << iQuadChIter << endl;
+			if (CheckOnceAux==true){
+				cout << "GPIO::PRUdetCorrRelFreq disorded TimeTaggsSplitted before processing!!! for iQuadChIter: " << iQuadChIter << endl;
+			}
 		}
 		/////////////////////////////////////////////////////////////////////////
 		//cout << "GPIO::PRUdetCorrRelFreq iQuadChIter: " << iQuadChIter << endl;
@@ -1444,13 +1446,15 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 		//////////////////////////////////////////////////////////////////////////
 		// Check. It can be commented for normal operation
 		CheckOnceAux=false; //bool CheckOnceAux=false;
-		for (int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-1);i++){		
-			if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
-				CheckOnceAux=true;
+		if (TotalCurrentNumRecordsQuadChNewOldAux>1){
+			for (int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-1);i++){		
+				if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
+					CheckOnceAux=true;
+				}
 			}
-		}
-		if (CheckOnceAux==true){
-			cout << "GPIO::PRUdetCorrRelFreq disorded TimeTaggsSplitted after processing!!! for iQuadChIter: " << iQuadChIter << endl;
+			if (CheckOnceAux==true){
+				cout << "GPIO::PRUdetCorrRelFreq disorded TimeTaggsSplitted after processing!!! for iQuadChIter: " << iQuadChIter << endl;
+			}
 		}
 		/////////////////////////////////////////////////////////////////////////
 		} // for
