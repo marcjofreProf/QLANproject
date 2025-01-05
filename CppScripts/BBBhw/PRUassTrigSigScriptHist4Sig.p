@@ -34,9 +34,11 @@
 #define ARM_PRU0_INTERRUPT      21
 #define ARM_PRU1_INTERRUPT      22
 
+
+// The constant table registers are common for both PRU (so they share the same values)
 #define CONST_PRUCFG         C4
 #define CONST_PRUDRAM        C24 // allow the PRU to map portions of the system's memory into its own address space. In particular we will map its own data RAM
-#define CONST_IETREG	     C26
+#define CONST_IETREG	     C26 //
 
 #define OWN_RAM              0x00000000 // current PRU data RAM
 #define OWN_RAMoffset	     0x00000200 // Offset from Base OWN_RAM to avoid collision with some data tht PRU might store
@@ -62,8 +64,8 @@
 // r1 is reserved with the number NUM_REPETITIONS - storing the PRU 1 DATA number of repetitions
 //// If using the cycle counte rin the PRU (not adjusted to synchronization protocols)
 // We cannot use Constan table pointers since the base addresses are too far
-// r2 reserved for 0x22000 Control register
-// r3 reserved for 0x2200C DWT_CYCCNT
+// r2 reserved for 0x22000 Control register. Not really needed
+// r3 reserved for 0x2200C DWT_CYCCNT. Not really needed
 // r4 reserved for zeroing registers
 // r5 reserved for delay count
 // r6 reserved for half period of delay module
