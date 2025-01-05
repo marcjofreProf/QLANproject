@@ -1724,6 +1724,21 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 	  	//cout << "QPLA::RawTotalCurrentNumRecordsQuadCh[iQuadChIter] " << RawTotalCurrentNumRecordsQuadCh[iQuadChIter] << endl;
 	  	if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
 				// If the SNR is not well above 20dB or 30dB, this methods perform really bad
+				//////////////////////////////////////////////////////////////////////////
+				// Check. It can be commented for normal operation
+				bool CheckOnceAux=false; //bool CheckOnceAux=false;
+				if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
+					for (int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
+						if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i]))<=0){
+							cout << "QPLA::LinearRegressionQuBitFilter disorded TimeTaggs before processing!!! for i: " << i << ". Involved values TimeTaggs[iQuadChIter][i+1]: " << static_cast<long long int>(TimeTaggs[iQuadChIter][i+1]) << " and static_cast<long long int>(TimeTaggs[iQuadChIter][i]): " << static_cast<long long int>(TimeTaggs[iQuadChIter][i]) << endl;
+							CheckOnceAux=true;
+						}
+					}
+					if (CheckOnceAux==true){
+						cout << "QPLA::LinearRegressionQuBitFilter disorded TimeTaggs before processing!!! for iQuadChIter: " << iQuadChIter << endl;
+					}
+				}
+				/////////////////////////////////////////////////////////////////////////
 				// Estimate the x values for the linear regression from the y values (RawTimeTaggs)
 				long long int xEstimateRawTimeTaggs[RawTotalCurrentNumRecordsQuadCh[iQuadChIter]]={0}; // Timetaggs of the detections raw
 				//long long int RoundingAux;
@@ -1824,7 +1839,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				////////////////////////////////////////
 				//////////////////////////////////////////////////////////////////////////
 				// Check. It can be commented for normal operation
-				bool CheckOnceAux=false; //bool CheckOnceAux=false;
+				CheckOnceAux=false; //bool CheckOnceAux=false;
 				if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
 					for (int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
 						if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i]))<=0){

@@ -1583,6 +1583,22 @@ int GPIO::RetrieveNumStoredQuBits(unsigned long long int* LastTimeTaggRefAux, un
 			ChannelTagsAux[iQuadChIter][i]=ChannelTagsSplitted[iQuadChIter][i];			
 		}
 		TotalCurrentNumRecordsQuadChAux[iQuadChIter]=TotalCurrentNumRecordsQuadCh[iQuadChIter];
+
+		//////////////////////////////////////////////////////////////////////////
+		// Check. It can be commented for normal operation
+		bool CheckOnceAux=false; //bool CheckOnceAux=false;
+		if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
+			for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
+				if ((static_cast<long long int>(TimeTaggsAux[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsAux[iQuadChIter][i]))<=0){
+					cout << "GPIO::RetrieveNumStoredQuBits disorded TimeTaggsAux before processing!!! for i: " << i << ". Involved values TimeTaggsAux[iQuadChIter][i+1]: " << static_cast<long long int>(TimeTaggsAux[iQuadChIter][i+1]) << " and static_cast<long long int>(TimeTaggsAux[iQuadChIter][i]): " << static_cast<long long int>(TimeTaggsAux[iQuadChIter][i]) << endl;
+					CheckOnceAux=true;
+				}
+			}
+			if (CheckOnceAux==true){
+				cout << "GPIO::RetrieveNumStoredQuBits disorded TimeTaggsAux before processing!!! for iQuadChIter: " << iQuadChIter << endl;
+			}
+		}
+		/////////////////////////////////////////////////////////////////////////
 	}
 
 	return TotalCurrentNumRecords;
