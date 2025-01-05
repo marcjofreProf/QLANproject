@@ -1290,16 +1290,34 @@ if(valCycleCountPRU >= (0xFFFFFFFF-this->AfterCountsThreshold)){// The counts th
 //cout << "GPIO::DDRdumpdata::SynchTrigPeriod: " << SynchTrigPeriod << endl;
 //cout << "GPIO::DDRdumpdata::NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
 ///////////////////////////////////////////////
-// Check that timetaggs are increasingly ordered. This can be commented, it is just for checking
+// Check that TimeTaggsStored are increasingly ordered. This can be commented, it is just for checking
 //
-for (int i=0;i<(CurrentiIterDump-1);i++){
-	if ((static_cast<long long int>(TimeTaggsStored[i+1])-static_cast<long long int>(TimeTaggsStored[i]))<=0){
-		cout << "GPIO::DDRdumpdata disorded tags!!!" << endl;
-	}
-}
+//for (int i=0;i<(CurrentiIterDump-1);i++){
+//	if ((static_cast<long long int>(TimeTaggsStored[i+1])-static_cast<long long int>(TimeTaggsStored[i]))<=0){
+//		cout << "GPIO::DDRdumpdata disorded tags before PRUdetCorrRelFreq!!!" << endl;
+//	}
+//}
 ///////////////////////////////////////////////
 // Correct the detected qubits relative frequency difference (due to the sender node) and split between quad groups of 4 channels. Computed at each iteration so that the time span is not too large
 PRUdetCorrRelFreq(iIterRunsAux,CurrentiIterDump);
+
+///////////////////////////////////////////////
+// Check that TimeTaggsStored are increasingly ordered. This can be commented, it is just for checking
+//
+for (int i=0;i<(CurrentiIterDump-1);i++){
+	if ((static_cast<long long int>(TimeTaggsStored[i+1])-static_cast<long long int>(TimeTaggsStored[i]))<=0){
+		cout << "GPIO::DDRdumpdata disorded tags after PRUdetCorrRelFreq!!!" << endl;
+	}
+}
+
+for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+	for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
+		if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
+			cout << "GPIO::DDRdumpdata disorded TimeTaggsStored!!!" << endl;
+		}
+	}
+}
+///////////////////////////////////////////////
 
 if (SlowMemoryPermanentStorageFlag==true){ // We save into file the relative frequency corrected info (so it might be time disorded for different QuadNumChGroups)
 	// Reading TimeTaggs
