@@ -1390,7 +1390,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 		/////////////////////////////////////////////////////////////////////////
 		//cout << "GPIO::PRUdetCorrRelFreq iQuadChIter: " << iQuadChIter << endl;
 		//cout << "GPIO::PRUdetCorrRelFreq TotalCurrentNumRecordsQuadChNewOldAux: " << TotalCurrentNumRecordsQuadChNewOldAux << endl;
-		if (TotalCurrentNumRecordsQuadChNewOldAux>=TagsSeparationDetRelFreq){
+		if (TotalCurrentNumRecordsQuadChNewOldAux>=TagsSeparationDetRelFreq and GPIOFlagRelFreqTest==false){
 			// Good strategy to substrat the system absolute time which is multiple to the effective period, since we want to see the deviation with respect this reference values
     		unsigned long long int ULLIInitialTimeTaggs=TimeTaggsLast;//TimeTaggs[iQuadChIter][0];// Normalize to the first reference timetag (it is not a detect qubit, but the timetagg of entering the timetagg PRU), which is a strong reference
     		long long int LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggsLast);//static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
