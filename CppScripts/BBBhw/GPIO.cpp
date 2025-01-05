@@ -1312,9 +1312,11 @@ PRUdetCorrRelFreq(iIterRunsAux,CurrentiIterDump);
 //}
 //
 for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-	for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
-		if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
-			cout << "GPIO::DDRdumpdata disorded TimeTaggsSplitted!!! for iQuadChIter: " << iQuadChIter << endl;
+	if (TotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
+		for (int i=0;i<(TotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
+			if ((static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i]))<=0){
+				cout << "GPIO::DDRdumpdata disorded TimeTaggsSplitted!!! for iQuadChIter: " << iQuadChIter << endl;
+			}
 		}
 	}
 }
