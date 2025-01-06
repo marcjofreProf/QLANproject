@@ -898,8 +898,8 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	// Apply a slotted synch configuration (like synchronized Ethernet)
 	this->AdjPulseSynchCoeffAverage=static_cast<long double>(this->EstimateSynchAvg);
 	// Different Signal ON time, when synching with respect normal operation.
-	if (QPLAFlagTestSynchAux==true){pru1dataMem_int[5]=static_cast<unsigned int>(minSigONPeriod);this->SigOFFPeriod=this->SynchTrigPeriod-minSigONPeriod-1.0;}// Minimum width time on, to have accuracy
-	else{pru1dataMem_int[5]=static_cast<unsigned int>(this->SigONPeriod);this->SigOFFPeriod=this->SynchTrigPeriod-this->SigONPeriod-1.0;} // signal width time on in regular operation
+	if (QPLAFlagTestSynchAux==true){pru1dataMem_int[5]=static_cast<unsigned int>(minSigONPeriod);this->SigOFFPeriod=this->SynchTrigPeriod-minSigONPeriod+1.0;}// Minimum width time on, to have accuracy
+	else{pru1dataMem_int[5]=static_cast<unsigned int>(this->SigONPeriod);this->SigOFFPeriod=this->SynchTrigPeriod-this->SigONPeriod+1.0;} // signal width time on in regular operation
 	if (SigOFFPeriod<1.0){SigOFFPeriod=1.0; cout << "GPIO::SendTriggerSignals SigOFFPeriod smaller than 1 PRU unit...check inconsistency!!!" << endl;}
 	pru1dataMem_int[7]=static_cast<unsigned int>(this->SigOFFPeriod);// Off time
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->GuardPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2

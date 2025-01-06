@@ -1819,6 +1819,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 						}
 					}
 				}
+				cout << "QPLA::LinearRegressionQuBitFilter FilterDiffCheckAux: " << FilterDiffCheckAux << endl;
 	
 				// Compute quality of estimation, related to the SNR
 				double EstimatedSNRqubitsRatio=1.0-static_cast<double>(FilteredNumStoredQubits)/static_cast<double>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]);// in linear	
