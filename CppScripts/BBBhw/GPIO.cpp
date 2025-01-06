@@ -898,8 +898,8 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	// Apply a slotted synch configuration (like synchronized Ethernet)
 	this->AdjPulseSynchCoeffAverage=static_cast<long double>(this->EstimateSynchAvg);
 	// Different Signal ON time, when synching with respect normal operation.
-	if (QPLAFlagTestSynchAux==true){pru1dataMem_int[5]=static_cast<unsigned int>(minSigONPeriod);this->SigOFFPeriod=this->SynchTrigPeriod-minSigONPeriod+2.0;}// Minimum width time on, to have accuracy
-	else{pru1dataMem_int[5]=static_cast<unsigned int>(this->SigONPeriod);this->SigOFFPeriod=this->SynchTrigPeriod-this->SigONPeriod+2.0;} // signal width time on in regular operation
+	if (QPLAFlagTestSynchAux==true){pru1dataMem_int[5]=static_cast<unsigned int>(minSigONPeriod);this->SigOFFPeriod=this->SynchTrigPeriod-minSigONPeriod;}// Minimum width time on, to have accuracy
+	else{pru1dataMem_int[5]=static_cast<unsigned int>(this->SigONPeriod);this->SigOFFPeriod=this->SynchTrigPeriod-this->SigONPeriod;} // signal width time on in regular operation
 	if (SigOFFPeriod<1.0){SigOFFPeriod=1.0; cout << "GPIO::SendTriggerSignals SigOFFPeriod smaller than 1 PRU unit...check inconsistency!!!" << endl;}
 	pru1dataMem_int[7]=static_cast<unsigned int>(this->SigOFFPeriod);// Off time
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->GuardPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
@@ -1261,7 +1261,7 @@ this->ManualSemaphoreExtra=false;
 this->release();
 /////////////////////////////////////////////////////////////////////////
 // Debbugin relative frequency difference
-cout << "GPIO::DDRdumpdata AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
+//cout << "GPIO::DDRdumpdata AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
 //////////////////////////////////////////////////////////////////////////
 // Notify lost of track of counts due to timer overflow - Not really used
 //if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
@@ -1435,35 +1435,35 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     			//CurrentiIterDumpAux++;// update value
     		}
 		    //////////////////////////////////////////////////////////////////////////////////////////
-		    // Checks of proper relative frequency correction
-		    LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggsLast);//static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
-    		//cout << "GPIO::LastTimeTaggRef[0]: " << LastTimeTaggRef[0] << endl;
-    		//cout << "GPIO::TimeTaggs[iQuadChIter][0]: " << TimeTaggs[iQuadChIter][0] << endl;
-    		LLITimeTaggs[TotalCurrentNumRecordsQuadChNewOldAux]={0};
-    		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
-    			LLITimeTaggs[i]=static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]])-LLIInitialTimeTaggs;
-    		}
-    		SlopeDetTagsAux=1.0;
-
-		    // Calculate the "x" values
-    		xAux[TotalCurrentNumRecordsQuadChNewOldAux]={0};
-    		LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
-    		LLISynchTrigPeriodHalf=static_cast<long long int>(SynchTrigPeriod/2.0);
-    		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
-    			xAux[i]=((LLITimeTaggs[i]+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
-    		}
-
-		    // Compute the candidate slope
-    		iAux=0;
-    		for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-TagsSeparationDetRelFreq);i++){
-    			if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
-    				SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
-    				iAux++;
-    			}
-    		}
-
-    		SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
-		    cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux: " << SlopeDetTagsAux << endl;
+		    //// Checks of proper relative frequency correction
+		    //LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggsLast);//static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
+    		////cout << "GPIO::LastTimeTaggRef[0]: " << LastTimeTaggRef[0] << endl;
+    		////cout << "GPIO::TimeTaggs[iQuadChIter][0]: " << TimeTaggs[iQuadChIter][0] << endl;
+    		//LLITimeTaggs[TotalCurrentNumRecordsQuadChNewOldAux]={0};
+    		//for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
+    		//	LLITimeTaggs[i]=static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]])-LLIInitialTimeTaggs;
+    		//}
+    		//SlopeDetTagsAux=1.0;
+    		//
+		    //// Calculate the "x" values
+    		//xAux[TotalCurrentNumRecordsQuadChNewOldAux]={0};
+    		//LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
+    		//LLISynchTrigPeriodHalf=static_cast<long long int>(SynchTrigPeriod/2.0);
+    		//for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
+    		//	xAux[i]=((LLITimeTaggs[i]+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
+    		//}
+    		//
+		    //// Compute the candidate slope
+    		//iAux=0;
+    		//for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-TagsSeparationDetRelFreq);i++){
+    		//	if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
+    		//		SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
+    		//		iAux++;
+    		//	}
+    		//}
+    		//
+    		//SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
+		    //cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux: " << SlopeDetTagsAux << endl;
 		    //////////////////////////////////////////////////////////////////////////////////////////////////
 		}// if
 		else {//(TotalCurrentNumRecordsQuadChNewOldAux>0 or GPIOFlagRelFreqTest==true){
