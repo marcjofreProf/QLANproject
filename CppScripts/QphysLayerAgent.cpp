@@ -1763,7 +1763,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 					//if (RoundingAux>=(HistPeriodicityAux/4)){RoundingAux=1;}
 					//else if (RoundingAux<=(-HistPeriodicityAux/4)){RoundingAux=-1;}
 					//else{RoundingAux=0;}
-					xEstimateRawTimeTaggs[i]=((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])+LLIHistPeriodicityHalfAux)/LLIHistPeriodicityAux)*LLIHistPeriodicityAux+LLIHistPeriodicityHalfAux;	// Important to account from -Period/2 to Period/2 as the same x bin
+					xEstimateRawTimeTaggs[i]=((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])+LLIHistPeriodicityHalfAux)/LLIHistPeriodicityAux)*LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;	// Important to account from -Period/2 to Period/2 as the same x bin
 				}
 
 				// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
@@ -1804,7 +1804,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				int FilteredNumStoredQubits=0;
 				// Filter out detections not falling within the defined detection window and calculated signal positions				
 				for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-					if (abs(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-static_cast<long long int>(xEstimateRawTimeTaggs[i]))<FilteringAcceptWindowSize){// Within acceptance window
+					if (abs(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-static_cast<long long int>(xEstimateRawTimeTaggs[i]))<=FilteringAcceptWindowSize){// Within acceptance window
 						TimeTaggs[iQuadChIter][FilteredNumStoredQubits]=RawTimeTaggs[iQuadChIter][i];
 						ChannelTags[iQuadChIter][FilteredNumStoredQubits]=RawChannelTags[iQuadChIter][i];
 						FilteredNumStoredQubits++;
