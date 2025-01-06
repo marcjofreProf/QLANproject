@@ -557,15 +557,6 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 
 				//// Compute error - Relative correction of the frequency difference of the absolute time. This provides like the stability of the hardware clock referenced to the system clock (disciplined with network protocol)...so in the order of ppb
 				if ((iIterPRUcurrentTimerValSynch%static_cast<unsigned long long int>(NumSynchMeasAvgAux/ExtraExtraNumSynchMeasAvgAux))==0 and CountPRUcurrentTimerValSynchLong!=0){
-					//// Smart version of the truncation - avoid being at the border of transition
-					//if (abs(PRUoffsetDriftErrorAbsAvg-PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic)>truncatedSynchTrigPeriodPeriodic){
-					//	truncatedPRUoffsetDriftErrorAbsAvg=round(PRUoffsetDriftErrorAbsAvg/truncatedSynchTrigPeriodPeriodic)*truncatedSynchTrigPeriodPeriodic;
-					//}
-					//else{
-					//	truncatedPRUoffsetDriftErrorAbsAvg=truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic;
-					//}
-					//PRUoffsetDriftErrorAbsAvgOldTruncatedPeriodic=PRUoffsetDriftErrorAbsAvg;// Update value
-					//truncatedPRUoffsetDriftErrorAbsAvgOldPeriodic=truncatedPRUoffsetDriftErrorAbsAvg; // Update value
 					// RElative implementation
 					this->PRUoffsetDriftError=this->PRUoffsetDriftErrorAbsAvgOld-static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg);
 					this->PRUoffsetDriftErrorAbsAvgOld=static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg);// Update value
@@ -593,8 +584,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					PRUoffsetDriftErrorAvg=PRUoffsetDriftErrorAvg*1000000000.0;// Make it integer like
 					//cout << "GPI::PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << " ppb" << endl;
 					// Smart version of the truncation - avoid being at the border of transition
-					if (abs(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorAvgOldTruncatedPeriodic)>static_cast<long double>(truncatedSynchTrigPeriodPeriodic)){
-						PRUoffsetDriftErrorAvg=roundl(PRUoffsetDriftErrorAvg/static_cast<long double>(truncatedSynchTrigPeriodPeriodic))*static_cast<long double>(truncatedSynchTrigPeriodPeriodic);
+					if (abs(PRUoffsetDriftErrorAvg-PRUoffsetDriftErrorAvgOldTruncatedPeriodic)>static_cast<long double>(truncatedSynchAbsRelFreq)){
+						PRUoffsetDriftErrorAvg=roundl(PRUoffsetDriftErrorAvg/static_cast<long double>(truncatedSynchAbsRelFreq))*static_cast<long double>(truncatedSynchAbsRelFreq);
 					}
 					else{
 						PRUoffsetDriftErrorAvg=truncatedPRUoffsetDriftErrorAvgOldPeriodic;
@@ -1268,7 +1259,10 @@ sharedMem_int[OFFSET_SHAREDRAM+1]=static_cast<unsigned int>(0x00000000); // Put 
 this->ManualSemaphore=false;
 this->ManualSemaphoreExtra=false;
 this->release();
-
+/////////////////////////////////////////////////////////////////////////
+// Debbugin relative frequency difference
+cout << "GPIO::DDRdumpdata AdjPulseSynchCoeffAverage: " << AdjPulseSynchCoeffAverage << endl;
+//////////////////////////////////////////////////////////////////////////
 // Notify lost of track of counts due to timer overflow - Not really used
 //if (this->FirstTimeDDRdumpdata or this->valThresholdResetCounts==0){this->AfterCountsThreshold=24+5;}// First time the Threshold reset counts of the timetagg is not well computed, hence estimated as the common value
 //else{this->AfterCountsThreshold=this->valThresholdResetCounts+5;};// Related to the number of instruciton counts after the last read of the counter. It is a parameter to adjust
@@ -1343,7 +1337,7 @@ if (SlowMemoryPermanentStorageFlag==true){ // We save into file the relative fre
 		}
 	}
 	else{
-		cout << "DDRdumpdata streamDDRpru is not open!" << endl;
+		cout << "GPIO::DDRdumpdata streamDDRpru is not open!" << endl;
 	}
 }
 
@@ -1424,7 +1418,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     		}
 
     		SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
-		    //cout << "GPIO::SlopeDetTagsAux: " << SlopeDetTagsAux << endl;
+		    cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux: " << SlopeDetTagsAux << endl;
 
     		if (SlopeDetTagsAux<0.5 or SlopeDetTagsAux>1.5){
     			cout << "GPIO::PRUdetCorrRelFreq wrong computation of the SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << ". Not applying the correction..." << endl;
@@ -1440,11 +1434,37 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     			//ChannelTagsStored[CurrentiIterDumpAux]=ChannelTagsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]];
     			//CurrentiIterDumpAux++;// update value
     		}
-		    //////////////////////////////////////////
-		    // Checks of proper values handling
-		    //long long int CheckValueAux=(static_cast<long long int>(SynchTrigPeriod/2.0)+static_cast<long long int>(TimeTaggsStored[0]))%static_cast<long long int>(SynchTrigPeriod)-static_cast<long long int>(SynchTrigPeriod/2.0);
-		    //cout << "GPIO::PRUdetCorrRelFreq::CheckValueAux: "<< CheckValueAux << endl;
-		    ////////////////////////////////////////
+		    //////////////////////////////////////////////////////////////////////////////////////////
+		    // Checks of proper relative frequency correction
+		    LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggsLast);//static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
+    		//cout << "GPIO::LastTimeTaggRef[0]: " << LastTimeTaggRef[0] << endl;
+    		//cout << "GPIO::TimeTaggs[iQuadChIter][0]: " << TimeTaggs[iQuadChIter][0] << endl;
+    		LLITimeTaggs[TotalCurrentNumRecordsQuadChNewOldAux]={0};
+    		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
+    			LLITimeTaggs[i]=static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]])-LLIInitialTimeTaggs;
+    		}
+    		SlopeDetTagsAux=1.0;
+
+		    // Calculate the "x" values
+    		xAux[TotalCurrentNumRecordsQuadChNewOldAux]={0};
+    		LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
+    		LLISynchTrigPeriodHalf=static_cast<long long int>(SynchTrigPeriod/2.0);
+    		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
+    			xAux[i]=((LLITimeTaggs[i]+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
+    		}
+
+		    // Compute the candidate slope
+    		iAux=0;
+    		for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-TagsSeparationDetRelFreq);i++){
+    			if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
+    				SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
+    				iAux++;
+    			}
+    		}
+
+    		SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
+		    cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux: " << SlopeDetTagsAux << endl;
+		    //////////////////////////////////////////////////////////////////////////////////////////////////
 		}// if
 		else {//(TotalCurrentNumRecordsQuadChNewOldAux>0 or GPIOFlagRelFreqTest==true){
 			if (TotalCurrentNumRecordsQuadChNewOldAux>0 and GPIOFlagRelFreqTest==false){cout << "GPIO::PRUdetCorrRelFreq not enough detections " << TotalCurrentNumRecordsQuadChNewOldAux << "<" << TagsSeparationDetRelFreq << " in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;}
