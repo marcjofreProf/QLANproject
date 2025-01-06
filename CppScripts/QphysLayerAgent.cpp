@@ -1768,9 +1768,9 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 
 				// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
 				double y_mean = 0.0;
-				double x_mean = 0.0;
+				//double x_mean = 0.0;
 				double y_meanArray[RawTotalCurrentNumRecordsQuadCh[iQuadChIter]]={0.0};
-				double x_meanArray[RawNumStoredQubits]={0.0};
+				//double x_meanArray[RawNumStoredQubits]={0.0};
 				// Relative
 			        //for (int i=0; i < (RawNumStoredQubits-1); i++) {
 			        //    y_meanArray[i]=static_cast<double>((HistPeriodicityAux/2+RawTimeTaggs[i+1]-RawTimeTaggs[i])%HistPeriodicityAux)-HistPeriodicityAux/2.0;
@@ -1790,15 +1790,15 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				}
         y_mean=DoubleMedianFilterSubArray(y_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average
         //y_mean=DoubleMeanFilterSubArray(y_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average
-        x_mean=DoubleMedianFilterSubArray(x_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average. Not really needed x_mean
+        //x_mean=DoubleMedianFilterSubArray(x_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average. Not really needed x_mean
         cout << "QPLA::y_mean: " << y_mean << endl;
-        cout << "QPLA::x_mean: " << x_mean << endl;
+        //cout << "QPLA::x_mean: " << x_mean << endl;
 				long long int EstInterceptVal = static_cast<long long int>(y_mean);// - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1 and it should be zero
 				cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
 
 				// Re-escale the xEstimated values with the intercept point
 				for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-					xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i]-EstInterceptVal;
+					xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i]+EstInterceptVal;
 				}
 
 				int FilteredNumStoredQubits=0;
