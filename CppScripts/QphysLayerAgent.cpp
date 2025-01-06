@@ -1802,12 +1802,21 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				}
 
 				int FilteredNumStoredQubits=0;
+				double FilterDiffCheckAux=0.0;
 				// Filter out detections not falling within the defined detection window and calculated signal positions				
 				for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 					if (abs(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-static_cast<long long int>(xEstimateRawTimeTaggs[i]))<=FilteringAcceptWindowSize){// Within acceptance window
 						TimeTaggs[iQuadChIter][FilteredNumStoredQubits]=RawTimeTaggs[iQuadChIter][i];
 						ChannelTags[iQuadChIter][FilteredNumStoredQubits]=RawChannelTags[iQuadChIter][i];
 						FilteredNumStoredQubits++;
+					}
+					else{// This can be commented for normal operation
+						if (FilterDiffCheckAux==0.0){
+							FilterDiffCheckAux=static_cast<double>(abs(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-static_cast<long long int>(xEstimateRawTimeTaggs[i])));
+						}
+						else{
+							FilterDiffCheckAux=0.5*FilterDiffCheckAux+0.5*static_cast<double>(abs(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-static_cast<long long int>(xEstimateRawTimeTaggs[i])));
+						}
 					}
 				}
 	
