@@ -1787,6 +1787,13 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 			        // Absolute
 				for (unsigned int i=0; i < RawTotalCurrentNumRecordsQuadCh[iQuadChIter]; i++) {
 					y_meanArray[i]=(LLIHistPeriodicityHalfAux+static_cast<long long int>(RawTimeTaggs[iQuadChIter][i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+					//y_meanArray[i]=(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i]))%LLIHistPeriodicityAux;
+					if (y_meanArray[i]>LLIHistPeriodicityHalfAux){
+						y_meanArray[i]=y_meanArray[i]-LLIHistPeriodicityAux;
+					}
+					else if(y_meanArray[i]<-LLIHistPeriodicityHalfAux){
+						y_meanArray[i]=y_meanArray[i]+LLIHistPeriodicityAux;
+					}
 			    //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
 			    // We cannot use mean averaging since there might be outliers
 				    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
