@@ -1821,13 +1821,36 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 						}
 						else{
 							FilterDiffCheckAux=0.5*FilterDiffCheckAux+0.5*static_cast<double>((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i]));
-							if (i%100==0){
+							if (i%25==0){
 								cout << "QPLA::LinearRegressionQuBitFilter FilterDiffCheckAux final: " << static_cast<double>((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i])) << endl;
 							}
 						}
 					}
 				}
 				cout << "QPLA::LinearRegressionQuBitFilter FilterDiffCheckAux: " << FilterDiffCheckAux << endl;
+				///////////////////////////////////////////////////////////////////////////////////////////////////
+				// Check for the slopes values
+				//// Compute the slope value for the x axis
+				double SlopeDetTagsAuxArrayXaxis[RawTotalCurrentNumRecordsQuadCh[iQuadChIter]]={0.0};
+				double SlopeDetTagsAuxXaxis=0.0;
+    		int iAux=0;
+    		for (unsigned int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){
+    			SlopeDetTagsAuxArrayXaxis[iAux]=static_cast<double>((LLIHistPeriodicityHalfAux+(xEstimateRawTimeTaggs[i+1]-xEstimateRawTimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
+    		}
+    		
+    		SlopeDetTagsAuxXaxis=DoubleMedianFilterSubArray(SlopeDetTagsAuxArrayXaxis,iAux);
+		    cout << "QPLA::LinearRegressionQuBitFilter SlopeDetTagsAuxXaxis: " << SlopeDetTagsAuxXaxis << endl;
+
+		    double SlopeDetTagsAuxArrayYaxis[RawTotalCurrentNumRecordsQuadCh[iQuadChIter]]={0.0};
+				double SlopeDetTagsAuxYaxis=0.0;
+    		iAux=0;
+    		for (unsigned int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){
+    			SlopeDetTagsAuxArrayYaxis[iAux]=static_cast<double>(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(RawTimeTaggs[iQuadChIter][i]))/static_cast<double>(xEstimateRawTimeTaggs[i+1]-xEstimateRawTimeTaggs[i]);
+    		}
+    		
+    		SlopeDetTagsAuxYaxis=DoubleMedianFilterSubArray(SlopeDetTagsAuxArrayYaxis,iAux);
+		    cout << "QPLA::LinearRegressionQuBitFilter SlopeDetTagsAuxYaxis: " << SlopeDetTagsAuxYaxis << endl;
+				//////////////////////////////////////////////////////////////////////////////////////////////////
 	
 				// Compute quality of estimation, related to the SNR
 				double EstimatedSNRqubitsRatio=1.0-static_cast<double>(FilteredNumStoredQubits)/static_cast<double>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]);// in linear	
