@@ -1785,15 +1785,15 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 			        //}
 			        //y_mean=DoubleMedianFilterSubArray(y_meanArray,(RawNumStoredQubits-1)); // Median average
 			        // Absolute
-				for (unsigned int i=0; i < RawTotalCurrentNumRecordsQuadCh[iQuadChIter]; i++) {
-					y_meanArray[i]=(LLIHistPeriodicityHalfAux+static_cast<long long int>(RawTimeTaggs[iQuadChIter][i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+				for (unsigned int i=0; i < (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1); i++) {
+					y_meanArray[i]=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
 			    //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
 			    // We cannot use mean averaging since there might be outliers
 				    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
 				    //x_mean += static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
 				}
-        y_mean=LLIMedianFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
-        //y_mean=LLIMeanFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
+        y_mean=LLIMedianFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])-1); // Median average
+        //y_mean=LLIMeanFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])-1); // Median average
         //x_mean=LLIMedianFilterSubArray(x_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average. Not really needed x_mean
         cout << "QPLA::y_mean: " << y_mean << endl;
         //cout << "QPLA::x_mean: " << x_mean << endl;
@@ -1821,7 +1821,9 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 						}
 						else{
 							FilterDiffCheckAux=0.5*FilterDiffCheckAux+0.5*static_cast<double>((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i]));
-							cout << "QPLA::LinearRegressionQuBitFilter FilterDiffCheckAux final: " << static_cast<double>((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i])) << endl;
+							if (i%100==0){
+								cout << "QPLA::LinearRegressionQuBitFilter FilterDiffCheckAux final: " << static_cast<double>((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i])) << endl;
+							}
 						}
 					}
 				}
