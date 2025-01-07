@@ -299,7 +299,7 @@ private:// Variables
 	bool QPLAFlagTestSynch=false;
 	bool GPIOFlagRelFreqTest=false; // To deactive (true) slope correction of the emitter, for testing purpouses
 	// Correct Qubits relative frequency difference due to the sender
-	unsigned int TagsSeparationDetRelFreq=4*10; // Number of index separation to compute the slope of disadjustment in order to have accuraccy. Times 4 to account the possibility that all tags arrive to the same detector
+	unsigned int TagsSeparationDetRelFreq=1;//4*10; // Number of index separation to compute the slope of disadjustment in order to have accuraccy. Times 4 to account the possibility that all tags arrive to the same detector
 	double SlopeDetTagsAuxArray[MaxNumQuBitsMemStored]={0.0}; // Array in order to do the computations
 	// Information and status
 	bool HardwareSynchStatus=false; // Turn to true when hardware synchronized with the PRU clock
