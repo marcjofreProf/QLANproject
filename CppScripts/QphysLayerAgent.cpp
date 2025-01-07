@@ -1811,13 +1811,13 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
         cout << "QPLA::x_mean: " << x_mean << endl;
 				long long int EstInterceptVal = 0;
 				if (y_mean>x_mean){
-					EstInterceptVal = -y_mean + x_mean;
+					EstInterceptVal = +y_mean - x_mean;
 				}
 				else if(y_mean<x_mean){
-					EstInterceptVal = y_mean - x_mean;
+					EstInterceptVal = -y_mean + x_mean;
 				}
 				else{
-					EstInterceptVal = y_mean + x_mean;
+					EstInterceptVal = +y_mean + x_mean;
 				}
 				cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
 
