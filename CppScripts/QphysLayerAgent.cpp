@@ -1802,7 +1802,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 
 				// Re-escale the xEstimated values with the intercept point
 				for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-					xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i]+EstInterceptVal;
+					xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i];//+EstInterceptVal;
 				}
 
 				int FilteredNumStoredQubits=0;
@@ -1817,9 +1817,11 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 					else{// This can be commented for normal operation
 						if (FilterDiffCheckAux==0.0){
 							FilterDiffCheckAux=static_cast<double>((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i]));
+							cout << "QPLA::LinearRegressionQuBitFilter FilterDiffCheckAux initial: " << FilterDiffCheckAux << endl;
 						}
 						else{
 							FilterDiffCheckAux=0.5*FilterDiffCheckAux+0.5*static_cast<double>((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i]));
+							cout << "QPLA::LinearRegressionQuBitFilter FilterDiffCheckAux final: " << static_cast<double>((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i])) << endl;
 						}
 					}
 				}
