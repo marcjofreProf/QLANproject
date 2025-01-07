@@ -1155,7 +1155,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 					long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
 					if (UseAllTagsForEstimation){
 						long long int SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0};				
-						for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+						for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 						  // Mean averaging, not very resilent with glitches, eventhough filtered in liner regression
 						  // Median averaging
 						  if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
@@ -1192,7 +1192,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 					// Apply insitu correction
 					long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftAux+SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 				  //long long int LLISmallOffsetDriftAux=static_cast<long long int>(SmallOffsetDriftAux);
-					for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+					for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 						if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink)>=0){
 							TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
 						}
@@ -1283,7 +1283,7 @@ int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];// Numbe
 int SimulateNumStoredQubitsNodeMinus1Aux=0;
 for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 	if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
-    SimulateNumStoredQubitsNodeMinus1Aux+=RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1;// Number of qubits to process
+    SimulateNumStoredQubitsNodeMinus1Aux+=static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])-1;// Number of qubits to process
   }
 }
 TimeTaggsDetAnalytics[0]=0.0;
@@ -1320,8 +1320,8 @@ if (SimulateNumStoredQubitsNodeAux>1){
 	//}
 	for (int i = 0; i < (QuadNumChGroups-1); i++) {
         for (int j = i+1; j < (QuadNumChGroups); j++) {
-            for (int k = 0; k < RawTotalCurrentNumRecordsQuadCh[i]; k++){
-	            	for (int l = 0; l < RawTotalCurrentNumRecordsQuadCh[j]; l++){
+            for (unsigned int k = 0; k < RawTotalCurrentNumRecordsQuadCh[i]; k++){
+	            	for (unsigned int l = 0; l < RawTotalCurrentNumRecordsQuadCh[j]; l++){
 		                if (abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l]))<CoincidenceWindowPRU and TimeTaggs[i][k]!=0) {
 		                    TimeTaggsDetAnalytics[4]+=1.0;; // Repetition found
 		                }
@@ -1333,7 +1333,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
       TimeTaggsDetAnalytics[7]=static_cast<double>(TimeTaggs[iQuadChIter][0]);// Timetag of the first capture
-      for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+      for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
         //cout << "TimeTaggs[i]: "<< TimeTaggs[i] << endl;
         //cout << "ChannelTags[i]: "<< std::bitset<8>(ChannelTags[i]) << endl;
       	if (ChannelTags[iQuadChIter][i]&0x0001==1 or (ChannelTags[iQuadChIter][i]>>4)&0x0001==1 or (ChannelTags[iQuadChIter][i]>>8)&0x0001==1){TimeTaggsDetAnalytics[0]++;}
@@ -1355,7 +1355,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
   }
   for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
   	if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
-  		for (int i=1;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+  		for (unsigned int i=1;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
   			if (i>0){TimeTaggsDetAnalytics[6]+=(1.0/(static_cast<double>(SimulateNumStoredQubitsNodeMinus1Aux)))*pow(static_cast<double>(TimeTaggs[iQuadChIter][i]-TimeTaggs[iQuadChIter][i-1])-TimeTaggsDetAnalytics[5],2.0);}
   		}
   	}
@@ -1401,7 +1401,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
 			cout << "QPLA::Quad group channel: " << iQuadChIter << endl;
 			TimeTaggsDetAnalytics[7]=static_cast<double>(TimeTaggs[iQuadChIter][0]);
-			for (int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){
+			for (unsigned int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){
 				if (i==0){cout << "TimeTaggs[iQuadChIter][1]-TimeTaggs[iQuadChIter][0]: " << (static_cast<long long int>(TimeTaggs[iQuadChIter][1])-static_cast<long long int>(TimeTaggs[iQuadChIter][0])) << endl;}
 				else if(i==(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-2) and RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>2){cout << "TimeTaggs[iQuadChIter][i+1]-TimeTaggs[iQuadChIter][i]: " << (static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i])) << endl;}
 
@@ -1412,7 +1412,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 
 	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
-			for (int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){
+			for (unsigned int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){
 				TimeTaggsDetAnalytics[6]+=(1.0/(static_cast<double>(SimulateNumStoredQubitsNodeMinus1Aux)))*pow((static_cast<double>((static_cast<long long int>(HistPeriodicityAux)/2+static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i]))%(static_cast<long long int>(HistPeriodicityAux))))-static_cast<double>(static_cast<long long int>(HistPeriodicityAux)/2)-TimeTaggsDetAnalytics[5],2.0);
 			}
 		}
@@ -1489,11 +1489,11 @@ int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,
 	if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]>0){
 		if (UseAllTagsForEstimation){
 			// Median averaging
-			for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
+			for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
 				ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a specific state
 				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIHistPeriodicityAux);
 			}
-			SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]);
+			SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
 		}
 		else{
 			// Single value
@@ -1510,11 +1510,11 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 	if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]>0){	
 		if (UseAllTagsForEstimation){
 			// Median averaging
-			for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
+			for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
 				ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a states
 				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
 			}
-			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]);
+			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
 		}
 		else{
 			// Single value
@@ -1716,6 +1716,8 @@ return 0; // All Ok
 }
 
 int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection window
+// This script aims at detectig the offset in PRU units, in order to remove outliers (presumambly noise).
+// We do so by considering that timetaggs are offset with respect the general absolute time bin, which is a multiple of the Histogram period
 //this->acquire(); It is already within an acquire/release
 	if (ApplyRawQubitFilteringFlag==true){//and FlagTestSynch==false){
 	  this->SimulateNumStoredQubitsNode[0]=0; // Reset this value
@@ -1728,7 +1730,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				// Check. It can be commented for normal operation
 				//bool CheckOnceAux=false; //bool CheckOnceAux=false;
 				//if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
-				//	for (int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
+				//	for (unsigned int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
 				//		if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i]))<=0){
 				//			cout << "QPLA::LinearRegressionQuBitFilter disorded TimeTaggs before processing!!! for i: " << i << ". Involved values TimeTaggs[iQuadChIter][i+1]: " << static_cast<long long int>(TimeTaggs[iQuadChIter][i+1]) << " and static_cast<long long int>(TimeTaggs[iQuadChIter][i]): " << static_cast<long long int>(TimeTaggs[iQuadChIter][i]) << endl;
 				//			CheckOnceAux=true;
@@ -1743,8 +1745,10 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				long long int xEstimateRawTimeTaggs[RawTotalCurrentNumRecordsQuadCh[iQuadChIter]]={0}; // Timetaggs of the detections raw
 				//long long int RoundingAux;
 				long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
-				long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2);
-				for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+				long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
+				cout << "QPLA::LinearRegressionQuBitFilter LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << endl;
+				cout << "QPLA::LinearRegressionQuBitFilter LLIHistPeriodicityHalfAux: " << LLIHistPeriodicityHalfAux << endl;
+				for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 					/*if (i==0){
 						RoundingAux=(HistPeriodicityAux/2+RawTimeTaggs[i])%HistPeriodicityAux-HistPeriodicityAux/2;
 						if (RoundingAux>=(HistPeriodicityAux/4)){RoundingAux=1;}
@@ -1781,30 +1785,30 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 			        //}
 			        //y_mean=DoubleMedianFilterSubArray(y_meanArray,(RawNumStoredQubits-1)); // Median average
 			        // Absolute
-				for (int i=0; i < RawTotalCurrentNumRecordsQuadCh[iQuadChIter]; i++) {
+				for (unsigned int i=0; i < RawTotalCurrentNumRecordsQuadCh[iQuadChIter]; i++) {
 					y_meanArray[i]=static_cast<double>((LLIHistPeriodicityHalfAux+static_cast<long long int>(RawTimeTaggs[iQuadChIter][i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
 			    //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
 			    // We cannot use mean averaging since there might be outliers
 				    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
 				    //x_mean += static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
 				}
-        y_mean=DoubleMedianFilterSubArray(y_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average
-        //y_mean=DoubleMeanFilterSubArray(y_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average
-        //x_mean=DoubleMedianFilterSubArray(x_meanArray,RawTotalCurrentNumRecordsQuadCh[iQuadChIter]); // Median average. Not really needed x_mean
+        y_mean=DoubleMedianFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
+        //y_mean=DoubleMeanFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
+        //x_mean=DoubleMedianFilterSubArray(x_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average. Not really needed x_mean
         cout << "QPLA::y_mean: " << y_mean << endl;
         //cout << "QPLA::x_mean: " << x_mean << endl;
 				long long int EstInterceptVal = static_cast<long long int>(y_mean);// - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1 and it should be zero
 				cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
 
 				// Re-escale the xEstimated values with the intercept point
-				for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+				for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 					xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i]+EstInterceptVal;
 				}
 
 				int FilteredNumStoredQubits=0;
 				double FilterDiffCheckAux=0.0;
 				// Filter out detections not falling within the defined detection window and calculated signal positions				
-				for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+				for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 					if (abs(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-static_cast<long long int>(xEstimateRawTimeTaggs[i]))<=FilteringAcceptWindowSize){// Within acceptance window
 						TimeTaggs[iQuadChIter][FilteredNumStoredQubits]=RawTimeTaggs[iQuadChIter][i];
 						ChannelTags[iQuadChIter][FilteredNumStoredQubits]=RawChannelTags[iQuadChIter][i];
@@ -1827,7 +1831,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				if (EstimatedSNRqubitsRatio>0.1){ // 0.1 equivalent to 10 dB// < Bad SNR
 					cout << "QPLA::LinearRegressionQuBitFilter EstimatedSNRqubitsRatio " << EstimatedSNRqubitsRatio << " for quad group Channel "<< iQuadChIter << " does not have enough SNR (>10 dB) to perform good when filtering raw qubits!!! Not filtering outlier qubits!!!" << endl;
 					FilteredNumStoredQubits=0;// Reset value
-					for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+					for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 						TimeTaggs[iQuadChIter][FilteredNumStoredQubits]=RawTimeTaggs[iQuadChIter][i];
 						ChannelTags[iQuadChIter][FilteredNumStoredQubits]=RawChannelTags[iQuadChIter][i];
 						FilteredNumStoredQubits++;
@@ -1851,7 +1855,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				// Check. It can be commented for normal operation
 				//CheckOnceAux=false; //bool CheckOnceAux=false;
 				//if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
-				//	for (int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
+				//	for (unsigned int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){		
 				//		if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i]))<=0){
 				//			cout << "QPLA::LinearRegressionQuBitFilter disorded TimeTaggs after processing!!! for i: " << i << ". Involved values TimeTaggs[iQuadChIter][i+1]: " << static_cast<long long int>(TimeTaggs[iQuadChIter][i+1]) << " and static_cast<long long int>(TimeTaggs[iQuadChIter][i]): " << static_cast<long long int>(TimeTaggs[iQuadChIter][i]) << endl;
 				//			CheckOnceAux=true;
@@ -1875,7 +1879,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 	  for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 	  	int FilteredNumStoredQubits=0;// Reset value
 	  	if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){				
-				for (int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+				for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 					TimeTaggs[iQuadChIter][FilteredNumStoredQubits]=RawTimeTaggs[iQuadChIter][i];
 					ChannelTags[iQuadChIter][FilteredNumStoredQubits]=RawChannelTags[iQuadChIter][i];
 					FilteredNumStoredQubits++;
