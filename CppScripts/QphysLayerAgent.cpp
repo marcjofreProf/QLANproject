@@ -1746,8 +1746,8 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				//long long int RoundingAux;
 				long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
 				long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
-				cout << "QPLA::LinearRegressionQuBitFilter LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << endl;
-				cout << "QPLA::LinearRegressionQuBitFilter LLIHistPeriodicityHalfAux: " << LLIHistPeriodicityHalfAux << endl;
+				//cout << "QPLA::LinearRegressionQuBitFilter LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << endl;
+				//cout << "QPLA::LinearRegressionQuBitFilter LLIHistPeriodicityHalfAux: " << LLIHistPeriodicityHalfAux << endl;
 				for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 					/*if (i==0){
 						RoundingAux=(HistPeriodicityAux/2+RawTimeTaggs[i])%HistPeriodicityAux-HistPeriodicityAux/2;
@@ -1771,9 +1771,9 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				}
 
 				// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
-				double y_mean = 0.0;
+				long long int y_mean = 0.0;
 				//double x_mean = 0.0;
-				double y_meanArray[RawTotalCurrentNumRecordsQuadCh[iQuadChIter]]={0.0};
+				long long int y_meanArray[RawTotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
 				//double x_meanArray[RawNumStoredQubits]={0.0};
 				// Relative
 			        //for (int i=0; i < (RawNumStoredQubits-1); i++) {
@@ -1786,18 +1786,18 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 			        //y_mean=DoubleMedianFilterSubArray(y_meanArray,(RawNumStoredQubits-1)); // Median average
 			        // Absolute
 				for (unsigned int i=0; i < RawTotalCurrentNumRecordsQuadCh[iQuadChIter]; i++) {
-					y_meanArray[i]=static_cast<double>((LLIHistPeriodicityHalfAux+static_cast<long long int>(RawTimeTaggs[iQuadChIter][i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
+					y_meanArray[i]=(LLIHistPeriodicityHalfAux+static_cast<long long int>(RawTimeTaggs[iQuadChIter][i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
 			    //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
 			    // We cannot use mean averaging since there might be outliers
 				    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
 				    //x_mean += static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
 				}
-        y_mean=DoubleMedianFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
-        //y_mean=DoubleMeanFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
-        //x_mean=DoubleMedianFilterSubArray(x_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average. Not really needed x_mean
+        y_mean=LLIMedianFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
+        //y_mean=LLIMeanFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
+        //x_mean=LLIMedianFilterSubArray(x_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average. Not really needed x_mean
         cout << "QPLA::y_mean: " << y_mean << endl;
         //cout << "QPLA::x_mean: " << x_mean << endl;
-				long long int EstInterceptVal = static_cast<long long int>(y_mean);// - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1 and it should be zero
+				long long int EstInterceptVal = y_mean;// - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1 and it should be zero
 				cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
 
 				// Re-escale the xEstimated values with the intercept point
@@ -1809,17 +1809,17 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				double FilterDiffCheckAux=0.0;
 				// Filter out detections not falling within the defined detection window and calculated signal positions				
 				for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-					if (abs(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-static_cast<long long int>(xEstimateRawTimeTaggs[i]))<=FilteringAcceptWindowSize){// Within acceptance window
+					if (abs(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i])<=FilteringAcceptWindowSize){// Within acceptance window
 						TimeTaggs[iQuadChIter][FilteredNumStoredQubits]=RawTimeTaggs[iQuadChIter][i];
 						ChannelTags[iQuadChIter][FilteredNumStoredQubits]=RawChannelTags[iQuadChIter][i];
 						FilteredNumStoredQubits++;
 					}
 					else{// This can be commented for normal operation
 						if (FilterDiffCheckAux==0.0){
-							FilterDiffCheckAux=static_cast<double>(abs(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-static_cast<long long int>(xEstimateRawTimeTaggs[i])));
+							FilterDiffCheckAux=static_cast<double>((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i]));
 						}
 						else{
-							FilterDiffCheckAux=0.5*FilterDiffCheckAux+0.5*static_cast<double>(abs(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-static_cast<long long int>(xEstimateRawTimeTaggs[i])));
+							FilterDiffCheckAux=0.5*FilterDiffCheckAux+0.5*static_cast<double>((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i]));
 						}
 					}
 				}
