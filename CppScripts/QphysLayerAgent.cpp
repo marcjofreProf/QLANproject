@@ -1777,9 +1777,9 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 
 				// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
 				long long int y_mean = 0.0;
-				//double x_mean = 0.0;
+				long long int x_mean = 0.0;
 				long long int y_meanArray[RawTotalCurrentNumRecordsQuadCh[iQuadChIter]]={0};
-				//double x_meanArray[RawNumStoredQubits]={0.0};
+				long long int x_meanArray[RawNumStoredQubits]={0};
 				// Relative
 			        //for (int i=0; i < (RawNumStoredQubits-1); i++) {
 			        //    y_meanArray[i]=static_cast<double>((HistPeriodicityAux/2+RawTimeTaggs[i+1]-RawTimeTaggs[i])%HistPeriodicityAux)-HistPeriodicityAux/2.0;
@@ -1799,16 +1799,16 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 					else if(y_meanArray[i]<-LLIHistPeriodicityHalfAux){
 						y_meanArray[i]=y_meanArray[i]+LLIHistPeriodicityAux;
 					}
-			    //x_meanArray[i]=static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux);// Not really needed
+			    x_meanArray[i]=static_cast<long long int>(xEstimateRawTimeTaggs[i]%LLIHistPeriodicityAux);// Not really needed
 			    // We cannot use mean averaging since there might be outliers
 				    //y_mean += static_cast<double>(RawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
 				    //x_mean += static_cast<double>(xEstimateRawTimeTaggs[i]%HistPeriodicityAux)/static_cast<double>(RawNumStoredQubits);
 				}
         y_mean=LLIMedianFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
         //y_mean=LLIMeanFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
-        //x_mean=LLIMedianFilterSubArray(x_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average. Not really needed x_mean
+        x_mean=LLIMedianFilterSubArray(x_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average. Not really needed x_mean
         cout << "QPLA::y_mean: " << y_mean << endl;
-        //cout << "QPLA::x_mean: " << x_mean << endl;
+        cout << "QPLA::x_mean: " << x_mean << endl;
 				long long int EstInterceptVal = y_mean;// - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1 and it should be zero
 				cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
 
