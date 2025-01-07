@@ -1814,7 +1814,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 					EstInterceptVal = +y_mean - x_mean;
 				}
 				else if(y_mean<x_mean){
-					EstInterceptVal = -y_mean + x_mean;
+					EstInterceptVal = -y_mean - x_mean;
 				}
 				else{
 					EstInterceptVal = +y_mean + x_mean;
