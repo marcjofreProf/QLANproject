@@ -1792,12 +1792,12 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 			        // Absolute
 				for (unsigned int i=0; i < RawTotalCurrentNumRecordsQuadCh[iQuadChIter]; i++) {
 					y_meanArray[i]=(LLIHistPeriodicityHalfAux+static_cast<long long int>(RawTimeTaggs[iQuadChIter][i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
-					if (y_meanArray[i]>LLIHistPeriodicityHalfAux){
-						y_meanArray[i]=y_meanArray[i]-LLIHistPeriodicityAux;
-					}
-					else if(y_meanArray[i]<-LLIHistPeriodicityHalfAux){
-						y_meanArray[i]=y_meanArray[i]+LLIHistPeriodicityAux;
-					}
+					//if (y_meanArray[i]>LLIHistPeriodicityHalfAux){
+					//	y_meanArray[i]=y_meanArray[i]-LLIHistPeriodicityAux;
+					//}
+					//else if(y_meanArray[i]<-LLIHistPeriodicityHalfAux){
+					//	y_meanArray[i]=y_meanArray[i]+LLIHistPeriodicityAux;
+					//}
 			    //x_meanArray[i]=static_cast<long long int>(xEstimateRawTimeTaggs[i]%LLIHistPeriodicityAux);// Not really needed
 				}
         y_mean=LLIMedianFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
@@ -1823,7 +1823,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				double FilterDiffCheckAux=0.0;
 				// Filter out detections not falling within the defined detection window and calculated signal positions				
 				for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-					if (abs(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i])<=FilteringAcceptWindowSize){// Within acceptance window
+					if (abs((LLIHistPeriodicityHalfAux+static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i])%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux)<=FilteringAcceptWindowSize){// Within acceptance window
 						TimeTaggs[iQuadChIter][FilteredNumStoredQubits]=RawTimeTaggs[iQuadChIter][i];
 						ChannelTags[iQuadChIter][FilteredNumStoredQubits]=RawChannelTags[iQuadChIter][i];
 						FilteredNumStoredQubits++;
