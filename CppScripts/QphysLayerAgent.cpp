@@ -1802,7 +1802,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 
 				// Re-escale the xEstimated values with the intercept point
 				for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-					xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i];//+EstInterceptVal;
+					xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i]+EstInterceptVal;
 				}
 
 				int FilteredNumStoredQubits=0;
