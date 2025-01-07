@@ -1809,7 +1809,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
         x_mean=LLIMedianFilterSubArray(x_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average. Not really needed x_mean
         cout << "QPLA::y_mean: " << y_mean << endl;
         cout << "QPLA::x_mean: " << x_mean << endl;
-				long long int EstInterceptVal = y_mean;// - x_mean); // x_mean is not multiplied by slope because it has been normalized to 1 and it should be zero
+				long long int EstInterceptVal = y_mean - x_mean;
 				cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
 
 				// Re-escale the xEstimated values with the intercept point
