@@ -1443,12 +1443,22 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     			// Non-adaptive slope
     			//TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]]=static_cast<unsigned long long int>(static_cast<long long int>(static_cast<long double>(1.0/SlopeDetTagsAux)*static_cast<long double>(LLITimeTaggs[i]))+LLIInitialTimeTaggs);
     			// Applying adaptive slope
-    			if ((i+TagsSeparationDetRelFreqAdpSlope)<TotalCurrentNumRecordsQuadChNewOldAux){// Limit the range to not overflow the buffer
-	    			for (unsigned int iAdapAux=i;iAdapAux<(i+TagsSeparationDetRelFreqAdpSlope);iAdapAux++){
-	    				SlopeDetTagsAuxArrayAdap[static_cast<int>(iAdapAux)-static_cast<int>(i)]=SlopeDetTagsAuxArray[iAdapAux];    				
+    			if (i<(TagsSeparationDetRelFreqAdpSlope/2)){
+    				for (unsigned int iAdapAux=0;iAdapAux<TagsSeparationDetRelFreqAdpSlope;iAdapAux++){
+	    				SlopeDetTagsAuxArrayAdap[static_cast<int>(iAdapAux)]=SlopeDetTagsAuxArray[iAdapAux];    				
+	    			}
+    			}
+    			else if (i>=(TagsSeparationDetRelFreqAdpSlope/2) and (i+TagsSeparationDetRelFreqAdpSlope/2)<TotalCurrentNumRecordsQuadChNewOldAux){
+	    			for (unsigned int iAdapAux=static_cast<unsigned int>(static_cast<int>(i)-static_cast<int>(TagsSeparationDetRelFreqAdpSlope/2));iAdapAux<(i+TagsSeparationDetRelFreqAdpSlope/2);iAdapAux++){
+	    				SlopeDetTagsAuxArrayAdap[static_cast<int>(iAdapAux)-(static_cast<int>(i)-static_cast<int>(TagsSeparationDetRelFreqAdpSlope/2))]=SlopeDetTagsAuxArray[iAdapAux];    				
+	    			}	    			
+	    		}
+	    		else{
+	    			for (unsigned int iAdapAux=static_cast<unsigned int>(static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux)-static_cast<int>(TagsSeparationDetRelFreqAdpSlope));iAdapAux<TotalCurrentNumRecordsQuadChNewOldAux;iAdapAux++){
+	    				SlopeDetTagsAuxArrayAdap[static_cast<int>(iAdapAux)-(static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux)-static_cast<int>(TagsSeparationDetRelFreqAdpSlope))]=SlopeDetTagsAuxArray[iAdapAux];    				
 	    			}
 	    		}
-    			SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArrayAdap,TagsSeparationDetRelFreqAdpSlope);
+    			SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArrayAdap,static_cast<int>(TagsSeparationDetRelFreqAdpSlope));
     			if (i%25==0){// To be commented when not being check
     				cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux i[" << i << "] current adaptive: " << SlopeDetTagsAux << endl;
     			}
