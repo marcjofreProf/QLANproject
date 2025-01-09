@@ -1435,7 +1435,24 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     		
     		//cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << endl;
 		    // Un-normalize
+		    double SlopeDetTagsAuxArrayAdap[TagsSeparationDetRelFreqAdpSlope]={0.0};
     		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
+    			// Non-adaptive slope
+    			//TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]]=static_cast<unsigned long long int>(static_cast<long long int>(static_cast<long double>(1.0/SlopeDetTagsAux)*static_cast<long double>(LLITimeTaggs[i]))+LLIInitialTimeTaggs);
+    			// Applying adaptive slope
+    			if ((i+TagsSeparationDetRelFreqAdpSlope)<TotalCurrentNumRecordsQuadChNewOldAux){// Limit the range to not overflow the buffer
+	    			for (unsigned int iAdapAux=i;iAdapAux<(i+TagsSeparationDetRelFreqAdpSlope);iAdapAux++){
+	    				SlopeDetTagsAuxArrayAdap[static_cast<int>(iAdapAux)-static_cast<int>(i)]=SlopeDetTagsAuxArray[iAdapAux];    				
+	    			}
+	    		}
+    			SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArrayAdap,TagsSeparationDetRelFreqAdpSlope);
+    			if (i%25==0){// To be commented when not being check
+    				cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux i[" << i << "] current adaptive: " << SlopeDetTagsAux << endl;
+    			}
+    			if (SlopeDetTagsAux<0.5 or SlopeDetTagsAux>1.5){
+	    			cout << "GPIO::PRUdetCorrRelFreq wrong computation of the adaptive SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << ". Not applying the correction..." << endl;
+	    			SlopeDetTagsAux=1.0;
+	    		}
     			TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]]=static_cast<unsigned long long int>(static_cast<long long int>(static_cast<long double>(1.0/SlopeDetTagsAux)*static_cast<long double>(LLITimeTaggs[i]))+LLIInitialTimeTaggs);
     			// Also update the information in the original array - Bad idea because they become disorded
     			//TimeTaggsStored[CurrentiIterDumpAux]=TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]]; 
