@@ -1389,7 +1389,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 		/////////////////////////////////////////////////////////////////////////
 		//cout << "GPIO::PRUdetCorrRelFreq iQuadChIter: " << iQuadChIter << endl;
 		//cout << "GPIO::PRUdetCorrRelFreq TotalCurrentNumRecordsQuadChNewOldAux: " << TotalCurrentNumRecordsQuadChNewOldAux << endl;
-		if (TotalCurrentNumRecordsQuadChNewOldAux>=TagsSeparationDetRelFreq and GPIOFlagRelFreqTest==false){
+		if (TotalCurrentNumRecordsQuadChNewOldAux>TagsSeparationDetRelFreq and GPIOFlagRelFreqTest==false){
 			// Good strategy to substrat the system absolute time which is multiple to the effective period, since we want to see the deviation with respect this reference values
     		long long int LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggsLast);//static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
     		//cout << "GPIO::LastTimeTaggRef[0]: " << LastTimeTaggRef[0] << endl;
