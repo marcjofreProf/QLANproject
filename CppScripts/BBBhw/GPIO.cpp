@@ -1429,7 +1429,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     		}
 
     		SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
-		    cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux original iQuadChIter[" << iQuadChIter << "]: " << SlopeDetTagsAux << endl;
+		    //cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux original iQuadChIter[" << iQuadChIter << "]: " << SlopeDetTagsAux << endl;
 
     		if (SlopeDetTagsAux<0.5 or SlopeDetTagsAux>1.5){
     			cout << "GPIO::PRUdetCorrRelFreq wrong computation of the SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << ". Not applying the correction..." << endl;
@@ -1473,47 +1473,47 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     			//CurrentiIterDumpAux++;// update value
     		}
 		    //////////////////////////////////////////////////////////////////////////////////////////
-		    ////// Checks of proper relative frequency correction
-		    LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggsLast);//static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
-    		//cout << "GPIO::LastTimeTaggRef[0]: " << LastTimeTaggRef[0] << endl;
-    		//cout << "GPIO::TimeTaggs[iQuadChIter][0]: " << TimeTaggs[iQuadChIter][0] << endl;
-    		LLITimeTaggs[TotalCurrentNumRecordsQuadChNewOldAux]={0};
-    		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
-    			LLITimeTaggs[i]=static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]])-LLIInitialTimeTaggs;
-    		}
-    		SlopeDetTagsAux=1.0;
-    		
-		    // Calculate the "x" values
-    		xAux[TotalCurrentNumRecordsQuadChNewOldAux]={0};
-    		LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
-    		LLISynchTrigPeriodHalf=static_cast<long long int>(SynchTrigPeriod/2.0);
-    		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
-    			// Absolute calculation
-    			xAux[i]=((LLITimeTaggs[i]+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
-    		
-    			//// Relative calculation
-    			//if (i==0){
-    			//	xAux[i]=((LLITimeTaggs[i]+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
-    			//}
-    			//else{
-    			//	xAux[i]=LLITimeTaggs[i-1]+(((LLITimeTaggs[i]-LLITimeTaggs[i-1])+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
-    			//}
-    		}
-    		
-		    // Compute the candidate slope
-    		iAux=0;
-    		for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-TagsSeparationDetRelFreq);i++){
-    			if (xAux[i]>0){//if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
-    				// Absolute slope calculation
-    				SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i])/static_cast<double>(xAux[i]);
-    				// Relative slope calculation
-    				//SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
-    				iAux++;
-    			}
-    		}
-    		
-    		SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
-		    cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux final iQuadChIter[" << iQuadChIter << "]: " << SlopeDetTagsAux << endl;
+		    ////// Checks of proper relative frequency correction. It can be commented
+		    //LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggsLast);//static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
+    		////cout << "GPIO::LastTimeTaggRef[0]: " << LastTimeTaggRef[0] << endl;
+    		////cout << "GPIO::TimeTaggs[iQuadChIter][0]: " << TimeTaggs[iQuadChIter][0] << endl;
+    		//LLITimeTaggs[TotalCurrentNumRecordsQuadChNewOldAux]={0};
+    		//for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
+    		//	LLITimeTaggs[i]=static_cast<long long int>(TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]])-LLIInitialTimeTaggs;
+    		//}
+    		//SlopeDetTagsAux=1.0;
+    		//
+		    //// Calculate the "x" values
+    		//xAux[TotalCurrentNumRecordsQuadChNewOldAux]={0};
+    		//LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
+    		//LLISynchTrigPeriodHalf=static_cast<long long int>(SynchTrigPeriod/2.0);
+    		//for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
+    		//	// Absolute calculation
+    		//	xAux[i]=((LLITimeTaggs[i]+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
+    		//
+    		//	//// Relative calculation
+    		//	//if (i==0){
+    		//	//	xAux[i]=((LLITimeTaggs[i]+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
+    		//	//}
+    		//	//else{
+    		//	//	xAux[i]=LLITimeTaggs[i-1]+(((LLITimeTaggs[i]-LLITimeTaggs[i-1])+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
+    		//	//}
+    		//}
+    		//
+		    //// Compute the candidate slope
+    		//iAux=0;
+    		//for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-TagsSeparationDetRelFreq);i++){
+    		//	if (xAux[i]>0){//if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
+    		//		// Absolute slope calculation
+    		//		SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i])/static_cast<double>(xAux[i]);
+    		//		// Relative slope calculation
+    		//		//SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
+    		//		iAux++;
+    		//	}
+    		//}
+    		//
+    		//SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
+		    //cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux final iQuadChIter[" << iQuadChIter << "]: " << SlopeDetTagsAux << endl;
 		    //////////////////////////////////////////////////////////////////////////////////////////////////
 		}// if
 		else {//(TotalCurrentNumRecordsQuadChNewOldAux>0 or GPIOFlagRelFreqTest==true){
