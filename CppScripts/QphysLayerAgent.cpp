@@ -1877,8 +1877,8 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				// Compute quality of estimation, related to the SNR
 				double EstimatedSNRqubitsRatio=1.0-static_cast<double>(FilteredNumStoredQubits)/static_cast<double>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]);// in linear	
 
-				if (EstimatedSNRqubitsRatio>0.1){ // 0.1 equivalent to 10 dB// < Bad SNR
-					cout << "QPLA::LinearRegressionQuBitFilter EstimatedSNRqubitsRatio " << EstimatedSNRqubitsRatio << " for quad group Channel "<< iQuadChIter << " does not have enough SNR (>10 dB) to perform good when filtering raw qubits!!! Not filtering outlier qubits!!!" << endl;
+				if (EstimatedSNRqubitsRatio>0.2){ // 0.2 equivalent to 13 dB// < Bad SNR
+					cout << "QPLA::LinearRegressionQuBitFilter EstimatedSNRqubitsRatio " << EstimatedSNRqubitsRatio << " for quad group Channel "<< iQuadChIter << " does not have enough SNR (>13 dB) to perform good when filtering raw qubits!!! Not filtering outlier qubits!!!" << endl;
 					FilteredNumStoredQubits=0;// Reset value
 					for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 						TimeTaggs[iQuadChIter][FilteredNumStoredQubits]=RawTimeTaggs[iQuadChIter][i];
