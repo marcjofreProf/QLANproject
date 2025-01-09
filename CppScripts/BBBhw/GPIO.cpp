@@ -1459,7 +1459,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 	    			}
 	    		}
     			SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArrayAdap,static_cast<int>(TagsSeparationDetRelFreqAdpSlope));
-    			if (i%25==0){// To be commented when not being check
+    			if (i%75==0){// To be commented when not being check
     				cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux i[" << i << "] current adaptive: " << SlopeDetTagsAux << endl;
     			}
     			if (SlopeDetTagsAux<0.5 or SlopeDetTagsAux>1.5){
