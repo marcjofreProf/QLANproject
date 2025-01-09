@@ -1419,7 +1419,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 		    // Compute the candidate slope
     		int iAux=0;
     		for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-TagsSeparationDetRelFreq);i++){
-    			if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
+    			if (xAux[i]>0){//if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
     				// Absolute slope calculation
     				SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i])/static_cast<double>(xAux[i]);
     				// Relative slope calculation
