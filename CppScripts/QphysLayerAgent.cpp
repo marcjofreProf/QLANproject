@@ -1819,7 +1819,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				//else{//} if(y_mean>=0){
 				//	EstInterceptVal = y_mean;// - x_mean;
 				//}
-				
+
 				//cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
 
 				// Re-escale the xEstimated values with the intercept point
@@ -1844,7 +1844,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 						else{
 							FilterDiffCheckAux=0.5*FilterDiffCheckAux+0.5*static_cast<double>((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i]));
 							if (i%25==0){
-								cout << "QPLA::LinearRegressionQuBitFilter FilterDiffCheckAux final: " << static_cast<double>((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i])) << endl;
+								cout << "QPLA::LinearRegressionQuBitFilter FilterDiffCheckAux final i[" << i << "]: " << static_cast<double>((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i])) << endl;
 							}
 						}
 					}
