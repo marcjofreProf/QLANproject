@@ -1810,18 +1810,21 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
         x_mean=LLIMedianFilterSubArray(x_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average. Not really needed x_mean
         cout << "QPLA::y_mean: " << y_mean << endl;
         cout << "QPLA::x_mean: " << x_mean << endl;
-				long long int EstInterceptVal = 0;
-				if (y_mean<0){
-					EstInterceptVal = -y_mean;// - x_mean;
-				}
-				else{//} if(y_mean>=0){
-					EstInterceptVal = y_mean;// - x_mean;
-				}
+
+        long long int EstInterceptVal = y_mean;// - x_mean;
+				//long long int EstInterceptVal = 0;
+				//if (y_mean<0){
+				//	EstInterceptVal = -y_mean;// - x_mean;
+				//}
+				//else{//} if(y_mean>=0){
+				//	EstInterceptVal = y_mean;// - x_mean;
+				//}
+				
 				//cout << "QPLA::LinearRegressionQuBitFilter EstInterceptVal: " << EstInterceptVal << endl;
 
 				// Re-escale the xEstimated values with the intercept point
 				for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-					xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i]-EstInterceptVal;
+					xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i]+EstInterceptVal;
 				}
 
 				int FilteredNumStoredQubits=0;
