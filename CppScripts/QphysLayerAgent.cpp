@@ -1412,7 +1412,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 			}
 		}
 	}
-	TimeTaggsDetAnalytics[7]=DoubleMedianFilterSubArray(TimeTaggsDetAnalytics7ArrayAux,TimeTaggsDetAnalytics7iterAux);// Dangerous if the array is too large
+	TimeTaggsDetAnalytics[7]=DoubleMeanFilterSubArray(TimeTaggsDetAnalytics7ArrayAux,TimeTaggsDetAnalytics7iterAux);// Dangerous if the array is too large. Mayybe better mean because if median then it is completely exact due to all the corrections taking place continuously
 
 	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
