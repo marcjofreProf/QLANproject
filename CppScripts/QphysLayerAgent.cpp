@@ -1403,7 +1403,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
 			cout << "QPLA::Quad group channel: " << iQuadChIter << endl;			
 			for (unsigned int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){
-				TimeTaggsDetAnalytics7ArrayAux[TimeTaggsDetAnalytics7iterAux]=static_cast<double>(TimeTaggs[iQuadChIter][i]);
+				TimeTaggsDetAnalytics7ArrayAux[TimeTaggsDetAnalytics7iterAux]=static_cast<double>((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[iQuadChIter][i])%static_cast<unsigned long long int>(HistPeriodicityAux)+static_cast<unsigned long long int>(HistPeriodicityAux)/2);
 				TimeTaggsDetAnalytics7iterAux++;
 				if (i==0){cout << "TimeTaggs[iQuadChIter][1]-TimeTaggs[iQuadChIter][0]: " << (static_cast<long long int>(TimeTaggs[iQuadChIter][1])-static_cast<long long int>(TimeTaggs[iQuadChIter][0])) << endl;}
 				else if(i==(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-2) and RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>2){cout << "TimeTaggs[iQuadChIter][i+1]-TimeTaggs[iQuadChIter][i]: " << (static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i])) << endl;}
