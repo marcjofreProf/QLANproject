@@ -1305,7 +1305,7 @@ TimeTaggsDetAnalytics[7]=0.0;
 // Param 4: Multidetection events (coincidences)
 // Param 5: Mean time difference between tags
 // Param 6: std time difference between tags
-// Param 7: Mean time value tags
+// Param 7: Absolute Time tagg value in the middle
 
 // Check that we now exceed the QuBits buffer size
 if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
@@ -1390,21 +1390,25 @@ cout << "TIMETAGGING ANALYSIS of QphysLayerAgent.h" << endl;
 //cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 //cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
 //cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
-//cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected mean absolute timetagg value" << endl;
+//cout << "Attention TimeTaggsDetAnalytics[7] stores the syntethically corrected absolute timetagg value in the middle" << endl;
 //cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
 if (SimulateNumStoredQubitsNodeAux>1){
 	TimeTaggsDetAnalytics[5]=0.0;
 	TimeTaggsDetAnalytics[6]=0.0;
 	TimeTaggsDetAnalytics[7]=0.0;
-	double TimeTaggsDetAnalytics7ArrayAux[QuadNumChGroups*MaxNumQuBitsPerRun]={0.0};
-	int TimeTaggsDetAnalytics7iterAux=0;
-
+	//double TimeTaggsDetAnalytics7ArrayAux[QuadNumChGroups*MaxNumQuBitsPerRun]={0.0};
+	//int TimeTaggsDetAnalytics7iterAux=0;
+	unsigned int TimeTaggsDetAnalytics7iQuadChMax=0;
 	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
+			if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>TimeTaggsDetAnalytics7iQuadChMax){// Considering taking the time tagg in the middle of the larger sequence of tags in iQuadChIter
+				TimeTaggsDetAnalytics[7]=TimeTaggs[iQuadChIter][RawTotalCurrentNumRecordsQuadCh[iQuadChIter]/2];
+				TimeTaggsDetAnalytics7iQuadChMax=RawTotalCurrentNumRecordsQuadCh[iQuadChIter];
+			}
 			cout << "QPLA::Quad group channel: " << iQuadChIter << endl;			
-			for (unsigned int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){
-				TimeTaggsDetAnalytics7ArrayAux[TimeTaggsDetAnalytics7iterAux]=static_cast<double>((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[iQuadChIter][i])%static_cast<unsigned long long int>(HistPeriodicityAux)+static_cast<unsigned long long int>(HistPeriodicityAux)/2);
-				TimeTaggsDetAnalytics7iterAux++;
+			for (unsigned int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){				
+				//TimeTaggsDetAnalytics7ArrayAux[TimeTaggsDetAnalytics7iterAux]=static_cast<double>((static_cast<unsigned long long int>(HistPeriodicityAux)/2+TimeTaggs[iQuadChIter][i])%static_cast<unsigned long long int>(HistPeriodicityAux)+static_cast<unsigned long long int>(HistPeriodicityAux)/2);
+				//TimeTaggsDetAnalytics7iterAux++;
 				if (i==0){cout << "TimeTaggs[iQuadChIter][1]-TimeTaggs[iQuadChIter][0]: " << (static_cast<long long int>(TimeTaggs[iQuadChIter][1])-static_cast<long long int>(TimeTaggs[iQuadChIter][0])) << endl;}
 				else if(i==(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-2) and RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>2){cout << "TimeTaggs[iQuadChIter][i+1]-TimeTaggs[iQuadChIter][i]: " << (static_cast<long long int>(TimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(TimeTaggs[iQuadChIter][i])) << endl;}
 
@@ -1412,7 +1416,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 			}
 		}
 	}
-	TimeTaggsDetAnalytics[7]=DoubleMeanFilterSubArray(TimeTaggsDetAnalytics7ArrayAux,TimeTaggsDetAnalytics7iterAux);// Dangerous if the array is too large. Mayybe better mean because if median then it is completely exact due to all the corrections taking place continuously
+	//TimeTaggsDetAnalytics[7]=DoubleMeanFilterSubArray(TimeTaggsDetAnalytics7ArrayAux,TimeTaggsDetAnalytics7iterAux);// Dangerous if the array is too large. Mayybe better mean because if median then it is completely exact due to all the corrections taking place continuously
 
 	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
