@@ -245,6 +245,7 @@ private: // Functions/Methods
 	int DoubleBubbleSort(double* arr,int MedianFilterFactor);
 	unsigned long long int ULLIMedianFilterSubArray(unsigned long long int* ArrayHolderAux,int MedianFilterFactor);
 	int ULLIBubbleSort(unsigned long long int* arr,int MedianFilterFactor);
+	long long int LLIMeanFilterSubArray(long long int* ArrayHolderAux,int MeanFilterFactor);
 	long long int LLIMedianFilterSubArray(long long int* ArrayHolderAux,int MedianFilterFactor);
 	int LLIBubbleSort(long long int* arr,int MedianFilterFactor);
 	// QuBits Filtering methods

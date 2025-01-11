@@ -1165,7 +1165,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 								SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
 							}
 						}
-					  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
+					  SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
 					  //cout << "QPLA::SmallDriftContinuousCorrection static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]): " << static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]) << endl;
 					  //cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftAux: " << SmallOffsetDriftAux << endl;
 					}
@@ -1216,7 +1216,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux]=SmallOffsetDriftAux;//SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]++;// Update value
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]=IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux;// Wrap value
-				  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Median filter				  
+				  SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Mean filter	//LLIMedianFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Median filter				  
 				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+SmallOffsetDriftAux;// Update value
 
 				  // Implement PID
@@ -1501,7 +1501,7 @@ int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,
 				ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a specific state
 				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIHistPeriodicityAux);
 			}
-			SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
+			SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=LLIMeanFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));//LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
 		}
 		else{
 			// Single value
@@ -1522,7 +1522,7 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 				ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a states
 				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
 			}
-			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
+			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMeanFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));//LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
 		}
 		else{
 			// Single value
@@ -1555,7 +1555,7 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 			CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[0][i]))%(LLIHistPeriodicityAux))-LLIHistPeriodicityHalfAux);
 		}
 	}
-	SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));
+	SynchHistCenterMassArray[iCenterMass]=DoubleMeanFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));//DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));
 }
 
 if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){// Achieved number measurements to compute values
@@ -1573,15 +1573,15 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		for (int i=0;i<(NumRunsPerCenterMass-1);i++){
 			SynchTimeTaggRefMedianArrayAuxAux[i]=SynchTimeTaggRef[0][i+1]-SynchTimeTaggRef[0][i];
 		}
-		SynchTimeTaggRefMedianArrayAux[0]=LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
+		SynchTimeTaggRefMedianArrayAux[0]=LLIMeanFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);//LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
 		for (int i=0;i<(NumRunsPerCenterMass-1);i++){
 			SynchTimeTaggRefMedianArrayAuxAux[i]=SynchTimeTaggRef[1][i+1]-SynchTimeTaggRef[1][i];
 		}
-		SynchTimeTaggRefMedianArrayAux[1]=LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
+		SynchTimeTaggRefMedianArrayAux[1]=LLIMeanFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);//LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
 		for (int i=0;i<(NumRunsPerCenterMass-1);i++){
 			SynchTimeTaggRefMedianArrayAuxAux[i]=SynchTimeTaggRef[2][i+1]-SynchTimeTaggRef[2][i];
 		}
-		SynchTimeTaggRefMedianArrayAux[2]=LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
+		SynchTimeTaggRefMedianArrayAux[2]=LLIMeanFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);//LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
 		
 		long long int SynchTimeTaggRefMedianArrayAuxAuxAux=SynchTimeTaggRefMedianArrayAux[0];//LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAux,NumCalcCenterMass);
 		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAuxAuxAux)*(5e-9);// Conversion to seconds from PRU clock tick
@@ -1640,7 +1640,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		for (int i=0;i<(NumRunsPerCenterMass-1);i++){
 			SynchTimeTaggRefMedianArrayAuxAux[i]=SynchTimeTaggRef[0][i+1]-SynchTimeTaggRef[0][i];
 		}
-		SynchTimeTaggRefMedianArrayAux[0]=LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
+		SynchTimeTaggRefMedianArrayAux[0]=LLIMeanFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);//LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
 		long long int SynchTimeTaggRefMedianArrayAuxAuxAux=SynchTimeTaggRefMedianArrayAux[0];// In PRU units of time
 		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAux[0])*(5e-9);// Conversion to seconds from PRU clock tick. For human representation.
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//Period adjustment
@@ -1684,7 +1684,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 		//cout << "QPLA::SynchCalcValuesArrayAux[i]: " << SynchCalcValuesArrayAux[i] << endl;
 	}
-	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
+	SynchCalcValuesArray[1]=DoubleMeanFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	
 	// Check if nan values, then convert them to 0 and inform through the terminal
@@ -1813,8 +1813,8 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 					}
 			    //x_meanArray[i]=static_cast<long long int>(xEstimateRawTimeTaggs[i]%LLIHistPeriodicityAux);// Not really needed
 				}
-        y_mean=LLIMedianFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
-        //y_mean=LLIMeanFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
+        //y_mean=LLIMedianFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
+        y_mean=LLIMeanFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Mean average
         //x_mean=LLIMedianFilterSubArray(x_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average. Not really needed x_mean
         //cout << "QPLA::y_mean: " << y_mean << endl;
         //cout << "QPLA::x_mean: " << x_mean << endl;
@@ -1868,7 +1868,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
     		//	SlopeDetTagsAuxArrayXaxis[iAux]=static_cast<double>((LLIHistPeriodicityHalfAux+(xEstimateRawTimeTaggs[i+1]-xEstimateRawTimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
     		//}
     		//
-    		//SlopeDetTagsAuxXaxis=DoubleMedianFilterSubArray(SlopeDetTagsAuxArrayXaxis,iAux);
+    		//SlopeDetTagsAuxXaxis=DoubleMeanFilterSubArray(SlopeDetTagsAuxArrayXaxis,iAux);//DoubleMedianFilterSubArray(SlopeDetTagsAuxArrayXaxis,iAux);
 		    //cout << "QPLA::LinearRegressionQuBitFilter SlopeDetTagsAuxXaxis: " << SlopeDetTagsAuxXaxis << endl;
 				//
 		    //double SlopeDetTagsAuxArrayYaxis[RawTotalCurrentNumRecordsQuadCh[iQuadChIter]]={0.0};
@@ -1878,7 +1878,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
     		//	SlopeDetTagsAuxArrayYaxis[iAux]=static_cast<double>(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i+1])-static_cast<long long int>(RawTimeTaggs[iQuadChIter][i]))/static_cast<double>(xEstimateRawTimeTaggs[i+1]-xEstimateRawTimeTaggs[i]);
     		//}
     		//
-    		//SlopeDetTagsAuxYaxis=DoubleMedianFilterSubArray(SlopeDetTagsAuxArrayYaxis,iAux);
+    		//SlopeDetTagsAuxYaxis=DoubleMeanFilterSubArray(SlopeDetTagsAuxArrayYaxis,iAux);//DoubleMedianFilterSubArray(SlopeDetTagsAuxArrayYaxis,iAux);
 		    //cout << "QPLA::LinearRegressionQuBitFilter SlopeDetTagsAuxYaxis: " << SlopeDetTagsAuxYaxis << endl;
 				//////////////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -2128,6 +2128,22 @@ void QPLA::AgentProcessRequestsPetitions(){// Check next thing to do
   	}
     return 0; // All ok
   }
+
+  long long int QPLA::LLIMeanFilterSubArray(long long int* ArrayHolderAux,int MeanFilterFactor){
+		if (MeanFilterFactor<=1){
+			return ArrayHolderAux[0];
+		}
+		else{
+		// Step 1: Copy the array to a temporary array
+			long long int temp=0.0;
+			for(int i = 0; i < MeanFilterFactor; i++) {
+				temp = temp + ArrayHolderAux[i];
+			}
+			
+			temp=static_cast<long long int>(static_cast<long double>(temp)/static_cast<long double>(MeanFilterFactor));
+			return temp;
+		}
+	}
 
   long long int QPLA::LLIMedianFilterSubArray(long long int* ArrayHolderAux,int MedianFilterFactor){
   	if (MedianFilterFactor<=1){
