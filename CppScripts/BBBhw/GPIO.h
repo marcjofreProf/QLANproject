@@ -98,8 +98,8 @@ private:// Variables
 	double PRUoffsetDriftErrorAbsAvgOldTruncatedRecv=0.0;
 	double PRUoffsetDriftErrorAbsAvgOldTruncatedEmit=0.0;
 	double MultFactorEffSynchPeriod=4.0; // When using 4 channels histogram, this value is 4.0; when using real signals this value should be 1.0 (also in QphysLayerAgent.h)
-	double GuardPeriod=MultFactorEffSynchPeriod*16384.0; // The guard time has to be larger than any period wanted to be used (also considering the histogram analysis consisting of 4 symbols). Time period in PRU units of guard time. The guard time is limitted by the interrupt handling jitter. It has to be a power of 2!!!
 	double SynchTrigPeriod=4096.0; //For slotted analysis. It has to match to the histogram analysis
+	double GuardPeriod=8.0*MultFactorEffSynchPeriod*SynchTrigPeriod; // The guard time has to be larger and multiple of any period wanted to be used (also considering the histogram analysis consisting of 4 symbols; and the period choosen for synchronization). Time period in PRU units of guard time. The guard time is limitted by the interrupt handling jitter. It has to be a power of 2!!!
 	// The below number, the smaller the more fine grain so it will react faster to hardware PRU counter changes (so faster) but probably more jitter
 	// The longer (way more than the averaged jtter) it will have less jittter provided that the IEP counter is stable enough so that the absolute offset error is PID corrected with the QPLA
 	double truncatedSynchTrigPeriod=1024.0; // Multiple of power of 2, and related to the averaged interrupt jitter (in PRU units). Since otherwise it adds noise. The larger with respect the averaged jitter (of measuring the curren tPRU counter) the more offset residual error that the QPLA PID will have to correct for

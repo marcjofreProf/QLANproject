@@ -707,6 +707,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	this->AdjPulseSynchCoeffAverage=static_cast<long double>(this->EstimateSynchAvg);// Acquire this value for the this tag reading set
 	///////////
+	if (this->GuardPeriod<=(this->MultFactorEffSynchPeriod*this->SynchTrigPeriod)){cout << "GPIO::ReadTimeStamps Attention!!! GuardPeriod smaller or equal than the effective period...check inconsistency!!!" << endl;}
 	pru0dataMem_int[2]=static_cast<unsigned int>(this->GuardPeriod);// Indicate guard period of the sequence signal, so that it falls correctly and it is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru0dataMem_int[1]=static_cast<unsigned int>(this->NumQuBitsPerRun); // set number captures
 	// Different modes of periodic correction
@@ -901,6 +902,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	if (QPLAFlagTestSynchAux==true){pru1dataMem_int[5]=static_cast<unsigned int>(minSigONPeriod);this->SigOFFPeriod=this->SynchTrigPeriod-minSigONPeriod;}// Minimum width time on, to have accuracy
 	else{pru1dataMem_int[5]=static_cast<unsigned int>(this->SigONPeriod);this->SigOFFPeriod=this->SynchTrigPeriod-this->SigONPeriod;} // signal width time on in regular operation
 	if (SigOFFPeriod<1.0){SigOFFPeriod=1.0; cout << "GPIO::SendTriggerSignals SigOFFPeriod smaller than 1 PRU unit...check inconsistency!!!" << endl;}
+	if (this->GuardPeriod<=(this->MultFactorEffSynchPeriod*this->SynchTrigPeriod)){cout << "GPIO::SendTriggerSignals Attention!!! GuardPeriod smaller or equal than the effective period...check inconsistency!!!" << endl;}
 	pru1dataMem_int[7]=static_cast<unsigned int>(this->SigOFFPeriod);// Off time
 	pru1dataMem_int[3]=static_cast<unsigned int>(this->GuardPeriod);// Indicate period of the sequence signal, so that it falls correctly and is picked up by the Signal PRU. Link between system clock and PRU clock. It has to be a power of 2
 	pru1dataMem_int[1]=static_cast<unsigned int>(this->NumberRepetitionsSignal); // set the number of repetitions
