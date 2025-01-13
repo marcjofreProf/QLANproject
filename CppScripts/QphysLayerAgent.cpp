@@ -1500,12 +1500,12 @@ int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,
 			for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
 				ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a specific state
 				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIHistPeriodicityAux);
-				if (i%150){// To be commented when not debugging}
-					cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayAux[" << i << "]: " << SynchFirstTagsArrayAux[i] << endl;
-				}
+				//if (i%150==0){// To be commented when not debugging
+				//	cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayAux[" << i << "]: " << SynchFirstTagsArrayAux[i] << endl;
+				//}
 			}
 			SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=LLIMeanFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));//LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
-			cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArray[" << iCenterMass <<"][" << iNumRunsPerCenterMass << "]: " << SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass] << endl;
+			//cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArray[" << iCenterMass <<"][" << iNumRunsPerCenterMass << "]: " << SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass] << endl;
 		}
 		else{
 			// Single value
@@ -1525,7 +1525,8 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 			for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
 				ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a states
 				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
-				if (i%150){// To be commented when not debugging}
+				if (i%150==0){// To be commented when not debugging
+					cout << "QPLA::HistCalcPeriodTimeTags ChOffsetCorrection[" << i << "]: " << ChOffsetCorrection << endl;
 					cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayAux[" << i << "]: " << SynchFirstTagsArrayAux[i] << endl;
 				}
 			}
