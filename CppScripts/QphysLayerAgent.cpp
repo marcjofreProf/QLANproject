@@ -1549,10 +1549,10 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 		//}
 
 		if ((SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[0][i])<0){// With respect reference of the first run with no added relative frequency difference
-			CenterMassValAux[i]=-static_cast<double>(((LLIHistPeriodicityHalfAux-(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[0][i]))%(LLIHistPeriodicityAux))-LLIHistPeriodicityHalfAux);
+			CenterMassValAux[i]=-static_cast<double>(((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[0][i]))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux))-LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
 		}
 		else{
-			CenterMassValAux[i]=static_cast<double>(((LLIHistPeriodicityHalfAux+(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[0][i]))%(LLIHistPeriodicityAux))-LLIHistPeriodicityHalfAux);
+			CenterMassValAux[i]=static_cast<double>(((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[0][i]))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux))-LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
 		}
 	}
 	SynchHistCenterMassArray[iCenterMass]=DoubleMeanFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));//DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));
