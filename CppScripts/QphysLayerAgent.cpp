@@ -1472,6 +1472,15 @@ int QPLA::GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams){
 	return 0; // All ok
 }
 
+long long int QPLA::BitPositionChannelTags(unsigned long long int ChannelTagsPosAux){
+	long long int BitPosAux=0;
+	while (ChannelTagsPosAux==true and BitPosAux<16){
+		ChannelTagsPosAux<<1;
+		BitPosAux++;
+	}
+	return BitPosAux;
+}
+
 int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,int iNumRunsPerCenterMass){
 	//cout << "QPLA::HistCalcPeriodTimeTags CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
 	//this->acquire();
@@ -1498,8 +1507,8 @@ int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,
 		if (UseAllTagsForEstimation){
 			// Median averaging
 			for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
-				ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a specific state
-				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])+ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIHistPeriodicityAux);
+				ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i])%4);// Maps the offset correction for the different channels to detect a specific state
+				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIHistPeriodicityAux);
 				//if (i%150==0){// To be commented when not debugging
 				//	cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayAux[" << i << "]: " << SynchFirstTagsArrayAux[i] << endl;
 				//}
@@ -1509,8 +1518,8 @@ int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,
 		}
 		else{
 			// Single value
-			ChOffsetCorrection=ChannelTags[SpecificQuadChDet][0]%4;// Maps the offset correction for the different channels to detect a states
-			SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][0])+ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIHistPeriodicityAux);
+			ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[SpecificQuadChDet][0])%4);// Maps the offset correction for the different channels to detect a states
+			SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][0])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIHistPeriodicityAux);
 			cout << "QPLA::Using only first timetag for network synch computations!...to be deactivated" << endl;
 		}
 		//cout << "QPLA::SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]: " << SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass] << endl;
@@ -1523,9 +1532,11 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 		if (UseAllTagsForEstimation){
 			// Median averaging
 			for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
-				ChOffsetCorrection=ChannelTags[SpecificQuadChDet][i]%4;// Maps the offset correction for the different channels to detect a states
-				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])+ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
+				ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i])%4);// Maps the offset correction for the different channels to detect a states
+				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
 				if (i%150==0){// To be commented when not debugging
+					cout << "QPLA::HistCalcPeriodTimeTags ChannelTags[" << i << "]: " << ChannelTags[SpecificQuadChDet][i] << endl;
+					cout << "QPLA::HistCalcPeriodTimeTags BitPositionChannelTags(ChannelTags[" << i << "]): " << BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i]) << endl;
 					cout << "QPLA::HistCalcPeriodTimeTags ChOffsetCorrection[" << i << "]: " << ChOffsetCorrection << endl;
 					cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayAux[" << i << "]: " << SynchFirstTagsArrayAux[i] << endl;
 				}
@@ -1535,8 +1546,8 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 		}
 		else{
 			// Single value
-			ChOffsetCorrection=ChannelTags[SpecificQuadChDet][0]%4;// Maps the offset correction for the different channels to detect a states
-			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][0])+ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux; // Considering only the first timetagg. Might not be very resilence with noise
+			ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[SpecificQuadChDet][0])%4);// Maps the offset correction for the different channels to detect a states
+			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][0])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[0]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[0])%LLIHistPeriodicityAux; // Considering only the first timetagg. Might not be very resilence with noise
 			cout << "QPLA::Using only first timetag for network synch computations!...to be deactivated" << endl;
 		}
 		//cout << "QPLA::SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]: " << SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass] << endl;

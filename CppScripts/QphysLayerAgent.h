@@ -147,9 +147,9 @@ private: //Variables/Instances
 	// the following arrays are initialized to zero in the Agent creator. PID system develop
 	bool ApplyPIDOffsetContinuousCorrection=true; // Correct at the transmitter the instantaneous offset retrieved
 	double SplitEmitReceiverSmallOffsetDriftPerLink=0.1; // Splitting ratio between the effort of the emitter and receiver of constantly updateing the synch values. The closer to 0 the more aggresive
-	double SplitEmitReceiverSmallOffsetDriftPerLinkP=1.0; // Proportional values for the PID
-	double SplitEmitReceiverSmallOffsetDriftPerLinkI=0.1; // Integral values for the PID
-	double SplitEmitReceiverSmallOffsetDriftPerLinkD=0.5; // Derivative value for the PID
+	double SplitEmitReceiverSmallOffsetDriftPerLinkP=0.5; // Proportional values for the PID
+	double SplitEmitReceiverSmallOffsetDriftPerLinkI=0.05; // Integral values for the PID
+	double SplitEmitReceiverSmallOffsetDriftPerLinkD=0.25; // Derivative value for the PID
 	long long int SmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
 	long long int SmallOffsetDriftPerLinkError[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Integral value of PID. Idnetified each link and the accumulated error for the PID
 	long long int oldSmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Old valuesIdentified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
@@ -198,6 +198,7 @@ public: // Functions/Methods
 
 private: // Functions/Methods
 	int RelativeNanoSleepWait(unsigned int TimeNanoSecondsSleep);
+	long long int BitPositionChannelTags(unsigned long long int ChannelTagsPosAux);
 	// Sempahore
 	void acquire();
 	void release();
