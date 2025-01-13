@@ -1474,8 +1474,8 @@ int QPLA::GetSimulateSynchParamsNode(double* TimeTaggsDetSynchParams){
 
 long long int QPLA::BitPositionChannelTags(unsigned long long int ChannelTagsPosAux){
 	long long int BitPosAux=0;
-	while (ChannelTagsPosAux==true and BitPosAux<16){
-		ChannelTagsPosAux<<1;
+	while (ChannelTagsPosAux>1 and BitPosAux<16){
+		ChannelTagsPosAux>>1;
 		BitPosAux++;
 	}
 	return BitPosAux;
