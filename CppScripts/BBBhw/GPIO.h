@@ -297,7 +297,7 @@ private:// Variables
 	double AccumulatedErrorDriftAux=0.0;// For retrieved relative offset difference from protocol
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
 	bool QPLAFlagTestSynch=false;
-	bool GPIOFlagRelFreqTest=false; // To deactive (true) slope correction of the emitter, for testing purpouses
+	bool GPIOFlagRelFreqTest=true; // To deactive (true) slope correction of the emitter, for testing purpouses
 	// Correct Qubits relative frequency difference due to the sender
 	unsigned int TagsSeparationDetRelFreq=0; //1;//4*10; // Number of index separation to compute the slope of disadjustment in order to have accuraccy. Times 4 to account the possibility that all tags arrive to the same detector
 	unsigned int TagsSeparationDetRelFreqAdpSlope=4*20; // To compute an adaptive slope
