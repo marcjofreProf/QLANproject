@@ -44,7 +44,7 @@ using std::fstream;
 #define ExtraNumSynchMeasAvgAux 	161 // 191 // Averaging for computing current absolute time offset
 // The calculation of the relative frequency difference is important.
 // The periodic checking is every 100000000, where the relative frequency calculation is done every fraction of NumSynchMeasAvgAux. There is a trade-off between not taking to long to calculate the relative frequency edifference because then we are probably exceeding the IEP counter range, but we want it to be long enough to produce little error in the calculation. Furthermore, there is an averaging of different calculation sof the relative frequency difference.
-#define ExtraExtraNumSynchMeasAvgAux 	131 // 161 Averaging for computing current relative frequency diference.
+#define ExtraExtraNumSynchMeasAvgAux 	161 // 161 Averaging for computing current relative frequency diference.
 
 namespace exploringBB {
 
@@ -151,7 +151,7 @@ private:// Variables
 	// Account that this value is divided by two in the PRU assembler, so put the actual value wanted
 	// SigONPeriod should be an even number
 	double minSigONPeriod=6.0; // Signal ON period at synchronization procedure
-	double SigONPeriod=12.0; // Half the time jitter in PRU units // ON time (duty cycle) of the signal, in PRU time. It cannot be smaller than 6. It has to be multiple of 2. Somehow, it cannot be very large because the PRUs stall (maybe a voltage issue or device tree overlay...)
+	double SigONPeriod=8.0; // Half the time jitter in PRU units // ON time (duty cycle) of the signal, in PRU time. It cannot be smaller than 6. It has to be multiple of 2. Somehow, it cannot be very large because the PRUs stall (maybe a voltage issue or device tree overlay...)
 	double SigOFFPeriod=SynchTrigPeriod-SigONPeriod; // It has to be positive
 	unsigned long long int TimePRU1synchPeriod=100000000; // In nanoseconds and multiple of PRUclockStepPeriodNanoseconds// The faster the more corrections, and less time passed since last correction, but more averaging needed. Also, there is a limit on the lower limit to procees and handle interrupts. Also, the sorter the more error in the correct estimation, since there has not elapsed enough time to compute a tendency (it also happens with PRUdetCorrRelFreq() method whre a separation TagsSeparationDetRelFreq is inserted). The limit might be the error at each iteration, if the error becomes too small, then it cannot be corrected. Anyway, with a better hardware clock (more stable) the correctioons can be done more separated in time).
 	unsigned long long int DistTimePRU1synchPeriod=10; // Multiple of PRUclockStepPeriodNanoseconds. Number of passes with respect TimePRU1synchPeriod, in order to compute both the absolute time difference and the relative frequency difference
@@ -226,7 +226,7 @@ private:// Variables
 	unsigned int NumberRepetitionsSignal=32768;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	// For the synchronization protocol (at the begging or during operation) it sets the timetagging window to 1 for maximum synchronization resolution.
 	// Account that the effective value of the coincidence time window doubles because in the PRU it takes to clock cycles
-	unsigned int TTGcoincWin=4; // Less than half of half the signal time (related to the time jitter in PRU units). 1;// It cannot be smaller than 1. Timetagging coincidence window length In PRU units. It reduces time resolution of the detected qubits.
+	unsigned int TTGcoincWin=2; // Less than half of half the signal time (related to the time jitter in PRU units). 1;// It cannot be smaller than 1. Timetagging coincidence window length In PRU units. It reduces time resolution of the detected qubits.
 	unsigned int NumQuBitsPerRun=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=7500000; // In microseconds. Signal generation
