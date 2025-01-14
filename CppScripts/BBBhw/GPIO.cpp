@@ -1156,7 +1156,7 @@ valp=valpHolder; // Coincides with SHARED in PRUassTaggDetSimpleScript.p
 
 // Reading first calibration tag and link it to the system clock
 OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCounterPRUaux + static_cast<unsigned long long int>(*CalpHolder);
-cout << "GPIO::OldLastTimeTagg: " << OldLastTimeTagg << endl;
+//cout << "GPIO::OldLastTimeTagg: " << OldLastTimeTagg << endl;
 
 // Slot the TimeTaggsLast, since it eventually has to start at the beggining of the effective period
 this->TimeTaggsLast=(static_cast<unsigned long long int>(ldTimePointClockTagPRUinitial)/static_cast<unsigned long long int>(GuardPeriod))*static_cast<unsigned long long int>(GuardPeriod);//(static_cast<unsigned long long int>(ldTimePointClockTagPRUinitial)/static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod))*static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod);
