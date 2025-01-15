@@ -1312,6 +1312,7 @@ TimeTaggsDetAnalytics[7]=0.0;
 if (FirstQPLACalcStats==true){// First time. Hence, acquire the normalization value of the time taggs
 	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
+			FirstQPLACalcStats=false;// Negate forever more this condition
       for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
       	if (FirstQPLAtimeTagNorm<static_cast<long long int>(TimeTaggs[iQuadChIter][i])){
 					FirstQPLAtimeTagNorm=TimeTaggs[iQuadChIter][i];
