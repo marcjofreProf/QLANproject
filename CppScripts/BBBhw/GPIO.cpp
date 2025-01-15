@@ -1166,7 +1166,7 @@ this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long in
 
 if (iIterRunsAux==0){TimeTaggsLastStored=TimeTaggsLast;TotalCurrentNumRecords=0;}// First iteration of current runs, store the value for synchronization time difference calibration
 
-long long int LLIOldLastTimeTagg=0*static_cast<long long int>(OldLastTimeTagg);
+long long int LLIOldLastTimeTagg=static_cast<long long int>(OldLastTimeTagg);
 unsigned int valCycleCountPRUAux1;
 unsigned int valCycleCountPRUAux2;
 //cout << "GPIO::NumQuBitsPerRun " << NumQuBitsPerRun << endl;

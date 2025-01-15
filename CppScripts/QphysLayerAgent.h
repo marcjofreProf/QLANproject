@@ -105,6 +105,8 @@ private: //Variables/Instances
 	bool RunThreadSimulateEmitQuBitFlag=true;
 	bool RunThreadSimulateReceiveQuBitFlag=true;
 	bool RunThreadAcquireSimulateNumStoredQubitsNode=true;
+	bool FirstQPLACalcStats=true;
+	long long int FirstQPLAtimeTagNorm=0;// Normalization value of time taggs for the Stats
 	// Periodic signal histogram analysis
 	unsigned long long int OldLastTimeTagg=0;
 	// Above agents passed values to this agent

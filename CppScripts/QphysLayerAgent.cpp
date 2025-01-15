@@ -1307,6 +1307,28 @@ TimeTaggsDetAnalytics[7]=0.0;
 // Param 6: std time difference between tags
 // Param 7: Absolute Time tagg value in the middle
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Normalize time taggs to the first run since the node was started
+if (FirstQPLACalcStats==true){// First time. Hence, acquire the normalization value of the time taggs
+	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
+      for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+      	if (FirstQPLAtimeTagNorm<static_cast<long long int>(TimeTaggs[iQuadChIter][i])){
+					FirstQPLAtimeTagNorm=TimeTaggs[iQuadChIter][i];
+				}
+			}
+		}
+	}
+}
+//Actual normalization of Time taggs to the normalization value
+for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+	if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
+    for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+    	TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-FirstQPLAtimeTagNorm);
+    }
+  }
+}
+
 // Check that we now exceed the QuBits buffer size
 if (SimulateNumStoredQubitsNodeAux>NumQubitsMemoryBuffer){SimulateNumStoredQubitsNodeAux=NumQubitsMemoryBuffer;}
 
@@ -1386,7 +1408,8 @@ else{
 // Accordingly a complete sycle has 8 counts (2 counts for each step)
 // Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
 // Accordingly, the std wrapped count difference is stored in TimeTaggsDetAnalytics[6]
-cout << "TIMETAGGING ANALYSIS of QphysLayerAgent.h" << endl;
+cout << "QPLA::TIMETAGGING ANALYSIS of QphysLayerAgent.h" << endl;
+cout << "QPLA::Attention, the absolute tag time value has been reset to the first tag since the node was started" << endl;
 //cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 //cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
 //cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
@@ -1534,12 +1557,12 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 			for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
 				ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i])%4);// Maps the offset correction for the different channels to detect a states
 				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])+ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
-				if (i%600==0){// To be commented when not debugging
-					cout << "QPLA::HistCalcPeriodTimeTags ChannelTags[" << i << "]: " << ChannelTags[SpecificQuadChDet][i] << endl;
-					cout << "QPLA::HistCalcPeriodTimeTags BitPositionChannelTags(ChannelTags[" << i << "]): " << BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i]) << endl;
-					cout << "QPLA::HistCalcPeriodTimeTags ChOffsetCorrection[" << i << "]: " << ChOffsetCorrection << endl;
-					cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayAux[" << i << "]: " << SynchFirstTagsArrayAux[i] << endl;
-				}
+				//if (i%600==0){// To be commented when not debugging
+				//	cout << "QPLA::HistCalcPeriodTimeTags ChannelTags[" << i << "]: " << ChannelTags[SpecificQuadChDet][i] << endl;
+				//	cout << "QPLA::HistCalcPeriodTimeTags BitPositionChannelTags(ChannelTags[" << i << "]): " << BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i]) << endl;
+				//	cout << "QPLA::HistCalcPeriodTimeTags ChOffsetCorrection[" << i << "]: " << ChOffsetCorrection << endl;
+				//	cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayAux[" << i << "]: " << SynchFirstTagsArrayAux[i] << endl;
+				//}
 			}
 			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMeanFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));//LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
 			//cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayOffsetCalc[" << iNumRunsPerCenterMass << "]: " << SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass] << endl;
