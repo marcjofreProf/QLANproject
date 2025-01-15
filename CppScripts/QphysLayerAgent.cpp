@@ -1311,10 +1311,10 @@ TimeTaggsDetAnalytics[7]=0.0;
 // Normalize time taggs to the first run since the node was started
 if (FirstQPLACalcStats==true){// First time. Hence, acquire the normalization value of the time taggs
 	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
-			FirstQPLACalcStats=false;// Negate forever more this condition
+		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){			
       for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-      	if (FirstQPLAtimeTagNorm<static_cast<long long int>(TimeTaggs[iQuadChIter][i])){
+      	if (FirstQPLAtimeTagNorm==0 or (TimeTaggs[iQuadChIter][i]>0 and FirstQPLAtimeTagNorm>static_cast<long long int>(TimeTaggs[iQuadChIter][i]))){
+      		FirstQPLACalcStats=false;// Negate forever more this condition
 					FirstQPLAtimeTagNorm=TimeTaggs[iQuadChIter][i];
 				}
 			}
