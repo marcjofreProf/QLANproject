@@ -1729,7 +1729,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 		//cout << "QPLA::SynchCalcValuesArrayAux[i]: " << SynchCalcValuesArrayAux[i] << endl;
 	}
-	SynchCalcValuesArray[1]=DoubleMeanFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);
+	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMeanFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass); // The actual computed offset. To avoid glitches, it is better to make a median
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	

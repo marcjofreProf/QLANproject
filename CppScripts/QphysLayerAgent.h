@@ -25,7 +25,7 @@ Header declaration file for Quantum physical Layer Agent
 #define NumQubitsMemoryBuffer 1*MaxNumQuBitsPerRun// In multiples of NumQuBitsPerRun (e.g., 1964, 3928, ...). Maximum buffer size
 // Synchronization
 #define NumCalcCenterMass 1 // 1 // 3 // Number of centers of mass to measure to compute the synchronization. // With 3, it also computes hardware calibration of the detunnings
-#define NumRunsPerCenterMass 6 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
+#define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
 #define NumSmallOffsetDriftAux 1 // 5 // Better odd number Length of samples to filter the small time offset continuous correction for the PID. Integration length of the PID controller for correction
 

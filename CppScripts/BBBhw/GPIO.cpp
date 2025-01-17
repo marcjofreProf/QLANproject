@@ -197,7 +197,7 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 	}
 	cout << "Wait to proceed, calibrating synchronization!..." << endl;
 	////prussdrv_pru_enable(PRU_Signal_NUM);
-	sleep(150); // Give some time to load programs in PRUs and the synch protocols to initiate and lock after prioritazion and adjtimex. Very important, otherwise bad values might be retrieved
+	sleep(50); // Give some time to load programs in PRUs and the synch protocols to initiate and lock after prioritazion and adjtimex. Very important, otherwise bad values might be retrieved
 	
 	// Reset values of the sharedMem_int at the beggining
 	for (iIterDump=0; iIterDump<((NumQuBitsPerRun/2)*3); iIterDump++){
@@ -519,6 +519,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				this->PRUoffsetDriftErrorAbsArray[iIterPRUcurrentTimerValSynch%ExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftErrorAbs;
 				this->PRUoffsetDriftErrorAbsAvg=DoubleMedianFilterSubArray(PRUoffsetDriftErrorAbsArray,ExtraNumSynchMeasAvgAux);// Since we are applying a filter of length NumSynchMeasAvgAux, temporally it effects somehow the longer the filter. Altough it is difficult to correct
 				
+				if (this->iIterPRUcurrentTimerVal<(2*ExtraNumSynchMeasAvgAux)){// Update until offset fully calculated
+					// First update of the values
+					QPLAFutureTimePointSendTriggerSignalsOld=this->TimePointClockCurrentSynchPRU1future;// update value
+					QPLAFutureTimePointReadTimeStampsOld=this->TimePointClockCurrentSynchPRU1future;// update value
+				}
+
 				// The absolute time error has a natural wander due to the fact that the conversion from PRU ticks to real time (and viceversa is not exactly PRUclockStepPeriodNanoseconds). Therefore, an effective relative frequency difference is present that it can be accounted for (this relative frequency difference is computed below).
 				if (this->iIterPRUcurrentTimerValPassLong>DistTimePRU1synchPeriod){// Long range measurements to retrieve relative frequency differences
 					// Computations for Synch calculation for PRU0 compensation
@@ -722,10 +728,6 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	//	case 7: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld7;break;}
 	//	default: {break;}
 	//}
-	// The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of half the effective guard period due to interrupt alignment handling, the effective period, the time since last emission detection, then again MultFactorEffSynchPeriod*SynchTrigPeriod more or less
-	// Correcting for relative frequency difference is an approximation game (due to all the variable involved). The best is to have all hardware clocks so in-phase synchronized that there is no relative frequency difference.
-	//ldTimePointClockTagPRUDiff=static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*GuardPeriod)+0.5*NumSynchMeasAvgAux*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds);//static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
-	ldTimePointClockTagPRUDiff=static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*GuardPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
 	// There is an intrinsic limitation estimating PRUoffsetDriftErrorAbsAvg, which is impaired by the time jitter of handling the interrupt to check the curren tPRU clock.
 	// At some point, it could be that the PRU clock is more stable than this jitter (even more so if SyncE synchronizaed the clocks).
 	// Then, for the triggering of the signals, it is better to truncate this value to a sub multiple of the SynchTrigPeriod; and let the qubits handle the time offset synchronization from this point onwards
@@ -742,12 +744,25 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	// Smart version of the truncation - avoid being at the border of transition
 	if (abs(PRUoffsetDriftErrorAbsAvg-PRUoffsetDriftErrorAbsAvgOldTruncatedRecv)>truncatedSynchTrigPeriod){
 		truncatedPRUoffsetDriftErrorAbsAvg=round(PRUoffsetDriftErrorAbsAvg/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
+		TimePointUpdateFlagAux=true;
 	}
 	else{
 		truncatedPRUoffsetDriftErrorAbsAvg=truncatedPRUoffsetDriftErrorAbsAvgOldRecv;
 	}
 	PRUoffsetDriftErrorAbsAvgOldTruncatedRecv=PRUoffsetDriftErrorAbsAvg;// Update value
 	truncatedPRUoffsetDriftErrorAbsAvgOldRecv=truncatedPRUoffsetDriftErrorAbsAvg; // Update value
+	
+	// The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of half the effective guard period due to interrupt alignment handling, the effective period, the time since last emission detection, then again MultFactorEffSynchPeriod*SynchTrigPeriod more or less
+	// Correcting for relative frequency difference is an approximation game (due to all the variable involved). The best is to have all hardware clocks so in-phase synchronized that there is no relative frequency difference.
+	//ldTimePointClockTagPRUDiff=static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*GuardPeriod)+0.5*NumSynchMeasAvgAux*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds);//static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
+	// Since we truncated the offset value (due to the jitter) it no longer makes sense that the QPLAFutureTimePointOld is used. Instead, it makes more sense, to take the last time the offset exceeded the truncation
+	ldTimePointClockTagPRUDiff=static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*GuardPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointReadTimeStampsOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
+	
+	if (TimePointUpdateFlagAux==true){
+		this->QPLAFutureTimePointReadTimeStampsOld=this->QPLAFutureTimePoint;
+		TimePointUpdateFlagAux=false;
+	}
+
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
 			PRUoffFreqTotalAux=static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);
@@ -918,9 +933,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	//	case 7: {this->QPLAFutureTimePointOld=this->QPLAFutureTimePointOld7;break;}
 	//	default: {break;}
 	//}
-	// The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of half the effective period due to interrupt alignment handling, the effective period, the time since last emission detection, then again MultFactorEffSynchPeriod*SynchTrigPeriod more or less
-	//ldTimePointClockTagPRUDiff=static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*GuardPeriod)+0.5*NumSynchMeasAvgAux*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds);//static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
-	ldTimePointClockTagPRUDiff=static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*GuardPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
+	
 	// There is an intrinsic limitation estimating PRUoffsetDriftErrorAbsAvg, which is impaired by the time jitter of handling the interrupt to check the curren tPRU clock.
 	// At some point, it could be that the PRU clock is more stable than this jitter (even more so if SyncE synchronizaed the clocks).
 	// Then, for the triggering of the signals, it is better to truncate this value to a sub multiple of the SynchTrigPeriod; and let the qubits handle the time offset synchronization from this point onwards
@@ -938,12 +951,24 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	// Smart version of the truncation - avoid being at the border of transition
 	if (abs(PRUoffsetDriftErrorAbsAvg-PRUoffsetDriftErrorAbsAvgOldTruncatedEmit)>truncatedSynchTrigPeriod){
 		truncatedPRUoffsetDriftErrorAbsAvg=round(PRUoffsetDriftErrorAbsAvg/truncatedSynchTrigPeriod)*truncatedSynchTrigPeriod;
+		TimePointUpdateFlagAux=true;
 	}
 	else{
 		truncatedPRUoffsetDriftErrorAbsAvg=truncatedPRUoffsetDriftErrorAbsAvgOldEmit;
 	}
 	PRUoffsetDriftErrorAbsAvgOldTruncatedEmit=PRUoffsetDriftErrorAbsAvg;// Update value
 	truncatedPRUoffsetDriftErrorAbsAvgOldEmit=truncatedPRUoffsetDriftErrorAbsAvg; // Update value
+	
+	// The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of half the effective period due to interrupt alignment handling, the effective period, the time since last emission detection, then again MultFactorEffSynchPeriod*SynchTrigPeriod more or less
+	//ldTimePointClockTagPRUDiff=static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*GuardPeriod)+0.5*NumSynchMeasAvgAux*static_cast<long double>(TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds);//static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
+	// Since we truncated the offset value (due to the jitter) it no longer makes sense that the QPLAFutureTimePointOld is used. Instead, it makes more sense, to take the last time the offset exceeded the truncation
+	ldTimePointClockTagPRUDiff=static_cast<long double>(0.5*MultFactorEffSynchPeriod*SynchTrigPeriod)+static_cast<long double>(0.5*GuardPeriod)+static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint-this->QPLAFutureTimePointSendTriggerSignalsOld).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds);// update value
+	
+	if(TimePointUpdateFlagAux==true){
+		this->QPLAFutureTimePointSendTriggerSignalsOld=this->QPLAFutureTimePoint;
+		TimePointUpdateFlagAux=false;
+	}
+
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
 			PRUoffFreqTotalAux=static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAvg);

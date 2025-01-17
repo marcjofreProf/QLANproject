@@ -104,7 +104,7 @@ private:// Variables
 	// The longer (way more than the averaged jtter) it will have less jittter provided that the IEP counter is stable enough so that the absolute offset error is PID corrected with the QPLA
 	double truncatedSynchTrigPeriod=1024.0; // Multiple of power of 2, and related to the averaged interrupt jitter (in PRU units). Since otherwise it adds noise. The larger with respect the averaged jitter (of measuring the curren tPRU counter) the more offset residual error that the QPLA PID will have to correct for
 	double truncatedSynchTrigPeriodPeriodic=10.0;// Multiple of power of 2, for the periodic monitoring to content the EstimateSynchAvg. Gives stability to the calculation of the relative frequency difference.
-	double truncatedSynchAbsRelFreq=128.0;// Multiple of power of 2, for the periodic monitoring to content the relative frequency difference. Gives stability to the calculation of the relative frequency difference.
+	double truncatedSynchAbsRelFreq=64.0;// Multiple of power of 2, for the periodic monitoring to content the relative frequency difference. Gives stability to the calculation of the relative frequency difference.
 	long double PRUoffsetDriftErrorAbsAvgOld=0.0;
 	// Others
 	double PRUoffsetDriftErrorIntegral=0;
@@ -168,10 +168,13 @@ private:// Variables
 	//TimePoint TimePointClockTagPRUinitial=std::chrono::time_point<Clock>();// For absolute drift purposes
 	long double ldTimePointClockTagPRUDiff=0.0;
 	long double ldTimePointClockTagPRUinitial=0.0;
+	bool TimePointUpdateFlagAux=false;
 	//TimePoint TimePointClockTagPRUfinal=std::chrono::time_point<Clock>();// For absolute drift purposes
 	TimePoint QPLAFutureTimePoint=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
 	//TimePoint QPLAFutureTimePointBusyWaitInterrupt=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
 	TimePoint QPLAFutureTimePointOld=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
+	TimePoint QPLAFutureTimePointSendTriggerSignalsOld=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
+	TimePoint QPLAFutureTimePointReadTimeStampsOld=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
 	//TimePoint QPLAFutureTimePointOld1=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
 	//TimePoint QPLAFutureTimePointOld2=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
 	//TimePoint QPLAFutureTimePointOld3=std::chrono::time_point<Clock>();// For matching trigger signals and timetagging
