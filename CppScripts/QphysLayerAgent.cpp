@@ -1599,7 +1599,7 @@ if (iNumRunsPerCenterMass==(NumRunsPerCenterMass-1)){
 			CenterMassValAux[i]=static_cast<double>(((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+(SynchFirstTagsArray[iCenterMass][i+1]-SynchFirstTagsArray[0][i]))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux))-LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
 		}
 	}
-	SynchHistCenterMassArray[iCenterMass]=DoubleMeanFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));//DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));
+	SynchHistCenterMassArray[iCenterMass]=DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));//DoubleMeanFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1));//DoubleMedianFilterSubArray(CenterMassValAux,(NumRunsPerCenterMass-1)); // Center of mass. Beter to use median for robustness
 	//cout << "QPLA::HistCalcPeriodTimeTags SynchHistCenterMassArray[" << iCenterMass << "]: " << SynchHistCenterMassArray[iCenterMass] << endl;
 }
 
@@ -1685,7 +1685,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		for (int i=0;i<(NumRunsPerCenterMass-1);i++){
 			SynchTimeTaggRefMedianArrayAuxAux[i]=SynchTimeTaggRef[0][i+1]-SynchTimeTaggRef[0][i];
 		}
-		SynchTimeTaggRefMedianArrayAux[0]=LLIMeanFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);//LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
+		SynchTimeTaggRefMedianArrayAux[0]=LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);// MEdian more robustness LLIMeanFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);//LLIMedianFilterSubArray(SynchTimeTaggRefMedianArrayAuxAux,NumRunsPerCenterMass-1);
 		long long int SynchTimeTaggRefMedianArrayAuxAuxAux=SynchTimeTaggRefMedianArrayAux[0];// In PRU units of time
 		SynchTimeTaggRefMedianAux=static_cast<double>(SynchTimeTaggRefMedianArrayAux[0])*(5e-9);// Conversion to seconds from PRU clock tick. For human representation.
 		SynchCalcValuesArray[0]=dHistPeriodicityAux;//Period adjustment
