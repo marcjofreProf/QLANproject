@@ -587,7 +587,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					//// Relative error average
 					this->PRUoffsetDriftErrorArray[iIterPRUcurrentTimerValSynchLongExtra%ExtraExtraNumSynchMeasAvgAux]=this->PRUoffsetDriftError;
 					this->PRUoffsetDriftErrorAvg=LongDoubleMedianFilterSubArray(PRUoffsetDriftErrorArray,ExtraExtraNumSynchMeasAvgAux);// averaging
-					
+					/*
 					//cout << "GPI::PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << endl;
 					PRUoffsetDriftErrorAvg=PRUoffsetDriftErrorAvg*1000000000.0;// Make it integer like
 					//cout << "GPI::PRUoffsetDriftErrorAvg: " << PRUoffsetDriftErrorAvg << " ppb" << endl;
@@ -603,7 +603,7 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 					PRUoffsetDriftErrorAvg=PRUoffsetDriftErrorAvg/1000000000.0;// Scale it back
 
 					if (abs(this->PRUoffsetDriftErrorAvg)<this->PRUoffsetDriftErrorAvgThresh and this->iIterPRUcurrentTimerValSynchLong>(1.5*NumSynchMeasAvgAux)){this->PRUoffsetDriftErrorAvg=0.0;}// Do not apply relative frequency difference if it is below a certain value
-					
+					*/
 					CountPRUcurrentTimerValSynchLong=0;// Update value
 					iIterPRUcurrentTimerValSynchLongExtra++;// Update value
 				}
