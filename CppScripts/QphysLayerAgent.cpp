@@ -1153,16 +1153,17 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 					long long int SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 					long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);	
 					long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
+					long long int LLIMultFactorEffSynchPeriod=static_cast<long long int>(MultFactorEffSynchPeriodQPLA);
 					if (UseAllTagsForEstimation){
 						long long int SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0};				
 						for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 						  // Mean averaging, not very resilent with glitches, eventhough filtered in liner regression
 						  // Median averaging
 						  if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
-								SmallOffsetDriftArrayAux[i]=-((LLIHistPeriodicityHalfAux-(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
+								SmallOffsetDriftArrayAux[i]=-((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
 							}
 							else{
-								SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+								SmallOffsetDriftArrayAux[i]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
 							}
 						}
 					  SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
@@ -1171,10 +1172,10 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 					}
 					else{
 						if((static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
-							SmallOffsetDriftAux=-((LLIHistPeriodicityHalfAux-(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux);
+							SmallOffsetDriftAux=-((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
 						}
 						else{
-							SmallOffsetDriftAux=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+							SmallOffsetDriftAux=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
 						}
 						cout << "QPLA::SmallDriftContinuousCorrection Using only first timetag for small offset correction!...to be deactivated" << endl;
 					}
@@ -1254,8 +1255,8 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]>0){SignAuxInstantCorr=1;}
 				  else if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]<0){SignAuxInstantCorr=-1;}
 				  else {SignAuxInstantCorr=0;}
-				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SignAuxInstantCorr*(abs(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux));
-				  //SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple])%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SignAuxInstantCorr*(abs(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux));
+				  //SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLink[CurrentSpecificLinkMultiple])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
 				}// end if				 
 			}// end for			
 			// Send the updated values to the respective nodes
@@ -1341,17 +1342,20 @@ if (SimulateNumStoredQubitsNodeAux>1){
 	//		TimeTaggsDetAnalytics[4]+=1.0;
 	//	}
 	//}
+
+	// Full coincidence in time and channel
 	for (int i = 0; i < (QuadNumChGroups-1); i++) {
-        for (int j = i+1; j < (QuadNumChGroups); j++) {
-            for (unsigned int k = 0; k < RawTotalCurrentNumRecordsQuadCh[i]; k++){
-	            	for (unsigned int l = 0; l < RawTotalCurrentNumRecordsQuadCh[j]; l++){
-		                if (abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l]))<CoincidenceWindowPRU and TimeTaggs[i][k]!=0) {
-		                    TimeTaggsDetAnalytics[4]+=1.0;; // Repetition found
-		                }
-	              }
-            }
-        }
-    }
+      for (int j = i+1; j < (QuadNumChGroups); j++) {
+          for (unsigned int k = 0; k < RawTotalCurrentNumRecordsQuadCh[i]; k++){
+            	for (unsigned int l = 0; l < RawTotalCurrentNumRecordsQuadCh[j]; l++){
+	                if (abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l]))<CoincidenceWindowPRU and TimeTaggs[i][k]!=0 and ((BitPositionChannelTags(ChannelTags[i][k])%4)==(BitPositionChannelTags(ChannelTags[j][l])%4))){
+	                    TimeTaggsDetAnalytics[4]+=1.0;; // Repetition found
+	                }
+              }
+          }
+      }
+  }
+
   // Individual quad channels analysis
 	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
