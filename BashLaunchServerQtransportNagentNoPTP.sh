@@ -6,9 +6,9 @@ pidAux=$(pgrep -f "systemd-journal")
 sudo kill $pidAux
 sudo systemctl stop haveged
 
-# https://ubuntu.com/blog/real-time-kernel-tuning
-sudo sysctl kernel.sched_rt_runtime_us=-1
-sudo sysctl kernel.timer_migration=0
+## https://ubuntu.com/blog/real-time-kernel-tuning
+#sudo sysctl kernel.sched_rt_runtime_us=-1
+#sudo sysctl kernel.timer_migration=0
 
 # Function to check for real-time kernel
 is_rt_kernel() {
