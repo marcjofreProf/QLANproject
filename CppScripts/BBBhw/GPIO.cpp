@@ -563,7 +563,8 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				}
 
 				//// Compute error - Relative correction of the frequency difference of the absolute time. This provides like the stability of the hardware clock referenced to the system clock (disciplined with network protocol)...so in the order of ppb
-				if ((iIterPRUcurrentTimerValSynch%static_cast<unsigned long long int>(NumSynchMeasAvgAux/ExtraExtraNumSynchMeasAvgAux))==0 and CountPRUcurrentTimerValSynchLong!=0){
+				//if ((iIterPRUcurrentTimerValSynch%static_cast<unsigned long long int>(NumSynchMeasAvgAux/ExtraExtraNumSynchMeasAvgAux))==0 and CountPRUcurrentTimerValSynchLong!=0){
+				if (this->iIterPRUcurrentTimerValPassLong>DistTimePRU1synchPeriod){
 					// RElative implementation
 					this->PRUoffsetDriftError=this->PRUoffsetDriftErrorAbsAvgOld-static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg);
 					this->PRUoffsetDriftErrorAbsAvgOld=static_cast<long double>(this->PRUoffsetDriftErrorAbsAvg);// Update value
