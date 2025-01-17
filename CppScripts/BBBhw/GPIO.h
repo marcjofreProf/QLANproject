@@ -40,11 +40,11 @@ using std::fstream;
 #define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
 // Num averages below is critical not to get system stall (since performing median averagins is very resource consuming)
-#define NumSynchMeasAvgAux 	161 //191; // Num averages to compute the relative frequency difference. Better to be odd number.
-#define ExtraNumSynchMeasAvgAux 	161 // 191 // Averaging for computing current absolute time offset
+#define NumSynchMeasAvgAux 	101 //161; // Num averages to compute the relative frequency difference. Better to be odd number.
+#define ExtraNumSynchMeasAvgAux 	NumSynchMeasAvgAux // 191 // Averaging for computing current absolute time offset
 // The calculation of the relative frequency difference is important.
 // The periodic checking is every 100000000, where the relative frequency calculation is done every fraction of NumSynchMeasAvgAux. There is a trade-off between not taking to long to calculate the relative frequency edifference because then we are probably exceeding the IEP counter range, but we want it to be long enough to produce little error in the calculation. Furthermore, there is an averaging of different calculation sof the relative frequency difference.
-#define ExtraExtraNumSynchMeasAvgAux 	161 // 161 Averaging for computing current relative frequency diference.
+#define ExtraExtraNumSynchMeasAvgAux 	NumSynchMeasAvgAux // 161 Averaging for computing current relative frequency diference.
 
 namespace exploringBB {
 
