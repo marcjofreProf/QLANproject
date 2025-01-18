@@ -27,7 +27,7 @@ Header declaration file for Quantum physical Layer Agent
 #define NumCalcCenterMass 1 // 1 // 3 // Number of centers of mass to measure to compute the synchronization. // With 3, it also computes hardware calibration of the detunnings
 #define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
-#define NumSmallOffsetDriftAux 1 // 5 // Better odd number Length of samples to filter the small time offset continuous correction for the PID. Integration length of the PID controller for correction
+#define NumSmallOffsetDriftAux 3 // 5 // Better odd number Length of samples to filter the small time offset continuous correction for the PID. Integration length of the PID controller for correction
 
 // String operations
 #include<string>
@@ -143,7 +143,7 @@ private: //Variables/Instances
 	int CurrentNumIdentifiedEmitReceiveIP=0; // Variable to keep track of the number of identified IPs emitting/receiving to this node
 	int CurrentNumIdentifiedMultipleIP=0; // Variable to keep track of the number of identified multiple links to this node
 	char LinkIdentificationArray[LinkNumberMAX][IPcharArrayLengthMAX]={0}; // To track details of each specific link
-	bool ApplyProcQubitsSmallTimeOffsetContinuousCorrection=false; // Since we know that (after correcting for relative frequency difference and time offset) the tags should coincide with the initial value of the periodicity where the signals are sent
+	bool ApplyProcQubitsSmallTimeOffsetContinuousCorrection=true; // Since we know that (after correcting for relative frequency difference and time offset) the tags should coincide with the initial value of the periodicity where the signals are sent
 	long long int SmallOffsetDriftAuxArray[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)][NumSmallOffsetDriftAux]={0}; // Array to filter the SmallOffsetDriftAux
 	int IterSmallOffsetDriftAuxArray[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Array storing the index of the new value
 	// the following arrays are initialized to zero in the Agent creator. PID system develop

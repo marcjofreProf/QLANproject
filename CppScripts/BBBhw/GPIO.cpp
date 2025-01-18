@@ -1577,12 +1577,12 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 return 0; // All ok
 }
 
-// Function to pack bits 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15 of an unsigned int into the lower values
+// Function to pack bits 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15 of an unsigned short into the lower values
 unsigned short GPIO::packBits(unsigned short value) {
     // Rearrange the lower two bytes so that they are correctly splitted for each quad group channel. For each group of 4 bits the order does not follow an arranged order for channel detectors
-    unsigned short byte0aux0 = ((value & 0x0070) | ((value & 0x0002)<<6))>>4; // Are the bits 0x0072
-    unsigned short byte0aux1 = (((value & 0x0080)>> 6) | (value & 0x000D))<<4; // Are the bits 0x008D
-    unsigned short byte1 = ((value & 0xF000) >> 4); // Byte 1 shifts to the right four bit positions (the interesting ones)
+    unsigned short byte0aux0 = ((value & 0x0070) >> 3) | ((value & 0x0002) >> 1); // Are the bits 0x0072, moved to 0x000F
+    unsigned short byte0aux1 = (value & 0x0080) | ((value & 0x0004) << 4) | ((value & 0x0008) << 2) | ((value & 0x0001)<<4); // Are the bits 0x008D, moved to 0x00F0
+    unsigned short byte1 = ((value & 0xF000) >> 4); // Byte 1 shifts to the right four bit positions (the interesting ones) // Are the bits 0xF000, moved to 0x0F00
 
     // Combine the bytes into a single unsigned short
     return byte0aux0 | byte0aux1 | byte1;
