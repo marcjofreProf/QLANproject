@@ -1213,7 +1213,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  //cout << "QPLA::SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink: " << SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink << endl;
 				  ////////////////////////////////////////
 					// Apply insitu correction
-					long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftAux+SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
+					long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftAux+0*SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 				  //long long int LLISmallOffsetDriftAux=static_cast<long long int>(SmallOffsetDriftAux);
 					for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 						if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink)>=0){
@@ -1256,8 +1256,8 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  	//else{
 				  	//	SmallOffsetDriftPerLinkPIDvalAux=fmod(SmallOffsetDriftPerLinkPIDvalAux,HistPeriodicityAux);
 				  	//}
-				  	//cout << "QPLA::SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
-				  	//cout << "QPLA::SmallOffsetDriftPerLinkPIDvalAux: " << SmallOffsetDriftPerLinkPIDvalAux << endl;
+				  	cout << "QPLA::SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
+				  	cout << "QPLA::SmallOffsetDriftPerLinkPIDvalAux: " << SmallOffsetDriftPerLinkPIDvalAux << endl;
 						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
 						//SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 						//SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
