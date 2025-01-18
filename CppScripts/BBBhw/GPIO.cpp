@@ -1584,6 +1584,8 @@ unsigned short GPIO::packBits(unsigned short value) {
     unsigned short byte1aux = ((value & 0x0008) << 4) | ((value & 0x0004) << 4) | ((value & 0x0080) >> 2) | ((value & 0x0001) << 4); // Are the bits 0x008D, moved to 0x00F0
     unsigned short byte2aux = ((value & 0x8000) >> 7) | ((value & 0x4000) >> 4) | ((value & 0x2000) >> 4) | ((value & 0x1000) >> 1); // To be check that the ordering is correct!!!! // Byte 1 shifts to the right four bit positions (the interesting ones) // Are the bits 0xF000, moved to 0x0F00
 
+    if (byte2aux!=0){cout << "GPIO::packBits byte2aux has never tested (check synchronization network ordering of bits)!!" << endl;}
+
     // Combine the bytes into a single unsigned short
     return byte0aux | byte1aux | byte2aux;
 }
