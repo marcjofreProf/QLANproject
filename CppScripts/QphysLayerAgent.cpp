@@ -669,6 +669,7 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 	if (CurrentSpecificLink>=0){
 	this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
 	this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
+	cout << "QPLA::SimulateReceiveQuBit CurrentExtraSynchNetworkParamsLink[0]: " << CurrentExtraSynchNetworkParamsLink[0] << endl;
 	}
 	else{
 	this->FineSynchAdjVal[0]=0.0;// synch trig offset
