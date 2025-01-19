@@ -284,7 +284,9 @@ int QPLA::ProcessNewParameters(){
 		for (int j=0;j<numCurrentEmitReceiveIP;j++){
 			if (j==0){strcpy(SpecificCurrentReceiveHostIPAuxAux,strtok(CurrentReceiveHostIPAuxAux,"_"));}
 			else{strcpy(SpecificCurrentReceiveHostIPAuxAux,strtok(NULL,"_"));}
+			cout << "QPLA::ProcessNewParameters SpecificCurrentReceiveHostIPAuxAux: " << SpecificCurrentReceiveHostIPAuxAux << endl;
 			for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
+				cout << "QPLA::ProcessNewParameters LinkIdentificationArray[i]: " << LinkIdentificationArray[i] << endl;
 				if (string(LinkIdentificationArray[i])==string(SpecificCurrentReceiveHostIPAuxAux)){// IP already present
 					if (CurrentSpecificLink<0){CurrentSpecificLink=i;}// Take the first identified, which is the one that matters most
 					CurrentSpecificLinkMultipleIndices[numSpecificLinkmatches]=i; // For multiple links at the same time
