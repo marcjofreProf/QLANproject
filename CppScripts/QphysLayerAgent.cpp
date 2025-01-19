@@ -1163,15 +1163,15 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 						  	ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[iQuadChIter][i])%4);// Maps the offset correction for the different channels to detect a specific state
 						  	if (((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
 									SmallOffsetDriftArrayAux[i]=-((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
-									if (i%200==0){
-										cout << "QPLA::SmallDriftContinuousCorrection negative" << endl;
-									}
+									//if (i%200==0){
+									//	cout << "QPLA::SmallDriftContinuousCorrection negative" << endl;
+									//}
 								}
 								else{
 									SmallOffsetDriftArrayAux[i]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
-									if (i%200==0){
-										cout << "QPLA::SmallDriftContinuousCorrection positive" << endl;
-									}
+									//if (i%200==0){
+									//	cout << "QPLA::SmallDriftContinuousCorrection positive" << endl;
+									//}
 								}
 								
 						  }
@@ -1183,12 +1183,12 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 									SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
 								}
 							}
-							if (i%200==0){
-								cout << "QPLA::SmallDriftContinuousCorrection ChannelTags[" << i << "]: " << ChannelTags[iQuadChIter][i] << endl;
-								cout << "QPLA::SmallDriftContinuousCorrection BitPositionChannelTags(ChannelTags[" << i << "]): " << BitPositionChannelTags(ChannelTags[iQuadChIter][i]) << endl;
-								cout << "QPLA::SmallDriftContinuousCorrection ChOffsetCorrection[" << i << "]: " << ChOffsetCorrection << endl;
-								cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftArrayAux[" << i << "]: " << SmallOffsetDriftArrayAux[i] << endl;
-							}
+							//if (i%200==0){
+							//	cout << "QPLA::SmallDriftContinuousCorrection ChannelTags[" << i << "]: " << ChannelTags[iQuadChIter][i] << endl;
+							//	cout << "QPLA::SmallDriftContinuousCorrection BitPositionChannelTags(ChannelTags[" << i << "]): " << BitPositionChannelTags(ChannelTags[iQuadChIter][i]) << endl;
+							//	cout << "QPLA::SmallDriftContinuousCorrection ChOffsetCorrection[" << i << "]: " << ChOffsetCorrection << endl;
+							//	cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftArrayAux[" << i << "]: " << SmallOffsetDriftArrayAux[i] << endl;
+							//}
 						}
 					  SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
 					  //cout << "QPLA::SmallDriftContinuousCorrection static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]): " << static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]) << endl;
@@ -1253,7 +1253,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]++;// Update value
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]=IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux;// Wrap value
 				  SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Mean filter	//LLIMedianFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Median filter				  
-				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=0*oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+SmallOffsetDriftAux;// Update value
+				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+SmallOffsetDriftAux;// Update value
 
 				  // Implement PID
 				  SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux; // Integral value of the PID
@@ -1273,7 +1273,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 							SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
 						}
 					}
-				  cout << "QPLA::SmallDriftContinuousCorrection PID Integral SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
+				  //cout << "QPLA::SmallDriftContinuousCorrection PID Integral SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 				  // Update information to the other node about synch parameters				  
 				  if (CurrentSpecificLinkAux>-1 && ApplyPIDOffsetContinuousCorrection==true){
 				  	// Implement PID
@@ -1287,7 +1287,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  	//}
 				  	cout << "QPLA::SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 				  	cout << "QPLA::SmallOffsetDriftPerLinkPIDvalAux: " << SmallOffsetDriftPerLinkPIDvalAux << endl;
-						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
+						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
 						//SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 						//SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 						//SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
