@@ -1317,7 +1317,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 						if (CurrentSpecificLinkAux<=-1){
 							cout << "QPLA::SmallDriftContinuousCorrection Network synchronization needed..." << endl;
 						}
-						oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
+						//oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 					}
 					long long int SignAuxInstantCorr=0;
 				  if (SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]>0){SignAuxInstantCorr=1;}
