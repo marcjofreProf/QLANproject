@@ -54,7 +54,7 @@ namespace nsQphysLayerAgent {
 private: //Variables/Instances	
 	int NumberRepetitionsSignal=32768;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	int NumQuBitsPerRun=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)	
-	long long int CoincidenceWindowPRU=25;//Size of the coincidence window for evaluating coincidences in PRU time, related to jitter and the fact that there are inter corrections for each quad channel
+	long long int CoincidenceWindowPRU=16;//Size of the coincidence window for evaluating coincidences in PRU time, related to jitter and the fact that there are inter corrections for each quad channel
 	int numberLinks=0;// Number of full duplex links directly connected to this physical quantum node
 	unsigned long long int RawLastTimeTaggRef[1]={0}; // Timetaggs of the start of the detection in units of Time (not PRU time)
 	unsigned long long int RawTimeTaggs[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections raw
@@ -143,13 +143,13 @@ private: //Variables/Instances
 	int CurrentNumIdentifiedEmitReceiveIP=0; // Variable to keep track of the number of identified IPs emitting/receiving to this node
 	int CurrentNumIdentifiedMultipleIP=0; // Variable to keep track of the number of identified multiple links to this node
 	char LinkIdentificationArray[LinkNumberMAX][IPcharArrayLengthMAX]={0}; // To track details of each specific link
-	bool ApplyProcQubitsSmallTimeOffsetContinuousCorrection=false; // Since we know that (after correcting for relative frequency difference and time offset) the tags should coincide with the initial value of the periodicity where the signals are sent
+	bool ApplyProcQubitsSmallTimeOffsetContinuousCorrection=true; // Since we know that (after correcting for relative frequency difference and time offset) the tags should coincide with the initial value of the periodicity where the signals are sent
 	long long int SmallOffsetDriftAuxArray[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)][NumSmallOffsetDriftAux]={0}; // Array to filter the SmallOffsetDriftAux
 	int IterSmallOffsetDriftAuxArray[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Array storing the index of the new value
 	// the following arrays are initialized to zero in the Agent creator. PID system develop
 	bool ApplyPIDOffsetContinuousCorrection=true; // Correct at the transmitter the instantaneous offset retrieved
 	double SplitEmitReceiverSmallOffsetDriftPerLink=0.0; // Splitting ratio between the effort of the emitter and receiver of constantly updating the synch values. The closer to 0 the more aggresive (more correction from the transmitter)
-	double SplitEmitReceiverSmallOffsetDriftPerLinkP=0.5; // Proportional values for the PID
+	double SplitEmitReceiverSmallOffsetDriftPerLinkP=0.0; // Proportional values for the PID
 	double SplitEmitReceiverSmallOffsetDriftPerLinkI=0.0;//0.05; // Integral values for the PID
 	double SplitEmitReceiverSmallOffsetDriftPerLinkD=0.0;//0.01; // Derivative value for the PID
 	long long int SmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm

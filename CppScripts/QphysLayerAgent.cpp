@@ -1386,7 +1386,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
       for (int j = i+1; j < (QuadNumChGroups); j++) {
           for (unsigned int k = 0; k < RawTotalCurrentNumRecordsQuadCh[i]; k++){
             	for (unsigned int l = 0; l < RawTotalCurrentNumRecordsQuadCh[j]; l++){
-	                if (abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l]))<CoincidenceWindowPRU and TimeTaggs[i][k]!=0 and ((BitPositionChannelTags(ChannelTags[i][k])%4)==(BitPositionChannelTags(ChannelTags[j][l])%4))){
+	                if (abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l]))<CoincidenceWindowPRU and TimeTaggs[i][k]!=0){ // Channel might not coincide... and ((BitPositionChannelTags(ChannelTags[i][k])%4)==(BitPositionChannelTags(ChannelTags[j][l])%4))){
 	                    TimeTaggsDetAnalytics[4]+=1.0;; // Repetition found
 	                }
               }
