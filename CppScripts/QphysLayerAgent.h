@@ -27,7 +27,7 @@ Header declaration file for Quantum physical Layer Agent
 #define NumCalcCenterMass 1 // 1 // 3 // Number of centers of mass to measure to compute the synchronization. // With 3, it also computes hardware calibration of the detunnings
 #define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
-#define NumSmallOffsetDriftAux 3 // 5 // Better odd number Length of samples to filter the small time offset continuous correction for the PID. Integration length of the PID controller for correction
+#define NumSmallOffsetDriftAux 1 // 5 // Better odd number Length of samples to filter the small time offset continuous correction for the PID. Integration length of the PID controller for correction
 
 // String operations
 #include<string>
@@ -150,8 +150,8 @@ private: //Variables/Instances
 	bool ApplyPIDOffsetContinuousCorrection=true; // Correct at the transmitter the instantaneous offset retrieved
 	double SplitEmitReceiverSmallOffsetDriftPerLink=0.0; // Splitting ratio between the effort of the emitter and receiver of constantly updating the synch values. The closer to 0 the more aggresive (more correction from the transmitter)
 	double SplitEmitReceiverSmallOffsetDriftPerLinkP=0.5; // Proportional values for the PID
-	double SplitEmitReceiverSmallOffsetDriftPerLinkI=0.05; // Integral values for the PID
-	double SplitEmitReceiverSmallOffsetDriftPerLinkD=0.01; // Derivative value for the PID
+	double SplitEmitReceiverSmallOffsetDriftPerLinkI=0.0;//0.05; // Integral values for the PID
+	double SplitEmitReceiverSmallOffsetDriftPerLinkD=0.0;//0.01; // Derivative value for the PID
 	long long int SmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
 	long long int SmallOffsetDriftPerLinkError[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Integral value of PID. Idnetified each link and the accumulated error for the PID
 	long long int oldSmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Old valuesIdentified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
