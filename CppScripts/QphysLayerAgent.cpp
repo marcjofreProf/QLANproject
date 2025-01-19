@@ -1154,13 +1154,13 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 					long long int SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink=0*SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 					long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);	
 					long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
-					long long int LLIMultFactorEffSynchPeriod=1;//static_cast<long long int>(MultFactorEffSynchPeriodQPLA);
+					long long int LLIMultFactorEffSynchPeriod=static_cast<long long int>(MultFactorEffSynchPeriodQPLA);
 					long long int ChOffsetCorrection=0;// Variable to acomodate the 4 different channels in the periodic histogram analysis
 					if (UseAllTagsForEstimation){
 						long long int SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0};				
 						for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){						  
 						  if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
-						  	ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i])%4);// Maps the offset correction for the different channels to detect a specific state
+						  	ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[iQuadChIter][i])%4);// Maps the offset correction for the different channels to detect a specific state
 						  	if (((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
 									SmallOffsetDriftArrayAux[i]=-((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
 								}
@@ -1183,7 +1183,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 					}
 					else{
 						if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
-							ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[SpecificQuadChDet][0])%4);// Maps the offset correction for the different channels to detect a specific state
+							ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[iQuadChIter][0])%4);// Maps the offset correction for the different channels to detect a specific state
 							if(((static_cast<long long int>(TimeTaggs[iQuadChIter][0])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
 								SmallOffsetDriftAux=-((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-((static_cast<long long int>(TimeTaggs[iQuadChIter][0])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
 							}
