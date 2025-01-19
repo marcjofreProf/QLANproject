@@ -1258,11 +1258,27 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  	//}
 				  	cout << "QPLA::SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 				  	cout << "QPLA::SmallOffsetDriftPerLinkPIDvalAux: " << SmallOffsetDriftPerLinkPIDvalAux << endl;
-						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
+						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]+(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
 						//SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 						//SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 						//SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
 						oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+=static_cast<long long int>((1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux);
+						if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
+							if (oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]<0){
+								oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=-((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
+							}
+							else{
+								oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
+							}
+						}
+						else{// When NOT using histogram analysis
+							if (oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]<0){
+								oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=-((LLIHistPeriodicityHalfAux-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux));
+							}
+							else{
+								oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
+							}
+						}
 						cout << "QPLA::SmallDriftContinuousCorrection PID oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 						// Split the effor between sender and receiver for constantly correcting the synch parameters
 						SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=static_cast<long long int>(SplitEmitReceiverSmallOffsetDriftPerLink*SmallOffsetDriftPerLinkPIDvalAux);
