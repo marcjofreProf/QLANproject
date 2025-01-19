@@ -1157,8 +1157,8 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 					long long int LLIMultFactorEffSynchPeriod=static_cast<long long int>(MultFactorEffSynchPeriodQPLA);
 					long long int ChOffsetCorrection=0;// Variable to acomodate the 4 different channels in the periodic histogram analysis
 					if (UseAllTagsForEstimation){
-						long long int SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0};				
-						for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){						  
+						long long int SmallOffsetDriftArrayAux[static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])]={0};				
+						for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){					  
 						  if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
 						  	ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[iQuadChIter][i])%4);// Maps the offset correction for the different channels to detect a specific state
 						  	if (((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
@@ -1179,7 +1179,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 						}
 					  SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
 					  //cout << "QPLA::SmallDriftContinuousCorrection static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]): " << static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]) << endl;
-					  //cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftAux: " << SmallOffsetDriftAux << endl;
+					  cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftAux: " << SmallOffsetDriftAux << endl;
 					}
 					else{
 						if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
