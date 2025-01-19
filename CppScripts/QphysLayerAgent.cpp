@@ -1287,7 +1287,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  	//}
 				  	cout << "QPLA::SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 				  	cout << "QPLA::SmallOffsetDriftPerLinkPIDvalAux: " << SmallOffsetDriftPerLinkPIDvalAux << endl;
-						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
+						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]+(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
 						//SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 						//SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 						//SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
