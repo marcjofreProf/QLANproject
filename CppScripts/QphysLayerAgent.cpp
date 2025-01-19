@@ -1154,7 +1154,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 					long long int SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink=0*SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 					long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);	
 					long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
-					long long int LLIMultFactorEffSynchPeriod=static_cast<long long int>(MultFactorEffSynchPeriodQPLA);
+					long long int LLIMultFactorEffSynchPeriod=1;//static_cast<long long int>(MultFactorEffSynchPeriodQPLA);
 					long long int ChOffsetCorrection=0;// Variable to acomodate the 4 different channels in the periodic histogram analysis
 					if (UseAllTagsForEstimation){
 						long long int SmallOffsetDriftArrayAux[SimulateNumStoredQubitsNodeAux]={0};				
