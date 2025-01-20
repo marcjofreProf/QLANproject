@@ -242,7 +242,7 @@ private: // Functions/Methods
 	int SetSynchParamsOtherNode();// Tell the other nodes about the synchronization information calculated
 	int RetrieveOtherEmiterReceiverMethod();// Stores and retrieves the current other emiter receiver
 	int HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,int iNumRunsPerCenterMass); // Calculate the histogram center given a period and a list of timetaggs
-	int SmallDriftContinuousCorrection();// Methods to keep track of the small offset correction at each measurement (but not in the network synch)
+	int SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux);// Methods to keep track of the small offset correction at each measurement (but not in the network synch)
 	double DoubleMedianFilterSubArray(double* ArrayHolderAux,int MedianFilterFactor);
 	double DoubleMeanFilterSubArray(double* ArrayHolderAux,int MeanFilterFactor);
 	int DoubleBubbleSort(double* arr,int MedianFilterFactor);

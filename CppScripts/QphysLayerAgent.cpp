@@ -284,9 +284,9 @@ int QPLA::ProcessNewParameters(){
 		for (int j=0;j<numCurrentEmitReceiveIP;j++){
 			if (j==0){strcpy(SpecificCurrentReceiveHostIPAuxAux,strtok(CurrentReceiveHostIPAuxAux,"_"));}
 			else{strcpy(SpecificCurrentReceiveHostIPAuxAux,strtok(NULL,"_"));}
-			cout << "QPLA::ProcessNewParameters SpecificCurrentReceiveHostIPAuxAux: " << SpecificCurrentReceiveHostIPAuxAux << endl;
+			//cout << "QPLA::ProcessNewParameters SpecificCurrentReceiveHostIPAuxAux: " << SpecificCurrentReceiveHostIPAuxAux << endl;
 			for (int i=0;i<CurrentNumIdentifiedEmitReceiveIP;i++){
-				cout << "QPLA::ProcessNewParameters LinkIdentificationArray[i]: " << LinkIdentificationArray[i] << endl;
+				//cout << "QPLA::ProcessNewParameters LinkIdentificationArray[i]: " << LinkIdentificationArray[i] << endl;
 				if (string(LinkIdentificationArray[i])==string(SpecificCurrentReceiveHostIPAuxAux)){// IP already present
 					if (CurrentSpecificLink<0){CurrentSpecificLink=i;}// Take the first identified, which is the one that matters most
 					CurrentSpecificLinkMultipleIndices[numSpecificLinkmatches]=i; // For multiple links at the same time
@@ -653,6 +653,8 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 	this->FlagTestSynch=false;
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
+	char CurrentEmitReceiveHostIP[NumBytesBufferICPMAX]={0};
+	strcpy(CurrentEmitReceiveHostIP,CurrentEmitReceiveIPAux);	
 	this->RetrieveOtherEmiterReceiverMethod();
 	// Retrieve the involved single specific quad group channel if possible
 	QuadEmitDetecSelec=QuadEmitDetecSelecAux; // Identifies the quad groups channels to detect
@@ -680,8 +682,9 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 	if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 	this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 	std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
-	threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();	
-	this->SmallDriftContinuousCorrection();// Run after threadSimulateReceiveQuBitRefAux
+	threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
+
+	this->SmallDriftContinuousCorrection(CurrentEmitReceiveHostIP);// Run after threadSimulateReceiveQuBitRefAux
 	}
 	else{
 		cout << "QPLA::Not possible to launch ThreadSimulateReceiveQubit!" << endl;
@@ -1123,7 +1126,7 @@ this->release();
 return GPIOHardwareSynchedAux;
 }
 
-int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drifts because it is assumed that qubists fall within their histogram period
+int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// Eliminate small wander clock drifts because it is assumed that qubists fall within their histogram period
 	int SimulateNumStoredQubitsNodeAux=this->SimulateNumStoredQubitsNode[0];// Number of qubits to process
 
 	// Check that we now exceed the QuBits buffer size
@@ -1289,9 +1292,23 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  	//else{
 				  	//	SmallOffsetDriftPerLinkPIDvalAux=fmod(SmallOffsetDriftPerLinkPIDvalAux,HistPeriodicityAux);
 				  	//}
-				  	cout << "QPLA::SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
+				  	//cout << "QPLA::SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 				  	cout << "QPLA::SmallOffsetDriftPerLinkPIDvalAux: " << SmallOffsetDriftPerLinkPIDvalAux << endl;
-						SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
+				  	int numCurrentEmitReceiveIP=countUnderscores(CurrentEmitReceiveHostIPaux); // Which means the number of IP addresses that currently will send/receive qubits
+				  	if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP==1 and SynchNetworkParamsLink[CurrentSpecificLink][2]>0.0 and FlagTestSynch==false){// This corresponds to RequestQubits Node to node or SendEntangled. The receiver always performs correction, so does not matter for the sender since they are zeroed
+							// For receiver correction - it should be only one
+							cout << "QPLA::SmallDriftContinuousCorrection iQuadChIter: " << iQuadChIter << endl;
+							cout << "QPLA::SmallDriftContinuousCorrection correction for receiver!" << endl;
+						}
+						else if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP>1 and SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]>0.0 and FlagTestSynch==false){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
+							// For transmitter correction
+							// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for detection to use another story is if compensating for emitter
+							SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
+							cout << "QPLA::SmallDriftContinuousCorrection iQuadChIter: " << iQuadChIter << endl;
+							cout << "QPLA::SmallDriftContinuousCorrection correction for transmitter!" << endl;
+							// Send the updated values to the respective nodes
+							this->SetSynchParamsOtherNode(); // Tell the synchronization information to the other nodes		
+						}
 						//SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 						//SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 						//SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
@@ -1312,7 +1329,7 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 								oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
 							}
 						}
-						cout << "QPLA::SmallDriftContinuousCorrection PID oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
+						cout << "QPLA::SmallDriftContinuousCorrection oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 						// Split the effor between sender and receiver for constantly correcting the synch parameters
 						SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=static_cast<long long int>(SplitEmitReceiverSmallOffsetDriftPerLink*SmallOffsetDriftPerLinkPIDvalAux);
 					}
@@ -1330,10 +1347,6 @@ int QPLA::SmallDriftContinuousCorrection(){// Eliminate small wander clock drift
 				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SignAuxInstantCorr*(abs(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux));				  
 				}// end if				 
 			}// end for			
-			// Send the updated values to the respective nodes
-			if (CurrentSpecificLinkMultiple>-1){
-					this->SetSynchParamsOtherNode(); // Tell the synchronization information to the other nodes		
-			}
 		}
 		else{// Mal function we should not be here
 			cout << "QPLA::The Emitter nodes have not been previously identified, so no small offset drift correction applied" << endl;
