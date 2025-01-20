@@ -43,5 +43,5 @@ Furthermore, the priority of processes ptp0, ptp4l and phc2sys is very important
 
 # Write phase mode not supported in BBB
 # Required to quickly correct Time Jumps in slave
-# step_threshold: long values produces large jumps every now and then but allow better precition (less jitter). So it is a trade-off. Maybe, it has to be smaller than the truncation for the offset error in the main scripts, since we relay on the stability of the hardware clock of each device.
+# step_threshold: long values produces large jumps every now and then but allow better precition (less jitter). So it is a trade-off. Maybe, it has to be smaller or maybe largerthan the truncation for the offset error in the main scripts, since we relay on the stability of the hardware clock of each device.
 
