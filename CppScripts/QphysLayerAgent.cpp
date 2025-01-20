@@ -316,7 +316,7 @@ int QPLA::ProcessNewParameters(){
 			SynchNetworkParamsLinkOther[CurrentSpecificLink][1]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Relative frequency difference.
 			SynchNetworkParamsLinkOther[CurrentSpecificLink][2]=stod(strtok(NULL,":")); // Save the provided values to the proper indices. Period.
 
-			cout << "QPLA::SynchNetworkParamsLinkOther[CurrentSpecificLink][0]: " << SynchNetworkParamsLinkOther[CurrentSpecificLink][0] << endl;
+			//cout << "QPLA::SynchNetworkParamsLinkOther[CurrentSpecificLink][0]: " << SynchNetworkParamsLinkOther[CurrentSpecificLink][0] << endl;
 			//cout << "QPLA::SynchNetworkParamsLinkOther[CurrentSpecificLink][1]: " << SynchNetworkParamsLinkOther[CurrentSpecificLink][1] << endl;
 			//cout << "QPLA::SynchNetworkParamsLinkOther[CurrentSpecificLink][2]: " << SynchNetworkParamsLinkOther[CurrentSpecificLink][2] << endl;
 		}
