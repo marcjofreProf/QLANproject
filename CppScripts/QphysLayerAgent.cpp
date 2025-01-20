@@ -1139,7 +1139,8 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 	//Particularized for histogram analysis when MultFactorEffSynchPeriodQPLA=4 and for regular operation (non-histogram analysis)
 	// Apply the small offset drift correction
 	if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
-		if (CurrentSpecificLinkMultiple>-1){// The specific identification IP is present			
+		if (CurrentSpecificLinkMultiple>-1){// The specific identification IP is present
+			int numCurrentEmitReceiveIP=countUnderscores(CurrentEmitReceiveHostIPaux); // Which means the number of IP addresses that currently will send/receive qubits
 			for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){	
 				if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
 					//cout << "QPLA::SmallDriftContinuousCorrection iter iQuadChIter: " << iQuadChIter << endl;
@@ -1294,7 +1295,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 				  	//}
 				  	//cout << "QPLA::SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 				  	cout << "QPLA::SmallOffsetDriftPerLinkPIDvalAux: " << SmallOffsetDriftPerLinkPIDvalAux << endl;
-				  	int numCurrentEmitReceiveIP=countUnderscores(CurrentEmitReceiveHostIPaux); // Which means the number of IP addresses that currently will send/receive qubits
+				  	
 				  	if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP==1 and SynchNetworkParamsLink[CurrentSpecificLink][2]>0.0 and FlagTestSynch==false){// This corresponds to RequestQubits Node to node or SendEntangled. The receiver always performs correction, so does not matter for the sender since they are zeroed
 							// For receiver correction - it should be only one
 							SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
@@ -1306,9 +1307,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 							// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for detection to use another story is if compensating for emitter
 							SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
 							cout << "QPLA::SmallDriftContinuousCorrection iQuadChIter: " << iQuadChIter << endl;
-							cout << "QPLA::SmallDriftContinuousCorrection correction for transmitter!" << endl;
-							// Send the updated values to the respective nodes
-							this->SetSynchParamsOtherNode(); // Tell the synchronization information to the other nodes		
+							cout << "QPLA::SmallDriftContinuousCorrection correction for transmitter!" << endl;	
 						}
 						//SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 						//SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
@@ -1347,7 +1346,13 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 				  else {SignAuxInstantCorr=0;}
 				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=SignAuxInstantCorr*(abs(SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux));				  
 				}// end if				 
-			}// end for			
+			}// end for
+
+			if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP>1 and SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]>0.0 and FlagTestSynch==false){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
+				// For transmitter correction
+				// Send the updated values to the respective nodes
+				this->SetSynchParamsOtherNode(); // Tell the synchronization information to the other nodes		
+			}	
 		}
 		else{// Mal function we should not be here
 			cout << "QPLA::The Emitter nodes have not been previously identified, so no small offset drift correction applied" << endl;
