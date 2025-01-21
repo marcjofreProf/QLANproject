@@ -1211,11 +1211,11 @@ switch (QuadEmitDetecSelecGPIO){
 		break;
 	}
 	case 6:{// Time and frequency correction			
-		ValidTagMask=0x0FF0;
+		ValidTagMask=0x0F8D;//0x0FF0;
 		break;
 	}
 	case 5:{// Time and frequency correction			
-		ValidTagMask=0x0F0F;
+		ValidTagMask=0x0F72;//0x0F0F;
 		break;
 	}
 	case 4:{// Time and frequency correction			
@@ -1227,11 +1227,11 @@ switch (QuadEmitDetecSelecGPIO){
 		break;
 	}
 	case 2:{// Time correction
-		ValidTagMask=0x00F0;
+		ValidTagMask=0x008D;//0x00F0;
 		break;
 	}
 	case 1:{ // Frequency correction
-		ValidTagMask=0x000F;
+		ValidTagMask=0x0072;//0x000F;
 		break;
 	}
 	default:{ValidTagMask=0x0000;break;}// None time nor frequency correction
