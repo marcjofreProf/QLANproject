@@ -540,6 +540,22 @@ return 0; // return 0 is for no error
 
 int QPLA::SimulateEmitSynchQuBit(char* ModeActivePassiveAux,char* CurrentEmitReceiveIPAux,char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux){
 	this->acquire();
+	// Reset values
+	int CombinationLinksNumAux=static_cast<int>(2*((1LL<<LinkNumberMAX)-1));
+	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+		for (int i=0;i<CombinationLinksNumAux;i++){
+		  SmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
+		  SmallOffsetDriftPerLinkError[iQuadChIter][i]=0.0; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
+		  oldSmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Old Values, Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
+		  ReferencePointSmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
+		  // Filtering qubits
+		  NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][i]=false; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
+		  for (int j=0;j<NumSmallOffsetDriftAux;j++){
+		  	SmallOffsetDriftAuxArray[iQuadChIter][i][j]=0;
+		  }
+		  IterSmallOffsetDriftAuxArray[iQuadChIter][i]=0;
+		}
+	}
 	this->FlagTestSynch=true;
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
@@ -769,6 +785,22 @@ int QPLA::SetSynchParamsOtherNode(){// It is responsability of the host to distr
 int QPLA::SimulateReceiveSynchQuBit(char* ModeActivePassiveAux,char* CurrentReceiveHostIPaux, char* CurrentEmitReceiveIPAux, char* IPaddressesAux,int numReqQuBitsAux,int NumRunsPerCenterMassAux,double* FreqSynchNormValuesArrayAux,double HistPeriodicityAuxAux,double* FineSynchAdjValAux,int iCenterMass,int iNumRunsPerCenterMass, int QuadEmitDetecSelecAux){
 	//cout << "QPLA::SimulateReceiveSynchQuBit CurrentReceiveHostIPaux: " << CurrentReceiveHostIPaux << endl;
 	this->acquire();
+	// Reset values
+	int CombinationLinksNumAux=static_cast<int>(2*((1LL<<LinkNumberMAX)-1));
+	for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+		for (int i=0;i<CombinationLinksNumAux;i++){
+		  SmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
+		  SmallOffsetDriftPerLinkError[iQuadChIter][i]=0.0; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
+		  oldSmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Old Values, Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
+		  ReferencePointSmallOffsetDriftPerLink[iQuadChIter][i]=0.0; // Identified by each link, annotate the first time offset that all other acquisitions should match to, so an offset with respect the SignalPeriod histogram
+		  // Filtering qubits
+		  NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][i]=false; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
+		  for (int j=0;j<NumSmallOffsetDriftAux;j++){
+		  	SmallOffsetDriftAuxArray[iQuadChIter][i][j]=0;
+		  }
+		  IterSmallOffsetDriftAuxArray[iQuadChIter][i]=0;
+		}
+	}
 	this->FlagTestSynch=true;
 	strcpy(this->ModeActivePassive,ModeActivePassiveAux);
 	strcpy(this->CurrentEmitReceiveIP,CurrentEmitReceiveIPAux);
@@ -1141,6 +1173,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 	if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		if (CurrentSpecificLinkMultiple>-1){// The specific identification IP is present
 			int numCurrentEmitReceiveIP=countUnderscores(CurrentEmitReceiveHostIPaux); // Which means the number of IP addresses that currently will send/receive qubits
+			cout << "QPLA::SmallDriftContinuousCorrection CurrentEmitReceiveHostIPaux: " << CurrentEmitReceiveHostIPaux << endl;
 			for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){	
 				if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
 					//cout << "QPLA::SmallDriftContinuousCorrection iter iQuadChIter: " << iQuadChIter << endl;
@@ -1151,6 +1184,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 							if (CurrentSpecificLinkAux<0){CurrentSpecificLinkAux=i;}// Take the first identified, which is th eone that matters most
 						}
 					}
+					cout << "QPLA::SmallDriftContinuousCorrection CurrentSpecificLinkAux: " << CurrentSpecificLinkAux << endl;
 				  // If it is the first time, annotate the relative time offset with respect HostPeriodicityAux
 				  ReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=0;// Reset value. ReferencePointSmallOffset could be used to allocate multiple channels separated by time
 				  if (NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]==false){			
@@ -1159,7 +1193,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 					}
 				  // First compute the relative new time offset from last iteration
 					long long int SmallOffsetDriftAux=0;
-					long long int SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink=0*SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
+					long long int SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink=0;//SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+ReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 					long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);	
 					long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
 					long long int LLIMultFactorEffSynchPeriod=static_cast<long long int>(MultFactorEffSynchPeriodQPLA);
@@ -1171,15 +1205,15 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 						  	ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[iQuadChIter][i])%4);// Maps the offset correction for the different channels to detect a specific state
 						  	if (((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
 									SmallOffsetDriftArrayAux[i]=-((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
-									//if (i%200==0){
-									//	cout << "QPLA::SmallDriftContinuousCorrection negative" << endl;
-									//}
+									if (i%200==0){
+										cout << "QPLA::SmallDriftContinuousCorrection negative" << endl;
+									}
 								}
 								else{
 									SmallOffsetDriftArrayAux[i]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
-									//if (i%200==0){
-									//	cout << "QPLA::SmallDriftContinuousCorrection positive" << endl;
-									//}
+									if (i%200==0){
+										cout << "QPLA::SmallDriftContinuousCorrection positive" << endl;
+									}
 								}
 								
 						  }
@@ -1191,12 +1225,12 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 									SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
 								}
 							}
-							//if (i%200==0){
-							//	cout << "QPLA::SmallDriftContinuousCorrection ChannelTags[" << i << "]: " << ChannelTags[iQuadChIter][i] << endl;
-							//	cout << "QPLA::SmallDriftContinuousCorrection BitPositionChannelTags(ChannelTags[" << i << "]): " << BitPositionChannelTags(ChannelTags[iQuadChIter][i]) << endl;
-							//	cout << "QPLA::SmallDriftContinuousCorrection ChOffsetCorrection[" << i << "]: " << ChOffsetCorrection << endl;
-							//	cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftArrayAux[" << i << "]: " << SmallOffsetDriftArrayAux[i] << endl;
-							//}
+							if (i%200==0){
+								cout << "QPLA::SmallDriftContinuousCorrection ChannelTags[" << i << "]: " << ChannelTags[iQuadChIter][i] << endl;
+								cout << "QPLA::SmallDriftContinuousCorrection BitPositionChannelTags(ChannelTags[" << i << "]): " << BitPositionChannelTags(ChannelTags[iQuadChIter][i]) << endl;
+								cout << "QPLA::SmallDriftContinuousCorrection ChOffsetCorrection[" << i << "]: " << ChOffsetCorrection << endl;
+								cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftArrayAux[" << i << "]: " << SmallOffsetDriftArrayAux[i] << endl;
+							}
 						}
 					  SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
 					  //cout << "QPLA::SmallDriftContinuousCorrection static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]): " << static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]) << endl;
@@ -1298,14 +1332,14 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 				  	
 				  	if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP==1 and SynchNetworkParamsLink[CurrentSpecificLink][2]>0.0 and FlagTestSynch==false){// This corresponds to RequestQubits Node to node or SendEntangled. The receiver always performs correction, so does not matter for the sender since they are zeroed
 							// For receiver correction - it should be only one
-							SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
+							SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
 							cout << "QPLA::SmallDriftContinuousCorrection iQuadChIter: " << iQuadChIter << endl;
 							cout << "QPLA::SmallDriftContinuousCorrection correction for receiver!" << endl;
 						}
 						else if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP>1 and SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]>0.0 and FlagTestSynch==false){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
 							// For transmitter correction
 							// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for detection to use another story is if compensating for emitter
-							SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
+							SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
 							cout << "QPLA::SmallDriftContinuousCorrection iQuadChIter: " << iQuadChIter << endl;
 							cout << "QPLA::SmallDriftContinuousCorrection correction for transmitter!" << endl;	
 						}
