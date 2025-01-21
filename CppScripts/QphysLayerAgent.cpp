@@ -687,7 +687,7 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 	if (CurrentSpecificLink>=0){
 	this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
 	this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
-	cout << "QPLA::SimulateReceiveQuBit CurrentExtraSynchNetworkParamsLink[0]: " << CurrentExtraSynchNetworkParamsLink[0] << endl;
+	cout << "QPLA::SimulateReceiveQuBit CurrentSynchNetworkParamsLink[0]: " << CurrentSynchNetworkParamsLink[0] << endl;
 	}
 	else{
 	this->FineSynchAdjVal[0]=0.0;// synch trig offset
@@ -1318,7 +1318,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]++;// Update value
 				  IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]=IterSmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple]%NumSmallOffsetDriftAux;// Wrap value
 				  SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Mean filter	//LLIMedianFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Median filter				  
-				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=0*oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+0*SmallOffsetDriftAux;// Update value
+				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=0*oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+SmallOffsetDriftAux;// Update value
 
 				  // Implement PID
 				  SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux; // Integral value of the PID
