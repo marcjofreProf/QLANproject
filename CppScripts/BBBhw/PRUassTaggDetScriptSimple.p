@@ -185,10 +185,10 @@ QUADDET7:
 	MOV		r11, 0xC000C0FF // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET6:
-	MOV		r11, 0xC000C0F0 // detection mask
+	MOV		r11, 0xC000C08D // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET5:
-	MOV		r11, 0xC000C08D // detection mask
+	MOV		r11, 0xC000C072 // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET4:
 	MOV		r11, 0xC000C000 // detection mask
