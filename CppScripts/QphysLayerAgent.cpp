@@ -1683,15 +1683,37 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 	if (RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]>0){	
 		if (UseAllTagsForEstimation){
 			// Median averaging
+			long long int CheckChOffsetCorrectionArray[4][RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]]={0};
+			long long int CheckChOffsetCorrection[4]={0};
+			unsigned int CheckChOffsetCorrectionIter[4]={0};
+			bool boolCheckChOffsetCorrectionflag=false;
+			for (unsigned int i=0;i<4;i++){CheckChOffsetCorrectionIter[i]=0;}// Reset values
 			for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
 				ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i])%4);// Maps the offset correction for the different channels to detect a states
 				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
+				CheckChOffsetCorrectionArray[ChOffsetCorrection][CheckChOffsetCorrectionIter[ChOffsetCorrection]]=SynchFirstTagsArrayAux[i];
+				CheckChOffsetCorrectionIter[ChOffsetCorrection]++;
 				if (i%10==0){// To be commented when not debugging
 					cout << "QPLA::HistCalcPeriodTimeTags ChannelTags[" << i << "]: " << ChannelTags[SpecificQuadChDet][i] << endl;
 					cout << "QPLA::HistCalcPeriodTimeTags BitPositionChannelTags(ChannelTags[" << i << "]): " << BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i]) << endl;
 					cout << "QPLA::HistCalcPeriodTimeTags ChOffsetCorrection[" << i << "]: " << ChOffsetCorrection << endl;
 					cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayAux[" << i << "]: " << SynchFirstTagsArrayAux[i] << endl;
 				}
+			}
+			for (unsigned int i=0;i<4;i++){
+				if (CheckChOffsetCorrectionIter[i]>0){
+					CheckChOffsetCorrection[i]=LLIMeanFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i]));
+				}
+			}
+			for (unsigned int i=0;i<4;i++){
+				for (unsigned int j=0;j<4;j++){
+					if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>LLIHistPeriodicityAux and CheckChOffsetCorrectionIter[i]>0 and CheckChOffsetCorrectionIter[j]>0){
+						boolCheckChOffsetCorrectionflag=true;
+					}
+				}
+			}
+			if (boolCheckChOffsetCorrectionflag==true){
+				cout << "QPLA::HistCalcPeriodTimeTags Potentially GPIO pins connection order is wrong. Check!!!" << endl;
 			}
 			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMeanFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));//LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
 			//cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayOffsetCalc[" << iNumRunsPerCenterMass << "]: " << SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass] << endl;
