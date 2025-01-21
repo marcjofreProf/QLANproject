@@ -1211,15 +1211,15 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 								
 						  	if (((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink)<0){
 									SmallOffsetDriftArrayAux[i]=-((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
-									if (i%200==0){
-										cout << "QPLA::SmallDriftContinuousCorrection negative" << endl;
-									}
+									//if (i%200==0){
+									//	cout << "QPLA::SmallDriftContinuousCorrection negative" << endl;
+									//}
 								}
 								else{
 									SmallOffsetDriftArrayAux[i]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
-									if (i%200==0){
-										cout << "QPLA::SmallDriftContinuousCorrection positive" << endl;
-									}
+									//if (i%200==0){
+									//	cout << "QPLA::SmallDriftContinuousCorrection positive" << endl;
+									//}
 								}
 								CheckChOffsetCorrectionArray[ChOffsetCorrection][CheckChOffsetCorrectionIter[ChOffsetCorrection]]=SmallOffsetDriftArrayAux[i];
 								CheckChOffsetCorrectionIter[ChOffsetCorrection]++;								
@@ -1232,12 +1232,12 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 									SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
 								}
 							}
-							if (i%200==0){
-								cout << "QPLA::SmallDriftContinuousCorrection ChannelTags[" << i << "]: " << ChannelTags[iQuadChIter][i] << endl;
-								cout << "QPLA::SmallDriftContinuousCorrection BitPositionChannelTags(ChannelTags[" << i << "]): " << BitPositionChannelTags(ChannelTags[iQuadChIter][i]) << endl;
-								cout << "QPLA::SmallDriftContinuousCorrection ChOffsetCorrection[" << i << "]: " << ChOffsetCorrection << endl;
-								cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftArrayAux[" << i << "]: " << SmallOffsetDriftArrayAux[i] << endl;
-							}
+							//if (i%200==0){
+							//	cout << "QPLA::SmallDriftContinuousCorrection ChannelTags[" << i << "]: " << ChannelTags[iQuadChIter][i] << endl;
+							//	cout << "QPLA::SmallDriftContinuousCorrection BitPositionChannelTags(ChannelTags[" << i << "]): " << BitPositionChannelTags(ChannelTags[iQuadChIter][i]) << endl;
+							//	cout << "QPLA::SmallDriftContinuousCorrection ChOffsetCorrection[" << i << "]: " << ChOffsetCorrection << endl;
+							//	cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftArrayAux[" << i << "]: " << SmallOffsetDriftArrayAux[i] << endl;
+							//}
 						}
 						// Checks
 						for (unsigned int i=0;i<4;i++){
@@ -1716,12 +1716,12 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
 				CheckChOffsetCorrectionArray[ChOffsetCorrection][CheckChOffsetCorrectionIter[ChOffsetCorrection]]=SynchFirstTagsArrayAux[i];
 				CheckChOffsetCorrectionIter[ChOffsetCorrection]++;
-				if (i%10==0){// To be commented when not debugging
-					cout << "QPLA::HistCalcPeriodTimeTags ChannelTags[" << i << "]: " << ChannelTags[SpecificQuadChDet][i] << endl;
-					cout << "QPLA::HistCalcPeriodTimeTags BitPositionChannelTags(ChannelTags[" << i << "]): " << BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i]) << endl;
-					cout << "QPLA::HistCalcPeriodTimeTags ChOffsetCorrection[" << i << "]: " << ChOffsetCorrection << endl;
-					cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayAux[" << i << "]: " << SynchFirstTagsArrayAux[i] << endl;
-				}
+				//if (i%10==0){// To be commented when not debugging
+				//	cout << "QPLA::HistCalcPeriodTimeTags ChannelTags[" << i << "]: " << ChannelTags[SpecificQuadChDet][i] << endl;
+				//	cout << "QPLA::HistCalcPeriodTimeTags BitPositionChannelTags(ChannelTags[" << i << "]): " << BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i]) << endl;
+				//	cout << "QPLA::HistCalcPeriodTimeTags ChOffsetCorrection[" << i << "]: " << ChOffsetCorrection << endl;
+				//	cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayAux[" << i << "]: " << SynchFirstTagsArrayAux[i] << endl;
+				//}
 			}
 			for (unsigned int i=0;i<4;i++){
 				if (CheckChOffsetCorrectionIter[i]>0){
