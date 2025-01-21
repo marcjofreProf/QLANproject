@@ -1891,22 +1891,16 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	//cout << "QPLA::Rel. Freq. Difference zeroed...to be deactivated" << endl;
 	//SynchCalcValuesArray[2]=0.0; // To be removed
 
-	//double SynchCalcValuesArrayAux[NumRunsPerCenterMass];// Split between the four channels		
-	//for (int i=0;i<NumRunsPerCenterMass;i++){
-		//if ((SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2]))<0){
-		//	SynchCalcValuesArrayAux[i]=static_cast<double>((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-(SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2])))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
-		//}
-		//else{
-		//	SynchCalcValuesArrayAux[i]=-static_cast<double>((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+(SynchFirstTagsArrayOffsetCalc[i]+static_cast<long long int>(SynchCalcValuesArray[2])))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);// Offset is not normalized to the histogram /DHistPeriodicityAux; // Offset adjustment - watch out, maybe it is not here the place since it is dependent on link
-		//}
+	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];// Split between the four channels		
+	for (int i=0;i<NumRunsPerCenterMass;i++){
+		// Offset wrapping
+		SynchCalcValuesArrayAux[i]=static_cast<double>((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+SynchFirstTagsArrayOffsetCalc[0])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
 		//cout << "QPLA::SynchFirstTagsArrayOffsetCalc[i]: " << SynchFirstTagsArrayOffsetCalc[i] << endl;
 		//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 		//cout << "QPLA::SynchCalcValuesArrayAux[i]: " << SynchCalcValuesArrayAux[i] << endl;
-	//}
-	// Offset wrapping
-	SynchCalcValuesArray[1]==(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+SynchFirstTagsArrayOffsetCalc[0])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
-		
-	////SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMeanFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass); // The actual computed offset. To avoid glitches, it is better to make a median
+	}	
+	
+	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMeanFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass); // The actual computed offset. To avoid glitches, it is better to make a median
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	
