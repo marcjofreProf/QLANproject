@@ -1303,7 +1303,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 						}
 					}
 
-				  if (abs(SmallOffsetDriftAux)>(HistPeriodicityAux/2.0)){// Large step
+				  if (abs(static_cast<double>(SmallOffsetDriftAux))>(HistPeriodicityAux/2.0)){// Large step
 				  	cout << "QPLA::SmallDriftContinuousCorrection iQuadChIter: " << iQuadChIter << endl;
 				  	cout << "QPLA::Large small offset drift encountered SmallOffsetDriftAux " << SmallOffsetDriftAux << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << ". Potentially lost ABSOLUTE temporal track of timetaggs from previous runs!!!" << endl;
 				  	cout << "QPLA::Applying SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << " for link " << ListCombinationSpecificLink[CurrentSpecificLinkMultiple] << endl;

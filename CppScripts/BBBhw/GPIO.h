@@ -285,7 +285,7 @@ private:// Variables
 	int togglePeriod;  //default 100ms
 	int toggleNumber;  //default -1 (infinite)
 	// Testing with periodic histogram signal
-	unsigned long long int ULLIEpochReOffset=288230376151711744;// Better power of 2. Amount to remove to timetaggs so that the numbers are not so high and difficult to handle by other agents (value adjusted August 2024)
+	unsigned long long int ULLIEpochReOffset=347506519442587648;// Better power of 2. Amount to remove to timetaggs so that the numbers are not so high and difficult to handle by other agents (value adjusted August 2024)
 	unsigned long long int OldLastTimeTagg=0;
 	unsigned long long int TimeTaggsLast=0;
 	unsigned long long int TimeTaggsLastStored=0;
