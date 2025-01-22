@@ -797,6 +797,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Now, The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of the effective period, and the period
 	if (abs(AccumulatedErrorDrift)<AccumulatedErrorDriftThresh){AccumulatedErrorDrift=0.0;}// Do not apply computed synch relative frequency difference
+	cout << "GPIO::ReadTimeStamps AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
 			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(AccumulatedErrorDrift)*ldTimePointClockTagPRUDiff;
@@ -1028,6 +1029,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		// Then, it is divided by 4 because it is histogram analysis
 		// Then, it is divided by the period length
 		// Then is multiplied by 2, because the assembler code can do loops that consume double
+		cout << "GPIO::SendTriggerSignals AccumulatedErrorDriftPRUoffsetDriftErrorAvg: " << AccumulatedErrorDriftPRUoffsetDriftErrorAvg << endl;
 		if (AccumulatedErrorDriftPRUoffsetDriftErrorAvg==0.0){ContCorr=static_cast<unsigned int>(4294967295);}
 		else{
 			long double AccumulatedErrorDriftPRUoffsetDriftErrorAvgAux=2.0*(1.0/abs(AccumulatedErrorDriftPRUoffsetDriftErrorAvg))/static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod);
@@ -1191,8 +1193,14 @@ OldLastTimeTagg=static_cast<unsigned long long int>(*CalpHolder);//extendedCount
 this->TimeTaggsLast=(static_cast<unsigned long long int>(ldTimePointClockTagPRUinitial)/static_cast<unsigned long long int>(GuardPeriod))*static_cast<unsigned long long int>(GuardPeriod);//(static_cast<unsigned long long int>(ldTimePointClockTagPRUinitial)/static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod))*static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod);
 
 //Furthermore, remove some time from epoch - in multiples of the SynchTrigPeriod, so it is easier to handle in the above agents
-this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsLast)-static_cast<long long int>((this->ULLIEpochReOffset/static_cast<unsigned long long int>(GuardPeriod))*static_cast<unsigned long long int>(GuardPeriod)));//static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsLast)-static_cast<long long int>((this->ULLIEpochReOffset/static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod))*static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
-
+cout << "GPIO::DDRdumpdata TimeTaggsLast before removing Epoch: " << TimeTaggsLast << endl;
+if (this->TimeTaggsLast<((this->ULLIEpochReOffset/static_cast<unsigned long long int>(GuardPeriod))*static_cast<unsigned long long int>(GuardPeriod))){
+	cout << "GPIO::DDRdumpdata ULLIEpochReOffset is too large...not removing actual time since epoch!!!! check: " << endl;
+}
+else{
+	this->TimeTaggsLast=static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsLast)-static_cast<long long int>((this->ULLIEpochReOffset/static_cast<unsigned long long int>(GuardPeriod))*static_cast<unsigned long long int>(GuardPeriod)));//static_cast<unsigned long long int>(static_cast<long long int>(this->TimeTaggsLast)-static_cast<long long int>((this->ULLIEpochReOffset/static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod))*static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod)));
+}
+cout << "GPIO::DDRdumpdata TimeTaggsLast after removing Epoch: " << TimeTaggsLast << endl;
 if (iIterRunsAux==0){TimeTaggsLastStored=TimeTaggsLast;TotalCurrentNumRecords=0;}// First iteration of current runs, store the value for synchronization time difference calibration
 
 long long int LLIOldLastTimeTagg=static_cast<long long int>(OldLastTimeTagg);

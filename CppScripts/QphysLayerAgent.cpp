@@ -509,7 +509,7 @@ this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 if (CurrentSpecificLink>=0){
 this->FineSynchAdjVal[0]=CurrentExtraSynchNetworkParamsLink[0];// synch trig offset
 this->FineSynchAdjVal[1]=CurrentExtraSynchNetworkParamsLink[1];// synch trig frequency
-cout << "QPLA::SimulateEmitQuBit CurrentExtraSynchNetworkParamsLink[0]: " << CurrentExtraSynchNetworkParamsLink[0] << endl;
+//cout << "QPLA::SimulateEmitQuBit CurrentExtraSynchNetworkParamsLink[0]: " << CurrentExtraSynchNetworkParamsLink[0] << endl;
 }
 else{
 this->FineSynchAdjVal[0]=0.0;// synch trig offset
@@ -687,7 +687,7 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 	if (CurrentSpecificLink>=0){
 	this->FineSynchAdjVal[0]=CurrentSynchNetworkParamsLink[0];// synch trig offset
 	this->FineSynchAdjVal[1]=CurrentSynchNetworkParamsLink[1];// synch trig frequency
-	cout << "QPLA::SimulateReceiveQuBit CurrentSynchNetworkParamsLink[0]: " << CurrentSynchNetworkParamsLink[0] << endl;
+	//cout << "QPLA::SimulateReceiveQuBit CurrentSynchNetworkParamsLink[0]: " << CurrentSynchNetworkParamsLink[0] << endl;
 	}
 	else{
 	this->FineSynchAdjVal[0]=0.0;// synch trig offset
@@ -1173,7 +1173,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 	if (ApplyProcQubitsSmallTimeOffsetContinuousCorrection==true){
 		if (CurrentSpecificLinkMultiple>-1){// The specific identification IP is present
 			int numCurrentEmitReceiveIP=countUnderscores(CurrentEmitReceiveHostIPaux); // Which means the number of IP addresses that currently will send/receive qubits
-			cout << "QPLA::SmallDriftContinuousCorrection CurrentEmitReceiveHostIPaux: " << CurrentEmitReceiveHostIPaux << endl;
+			//cout << "QPLA::SmallDriftContinuousCorrection CurrentEmitReceiveHostIPaux: " << CurrentEmitReceiveHostIPaux << endl;
 			for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){	
 				if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
 					//cout << "QPLA::SmallDriftContinuousCorrection iter iQuadChIter: " << iQuadChIter << endl;
@@ -1184,7 +1184,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 							if (CurrentSpecificLinkAux<0){CurrentSpecificLinkAux=i;}// Take the first identified, which is th eone that matters most
 						}
 					}
-					cout << "QPLA::SmallDriftContinuousCorrection CurrentSpecificLinkAux: " << CurrentSpecificLinkAux << endl;
+					//cout << "QPLA::SmallDriftContinuousCorrection CurrentSpecificLinkAux: " << CurrentSpecificLinkAux << endl;
 				  // If it is the first time, annotate the relative time offset with respect HostPeriodicityAux
 				  ReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=0;// Reset value. ReferencePointSmallOffset could be used to allocate multiple channels separated by time
 				  if (NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]==false){			
@@ -1351,20 +1351,20 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 				  	//	SmallOffsetDriftPerLinkPIDvalAux=fmod(SmallOffsetDriftPerLinkPIDvalAux,HistPeriodicityAux);
 				  	//}
 				  	//cout << "QPLA::SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
-				  	cout << "QPLA::SmallOffsetDriftPerLinkPIDvalAux: " << SmallOffsetDriftPerLinkPIDvalAux << endl;
+				  	//cout << "QPLA::SmallOffsetDriftPerLinkPIDvalAux: " << SmallOffsetDriftPerLinkPIDvalAux << endl;
 				  	
 				  	if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP==1 and SynchNetworkParamsLink[CurrentSpecificLink][2]>0.0 and FlagTestSynch==false){// This corresponds to RequestQubits Node to node or SendEntangled. The receiver always performs correction, so does not matter for the sender since they are zeroed
 							// For receiver correction - it should be only one
 							SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
-							cout << "QPLA::SmallDriftContinuousCorrection iQuadChIter: " << iQuadChIter << endl;
-							cout << "QPLA::SmallDriftContinuousCorrection correction for receiver!" << endl;
+							//cout << "QPLA::SmallDriftContinuousCorrection iQuadChIter: " << iQuadChIter << endl;
+							//cout << "QPLA::SmallDriftContinuousCorrection correction for receiver!" << endl;
 						}
 						else if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP>1 and SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][2]>0.0 and FlagTestSynch==false){// correction has to take place at the emitter. this Corresponds to RequestMultiple, where the first IP identifies the correction at the sender to the receiver and the extra identifies the other sender, but no other action takes place more than identifying numSpecificLinkmatches>1
 							// For transmitter correction
 							// Ideally, the first IP indicates the sender, hence the index of the synch network parameters for detection to use another story is if compensating for emitter
 							SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]+(1.0-SplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
-							cout << "QPLA::SmallDriftContinuousCorrection iQuadChIter: " << iQuadChIter << endl;
-							cout << "QPLA::SmallDriftContinuousCorrection correction for transmitter!" << endl;	
+							//cout << "QPLA::SmallDriftContinuousCorrection iQuadChIter: " << iQuadChIter << endl;
+							//cout << "QPLA::SmallDriftContinuousCorrection correction for transmitter!" << endl;	
 						}
 						//SynchNetworkParamsLink[CurrentSpecificLink][1]=0.0*SynchNetworkParamsLink[CurrentSpecificLink][1]+SynchCalcValuesArray[2];// Relative frequency
 						//SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
@@ -1386,7 +1386,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 								oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
 							}
 						}
-						cout << "QPLA::SmallDriftContinuousCorrection oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
+						//cout << "QPLA::SmallDriftContinuousCorrection oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 						// Split the effor between sender and receiver for constantly correcting the synch parameters
 						SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=static_cast<long long int>(SplitEmitReceiverSmallOffsetDriftPerLink*SmallOffsetDriftPerLinkPIDvalAux);
 					}
@@ -1463,12 +1463,15 @@ if (FirstQPLACalcStats==true){// First time. Hence, acquire the normalization va
       for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
       	if (FirstQPLAtimeTagNorm==0 or (TimeTaggs[iQuadChIter][i]>0 and FirstQPLAtimeTagNorm>static_cast<long long int>(TimeTaggs[iQuadChIter][i]))){
       		FirstQPLACalcStats=false;// Negate forever more this condition
-					FirstQPLAtimeTagNorm=TimeTaggs[iQuadChIter][i];
+					FirstQPLAtimeTagNorm=static_cast<long long int>(TimeTaggs[iQuadChIter][i]);
 				}
 			}
 		}
 	}
 }
+// Floor to the nearest point
+FirstQPLAtimeTagNorm=(FirstQPLAtimeTagNorm/(static_cast<long long int>(MultFactorEffSynchPeriodQPLA*HistPeriodicityAux)))*(static_cast<long long int>(MultFactorEffSynchPeriodQPLA*HistPeriodicityAux));
+
 //Actual normalization of Time taggs to the normalization value
 for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 	if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){
@@ -1561,7 +1564,7 @@ else{
 // Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
 // Accordingly, the std wrapped count difference is stored in TimeTaggsDetAnalytics[6]
 cout << "QPLA::TIMETAGGING ANALYSIS of QphysLayerAgent.h" << endl;
-cout << "QPLA::Attention, the absolute tag time value has been reset to the first tag since the node was started" << endl;
+//cout << "QPLA::Attention, the absolute tag time value has been reset to the first tag since the node was started" << endl;
 //cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 //cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
 //cout << "Attention TimeTaggsDetAnalytics[6] stores the std wrap count difference" << endl;
