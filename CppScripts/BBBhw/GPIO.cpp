@@ -797,7 +797,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Now, The time in PRU units to consider (as an approximation) for correction with relative frequency correction is composed of the effective period, and the period
 	if (abs(AccumulatedErrorDrift)<AccumulatedErrorDriftThresh){AccumulatedErrorDrift=0.0;}// Do not apply computed synch relative frequency difference
-	cout << "GPIO::ReadTimeStamps AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
+	//cout << "GPIO::ReadTimeStamps AccumulatedErrorDrift: " << AccumulatedErrorDrift << endl;
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
 			PRUoffFreqTotalAux+=static_cast<long double>(AccumulatedErrorDriftAux)+static_cast<long double>(AccumulatedErrorDrift)*ldTimePointClockTagPRUDiff;
@@ -1029,7 +1029,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		// Then, it is divided by 4 because it is histogram analysis
 		// Then, it is divided by the period length
 		// Then is multiplied by 2, because the assembler code can do loops that consume double
-		cout << "GPIO::SendTriggerSignals AccumulatedErrorDriftPRUoffsetDriftErrorAvg: " << AccumulatedErrorDriftPRUoffsetDriftErrorAvg << endl;
+		//cout << "GPIO::SendTriggerSignals AccumulatedErrorDriftPRUoffsetDriftErrorAvg: " << AccumulatedErrorDriftPRUoffsetDriftErrorAvg << endl;
 		if (AccumulatedErrorDriftPRUoffsetDriftErrorAvg==0.0){ContCorr=static_cast<unsigned int>(4294967295);}
 		else{
 			long double AccumulatedErrorDriftPRUoffsetDriftErrorAvgAux=2.0*(1.0/abs(AccumulatedErrorDriftPRUoffsetDriftErrorAvg))/static_cast<long double>(MultFactorEffSynchPeriod*SynchTrigPeriod);
@@ -1038,18 +1038,18 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 			ContCorr=static_cast<unsigned int>(AccumulatedErrorDriftPRUoffsetDriftErrorAvgAux);
 		}
 		if (AccumulatedErrorDriftPRUoffsetDriftErrorAvg<0.0){
-			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0+1.0);// 1 positive unit intra pulses reltive frequency difference correction
+			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0+1.0);// 1 positive unit intra pulses relative frequency difference correction
 		}
 		else if(AccumulatedErrorDriftPRUoffsetDriftErrorAvg>0.0){
-			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0-1.0);// 1 negative unit intra pulses reltive frequency difference correction
+			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0-1.0);// 1 negative unit intra pulses relative frequency difference correction
 		}
 		else{
-			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0);// No intra pulses reltive frequency difference correction
+			ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0);// No intra pulses relative frequency difference correction
 		}
 	}
 	else{// Do not apply relative frequency correction in the PRU script
 		ContCorr=static_cast<unsigned int>(4294967295);
-		ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0);// No intra pulses reltive frequency difference correction
+		ContCorrSign=static_cast<unsigned int>(((SynchTrigPeriod-SigONPeriod)-4.0-4.0)/2.0);// No intra pulses relative frequency difference correction
 	}
 
 	// Accounting for the effective offset and frequency correction
