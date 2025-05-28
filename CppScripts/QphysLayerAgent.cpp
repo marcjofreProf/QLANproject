@@ -1106,13 +1106,18 @@ else{ // For instance when testing Synch mechanisms or when no previous synch pa
 return 0; // All ok
 }
 
+int QPLA::makeEvenInt(int xAux) {
+    return (xAux % 2 == 0) ? xAux : xAux + 1;
+}
+
 int QPLA::ThreadSimulateReceiveQubit(){
 	cout << "Receiving Qubits" << endl;
 	this->acquire();
 	PRUGPIO.ClearStoredQuBits();//PRUGPIO->ClearStoredQuBits();
 	this->release();
 	int iIterRuns;
-	int DetRunsCount = NumQubitsMemoryBuffer/NumQuBitsPerRun;
+	NumQuBitsPerRun=makeEvenInt(NumQuBitsPerRun); // Force that it is an even number (needed for GPIO.cpp)
+	int DetRunsCount = static_cast<int>(ceil(static_cast<double>(NumQuBitsPerRun)/static_cast<double>(NumQubitsMemoryBuffer))); // Number of iteration runs
 	//cout << "DetRunsCount: " << DetRunsCount << endl;
 	struct timespec requestWhileWait;
 	if (string(this->ModeActivePassive)==string("Active")){
@@ -1423,7 +1428,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 return 0; // All Ok
 }
 
-int QPLA::GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics){
+int QPLA::GetSimulateNumStoredQubitsNode(double* TimeTaggsDetAnalytics){ // Function to compute results and return them to the Application layer
 	this->acquire();
 while(this->RunThreadSimulateReceiveQuBitFlag==false or this->RunThreadAcquireSimulateNumStoredQubitsNode==false){this->release();this->RelativeNanoSleepWait((unsigned int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));this->acquire();}// Wait for Receiving thread to finish
 this->RunThreadAcquireSimulateNumStoredQubitsNode=false;
@@ -1557,13 +1562,16 @@ else{
 //cout << "TimeTaggsDetAnalytics[5]: " << TimeTaggsDetAnalytics[5] << endl;
 //cout << "TimeTaggsDetAnalytics[6]: " << TimeTaggsDetAnalytics[6] << endl;
 //cout << "TimeTaggsDetAnalytics[7]: " << TimeTaggsDetAnalytics[7] << endl;
-// Particular analysis
+
+/* // Start TIMETAGGING ANALYSIS time synchronization
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Particular analysis Time synchronization
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Part to analyze if there is absolute synch between clocks with channel 1 and and histogram periodic signals of 4 steps (ch1, ch2, ch3, ch4).
-// Accordingly a complete sycle has 8 counts (2 counts for each step)
+// Accordingly a complete cycle has 8 counts (2 counts for each step)
 // Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
 // Accordingly, the std wrapped count difference is stored in TimeTaggsDetAnalytics[6]
-cout << "QPLA::TIMETAGGING ANALYSIS of QphysLayerAgent.h" << endl;
+cout << "QPLA::TIMETAGGING ANALYSIS time synchronization of QphysLayerAgent.h" << endl;
 //cout << "QPLA::Attention, the absolute tag time value has been reset to the first tag since the node was started" << endl;
 //cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 //cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
@@ -1619,6 +1627,58 @@ else{
 	TimeTaggsDetAnalytics[6]=0.0;
 	TimeTaggsDetAnalytics[7]=0.0;
 }
+*/ // End TIMETAGGING ANALYSIS time synchronization
+
+// Start TIMETAGGING ANALYSIS effective detection rate
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Particular analysis Effective transmission/detection rate
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Part to analyze if there is absolute synch between clocks with channel 1 and and histogram periodic signals of 4 steps (ch1, ch2, ch3, ch4).
+// Accordingly a complete cycle has 8 counts (2 counts for each step)
+// Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
+// Accordingly, the std wrapped count difference is stored in TimeTaggsDetAnalytics[6]
+cout << "QPLA::TIMETAGGING ANALYSIS effective detection rate of QphysLayerAgent.h" << endl;
+//cout << "QPLA::Attention, the absolute tag time value has been reset to the first tag since the node was started" << endl;
+//cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
+//cout << "Attention TimeTaggsDetAnalytics[5] stores the syntethically corrected absolute timetagg value at the start" << endl;
+//cout << "Attention TimeTaggsDetAnalytics[6] stores the syntethically corrected absolute timetagg value at the end" << endl;
+//cout << "Attention TimeTaggsDetAnalytics[7] stores the reference value of start timetagging capture" << endl;
+//cout << "In GPIO it can be increased NumberRepetitionsSignal when deactivating this hist. analysis" << endl;
+if (SimulateNumStoredQubitsNodeAux>1){
+	TimeTaggsDetAnalytics[5]=0.0;
+	TimeTaggsDetAnalytics[6]=0.0;
+	TimeTaggsDetAnalytics[7]=0.0;
+	//double TimeTaggsDetAnalytics7ArrayAux[QuadNumChGroups*MaxNumQuBitsPerRun]={0.0};
+	//int TimeTaggsDetAnalytics7iterAux=0;
+	TimeTaggsDetAnalytics[7]=static_cast<double>(RawLastTimeTaggRef[0]);
+	unsigned int TimeTaggsDetAnalytics7iQuadChMax=0;
+	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
+			if (TimeTaggsDetAnalytics[5]>TimeTaggs[iQuadChIter][0] or TimeTaggsDetAnalytics[5]<=0.0){ // Start value
+				TimeTaggsDetAnalytics[5]=TimeTaggs[iQuadChIter][0];
+			}
+			if (TimeTaggsDetAnalytics[6]<TimeTaggs[iQuadChIter][RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1]){ // End value
+				TimeTaggsDetAnalytics[6]=TimeTaggs[iQuadChIter][RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1];
+			}
+		}
+	}
+  //cout << "Offset corrected TimeTaggs[0]: " << TimeTaggs[0] << endl;
+  //cout << "Offset corrected TimeTaggs[1]: " << TimeTaggs[1] << endl;
+  //cout << "Offset corrected TimeTaggs[2]: " << TimeTaggs[2] << endl;
+  //cout << "Offset corrected TimeTaggs[3]: " << TimeTaggs[3] << endl;
+}
+else{
+	TimeTaggsDetAnalytics[0]=0.0;
+	TimeTaggsDetAnalytics[1]=0.0;
+	TimeTaggsDetAnalytics[2]=0.0;
+	TimeTaggsDetAnalytics[3]=0.0;
+	TimeTaggsDetAnalytics[4]=0.0;
+	TimeTaggsDetAnalytics[5]=0.0;
+	TimeTaggsDetAnalytics[6]=0.0;
+	TimeTaggsDetAnalytics[7]=0.0;
+}
+
+// Start TIMETAGGING ANALYSIS effective detection rate
 
 this->RunThreadAcquireSimulateNumStoredQubitsNode=true;
 this->release();
