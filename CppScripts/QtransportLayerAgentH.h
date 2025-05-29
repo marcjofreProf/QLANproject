@@ -71,7 +71,7 @@ private: // Variables/Objects
 	// Status
 	bool InfoSimulateNumStoredQubitsNodeFlag=false;// Flag to account that there is informaiton on number Qubits in node
 	int SimulateNumStoredQubitsNodeParamsIntArray[1]={0};// Array storing the Number Qubits stored in the node
-	double TimeTaggsDetAnalytics[8]={0.0};// Array containing the timetaggs detections analytics (proceesses by the nodes)
+	double TimeTaggsDetAnalytics[11]={0.0};// Array containing the timetaggs detections analytics (proceesses by the nodes)
 	double TimeTaggsDetSynchParams[3]={0.0};// Array containing the retrieved synch params (proceesses by the nodes)
 	int NumSockets=0;
 	bool SimulateRetrieveNumStoredQubitsNodeFlag=false; // Flag to only allow one process ask to retrieve QuBits info

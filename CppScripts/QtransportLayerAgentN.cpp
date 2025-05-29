@@ -967,8 +967,11 @@ this->release();
 // Param 4: Multidetection events
 // Param 5: Mean time difference between tags
 // Param 6: std time difference between tags
-// Param 7: time value first count tags
-int NumTimetaggDetAnalytics=8;
+// Param 7: time value center count tags
+// Param 8: time value first count tags
+// Param 9: time value last count tags
+// Param 10: time value reference time count tags
+int NumTimetaggDetAnalytics=11;
 double TimeTaggsDetAnalytics[NumTimetaggDetAnalytics]={0.0};
 int SimulateNumStoredQubitsNode=this->QNLAagent.QLLAagent.QPLAagent.GetSimulateNumStoredQubitsNode(TimeTaggsDetAnalytics);// to be developed for more than one link
 //cout << "Node return SimulateNumStoredQubitsNode: " << SimulateNumStoredQubitsNode << endl;
@@ -1011,6 +1014,15 @@ sprintf(charNum, "%.15f", TimeTaggsDetAnalytics[6]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// Separate different Payloads with :
 sprintf(charNum, "%.15f", TimeTaggsDetAnalytics[7]);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,":");// Separate different Payloads with :
+sprintf(charNum, "%.15f", TimeTaggsDetAnalytics[8]);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,":");// Separate different Payloads with :
+sprintf(charNum, "%.15f", TimeTaggsDetAnalytics[9]);
+strcat(ParamsCharArray,charNum);
+strcat(ParamsCharArray,":");// Separate different Payloads with :
+sprintf(charNum, "%.15f", TimeTaggsDetAnalytics[10]);
 strcat(ParamsCharArray,charNum);
 strcat(ParamsCharArray,":");// End Separate different Payloads with :
 strcat(ParamsCharArray,",");// Very important to end the message

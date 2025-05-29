@@ -22,7 +22,7 @@ Header declaration file for Quantum physical Layer Agent
 #define NumBytesBufferICPMAX 4096 // Oversized to make sure that sockets do not get full
 //Qubits
 #define MaxNumQuBitsPerRun 1964 // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
-#define NumQubitsMemoryBuffer 1*MaxNumQuBitsPerRun// In multiples of NumQuBitsPerRun (e.g., 1964, 3928, ...). Maximum buffer size
+#define NumQubitsMemoryBuffer 5*MaxNumQuBitsPerRun // Really defined in GPIO.h.// In multiples of NumQuBitsPerRun (e.g., 1964, 3928, ...). Maximum buffer size
 // Synchronization
 #define NumCalcCenterMass 1 // 1 // 3 // Number of centers of mass to measure to compute the synchronization. // With 3, it also computes hardware calibration of the detunnings
 #define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
@@ -105,7 +105,7 @@ private: //Variables/Instances
 	bool RunThreadSimulateEmitQuBitFlag=true;
 	bool RunThreadSimulateReceiveQuBitFlag=true;
 	bool RunThreadAcquireSimulateNumStoredQubitsNode=true;
-	bool FirstQPLACalcStats=true;
+	bool FirstQPLACalcStats=false; // Data analytics about timetags are referenced to the first tagg (if tru, then it is difficult to compare among different nodes)
 	long long int FirstQPLAtimeTagNorm=0;// Normalization value of time taggs for the Stats
 	// Periodic signal histogram analysis
 	unsigned long long int OldLastTimeTagg=0;

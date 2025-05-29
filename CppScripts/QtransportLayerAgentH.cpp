@@ -1392,6 +1392,9 @@ while(isValidWhileLoopCount>0){
 		ParamsDoubleArray[5]=this->TimeTaggsDetAnalytics[5];
 		ParamsDoubleArray[6]=this->TimeTaggsDetAnalytics[6];
 		ParamsDoubleArray[7]=this->TimeTaggsDetAnalytics[7];
+		ParamsDoubleArray[8]=this->TimeTaggsDetAnalytics[8];
+		ParamsDoubleArray[9]=this->TimeTaggsDetAnalytics[9];
+		ParamsDoubleArray[10]=this->TimeTaggsDetAnalytics[10];
 		
 		this->SimulateRetrieveNumStoredQubitsNodeFlag=false;
 		this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
