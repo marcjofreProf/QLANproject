@@ -1470,7 +1470,7 @@ TimeTaggsDetAnalytics[10]=0.0;
 // Normalize time taggs to the first run since the node was started
 if (FirstQPLACalcStats==true){// First time. Hence, acquire the normalization value of the time taggs
 	FirstQPLACalcStats=false;// Negate forever more this condition
-	FirstQPLAtimeTagNorm=static_cast<long long int>(65536*915527343749); // It can be a multiple of a large value of MultFactorEffSynchPeriodQPLA*HistPeriodicityAux, which will not be used (so that an other used MultFactorEffSynchPeriodQPLA*HistPeriodicityAux is multiple), and that does not exceed the current absolute time tag value
+	FirstQPLAtimeTagNorm=static_cast<long long int>(65536*937974421909); // It can be a multiple of a large value of MultFactorEffSynchPeriodQPLA*HistPeriodicityAux, which will not be used (so that an other used MultFactorEffSynchPeriodQPLA*HistPeriodicityAux is multiple), and that does not exceed the current absolute time tag value
 	// Old implementation which rendered the comparison between nodes not possible
 	//for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 	//	if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){			
@@ -1483,6 +1483,7 @@ if (FirstQPLACalcStats==true){// First time. Hence, acquire the normalization va
 	//	}
 	//}
 }
+else{FirstQPLAtimeTagNorm=0;}
 // Floor to the nearest point
 FirstQPLAtimeTagNorm=(FirstQPLAtimeTagNorm/(static_cast<long long int>(MultFactorEffSynchPeriodQPLA*HistPeriodicityAux)))*(static_cast<long long int>(MultFactorEffSynchPeriodQPLA*HistPeriodicityAux));
 
@@ -1602,7 +1603,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 	TimeTaggsDetAnalytics[10]=0.0;
 	//double TimeTaggsDetAnalytics7ArrayAux[QuadNumChGroups*MaxNumQuBitsPerRun]={0.0};
 	//int TimeTaggsDetAnalytics7iterAux=0;
-	TimeTaggsDetAnalytics[10]=static_cast<double>(RawLastTimeTaggRef[0]);
+	TimeTaggsDetAnalytics[10]=static_cast<double>(static_cast<long long int>(RawLastTimeTaggRef[0])-FirstQPLAtimeTagNorm);
 	unsigned int TimeTaggsDetAnalytics7iQuadChMax=0;
 	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
