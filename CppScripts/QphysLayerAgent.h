@@ -105,7 +105,7 @@ private: //Variables/Instances
 	bool RunThreadSimulateEmitQuBitFlag=true;
 	bool RunThreadSimulateReceiveQuBitFlag=true;
 	bool RunThreadAcquireSimulateNumStoredQubitsNode=true;
-	bool FirstQPLACalcStats=false; // Data analytics about timetags are referenced to the first tagg (if tru, then it is difficult to compare among different nodes)
+	bool FirstQPLACalcStats=true; // Data analytics about timetags are referenced to common tag for easiness to transfer the data to the application layer. How it is done, different nodes are comparable
 	long long int FirstQPLAtimeTagNorm=0;// Normalization value of time taggs for the Stats
 	// Periodic signal histogram analysis
 	unsigned long long int OldLastTimeTagg=0;
