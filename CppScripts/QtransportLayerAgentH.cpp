@@ -1515,6 +1515,7 @@ return 0; // all ok
 int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){	
 	try{
 		//cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFreePreLock" << endl;
+		this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 		this->acquire();
 		//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 1" << endl;
 		bool FirstPassAux=true;
