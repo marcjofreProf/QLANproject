@@ -1584,6 +1584,8 @@ return 0; // all ok;
 }
 
 int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
+	// First block the current host
+	HostsActiveActionsFree[0]=false;// This host blocked
 	AchievedAttentionParticularHosts=false;// reset value
 	//cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFree" << endl;
 	//cout << "Host " << this->IPaddressesSockets[2] << " IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
