@@ -378,6 +378,7 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     //cout << "IPSocketsList: "<< IPSocketsList << endl;
     
     cout << "Client connected to server: "<< IPaddressesSockets << endl;
+    cout << "Wait to proceed, still calibrating synchronization!..." << endl;
     return 0; // All Ok
   }
 
