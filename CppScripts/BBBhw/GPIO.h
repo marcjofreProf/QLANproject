@@ -65,7 +65,7 @@ private:// Variables
 	int PriorityValRegular=60; // Regular priority during most of the operation
 	int PriorityValTop=70; // Top priority for critical operations
 	// Semaphore
-	unsigned long long int UnTrapSemaphoreValueMaxCounter=10000000;//MAx counter trying to acquire semaphore, then force release
+	unsigned long long int UnTrapSemaphoreValueMaxCounter=1000;//MAx counter trying to acquire semaphore, then force release
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	std::atomic<bool> ManualSemaphore=false;
 	std::atomic<bool> ManualSemaphoreExtra=false;
