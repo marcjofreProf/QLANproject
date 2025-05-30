@@ -833,6 +833,19 @@ int QTLAH::RegularCheckToPerform(){
 			cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[1+i]: " << HostsActiveActionsFree[1+i] << endl;
 			HostsActiveActionsFree[1+i]=true;
 		}
+		////////////////////
+		// Send unblock signals
+		cout << "Host " << this->IPaddressesSockets[2] << " will unblock itself due to block malfunction" << endl;
+		int nChararray=NumConnectedHosts;
+		char ParamsCharArrayArg[NumBytesBufferICPMAX];
+		for (int i=0;i<NumConnectedHosts;i++){
+			if (i==0){strcpy(ParamsCharArrayArg,this->IPaddressesSockets[3+i]);}
+			else{strcat(ParamsCharArrayArg,this->IPaddressesSockets[3+i]);}
+			strcat(ParamsCharArrayArg,","); // IP separator
+		}
+		this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray); // Try to unblock others if needed	
+		iIterPeriodicBlockTimer=0; // Reset value
+		//////////////////////
 	}
 	////////////////////////////////////////////////////////////////////////////
 	// Check if there is a permanent Block at this node
@@ -845,7 +858,7 @@ int QTLAH::RegularCheckToPerform(){
 	}
 	if (iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer and HostsActiveActionsFree[0]==false){// Try to unblock itself
 		// Send unblock signals
-		cout << "Host" << this->IPaddressesSockets[2] << " will unblock itself since to much time blocked" << endl;
+		cout << "Host " << this->IPaddressesSockets[2] << " will unblock itself since to much time blocked" << endl;
 		int nChararray=NumConnectedHosts;
 		char ParamsCharArrayArg[NumBytesBufferICPMAX];
 		for (int i=0;i<NumConnectedHosts;i++){
@@ -891,11 +904,12 @@ void QTLAH::AgentProcessRequestsPetitions(){// Check next thing to do
     	// Code that might throw an exception
  	// Check if there are need messages or actions to be done by the node 	
  	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
- 	this->RegularCheckToPerform();// Every now and then some checks have to happen
+ 	
  	switch(this->getState()) {
  	case QTLAH::APPLICATION_RUNNING: {               
                // Do Some Work
- 		this->ProcessNewMessage();
+ 							this->ProcessNewMessage();
+ 							this->RegularCheckToPerform();// Every now and then some checks have to happen. Maybe it has to happen after New Messages have been proceesed
                //while(this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard)>0);// Make sure to remove all pending mesages in the socket
                this->m_pause(); // After procesing the request, pass to paused state
                break;
