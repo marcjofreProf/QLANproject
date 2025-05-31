@@ -712,7 +712,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(SynchRem);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestSemaphoreWhileWait,NULL); // Synch barrier. so the time within acquired semaphore is not so large
 	//cout << "Before this->ManualSemaphore...to be commented" << endl;
-	while (this->ManualSemaphore or whileProtAux>0){whileProtAux--;};// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
+	while (this->ManualSemaphore and whileProtAux>0){whileProtAux--;};// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	whileProtAux=whileProtAuxMax;
 	//cout << "After this->ManualSemaphore...to be commented" << endl;
 	this->ManualSemaphoreExtra=true;
@@ -914,7 +914,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	SynchRem=static_cast<int>((static_cast<long double>(1.5*GuardPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(GuardPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(SynchRem);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestSemaphoreWhileWait,NULL); // Synch barrier. so the time within acquired semaphore is not so large
-	while (this->ManualSemaphore or whileProtAux>0){whileProtAux--;};// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
+	while (this->ManualSemaphore and whileProtAux>0){whileProtAux--;};// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	whileProtAux=whileProtAuxMax;
 	this->ManualSemaphoreExtra=true;
 	this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
