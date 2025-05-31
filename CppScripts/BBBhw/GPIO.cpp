@@ -712,7 +712,9 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(SynchRem);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestSemaphoreWhileWait,NULL); // Synch barrier. so the time within acquired semaphore is not so large
 	//while (this->ManualSemaphoreExtra);// Wait until periodic synch method finishes
+	cout << "Before this->ManualSemaphore...to be commented" << endl;
 	while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
+	cout << "After this->ManualSemaphore...to be commented" << endl;
 	this->ManualSemaphoreExtra=true;
 	this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization

@@ -1114,7 +1114,7 @@ int QPLA::ThreadSimulateReceiveQubit(){
 	cout << "Receiving Qubits" << endl;
 	this->acquire();
 	PRUGPIO.ClearStoredQuBits();//PRUGPIO->ClearStoredQuBits();
-	cout << "Clear previously stored Qubits...to be commented" << endl;
+	//cout << "Clear previously stored Qubits...to be commented" << endl;
 	this->release();
 	int iIterRuns;
 	NumQuBitsPerRun=makeEvenInt(NumQuBitsPerRun); // Force that it is an even number (needed for GPIO.cpp)
@@ -1128,7 +1128,7 @@ int QPLA::ThreadSimulateReceiveQubit(){
 	else{
 		requestWhileWait = this->GetFutureTimePointOtherNode();
 	}
-	cout << "Completed get/set future time point...to be commented" << endl;
+	//cout << "Completed get/set future time point...to be commented" << endl;
 	this->acquire();
 	// So that there are no segmentation faults by grabbing the CLOCK REALTIME and also this has maximum priority
 	//clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestWhileWait,NULL); // Synch barrier
@@ -1147,12 +1147,12 @@ int QPLA::ThreadSimulateReceiveQubit(){
 	for (iIterRuns=0;iIterRuns<DetRunsCount;iIterRuns++){	
 		PRUGPIO.ReadTimeStamps(iIterRuns,this->QuadEmitDetecSelec,this->HistPeriodicityAux,static_cast<unsigned int>(NumQuBitsPerRun),this->FineSynchAdjVal,TimePointFuture_time_as_count,FlagTestSynch);//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
 	}
-	cout << "Detected timestamps...to be commented" << endl;
+	//cout << "Detected timestamps...to be commented" << endl;
 	this->LinearRegressionQuBitFilter();// Retrieve raw detected qubits and channel tags
-	cout << "Completed LinearRegressionQuBitFilter...to be commented" << endl;
+	//cout << "Completed LinearRegressionQuBitFilter...to be commented" << endl;
 	this->PurgeExtraordinaryTimePointsNodes();
 	this->RunThreadSimulateReceiveQuBitFlag=true;//enable again that this thread can again be called
-	cout << "Completed PurgeExtraordinaryTimePointsNodes...to be commented" << endl;
+	//cout << "Completed PurgeExtraordinaryTimePointsNodes...to be commented" << endl;
 	this->release();
 	cout << "End Receiving Qubits" << endl;
 
