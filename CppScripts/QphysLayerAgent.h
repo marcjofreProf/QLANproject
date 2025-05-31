@@ -149,6 +149,7 @@ private: //Variables/Instances
 	// the following arrays are initialized to zero in the Agent creator. PID system develop
 	bool ApplyPIDOffsetContinuousCorrection=true; // Correct at the transmitter the instantaneous offset retrieved
 	double SplitEmitReceiverSmallOffsetDriftPerLink=0.25; // Splitting ratio between the effort of the emitter and receiver of constantly updating the synch values. The closer to 0 the more aggresive (more correction from the transmitter)
+	double EffectiveSplitEmitReceiverSmallOffsetDriftPerLink=1.0; // Effective (if correction above certain threshold) Splitting ratio between the effort of the emitter and receiver of constantly updating the synch values. The closer to 0 the more aggresive (more correction from the transmitter)
 	double SplitEmitReceiverSmallOffsetDriftPerLinkP=0.65; // Proportional values for the PID
 	double SplitEmitReceiverSmallOffsetDriftPerLinkI=0.05; // Integral values for the PID
 	double SplitEmitReceiverSmallOffsetDriftPerLinkD=0.01; // Derivative value for the PID

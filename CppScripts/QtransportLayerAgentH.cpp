@@ -1109,6 +1109,7 @@ try{
 							strcpy(InfoRemoteHostActiveActions[0],IPorg);// Copy the identification of the host
 							strcpy(InfoRemoteHostActiveActions[1],"Block");// Set status to Preventive
 							HostsActiveActionsFree[0]=false; // Set the host as not free
+							BusyAttachedNode=true; // Set the node already as busy
 							// Respond with message saying that available
 							char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 							strcpy(ParamsCharArray,IPorg);// Send to what was the origin
@@ -1614,6 +1615,7 @@ return 0; // all ok;
 int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 	// First block the current host
 	HostsActiveActionsFree[0]=false;// This host blocked
+	BusyAttachedNode=true; // Set it already as busy
 	AchievedAttentionParticularHosts=false;// reset value
 	//cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFree" << endl;
 	//cout << "Host " << this->IPaddressesSockets[2] << " IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
