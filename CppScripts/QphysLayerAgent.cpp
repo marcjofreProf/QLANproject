@@ -1357,12 +1357,15 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 				  	//}
 				  	//cout << "QPLA::SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 				  	//cout << "QPLA::SmallOffsetDriftPerLinkPIDvalAux: " << SmallOffsetDriftPerLinkPIDvalAux << endl;
+				  	/*
 				  	if (abs(SmallOffsetDriftPerLinkPIDvalAux)>(HistPeriodicityAux/4.0)){// Apply correction at the transmitter also
 				  		EffectiveSplitEmitReceiverSmallOffsetDriftPerLink=SplitEmitReceiverSmallOffsetDriftPerLink;
 				  	}
 				  	else{// do not apply correction at the transmitter
 				  		EffectiveSplitEmitReceiverSmallOffsetDriftPerLink=1.0;
 				  	}
+				  	*/
+				  	EffectiveSplitEmitReceiverSmallOffsetDriftPerLink=SplitEmitReceiverSmallOffsetDriftPerLink;
 				  	if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP==1 and SynchNetworkParamsLink[CurrentSpecificLink][2]>0.0 and FlagTestSynch==false){// This corresponds to RequestQubits Node to node or SendEntangled. The receiver always performs correction, so does not matter for the sender since they are zeroed
 							// For receiver correction - it should be only one
 							SynchNetworkParamsLink[CurrentSpecificLinkAux][0]=originalSynchNetworkParamsLink[CurrentSpecificLinkAux][0]+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-(1.0-EffectiveSplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux;// Offset difference
