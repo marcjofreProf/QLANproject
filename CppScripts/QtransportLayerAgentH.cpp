@@ -1124,7 +1124,7 @@ try{
 							//cout << "Operation HostAreYouFree Preventive" << endl;	
 							this->ICPdiscoverSend(ParamsCharArray);
 						}
-						else if ((HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false) and string(Payload)==string("Block")){// Not free. Respond that not free (either because not free, or not finalized with synchronizations)
+						else if ((HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or BusyAttachedNode==true) and string(Payload)==string("Block")){// Not free. Respond that not free (either because not free, or not finalized with synchronizations)
 							// Respond with message saying that not available
 							// Respond with message saying that available
 							char ParamsCharArray[NumBytesBufferICPMAX] = {0};
