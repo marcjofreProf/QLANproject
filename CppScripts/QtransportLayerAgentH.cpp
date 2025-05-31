@@ -1544,6 +1544,7 @@ return 0; // all ok
 int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){	
 	try{
 		//cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFreePreLock" << endl;
+		this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 		this->acquire();
 		//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 1" << endl;
 		bool FirstPassAux=true;
@@ -1630,8 +1631,7 @@ int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 			this->m_pause(); // After procesing the request, pass to paused state
 			//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 		}
-		this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-		this->RelativeNanoSleepWait((unsigned long long int)(5*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+		this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);		
 	}
 //cout << "Host " << this->IPaddressesSockets[2] << " Finished WaitUntilActiveActionFree" << endl;
 return 0; // All ok
@@ -1640,7 +1640,7 @@ return 0; // All ok
 int QTLAH::UnBlockActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){	
 	try{
 		//cout << "Host " << this->IPaddressesSockets[2] << " Initiated UnBlockActiveActionFreePreLock" << endl;
-		this->RelativeNanoSleepWait((unsigned long long int)(150*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+		this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 		this->acquire();
 		this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);
 	}

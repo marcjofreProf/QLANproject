@@ -1594,7 +1594,7 @@ else{
 // Accordingly a complete cycle has 8 counts (2 counts for each step)
 // Accordingly, the mean wrapped count difference is stored in TimeTaggsDetAnalytics[5]
 // Accordingly, the std wrapped count difference is stored in TimeTaggsDetAnalytics[6]
-cout << "QPLA::TIMETAGGING ANALYSIS time synchronization/detection rate of QphysLayerAgent.h" << endl;
+cout << "QPLA::TIMETAGGING ANALYSIS time synchronization/detection rate of QphysLayerAgent.cpp" << endl;
 //cout << "QPLA::Attention, the absolute tag time value has been reset to the first tag since the node was started" << endl;
 //cout << "It has to be used PRUassTrigSigScriptHist4Sig in PRU1" << endl;
 //cout << "Attention TimeTaggsDetAnalytics[5] stores the mean wrap count difference" << endl;
