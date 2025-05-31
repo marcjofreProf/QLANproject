@@ -712,10 +712,11 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(SynchRem);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestSemaphoreWhileWait,NULL); // Synch barrier. so the time within acquired semaphore is not so large
 	//cout << "Before this->ManualSemaphore...to be commented" << endl;
-	//while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
+	while (this->ManualSemaphore or whileProtAux<=0){whileProtAux--;};// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
+	whileProtAux=whileProtAuxMax;
 	//cout << "After this->ManualSemaphore...to be commented" << endl;
-	//this->ManualSemaphoreExtra=true;
-	//this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
+	this->ManualSemaphoreExtra=true;
+	this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	this->AdjPulseSynchCoeffAverage=static_cast<long double>(this->EstimateSynchAvg);// Acquire this value for the this tag reading set
 	///////////
@@ -913,9 +914,10 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 	SynchRem=static_cast<int>((static_cast<long double>(1.5*GuardPeriod)-fmodl((static_cast<long double>(std::chrono::duration_cast<std::chrono::nanoseconds>(this->QPLAFutureTimePoint.time_since_epoch()).count())/static_cast<long double>(PRUclockStepPeriodNanoseconds)),static_cast<long double>(GuardPeriod)))*static_cast<long double>(PRUclockStepPeriodNanoseconds));
 	this->QPLAFutureTimePoint=this->QPLAFutureTimePoint+std::chrono::nanoseconds(SynchRem);
 	clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&requestSemaphoreWhileWait,NULL); // Synch barrier. so the time within acquired semaphore is not so large
-	//while (this->ManualSemaphore);// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
-	//this->ManualSemaphoreExtra=true;
-	//this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
+	while (this->ManualSemaphore or whileProtAux<=0){whileProtAux--;};// Wait other process// Very critical to not produce measurement deviations when assessing the periodic snchronization
+	whileProtAux=whileProtAuxMax;
+	this->ManualSemaphoreExtra=true;
+	this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	this->acquire();// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	//this->ManualSemaphore=true;// Very critical to not produce measurement deviations when assessing the periodic snchronization
 	// Apply a slotted synch configuration (like synchronized Ethernet)
@@ -1118,8 +1120,8 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 		cout << "PRU1 interrupt error" << endl;
 	}
 
-	//this->ManualSemaphore=false;
-	//this->ManualSemaphoreExtra=false;
+	this->ManualSemaphore=false;
+	this->ManualSemaphoreExtra=false;
 	this->release();
 
 	}
@@ -1297,8 +1299,8 @@ else if (TotalCurrentNumRecords==TotalCurrentNumRecordsOld){cout << "GPIO::No de
 sharedMem_int[OFFSET_SHAREDRAM+1]=static_cast<unsigned int>(0x00000000); // Put it all to zeros
 
 // Freeeing the semaphore block after all the access to the PRU shared memory
-//this->ManualSemaphore=false;
-//this->ManualSemaphoreExtra=false;
+this->ManualSemaphore=false;
+this->ManualSemaphoreExtra=false;
 this->release();
 /////////////////////////////////////////////////////////////////////////
 // Debbugin relative frequency difference
