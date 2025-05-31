@@ -727,6 +727,22 @@ int QTLAH::RegularCheckToPerform(){
 			this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 		}
 
+		if (GPIOnodeHardwareSynched==true and HostsActiveActionsFree[0]==true){// Ask the node if busy
+			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+			strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,this->IPaddressesSockets[1]);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"Control");
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"BusyNode");
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"none");
+			strcat(ParamsCharArray,",");// Very important to end the message
+			//cout << "Host sent HardwareSynchNode" << endl;
+			this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+		}
+
 		// Second thing to do is to network synchronize the below node, when at least the node is PRU hardware synch
 		//cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
 		//cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
@@ -1049,6 +1065,18 @@ try{
 					this->InfoSimulateNumStoredQubitsNodeFlag=true;
 					//cout << "SimulateSynchParamsNode finished parsing values" << endl;		
 				}
+				else if (string(Command)==string("BusyNode")){ // Have knowledge if the node attached is busy doing things
+					if (string(Payload)==string("true")){
+						// If received is because node is hardware synched
+						BusyAttachedNode=true;
+						//cout << "Node " << this->IPaddressesSockets[0] << " busy attached node ..." << endl;
+					}
+					else{
+						// If received is because node is NOT hardware synched
+						BusyAttachedNode=false;
+						//cout << "Node " << this->IPaddressesSockets[0] << " Non busy attached node ..." << endl;
+					}
+				}
 				else if (string(Command)==string("HardwareSynchNode")){
 					if (string(Payload)==string("true")){
 						// If received is because node is hardware synched
@@ -1077,7 +1105,7 @@ try{
 							NumAnswersOtherHostsActiveActionsFree++;// Update value
 							//cout << "Response HostAreYouFree: " << IPorg << ", " << Payload << endl;
 						}
-						else if (HostsActiveActionsFree[0]==true and string(Payload)==string("Block") and GPIOnodeHardwareSynched==true){// Block
+						else if (HostsActiveActionsFree[0]==true and string(Payload)==string("Block") and GPIOnodeHardwareSynched==true and BusyAttachedNode==false){// Block
 							strcpy(InfoRemoteHostActiveActions[0],IPorg);// Copy the identification of the host
 							strcpy(InfoRemoteHostActiveActions[1],"Block");// Set status to Preventive
 							HostsActiveActionsFree[0]=false; // Set the host as not free
@@ -1535,7 +1563,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 				//cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 			}
 			FirstPassAux=false;// First pass is compulsory, since it might be true AchievedAttentionParticularHosts, but because of another process
-			while (HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
+			while (BusyAttachedNode==true or HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
 				//cout << "Host " << this->IPaddressesSockets[2] << " Entered While 2" << endl;
 				this->release();
 				//cout << "Host " << this->IPaddressesSockets[2] << " Exited release 1" << endl;
@@ -1558,7 +1586,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 			//	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 			//}
 			//cout << "Host " << this->IPaddressesSockets[2] << " Exited While 2" << endl;
-			if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true){//string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){
+			if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true and BusyAttachedNode==false){//string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){
 				//cout << "Host " << this->IPaddressesSockets[2] << " Entering WaitUntilActiveActionFree" << endl;
 				this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 			}

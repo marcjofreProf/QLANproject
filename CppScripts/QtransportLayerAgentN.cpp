@@ -808,6 +808,39 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 			}
 		}
+		else if (string(Command)==string("BusyNode")){ // Host proactively ask if PRU hardware is busy
+			if (this->QPLASimulateEmitQuBitFlag==true or this->QPLASimulateReceiveQuBitFlag==true){// The instance that the node is busy send message to host
+				// Send mesage to host with this information, so that the network synchronization can happen
+				char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+				strcpy(ParamsCharArray,this->IPaddressesSockets[0]);// Destination, the host of this node
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,this->IPaddressesSockets[1]);// Origin, this node
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,"Operation");
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,"BusyNode");
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,"true");
+				strcat(ParamsCharArray,",");// Very important to end the message
+				//cout << "SimulateRetrieveNumStoredQubitsNode ParamsCharArray: " << ParamsCharArray << endl;
+				this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest	
+			}
+			else{
+				char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+				strcpy(ParamsCharArray,this->IPaddressesSockets[0]);// Destination, the host of this node
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,this->IPaddressesSockets[1]);// Origin, this node
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,"Operation");
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,"BusyNode");
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,"false");
+				strcat(ParamsCharArray,",");// Very important to end the message
+				//cout << "SimulateRetrieveNumStoredQubitsNode ParamsCharArray: " << ParamsCharArray << endl;
+				this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+			}
+		}
 		else if (string(Command)==string("SimulateSendQubits")){// Send qubits to the requesting host
 			//cout << "Node Payload: "<< Payload << endl;
 			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
