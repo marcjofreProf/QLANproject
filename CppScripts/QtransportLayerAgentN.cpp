@@ -809,7 +809,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			}
 		}
 		else if (string(Command)==string("BusyNode")){ // Host proactively ask if PRU hardware is busy
-			if (this->QPLASimulateEmitQuBitFlag==true or this->QPLASimulateReceiveQuBitFlag==true){// The instance that the node is busy send message to host
+			if (this->QPLASimulateEmitQuBitFlag==true or this->QPLASimulateReceiveQuBitFlag==true or this->GetSimulateNumStoredQubitsNodeFlag==true or this->GetSimulateNumStoredQubitsNodeFlag==true){// The instance that the node is busy send message to host
 				// Send mesage to host with this information, so that the network synchronization can happen
 				char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 				strcpy(ParamsCharArray,this->IPaddressesSockets[0]);// Destination, the host of this node
