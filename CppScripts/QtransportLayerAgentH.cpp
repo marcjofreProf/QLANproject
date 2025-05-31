@@ -727,7 +727,7 @@ int QTLAH::RegularCheckToPerform(){
 			this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 		}
 
-		if (GPIOnodeHardwareSynched==true and HostsActiveActionsFree[0]==true){// Ask the node if busy
+		if (GPIOnodeHardwareSynched==true){//} and HostsActiveActionsFree[0]==true){// Ask the node if busy
 			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 			strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
 			strcat(ParamsCharArray,",");
@@ -1678,6 +1678,7 @@ int QTLAH::SendAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int 
 // Three-step handshake
 // First block the current host
 HostsActiveActionsFree[0]=false;// This host blocked
+//BusyAttachedNode=true; // Set it already as busy
 strcpy(InfoRemoteHostActiveActions[0],this->IPaddressesSockets[2]);// Clear active host
 strcpy(InfoRemoteHostActiveActions[1],"Block");// Clear status
 
@@ -1793,6 +1794,7 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){// Reset values
 // If all available, notify that attention achieved
 if (CheckAllOthersFreeAux==true){
 	IterHostsActiveActionsFreeStatus=0;// reset process
+	//BusyAttachedNode=true; // Set it already as busy
 	return true;
 }
 else{ // If some are unavailable, unblock them all

@@ -109,7 +109,7 @@ private: // Variables/Objects
 	unsigned long long int MaxiIterNetworkSynchcurrentTimerVal=17280; //20;//2160; // Counter value to reset network synchronization, which is actually multiplied by the variable MaxiIterPeriodicTimerVal. E.g, every 48 hours
 	unsigned long long int iIterPeriodicBlockTimer=0; // Counter of how much passes the host is constantly block. If larger than MaxiIterPeriodicBlockTimer, unblock itself
 	unsigned long long int MaxiIterPeriodicBlockTimer=900000; //100000;//3600000; // Counter of how much passes the host is constantly block. If larger than , unblock itself. To know the time the value has to be divided by 1000 to have seconds.
-	bool BusyAttachedNode=true; // Variable to know if the attached node is busy. Of particular interest when multiplexing different petitons among different nodes
+	bool BusyAttachedNode=false; // Variable to know if the attached node is busy. Of particular interest when multiplexing different petitons among different nodes
 	bool GPIOnodeHardwareSynched=false;// Variable to know the hardware synch status of the node below. Actually, do not let many operations and controls to happen until this variable is set to true.
 	bool GPIOnodeNetworkSynched=false;// Variable to know the network synch status of the node below. Periodically turn to false, to proceed again with network synchronization
 	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0};//,-0.25,0.25}; // Normalized values of frequency testing// Relative frequency difference normalized
