@@ -1392,12 +1392,12 @@ int QTLAH::SendMessageAgent(char* ParamsDescendingCharArray){
   }
 
 int QTLAH::SimulateRetrieveNumStoredQubitsNode(char* IPhostReply,char* IPhostRequest, int* ParamsIntArray,int nIntarray,double* ParamsDoubleArray,int nDoublearray){ // Send to the upper layer agent how many qubits are stored
-this->RelativeNanoSleepWait((unsigned long long int)(100*(unsigned long long int)(WaitTimeAfterMainWhileLoop)));//usleep((int)(5000*WaitTimeAfterMainWhileLoop));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes. This can be improved by sending messages to the specific node, and this node replying that has received the detection command, then this could start
+this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop)));//usleep((int)(5000*WaitTimeAfterMainWhileLoop));// Wait initially because this method does not need to send/receive message compared ot others like send or receive qubits, and then it happens that it executes first sometimes. This can be improved by sending messages to the specific node, and this node replying that has received the detection command, then this could start
 this->acquire();
 // It is a "blocking" communication between host and node, because it is many read trials for reading
 while(this->SimulateRetrieveNumStoredQubitsNodeFlag==true){//Wait, only one asking
 	this->release();
-	this->RelativeNanoSleepWait((unsigned long long int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
+	this->RelativeNanoSleepWait((unsigned long long int)(25*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));//usleep((int)(15*WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX)));
 	this->acquire();
 }
 
