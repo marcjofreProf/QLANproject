@@ -73,6 +73,7 @@ private: // Variables/Objects
 	char PayloadReadBuffer[NumBytesPayloadBuffer]={0}; //Buffer to read payload messages
 	char PayloadSendBuffer[NumBytesPayloadBuffer]={0}; //Buffer to send payload messages
 	// Status info
+	bool BusyNode=false;
 	bool OtherNodeThereFlag=false; // To check if the other node is there
 	bool InfoIPaddressesSocketsFlag=false;// To check if there is information for IPAddressesSockets
 	bool QPLASimulateEmitQuBitFlag=false;

@@ -750,6 +750,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 	else if(string(Type)==string("Control")){//Control message	
 		if (string(Command)==string("InfoRequest")){ // Request to provide information
 			if (string(Payload)==string("SimulateNumStoredQubitsNode")){
+				this->BusyNode=true;
 			  //cout << "IPorg: " << IPorg << endl;
 			  //cout << "IPdest: " << IPdest << endl;
 				strcpy(this->IPorgAux,IPorg);
@@ -758,6 +759,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 				threadGetSimulateNumStoredQubitsNodeRefAux.detach();
 			}
 			else if (string(Payload)==string("SimulateRetrieveSynchParamsNode")){
+				this->BusyNode=true;
 			  //cout << "IPorg: " << IPorg << endl;
 			  //cout << "IPdest: " << IPdest << endl;
 				strcpy(this->IPorgAux,IPorg);
@@ -809,7 +811,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			}
 		}
 		else if (string(Command)==string("BusyNode")){ // Host proactively ask if PRU hardware is busy
-			if (this->QPLASimulateEmitQuBitFlag==true or this->QPLASimulateReceiveQuBitFlag==true or this->GetSimulateNumStoredQubitsNodeFlag==true or this->GetSimulateNumStoredQubitsNodeFlag==true){// The instance that the node is busy send message to host
+			if (this->BusyNode==true or this->QPLASimulateEmitQuBitFlag==true or this->QPLASimulateReceiveQuBitFlag==true or this->GetSimulateNumStoredQubitsNodeFlag==true){// The instance that the node is busy send message to host
 				// Send mesage to host with this information, so that the network synchronization can happen
 				char ParamsCharArray[NumBytesBufferICPMAX] = {0};
 				strcpy(ParamsCharArray,this->IPaddressesSockets[0]);// Destination, the host of this node
@@ -843,6 +845,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 		}
 		else if (string(Command)==string("SimulateSendQubits")){// Send qubits to the requesting host
 			//cout << "Node Payload: "<< Payload << endl;
+			this->BusyNode=true;
 			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
 			strcpy(this->QPLLACurrentEmitReceiveIP,strtok(NULL,";"));
 			strcpy(this->QLLAIPaddresses,strtok(NULL,";"));
@@ -857,6 +860,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			threadSimulateEmitQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("SimulateSendSynchQubits")){// Send qubits to the requesting host
+			this->BusyNode=true;
 			//cout << "Node SimulateSendSynchQubits Payload: "<< Payload << endl;
 			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
 			strcpy(this->QPLLACurrentEmitReceiveIP,strtok(NULL,";"));
@@ -877,6 +881,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			threadSimulateEmitSynchQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("SimulateReceiveQubits")){// Read qubits to the attached node
+			this->BusyNode=true;
 			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
 			strcpy(this->QPLLACurrentEmitReceiveIP,strtok(NULL,";"));
 			//char PayloadAux[NumBytesPayloadBuffer]={0};
@@ -892,6 +897,7 @@ for (int iIterMessages=0;iIterMessages<NumQintupleComas;iIterMessages++){
 			threadSimulateReceiveQuBitRefAux.detach();
 		}
 		else if (string(Command)==string("SimulateReceiveSynchQubits")){// Read qubits to the attached node
+			this->BusyNode=true;
 			strcpy(this->QLLAModeActivePassive,strtok(Payload,";"));
 			char CurrentReceiveHostIP[NumBytesPayloadBuffer]={0};
 			strcpy(CurrentReceiveHostIP,strtok(NULL,";"));
@@ -940,6 +946,7 @@ if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this inf
 	this->QPLASimulateEmitQuBitFlag=true; 
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,this->QLLAQuadEmitDetecSelec);
 	this->QPLASimulateEmitQuBitFlag=false;
+	this->BusyNode=false;
 }
 this->release();
 return 0;
@@ -951,7 +958,7 @@ if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this inf
 	this->QPLASimulateEmitQuBitFlag=true; 
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitSynchQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass,this->QLLAQuadEmitDetecSelec);
 	this->QPLASimulateEmitQuBitFlag=false;
-	
+	this->BusyNode=false;
 }
 this->release();
 
@@ -964,6 +971,7 @@ if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this 
 	this->QPLASimulateReceiveQuBitFlag=true; 
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,this->QLLAQuadEmitDetecSelec);
 	this->QPLASimulateReceiveQuBitFlag=false;
+	this->BusyNode=false;
 }
 this->release();
 return 0;
@@ -975,6 +983,7 @@ if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this 
 	this->QPLASimulateReceiveQuBitFlag=true; 
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,CurrentReceiveHostIPaux,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass,this->QLLAQuadEmitDetecSelec);
 	this->QPLASimulateReceiveQuBitFlag=false;
+	this->BusyNode=false;
 }
 this->release();
 
@@ -990,7 +999,7 @@ while (this->GetSimulateNumStoredQubitsNodeFlag==true or this->QPLASimulateRecei
 }
 
 //cout<< "Node after this->GetSimulateNumStoredQubitsNodeFlag==false" << endl;
-this->GetSimulateNumStoredQubitsNodeFlag=true; 
+this->GetSimulateNumStoredQubitsNodeFlag=true;
 this->release();
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Compute interesting analystics on the Timetaggs and deteciton so that not all data has to be transfered thorugh sockets
@@ -1076,6 +1085,7 @@ else{// server sends on the socket connection
 }      
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
 this->GetSimulateNumStoredQubitsNodeFlag=false;
+this->BusyNode=false;
 //cout<< "Node after send" << endl;
 this->release();
 //cout << "We get here Node GetNumStoredQubitsNode" << endl;
@@ -1143,6 +1153,7 @@ else{// server sends on the socket connection
 }      
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
 this->GetSimulateNumStoredQubitsNodeFlag=false;
+this->BusyNode=false;
 //cout<< "Node after GetSimulateSynchParamsNode" << endl;
 this->release();
 //cout << "We get here Node GetSimulateSynchParamsNode" << endl;
