@@ -837,6 +837,7 @@ int QTLAH::RegularCheckToPerform(){
 			OtherHostsActiveActionsFreeAux++;
 		}
 	}
+	/*
 	if (HostsActiveActionsFree[0]==true and (string(InfoRemoteHostActiveActions[0])!=string("\0") or string(InfoRemoteHostActiveActions[1])!=string("\0") or AchievedAttentionParticularHosts==true or OtherHostsActiveActionsFreeAux>0)){
 		cout << "Host " << this->IPaddressesSockets[2] << " scheduler blocking malfunction!!!...trying to correct it..." << endl;
 		cout << "Host " << this->IPaddressesSockets[2] << " InfoRemoteHostActiveActions[0]: " << InfoRemoteHostActiveActions[0] << endl;
@@ -863,6 +864,7 @@ int QTLAH::RegularCheckToPerform(){
 		iIterPeriodicBlockTimer=0; // Reset value
 		//////////////////////
 	}
+	*/
 	////////////////////////////////////////////////////////////////////////////
 	// Check if there is a permanent Block at this node
 	if (string(InfoRemoteHostActiveActions[1])==string("Block") or HostsActiveActionsFree[0]==false){
@@ -1677,7 +1679,7 @@ return 0; // All Ok
 int QTLAH::SendAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 // Three-step handshake
 // First block the current host
-HostsActiveActionsFree[0]=false;// This host blocked
+//HostsActiveActionsFree[0]=false;// This host blocked
 //BusyAttachedNode=true; // Set it already as busy
 strcpy(InfoRemoteHostActiveActions[0],this->IPaddressesSockets[2]);// Clear active host
 strcpy(InfoRemoteHostActiveActions[1],"Block");// Clear status
