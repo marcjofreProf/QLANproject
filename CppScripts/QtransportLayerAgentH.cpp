@@ -709,7 +709,7 @@ return 0; // All ok
 }
 
 int QTLAH::RegularCheckToPerform(){
-	if (iIterPeriodicTimerVal>MaxiIterPeriodicTimerVal){
+	if (iIterPeriodicTimerVal>(int)(MaxiIterPeriodicTimerVal*(1.0+(float)rand()/(float)RAND_MAX))){ // Put some randomness here
 		// First thing to do is to know if the node below is PRU hardware synch
 		if (GPIOnodeHardwareSynched==false and HostsActiveActionsFree[0]==true){// Ask the node
 			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
