@@ -27,7 +27,7 @@ Furthermore, the priority of processes ptp0, ptp4l and phc2sys is very important
 
 # twoStepFlag activated means that the initial first time information comes in the follow-up message (somehow it is simpler to implement because the devices do not have to timestamp+transmit this timestamp at the same message, but the message containint the information comes later).
 
-# Messages rate is very important (logSyncInterval and operLogSyncInterval). Range from -7 to +6. For instance, -4 makes a great difference compared to -3.
+# Messages rate is very important (logSyncInterval and operLogSyncInterval). Range from -7 to +6. For instance, below -2 or -1, makes the nodes jump to their local clock (instead of the master) because the master cannot mantain the accuraccy needed (too much petitions).
 
 # Maybe P2P has better time accuracy (instead of E2E), provided the network topology can support it. P2P makes sense for devices in-between, that want to be transparent to PTP messages (but it is of no use of end devices like the BBB nodes).
 # In P2P mode, receiving the console message: "received PDELAY_REQ without timestamp" might be indicative of high network congestion (specially in P2P which the amount of messages increases).
@@ -44,4 +44,5 @@ Furthermore, the priority of processes ptp0, ptp4l and phc2sys is very important
 # Write phase mode not supported in BBB
 # Required to quickly correct Time Jumps in slave
 # step_threshold: long values produces large jumps every now and then but allow better precition (less jitter). So it is a trade-off. Maybe, it has to be smaller or maybe largerthan the truncation for the offset error in the main scripts, since we relay on the stability of the hardware clock of each device.
+
 
