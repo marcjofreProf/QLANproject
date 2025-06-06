@@ -748,7 +748,7 @@ int QTLAH::RegularCheckToPerform(){
 		//cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 		//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
 		//cout << "Host " << this->IPaddressesSockets[2] << " numHolderOtherNodesSynchNetwork: " << numHolderOtherNodesSynchNetwork << endl;
-		if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false and HostsActiveActionsFree[0]==true and CycleSynchNetworkDone==false){
+		if (GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==false and HostsActiveActionsFree[0]==true and CycleSynchNetworkDone==false and BusyAttachedNode==false){
 			char argsPayloadAux[NumBytesBufferICPMAX] = {0};
 				// Try to block all connected nodes
 				for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
@@ -759,7 +759,7 @@ int QTLAH::RegularCheckToPerform(){
 			if (FastInitialFakeSkipNetworkSynchFlag==true){// Skip network synchronization and thus blocking all other involved hosts
 				AchievedAttentionParticularHosts=true;
 			}
-			else{				
+			else{			
 				this->WaitUntilActiveActionFree(argsPayloadAux,NumConnectedHosts);
 			}
 			
@@ -1617,8 +1617,8 @@ return 0; // all ok;
 
 int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 	// First block the current host
-	HostsActiveActionsFree[0]=false;// This host blocked
-	BusyAttachedNode=true; // Set it already as busy
+	//HostsActiveActionsFree[0]=false;// This host blocked
+	//BusyAttachedNode=true; // Set it already as busy
 	AchievedAttentionParticularHosts=false;// reset value
 	//cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFree" << endl;
 	//cout << "Host " << this->IPaddressesSockets[2] << " IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
@@ -1679,8 +1679,8 @@ return 0; // All Ok
 int QTLAH::SendAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 // Three-step handshake
 // First block the current host
-//HostsActiveActionsFree[0]=false;// This host blocked
-//BusyAttachedNode=true; // Set it already as busy
+HostsActiveActionsFree[0]=false;// This host blocked
+BusyAttachedNode=true; // Set it already as busy
 strcpy(InfoRemoteHostActiveActions[0],this->IPaddressesSockets[2]);// Clear active host
 strcpy(InfoRemoteHostActiveActions[1],"Block");// Clear status
 
@@ -1823,6 +1823,7 @@ if ((HostsActiveActionsFree[0]==false and string(InfoRemoteHostActiveActions[0])
 	// }
 	strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
 	strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
+	BusyAttachedNode=false;
 	HostsActiveActionsFree[0]=true;// This host unblocked
 	IterHostsActiveActionsFreeStatus=0;// reset process
 	AchievedAttentionParticularHosts=false;// Indicates that we have got NOT the attention of the hosts
