@@ -1663,8 +1663,35 @@ return 0; // All ok
 }
 
 int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
+	// Process other messages if available
+
+	if (GPIOnodeHardwareSynched==true){//} and HostsActiveActionsFree[0]==true){// Ask the node if busy
+			char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+			strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,this->IPaddressesSockets[1]);
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"Control");
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"BusyNode");
+			strcat(ParamsCharArray,",");
+			strcat(ParamsCharArray,"none");
+			strcat(ParamsCharArray,",");// Very important to end the message
+			//cout << "Host sent HardwareSynchNode" << endl;
+			this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+		}
+	
+	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+		if(this->getState()==0){
+			this->ProcessNewMessage();
+			this->m_pause(); // After procesing the request, pass to paused state
+			//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+		}
+
 	if (IterHostsActiveActionsFreeStatus==0){
-		this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+		if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and BusyAttachedNode==false){
+			this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+		}
 	}
 	else if (IterHostsActiveActionsFreeStatus==1){
 		this->AcumulateAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
@@ -1760,6 +1787,9 @@ else{// Too many rounds, kill the process of blocking other hosts
 	for (int i=0;i<NumInterestIPaddressesAux;i++){// Reset values
 		HostsActiveActionsFree[1+i]=true;
 	}
+
+
+	
 }
 
 //cout << "ReWaitsAnswersHostsActiveActionsFree: " << ReWaitsAnswersHostsActiveActionsFree << endl;
@@ -1823,7 +1853,7 @@ if ((HostsActiveActionsFree[0]==false and string(InfoRemoteHostActiveActions[0])
 	// }
 	strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
 	strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
-	BusyAttachedNode=false;
+	//BusyAttachedNode=false;
 	HostsActiveActionsFree[0]=true;// This host unblocked
 	IterHostsActiveActionsFreeStatus=0;// reset process
 	AchievedAttentionParticularHosts=false;// Indicates that we have got NOT the attention of the hosts
