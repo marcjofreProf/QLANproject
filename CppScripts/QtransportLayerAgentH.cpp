@@ -1098,6 +1098,7 @@ try{
 							strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
 							strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
 							HostsActiveActionsFree[0]=true; // Set the host as free
+							BusyAttachedNode=false; // Set the node already as not busy
 						}
 					}
 					else{// Either the message is not from the current active hosts or there is no active host, or it is a response for this host
@@ -1906,7 +1907,7 @@ if ((HostsActiveActionsFree[0]==false and string(InfoRemoteHostActiveActions[0])
 		}
 		this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 	}*/
-	this->RelativeNanoSleepWait((unsigned long long int)(2*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+5.0*(float)rand()/(float)RAND_MAX))));
+	this->RelativeNanoSleepWait((unsigned long long int)(2*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+10.0*(float)rand()/(float)RAND_MAX))));
 	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 		if(this->getState()==0){
 			this->ProcessNewMessage();
