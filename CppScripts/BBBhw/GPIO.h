@@ -66,8 +66,8 @@ private:// Variables
 	int PriorityValTop=70; // Top priority for critical operations
 	// Semaphore
 	unsigned long long int UnTrapSemaphoreValueMaxCounter=1000;//MAx counter trying to acquire semaphore, then force release
-	int whileProtAuxMax=1000000;
-	int whileProtAux=whileProtAuxMax; // Protection agains blocking indefenetely
+	int whileProtAuxMax=10000; // Value of protecton against blocking indefenitely, which produces the node to go down (broken pipe and re-start)
+	int whileProtAux=whileProtAuxMax; // Protection againts blocking indefinetely
 	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
 	std::atomic<bool> ManualSemaphore=false;
 	std::atomic<bool> ManualSemaphoreExtra=false;
