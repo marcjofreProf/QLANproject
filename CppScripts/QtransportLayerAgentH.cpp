@@ -1105,7 +1105,7 @@ try{
 							if (string(Payload)==string("true")){HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]=false;}// Mark it as Block
 							else{HostsActiveActionsFree[1+NumAnswersOtherHostsActiveActionsFree]=true;}
 							NumAnswersOtherHostsActiveActionsFree++;// Update value
-							//cout << "Response HostAreYouFree: " << IPorg << ", " << Payload << endl;
+							//cout << "Response HostAreYouFree IPorg " << IPorg << " to IPdest " << IPdest <<": " << Payload << endl;
 						}
 						else if (HostsActiveActionsFree[0]==true and string(Payload)==string("Block") and GPIOnodeHardwareSynched==true and BusyAttachedNode==false){// Block
 							strcpy(InfoRemoteHostActiveActions[0],IPorg);// Copy the identification of the host
@@ -1664,17 +1664,9 @@ return 0; // All ok
 
 int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 	if (IterHostsActiveActionsFreeStatus==0){
-		int iAuxRand=0;
-		if ((float)rand()/(float)RAND_MAX < 0.20){
-			iAuxRand=0;
-		}
-		else{
-			iAuxRand=(int)(100.0*(1.0+100.0*(float)rand()/(float)RAND_MAX));
-		}
-		for (int i=0;i<iAuxRand;i++){ // Provide some randomness to also allow others to block the scheduler
-			//this->release();
-			//this->RelativeNanoSleepWait((unsigned long long int)(1*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
-			//this->acquire();
+			if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and BusyAttachedNode==false){
+				this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+			}			
 			// Process other messages if available
 			if (GPIOnodeHardwareSynched==true and BusyAttachedNode==true){//} and HostsActiveActionsFree[0]==true){// Ask the node if busy
 					char ParamsCharArray[NumBytesBufferICPMAX] = {0};
@@ -1691,6 +1683,10 @@ int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg,
 					//cout << "Host sent HardwareSynchNode" << endl;
 					this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
 				}
+			
+			//this->release();
+			this->RelativeNanoSleepWait((unsigned long long int)(2*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+			//this->acquire();
 
 			this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 				if(this->getState()==0){
@@ -1698,10 +1694,6 @@ int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg,
 					this->m_pause(); // After procesing the request, pass to paused state
 					//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 				}
-		}
-		if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and BusyAttachedNode==false){
-			this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
-		}
 	}
 	else if (IterHostsActiveActionsFreeStatus==1){
 		this->AcumulateAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
@@ -1796,10 +1788,7 @@ else{// Too many rounds, kill the process of blocking other hosts
 
 	for (int i=0;i<NumInterestIPaddressesAux;i++){// Reset values
 		HostsActiveActionsFree[1+i]=true;
-	}
-
-
-	
+	}	
 }
 
 //cout << "ReWaitsAnswersHostsActiveActionsFree: " << ReWaitsAnswersHostsActiveActionsFree << endl;
