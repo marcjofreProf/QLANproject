@@ -1622,6 +1622,13 @@ int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 	AchievedAttentionParticularHosts=false;// reset value
 	//cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFree" << endl;
 	//cout << "Host " << this->IPaddressesSockets[2] << " IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+		if(this->getState()==0){
+			this->ProcessNewMessage();
+			this->m_pause(); // After procesing the request, pass to paused state
+			//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+		}
+	
 	this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 	//cout << "Host " << this->IPaddressesSockets[2] << " IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 	while(IterHostsActiveActionsFreeStatus!=0){
