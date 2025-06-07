@@ -1666,6 +1666,7 @@ int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg,
 	if (IterHostsActiveActionsFreeStatus==0){
 			if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and BusyAttachedNode==false){
 				this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
+				return 0; // All Ok
 			}			
 			// Process other messages if available
 			if (GPIOnodeHardwareSynched==true and BusyAttachedNode==true){//} and HostsActiveActionsFree[0]==true){// Ask the node if busy
@@ -1685,7 +1686,7 @@ int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg,
 				}
 			
 			//this->release();
-			this->RelativeNanoSleepWait((unsigned long long int)(2*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+			this->RelativeNanoSleepWait((unsigned long long int)(2*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+5.0*(float)rand()/(float)RAND_MAX))));
 			//this->acquire();
 
 			this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
