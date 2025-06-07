@@ -1065,7 +1065,7 @@ else if (CurrentSpecificLink>=0 and numCurrentEmitReceiveIP>1 and SynchNetworkPa
 	CurrentSynchNetworkParamsLink[2]=0.0;
 	//For emitter correction - info provided by the other nodes
 	// Maybe the offset does not have to be transformed
-	CurrentExtraSynchNetworkParamsLink[0]=SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][0];// Synch offset
+	CurrentExtraSynchNetworkParamsLink[0]=-SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][0];// Synch offset
 	// Relative frequency difference
 	//if (SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1]<0.0){
 	//	CurrentExtraSynchNetworkParamsLink[1]=(-(fmod(-dHistPeriodicityHalfAux-SynchNetworkParamsLinkOther[CurrentSpecificLinkMultipleIndices[0]][1],dHistPeriodicityAux)+dHistPeriodicityHalfAux)/dHistPeriodicityAux)*(SynchNetAdj[CurrentSpecificLink]/SynchNetTransHardwareAdjAux);// Relative frequency offset
