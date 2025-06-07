@@ -1671,7 +1671,7 @@ return 0; // All ok
 
 int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 	if (IterHostsActiveActionsFreeStatus==0){
-			if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and BusyAttachedNode==false){
+			if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and BusyAttachedNode==false and ((float)rand()/(float)RAND_MAX)>=0.5){
 				this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 				return 0; // All Ok
 			}			
