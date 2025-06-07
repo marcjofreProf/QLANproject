@@ -1907,6 +1907,12 @@ if ((HostsActiveActionsFree[0]==false and string(InfoRemoteHostActiveActions[0])
 		this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 	}*/
 	this->RelativeNanoSleepWait((unsigned long long int)(2*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+5.0*(float)rand()/(float)RAND_MAX))));
+	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+		if(this->getState()==0){
+			this->ProcessNewMessage();
+			this->m_pause(); // After procesing the request, pass to paused state
+			//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+		}
 }
 return 0; // All ok
 }
