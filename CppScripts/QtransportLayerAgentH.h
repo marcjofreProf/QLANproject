@@ -118,7 +118,7 @@ private: // Variables/Objects
 	unsigned long long int MaxiIterPeriodicTimerVal=1000; // Max number of passes so that it enters the periodic checks
 	int IterHostsActiveActionsFreeStatus=0;// 0: Not asked this question; 1: Question asked; 2: All questions received; -1: Abort and reset all
 	int ReWaitsAnswersHostsActiveActionsFree=0;// Counter to know how many times waited to have all the responses
-	int MaxReWaitsAnswersHostsActiveActionsFree=30; // Maximum number of times to wait to collect all answers
+	int MaxReWaitsAnswersHostsActiveActionsFree=10; // Maximum number of times to wait to collect all answers
 	// Some parameters are initialized to zero in the constructor
 	bool HostsActiveActionsFree[1+NumConnectedHosts]={true}; // Indicate if the hosts are currently free to perform active actions. Index 0 is the host itself, the other indexes are the other remote hosts in the order of IPaddressesSockets starting from position 2
 	int NumAnswersOtherHostsActiveActionsFree=0;// Counter of the number of answers from other hosts proceessed

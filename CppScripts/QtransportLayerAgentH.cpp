@@ -1663,37 +1663,42 @@ return 0; // All ok
 }
 
 int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
-	int iAuxRand=(int)(5.0*(1.0+3.0*(float)rand()/(float)RAND_MAX));
-	for (int i=0;i<iAuxRand;i++){ // Provide some randomness to also allow others to block the scheduler
-		this->release();
-		this->RelativeNanoSleepWait((unsigned long long int)(150*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
-		this->acquire();
-		// Process other messages if available
-		if (GPIOnodeHardwareSynched==true and BusyAttachedNode==true){//} and HostsActiveActionsFree[0]==true){// Ask the node if busy
-				char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-				strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
-				strcat(ParamsCharArray,",");
-				strcat(ParamsCharArray,this->IPaddressesSockets[1]);
-				strcat(ParamsCharArray,",");
-				strcat(ParamsCharArray,"Control");
-				strcat(ParamsCharArray,",");
-				strcat(ParamsCharArray,"BusyNode");
-				strcat(ParamsCharArray,",");
-				strcat(ParamsCharArray,"none");
-				strcat(ParamsCharArray,",");// Very important to end the message
-				//cout << "Host sent HardwareSynchNode" << endl;
-				this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
-			}
-
-		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
-			if(this->getState()==0){
-				this->ProcessNewMessage();
-				this->m_pause(); // After procesing the request, pass to paused state
-				//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
-			}
-	}
-
 	if (IterHostsActiveActionsFreeStatus==0){
+		int iAuxRand=0;
+		if ((float)rand()/(float)RAND_MAX < 0.20){
+			iAuxRand=0;
+		}
+		else{
+			iAuxRand=(int)(100.0*(1.0+100.0*(float)rand()/(float)RAND_MAX));
+		}
+		for (int i=0;i<iAuxRand;i++){ // Provide some randomness to also allow others to block the scheduler
+			//this->release();
+			//this->RelativeNanoSleepWait((unsigned long long int)(1*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+			//this->acquire();
+			// Process other messages if available
+			if (GPIOnodeHardwareSynched==true and BusyAttachedNode==true){//} and HostsActiveActionsFree[0]==true){// Ask the node if busy
+					char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+					strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
+					strcat(ParamsCharArray,",");
+					strcat(ParamsCharArray,this->IPaddressesSockets[1]);
+					strcat(ParamsCharArray,",");
+					strcat(ParamsCharArray,"Control");
+					strcat(ParamsCharArray,",");
+					strcat(ParamsCharArray,"BusyNode");
+					strcat(ParamsCharArray,",");
+					strcat(ParamsCharArray,"none");
+					strcat(ParamsCharArray,",");// Very important to end the message
+					//cout << "Host sent HardwareSynchNode" << endl;
+					this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+				}
+
+			this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+				if(this->getState()==0){
+					this->ProcessNewMessage();
+					this->m_pause(); // After procesing the request, pass to paused state
+					//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+				}
+		}
 		if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and BusyAttachedNode==false){
 			this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 		}
