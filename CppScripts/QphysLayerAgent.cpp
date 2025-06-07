@@ -1474,9 +1474,9 @@ TimeTaggsDetAnalytics[10]=0.0;
 // Param 5: Mean time difference between tags
 // Param 6: std time difference between tags
 // Param 7: Absolute Time tagg value in the middle
-// Param 7: Absolute Time tagg value first
-// Param 7: Absolute Time tagg value last
-// Param 7: Absolute Time tagg value reference
+// Param 8: Absolute Time tagg value first
+// Param 9: Absolute Time tagg value last
+// Param 10: Absolute Time tagg value reference
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Normalize time taggs to the first run since the node was started
