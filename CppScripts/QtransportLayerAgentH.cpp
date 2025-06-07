@@ -1907,7 +1907,7 @@ if ((HostsActiveActionsFree[0]==false and string(InfoRemoteHostActiveActions[0])
 		}
 		this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 	}*/
-	this->RelativeNanoSleepWait((unsigned long long int)(2*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+10.0*(float)rand()/(float)RAND_MAX))));
+	this->RelativeNanoSleepWait((unsigned long long int)(10*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+10.0*(float)rand()/(float)RAND_MAX))));
 	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 		if(this->getState()==0){
 			this->ProcessNewMessage();
