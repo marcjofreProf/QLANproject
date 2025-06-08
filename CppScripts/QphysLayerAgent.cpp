@@ -1736,6 +1736,7 @@ int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,
 			// Median averaging
 			for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
 				ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i])%4);// Maps the offset correction for the different channels to detect a specific state
+				cout << "ChOffsetCorrection: " << ChOffsetCorrection << endl;
 				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);
 				//if (i%300==0){// To be commented when not debugging
 				//	cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayAux[" << i << "]: " << SynchFirstTagsArrayAux[i] << endl;
@@ -1766,6 +1767,7 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 			for (unsigned int i=0;i<4;i++){CheckChOffsetCorrectionIter[i]=0;}// Reset values
 			for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
 				ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i])%4);// Maps the offset correction for the different channels to detect a states
+				cout << "ChOffsetCorrection: " << ChOffsetCorrection << endl;
 				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
 				CheckChOffsetCorrectionArray[ChOffsetCorrection][CheckChOffsetCorrectionIter[ChOffsetCorrection]]=SynchFirstTagsArrayAux[i];
 				CheckChOffsetCorrectionIter[ChOffsetCorrection]++;
