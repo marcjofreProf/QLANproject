@@ -115,7 +115,7 @@ private: // Variables/Objects
 	double QTLAHFreqSynchNormValuesArray[NumCalcCenterMass]={0.0};//,-0.25,0.25}; // Normalized values of frequency testing// Relative frequency difference normalized
 	// Scheduler status
 	unsigned long long int iIterPeriodicTimerVal=0; // Variable to keep track of number of passes thorugh periodic checks
-	unsigned long long int MaxiIterPeriodicTimerVal=1000; // Max number of passes so that it enters the periodic checks
+	unsigned long long int MaxiIterPeriodicTimerVal=2000; // Max number of passes so that it enters the periodic checks
 	int IterHostsActiveActionsFreeStatus=0;// 0: Not asked this question; 1: Question asked; 2: All questions received; -1: Abort and reset all
 	int ReWaitsAnswersHostsActiveActionsFree=0;// Counter to know how many times waited to have all the responses
 	int MaxReWaitsAnswersHostsActiveActionsFree=50; // Maximum number of times to wait to collect all answers
