@@ -1790,7 +1790,10 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 				for (unsigned int j=0;j<4;j++){
 					if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>(LLIHistPeriodicityAux/2) and CheckChOffsetCorrectionIter[i]>0 and CheckChOffsetCorrectionIter[j]>0){ // If tehre are counts in each pin compared
 						boolCheckChOffsetCorrectionflag=true;
-						cout << "QPLA::HistCalcPeriodTimeTags Potentially GPIO pins i=" << i << " and j=" << j << " on SpecificQuadChDet: " << SpecificQuadChDet << " connection order is wrong. Check!!!" << endl;
+						cout << "QPLA::HistCalcPeriodTimeTags Potentially GPIO pins i=" << i << " and j=" << j << " with difference " << (CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j]) << " on SpecificQuadChDet: " << SpecificQuadChDet << " connection order is wrong. Check!!!" << endl;
+					}
+					else if(CheckChOffsetCorrectionIter[i]>0 and CheckChOffsetCorrectionIter[j]>0){// Just information
+						cout << "QPLA::HistCalcPeriodTimeTags GPIO pins i=" << i << " and j=" << j << " with difference " << (CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j]) << " on SpecificQuadChDet: " << SpecificQuadChDet << endl;
 					}
 				}
 			}
