@@ -1596,11 +1596,11 @@ return 0; // All ok
 // Function to pack bits 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15 of an unsigned short into the lower values
 unsigned short GPIO::packBits(unsigned short value) {
     // Rearrange the lower two bytes so that they are correctly splitted for each quad group channel. For each group of 4 bits the order does not follow an arranged order for channel detectors
-    unsigned short byte0aux = ((value & 0x0010) >> 3) | ((value & 0x0002) << 1) | ((value & 0x0040) >> 3) | ((value & 0x0020) >> 5) ; // Are the bits 0x0072, moved to 0x000F
+    unsigned short byte0aux = ((value & 0x0010) >> 2) | ((value & 0x0002) << 2) | ((value & 0x0040) >> 3) | ((value & 0x0020) >> 5) ; // Are the bits 0x0072, moved to 0x000F
     unsigned short byte1aux = ((value & 0x0008) << 4) | ((value & 0x0004) << 4) | ((value & 0x0080) >> 3) | ((value & 0x0001) << 4); // Are the bits 0x008D, moved to 0x00F0
     unsigned short byte2aux = ((value & 0x8000) >> 4) | ((value & 0x4000) >> 4) | ((value & 0x2000) >> 4) | ((value & 0x1000) >> 4); // To be check that the ordering is correct!!!! // Byte 1 shifts to the right four bit positions (the interesting ones) // Are the bits 0xF000, moved to 0x0F00
 
-    if (byte2aux!=0){cout << "GPIO::packBits byte2aux has never tested (check synchronization network ordering of bits)!!" << endl;}
+    if (byte2aux!=0){cout << "GPIO::packBits byte2aux has never been tested (check synchronization network ordering of bits)!!" << endl;}
 
     // Combine the bytes into a single unsigned short
     return byte0aux | byte1aux | byte2aux;
