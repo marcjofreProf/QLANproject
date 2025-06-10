@@ -1786,8 +1786,8 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 			// Checks of correct GPIO pins alignment
 			for (unsigned int i=0;i<4;i++){ // Computes for each of the four pins
 				if (CheckChOffsetCorrectionIter[i]>0){
-					//CheckChOffsetCorrection[i]=LLIMeanFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i]));
-					CheckChOffsetCorrection[i]=LLIMedianFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i])); // To avoid glitches
+					CheckChOffsetCorrection[i]=LLIMeanFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i]));
+					//CheckChOffsetCorrection[i]=LLIMedianFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i])); // To avoid glitches
 				}
 			}
 			for (unsigned int i=0;i<4;i++){
