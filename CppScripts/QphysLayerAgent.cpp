@@ -518,7 +518,7 @@ this->FineSynchAdjVal[1]=0.0;// synch trig frequ
 this->FineSynchAdjVal[0]+=FineSynchAdjValAux[0];// synch trig offset
 this->FineSynchAdjVal[1]+=FineSynchAdjValAux[1];// synch trig frequency
 //cout << "this->FineSynchAdjVal[1]: " << this->FineSynchAdjVal[1] << endl;
-if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
+if (this->RunThreadSimulateEmitQuBitFlag and this->RunThreadAcquireSimulateNumStoredQubitsNode and this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
 threadSimulateEmitQuBitRefAux.join();//threadSimulateEmitQuBitRefAux.detach();
@@ -598,7 +598,7 @@ this->FineSynchAdjVal[1]=0.0;// synch trig frequ
 }
 this->FineSynchAdjVal[0]+=FineSynchAdjValAux[0];// synch trig offset
 this->FineSynchAdjVal[1]+=FineSynchAdjValAux[1]+FreqSynchNormValuesArray[iCenterMass];// synch trig frequency
-if (this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
+if (this->RunThreadSimulateEmitQuBitFlag and this->RunThreadAcquireSimulateNumStoredQubitsNode and this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateEmitQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateEmitQuBitRefAux=std::thread(&QPLA::ThreadSimulateEmitQuBit,this);
 threadSimulateEmitQuBitRefAux.join();//threadSimulateEmitQuBitRefAux.detach();//threadSimulateEmitQuBitRefAux.join();//
@@ -695,7 +695,7 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 	}
 	this->FineSynchAdjVal[0]+=FineSynchAdjValAux[0];// synch trig offset
 	this->FineSynchAdjVal[1]+=FineSynchAdjValAux[1];// synch trig frequency
-	if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
+	if (this->RunThreadSimulateReceiveQuBitFlag and this->RunThreadAcquireSimulateNumStoredQubitsNode and this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 	this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 	std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
 	threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
@@ -856,7 +856,7 @@ this->FineSynchAdjVal[1]=0.0;// synch trig frequ
 }
 this->FineSynchAdjVal[0]+=FineSynchAdjValAux[0];// synch trig offset
 this->FineSynchAdjVal[1]+=FineSynchAdjValAux[1];// synch trig frequency
-if (this->RunThreadSimulateReceiveQuBitFlag){// Protection, do not run if there is a previous thread running
+if (this->RunThreadSimulateReceiveQuBitFlag and this->RunThreadAcquireSimulateNumStoredQubitsNode and this->RunThreadSimulateEmitQuBitFlag){// Protection, do not run if there is a previous thread running
 this->RunThreadSimulateReceiveQuBitFlag=false;//disable that this thread can again be called
 std::thread threadSimulateReceiveQuBitRefAux=std::thread(&QPLA::ThreadSimulateReceiveQubit,this);
 threadSimulateReceiveQuBitRefAux.join();//threadSimulateReceiveQuBitRefAux.detach();
@@ -1251,20 +1251,23 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 						// Checks
 						for (unsigned int i=0;i<4;i++){
 							if (CheckChOffsetCorrectionIter[i]>0){
-								CheckChOffsetCorrection[i]=LLIMeanFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i]));
+								//CheckChOffsetCorrection[i]=LLIMeanFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i]));
+								CheckChOffsetCorrection[i]=LLIMedianFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i])); // To avoid glitches
 							}
 						}
 						for (unsigned int i=0;i<4;i++){
 							for (unsigned int j=0;j<4;j++){
-								if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>LLIHistPeriodicityAux and CheckChOffsetCorrectionIter[i]>0 and CheckChOffsetCorrectionIter[j]>0){
+								if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>(LLIHistPeriodicityAux/2) and CheckChOffsetCorrectionIter[i]>0 and CheckChOffsetCorrectionIter[j]>0){
 									boolCheckChOffsetCorrectionflag=true;
+									//cout << "QPLA::SmallDriftContinuousCorrection Potentially GPIO pins i=" << i << " " << CheckChOffsetCorrection[i] << " and j=" << j << " " << CheckChOffsetCorrection[j] << " with difference " << (CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j]) << " on iQuadChIter: " << iQuadChIter << " for LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << " connection order is wrong. Check!!!" << endl;
 								}
 							}
 						}
 						if (boolCheckChOffsetCorrectionflag==true){
-							cout << "QPLA::SmallDriftContinuousCorrection Potentially GPIO pins connection order is wrong. Check!!!" << endl;
+							cout << "QPLA::SmallDriftContinuousCorrection Potentially GPIO pins connection order is wrong on iQuadChIter: " << iQuadChIter <<" Check!!!" << endl;
 						}
-					  SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
+					  //SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
+					  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));// To avoid glitches//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
 					  //cout << "QPLA::SmallDriftContinuousCorrection static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]): " << static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]) << endl;
 					  //cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftAux: " << SmallOffsetDriftAux << endl;
 					}
@@ -1783,7 +1786,8 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 			// Checks of correct GPIO pins alignment
 			for (unsigned int i=0;i<4;i++){ // Computes for each of the four pins
 				if (CheckChOffsetCorrectionIter[i]>0){
-					CheckChOffsetCorrection[i]=LLIMeanFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i]));
+					//CheckChOffsetCorrection[i]=LLIMeanFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i]));
+					CheckChOffsetCorrection[i]=LLIMedianFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i])); // To avoid glitches
 				}
 			}
 			for (unsigned int i=0;i<4;i++){
@@ -1800,7 +1804,8 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 			if (boolCheckChOffsetCorrectionflag==true){
 				cout << "QPLA::HistCalcPeriodTimeTags Potentially GPIO pins connection order is wrong on SpecificQuadChDet: " << SpecificQuadChDet <<" Check!!!" << endl;
 			}
-			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMeanFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));//LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
+			//SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMeanFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));//LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
+			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));// To avoid glitches//LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
 			//cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayOffsetCalc[" << iNumRunsPerCenterMass << "]: " << SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass] << endl;
 		}
 		else{
