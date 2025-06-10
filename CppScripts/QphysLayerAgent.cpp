@@ -1259,12 +1259,12 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 							for (unsigned int j=0;j<4;j++){
 								if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>(LLIHistPeriodicityAux/2) and CheckChOffsetCorrectionIter[i]>0 and CheckChOffsetCorrectionIter[j]>0){
 									boolCheckChOffsetCorrectionflag=true;
-									//cout << "QPLA::SmallDriftContinuousCorrection Potentially GPIO pins i=" << i << " " << CheckChOffsetCorrection[i] << " and j=" << j << " " << CheckChOffsetCorrection[j] << " with difference " << (CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j]) << " on iQuadChIter: " << iQuadChIter << " for LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << " connection order is wrong. Check!!!" << endl;
+									//cout << "QPLA::SmallDriftContinuousCorrection Potentially GPIO pins i=" << i << " " << CheckChOffsetCorrection[i] << " and j=" << j << " " << CheckChOffsetCorrection[j] << " with difference " << (CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j]) << " on iQuadChIter: " << iQuadChIter << " for LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << " connection order is wrong or too much jitter. Check!!!" << endl;
 								}
 							}
 						}
 						if (boolCheckChOffsetCorrectionflag==true){
-							cout << "QPLA::SmallDriftContinuousCorrection Potentially GPIO pins connection order is wrong on iQuadChIter: " << iQuadChIter <<" Check!!!" << endl;
+							cout << "QPLA::SmallDriftContinuousCorrection Potentially GPIO pins connection order is wrong or too much jitter on iQuadChIter: " << iQuadChIter <<" Check!!!" << endl;
 						}
 					  //SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
 					  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));// To avoid glitches//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
