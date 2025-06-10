@@ -1257,7 +1257,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 						}
 						for (unsigned int i=0;i<4;i++){
 							for (unsigned int j=0;j<4;j++){
-								if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>(LLIHistPeriodicityAux/2) and CheckChOffsetCorrectionIter[i]>0 and CheckChOffsetCorrectionIter[j]>0){
+								if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>(3*LLIHistPeriodicityAux/4) and CheckChOffsetCorrectionIter[i]>0 and CheckChOffsetCorrectionIter[j]>0){
 									boolCheckChOffsetCorrectionflag=true;
 									//cout << "QPLA::SmallDriftContinuousCorrection Potentially GPIO pins i=" << i << " " << CheckChOffsetCorrection[i] << " and j=" << j << " " << CheckChOffsetCorrection[j] << " with difference " << (CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j]) << " on iQuadChIter: " << iQuadChIter << " for LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << " connection order is wrong or too much jitter. Check!!!" << endl;
 								}
@@ -1792,7 +1792,7 @@ if (iCenterMass==0){// Here the modulo is dependent n the effective period
 			}
 			for (unsigned int i=0;i<4;i++){
 				for (unsigned int j=0;j<4;j++){
-					if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>(LLIHistPeriodicityAux/2) and CheckChOffsetCorrectionIter[i]>0 and CheckChOffsetCorrectionIter[j]>0){ // If tehre are counts in each pin compared
+					if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>(3*LLIHistPeriodicityAux/4) and CheckChOffsetCorrectionIter[i]>0 and CheckChOffsetCorrectionIter[j]>0){ // If tehre are counts in each pin compared
 						boolCheckChOffsetCorrectionflag=true;
 						cout << "QPLA::HistCalcPeriodTimeTags Potentially GPIO pins i=" << i << " " << CheckChOffsetCorrection[i] << " and j=" << j << " " << CheckChOffsetCorrection[j] << " with difference " << (CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j]) << " on SpecificQuadChDet: " << SpecificQuadChDet << " for LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << " connection order is wrong. Check!!!" << endl;
 					}
