@@ -117,7 +117,7 @@ private: //Variables/Instances
 	// Automatic calculation of synchronization
 	bool FlagTestSynch=false;
 	double MultFactorEffSynchPeriodQPLA=4.0; // When using 4 channels histogram, this value is 4.0; when using real signals this value should be 1.0 (also in GPIO.h)
-	double HistPeriodicityAux=4096.0; //Value indicated by upper agents (and uploaded to GPIO)//Period in PRU counts of the synch period/histogram
+	double HistPeriodicityAux=4096.0/4.0; //Value indicated by upper agents (and uploaded to GPIO)//Period in PRU counts of the synch period/histogram
 	int CurrentSpecificLink=-1; // Identifies th eindex of the other emiter/receiver
 	int CurrentSpecificLinkMultiple=-1; // Identifies the index of the other emiter/receiver links when multiple present
 	char ListCombinationSpecificLink[2*((1LL<<LinkNumberMAX)-1)][NumBytesPayloadBuffer]; // Stores the list of detected links and combinations in an ordered way
