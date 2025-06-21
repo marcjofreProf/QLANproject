@@ -40,7 +40,7 @@ using std::fstream;
 #define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
 // Num averages below is critical not to get system stall (since performing median averagins is very resource consuming)
-#define NumSynchMeasAvgAux 	181 //141 //161; // Num averages to compute the relative frequency difference. Better to be odd number.
+#define NumSynchMeasAvgAux 	161 //141 //161; // Num averages to compute the relative frequency difference. Better to be odd number.
 #define ExtraNumSynchMeasAvgAux 	NumSynchMeasAvgAux // 191 // Averaging for computing current absolute time offset
 // The calculation of the relative frequency difference is important.
 // The periodic checking is every 100000000, where the relative frequency calculation is done every fraction of NumSynchMeasAvgAux. There is a trade-off between not taking to long to calculate the relative frequency edifference because then we are probably exceeding the IEP counter range, but we want it to be long enough to produce little error in the calculation. Furthermore, there is an averaging of different calculation sof the relative frequency difference.
@@ -302,7 +302,7 @@ private:// Variables
 	double AccumulatedErrorDriftAux=0.0;// For retrieved relative offset difference from protocol
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
 	bool QPLAFlagTestSynch=false;
-	bool GPIOFlagRelFreqTest=true; // To deactive (true) slope correction of the emitter, for testing purpouses
+	bool GPIOFlagRelFreqTest=false; // To deactive (true) slope correction of the emitter, for testing purpouses
 	// Correct Qubits relative frequency difference due to the sender
 	unsigned int TagsSeparationDetRelFreq=0; //1;//4*10; // Number of index separation to compute the slope of disadjustment in order to have accuraccy. Times 4 to account the possibility that all tags arrive to the same detector
 	unsigned int TagsSeparationDetRelFreqAdpSlope=4*20; // To compute an adaptive slope
