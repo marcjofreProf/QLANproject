@@ -1257,7 +1257,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 						}
 						for (unsigned int i=0;i<4;i++){
 							for (unsigned int j=0;j<4;j++){
-								if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>(LLIHistPeriodicityAux) and CheckChOffsetCorrectionIter[i]>0 and CheckChOffsetCorrectionIter[j]>0){
+								if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>(LLIHistPeriodicityAux) and CheckChOffsetCorrectionIter[i]>=5 and CheckChOffsetCorrectionIter[j]>=5){
 									boolCheckChOffsetCorrectionflag=true;
 									//cout << "QPLA::SmallDriftContinuousCorrection Potentially GPIO pins i=" << i << " " << CheckChOffsetCorrection[i] << " and j=" << j << " " << CheckChOffsetCorrection[j] << " with difference " << (CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j]) << " on iQuadChIter: " << iQuadChIter << " for LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << " connection order is wrong or too much jitter. Check!!!" << endl;
 								}
@@ -1796,7 +1796,7 @@ if (iCenterMass==0){// Here the modulo is dependent on the effective period
 						boolCheckChOffsetCorrectionflag=true;
 						cout << "QPLA::HistCalcPeriodTimeTags Potentially GPIO pins i=" << i << " " << CheckChOffsetCorrection[i] << " and j=" << j << " " << CheckChOffsetCorrection[j] << " with difference " << (CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j]) << " on SpecificQuadChDet: " << SpecificQuadChDet << " for LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << " connection order is wrong. Check!!!" << endl;
 					}
-					//else if(i!=j and CheckChOffsetCorrectionIter[i]>0 and CheckChOffsetCorrectionIter[j]>0){// Just information
+					//else if(i!=j and CheckChOffsetCorrectionIter[i]>=5 and CheckChOffsetCorrectionIter[j]>=5){// Just information
 					//	cout << "QPLA::HistCalcPeriodTimeTags GPIO pins i=" << i << " and j=" << j << " with difference " << (CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j]) << " on SpecificQuadChDet: " << SpecificQuadChDet << " for LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << endl;
 					//}
 				}
