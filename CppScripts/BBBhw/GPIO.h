@@ -40,7 +40,7 @@ using std::fstream;
 #define PulseFreq	1000 // Hz// Not used. Meant for external synchronization pulses (which it is what is wanted to avoid up to some extend)
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
 // Num averages below is critical not to get system stall (since performing median averagins is very resource consuming)
-#define NumSynchMeasAvgAux 	81 //161; // Num averages to compute the relative frequency difference. Better to be odd number.
+#define NumSynchMeasAvgAux 	81 //161; // Num averages to compute the relative frequency difference. Better to be odd number. If too high, then the resourcs consumed by the node are too high (more than 10% of continuous CPU usage) and makes it stall
 #define ExtraNumSynchMeasAvgAux 	NumSynchMeasAvgAux // 191 // Averaging for computing current absolute time offset
 // The calculation of the relative frequency difference is important.
 // The periodic checking is every 100000000, where the relative frequency calculation is done every fraction of NumSynchMeasAvgAux. There is a trade-off between not taking to long to calculate the relative frequency edifference because then we are probably exceeding the IEP counter range, but we want it to be long enough to produce little error in the calculation. Furthermore, there is an averaging of different calculation sof the relative frequency difference.
@@ -104,7 +104,7 @@ private:// Variables
 	double GuardPeriod=131072.0; // Maybe the guard time has to be larger than any possible interrupt time handling in excees. The guard time has to be larger and multiple of any period wanted to be used (also considering the histogram analysis consisting of 4 symbols; and the period choosen for synchronization). Time period in PRU units of guard time. The guard time is limitted by the interrupt handling jitter. It has to be a power of 2!!!
 	// The below number, the smaller the more fine grain so it will react faster to hardware PRU counter changes (so faster) but probably more jitter
 	// The longer (way more than the averaged jtter) it will have less jittter provided that the IEP counter is stable enough so that the absolute offset error is PID corrected with the QPLA
-	double truncatedSynchTrigPeriod=2048.0; // Multiple of power of 2, and related to the averaged interrupt jitter (in PRU units). Since otherwise it adds noise. The larger with respect the averaged jitter (of measuring the curren tPRU counter) the more offset residual error that the QPLA PID will have to correct for
+	double truncatedSynchTrigPeriod=16336.0;//2048.0; // Like hyperperiod in the PRU to properly link control plane and real-time plane. Multiple of power of 2, and related to the averaged interrupt jitter (in PRU units). Since otherwise it adds noise. The larger with respect the averaged jitter (of measuring the curren tPRU counter) the more offset residual error that the QPLA PID will have to correct for
 	double truncatedSynchTrigPeriodPeriodic=8.0;// Multiple of power of 2, for the periodic monitoring to content the EstimateSynchAvg. Gives stability to the calculation of the relative frequency difference.
 	double truncatedSynchAbsRelFreq=16.0;// Multiple of power of 2, for the periodic monitoring to content the relative frequency difference. Gives stability to the calculation of the relative frequency difference.
 	long double PRUoffsetDriftErrorAbsAvgOld=0.0;
