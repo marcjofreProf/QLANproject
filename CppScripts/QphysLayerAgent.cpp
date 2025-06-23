@@ -1709,7 +1709,24 @@ long long int QPLA::BitPositionChannelTags(unsigned long long int ChannelTagsPos
 	//	BitPosAux++;
 	//}
 	//return BitPosAux;
-	return static_cast<long long int>(ChannelTagsPosAux);
+	//return static_cast<long long int>(ChannelTagsPosAux);
+	// TAble-based decoding for faster execution
+	if (0x0001==ChannelTagsPosAux or 0x0010==ChannelTagsPosAux or 0x0100==ChannelTagsPosAux or 0x1000==ChannelTagsPosAux){
+		return static_cast<long long int>(0);
+	}
+	else if (0x0002==ChannelTagsPosAux or 0x0020==ChannelTagsPosAux or 0x0200==ChannelTagsPosAux or 0x2000==ChannelTagsPosAux){
+		return static_cast<long long int>(1);
+	}
+	else if (0x0004==ChannelTagsPosAux or 0x0040==ChannelTagsPosAux or 0x0400==ChannelTagsPosAux or 0x4000==ChannelTagsPosAux){
+		return static_cast<long long int>(2);
+	}
+	else if (0x0008==ChannelTagsPosAux or 0x0080==ChannelTagsPosAux or 0x0800==ChannelTagsPosAux or 0x8000==ChannelTagsPosAux){
+		return static_cast<long long int>(3);
+	}
+	else{
+		cout << "QPLA::BitPositionChannelTags bad decoding...coding produced in GPIO!!!" << endl;
+		return static_cast<long long int>(0);
+	}
 }
 
 int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,int iNumRunsPerCenterMass){
