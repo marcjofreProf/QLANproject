@@ -1977,7 +1977,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 	double SynchCalcValuesArrayAux[NumRunsPerCenterMass];// Split between the four channels		
 	for (int i=0;i<NumRunsPerCenterMass;i++){
 		// Offset wrapping
-		SynchCalcValuesArrayAux[i]=static_cast<double>((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+SynchFirstTagsArrayOffsetCalc[i])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
+		SynchCalcValuesArrayAux[i]=-static_cast<double>((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+SynchFirstTagsArrayOffsetCalc[i])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
 		//cout << "QPLA::SynchFirstTagsArrayOffsetCalc[i]: " << SynchFirstTagsArrayOffsetCalc[i] << endl;
 		//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 		//cout << "QPLA::SynchCalcValuesArrayAux[i]: " << SynchCalcValuesArrayAux[i] << endl;
