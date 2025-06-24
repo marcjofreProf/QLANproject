@@ -1798,8 +1798,8 @@ if (iCenterMass==0){// Here the modulo is dependent on the effective period
 			for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
 				ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i])%4);// Maps the offset correction for the different channels to detect a states
 				//cout << "ChOffsetCorrection: " << ChOffsetCorrection << endl;
-				//SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
-				SynchFirstTagsArrayAux[i]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
+				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
+				//SynchFirstTagsArrayAux[i]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
 				CheckChOffsetCorrectionArray[ChOffsetCorrection][CheckChOffsetCorrectionIter[ChOffsetCorrection]]=SynchFirstTagsArrayAux[i];
 				CheckChOffsetCorrectionIter[ChOffsetCorrection]++;
 				//if (i%10==0){// To be commented when not debugging
@@ -1830,8 +1830,8 @@ if (iCenterMass==0){// Here the modulo is dependent on the effective period
 			if (boolCheckChOffsetCorrectionflag==true){
 				cout << "QPLA::HistCalcPeriodTimeTags Potentially GPIO pins connection order is wrong on SpecificQuadChDet: " << SpecificQuadChDet <<" Check!!!" << endl;
 			}
-			//SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMeanFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));//LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
-			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));// To avoid glitches//LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
+			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMeanFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));//LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
+			//SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));// To avoid glitches//LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
 			//cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayOffsetCalc[" << iNumRunsPerCenterMass << "]: " << SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass] << endl;
 		}
 		else{
@@ -1993,7 +1993,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		//cout << "QPLA::SynchCalcValuesArrayAux[i]: " << SynchCalcValuesArrayAux[i] << endl;
 	}	
 	
-	SynchCalcValuesArray[1]=-DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMeanFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass); // The actual computed offset. To avoid glitches, it is better to make a median
+	SynchCalcValuesArray[1]=DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMeanFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass); // The actual computed offset. To avoid glitches, it is better to make a median
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	
