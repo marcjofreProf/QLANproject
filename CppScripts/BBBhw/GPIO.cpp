@@ -195,7 +195,13 @@ GPIO::GPIO(){// Redeclaration of constructor GPIO when no argument is specified
 		case 1:{cout << "GPIO::Frequency synchronization periodic correction selected!" << endl;break;}
 		default:{cout << "GPIO::None synchronization periodic correction selected!" << endl;break;}
 	}
-	cout << "Wait to proceed, calibrating synchronization!..." << endl;
+	cout << "GPIO::Wait to proceed, calibrating synchronization!..." << endl;
+	if (SynchPlaneDomainMode==true){
+		cout << "GPIO::For the time being synch. controlled by control plane...adds jitter in timetaggs...in the future a real-time clock with phase reference synch should be used!!!" << endl;
+	}
+	else{
+		cout << "GPIO::Synch. controlled by real-time plane..." << endl;
+	}
 	////prussdrv_pru_enable(PRU_Signal_NUM);
 	sleep(150); // Give some time to load programs in PRUs and the synch protocols to initiate and lock after prioritazion and adjtimex. Very important, otherwise bad values might be retrieved
 	
