@@ -59,7 +59,7 @@ namespace exploringBB {
 private:// Variables
 	// For frequency synchronization Then, the interrogation time has to be made very large (seconds)
 	int SynchCorrectionTimeFreqNoneFlag=2; // Frequency correction is not undercontrol and difficult (better to have good physical synch) //0: No correction; 1: frequency correction; 2: Time correction; 3: time and frequency correction
-	bool SynchPlaneDomainMode=false; // false: The real-time clock dominates (logical control plane just has to enter correctly thorugh the interrupt); true: the control plane logical PTP clock dominates
+	bool SynchPlaneDomainMode=true; // false: The real-time clock dominates (logical control plane just has to enter correctly thorugh the interrupt); true: the control plane logical PTP clock dominates
 	bool SlowMemoryPermanentStorageFlag=false; // Variable when true they are stored in a file (slower due to writting and reading) ; otherwise it uses array memory to store qubits (much faster)
 	bool ResetPeriodicallyTimerPRU1=true;// Avoiding interrupts
 	// Priority values
