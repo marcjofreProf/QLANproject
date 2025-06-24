@@ -785,7 +785,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
-			PRUoffFreqTotalAux=static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAbsAvg);
+			PRUoffFreqTotalAux=static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg);
 			break;
 		}
 		case 2:{// Time correction
@@ -793,7 +793,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 			break;
 		}
 		case 1:{ // Frequency correction
-			PRUoffFreqTotalAux=ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAbsAvg);
+			PRUoffFreqTotalAux=ldTimePointClockTagPRUDiff*static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg);
 			break;
 		}
 		default:{PRUoffFreqTotalAux=0.0;break;}// None time nor frequency correction
@@ -998,7 +998,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 
 	switch (SynchCorrectionTimeFreqNoneFlag){
 		case 3:{// Time and frequency correction			
-			PRUoffFreqTotalAux=static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAbsAvg);
+			PRUoffFreqTotalAux=static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg)+ldTimePointClockTagPRUDiff*static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg);
 			break;
 		}
 		case 2:{// Time correction
@@ -1006,7 +1006,7 @@ int GPIO::SendTriggerSignals(int QuadEmitDetecSelecAux, double SynchTrigPeriodAu
 			break;
 		}
 		case 1:{ // Frequency correction
-			PRUoffFreqTotalAux=ldTimePointClockTagPRUDiff*static_cast<long double>(PRUoffsetDriftErrorAbsAvg);
+			PRUoffFreqTotalAux=ldTimePointClockTagPRUDiff*static_cast<long double>(truncatedPRUoffsetDriftErrorAbsAvg);
 			break;
 		}
 		default:{PRUoffFreqTotalAux=0.0;break;}// None time nor frequency correction
