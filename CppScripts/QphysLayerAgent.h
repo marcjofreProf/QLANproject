@@ -27,7 +27,7 @@ Header declaration file for Quantum physical Layer Agent
 #define NumCalcCenterMass 1 // 1 // 3 // Number of centers of mass to measure to compute the synchronization. // With 3, it also computes hardware calibration of the detunnings
 #define NumRunsPerCenterMass 4 // Minimum 2. In order to compute the difference. Better and even number because the computation is done between differences and a median so effectively using odd number of measurements
 #define QuadNumChGroups 3 // There are three quad groups of emission channels and detection channels (which are treated independetly)
-#define NumSmallOffsetDriftAux 5 // 5 // Better odd number Length of samples to filter the small time offset continuous correction for the PID. Integration length of the PID controller for correction
+#define NumSmallOffsetDriftAux 3 // 5 // Better odd number Length of samples to filter the small time offset continuous correction for the PID. Integration length of the PID controller for correction
 
 // String operations
 #include<string>
@@ -160,7 +160,7 @@ private: //Variables/Instances
 	// Filtering qubits
 	bool NonInitialReferencePointSmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={false}; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
 	// Filtering qubits
-	bool ApplyRawQubitFilteringFlag=true;// Variable to select (true) or unselect (false) the filtering of raw qubits thorugh LinearRegressionQuBitFilter function. For the time being, it is not applied in the synchronization procedure.
+	bool ApplyRawQubitFilteringFlag=false;// Variable to select (true) or unselect (false) the filtering of raw qubits thorugh LinearRegressionQuBitFilter function. For the time being, it is not applied in the synchronization procedure.
 	long long int FilteringAcceptWindowSize=32; // Better power of 2!  Equivalent to around 3 times the time jitter (when physically synch). In PRU time. It should be dependent on the period of the signal
 	double SynchCalcValuesFreqThresh=5e-7; //Threshold value to not apply relative frequency difference
 	bool UseAllTagsForEstimation=true; // When false, use only the first tag (not resilent because it could be a remaining noise tag), when true it uses all tags of the run
