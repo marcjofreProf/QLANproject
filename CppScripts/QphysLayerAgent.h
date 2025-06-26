@@ -160,8 +160,8 @@ private: //Variables/Instances
 	// Filtering qubits
 	bool NonInitialReferencePointSmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={false}; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
 	// Filtering qubits
-	bool ApplyRawQubitFilteringFlag=true;// Variable to select (true) or unselect (false) the filtering of raw qubits thorugh LinearRegressionQuBitFilter function. For the time being, it is not applied in the synchronization procedure.
-	long long int FilteringAcceptWindowSize=32; // Better power of 2!  Equivalent to around 3 times the time jitter (when physically synch). In PRU time. It should be dependent on the period of the signal
+	bool ApplyRawQubitFilteringFlag=false;// Variable to select (true) or unselect (false) the filtering of raw qubits thorugh LinearRegressionQuBitFilter function. For the time being, it is not applied in the synchronization procedure.
+	long long int FilteringAcceptWindowSize=64; // Better power of 2!  Equivalent to around 3 times the time jitter (when physically synch). In PRU time. It should be dependent on the period of the signal
 	double SynchCalcValuesFreqThresh=5e-7; //Threshold value to not apply relative frequency difference
 	bool UseAllTagsForEstimation=true; // When false, use only the first tag (not resilent because it could be a remaining noise tag), when true it uses all tags of the run
 	//int iCenterMassAuxiliarTest=0;
