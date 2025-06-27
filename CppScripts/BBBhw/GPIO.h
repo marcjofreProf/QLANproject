@@ -232,7 +232,7 @@ private:// Variables
 	unsigned int NumberRepetitionsSignal=32768;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	// For the synchronization protocol (at the begging or during operation) it sets the timetagging window to 1 for maximum synchronization resolution.
 	// Account that the effective value of the coincidence time window doubles because in the PRU it takes to clock cycles
-	unsigned int TTGcoincWin=2; // Less than half of half the signal time (related to the time jitter in PRU units). 1;// It cannot be smaller than 1. Timetagging coincidence window length In PRU units. It reduces time resolution of the detected qubits.
+	unsigned int TTGcoincWin=4; // A little more than half of half the signal time (related to the time jitter in PRU units). 1;// It cannot be smaller than 1. Timetagging coincidence window length In PRU units. It reduces time resolution of the detected qubits.
 	unsigned int NumQuBitsPerRun=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=7500000; // In microseconds. Signal generation
@@ -302,8 +302,8 @@ private:// Variables
 	double AccumulatedErrorDrift=0.0; // For retrieved relative frequency difference from protocol
 	double AccumulatedErrorDriftAux=0.0;// For retrieved relative offset difference from protocol
 	double AdjPulseSynchCoeffArray[MaxNumPulses]={0.0};
-	bool QPLAFlagTestSynch=false;
-	bool GPIOFlagRelFreqTest=false; // To deactive (true) slope correction of the emitter, for testing purpouses; false, it is activated.
+	bool QPLAFlagTestSynch=false; // Flag indicating if it is at synchronization step.
+	bool GPIOFlagRelFreqTest=true; // To deactive (true) slope correction of the emitter, for testing purpouses; false, it is activated.
 	// Correct Qubits relative frequency difference due to the sender
 	unsigned int TagsSeparationDetRelFreq=0; //1;//4*10; // Number of index separation to compute the slope of disadjustment in order to have accuraccy. Times 4 to account the possibility that all tags arrive to the same detector
 	unsigned int TagsSeparationDetRelFreqAdpSlopeSynch=4*2; // To compute an adaptive slope in synchronization operation where time offsets between qubits are much longer
