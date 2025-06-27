@@ -1423,7 +1423,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 			TotalCurrentNumRecordsQuadChOld[iQuadChIter]=TotalCurrentNumRecordsQuadCh[iQuadChIter];
 		}
 	}
-	// The separate the raw timetagging detectin for each quad channel (since it quad channel will have to correct for a different relative frequency difference)
+	// The separate the raw timetagging detection for each quad channel (since it quad channel will have to correct for a different relative frequency difference)
 	for (int i=0;i<CurrentiIterDump;i++){
 		for (unsigned short iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 			if ((ChannelTagsStored[i]&(0x000F<<(4*iQuadChIter)))>0){  
@@ -1469,6 +1469,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     		long long int InterDetTagsAuxArray[TotalCurrentNumRecordsQuadChNewOldAux]={0};
     		long long int LLISynchTrigPeriod=static_cast<long long int>(SynchTrigPeriod);
     		long long int LLISynchTrigPeriodHalf=static_cast<long long int>(SynchTrigPeriod/2.0);
+    		long long int LLIMultFactorEffSynchPeriod=static_cast<long long int>(MultFactorEffSynchPeriod);
     		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
     			// Absolute slope calculation & intercept point
     			xAux[i]=((LLITimeTaggs[i]+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
@@ -1479,11 +1480,11 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     			//else{
     			//	xAux[i]=LLITimeTaggs[i-1]+(((LLITimeTaggs[i]-LLITimeTaggs[i-1])+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
     			//}
-    			// Intercept point
-    			InterDetTagsAuxArray[i]=(LLISynchTrigPeriodHalf+LLITimeTaggs[i])%LLISynchTrigPeriod-LLISynchTrigPeriodHalf;
+    			// Intercept point; it is like the offset to be retrieved and it should consider the histogram period if needed
+    			InterDetTagsAuxArray[i]=((LLIMultFactorEffSynchPeriod*LLISynchTrigPeriodHalf)+LLITimeTaggs[i])%(LLIMultFactorEffSynchPeriod*LLISynchTrigPeriod)-(LLIMultFactorEffSynchPeriod*LLISynchTrigPeriodHalf);
     		}
 
-    		InterDetTagsAux=LLIMeanFilterSubArray(InterDetTagsAuxArray,static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux));//LLIMedianFilterSubArray(InterDetTagsAuxArray,static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux))
+    		InterDetTagsAux=LLIMedianFilterSubArray(InterDetTagsAuxArray,static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux));//LLIMeanFilterSubArray(InterDetTagsAuxArray,static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux))
 		    //cout << "GPIO::PRUdetCorrRelFreq InterDetTagsAux original iQuadChIter[" << iQuadChIter << "]: " << InterDetTagsAux << endl;
 
 		    // Compute the candidate slope
@@ -1498,7 +1499,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     			}
     		}
 
-    		SlopeDetTagsAux=DoubleMeanFilterSubArray(SlopeDetTagsAuxArray,iAux);//DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);
+    		SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);//DoubleMeanFilterSubArray(SlopeDetTagsAuxArray,iAux);
 		    //cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux original iQuadChIter[" << iQuadChIter << "]: " << SlopeDetTagsAux << endl;
 
     		if (SlopeDetTagsAux<0.5 or SlopeDetTagsAux>1.5){
@@ -1528,7 +1529,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 	    				SlopeDetTagsAuxArrayAdap[static_cast<int>(iAdapAux)-(static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux)-static_cast<int>(TagsSeparationDetRelFreqAdpSlope))]=SlopeDetTagsAuxArray[iAdapAux];    				
 	    			}
 	    		}
-    			SlopeDetTagsAux=DoubleMeanFilterSubArray(SlopeDetTagsAuxArrayAdap,static_cast<int>(TagsSeparationDetRelFreqAdpSlope));//DoubleMedianFilterSubArray(SlopeDetTagsAuxArrayAdap,static_cast<int>(TagsSeparationDetRelFreqAdpSlope));
+    			SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArrayAdap,static_cast<int>(TagsSeparationDetRelFreqAdpSlope));//DoubleMeanFilterSubArray(SlopeDetTagsAuxArrayAdap,static_cast<int>(TagsSeparationDetRelFreqAdpSlope));
     			//if (i%75==0){// To be commented when not being check
     			//	cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux i[" << i << "] current adaptive: " << SlopeDetTagsAux << endl;
     			//}
@@ -1847,6 +1848,38 @@ long double GPIO::LongDoubleMeanFilterSubArray(long double* ArrayHolderAux,int M
 		}
 		
 		return temp/static_cast<long double>(MeanFilterFactor);
+	}
+}
+
+long long int GPIO::LLIMedianFilterSubArray(long long int* ArrayHolderAux,int MedianFilterFactor){
+	if (MedianFilterFactor<=1){
+		return ArrayHolderAux[0];
+	}
+	else{
+		/* // Non-efficient code
+		// Step 1: Copy the array to a temporary array
+		long double temp[MedianFilterFactor]={0.0};
+		for(int i = 0; i < MedianFilterFactor; i++) {
+			temp[i] = ArrayHolderAux[i];
+		}
+		
+    	// Step 2: Sort the temporary array
+		this->LongDoubleBubbleSort(temp,MedianFilterFactor);
+    	// If odd, middle number
+		return temp[MedianFilterFactor/2];*/
+
+		// Efficient code
+		// Step 0. Copy the array otherwise the original is modified!
+		long long int ArrayHolderAuxTemp[MedianFilterFactor];
+		for(int i = 0; i < MedianFilterFactor; i++) {
+			ArrayHolderAuxTemp[i] = ArrayHolderAux[i];
+		}
+		// Step 1: Find the median element without fully sorting
+	    int midIndex = MedianFilterFactor / 2;
+	    std::nth_element(ArrayHolderAuxTemp, ArrayHolderAuxTemp + midIndex, ArrayHolderAuxTemp + MedianFilterFactor);
+
+	    // Step 2: Return the median
+	    return ArrayHolderAuxTemp[midIndex];
 	}
 }
 
