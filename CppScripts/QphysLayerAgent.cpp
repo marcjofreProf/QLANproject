@@ -1772,7 +1772,7 @@ int QPLA::HistCalcPeriodTimeTags(char* CurrentReceiveHostIPaux, int iCenterMass,
 				//	cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArrayAux[" << i << "]: " << SynchFirstTagsArrayAux[i] << endl;
 				//}
 			}
-			SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=LLIMeanFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));//LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
+			SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass]=LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));//LLIMeanFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
 			//cout << "QPLA::HistCalcPeriodTimeTags SynchFirstTagsArray[" << iCenterMass <<"][" << iNumRunsPerCenterMass << "]: " << SynchFirstTagsArray[iCenterMass][iNumRunsPerCenterMass] << endl;
 		}
 		else{
@@ -1798,8 +1798,8 @@ if (iCenterMass==0){// Here the modulo is dependent on the effective period
 			for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
 				ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i])%4);// Maps the offset correction for the different channels to detect a states
 				//cout << "ChOffsetCorrection: " << ChOffsetCorrection << endl;
-				SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
-				//SynchFirstTagsArrayAux[i]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
+				//SynchFirstTagsArrayAux[i]=(static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
+				SynchFirstTagsArrayAux[i]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[SpecificQuadChDet][i])-ChOffsetCorrection*LLIHistPeriodicityAux)%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux;//(LLIHistPeriodicityHalfAux+static_cast<long long int>(TimeTaggs[i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;//static_cast<long long int>(TimeTaggs[i])%LLIHistPeriodicityAux;
 				CheckChOffsetCorrectionArray[ChOffsetCorrection][CheckChOffsetCorrectionIter[ChOffsetCorrection]]=SynchFirstTagsArrayAux[i];
 				CheckChOffsetCorrectionIter[ChOffsetCorrection]++;
 				//if (i%10==0){// To be commented when not debugging
@@ -2114,17 +2114,18 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 			        //y_mean=DoubleMedianFilterSubArray(y_meanArray,(RawNumStoredQubits-1)); // Median average
 			        // Absolute
 				for (unsigned int i=0; i < RawTotalCurrentNumRecordsQuadCh[iQuadChIter]; i++) {
-					y_meanArray[i]=(LLIHistPeriodicityHalfAux+static_cast<long long int>(RawTimeTaggs[iQuadChIter][i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
-					if (y_meanArray[i]>LLIHistPeriodicityHalfAux){
-						y_meanArray[i]=y_meanArray[i]-LLIHistPeriodicityAux;
-					}
-					else if(y_meanArray[i]<-LLIHistPeriodicityHalfAux){
-						y_meanArray[i]=y_meanArray[i]+LLIHistPeriodicityAux;
-					}
+					//y_meanArray[i]=(LLIHistPeriodicityHalfAux+static_cast<long long int>(RawTimeTaggs[iQuadChIter][i]))%LLIHistPeriodicityAux-LLIHistPeriodicityHalfAux;
+					y_meanArray[i]=(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i]))%LLIHistPeriodicityAux;
+					//if (y_meanArray[i]>LLIHistPeriodicityHalfAux){
+					//	y_meanArray[i]=y_meanArray[i]-LLIHistPeriodicityAux;
+					//}
+					//else if(y_meanArray[i]<-LLIHistPeriodicityHalfAux){
+					//	y_meanArray[i]=y_meanArray[i]+LLIHistPeriodicityAux;
+					//}
 			    //x_meanArray[i]=static_cast<long long int>(xEstimateRawTimeTaggs[i]%LLIHistPeriodicityAux);// Not really needed
 				}
-        //y_mean=LLIMedianFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
-        y_mean=LLIMeanFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Mean average
+        y_mean=LLIMedianFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average
+        //y_mean=LLIMeanFilterSubArray(y_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Mean average
         //x_mean=LLIMedianFilterSubArray(x_meanArray,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median average. Not really needed x_mean
         //cout << "QPLA::y_mean: " << y_mean << endl;
         //cout << "QPLA::x_mean: " << x_mean << endl;
