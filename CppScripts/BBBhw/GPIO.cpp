@@ -1480,8 +1480,9 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     			//else{
     			//	xAux[i]=LLITimeTaggs[i-1]+(((LLITimeTaggs[i]-LLITimeTaggs[i-1])+LLISynchTrigPeriodHalf)/LLISynchTrigPeriod)*LLISynchTrigPeriod;// Important to consider from -Period/2 to Period/2 fall in the specific x bin
     			//}
-    			// Intercept point; it is like the offset to be retrieved and it should consider the histogram period if needed
-    			InterDetTagsAuxArray[i]=((LLIMultFactorEffSynchPeriod*LLISynchTrigPeriodHalf)+LLITimeTaggs[i])%(LLIMultFactorEffSynchPeriod*LLISynchTrigPeriod)-(LLIMultFactorEffSynchPeriod*LLISynchTrigPeriodHalf);
+    			// Intercept point; it is like the offset to be retrieved and it should not consider the histogram period if needed
+    			//InterDetTagsAuxArray[i]=((LLISynchTrigPeriodHalf)+LLITimeTaggs[i])%(LLISynchTrigPeriod)-(LLISynchTrigPeriodHalf);
+    			InterDetTagsAuxArray[i]=(LLITimeTaggs[i])%(LLISynchTrigPeriod);
     		}
 
     		InterDetTagsAux=LLIMedianFilterSubArray(InterDetTagsAuxArray,static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux));//LLIMeanFilterSubArray(InterDetTagsAuxArray,static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux))
