@@ -182,19 +182,19 @@ CMDSEL:// Identify the command number to generate the mask of interest for check
 	QBEQ	QUADDET6, r0.b0, 6 // 6 command is detect signals second and third lower quad group channel
 	QBEQ	QUADDET7, r0.b0, 7 // 7 command is detect signals first, second and third (all) lower quad group channel
 QUADDET7:
-	MOV		r11, 0xC000C0FF // detection mask
+	MOV		r11, 0xFFFFFFFF // testing r11, 0xC000C0FF // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET6:
-	MOV		r11, 0xC000C08D // detection mask
+	MOV		r11, 0xFFFFFFFF // testing r11, 0xC000C08D // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET5:
-	MOV		r11, 0xC000C072 // detection mask
+	MOV		r11, 0xFFFFFFFF // testing r11, 0xC000C072 // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET4:
-	MOV		r11, 0xC000C000 // detection mask
+	MOV		r11, 0xFFFFFFFF // testing r11, 0xC000C000 // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET3:
-	MOV		r11, 0x000000FF // detection mask
+	MOV		r11, 0xFFFFFFFF // testing r11, 0x000000FF // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET2:
 	MOV		r11, 0xFFFFFFFF // testing 0x0000008D // detection mask
@@ -272,7 +272,7 @@ COMBINATIONEDGE:
 	OR		r6, r6, r18// Combine the registers
 	// Edge detection with the pins of interest. It can be extended to all pins reading
 	NOT		r16, r16 //NOT r16.w0, r16.w0 // 0s converted to 1s. This step can be placed here to increase chances of detection.	
-	AND		r6, r6, r16 //AND r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge
+//	AND		r6, r6, r16 //AND r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge
 CHECKDET:		
 	QBEQ 	WAIT_FOR_EVENT, r6, 0//QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 //all the b0 above can be converted to w0 to capture more channels, but then in the channel tag recorded has to be increaed and appropiatelly handled in c++ (also the number of tags per run has to be reduced)
 	// If the program reaches this point, at least one of the bits is high
