@@ -1533,7 +1533,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 	    				SlopeDetTagsAuxArrayAdap[static_cast<int>(iAdapAux)-(static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux)-static_cast<int>(TagsSeparationDetRelFreqAdpSlope))]=SlopeDetTagsAuxArray[iAdapAux];    				
 	    			}
 	    		}
-    			SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArrayAdap,static_cast<int>(TagsSeparationDetRelFreqAdpSlope));//DoubleMeanFilterSubArray(SlopeDetTagsAuxArrayAdap,static_cast<int>(TagsSeparationDetRelFreqAdpSlope));
+    			SlopeDetTagsAux=1.0;// For the time being set to 1. DoubleMedianFilterSubArray(SlopeDetTagsAuxArrayAdap,static_cast<int>(TagsSeparationDetRelFreqAdpSlope));//DoubleMeanFilterSubArray(SlopeDetTagsAuxArrayAdap,static_cast<int>(TagsSeparationDetRelFreqAdpSlope));
     			//if (i%75==0){// To be commented when not being check
     			//	cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux i[" << i << "] current adaptive: " << SlopeDetTagsAux << endl;
     			//}
