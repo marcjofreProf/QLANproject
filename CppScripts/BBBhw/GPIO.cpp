@@ -901,6 +901,9 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	//this->ManualSemaphoreExtra=false;
 	//this->release();
 
+	// Debugging
+	cout << "GPIO::ReadTimeStamps QuadEmitDetecSelecGPIO: " << QuadEmitDetecSelecGPIO << endl;
+
 	this->DDRdumpdata(iIterRunsAux); // Pre-process tags. Needs to access memory of PRU, so better within the controlled acquired environment
 
 	}
@@ -1237,32 +1240,32 @@ CurrentiIterDump=0;
 int CurrentiIterDumpAux=0;
 bool ValidTag=false;
 unsigned short ValidTagMask=0;
-switch (QuadEmitDetecSelecGPIO){
-	case 7:{// Time and frequency correction			
+switch (QuadEmitDetecSelecGPIO){// Once bits are re-ordered, make sure to keep only the channels of interest
+	case 7:{			
 		ValidTagMask=0x0FFF;
 		break;
 	}
-	case 6:{// Time and frequency correction			
+	case 6:{			
 		ValidTagMask=0x0FF0;
 		break;
 	}
-	case 5:{// Time and frequency correction			
+	case 5:{		
 		ValidTagMask=0x0F0F;
 		break;
 	}
-	case 4:{// Time and frequency correction			
+	case 4:{			
 		ValidTagMask=0x0F00;
 		break;
 	}
-	case 3:{// Time and frequency correction			
+	case 3:{			
 		ValidTagMask=0x00FF;
 		break;
 	}
-	case 2:{// Time correction
+	case 2:{
 		ValidTagMask=0x00F0;
 		break;
 	}
-	case 1:{ // Frequency correction
+	case 1:{
 		ValidTagMask=0x000F;
 		break;
 	}
@@ -1620,9 +1623,12 @@ return 0; // All ok
 unsigned short GPIO::packBits(unsigned short value) {
     // Rearrange the lower two bytes so that they are correctly splitted for each quad group channel. For each group of 4 bits the order does not follow an arranged order for channel detectors
     //unsigned short byte0aux = ((value & 0x0010) >> 2) | ((value & 0x0002) >> 1) | ((value & 0x0040) >> 5) | ((value & 0x0020) >> 2); // Are the bits 0x0072, moved to 0x000F
-    unsigned short byte0aux = ((value & 0x0010) >> 3) | ((value & 0x0002) << 1) | ((value & 0x0040) >> 3) | ((value & 0x0020) >> 5) ; // Are the bits 0x0072, moved to 0x000F
-    unsigned short byte1aux = ((value & 0x0008) << 4) | ((value & 0x0004) << 4) | ((value & 0x0080) >> 3) | ((value & 0x0001) << 4); // Are the bits 0x008D, moved to 0x00F0
-    unsigned short byte2aux = ((value & 0x8000) >> 4) | ((value & 0x4000) >> 4) | ((value & 0x2000) >> 4) | ((value & 0x1000) >> 4); // To be check that the ordering is correct!!!! // Byte 1 shifts to the right four bit positions (the interesting ones) // Are the bits 0xF000, moved to 0x0F00
+    unsigned short byte0aux = ((value & 0x0010) >> 3) | ((value & 0x0002) << 1) | ((value & 0x0040) >> 3) | ((value & 0x0020) >> 5) ; // Channel 0 // Are the bits 0x0072, moved to 0x000F
+    unsigned short byte1aux = ((value & 0x0008) << 4) | ((value & 0x0004) << 4) | ((value & 0x0080) >> 3) | ((value & 0x0001) << 4); // Channel 1 // Are the bits 0x008D, moved to 0x00F0
+    unsigned short byte2aux = ((value & 0x8000) >> 4) | ((value & 0x4000) >> 4) | ((value & 0x2000) >> 4) | ((value & 0x1000) >> 4); // Channel 2 // To be check that the ordering is correct!!!! // Byte 1 shifts to the right four bit positions (the interesting ones) // Are the bits 0xF000, moved to 0x0F00
+
+    // Debugging
+    cout << "GPIO::packBits value: " << std::bitset<16>(value) << endl;
 
     if (byte2aux!=0){cout << "GPIO::packBits byte2aux has never been tested (check synchronization network ordering of bits)!!" << endl;}
 
