@@ -1496,9 +1496,9 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     		for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-TagsSeparationDetRelFreq);i++){
     			if (xAux[i]>0){//if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
     				// Absolute slope calculation
-    				SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i]-InterDetTagsAux)/static_cast<double>(xAux[i]);
+    				//SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i]-InterDetTagsAux)/static_cast<double>(xAux[i]);
     				// Relative slope calculation
-    				//SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
+    				SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
     				iAux++;
     			}
     		}
