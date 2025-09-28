@@ -236,12 +236,12 @@ QUADEMT3:
 	MOV	r12, 0x00880044
 	JMP	PSEUDOSYNCH
 QUADEMT2:
-	MOV	r11, 0x00200010
-	MOV	r12, 0x00800040
+	MOV	r11, 0x00100010 // MOV	r11, 0x00200010
+	MOV	r12, 0x00100010 //MOV	r12, 0x00800040
 	JMP	PSEUDOSYNCH
 QUADEMT1:
-	MOV	r11, 0x00020001
-	MOV	r12, 0x00080004
+	MOV r11, 0x00010001 // MOV	r11, 0x00020001
+	MOV r12, 0x00010001 // MOV	r12, 0x00080004
 	JMP	PSEUDOSYNCH
 PSEUDOSYNCH:// Neutralizing interrupt jitter time //I belive this synch first because it depends on IEP counter// Only needed at the beggining to remove the unsynchronisms of starting to emit at specific bins for the histogram or signal. It is not meant to correct the absolute time, but to correct for the difference in time of emission due to entering thorugh an interrupt. So the period should be small (not 65536). For instance (power of 2) larger than the below calculations and slightly larger than the interrupt time (maybe 40 60 counts). Maybe 64 is a good number.
 	CLR     r30.t11	// disable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
