@@ -2037,7 +2037,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 // This script aims at detectig the offset in PRU units, in order to remove outliers (presumambly noise).
 // We do so by considering that timetaggs are offset with respect the general absolute time bin, which is a multiple of the Histogram period
 //this->acquire(); It is already within an acquire/release
-	if (ApplyRawQubitFilteringFlag==true){//and FlagTestSynch==false){
+	if (ApplyRawQubitFilteringFlag==true and FlagTestSynch==false){//and FlagTestSynch==false){
 	  this->SimulateNumStoredQubitsNode[0]=0; // Reset this value
 	  int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,RawTotalCurrentNumRecordsQuadCh,RawTimeTaggs,RawChannelTags); // Get raw values
 	  for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
@@ -2241,7 +2241,9 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 		//if (FlagTestSynch==false){
 		//	cout << "QPLA::Not applying ApplyRawQubitFilteringFlag...to be activated" << endl;
 		//}
-		cout << "QPLA::Not applying ApplyRawQubitFilteringFlag...to be activated" << endl;
+		if (FlagTestSynch==false){
+			cout << "QPLA::Not applying ApplyRawQubitFilteringFlag...to be activated" << endl;
+		}
 		this->SimulateNumStoredQubitsNode[0]=0; // Reset this value
 	  int RawNumStoredQubits=PRUGPIO.RetrieveNumStoredQuBits(RawLastTimeTaggRef,RawTotalCurrentNumRecordsQuadCh,RawTimeTaggs,RawChannelTags); // Get raw values
 	  for (int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){

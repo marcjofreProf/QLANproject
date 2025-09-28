@@ -305,7 +305,7 @@ private:// Variables
 	bool QPLAFlagTestSynch=false; // Flag indicating if it is at synchronization step.
 	bool GPIOFlagRelFreqTest=false; // To deactive (true) slope correction of the emitter, for testing purpouses; false, it is activated.
 	// Correct Qubits relative frequency difference due to the sender
-	unsigned int TagsSeparationDetRelFreq=0; //1;//4*10; // Number of index separation to compute the slope of disadjustment in order to have accuraccy. Times 4 to account the possibility that all tags arrive to the same detector
+	unsigned int TagsSeparationDetRelFreq=10; //1;//4*10; // Number of index separation to compute the slope of disadjustment in order to have accuraccy. Times 4 to account the possibility that all tags arrive to the same detector
 	unsigned int TagsSeparationDetRelFreqAdpSlopeSynch=4*2; // To compute an adaptive slope in synchronization operation where time offsets between qubits are much longer
 	unsigned int TagsSeparationDetRelFreqAdpSlopeRegular=4*20; // To compute an adaptive slope in regular operation
 	unsigned int TagsSeparationDetRelFreqAdpSlope=4*20; // To compute an adaptive slope, it has a lot of impact on the proper conditioning of the time taggs.
