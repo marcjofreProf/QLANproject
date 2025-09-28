@@ -1630,7 +1630,7 @@ unsigned short GPIO::packBits(unsigned short value) {
     // Debugging
     cout << "GPIO::packBits value: " << std::bitset<16>(value) << endl;
 
-    if (byte2aux!=0){cout << "GPIO::packBits byte2aux has never been tested (check synchronization network ordering of bits)!!" << endl;}
+    if (byte2aux!=0){cout << "GPIO::packBits byte2aux has never been tested (check synchronization network ordering of bits)!!" << endl;} // Check the packBits byte2aux ordering as well as the mask in the PRUassTaggDetScriptSimple.p
 
     // Combine the bytes into a single unsigned short
     return byte0aux | byte1aux | byte2aux;
