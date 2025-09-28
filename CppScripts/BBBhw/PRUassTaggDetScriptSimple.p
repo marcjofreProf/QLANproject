@@ -197,7 +197,7 @@ QUADDET3:
 	MOV		r11, 0x000000FF // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET2:
-	MOV		r11, 0x0000008D // detection mask
+	MOV		r11, 0xFFFFFFFF // testing 0x0000008D // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET1:
 	MOV		r11, 0x00000072 // detection mask

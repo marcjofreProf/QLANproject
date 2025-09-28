@@ -902,7 +902,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	//this->release();
 
 	// Debugging
-	cout << "GPIO::ReadTimeStamps QuadEmitDetecSelecGPIO: " << QuadEmitDetecSelecGPIO << endl;
+	//cout << "GPIO::ReadTimeStamps QuadEmitDetecSelecGPIO: " << QuadEmitDetecSelecGPIO << endl;
 
 	this->DDRdumpdata(iIterRunsAux); // Pre-process tags. Needs to access memory of PRU, so better within the controlled acquired environment
 

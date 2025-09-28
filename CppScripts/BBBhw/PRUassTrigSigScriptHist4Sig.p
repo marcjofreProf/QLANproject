@@ -214,6 +214,7 @@ PERIODICTIMESYNCHSUB: // with command coded 8 means synch by reseting the IEP ti
 	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	MOV 	r31.b0, PRU1_ARM_INTERRUPT+16// Send finish interrupt to host
 	JMP		CMDLOOP
+// Masks to select the pints to turn on for each specific case. Notice that registers r11 and r12 are used to select the four symbols
 QUADEMT7:
 	MOV	r11, 0x02220111
 	MOV	r12, 0x08880444
