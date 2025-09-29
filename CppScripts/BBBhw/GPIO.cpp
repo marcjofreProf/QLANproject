@@ -1485,35 +1485,42 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     			//}
     			// Intercept point; it is like the offset to be retrieved and it should not consider the histogram period if needed
     			//InterDetTagsAuxArray[i]=((LLISynchTrigPeriodHalf)+LLITimeTaggs[i])%(LLISynchTrigPeriod)-(LLISynchTrigPeriodHalf);
-    			InterDetTagsAuxArray[i]=(LLITimeTaggs[i])%(LLISynchTrigPeriod); // Used in the adaptive approach. It is like 
+    			//InterDetTagsAuxArray[i]=(LLITimeTaggs[i])%(LLISynchTrigPeriod); // Used in the adaptive approach. It is like 
     		}
 
-    		InterDetTagsAux=LLIMedianFilterSubArray(InterDetTagsAuxArray,static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux));//LLIMeanFilterSubArray(InterDetTagsAuxArray,static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux))
+    		//InterDetTagsAux=LLIMedianFilterSubArray(InterDetTagsAuxArray,static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux));//LLIMeanFilterSubArray(InterDetTagsAuxArray,static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux))
 		    //cout << "GPIO::PRUdetCorrRelFreq InterDetTagsAux original iQuadChIter[" << iQuadChIter << "]: " << InterDetTagsAux << endl;
 
-    		
 		    // Compute the absolute candidate slope
     		int iAux=0;
     		for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-TagsSeparationDetRelFreq);i++){
-    			if (xAux[i]>0){//if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
-    				// Absolute slope calculation
-    				SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i]-InterDetTagsAux)/static_cast<double>(xAux[i]);
+    			if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
     				// Relative slope calculation
-    				//SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
+    				SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i+TagsSeparationDetRelFreq]-LLITimeTaggs[i])/static_cast<double>(xAux[i+TagsSeparationDetRelFreq]-xAux[i]);
     				iAux++;
     			}
+    			//if (xAux[i]>0){//if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
+    			//	// Absolute slope calculation
+    			//	//SlopeDetTagsAuxArray[iAux]=static_cast<double>(LLITimeTaggs[i]-InterDetTagsAux)/static_cast<double>(xAux[i]);
+    			//	iAux++;
+    			//}
     		}
 
-    		/* Absolute slope calculation
-    		SlopeDetTagsAux=1.0;// For the time being set to 1. DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);//DoubleMeanFilterSubArray(SlopeDetTagsAuxArray,iAux);
+    		// Absolute slope calculation
+    		SlopeDetTagsAux=DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);//DoubleMeanFilterSubArray(SlopeDetTagsAuxArray,iAux);
+		    //SlopeDetTagsAux=1.0;// For the time being set to 1. 
 		    //cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux original iQuadChIter[" << iQuadChIter << "]: " << SlopeDetTagsAux << endl;
 
-    		if (SlopeDetTagsAux<0.5 or SlopeDetTagsAux>1.5){
+    		if (SlopeDetTagsAux<0.9 or SlopeDetTagsAux>1.1){
     			cout << "GPIO::PRUdetCorrRelFreq wrong computation of the SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << ". Not applying the correction..." << endl;
     			SlopeDetTagsAux=1.0;
     		}
-    		*/
+    		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
+    			TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]]=static_cast<unsigned long long int>(static_cast<long long int>(static_cast<long double>(1.0/SlopeDetTagsAux)*static_cast<long double>(LLITimeTaggs[i]))+LLIInitialTimeTaggs);
+    		}
+    		
     		//cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << endl;
+		    /*
 		    // Relative slope calculation
 		    double SlopeDetTagsAuxArrayAdap[TagsSeparationDetRelFreqAdpSlope]={0.0};
     		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
@@ -1549,7 +1556,8 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     			//TimeTaggsStored[CurrentiIterDumpAux]=TimeTaggsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]]; 
     			//ChannelTagsStored[CurrentiIterDumpAux]=ChannelTagsSplitted[iQuadChIter][i+TotalCurrentNumRecordsQuadChOld[iQuadChIter]];
     			//CurrentiIterDumpAux++;// update value
-    		}    		
+    		}*/
+
 		    //////////////////////////////////////////////////////////////////////////////////////////
 		    ////// Checks of proper relative frequency correction. It can be commented
 		    //LLIInitialTimeTaggs=static_cast<long long int>(TimeTaggsLast);//static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
