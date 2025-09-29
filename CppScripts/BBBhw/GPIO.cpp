@@ -1485,13 +1485,14 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     			//}
     			// Intercept point; it is like the offset to be retrieved and it should not consider the histogram period if needed
     			//InterDetTagsAuxArray[i]=((LLISynchTrigPeriodHalf)+LLITimeTaggs[i])%(LLISynchTrigPeriod)-(LLISynchTrigPeriodHalf);
-    			InterDetTagsAuxArray[i]=(LLITimeTaggs[i])%(LLISynchTrigPeriod);
+    			InterDetTagsAuxArray[i]=(LLITimeTaggs[i])%(LLISynchTrigPeriod); // Used in the adaptive approach. It is like 
     		}
 
     		InterDetTagsAux=LLIMedianFilterSubArray(InterDetTagsAuxArray,static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux));//LLIMeanFilterSubArray(InterDetTagsAuxArray,static_cast<int>(TotalCurrentNumRecordsQuadChNewOldAux))
 		    //cout << "GPIO::PRUdetCorrRelFreq InterDetTagsAux original iQuadChIter[" << iQuadChIter << "]: " << InterDetTagsAux << endl;
 
-		    // Compute the candidate slope
+    		
+		    // Compute the absolute candidate slope
     		int iAux=0;
     		for (unsigned int i=0;i<(TotalCurrentNumRecordsQuadChNewOldAux-TagsSeparationDetRelFreq);i++){
     			if (xAux[i]>0){//if ((xAux[i+TagsSeparationDetRelFreq]-xAux[i])>0){
@@ -1503,6 +1504,7 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     			}
     		}
 
+    		/* Absolute slope calculation
     		SlopeDetTagsAux=1.0;// For the time being set to 1. DoubleMedianFilterSubArray(SlopeDetTagsAuxArray,iAux);//DoubleMeanFilterSubArray(SlopeDetTagsAuxArray,iAux);
 		    //cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux original iQuadChIter[" << iQuadChIter << "]: " << SlopeDetTagsAux << endl;
 
@@ -1510,9 +1512,9 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
     			cout << "GPIO::PRUdetCorrRelFreq wrong computation of the SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << ". Not applying the correction..." << endl;
     			SlopeDetTagsAux=1.0;
     		}
-    		
+    		*/
     		//cout << "GPIO::PRUdetCorrRelFreq SlopeDetTagsAux " << SlopeDetTagsAux << " for quad channel " << iQuadChIter << endl;
-		    // Un-normalize
+		    // Relative slope calculation
 		    double SlopeDetTagsAuxArrayAdap[TagsSeparationDetRelFreqAdpSlope]={0.0};
     		for (unsigned int i=0;i<TotalCurrentNumRecordsQuadChNewOldAux;i++){
     			// Non-adaptive slope

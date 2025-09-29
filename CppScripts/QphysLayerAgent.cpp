@@ -1212,7 +1212,10 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 						long long int CheckChOffsetCorrectionArray[4][RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]]={0};
 						long long int CheckChOffsetCorrection[4]={0};
 						unsigned int CheckChOffsetCorrectionIter[4]={0};
-						bool boolCheckChOffsetCorrectionflag=false;
+						unsigned int CheckChOffsetCorrectionIterMinCheckCalc=static_cast<long long int>(0.01*MaxNumQuBitsPerRun);
+						unsigned int CheckChOffsetCorrectionIterMinCheck=static_cast<long long int>(0.1*MaxNumQuBitsPerRun);
+						unsigned int CheckChOffsetCorrectionIterMinCheckIter=0;
+						//bool boolCheckChOffsetCorrectionflag=false;
 						for (unsigned int i=0;i<4;i++){CheckChOffsetCorrectionIter[i]=0;}// Reset values			
 						for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){					  
 						  if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
@@ -1254,15 +1257,17 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 								CheckChOffsetCorrection[i]=LLIMedianFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i])); // To avoid glitches
 							}
 						}
+						CheckChOffsetCorrectionIterMinCheckIter=0; // Reset the counter
 						for (unsigned int i=0;i<4;i++){
 							for (unsigned int j=0;j<4;j++){
-								if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>(LLIHistPeriodicityAux) and CheckChOffsetCorrectionIter[i]>=5 and CheckChOffsetCorrectionIter[j]>=5){
-									boolCheckChOffsetCorrectionflag=true;
+								if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>(LLIHistPeriodicityAux) and CheckChOffsetCorrectionIter[i]>=CheckChOffsetCorrectionIterMinCheckCalc and CheckChOffsetCorrectionIter[j]>=CheckChOffsetCorrectionIterMinCheckCalc){
+									//boolCheckChOffsetCorrectionflag=true;
+									CheckChOffsetCorrectionIterMinCheckIter++;
 									//cout << "QPLA::SmallDriftContinuousCorrection Potentially GPIO pins i=" << i << " " << CheckChOffsetCorrection[i] << " and j=" << j << " " << CheckChOffsetCorrection[j] << " with difference " << (CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j]) << " on iQuadChIter: " << iQuadChIter << " for LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << " connection order is wrong or too much jitter. Check!!!" << endl;
 								}
 							}
 						}
-						if (boolCheckChOffsetCorrectionflag==true){
+						if (CheckChOffsetCorrectionIterMinCheckIter>=CheckChOffsetCorrectionIterMinCheck){
 							cout << "QPLA::SmallDriftContinuousCorrection Potentially GPIO pins connection order is wrong or too much jitter on iQuadChIter: " << iQuadChIter <<" Check!!!" << endl;
 						}
 					  //SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
