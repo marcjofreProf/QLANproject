@@ -182,22 +182,22 @@ CMDSEL:// Identify the command number to generate the mask of interest for check
 	QBEQ	QUADDET6, r0.b0, 6 // 6 command is detect signals second and third lower quad group channel
 	QBEQ	QUADDET7, r0.b0, 7 // 7 command is detect signals first, second and third (all) lower quad group channel
 QUADDET7:
-	MOV		r11, 0xC000C0FF // detection mask
+	MOV		r11, 0xC000C0D7 // detection mask MOV		r11, 0xC000C0FF // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET6:
-	MOV		r11, 0xC000C08D // detection mask
+	MOV		r11, 0xC000C005 // detection mask MOV		r11, 0xC000C08D // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET5:
-	MOV		r11, 0xC000C072 // detection mask
+	MOV		r11, 0xC0000072 // detection mask MOV		r11, 0xC000C072 // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET4:
-	MOV		r11, 0xC000C000 // detection mask
+	MOV		r11, 0xC0000000 // detection mask MOV		r11, 0xC000C000 // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET3:
-	MOV		r11, 0x000000FF // detection mask
+	MOV		r11, 0x0000C0D7 // detection mask MOV		r11, 0x000000FF 
 	JMP		PSEUDOSYNCH
 QUADDET2:
-	MOV		r11, 0x0000FF05 // detection mask MOV		r11, 0x0000008D // detection mask
+	MOV		r11, 0x0000C005 // detection mask MOV		r11, 0x0000008D // detection mask
 	JMP		PSEUDOSYNCH
 QUADDET1:
 	MOV		r11, 0x00000072 // detection mask
