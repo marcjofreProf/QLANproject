@@ -2070,13 +2070,14 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				//}
 				/////////////////////////////////////////////////////////////////////////
 				// Estimate the x values for the linear regression from the y values (RawTimeTaggs)
-				long long int TimeTaggRefAux=static_cast<long long int>(RawLastTimeTaggRef[0]);
+				long long int TimeTaggRefAux=0;//static_cast<long long int>(RawLastTimeTaggRef[0]);
 				long long int xEstimateRawTimeTaggs[RawTotalCurrentNumRecordsQuadCh[iQuadChIter]]={0}; // Timetaggs of the detections raw
 				//long long int RoundingAux;
 				long long int LLIHistPeriodicityAux=static_cast<long long int>(HistPeriodicityAux);
 				long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
 				//cout << "QPLA::LinearRegressionQuBitFilter LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << endl;
 				//cout << "QPLA::LinearRegressionQuBitFilter LLIHistPeriodicityHalfAux: " << LLIHistPeriodicityHalfAux << endl;
+				
 				for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 					/*if (i==0){
 						RoundingAux=(HistPeriodicityAux/2+RawTimeTaggs[i])%HistPeriodicityAux-HistPeriodicityAux/2;
@@ -2107,7 +2108,8 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 					//	xEstimateRawTimeTaggs[i]=static_cast<long long int>(RawTimeTaggs[iQuadChIter][i-1])+(((static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-static_cast<long long int>(RawTimeTaggs[iQuadChIter][i-1]))+LLIHistPeriodicityHalfAux)/LLIHistPeriodicityAux)*LLIHistPeriodicityAux;
 					//}
 				}
-
+				
+				/* Do not compute intercepts
 				// Find the intercept, since the slope is supposed to be know and equal to 1 (because it has been normalized to HistPeriodicityAux)
 				long long int y_mean = 0.0;
 				//long long int x_mean = 0.0;
@@ -2155,7 +2157,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 					xEstimateRawTimeTaggs[i]=xEstimateRawTimeTaggs[i]+EstInterceptVal;
 				}
-
+				*/
 				unsigned int FilteredNumStoredQubits=0;
 				double FilterDiffCheckAux=0.0;
 				// Filter out detections not falling within the defined detection window and calculated signal positions				
