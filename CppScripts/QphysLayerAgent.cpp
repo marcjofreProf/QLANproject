@@ -1793,7 +1793,10 @@ if (iCenterMass==0){// Here the modulo is dependent on the effective period
 			long long int CheckChOffsetCorrectionArray[4][RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]]={0};
 			long long int CheckChOffsetCorrection[4]={0};
 			unsigned int CheckChOffsetCorrectionIter[4]={0};
-			bool boolCheckChOffsetCorrectionflag=false;
+			unsigned int CheckChOffsetCorrectionIterMinCheckCalc=static_cast<long long int>(0.01*MaxNumQuBitsPerRun);
+			unsigned int CheckChOffsetCorrectionIterMinCheck=static_cast<long long int>(0.1*MaxNumQuBitsPerRun);
+			unsigned int CheckChOffsetCorrectionIterMinCheckIter=0;
+			//bool boolCheckChOffsetCorrectionflag=false;
 			for (unsigned int i=0;i<4;i++){CheckChOffsetCorrectionIter[i]=0;}// Reset values
 			for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet];i++){
 				ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[SpecificQuadChDet][i])%4);// Maps the offset correction for the different channels to detect a states
@@ -1816,18 +1819,20 @@ if (iCenterMass==0){// Here the modulo is dependent on the effective period
 					CheckChOffsetCorrection[i]=LLIMedianFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i])); // To avoid glitches
 				}
 			}
+			CheckChOffsetCorrectionIterMinCheckIter=0; // Reset counter
 			for (unsigned int i=0;i<4;i++){
 				for (unsigned int j=0;j<4;j++){
-					if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>(LLIHistPeriodicityAux/2) and CheckChOffsetCorrectionIter[i]>=200 and CheckChOffsetCorrectionIter[j]>=200){ // If there are counts in each pin compared
-						boolCheckChOffsetCorrectionflag=true;
-						cout << "QPLA::HistCalcPeriodTimeTags Potentially GPIO pins i=" << i << " " << CheckChOffsetCorrection[i] << " and j=" << j << " " << CheckChOffsetCorrection[j] << " with difference " << (CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j]) << " on SpecificQuadChDet: " << SpecificQuadChDet << " for LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << " connection order is wrong. Check!!!" << endl;
+					if (i!=j and abs(CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j])>(LLIHistPeriodicityAux/2) and CheckChOffsetCorrectionIter[i]>=CheckChOffsetCorrectionIterMinCheckCalc and CheckChOffsetCorrectionIter[j]>=CheckChOffsetCorrectionIterMinCheckCalc){ // If there are counts in each pin compared
+						//boolCheckChOffsetCorrectionflag=true;
+						CheckChOffsetCorrectionIterMinCheckIter++;
+						//cout << "QPLA::HistCalcPeriodTimeTags Potentially GPIO pins i=" << i << " " << CheckChOffsetCorrection[i] << " and j=" << j << " " << CheckChOffsetCorrection[j] << " with difference " << (CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j]) << " on SpecificQuadChDet: " << SpecificQuadChDet << " for LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << " connection order is wrong. Check!!!" << endl;
 					}
 					//else if(i!=j and CheckChOffsetCorrectionIter[i]>=5 and CheckChOffsetCorrectionIter[j]>=5){// Just information
 					//	cout << "QPLA::HistCalcPeriodTimeTags GPIO pins i=" << i << " and j=" << j << " with difference " << (CheckChOffsetCorrection[i]-CheckChOffsetCorrection[j]) << " on SpecificQuadChDet: " << SpecificQuadChDet << " for LLIHistPeriodicityAux: " << LLIHistPeriodicityAux << endl;
 					//}
 				}
 			}
-			if (boolCheckChOffsetCorrectionflag==true){
+			if (CheckChOffsetCorrectionIterMinCheckIter>=CheckChOffsetCorrectionIterMinCheck){
 				cout << "QPLA::HistCalcPeriodTimeTags Potentially GPIO pins connection order is wrong on SpecificQuadChDet: " << SpecificQuadChDet <<" Check!!!" << endl;
 			}
 			SynchFirstTagsArrayOffsetCalc[iNumRunsPerCenterMass]=LLIMeanFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));//LLIMedianFilterSubArray(SynchFirstTagsArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]));
@@ -2196,7 +2201,7 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				// Compute quality of estimation, related to the SNR
 				double EstimatedSNRqubitsRatio=1.0-static_cast<double>(FilteredNumStoredQubits)/static_cast<double>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]);// in linear	
 
-				if (EstimatedSNRqubitsRatio>0.9){ // 0.1 equivalent to 10 dB// < Bad SNR
+				if (EstimatedSNRqubitsRatio>0.1){ // 0.1 equivalent to 10 dB// < Bad SNR
 					cout << "QPLA::LinearRegressionQuBitFilter EstimatedSNRqubitsRatio " << EstimatedSNRqubitsRatio << " for quad group Channel "<< iQuadChIter << " does not have enough SNR (>10 dB) to perform good when filtering raw qubits!!! Not filtering outlier qubits!!!" << endl;
 					FilteredNumStoredQubits=0;// Reset value
 					for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
