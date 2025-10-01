@@ -1315,8 +1315,8 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 				  if (NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]==false){
 				  	for (unsigned int i=0;i<(NumSmallOffsetDriftAux-1);i++){
 				  		SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][i+1]=SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple][0];// Set all to an initial value to avoidglitches at the beggining
-				  		NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=true;// Update value, so that it is not run again	
 				  	}
+				  	NonInitialReferencePointSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=true;// Update value, so that it is not run again	
 				  }
 				  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Median filter	//LLIMedianFilterSubArray(SmallOffsetDriftAuxArray[iQuadChIter][CurrentSpecificLinkMultiple],NumSmallOffsetDriftAux);// Median filter				  
 				  SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=0*oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-SmallOffsetDriftAux;// Update value
@@ -1629,8 +1629,8 @@ if (SimulateNumStoredQubitsNodeAux>1){
 	unsigned int TimeTaggsDetAnalytics7iQuadChMax=0;
 	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
 		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>1){
-			if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>TimeTaggsDetAnalytics7iQuadChMax){// Considering taking the time tagg in the middle of the larger sequence of tags in iQuadChIter
-				TimeTaggsDetAnalytics[7]=TimeTaggs[iQuadChIter][RawTotalCurrentNumRecordsQuadCh[iQuadChIter]/2];
+			if (RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>TimeTaggsDetAnalytics7iQuadChMax){
+				TimeTaggsDetAnalytics[7]=static_cast<double>(ULLIMedianFilterSubArray(TimeTaggs[iQuadChIter],RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//static_cast<double>(TimeTaggs[iQuadChIter][RawTotalCurrentNumRecordsQuadCh[iQuadChIter]/2]); // Considering taking the time tagg in the middle of the larger sequence of tags in iQuadChIter
 				TimeTaggsDetAnalytics7iQuadChMax=RawTotalCurrentNumRecordsQuadCh[iQuadChIter];
 			}
 			if (TimeTaggsDetAnalytics[8]>TimeTaggs[iQuadChIter][0] or TimeTaggsDetAnalytics[8]<=0.0){ // Start value
