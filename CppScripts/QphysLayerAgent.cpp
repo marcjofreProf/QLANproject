@@ -1633,11 +1633,11 @@ if (SimulateNumStoredQubitsNodeAux>1){
 				TimeTaggsDetAnalytics[7]=static_cast<double>(ULLIMedianFilterSubArray(TimeTaggs[iQuadChIter],RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//static_cast<double>(TimeTaggs[iQuadChIter][RawTotalCurrentNumRecordsQuadCh[iQuadChIter]/2]); // Considering taking the time tagg in the middle of the larger sequence of tags in iQuadChIter
 				TimeTaggsDetAnalytics7iQuadChMax=RawTotalCurrentNumRecordsQuadCh[iQuadChIter];
 			}
-			if (TimeTaggsDetAnalytics[8]>TimeTaggs[iQuadChIter][0] or TimeTaggsDetAnalytics[8]<=0.0){ // Start value
-				TimeTaggsDetAnalytics[8]=TimeTaggs[iQuadChIter][0];
+			if (TimeTaggsDetAnalytics[8]>static_cast<double>(TimeTaggs[iQuadChIter][0]) or TimeTaggsDetAnalytics[8]<=0.0){ // Start value
+				TimeTaggsDetAnalytics[8]=static_cast<double>(TimeTaggs[iQuadChIter][0]);
 			}
-			if (TimeTaggsDetAnalytics[9]<TimeTaggs[iQuadChIter][RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1]){ // End value
-				TimeTaggsDetAnalytics[9]=TimeTaggs[iQuadChIter][RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1];
+			if (TimeTaggsDetAnalytics[9]<static_cast<double>(TimeTaggs[iQuadChIter][RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1])){ // End value
+				TimeTaggsDetAnalytics[9]=static_cast<double>(TimeTaggs[iQuadChIter][RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1]);
 			}
 			cout << "QPLA::Quad group channel: " << iQuadChIter << endl;			
 			for (unsigned int i=0;i<(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]-1);i++){				
