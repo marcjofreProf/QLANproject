@@ -1231,6 +1231,9 @@ else{
 if (iIterRunsAux==0){TimeTaggsLastStored=TimeTaggsLast;TotalCurrentNumRecords=0;}// First iteration of current runs, store the value for synchronization time difference calibration
 
 long long int LLIOldLastTimeTagg=static_cast<long long int>(OldLastTimeTagg);
+// It is important to adjust the OldLastTimeTagg so that absolute timetagg references match among nodes
+LLIOldLastTimeTagg=LLIOldLastTimeTagg%(static_cast<unsigned long long int>(MultFactorEffSynchPeriod*SynchTrigPeriod));
+
 unsigned int valCycleCountPRUAux1;
 unsigned int valCycleCountPRUAux2;
 //cout << "GPIO::NumQuBitsPerRun " << NumQuBitsPerRun << endl;
