@@ -1507,7 +1507,7 @@ if (FirstQPLACalcStats==true){// First time. Hence, acquire the normalization va
 	}
 }
 // Floor to the nearest point
-FirstQPLAtimeTagNorm=(FirstQPLAtimeTagNorm/(static_cast<long long int>(MultFactorEffSynchPeriodQPLA*HistPeriodicityAux)))*(static_cast<long long int>(MultFactorEffSynchPeriodQPLA*HistPeriodicityAux));
+FirstQPLAtimeTagNorm=floor(FirstQPLAtimeTagNorm/(static_cast<long long int>(MultFactorEffSynchPeriodQPLA*HistPeriodicityAux)))*(static_cast<long long int>(MultFactorEffSynchPeriodQPLA*HistPeriodicityAux));
 
 //Actual normalization of Time taggs to the normalization value
 for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
