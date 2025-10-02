@@ -1207,8 +1207,8 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 					long long int LLIHistPeriodicityHalfAux=static_cast<long long int>(HistPeriodicityAux/2.0);
 					long long int LLIMultFactorEffSynchPeriod=static_cast<long long int>(MultFactorEffSynchPeriodQPLA);
 					long long int ChOffsetCorrection=0;// Variable to acomodate the 4 different channels in the periodic histogram analysis
-					if (UseAllTagsForEstimation){
-						long long int SmallOffsetDriftArrayAux[static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])]={0};
+					long long int SmallOffsetDriftArrayAux[static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])]={0};
+					if (UseAllTagsForEstimation){						
 						long long int CheckChOffsetCorrectionArray[4][RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]]={0};
 						long long int CheckChOffsetCorrection[4]={0};
 						unsigned int CheckChOffsetCorrectionIter[4]={0};
@@ -1287,7 +1287,8 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 				  //long long int LLISmallOffsetDriftAux=static_cast<long long int>(SmallOffsetDriftAux);
 					for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 						if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink)>=0){
-							TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
+							//TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
+							TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftArrayAux[i]);// Cheating by adjusting every single timetagg allowed thorugh the filters
 						}
 						else{
 							TimeTaggs[iQuadChIter][i]=0;
