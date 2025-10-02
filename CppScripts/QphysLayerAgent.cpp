@@ -1287,8 +1287,8 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 				  //long long int LLISmallOffsetDriftAux=static_cast<long long int>(SmallOffsetDriftAux);
 					for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 						if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink)>=0){
-							//TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
-							TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftArrayAux[i]);// Cheating by adjusting every single timetagg allowed thorugh the filters
+							TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
+							//TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftArrayAux[i]);// Cheating by adjusting every single timetagg allowed thorugh the filters
 						}
 						else{
 							TimeTaggs[iQuadChIter][i]=0;
