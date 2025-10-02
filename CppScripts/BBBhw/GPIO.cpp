@@ -1415,7 +1415,7 @@ if (SlowMemoryPermanentStorageFlag==true){ // We save into file the relative fre
 return 0; // all ok
 }
 
-int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct relative frequency difference due to the sender
+int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct relative frequency difference due to the sender. It is very dangerous if not well estimated. Actually, it is better to estiamte it by hardware means having a clock derived froma synchronized network system like synchronous ethernet
 // Separate the detection by quad channels and do the processing independently
 	int CurrentiIterDumpAux=0;
 	// First (reset)compute the number of detections per quad channel
@@ -1611,8 +1611,9 @@ int GPIO::PRUdetCorrRelFreq(int iIterRunsAux,int CurrentiIterDump){// Correct re
 		    //////////////////////////////////////////////////////////////////////////////////////////////////
 		}// if
 		else {//(TotalCurrentNumRecordsQuadChNewOldAux>0 or GPIOFlagRelFreqTest==true){
-			if (TotalCurrentNumRecordsQuadChNewOldAux>0 and GPIOFlagRelFreqTest==false){cout << "GPIO::PRUdetCorrRelFreq not enough detections " << TotalCurrentNumRecordsQuadChNewOldAux << "<" << TagsSeparationDetRelFreq << " in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;}
-			else if (GPIOFlagRelFreqTest==true){cout << "GPIO::PRUdetCorrRelFreq deactivated..." << endl;}
+			// It is a very dangerous function. Better to deactivate it. Also, not promp the user.
+			//if (TotalCurrentNumRecordsQuadChNewOldAux>0 and GPIOFlagRelFreqTest==false){cout << "GPIO::PRUdetCorrRelFreq not enough detections " << TotalCurrentNumRecordsQuadChNewOldAux << "<" << TagsSeparationDetRelFreq << " in iQuadChIter " << iQuadChIter << " quad channel to correct emitter rel. frequency deviation!" << endl;}
+			//else if (GPIOFlagRelFreqTest==true){cout << "GPIO::PRUdetCorrRelFreq deactivated..." << endl;}
 		}
 		//////////////////////////////////////////////////////////////////////////
 		// Check. It can be commented for normal operation
