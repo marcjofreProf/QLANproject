@@ -1493,18 +1493,18 @@ TimeTaggsDetAnalytics[10]=0.0;
 // Normalize time taggs to the first run since the node was started
 if (FirstQPLACalcStats==true){// First time. Hence, acquire the normalization value of the time taggs
 	FirstQPLACalcStats=false;// Negate forever more this condition
-	FirstQPLAtimeTagNorm=static_cast<long long int>(65536*938020371964); // It can be a multiple of a large value of MultFactorEffSynchPeriodQPLA*HistPeriodicityAux, which will not be used (so that an other used MultFactorEffSynchPeriodQPLA*HistPeriodicityAux is multiple), and that does not exceed the current absolute time tag value
+	//FirstQPLAtimeTagNorm=static_cast<long long int>(65536*938020371964); // It can be a multiple of a large value of MultFactorEffSynchPeriodQPLA*HistPeriodicityAux, which will not be used (so that an other used MultFactorEffSynchPeriodQPLA*HistPeriodicityAux is multiple), and that does not exceed the current absolute time tag value
 	// Old implementation which rendered the comparison between nodes not possible
-	//for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
-	//	if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){			
-  //    for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-  //    	if (FirstQPLAtimeTagNorm==0 or (TimeTaggs[iQuadChIter][i]>0 and FirstQPLAtimeTagNorm>static_cast<long long int>(TimeTaggs[iQuadChIter][i]))){
+	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
+		if(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]>0){			
+      //for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
+      	if (FirstQPLAtimeTagNorm==0 or (TimeTaggs[iQuadChIter][0]>0 and FirstQPLAtimeTagNorm>static_cast<long long int>(TimeTaggs[iQuadChIter][0]))){
   //    		FirstQPLACalcStats=false;// Negate forever more this condition
-	//				FirstQPLAtimeTagNorm=static_cast<long long int>(TimeTaggs[iQuadChIter][i]);
-	//			}
-	//		}
-	//	}
-	//}
+					FirstQPLAtimeTagNorm=static_cast<long long int>(TimeTaggs[iQuadChIter][0]);
+				}
+			//}
+		}
+	}
 }
 // Floor to the nearest point
 FirstQPLAtimeTagNorm=(FirstQPLAtimeTagNorm/(static_cast<long long int>(MultFactorEffSynchPeriodQPLA*HistPeriodicityAux)))*(static_cast<long long int>(MultFactorEffSynchPeriodQPLA*HistPeriodicityAux));
@@ -1535,7 +1535,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
       for (int j = i+1; j < (QuadNumChGroups); j++) {
           for (unsigned int k = 0; k < RawTotalCurrentNumRecordsQuadCh[i]; k++){
             	for (unsigned int l = 0; l < RawTotalCurrentNumRecordsQuadCh[j]; l++){
-	                if (abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l]))<CoincidenceWindowPRU and TimeTaggs[i][k]!=0 and ((BitPositionChannelTags(ChannelTags[i][k])%4)==(BitPositionChannelTags(ChannelTags[j][l])%4))){
+	                if (abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l]))<CoincidenceWindowPRU and TimeTaggs[i][k]!=0 and ((BitPositionChannelTags(ChannelTags[i][k]))==(BitPositionChannelTags(ChannelTags[j][l])))){
 	                    TimeTaggsDetAnalytics[4]+=1.0;; // Repetition found
 	                }
               }
