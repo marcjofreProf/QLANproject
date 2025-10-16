@@ -58,8 +58,8 @@ cleanup_on_SIGINT() {
   
   sudo systemctl enable --now systemd-timesyncd # start system synch
   sudo systemctl start systemd-timesyncd # start system synch
-  sudo systemctl enable systemd-timedated
-  sudo systemctl start systemd-timedated
+  #sudo systemctl enable systemd-timedated
+  #sudo systemctl start systemd-timedated
   sudo systemctl daemon-reload
   sudo timedatectl set-ntp true # Start NTP
   echo 'Stopped PTP'
