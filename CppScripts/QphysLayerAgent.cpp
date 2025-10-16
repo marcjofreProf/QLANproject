@@ -682,6 +682,7 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 	}
 	strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 	this->NumQuBitsPerRun=numReqQuBitsAux;
+	cout << "QPLA::SimulateReceiveQuBit this->NumQuBitsPerRun: " << this->NumQuBitsPerRun << endl;
 	// Adjust the network synchronization values
 	this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 	if (CurrentSpecificLink>=0){

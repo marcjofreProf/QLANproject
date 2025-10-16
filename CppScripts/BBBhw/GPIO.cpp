@@ -703,6 +703,7 @@ int GPIO::ReadTimeStamps(int iIterRunsAux,int QuadEmitDetecSelecAux, double Sync
 	this->QPLAFlagTestSynch=QPLAFlagTestSynchAux;
 	SynchTrigPeriod=SynchTrigPeriodAux;// Histogram/Period value
 	NumQuBitsPerRun=NumQuBitsPerRunAux;
+	cout << "GPIO::ReadTimeStamps NumQuBitsPerRun: " << NumQuBitsPerRun << endl;
 	//valpAuxHolder=valpHolder+4+6*NumQuBitsPerRun;// 6* since each detection also includes the channels (2 Bytes) and 4 bytes for 32 bits counter, and plus 4 since the first tag is captured at the very beggining
 	AccumulatedErrorDriftAux=FineSynchAdjValAux[0];// Synch trig offset
 	AccumulatedErrorDrift=FineSynchAdjValAux[1]; // Synch trig frequency

@@ -968,7 +968,10 @@ return 0;
 int QTLAN::QPLASimulateReceiveQuBit(double HistPeriodicityAuxAux) {
 	this->acquire();	  
 if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this info
-	this->QPLASimulateReceiveQuBitFlag=true; 
+	this->QPLASimulateReceiveQuBitFlag=true;
+	// Debbuging
+	cout << "QTLAN::QPLASimulateReceiveQuBit this->QLLAnumReqQuBits: " << this->QLLAnumReqQuBits << endl;
+	///
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,this->QLLAQuadEmitDetecSelec);
 	this->QPLASimulateReceiveQuBitFlag=false;
 	this->BusyNode=false;

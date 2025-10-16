@@ -181,7 +181,7 @@ private: //Functions//Methods
 	void AgentProcessRequestsPetitions(); // Process thread that manages requests and petitions
 	int ICPConnectionsCheckNewMessages(int SockListenTimeusec); // Check for new messages
 	// Process and execute requests
-	int ProcessNewMessage(); // main function perferming the required operatons to process the task
+	int ProcessNewMessage(); // main function performing the required operations to process the task
 	int countQintupleComas(char* ParamsCharArray);
 	int countColons(char* ParamsCharArray);
 	int countDoubleColons(char* ParamsCharArray);
