@@ -1222,16 +1222,16 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 						//bool boolCheckChOffsetCorrectionflag=false;
 						for (unsigned int i=0;i<4;i++){CheckChOffsetCorrectionIter[i]=0;}// Reset values			
 						for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){					  
-						  //if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
-						  //	ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[iQuadChIter][i]));// Maps the offset correction for the different channels to detect a specific state								
-						  //	SmallOffsetDriftArrayAux[i]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
-							//	CheckChOffsetCorrectionArray[ChOffsetCorrection][CheckChOffsetCorrectionIter[ChOffsetCorrection]]=SmallOffsetDriftArrayAux[i];
-							//	CheckChOffsetCorrectionIter[ChOffsetCorrection]++;								
-						  //}
-						  //else{// When NOT using histogram analysis
-							//  SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
-							//}
-							SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
+						  if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
+						  	ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[iQuadChIter][i]));// Maps the offset correction for the different channels to detect a specific state								
+						  	SmallOffsetDriftArrayAux[i]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
+								CheckChOffsetCorrectionArray[ChOffsetCorrection][CheckChOffsetCorrectionIter[ChOffsetCorrection]]=SmallOffsetDriftArrayAux[i];
+								CheckChOffsetCorrectionIter[ChOffsetCorrection]++;								
+						  }
+						  else{// When NOT using histogram analysis
+							  SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
+							}
+							
 							//if (i%200==0){
 							//	cout << "QPLA::SmallDriftContinuousCorrection ChannelTags[" << i << "]: " << ChannelTags[iQuadChIter][i] << endl;
 							//	cout << "QPLA::SmallDriftContinuousCorrection BitPositionChannelTags(ChannelTags[" << i << "]): " << BitPositionChannelTags(ChannelTags[iQuadChIter][i]) << endl;
@@ -1259,20 +1259,20 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 						if (CheckChOffsetCorrectionIterMinCheckIter>=CheckChOffsetCorrectionIterMinCheck){
 							cout << "QPLA::SmallDriftContinuousCorrection Potentially GPIO pins connection order is wrong or too much jitter on iQuadChIter: " << iQuadChIter <<" Check!!!" << endl;
 						}
-					  SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
-					  //SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));// To avoid glitches//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
+					  //SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
+					  SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));// To avoid glitches//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
 					  //cout << "QPLA::SmallDriftContinuousCorrection static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]): " << static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]) << endl;
 					  //cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftAux: " << SmallOffsetDriftAux << endl;
 					}
 					else{
-						//if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
-						//	ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[iQuadChIter][0]));// Maps the offset correction for the different channels to detect a specific state
-						//	SmallOffsetDriftAux=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+((static_cast<long long int>(TimeTaggs[iQuadChIter][0])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
-						//}
-						//else{// When NOT using histogram analysis
-						//	SmallOffsetDriftAux=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
-						//}
-						SmallOffsetDriftAux=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
+						if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
+							ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[iQuadChIter][0]));// Maps the offset correction for the different channels to detect a specific state
+							SmallOffsetDriftAux=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+((static_cast<long long int>(TimeTaggs[iQuadChIter][0])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
+						}
+						else{// When NOT using histogram analysis
+							SmallOffsetDriftAux=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
+						}
+						
 						cout << "QPLA::SmallDriftContinuousCorrection Using only first timetag for small offset correction!...to be deactivated" << endl;
 					}
 
@@ -1335,28 +1335,23 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 
 				  // Implement PID
 				  SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]+=SmallOffsetDriftAux; // Integral value of the PID
-				  //if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
-					//	if (SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]<0){
-					//		SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]=-((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
-					//	}
-					//	else{
-					//		SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
-					//	}
-					//}
-					//else{// When NOT using histogram analysis
-					//	if (SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]<0){
-					//		SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]=-((LLIHistPeriodicityHalfAux-SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux));
-					//	}
-					//	else{
-					//		SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
-					//	}
-					//}
-					if (SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]<0){
-						SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]=-((LLIHistPeriodicityHalfAux-SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux));
+				  if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
+						if (SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]<0){
+							SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]=-((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
+						}
+						else{
+							SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
+						}
 					}
-					else{
-						SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
+					else{// When NOT using histogram analysis
+						if (SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]<0){
+							SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]=-((LLIHistPeriodicityHalfAux-SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux));
+						}
+						else{
+							SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
+						}
 					}
+					
 				  //cout << "QPLA::SmallDriftContinuousCorrection PID Integral SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple]: " << SmallOffsetDriftPerLinkError[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 				  // Update information to the other node about synch parameters				  
 				  if (CurrentSpecificLinkAux>-1 && ApplyPIDOffsetContinuousCorrection==true){
@@ -1397,28 +1392,23 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 						//SynchNetworkParamsLink[CurrentSpecificLink][2]=SynchCalcValuesArray[0];// Estimated period
 						//SynchNetAdj[CurrentSpecificLink]=SynchNetAdjAux;
 						oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]-=static_cast<long long int>((1.0-EffectiveSplitEmitReceiverSmallOffsetDriftPerLink)*SmallOffsetDriftPerLinkPIDvalAux);
-						//if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
-						//	if (oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]<0){
-						//		oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=-((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
-						//	}
-						//	else{
-						//		oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
-						//	}
-						//}
-						//else{// When NOT using histogram analysis
-						//	if (oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]<0){
-						//		oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=-((LLIHistPeriodicityHalfAux-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux));
-						//	}
-						//	else{
-						//		oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
-						//	}
-						//}
-						if (oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]<0){
-							oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=-((LLIHistPeriodicityHalfAux-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux));
+						if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
+							if (oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]<0){
+								oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=-((LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux));
+							}
+							else{
+								oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
+							}
 						}
-						else{
-							oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
+						else{// When NOT using histogram analysis
+							if (oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]<0){
+								oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=-((LLIHistPeriodicityHalfAux-oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux));
+							}
+							else{
+								oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=(LLIHistPeriodicityHalfAux+oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple])%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
+							}
 						}
+						
 						//cout << "QPLA::SmallDriftContinuousCorrection oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]: " << oldSmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple] << endl;
 						// Split the effor between sender and receiver for constantly correcting the synch parameters
 						SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple]=static_cast<long long int>(SplitEmitReceiverSmallOffsetDriftPerLink*SmallOffsetDriftPerLinkPIDvalAux);
