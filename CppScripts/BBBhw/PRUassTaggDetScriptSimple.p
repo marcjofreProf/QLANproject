@@ -252,7 +252,7 @@ COINCWINLOOP:
 	SUB		r0, r0, 1
 	MOV		r19.w2, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts.
 	MOV		r19.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0), increases the windows length but improves probability of detection
-	AND		r19, r19, r11 // Mask to make sure there are no other info
+//	AND		r19, r19, r11 // Mask to make sure there are no other info
 	OR		r6, r6, r19 // Combine the possibilities of reading on these bits.
 	QBNE	COINCWINLOOP, r0, 0 // Coincides with a 0 // End coincidence window
 ENDCOINCWIN:
