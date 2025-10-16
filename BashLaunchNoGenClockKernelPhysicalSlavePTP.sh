@@ -145,25 +145,6 @@ sudo nice -n $NicenestPriorValue ./linuxptp/ptp4l -i eth0 -s -H -f PTP4lConfigQL
 
 sudo nice -n $NicenestPriorValue ./linuxptp/phc2sys -s eth0 -c CLOCK_REALTIME -w -f PTP4lConfigQLANprojectSlave.cfg -m & # -w -f PTP2pcConfigQLANprojectSlave.cfg & # -m # Important to launch phc2sys first (not in slave)
 
-# adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
-#sleep 30 # give time to time protocols to lock
-sudo adjtimex -f 0 #-a --force-adjust # -f 0
-
-if ! sudo crontab -l > /dev/null 2>&1; then
-    sudo crontab -e
-fi
-
-line_to_check="adjtimex"
-line_to_add="30 * * * * sudo /sbin/adjtimex -f 0" #-a --force-adjust" # -f 0" 
-
-sudo crontab -l | grep -q "$line_to_check"
-
-if [ $? -eq 0 ]; then
-  sudo crontab -l | grep -v "$line_to_check" | sudo crontab -
-fi
-
-echo "$line_to_add" | sudo crontab -
-
 ## Update process priority values
 pidAux=$(pidof -s ptp0)
 sudo chrt -f -p $PriorityValue $pidAux
@@ -205,6 +186,7 @@ fi
 # Maybe using adjtimex is bad idea because it is an extra layer not controlled by synchronization protocols
 ## Once priorities have been set, hence synch-protocols fine adjusted, adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
 sleep 10 # give time to time protocols to lock
+sudo hwclock --systohc # First update hardware clock value from system clock, since it will have a better time and date
 sudo adjtimex -a --force-adjust #-a --force-adjust # -f 0#
 
 if ! sudo crontab -l > /dev/null 2>&1; then

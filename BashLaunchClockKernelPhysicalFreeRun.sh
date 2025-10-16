@@ -183,27 +183,6 @@ if [[ $is_rt_kernel -eq 0 ]]; then
 	sudo config-pin P8_46 pruout
 fi
 
-# adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
-#sleep 30 # give time to time protocols to lock
-sudo adjtimex -f 0 #-a --force-adjust # -f 0
-
-if ! sudo crontab -l > /dev/null 2>&1; then
-    sudo crontab -e
-fi
-
-line_to_check="adjtimex"
-line_to_add="30 * * * * sudo /sbin/adjtimex -f 0" #-a --force-adjust" # -f 0
-
-sudo crontab -l | grep -q "$line_to_check"
-
-if [ $? -eq 0 ]; then
-  sudo crontab -l | grep -v "$line_to_check" | sudo crontab -
-fi
-
-echo "$line_to_add" | sudo crontab -
-
-##
-
 BcKPDarg1=${1:-$default_arg1}
 BcKPDarg2=${2:-$default_arg2}
 BcKPDarg3=${3:-$default_arg3}
@@ -247,6 +226,7 @@ sudo chrt -f -p $PriorityNoSoHighValue $pidAux
 # Maybe using adjtimex is bad idea because it is an extra layer not controlled by synchronization protocols
 ## Once priorities have been set, hence synch-protocols fine adjusted, adjust kernel clock (also known as system clock) to hardware clock (also known as cmos clock)
 sleep 10 # give time to time protocols to lock
+sudo hwclock --systohc # First update hardware clock value from system clock, since it will have a better time and date
 sudo adjtimex -a --force-adjust #-a --force-adjust # -f 0#
 
 if ! sudo crontab -l > /dev/null 2>&1; then
