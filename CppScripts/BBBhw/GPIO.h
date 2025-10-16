@@ -69,9 +69,9 @@ private:// Variables
 	unsigned long long int UnTrapSemaphoreValueMaxCounter=1000;//MAx counter trying to acquire semaphore, then force release
 	int whileProtAuxMax=10000; // Value of protecton against blocking indefenitely, which produces the node to go down (broken pipe and re-start)
 	int whileProtAux=whileProtAuxMax; // Protection againts blocking indefinetely
-	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)
-	std::atomic<bool> ManualSemaphore=false;
-	std::atomic<bool> ManualSemaphoreExtra=false;
+	std::atomic<bool> valueSemaphore{true};// Start as 1 (open or acquireable)
+	std::atomic<bool> ManualSemaphore{false};
+	std::atomic<bool> ManualSemaphoreExtra{false};
 	std::thread threadRefSynch; // Process thread that executes requests/petitions without blocking
 	long long int LostCounts=4; // For stoping and changing IEP counter. It has to do with jitter??? If not ajusted correctly, more jitter
 	int ApproxInterruptTime=300000; // Important to control the kernel_scheduler (an not get negative times). Typical time of interrupt time duration is 5000 with simple busy wait; around 8000 with busy wait with yield; 100000 with sleep_for()

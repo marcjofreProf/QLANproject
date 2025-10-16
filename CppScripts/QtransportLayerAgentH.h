@@ -65,7 +65,7 @@ private: // Variables/Objects
 	// Thread management
 	std::thread threadRef; // Process thread that executes requests/petitions without blocking
 	// Semaphore
-	std::atomic<bool> valueSemaphore=true;// Start as 1 (open or acquireable)	
+	std::atomic<bool> valueSemaphore{true};// Start as 1 (open or acquireable)	
 	int valueSemaphoreExpected = 1;
 	unsigned long long int UnTrapSemaphoreValueMaxCounter=10000000;//MAx counter trying to acquire semaphore, then force release
 	// Status
