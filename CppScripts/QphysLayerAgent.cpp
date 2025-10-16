@@ -682,7 +682,7 @@ int QPLA::SimulateReceiveQuBit(char* ModeActivePassiveAux,char* CurrentEmitRecei
 	}
 	strcpy(this->IPaddressesTimePointBarrier,IPaddressesAux);
 	this->NumQuBitsPerRun=numReqQuBitsAux;
-	cout << "QPLA::SimulateReceiveQuBit this->NumQuBitsPerRun: " << this->NumQuBitsPerRun << endl;
+	//cout << "QPLA::SimulateReceiveQuBit this->NumQuBitsPerRun: " << this->NumQuBitsPerRun << endl;
 	// Adjust the network synchronization values
 	this->HistPeriodicityAux=HistPeriodicityAuxAux;// Update value
 	if (CurrentSpecificLink>=0){
@@ -1117,9 +1117,9 @@ int QPLA::ThreadSimulateReceiveQubit(){
 	PRUGPIO.ClearStoredQuBits();//PRUGPIO->ClearStoredQuBits();
 	//cout << "Clear previously stored Qubits...to be commented" << endl;
 	this->release();
-	int iIterRuns;
+	int iIterRuns; // Declaration for faster speed
 	NumQuBitsPerRun=makeEvenInt(NumQuBitsPerRun); // Force that it is an even number (needed for GPIO.cpp)
-	int DetRunsCount = static_cast<int>(ceil(static_cast<double>(NumQuBitsPerRun)/static_cast<double>(NumQubitsMemoryBuffer))); // Number of iteration runs
+	int DetRunsCount = static_cast<int>(ceil(static_cast<double>(NumQuBitsPerRun)/static_cast<double>(MaxNumQuBitsPerRun))); // Number of iteration runs
 	//cout << "DetRunsCount: " << DetRunsCount << endl;
 	struct timespec requestWhileWait;
 	if (string(this->ModeActivePassive)==string("Active")){
@@ -1146,7 +1146,10 @@ int QPLA::ThreadSimulateReceiveQubit(){
 	// Convert duration to desired time
 	unsigned long long int TimePointFuture_time_as_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epochFutureTimePoint).count(); // Add some margin
 	for (iIterRuns=0;iIterRuns<DetRunsCount;iIterRuns++){	
-		PRUGPIO.ReadTimeStamps(iIterRuns,this->QuadEmitDetecSelec,this->HistPeriodicityAux,static_cast<unsigned int>(NumQuBitsPerRun),this->FineSynchAdjVal,TimePointFuture_time_as_count,FlagTestSynch);//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
+		if (iIterRuns==(DetRunsCount-1)){ // Last detection run, the number of qubits to detect has to be recomputed
+			PRUGPIO.ReadTimeStamps(iIterRuns,this->QuadEmitDetecSelec,this->HistPeriodicityAux,static_cast<unsigned int>(NumQuBitsPerRun-(DetRunsCount-1)*MaxNumQuBitsPerRun),this->FineSynchAdjVal,TimePointFuture_time_as_count,FlagTestSynch);//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
+		}
+		else{PRUGPIO.ReadTimeStamps(iIterRuns,this->QuadEmitDetecSelec,this->HistPeriodicityAux,static_cast<unsigned int>(MaxNumQuBitsPerRun),this->FineSynchAdjVal,TimePointFuture_time_as_count,FlagTestSynch);}//PRUGPIO->ReadTimeStamps();// Multiple reads can be done in multiples of NumQuBitsPerRun qubit timetags
 	}
 	//cout << "Detected timestamps...to be commented" << endl;
 	this->LinearRegressionQuBitFilter();// Retrieve raw detected qubits and channel tags
