@@ -241,20 +241,21 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	QBEQ 	FINISH, r20, 0 // When this exit counter reaches 0 (almost 10 seconds, it oculd be up to almost 20 seconds) exit the program
 	// Give some time - while doing operations
 	//QBGT 	WAIT_FOR_EVENT, r16, 0 // Do not lose time with the below if all channels are not zero (very restrictive (but maybe good for coincidence)). If there is a faulty value/line always ON (this might render to 0 detections alw
+PRECOINCWIN:
+	MOV		r0, r21 // Load again the value of the window length
 	// Then measure wha should be 1 (for edge detection)
 	MOV		r6.w2, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. TAkes a lot of time and so it is skew with respect the bits from r31
 	MOV		r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)
+	QBEQ	ENDCOINCWIN, r0, 1 // Coincides with a 1 // Jump coincidence window
 	// Implement a coincidence window, effectively increasing the window length but introduces jitter
-PRECOINCWIN:
-	MOV		r0, r21 // Load again the value of the window length
 COINCWINLOOP:
 	SUB		r0, r0, 1
-	QBNE	COINCWINLOOP, r0, 0 // Coincides with a 0
-COINCWIN:
 	MOV		r19.w2, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts.
 	MOV		r19.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0), increases the windows length but improves probability of detection
+	AND		r19, r19, r11 // Mask to make sure there are no other info
 	OR		r6, r6, r19 // Combine the possibilities of reading on these bits.
-	// End coincidence window
+	QBNE	COINCWINLOOP, r0, 0 // Coincides with a 0 // End coincidence window
+ENDCOINCWIN:
 	AND		r6, r6, r11 // Mask to make sure there are no other info
 	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections
 POSTZERO:	// Give another chance to detect a zero to increase true counts (and even coincidences)

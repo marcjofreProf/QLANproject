@@ -232,7 +232,7 @@ private:// Variables
 	unsigned int NumberRepetitionsSignal=32768;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	// For the synchronization protocol (at the begging or during operation) it sets the timetagging window to 1 for maximum synchronization resolution.
 	// Account that the effective value of the coincidence time window doubles because in the PRU it takes to clock cycles
-	unsigned int TTGcoincWin=16; // A little more than half of half the signal time (related to the time jitter in PRU units). It is important in order to efficiently capture the pulses, but at the same time it increases jitter!!!. 1;// It cannot be smaller than 1. Timetagging coincidence window length In PRU units. It reduces time resolution of the detected qubits.
+	unsigned int TTGcoincWin=4; // Minimu value 1 (if 1, no coincidence window applied) A little more than half of half the signal time (related to the time jitter in PRU units). It is important in order to efficiently capture the pulses, but at the same time it increases jitter!!!. 1;// It cannot be smaller than 1. Timetagging coincidence window length In PRU units. It reduces time resolution of the detected qubits.
 	unsigned int NumQuBitsPerRun=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)
 	int retInterruptsPRU1;
 	int WaitTimeInterruptPRU1=7500000; // In microseconds. Signal generation
