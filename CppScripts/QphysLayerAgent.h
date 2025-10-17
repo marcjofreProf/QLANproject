@@ -150,7 +150,7 @@ private: //Variables/Instances
 	bool ApplyPIDOffsetContinuousCorrection=true; // Correct at the transmitter the instantaneous offset retrieved
 	double SplitEmitReceiverSmallOffsetDriftPerLink=0.25; // Splitting ratio between the effort of the emitter and receiver of constantly updating the synch values. The closer to 0 the more aggresive (more correction from the transmitter)
 	double EffectiveSplitEmitReceiverSmallOffsetDriftPerLink=SplitEmitReceiverSmallOffsetDriftPerLink; // Effective (if correction above certain threshold) Splitting ratio between the effort of the emitter and receiver of constantly updating the synch values. The closer to 0 the more aggresive (more correction from the transmitter)
-	double SplitEmitReceiverSmallOffsetDriftPerLinkP=0.65; // Proportional values for the PID
+	double SplitEmitReceiverSmallOffsetDriftPerLinkP=0.25; // Proportional values for the PID
 	double SplitEmitReceiverSmallOffsetDriftPerLinkI=0.05; // Integral values for the PID
 	double SplitEmitReceiverSmallOffsetDriftPerLinkD=0.01; // Derivative value for the PID
 	long long int SmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={0}; // Identified by each link, accumulate the small offset error that acumulates over time but that can be corrected for when receiving every now and then from the specific node. This correction comes after filtering raw qubits and applying relative frequency offset and total offset computed with the synchronization algorithm
