@@ -54,7 +54,6 @@ namespace nsQphysLayerAgent {
 private: //Variables/Instances	
 	int NumberRepetitionsSignal=32768;//8192// Sets the equivalent MTU (Maximum Transmission Unit) for quantum (together with the clock time) - it could be named Quantum MTU. The larger, the more stable the hardware clocks to not lose the periodic synchronization while emitting.
 	int NumQuBitsPerRun=1964; // Really defined in GPIO.h. Max 1964 for 12 input pins. 2048 for 8 input pins. Given the shared PRU memory size (discounting a 0x200 offset)	
-	long long int CoincidenceWindowPRU=32;//Size of the coincidence window for evaluating coincidences in PRU time, related to jitter and the fact that there are inter corrections for each quad channel
 	int numberLinks=0;// Number of full duplex links directly connected to this physical quantum node
 	unsigned long long int RawLastTimeTaggRef[1]={0}; // Timetaggs of the start of the detection in units of Time (not PRU time)
 	unsigned long long int RawTimeTaggs[QuadNumChGroups][NumQubitsMemoryBuffer]={0}; // Timetaggs of the detections raw
@@ -118,6 +117,7 @@ private: //Variables/Instances
 	bool FlagTestSynch=false;
 	double MultFactorEffSynchPeriodQPLA=4.0; // When using 4 channels histogram, this value is 4.0; when using real signals this value should be 1.0 (also in GPIO.h)
 	double HistPeriodicityAux=4096.0/4.0; //Value indicated by upper agents (and uploaded to GPIO)//Period in PRU counts of the synch period/histogram
+	long long int CoincidenceWindowPRU=static_cast<long long int>(HistPeriodicityAux/2.0);//Size of the coincidence window for evaluating coincidences in PRU time, related to jitter and the fact that there are inter corrections for each quad channel
 	int CurrentSpecificLink=-1; // Identifies th eindex of the other emiter/receiver
 	int CurrentSpecificLinkMultiple=-1; // Identifies the index of the other emiter/receiver links when multiple present
 	char ListCombinationSpecificLink[2*((1LL<<LinkNumberMAX)-1)][NumBytesPayloadBuffer]; // Stores the list of detected links and combinations in an ordered way
@@ -161,7 +161,7 @@ private: //Variables/Instances
 	bool NonInitialReferencePointSmallOffsetDriftPerLink[QuadNumChGroups][2*((1LL<<LinkNumberMAX)-1)]={false}; // Identified by each link, annotate if the first capture has been done and hence the initial ReferencePoint has been stored
 	// Filtering qubits
 	bool ApplyRawQubitFilteringFlag=true;// Variable to select (true) or unselect (false) the filtering of raw qubits thorugh LinearRegressionQuBitFilter function. For the time being, it is not applied in the synchronization procedure.
-	long long int FilteringAcceptWindowSize=512; // Better power of 2!  Equivalent to around 3 times the time jitter (when physically synch). In PRU time. It should be dependent on the period of the signal
+	long long int FilteringAcceptWindowSize=static_cast<long long int>(HistPeriodicityAux/2.0); // Better power of 2!  Equivalent to around 3 times the time jitter (when physically synch). In PRU time. It should be dependent on the period of the signal
 	double SynchCalcValuesFreqThresh=5e-7; //Threshold value to not apply relative frequency difference
 	bool UseAllTagsForEstimation=true; // When false, use only the first tag (not resilent because it could be a remaining noise tag), when true it uses all tags of the run
 	//int iCenterMassAuxiliarTest=0;

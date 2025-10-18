@@ -1508,6 +1508,8 @@ if (SimulateNumStoredQubitsNodeAux>1){
 	//		TimeTaggsDetAnalytics[4]+=1.0;
 	//	}
 	//}
+	// Update value ofCoincidenceWindowPRU
+	CoincidenceWindowPRU=static_cast<long long int>(1.0*HistPeriodicityAux/2.0);
 
 	// Full coincidence in time and channel
 	for (int i = 0; i < (QuadNumChGroups-1); i++) {
@@ -2139,6 +2141,8 @@ int QPLA::LinearRegressionQuBitFilter(){// remove detection out of detection win
 				*/
 				unsigned int FilteredNumStoredQubits=0;
 				double FilterDiffCheckAux=0.0;
+				// Update value of FilteringAcceptWindowSize
+				FilteringAcceptWindowSize=static_cast<long long int>(1.0*HistPeriodicityAux/2.0);
 				// Filter out detections not falling within the defined detection window and calculated signal positions				
 				for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
 					if (abs(static_cast<long long int>(RawTimeTaggs[iQuadChIter][i])-xEstimateRawTimeTaggs[i])<=FilteringAcceptWindowSize){// Within acceptance window
