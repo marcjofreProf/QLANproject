@@ -1509,7 +1509,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 	//	}
 	//}
 	// Update value ofCoincidenceWindowPRU
-	CoincidenceWindowPRU=static_cast<long long int>(1.0*HistPeriodicityAux/2.0);
+	CoincidenceWindowPRU=static_cast<long long int>(1.0*HistPeriodicityAux*4.0);
 
 	// Full coincidence in time and channel
 	for (int i = 0; i < (QuadNumChGroups-1); i++) {
