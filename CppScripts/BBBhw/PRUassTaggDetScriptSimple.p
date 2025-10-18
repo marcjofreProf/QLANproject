@@ -234,8 +234,8 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 	// Edge detection - No step in between (pulses have 1/3 of detection), can work with pulse rates of 75 MHz If we put one step in between we allow pulses to be detected with 1/2 chance. Neverthelss, separating by one operation, also makes the detection window to two steps hence 10ns, instead of 5ns.
 	// Measuring all pins of interest
 	// First measure what whould be zero (for edge detection)
-// Remove condition for starting or ending with a 0	MOV		r16.w2, r30.w0 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. Limits the pulse rate to 50 MHz. Takes a lot of time and so it is skew with respect the bits from r31
-// Remove condition for starting or ending with a 0	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection (bits 15, 14 and 7 to 0)	
+	MOV		r16.w2, r30.w0 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. Limits the pulse rate to 50 MHz. Takes a lot of time and so it is skew with respect the bits from r31
+	MOV 	r16.w0, r31.w0 // This wants to be zeros for edge detection (bits 15, 14 and 7 to 0)	
 	// Give some time - while doing operations
 	SUB 	r20, r20, 1 // Substract 1 to the exit counter
 	QBEQ 	FINISH, r20, 0 // When this exit counter reaches 0 (almost 10 seconds, it oculd be up to almost 20 seconds) exit the program
@@ -252,28 +252,28 @@ COINCWINLOOP:
 	SUB		r0, r0, 1
 	MOV		r19.w2, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts.
 	MOV		r19.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0), increases the windows length but improves probability of detection
-	AND		r19, r19, r11 // Mask to make sure there are no other info
+	//AND		r19, r19, r11 // Mask to make sure there are no other info
 	OR		r6, r6, r19 // Combine the possibilities of reading on these bits.
 	QBNE	COINCWINLOOP, r0, 0 // Coincides with a 0 // End coincidence window
 ENDCOINCWIN:
 	AND		r6, r6, r11 // Mask to make sure there are no other info
 	QBEQ 	WAIT_FOR_EVENT, r6, 0 // Do not lose time with the below if there are no detections
-// Remove condition for starting or ending with a 0POSTZERO:	// Give another chance to detect a zero to increase true counts (and even coincidences)
-// Remove condition for starting or ending with a 0	// Second measure what whould be zero (for edge detection)
-// Remove condition for starting or ending with a 0	MOV		r23.w2, r30.w0 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. Limits the pulse rate to 50 MHz. Takes a lot of time and so it is skew with respect the bits from r31
-// Remove condition for starting or ending with a 0	MOV 	r23.w0, r31.w0 // This wants to be zeros for edge detection (bits 15, 14 and 7 to 0)	
-// Remove condition for starting or ending with a 0	AND		r16, r16, r23// Combine the two measurements
-// Remove condition for starting or ending with a 0	// End post zero
+	POSTZERO:	// Give another chance to detect a zero to increase true counts (and even coincidences)
+	// Second measure what whould be zero (for edge detection)
+	MOV		r23.w2, r30.w0 // This wants to be zeros for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. Limits the pulse rate to 50 MHz. Takes a lot of time and so it is skew with respect the bits from r31
+	MOV 	r23.w0, r31.w0 // This wants to be zeros for edge detection (bits 15, 14 and 7 to 0)	
+	AND		r16, r16, r23// Combine the two measurements
+	// End post zero
 COMBINATIONEDGE:
-// Remove condition for starting or ending with a 0	AND		r16, r16, r11 // Mask to make sure there are no other info
+	AND		r16, r16, r11 // Mask to make sure there are no other info
 	// Combining all reading pins - for isolated ones in the other (bits 15 and 14)
-// Remove condition for starting or ending with a 0	LSR		r17.b1, r16.b3, 2
+	LSR		r17.b1, r16.b3, 2
 	LSR		r18.b1, r6.b3, 2
-// Remove condition for starting or ending with a 0	OR		r16, r16, r17// Combine the registers
+	OR		r16, r16, r17// Combine the registers
 	OR		r6, r6, r18// Combine the registers
 	// Edge detection with the pins of interest. It can be extended to all pins reading
-// Remove condition for starting or ending with a 0	NOT		r16, r16 //NOT r16.w0, r16.w0 // 0s converted to 1s. This step can be placed here to increase chances of detection.	
-// Remove condition for starting or ending with a 0	AND		r6, r6, r16 //AND r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge
+	NOT		r16, r16 //NOT r16.w0, r16.w0 // 0s converted to 1s. This step can be placed here to increase chances of detection.	
+	AND		r6, r6, r16 //AND r6.w0, r6.w0, r16.w0 // Only does complying with a rising edge
 CHECKDET:		
 	QBEQ 	WAIT_FOR_EVENT, r6, 0//QBEQ 	WAIT_FOR_EVENT, r6.w0, 0 //all the b0 above can be converted to w0 to capture more channels, but then in the channel tag recorded has to be increaed and appropiatelly handled in c++ (also the number of tags per run has to be reduced)
 	// If the program reaches this point, at least one of the bits is high
