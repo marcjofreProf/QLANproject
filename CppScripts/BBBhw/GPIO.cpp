@@ -501,11 +501,12 @@ int GPIO::PRUsignalTimerSynchJitterLessInterrupt(){
 				this->TrigAuxIterCount++;				
 				// Short range measurements to retrieve offsets (little effected by relative frequency difference)
 				// Compute error - Absolute corrected error of absolute error after removing the frequency difference. It adds jitter but probably ensures that hardwware clock offsets are removed periodically (a different story is the offset due to links which is calibrated with the algortm).
-				// Dealing with lon lon int matters due to floating or not precition!!!!
+				// Dealing with long long int matters due to floating or not precition!!!!
 				long double PRUoffsetDriftErrorAbsAux=0.0;
 				// Maybe it is important to substract duration_FinalInitialCountAuxArrayAvgInitial to mak eit more time absolut and the synchronization algorith in QPLA always works
 				// Not really, SUPER IMPORTANT, in order to not have jumps between periods, it has to be substracted the initial offset error static_cast<long double>(duration_FinalInitialCountAuxArrayAvgInitial)!!!
-				PRUoffsetDriftErrorAbsAux=-fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+static_cast<long double>(this->PRUcurrentTimerValWrap);//-static_cast<long double>(duration_FinalInitialCountAuxArrayAvgInitial);
+				// Import computation below for absolute PRU time comparison between nodes
+				PRUoffsetDriftErrorAbsAux=-fmodl(static_cast<long double>(this->iIterPRUcurrentTimerVal)*static_cast<long double>(this->TimePRU1synchPeriod)/static_cast<long double>(PRUclockStepPeriodNanoseconds),static_cast<long double>(iepPRUtimerRange32bits))+static_cast<long double>(this->PRUcurrentTimerValWrap)-static_cast<long double>(duration_FinalInitialCountAuxArrayAvgInitial);
 				//this->PRUoffsetDriftErrorAbs=static_cast<double>(PRUoffsetDriftErrorAbsAux);//
 				//// Below unwrap the difference
 				if (PRUoffsetDriftErrorAbsAux>(static_cast<long double>(iepPRUtimerRange32bits)/2.0)){
