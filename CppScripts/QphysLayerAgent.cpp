@@ -1516,7 +1516,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
       for (int j = i+1; j < (QuadNumChGroups); j++) {
           for (unsigned int k = 0; k < RawTotalCurrentNumRecordsQuadCh[i]; k++){
             	for (unsigned int l = 0; l < RawTotalCurrentNumRecordsQuadCh[j]; l++){
-	                if (abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l]))<CoincidenceWindowPRU and TimeTaggs[i][k]!=0 and ((BitPositionChannelTags(ChannelTags[i][k]))==(BitPositionChannelTags(ChannelTags[j][l])))){
+	                if (abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l]))<CoincidenceWindowPRU and TimeTaggs[i][k]!=0 and TimeTaggs[j][l]!=0){//} and ((BitPositionChannelTags(ChannelTags[i][k]))==(BitPositionChannelTags(ChannelTags[j][l])))){
 	                    TimeTaggsDetAnalytics[4]+=1.0;; // Repetition found
 	                }
               }
@@ -1984,7 +1984,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		//cout << "QPLA::SynchCalcValuesArrayAux[i]: " << SynchCalcValuesArrayAux[i] << endl;
 	}	
 	
-	SynchCalcValuesArray[1]=-DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMeanFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass); // The actual computed offset. To avoid glitches, it is better to make a median
+	SynchCalcValuesArray[1]=-DoubleMeanFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass); // The actual computed offset. To avoid glitches, it is better to make a median
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	
