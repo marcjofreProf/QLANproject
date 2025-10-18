@@ -1516,7 +1516,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
       for (int j = i+1; j < (QuadNumChGroups); j++) {
           for (unsigned int k = 0; k < RawTotalCurrentNumRecordsQuadCh[i]; k++){
             	for (unsigned int l = 0; l < RawTotalCurrentNumRecordsQuadCh[j]; l++){
-	                if (abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l]))<CoincidenceWindowPRU and TimeTaggs[i][k]!=0 and TimeTaggs[j][l]!=0){//} and ((BitPositionChannelTags(ChannelTags[i][k]))==(BitPositionChannelTags(ChannelTags[j][l])))){
+	                if ((abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l]))<CoincidenceWindowPRU or (abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l])+static_cast<long long int>(HistPeriodicityAux*MultFactorEffSynchPeriodQPLA))<CoincidenceWindowPRU) or (abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l])-+static_cast<long long int>(HistPeriodicityAux*MultFactorEffSynchPeriodQPLA))<CoincidenceWindowPRU)) and TimeTaggs[i][k]!=0 and TimeTaggs[j][l]!=0){//} and ((BitPositionChannelTags(ChannelTags[i][k]))==(BitPositionChannelTags(ChannelTags[j][l])))){
 	                    TimeTaggsDetAnalytics[4]+=1.0;; // Repetition found
 	                }
               }
