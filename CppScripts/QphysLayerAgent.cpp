@@ -1509,7 +1509,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 	//	}
 	//}
 	// Update value ofCoincidenceWindowPRU
-	CoincidenceWindowPRU=static_cast<long long int>(1.0*HistPeriodicityAux*1.0);
+	CoincidenceWindowPRU=static_cast<long long int>(1.0*HistPeriodicityAux*0.75);
 
 	// Full coincidence in time and channel
 	for (int i = 0; i < (QuadNumChGroups-1); i++) {
@@ -1984,7 +1984,7 @@ if (iCenterMass==(NumCalcCenterMass-1) and iNumRunsPerCenterMass==(NumRunsPerCen
 		//cout << "QPLA::SynchCalcValuesArrayAux[i]: " << SynchCalcValuesArrayAux[i] << endl;
 	}	
 	
-	SynchCalcValuesArray[1]=-DoubleMeanFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass); // The actual computed offset. To avoid glitches, it is better to make a median
+	SynchCalcValuesArray[1]=DoubleMeanFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass);//DoubleMedianFilterSubArray(SynchCalcValuesArrayAux,NumRunsPerCenterMass); // The actual computed offset. To avoid glitches, it is better to make a median
 	//cout << "QPLA::SynchCalcValuesArray[1]: " << SynchCalcValuesArray[1] << endl;
 	//cout << "QPLA::SynchCalcValuesArray[2]: " << SynchCalcValuesArray[2] << endl;
 	
