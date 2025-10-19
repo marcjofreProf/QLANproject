@@ -1547,7 +1547,7 @@ return 0; // all ok
 int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){	
 	try{
 		//cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFreePreLock" << endl;
-		this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+		//this->RelativeNanoSleepWait((unsigned long long int)(50000+150000*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 		this->acquire();
 		//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 1" << endl;
 		bool FirstPassAux=true;
@@ -1650,7 +1650,7 @@ return 0; // All ok
 int QTLAH::UnBlockActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){	
 	try{
 		//cout << "Host " << this->IPaddressesSockets[2] << " Initiated UnBlockActiveActionFreePreLock" << endl;
-		this->RelativeNanoSleepWait((unsigned long long int)(1000000));//*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+		//this->RelativeNanoSleepWait((unsigned long long int)(1000000));//*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 		this->acquire();
 		this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);
 	}
@@ -1664,7 +1664,7 @@ return 0; // All ok
 }
 
 int QTLAH::UnBlockActiveActionFree(char* ParamsCharArrayArg, int nChararray){
-
+	//this->RelativeNanoSleepWait((unsigned long long int)(5000));//*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 	this->UnBlockYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 
 return 0; // All ok
@@ -1848,17 +1848,18 @@ return false; // all ok
 }
 
 int QTLAH::UnBlockYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
+//this->RelativeNanoSleepWait((unsigned long long int)(50000));
 if ((HostsActiveActionsFree[0]==false and string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2])) or iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer){// This is the blocking host so proceed to unblock
-	//int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
-	//for (int i=0;i<numForstEquivalentToSleep;i++){
-	//	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
-	//	//cout << "this->getState(): " << this->getState() << endl;
-	//	if(this->getState()==0) {
-	//		this->ProcessNewMessage();
-	//		this->m_pause(); // After procesing the request, pass to paused state
-	//	}
-	//	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
-	// }
+	int numForstEquivalentToSleep=500;//100: Equivalent to 1 seconds# give time to other hosts to enter
+	for (int i=0;i<numForstEquivalentToSleep;i++){
+		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+		//cout << "this->getState(): " << this->getState() << endl;
+		if(this->getState()==0) {
+			this->ProcessNewMessage();
+			this->m_pause(); // After procesing the request, pass to paused state
+		}
+		this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+	}
 	strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
 	strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
 	//BusyAttachedNode=false;
@@ -1922,6 +1923,7 @@ int QTLAH::PeriodicRequestSynchsHost(){// Execute automatically the network sync
 	char charNumAux[NumBytesBufferICPMAX] = {0};
 	char messagePayloadAux[NumBytesBufferICPMAX] = {0};
 	char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+	int numForstEquivalentToSleep=1000;//100: Equivalent to 1 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
 for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){// For each connected node to be synch with
 	for (int iCenterMass=0;iCenterMass<NumCalcCenterMass;iCenterMass++){
 		for (int iNumRunsPerCenterMass=0;iNumRunsPerCenterMass<NumRunsPerCenterMass;iNumRunsPerCenterMass++){			
@@ -2037,7 +2039,8 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			
 			// Instead of a simple sleep, which would block the operation (specially processing new messages)
 			// usleep(usSynchProcIterRunsTimePoint);// Give time between iterations to send and receive qubits
-			int numForstEquivalentToSleep=1000;//100: Equivalent to 1 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
+			//int numForstEquivalentToSleep=1000;//100: Equivalent to 1 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
+			numForstEquivalentToSleep=1000;
 			for (int i=0;i<numForstEquivalentToSleep;i++){
 				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 				//cout << "this->getState(): " << this->getState() << endl;
@@ -2048,6 +2051,17 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 				this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 			}
 		}
+	}
+	// Wait a bit between nodes
+	numForstEquivalentToSleep=2000;
+	for (int i=0;i<numForstEquivalentToSleep;i++){
+		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+		//cout << "this->getState(): " << this->getState() << endl;
+		if(this->getState()==0) {
+			this->ProcessNewMessage();
+			this->m_pause(); // After procesing the request, pass to paused state
+		}
+		this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 	}
 }
 return 0; // all ok

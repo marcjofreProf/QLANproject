@@ -14,7 +14,7 @@
 # Menu View → Indentation → convert indentation to spaces
 #####################################################
 import sys, os
-import time
+import time, random
 import numpy as np
 
 import QsessionLayerAgent
@@ -56,11 +56,13 @@ class QPLA:
 		self.QSLAagent.SendMessageAgent(ParamsDescendingCharArray)
 	
 	def WaitUntilActiveActionFreePreLock(self,argsPayloadListAux): # Block other involved hosts/nodes
+		time.sleep(int(1000000 + 150000000 * random.random())/1e9) # To try to prevent many nodes claiming for Blocks
 		argsPayloadList=argsPayloadListAux#[IPhostDestOpNet]
 		argsPayloadAux=self.ListCharArrayParser(argsPayloadList)
 		self.QSLAagent.WaitUntilActiveActionFreePreLock(argsPayloadAux,len(argsPayloadList))
 	
 	def UnBlockActiveActionFreePreLock(self, argsPayloadListAux): # Unblock other involved hosts/nodes
+		#time.sleep(int(50000 + 150000 * random.random())/1e9) # To try to prevent many nodes claiming for Blocks while still blocked
 		argsPayloadList=argsPayloadListAux#[IPhostDestOpNet]
 		argsPayloadAux=self.ListCharArrayParser(argsPayloadList)
 		self.QSLAagent.UnBlockActiveActionFreePreLock(argsPayloadAux,len(argsPayloadList))
