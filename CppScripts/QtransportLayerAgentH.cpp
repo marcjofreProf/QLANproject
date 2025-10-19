@@ -1650,7 +1650,7 @@ return 0; // All ok
 int QTLAH::UnBlockActiveActionFreePreLock(char* ParamsCharArrayArg, int nChararray){	
 	try{
 		//cout << "Host " << this->IPaddressesSockets[2] << " Initiated UnBlockActiveActionFreePreLock" << endl;
-		this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+		this->RelativeNanoSleepWait((unsigned long long int)(1000000));//*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 		this->acquire();
 		this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);
 	}
