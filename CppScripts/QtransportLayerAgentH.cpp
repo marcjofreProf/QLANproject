@@ -1589,7 +1589,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 				//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
 				//cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
 				//cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
-				if (FirstPassAux==false){cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization and availability of other hosts to proceed with the request!" << endl;}
+				if (FirstPassAux==false){cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization or availability of other hosts to proceed with the request!" << endl;}
 				//else{cout << "Host " << this->IPaddressesSockets[2] << " second while!" << endl;}
 				FirstPassAux=false;// First pass is compulsory, since it might be true AchievedAttentionParticularHosts, but because of another process
 				this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
