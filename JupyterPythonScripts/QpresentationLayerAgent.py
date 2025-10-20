@@ -56,7 +56,7 @@ class QPLA:
 		self.QSLAagent.SendMessageAgent(ParamsDescendingCharArray)
 	
 	def WaitUntilActiveActionFreePreLock(self,argsPayloadListAux): # Block other involved hosts/nodes
-		#time.sleep(int(1000000000 + 5000000000 * random.random())/1e9) # To try to prevent many nodes claiming for Blocks
+		#time.sleep(int(7500000000 + 7500000000 * random.random())/1e9) # To try to prevent many nodes claiming for Blocks
 		argsPayloadList=argsPayloadListAux#[IPhostDestOpNet]
 		argsPayloadAux=self.ListCharArrayParser(argsPayloadList)
 		self.QSLAagent.WaitUntilActiveActionFreePreLock(argsPayloadAux,len(argsPayloadList))

@@ -1552,10 +1552,12 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 1" << endl;
 		bool FirstPassAux=true;
 		AchievedAttentionParticularHosts=false;
-		int MaxNumPassesCheckBlockAux=0;
+		int MaxNumPassesCheckBlockAux=100;
 		int NumPassesCheckBlockAux=0;
-		BusyAttachedNode==true;// Force busy node
+		BusyAttachedNode=true;// Force busy node
+		//cout << "Host " << this->IPaddressesSockets[2] << " before first while!" << endl;
 		while((AchievedAttentionParticularHosts==false or FirstPassAux==true) and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux){
+			//cout << "Host " << this->IPaddressesSockets[2] << " first while!" << endl;
 			NumPassesCheckBlockAux++;
 			if (NumPassesCheckBlockAux>=MaxNumPassesCheckBlockAux){// Not the best solution, but avoid for ever block
 				cout << "QTLAH::WaitUntilActiveActionFreePreLock Malfunction. Host " << this->IPaddressesSockets[2] << " will proceed eventhough Blocking not achieved!" << endl;
@@ -1569,21 +1571,27 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 				//cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
 				//cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 			}
-			FirstPassAux=false;// First pass is compulsory, since it might be true AchievedAttentionParticularHosts, but because of another process
+			
 			while (BusyAttachedNode==true or HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
 				//cout << "Host " << this->IPaddressesSockets[2] << " Entered While 2" << endl;
-				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
-				if(this->getState()==0){
-					this->ProcessNewMessage();
-					this->m_pause(); // After procesing the request, pass to paused state
-					//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+				int numForstEquivalentToSleep=(int)(1000+500*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
+				for (int i=0;i<numForstEquivalentToSleep;i++){
+					this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+					//cout << "this->getState(): " << this->getState() << endl;
+					if(this->getState()==0) {
+						this->ProcessNewMessage();
+						this->m_pause(); // After procesing the request, pass to paused state
+					}
+					this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 				}
 				this->release();
 				//cout << "Host " << this->IPaddressesSockets[2] << " Exited release 1" << endl;
 				//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
 				//cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
 				//cout << "GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
-				cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization and availability of other hosts to proceed with the request!" << endl;
+				if (FirstPassAux==false){cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization and availability of other hosts to proceed with the request!" << endl;}
+				//else{cout << "Host " << this->IPaddressesSockets[2] << " second while!" << endl;}
+				FirstPassAux=false;// First pass is compulsory, since it might be true AchievedAttentionParticularHosts, but because of another process
 				this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 				this->acquire();
 				//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 2" << endl;
