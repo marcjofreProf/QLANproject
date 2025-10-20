@@ -1552,7 +1552,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 1" << endl;
 		bool FirstPassAux=true;
 		AchievedAttentionParticularHosts=false;
-		int MaxNumPassesCheckBlockAux=100;
+		int MaxNumPassesCheckBlockAux=1000; // Protection to not block permanently
 		int NumPassesCheckBlockAux=0;
 		BusyAttachedNode=true;// Force busy node
 		//cout << "Host " << this->IPaddressesSockets[2] << " before first while!" << endl;
@@ -1574,7 +1574,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 			
 			while (BusyAttachedNode==true or HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
 				//cout << "Host " << this->IPaddressesSockets[2] << " Entered While 2" << endl;
-				int numForstEquivalentToSleep=(int)(1000+500*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
+				int numForstEquivalentToSleep=(int)(100+50*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
 				for (int i=0;i<numForstEquivalentToSleep;i++){
 					this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 					//cout << "this->getState(): " << this->getState() << endl;
