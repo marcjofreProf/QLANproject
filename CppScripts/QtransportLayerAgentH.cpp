@@ -1551,6 +1551,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		this->acquire();
 		//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 1" << endl;
 		bool FirstPassAux=true;
+		AchievedAttentionParticularHosts=false;
 		int MaxNumPassesCheckBlockAux=0;
 		int NumPassesCheckBlockAux=0;
 		while((AchievedAttentionParticularHosts==false or FirstPassAux==true) and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux){
@@ -1623,12 +1624,16 @@ int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 	AchievedAttentionParticularHosts=false;// reset value
 	//cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFree" << endl;
 	//cout << "Host " << this->IPaddressesSockets[2] << " IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
-	this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
-		if(this->getState()==0){
+	int numForstEquivalentToSleep=(int)(2000+1000*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
+	for (int i=0;i<numForstEquivalentToSleep;i++){
+		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+		//cout << "this->getState(): " << this->getState() << endl;
+		if(this->getState()==0) {
 			this->ProcessNewMessage();
 			this->m_pause(); // After procesing the request, pass to paused state
-			//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 		}
+		this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+	}
 
 	this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 	//cout << "Host " << this->IPaddressesSockets[2] << " IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
@@ -1848,9 +1853,7 @@ return false; // all ok
 }
 
 int QTLAH::UnBlockYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
-//this->RelativeNanoSleepWait((unsigned long long int)(50000));
-if ((HostsActiveActionsFree[0]==false and string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2])) or iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer){// This is the blocking host so proceed to unblock
-	int numForstEquivalentToSleep=2000;//100: Equivalent to 1 seconds# give time to other hosts to enter
+int numForstEquivalentToSleep=2000;//100: Equivalent to 1 seconds# give time to other hosts to enter
 	for (int i=0;i<numForstEquivalentToSleep;i++){
 		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 		//cout << "this->getState(): " << this->getState() << endl;
@@ -1860,6 +1863,7 @@ if ((HostsActiveActionsFree[0]==false and string(InfoRemoteHostActiveActions[0])
 		}
 		this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 	}
+if ((HostsActiveActionsFree[0]==false and string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2])) or iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer){// This is the blocking host so proceed to unblock	
 	strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
 	strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
 	//BusyAttachedNode=false;
