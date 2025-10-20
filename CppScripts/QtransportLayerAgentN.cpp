@@ -946,7 +946,7 @@ if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this inf
 	this->QPLASimulateEmitQuBitFlag=true; 
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,this->QLLAQuadEmitDetecSelec);
 	// Buy some time because the thread is detached and not really controlling when it finishes
-	int numForstEquivalentToSleep=(int)(2000+1000*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
+	int numForstEquivalentToSleep=(int)(100+0*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
 	for (int i=0;i<numForstEquivalentToSleep;i++){
 		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 		//cout << "this->getState(): " << this->getState() << endl;
@@ -970,7 +970,7 @@ if (this->QPLASimulateEmitQuBitFlag==false){// No other thread checking this inf
 	this->QPLASimulateEmitQuBitFlag=true; 
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateEmitSynchQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass,this->QLLAQuadEmitDetecSelec);
 	// Buy some time because the thread is detached and not really controlling when it finishes
-	int numForstEquivalentToSleep=(int)(2000+1000*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
+	int numForstEquivalentToSleep=(int)(100+0*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
 	for (int i=0;i<numForstEquivalentToSleep;i++){
 		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 		//cout << "this->getState(): " << this->getState() << endl;
@@ -998,7 +998,7 @@ if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this 
 	///
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveQuBit(this->QLLAModeActivePassive,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,this->QLLAQuadEmitDetecSelec);
 	// Buy some time because the thread is detached and not really controlling when it finishes
-	int numForstEquivalentToSleep=(int)(2000+1000*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
+	int numForstEquivalentToSleep=(int)(100+0*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
 	for (int i=0;i<numForstEquivalentToSleep;i++){
 		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 		//cout << "this->getState(): " << this->getState() << endl;
@@ -1022,7 +1022,7 @@ if (this->QPLASimulateReceiveQuBitFlag==false){// No other thread checking this 
 	this->QPLASimulateReceiveQuBitFlag=true; 
 	this->QNLAagent.QLLAagent.QPLAagent.SimulateReceiveSynchQuBit(this->QLLAModeActivePassive,CurrentReceiveHostIPaux,this->QPLLACurrentEmitReceiveIP,this->QLLAIPaddresses,this->QLLAnumReqQuBits,this->QLLANumRunsPerCenterMass,this->QLLAFreqSynchNormValuesArray,HistPeriodicityAuxAux,this->QLLAFineSynchAdjVal,iCenterMass,iNumRunsPerCenterMass,this->QLLAQuadEmitDetecSelec);
 	// Buy some time because the thread is detached and not really controlling when it finishes
-	int numForstEquivalentToSleep=(int)(2000+1000*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
+	int numForstEquivalentToSleep=(int)(100+0*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
 	for (int i=0;i<numForstEquivalentToSleep;i++){
 		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 		//cout << "this->getState(): " << this->getState() << endl;
@@ -1203,6 +1203,19 @@ else{// server sends on the socket connection
 	socket_fd_conn=this->new_socketArray[0];
 }      
 this->ICPmanagementSend(socket_fd_conn,this->IPaddressesSockets[0]);
+
+// Buy some time because the thread is detached and not really controlling when it finishes
+	int numForstEquivalentToSleep=(int)(100+0*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
+	for (int i=0;i<numForstEquivalentToSleep;i++){
+		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+		//cout << "this->getState(): " << this->getState() << endl;
+		if(this->getState()==0) {
+			this->ProcessNewMessage();
+			this->m_pause(); // After procesing the request, pass to paused state
+		}
+		this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+	}
+	///
 this->GetSimulateNumStoredQubitsNodeFlag=false;
 this->BusyNode=false;
 //cout<< "Node after GetSimulateSynchParamsNode" << endl;
