@@ -1554,6 +1554,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		AchievedAttentionParticularHosts=false;
 		int MaxNumPassesCheckBlockAux=0;
 		int NumPassesCheckBlockAux=0;
+		BusyAttachedNode==true;// Force busy node
 		while((AchievedAttentionParticularHosts==false or FirstPassAux==true) and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux){
 			NumPassesCheckBlockAux++;
 			if (NumPassesCheckBlockAux>=MaxNumPassesCheckBlockAux){// Not the best solution, but avoid for ever block
@@ -1571,6 +1572,12 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 			FirstPassAux=false;// First pass is compulsory, since it might be true AchievedAttentionParticularHosts, but because of another process
 			while (BusyAttachedNode==true or HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
 				//cout << "Host " << this->IPaddressesSockets[2] << " Entered While 2" << endl;
+				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+				if(this->getState()==0){
+					this->ProcessNewMessage();
+					this->m_pause(); // After procesing the request, pass to paused state
+					//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
+				}
 				this->release();
 				//cout << "Host " << this->IPaddressesSockets[2] << " Exited release 1" << endl;
 				//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
@@ -2044,7 +2051,7 @@ for (int iConnHostsNodes=0;iConnHostsNodes<NumConnectedHosts;iConnHostsNodes++){
 			// Instead of a simple sleep, which would block the operation (specially processing new messages)
 			// usleep(usSynchProcIterRunsTimePoint);// Give time between iterations to send and receive qubits
 			//int numForstEquivalentToSleep=1000;//100: Equivalent to 1 seconds#(usSynchProcIterRunsTimePoint*1000)/WaitTimeAfterMainWhileLoop;
-			numForstEquivalentToSleep=1000;
+			numForstEquivalentToSleep=1500;
 			for (int i=0;i<numForstEquivalentToSleep;i++){
 				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 				//cout << "this->getState(): " << this->getState() << endl;
