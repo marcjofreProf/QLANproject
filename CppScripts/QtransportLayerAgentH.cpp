@@ -1878,7 +1878,7 @@ int numForstEquivalentToSleep=2000;//100: Equivalent to 1 seconds# give time to 
 		}
 		this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 	}
-if ((HostsActiveActionsFree[0]==false and string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2])) or iIterPeriodicBlockTimer>MaxiIterPeriodicBlockTimer){// This is the blocking host so proceed to unblock	
+if ((HostsActiveActionsFree[0]==false and string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2])) or iIterPeriodicBlockTimer>=MaxiIterPeriodicBlockTimer or ReWaitsAnswersHostsActiveActionsFree>=MaxReWaitsAnswersHostsActiveActionsFree){// This is the blocking host so proceed to unblock	
 	strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
 	strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
 	//BusyAttachedNode=false;
