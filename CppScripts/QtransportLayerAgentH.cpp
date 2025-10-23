@@ -1560,7 +1560,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 			//cout << "Host " << this->IPaddressesSockets[2] << " first while!" << endl;
 			NumPassesCheckBlockAux++;
 			if (NumPassesCheckBlockAux>=MaxNumPassesCheckBlockAux){// Not the best solution, but avoid for ever block
-				cout << "QTLAH::WaitUntilActiveActionFreePreLock Malfunction. Host " << this->IPaddressesSockets[2] << " will proceed eventhough Blocking not achieved!" << endl;
+				cout << "QTLAH::WaitUntilActiveActionFreePreLock outer while malfunction. Host " << this->IPaddressesSockets[2] << " will proceed eventhough Blocking not achieved!" << endl;
 			}
 			//cout << "Host " << this->IPaddressesSockets[2] << " Entered While 1" << endl;
 			if (FirstPassAux==false){
@@ -1595,6 +1595,9 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 				this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 				this->acquire();
 				NumPassesCheckBlockAux++;
+				if (NumPassesCheckBlockAux>=MaxNumPassesCheckBlockAux){// Not the best solution, but avoid for ever block
+					cout << "QTLAH::WaitUntilActiveActionFreePreLock inner while malfunction. Host " << this->IPaddressesSockets[2] << " will proceed eventhough Blocking not achieved!" << endl;
+				}
 				//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 2" << endl;
 			}
 			//int numForstEquivalentToSleep=200;//100: Equivalent to 1 seconds# give time to other hosts to enter
