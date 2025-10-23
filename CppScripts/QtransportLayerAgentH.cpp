@@ -1552,7 +1552,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 1" << endl;
 		bool FirstPassAux=true;
 		AchievedAttentionParticularHosts=false;
-		int MaxNumPassesCheckBlockAux=1000; // Protection to not block permanently
+		int MaxNumPassesCheckBlockAux=10; // Protection to not block permanently
 		int NumPassesCheckBlockAux=0;
 		//BusyAttachedNode=true;// Force busy node
 		//cout << "Host " << this->IPaddressesSockets[2] << " before first while!" << endl;
@@ -1628,6 +1628,8 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		// Handle the exception
     	cout << "QTLAH::WaitUntilActiveActionFreePreLock Exception: " << e.what() << endl;
     }
+	HostsActiveActionsFree[0]=false; // Force it to busy
+  BusyAttachedNode=true;// Force busy node
 	this->release();
 	//cout << "Host " << this->IPaddressesSockets[2] << " Exited release 2" << endl;
 	//cout << "Host " << this->IPaddressesSockets[2] << " Finished WaitUntilActiveActionFreePreLock" << endl;
