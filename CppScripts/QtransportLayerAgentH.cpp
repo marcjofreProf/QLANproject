@@ -1584,7 +1584,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 					}
 					this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 				}
-				this->release();
+				//this->release();
 				//cout << "Host " << this->IPaddressesSockets[2] << " Exited release 1" << endl;
 				//cout << "HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
 				//cout << "GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
@@ -1592,8 +1592,8 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 				if (FirstPassAux==false){cout << "Host " << this->IPaddressesSockets[2] << " waiting network & hardware synchronization or availability of other hosts to proceed with the request!" << endl;}
 				//else{cout << "Host " << this->IPaddressesSockets[2] << " second while!" << endl;}
 				FirstPassAux=false;// First pass is compulsory, since it might be true AchievedAttentionParticularHosts, but because of another process
-				this->RelativeNanoSleepWait((unsigned long long int)(10.0*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter//this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
-				this->acquire();
+				//this->RelativeNanoSleepWait((unsigned long long int)(10.0*WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter//this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
+				//this->acquire();
 				NumPassesCheckBlockAux++;
 				if (NumPassesCheckBlockAux>=MaxNumPassesCheckBlockAux){// Not the best solution, but avoid for ever block
 					cout << "QTLAH::WaitUntilActiveActionFreePreLock inner while malfunction. Host " << this->IPaddressesSockets[2] << " will proceed eventhough Blocking not achieved!" << endl;
