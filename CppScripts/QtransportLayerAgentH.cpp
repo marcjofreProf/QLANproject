@@ -1611,7 +1611,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 			//	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 			//}
 			//cout << "Host " << this->IPaddressesSockets[2] << " Exited While 2" << endl;
-			if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true and BusyAttachedNode==false){//string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){
+			if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true and BusyAttachedNode==false and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux){//string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){
 				//cout << "Host " << this->IPaddressesSockets[2] << " Entering WaitUntilActiveActionFree" << endl;
 				this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 			}
