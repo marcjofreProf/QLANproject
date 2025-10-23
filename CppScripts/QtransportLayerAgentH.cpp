@@ -1572,7 +1572,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 				//cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 			}
 			
-			while (BusyAttachedNode==true or HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false){// Wait here// No other thread checking this info
+			while ((BusyAttachedNode==true or HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false) and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux){// Wait here// No other thread checking this info
 				//cout << "Host " << this->IPaddressesSockets[2] << " Entered While 2" << endl;
 				int numForstEquivalentToSleep=(int)(100+50*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
 				for (int i=0;i<numForstEquivalentToSleep;i++){
@@ -1594,6 +1594,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 				FirstPassAux=false;// First pass is compulsory, since it might be true AchievedAttentionParticularHosts, but because of another process
 				this->RelativeNanoSleepWait((unsigned long long int)(1500*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 				this->acquire();
+				NumPassesCheckBlockAux++;
 				//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 2" << endl;
 			}
 			//int numForstEquivalentToSleep=200;//100: Equivalent to 1 seconds# give time to other hosts to enter
@@ -1619,6 +1620,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 			//	this->UnBlockActiveActionFree(ParamsCharArrayArg,nChararray);// Unblock
 			//}
 		}
+		NumPassesCheckBlockAux=0; // Reset value
 	}
     catch (const std::exception& e) {
 		// Handle the exception
