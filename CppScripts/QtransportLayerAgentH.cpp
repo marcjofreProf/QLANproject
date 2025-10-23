@@ -1552,7 +1552,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 1" << endl;
 		bool FirstPassAux=true;
 		AchievedAttentionParticularHosts=false;
-		int MaxNumPassesCheckBlockAux=10; // Protection to not block permanently
+		int MaxNumPassesCheckBlockAux=50; // Protection to not block permanently
 		int NumPassesCheckBlockAux=0;
 		//BusyAttachedNode=true;// Force busy node
 		//cout << "Host " << this->IPaddressesSockets[2] << " before first while!" << endl;
