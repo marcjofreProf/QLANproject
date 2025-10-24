@@ -1557,6 +1557,22 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		//BusyAttachedNode=true;// Force busy node
 		//cout << "Host " << this->IPaddressesSockets[2] << " before first while!" << endl;
 		while((AchievedAttentionParticularHosts==false or FirstPassAux==true) and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux){
+			// Check if Busy the node
+			if (GPIOnodeHardwareSynched==true and BusyAttachedNode==true){//} and HostsActiveActionsFree[0]==true){// Ask the node if busy
+				char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+				strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,this->IPaddressesSockets[1]);
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,"Control");
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,"BusyNode");
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,"none");
+				strcat(ParamsCharArray,",");// Very important to end the message
+				//cout << "Host sent HardwareSynchNode" << endl;
+				this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+			}
 			//cout << "Host " << this->IPaddressesSockets[2] << " first while!" << endl;
 			NumPassesCheckBlockAux++;
 			if (NumPassesCheckBlockAux>=MaxNumPassesCheckBlockAux){// Not the best solution, but avoid for ever block
@@ -1704,27 +1720,7 @@ int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg,
 				this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 				return 0; // All Ok
 			}			
-			// Process other messages if available
-			if (GPIOnodeHardwareSynched==true and BusyAttachedNode==true){//} and HostsActiveActionsFree[0]==true){// Ask the node if busy
-					char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-					strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
-					strcat(ParamsCharArray,",");
-					strcat(ParamsCharArray,this->IPaddressesSockets[1]);
-					strcat(ParamsCharArray,",");
-					strcat(ParamsCharArray,"Control");
-					strcat(ParamsCharArray,",");
-					strcat(ParamsCharArray,"BusyNode");
-					strcat(ParamsCharArray,",");
-					strcat(ParamsCharArray,"none");
-					strcat(ParamsCharArray,",");// Very important to end the message
-					//cout << "Host sent HardwareSynchNode" << endl;
-					this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
-				}
-			
-			//this->release();
-			this->RelativeNanoSleepWait((unsigned long long int)(5*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+10.0*(float)rand()/(float)RAND_MAX))));
-			//this->acquire();
-
+			// Wait while processing answers
 			int numForstEquivalentToSleep=(int)(50+100*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
 			for (int i=0;i<numForstEquivalentToSleep;i++){
 				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
