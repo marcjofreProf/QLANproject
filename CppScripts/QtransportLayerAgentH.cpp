@@ -1557,22 +1557,10 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		//BusyAttachedNode=true;// Force busy node
 		//cout << "Host " << this->IPaddressesSockets[2] << " before first while!" << endl;
 		while((AchievedAttentionParticularHosts==false or FirstPassAux==true) and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux){
-			// Check if Busy the node
-			if (GPIOnodeHardwareSynched==true and BusyAttachedNode==true){//} and HostsActiveActionsFree[0]==true){// Ask the node if busy
-				char ParamsCharArray[NumBytesBufferICPMAX] = {0};
-				strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
-				strcat(ParamsCharArray,",");
-				strcat(ParamsCharArray,this->IPaddressesSockets[1]);
-				strcat(ParamsCharArray,",");
-				strcat(ParamsCharArray,"Control");
-				strcat(ParamsCharArray,",");
-				strcat(ParamsCharArray,"BusyNode");
-				strcat(ParamsCharArray,",");
-				strcat(ParamsCharArray,"none");
-				strcat(ParamsCharArray,",");// Very important to end the message
-				//cout << "Host sent HardwareSynchNode" << endl;
-				this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
-			}
+			cout << "Host " << this->IPaddressesSockets[2] << " AchievedAttentionParticularHosts" << AchievedAttentionParticularHosts << endl;
+			cout << "Host " << this->IPaddressesSockets[2] << " FirstPassAux" << FirstPassAux << endl;
+			cout << "Host " << this->IPaddressesSockets[2] << " NumPassesCheckBlockAux" << NumPassesCheckBlockAux << endl;
+			
 			//cout << "Host " << this->IPaddressesSockets[2] << " first while!" << endl;
 			NumPassesCheckBlockAux++;
 			if (NumPassesCheckBlockAux>=MaxNumPassesCheckBlockAux){// Not the best solution, but avoid for ever block
@@ -1589,7 +1577,12 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 			}
 			
 			while ((BusyAttachedNode==true or HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false) and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux){// Wait here// No other thread checking this info
-				//cout << "Host " << this->IPaddressesSockets[2] << " Entered While 2" << endl;
+				cout << "Host " << this->IPaddressesSockets[2] << " BusyAttachedNode" << BusyAttachedNode << endl;
+				cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]" << HostsActiveActionsFree[0] << endl;
+				cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeHardwareSynched" << GPIOnodeHardwareSynched << endl;
+				cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched" << GPIOnodeNetworkSynched << endl;
+				cout << "Host " << this->IPaddressesSockets[2] << " NumPassesCheckBlockAux" << NumPassesCheckBlockAux << endl;
+
 				int numForstEquivalentToSleep=(int)(100+50*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
 				for (int i=0;i<numForstEquivalentToSleep;i++){
 					this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
@@ -1719,7 +1712,24 @@ int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg,
 			if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and BusyAttachedNode==false){
 				this->SendAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
 				return 0; // All Ok
-			}			
+			}
+			// Busy the node
+			if (GPIOnodeHardwareSynched==true and BusyAttachedNode==true){//} and HostsActiveActionsFree[0]==true){// Ask the node if busy
+				char ParamsCharArray[NumBytesBufferICPMAX] = {0};
+				strcpy(ParamsCharArray,this->IPaddressesSockets[0]);
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,this->IPaddressesSockets[1]);
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,"Control");
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,"BusyNode");
+				strcat(ParamsCharArray,",");
+				strcat(ParamsCharArray,"none");
+				strcat(ParamsCharArray,",");// Very important to end the message
+				//cout << "Host sent HardwareSynchNode" << endl;
+				this->ICPdiscoverSend(ParamsCharArray); // send mesage to dest
+			}
+			
 			// Wait while processing answers
 			int numForstEquivalentToSleep=(int)(50+100*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
 			for (int i=0;i<numForstEquivalentToSleep;i++){
