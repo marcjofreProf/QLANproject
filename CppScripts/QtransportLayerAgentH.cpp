@@ -1550,16 +1550,20 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 		//this->RelativeNanoSleepWait((unsigned long long int)(50000+150000*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+(float)rand()/(float)RAND_MAX))));
 		this->acquire();
 		//cout << "Host " << this->IPaddressesSockets[2] << " Entered acquire 1" << endl;
+		// Force initial status
+		HostsActiveActionsFree[0]=true;// This host blocked
+		BusyAttachedNode=false; // Set it already as busy
+		//
 		bool FirstPassAux=true;
 		AchievedAttentionParticularHosts=false;
 		int MaxNumPassesCheckBlockAux=100; // Protection to not block permanently
 		int NumPassesCheckBlockAux=0;
 		//BusyAttachedNode=true;// Force busy node
 		//cout << "Host " << this->IPaddressesSockets[2] << " before first while!" << endl;
-		while((AchievedAttentionParticularHosts==false or FirstPassAux==true) and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux){
-			cout << "Host " << this->IPaddressesSockets[2] << " AchievedAttentionParticularHosts: " << AchievedAttentionParticularHosts << endl;
-			cout << "Host " << this->IPaddressesSockets[2] << " FirstPassAux: " << FirstPassAux << endl;
-			cout << "Host " << this->IPaddressesSockets[2] << " NumPassesCheckBlockAux: " << NumPassesCheckBlockAux << endl;
+		while((AchievedAttentionParticularHosts==false or FirstPassAux==true) and AchievedAttentionParticularHosts==false and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux){
+			//cout << "Host " << this->IPaddressesSockets[2] << " AchievedAttentionParticularHosts: " << AchievedAttentionParticularHosts << endl;
+			//cout << "Host " << this->IPaddressesSockets[2] << " FirstPassAux: " << FirstPassAux << endl;
+			//cout << "Host " << this->IPaddressesSockets[2] << " NumPassesCheckBlockAux: " << NumPassesCheckBlockAux << endl;
 			
 			//cout << "Host " << this->IPaddressesSockets[2] << " first while!" << endl;
 			NumPassesCheckBlockAux++;
@@ -1576,14 +1580,15 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 				//cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
 			}
 			
-			while ((BusyAttachedNode==true or HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false) and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux){// Wait here// No other thread checking this info
-				cout << "Host " << this->IPaddressesSockets[2] << " BusyAttachedNode: " << BusyAttachedNode << endl;
-				cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
-				cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
-				cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
-				cout << "Host " << this->IPaddressesSockets[2] << " NumPassesCheckBlockAux: " << NumPassesCheckBlockAux << endl;
+			while ((BusyAttachedNode==true or HostsActiveActionsFree[0]==false or GPIOnodeHardwareSynched==false or GPIOnodeNetworkSynched==false) and AchievedAttentionParticularHosts==false and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux){// Wait here// No other thread checking this info
+				//cout << "Host " << this->IPaddressesSockets[2] << " AchievedAttentionParticularHosts: " << AchievedAttentionParticularHosts << endl;
+				//cout << "Host " << this->IPaddressesSockets[2] << " BusyAttachedNode: " << BusyAttachedNode << endl;
+				//cout << "Host " << this->IPaddressesSockets[2] << " HostsActiveActionsFree[0]: " << HostsActiveActionsFree[0] << endl;
+				//cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeHardwareSynched: " << GPIOnodeHardwareSynched << endl;
+				//cout << "Host " << this->IPaddressesSockets[2] << " GPIOnodeNetworkSynched: " << GPIOnodeNetworkSynched << endl;
+				//cout << "Host " << this->IPaddressesSockets[2] << " NumPassesCheckBlockAux: " << NumPassesCheckBlockAux << endl;
 
-				int numForstEquivalentToSleep=(int)(100+50*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
+				int numForstEquivalentToSleep=(int)(100+500*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
 				for (int i=0;i<numForstEquivalentToSleep;i++){
 					this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 					//cout << "this->getState(): " << this->getState() << endl;
@@ -1620,7 +1625,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
 			//	this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 			//}
 			//cout << "Host " << this->IPaddressesSockets[2] << " Exited While 2" << endl;
-			if (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true and BusyAttachedNode==false and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux){//string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){
+			if (AchievedAttentionParticularHosts=true or (HostsActiveActionsFree[0]==true and GPIOnodeHardwareSynched==true and GPIOnodeNetworkSynched==true and BusyAttachedNode==false and NumPassesCheckBlockAux<MaxNumPassesCheckBlockAux)){//string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2]) or string(InfoRemoteHostActiveActions[0])==string("\0")){
 				//cout << "Host " << this->IPaddressesSockets[2] << " Entering WaitUntilActiveActionFree" << endl;
 				this->WaitUntilActiveActionFree(ParamsCharArrayArg,nChararray);
 			}
@@ -1639,6 +1644,7 @@ int QTLAH::WaitUntilActiveActionFreePreLock(char* ParamsCharArrayArg, int nChara
     }
 	HostsActiveActionsFree[0]=false; // Force it to busy
   BusyAttachedNode=true;// Force busy node
+  AchievedAttentionParticularHosts=true; // Force it to true 
 	this->release();
 	//cout << "Host " << this->IPaddressesSockets[2] << " Exited release 2" << endl;
 	//cout << "Host " << this->IPaddressesSockets[2] << " Finished WaitUntilActiveActionFreePreLock" << endl;
@@ -1649,7 +1655,7 @@ return 0; // all ok;
 
 int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 	// First block the current host
-	HostsActiveActionsFree[0]=true;// This host unblocked
+	// Not here HostsActiveActionsFree[0]=true;// This host unblocked
 	BusyAttachedNode=false; // Very important to be here
 	AchievedAttentionParticularHosts=false;// reset value
 	IterHostsActiveActionsFreeStatus=0;// Initialize value
@@ -1755,8 +1761,8 @@ return 0; // All Ok
 int QTLAH::SendAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg, int nChararray){
 // Three-step handshake
 // First block the current host
-HostsActiveActionsFree[0]=false;// This host blocked
-BusyAttachedNode=true; // Set it already as busy
+//HostsActiveActionsFree[0]=false;// This host blocked
+//BusyAttachedNode=true; // Set it already as busy
 strcpy(InfoRemoteHostActiveActions[0],this->IPaddressesSockets[2]);// Clear active host
 strcpy(InfoRemoteHostActiveActions[1],"Block");// Clear status
 
@@ -1871,6 +1877,8 @@ for (int i=0;i<NumInterestIPaddressesAux;i++){// Reset values
 
 // If all available, notify that attention achieved
 if (CheckAllOthersFreeAux==true){
+	HostsActiveActionsFree[0]=false;// This host blocked
+	BusyAttachedNode=true; // Set it already as busy
 	IterHostsActiveActionsFreeStatus=0;// reset process
 	//BusyAttachedNode=true; // Set it already as busy
 	return true;
@@ -1896,7 +1904,7 @@ int numForstEquivalentToSleep=2000;//100: Equivalent to 1 seconds# give time to 
 		}
 		this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 	}
-if ((HostsActiveActionsFree[0]==false and string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2])) or iIterPeriodicBlockTimer>=MaxiIterPeriodicBlockTimer or ReWaitsAnswersHostsActiveActionsFree>=MaxReWaitsAnswersHostsActiveActionsFree){// This is the blocking host so proceed to unblock	
+if (true){//(HostsActiveActionsFree[0]==false and string(InfoRemoteHostActiveActions[0])==string(this->IPaddressesSockets[2])) or iIterPeriodicBlockTimer>=MaxiIterPeriodicBlockTimer or ReWaitsAnswersHostsActiveActionsFree>=MaxReWaitsAnswersHostsActiveActionsFree){// This is the blocking host so proceed to unblock	
 	strcpy(InfoRemoteHostActiveActions[0],"\0");// Clear active host
 	strcpy(InfoRemoteHostActiveActions[1],"\0");// Clear status
 	BusyAttachedNode=false; // Very important to be here
