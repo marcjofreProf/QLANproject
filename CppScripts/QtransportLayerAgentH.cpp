@@ -1643,9 +1643,10 @@ int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 	//HostsActiveActionsFree[0]=false;// This host blocked
 	//BusyAttachedNode=true; // Set it already as busy
 	AchievedAttentionParticularHosts=false;// reset value
+	IterHostsActiveActionsFreeStatus=0;// Initialize value
 	//cout << "Host " << this->IPaddressesSockets[2] << " Initiated WaitUntilActiveActionFree" << endl;
 	//cout << "Host " << this->IPaddressesSockets[2] << " IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
-	int numForstEquivalentToSleep=(int)(2000+1000*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
+	int numForstEquivalentToSleep=(int)(50+100*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
 	for (int i=0;i<numForstEquivalentToSleep;i++){
 		this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
 		//cout << "this->getState(): " << this->getState() << endl;
@@ -1667,6 +1668,7 @@ int QTLAH::WaitUntilActiveActionFree(char* ParamsCharArrayArg, int nChararray){
 			this->m_pause(); // After procesing the request, pass to paused state
 			//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 		}
+		this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
 		this->SequencerAreYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);		
 	}
 //cout << "Host " << this->IPaddressesSockets[2] << " Finished WaitUntilActiveActionFree" << endl;
@@ -1720,15 +1722,19 @@ int QTLAH::SequencerAreYouFreeRequestToParticularHosts(char* ParamsCharArrayArg,
 				}
 			
 			//this->release();
-			this->RelativeNanoSleepWait((unsigned long long int)(2*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+10.0*(float)rand()/(float)RAND_MAX))));
+			this->RelativeNanoSleepWait((unsigned long long int)(5*(unsigned long long int)(WaitTimeAfterMainWhileLoop*(1.0+10.0*(float)rand()/(float)RAND_MAX))));
 			//this->acquire();
 
-			this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
-				if(this->getState()==0){
+			int numForstEquivalentToSleep=(int)(50+100*(float)rand()/(float)RAND_MAX);//100: Equivalent to 1 seconds# give time to other hosts to enter
+			for (int i=0;i<numForstEquivalentToSleep;i++){
+				this->ICPConnectionsCheckNewMessages(SockListenTimeusecStandard); // This function has some time out (so will not consume resources of the node)
+				//cout << "this->getState(): " << this->getState() << endl;
+				if(this->getState()==0) {
 					this->ProcessNewMessage();
 					this->m_pause(); // After procesing the request, pass to paused state
-					//cout << "IterHostsActiveActionsFreeStatus: " << IterHostsActiveActionsFreeStatus << endl;
 				}
+				this->RelativeNanoSleepWait((unsigned long long int)(WaitTimeAfterMainWhileLoop));// Wait a few nanoseconds for other processes to enter
+			}
 	}
 	else if (IterHostsActiveActionsFreeStatus==1){
 		this->AcumulateAnswersYouFreeRequestToParticularHosts(ParamsCharArrayArg,nChararray);
