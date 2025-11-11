@@ -369,6 +369,7 @@ public:	// Functions/Methods
 	~GPIO();  //destructor
 
 private: // Functions/Methods
+	int KillcodePRUs();
 	// Task manager priority
 	bool setMaxRrPriority(int PriorityValAux);
 	// Sempahore
