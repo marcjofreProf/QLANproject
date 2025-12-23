@@ -32,12 +32,26 @@ NicenestPriorValue=-10 # The smaller, the better
 PriorityValue=75 # The larger, the better. Above 60 is well enough
 PriorityNoSoHighValue=50 # The larger, the better.gh
 
+# Note for apt and apt-get
+# sudo nano /etc/apt/sources.list
+# Change the first three repositories urls for
+# deb http://archive.debian.org/debian buster main contrib non-free
+# deb http://archive.debian.org/debian buster-updates main contrib non-free
+# Comment it: deb http://security.debian.org/debian-security buster/updates main
+
+# Note for apt and apt-get
+# sudo nano /etc/apt/sources.list
+# Change the first three repositories urls for
+# deb http://archive.debian.org/debian buster main contrib non-free
+# deb http://archive.debian.org/debian buster-updates main contrib non-free
+# Comment it: deb http://security.debian.org/debian-security buster/updates main
+
 # Check if watchdog is installed using dpkg
 if dpkg -l | grep -q watchdog; then
     echo "watchdog is installed."
     sudo systemctl enable --now watchdog
 else
-    echo "whatchdog is not installed. sudo apt watchdog and configure it"
+    echo "whatchdog is not installed. sudo apt update && sudo apt install watchdog. Then, configure it - set time of time out: sudo wdctl -s 300"
 fi
 
 # Check if adjtimex is installed using dpkg
@@ -45,7 +59,7 @@ if dpkg -l | grep -q adjtimex; then
     echo "adjtimex is installed."
     sudo adjtimex -f 0 # Reset any adjtimex previous configuration
 else
-    echo "adjtimex is not installed. sudo apt-get install adjtimex."
+    echo "adjtimex is not installed. sudo apt-get update && sudo apt-get install adjtimex"
 fi
 
 cleanup_on_SIGINT() {
