@@ -2,3 +2,4 @@
 ./PRUdata/ClientRawStoredQubitsNode
 ./PRUdata/ServerRawStoredQubitsNode
 ./PRUdata/DealerRawStoredQubitsNode
+.ipynb_checkpoints/
