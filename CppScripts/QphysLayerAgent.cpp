@@ -1212,15 +1212,16 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 					long long int LLIMultFactorEffSynchPeriod=static_cast<long long int>(MultFactorEffSynchPeriodQPLA);
 					long long int ChOffsetCorrection=0;// Variable to acomodate the 4 different channels in the periodic histogram analysis
 					long long int SmallOffsetDriftArrayAux[static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])]={0};
+					long long int IndependentSmallOffsetDriftAux[4]={0}; // For each independent channel
 					if (UseAllTagsForEstimation){						
-						long long int CheckChOffsetCorrectionArray[4][RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]]={0};
+						long long int CheckChOffsetCorrectionArray[4][RawTotalCurrentNumRecordsQuadCh[SpecificQuadChDet]]={0}; // Stores the computed offset independently for each channel
 						long long int CheckChOffsetCorrection[4]={0};
 						unsigned int CheckChOffsetCorrectionIter[4]={0};
 						unsigned int CheckChOffsetCorrectionIterMinCheckCalc=static_cast<long long int>(0.01*MaxNumQuBitsPerRun);
 						unsigned int CheckChOffsetCorrectionIterMinCheck=static_cast<long long int>(0.1*MaxNumQuBitsPerRun);
-						unsigned int CheckChOffsetCorrectionIterMinCheckIter=0;
+						unsigned int CheckChOffsetCorrectionIterMinCheckIter=0;						
 						//bool boolCheckChOffsetCorrectionflag=false;
-						for (unsigned int i=0;i<4;i++){CheckChOffsetCorrectionIter[i]=0;}// Reset values			
+						for (unsigned int i=0;i<4;i++){CheckChOffsetCorrectionIter[i]=0;}// Reset values	
 						for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){					  
 						  if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
 						  	ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[iQuadChIter][i]));// Maps the offset correction for the different channels to detect a specific state								
@@ -1231,7 +1232,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 						  else{// When NOT using histogram analysis
 							  SmallOffsetDriftArrayAux[i]=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
 							}
-							
+
 							//if (i%200==0){
 							//	cout << "QPLA::SmallDriftContinuousCorrection ChannelTags[" << i << "]: " << ChannelTags[iQuadChIter][i] << endl;
 							//	cout << "QPLA::SmallDriftContinuousCorrection BitPositionChannelTags(ChannelTags[" << i << "]): " << BitPositionChannelTags(ChannelTags[iQuadChIter][i]) << endl;
@@ -1260,6 +1261,12 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 							cout << "QPLA::SmallDriftContinuousCorrection Potentially GPIO pins connection order is wrong or too much jitter on iQuadChIter: " << iQuadChIter <<" Check!!!" << endl;
 						}
 					  SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
+					  // For each independent channel
+					  for (unsigned int i=0;i<4;i++){
+					  	if (CheckChOffsetCorrectionIter[i]>0){
+					  		IndependentSmallOffsetDriftAux[i]=LLIMeanFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i]));
+					  	}
+					  }
 					  //SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));// To avoid glitches//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
 					  //cout << "QPLA::SmallDriftContinuousCorrection static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]): " << static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]) << endl;
 					  //cout << "QPLA::SmallDriftContinuousCorrection SmallOffsetDriftAux: " << SmallOffsetDriftAux << endl;
@@ -1272,7 +1279,10 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 						else{// When NOT using histogram analysis
 							SmallOffsetDriftAux=(LLIHistPeriodicityHalfAux+(static_cast<long long int>(TimeTaggs[iQuadChIter][0])-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIHistPeriodicityAux)-(LLIHistPeriodicityHalfAux);
 						}
-						
+						// For each independent channel
+					  for (unsigned int i=0;i<4;i++){
+					  		IndependentSmallOffsetDriftAux[i]=SmallOffsetDriftAux;
+					  }
 						cout << "QPLA::SmallDriftContinuousCorrection Using only first timetag for small offset correction!...to be deactivated" << endl;
 					}
 
@@ -1290,13 +1300,25 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 					long long int LLISmallOffsetDriftPerLinkCurrentSpecificLink=SmallOffsetDriftAux+0*SmallOffsetDriftPerLink[iQuadChIter][CurrentSpecificLinkMultiple];
 				  //long long int LLISmallOffsetDriftAux=static_cast<long long int>(SmallOffsetDriftAux);
 					for (unsigned int i=0;i<RawTotalCurrentNumRecordsQuadCh[iQuadChIter];i++){
-						if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink)>=0){
-							TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
-							//TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftArrayAux[i]);// Cheating by adjusting every single timetagg allowed thorugh the filters
+						if (UseAllTagsForEstimation){
+							if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-IndependentSmallOffsetDriftAux[static_cast<long long int>(BitPositionChannelTags(ChannelTags[iQuadChIter][i]))])>=0){
+								TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-IndependentSmallOffsetDriftAux[static_cast<long long int>(BitPositionChannelTags(ChannelTags[iQuadChIter][i]))]);
+								//TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftArrayAux[i]);// Cheating by adjusting every single timetagg allowed thorugh the filters
+							}
+							else{
+								TimeTaggs[iQuadChIter][i]=0;
+								cout << "QPLA::SmallDriftContinuousCorrection static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink: " << static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink << " negative!!!...we sould not be here!!" << endl;
+							}
 						}
 						else{
-							TimeTaggs[iQuadChIter][i]=0;
-							cout << "QPLA::SmallDriftContinuousCorrection static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink: " << static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink << " negative!!!...we sould not be here!!" << endl;
+							if ((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink)>=0){
+								TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink);
+								//TimeTaggs[iQuadChIter][i]=static_cast<unsigned long long int>(static_cast<long long int>(TimeTaggs[iQuadChIter][i])-SmallOffsetDriftArrayAux[i]);// Cheating by adjusting every single timetagg allowed thorugh the filters
+							}
+							else{
+								TimeTaggs[iQuadChIter][i]=0;
+								cout << "QPLA::SmallDriftContinuousCorrection static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink: " << static_cast<long long int>(TimeTaggs[iQuadChIter][i])-LLISmallOffsetDriftPerLinkCurrentSpecificLink << " negative!!!...we sould not be here!!" << endl;
+							}
 						}
 					}
 
