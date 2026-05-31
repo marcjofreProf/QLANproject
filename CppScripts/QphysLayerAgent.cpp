@@ -1509,8 +1509,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 	//	}
 	//}
 	// Update value ofCoincidenceWindowPRU
-	CoincidenceWindowPRU=static_cast<long long int>(1.0*HistPeriodicityAux);
-
+	CoincidenceWindowPRU=static_cast<long long int>(1.5*HistPeriodicityAux);
 	// Full coincidence in time (currently deactivated in channel)
 	// since synchronizaton with periodic pattern can turn into one channel adjusting to the lower side and the other to the higher side (in terms of time). Hence, watch out!
 	for (int i = 0; i < (QuadNumChGroups-1); i++) {
