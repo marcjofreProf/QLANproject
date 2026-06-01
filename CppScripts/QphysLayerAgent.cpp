@@ -1226,7 +1226,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 						  if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
 						  	ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[iQuadChIter][i]));// Maps the offset correction for the different channels to detect a specific state								
 						  	SmallOffsetDriftArrayAux[i]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
-								CheckChOffsetCorrectionArray[ChOffsetCorrection][CheckChOffsetCorrectionIter[ChOffsetCorrection]]=SmallOffsetDriftArrayAux[i];
+								CheckChOffsetCorrectionArray[ChOffsetCorrection][CheckChOffsetCorrectionIter[ChOffsetCorrection]]=(((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//SmallOffsetDriftArrayAux[i];
 								CheckChOffsetCorrectionIter[ChOffsetCorrection]++;								
 						  }
 						  else{// When NOT using histogram analysis
