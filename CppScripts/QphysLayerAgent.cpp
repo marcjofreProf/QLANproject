@@ -1226,7 +1226,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 						  if (LLIMultFactorEffSynchPeriod==4){// When using histogram analysis
 						  	ChOffsetCorrection=static_cast<long long int>(BitPositionChannelTags(ChannelTags[iQuadChIter][i]));// Maps the offset correction for the different channels to detect a specific state								
 						  	SmallOffsetDriftArrayAux[i]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
-								CheckChOffsetCorrectionArray[ChOffsetCorrection][CheckChOffsetCorrectionIter[ChOffsetCorrection]]=(((static_cast<long long int>(TimeTaggs[iQuadChIter][i])-ChOffsetCorrection*LLIHistPeriodicityAux)-SmallOffsetDriftPerLinkCurrentSpecificLinkReferencePointSmallOffsetDriftPerLinkCurrentSpecificLink))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux);//SmallOffsetDriftArrayAux[i];
+								CheckChOffsetCorrectionArray[ChOffsetCorrection][CheckChOffsetCorrectionIter[ChOffsetCorrection]]=SmallOffsetDriftArrayAux[i];
 								CheckChOffsetCorrectionIter[ChOffsetCorrection]++;								
 						  }
 						  else{// When NOT using histogram analysis
@@ -1263,8 +1263,8 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 					  SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
 					  // For each independent channel
 					  for (unsigned int i=0;i<4;i++){
-					  	if (CheckChOffsetCorrectionIter[i]>0){
-					  		IndependentSmallOffsetDriftAux[i]=LLIMeanFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i]));
+					  	if (CheckChOffsetCorrectionIter[i]>0){					  		
+					  		IndependentSmallOffsetDriftAux[i]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+LLIMeanFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i])))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
 					  	}
 					  }
 					  //SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));// To avoid glitches//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
@@ -1728,7 +1728,7 @@ long long int QPLA::BitPositionChannelTags(unsigned long long int ChannelTagsPos
 	//}
 	//return BitPosAux;
 	//return static_cast<long long int>(ChannelTagsPosAux);
-	// TAble-based decoding for faster execution
+	// Table-based decoding for faster execution
 	if (0x0001==ChannelTagsPosAux or 0x0010==ChannelTagsPosAux or 0x0100==ChannelTagsPosAux or 0x1000==ChannelTagsPosAux){
 		return static_cast<long long int>(0);
 	}
