@@ -348,6 +348,8 @@ return 0; // All Ok
 
 int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char* IPaddressesSocketsLocal,char* IPSocketsList) {    
 	struct sockaddr_in address;
+	memset(&address, 0, sizeof(address));
+
 	int opt = 1;
     // Creating socket file descriptor
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
@@ -356,6 +358,8 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
 	if (string(SOCKtype)=="SOCK_DGRAM"){socket_fd = socket(AF_INET, SOCK_DGRAM, 0);}
 	else {socket_fd = socket(AF_INET, SOCK_STREAM, 0);}
 	if (socket_fd < 0) {
+		close(socket_fd);
+		socket_fd = -1;
 		cout << "Client Socket creation error" << endl;
 		return -1;
 	}
@@ -366,7 +370,16 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     //this->SocketCheckForceShutDown(socket_fd); Not used
 
     // Specifying some options to the port
-	if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt,sizeof(opt))) {
+	if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEADDR, &opt,sizeof(opt))) {
+		close(socket_fd);
+		socket_fd = -1;
+		cout << "Server attaching socket options failed" << endl;
+		return -1;
+	}
+
+	if (setsockopt(socket_fd, SOL_SOCKET,SO_REUSEPORT, &opt,sizeof(opt))) {
+		close(socket_fd);
+		socket_fd = -1;
 		cout << "Server attaching socket options failed" << endl;
 		return -1;
 	}
@@ -380,6 +393,8 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
 
     // Forcefully attaching socket to the port
     if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
+    	close(socket_fd);
+    	socket_fd = -1;
     	cout << "Client socket bind failed" << endl;
     	return -1;
     }
@@ -388,6 +403,8 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     if (string(SOCKtype)=="SOCK_STREAM"){	 
 	    // Convert IPv4 and IPv6 addresses from text to binary form
     	if (inet_pton(AF_INET, IPaddressesSockets, &address.sin_addr)<= 0) {
+    		close(socket_fd);
+    		socket_fd = -1;
     		cout << "Invalid address / Address not supported" << endl;
     		return -1;
     	}
@@ -395,6 +412,8 @@ int QTLAH::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
 
     	int status= connect(socket_fd, (struct sockaddr*)&address,sizeof(address));
     	if (status< 0) {
+    		close(socket_fd);
+    		socket_fd = -1;
     		cout << "Client Connection Failed" << endl;
     		return -1;
     	}
