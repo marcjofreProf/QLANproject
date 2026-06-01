@@ -1264,7 +1264,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 					  // For each independent channel
 					  for (unsigned int i=0;i<4;i++){
 					  	if (CheckChOffsetCorrectionIter[i]>0){					  		
-					  		IndependentSmallOffsetDriftAux[i]=(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux+LLIMeanFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i])))%(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityAux)-(LLIMultFactorEffSynchPeriod*LLIHistPeriodicityHalfAux);
+					  		IndependentSmallOffsetDriftAux[i]=LLIMeanFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i]));
 					  	}
 					  }
 					  //SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));// To avoid glitches//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
