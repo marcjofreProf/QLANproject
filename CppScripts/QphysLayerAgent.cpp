@@ -1267,7 +1267,7 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 					  for (unsigned int i=0;i<4;i++){
 					  	if (CheckChOffsetCorrectionIter[i]>0){					  		
 					  		IndependentSmallOffsetDriftAux[i]=LLIMeanFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i]));
-					  		cout << "QPLA::IndependentSmallOffsetDriftAux[i]: " << IndependentSmallOffsetDriftAux[i] << endl; // To be commented out
+					  		cout << "QPLA::IndependentSmallOffsetDriftAux["<<i<<"]: " << IndependentSmallOffsetDriftAux[i] << endl; // To be commented out
 					  	}
 					  }
 					  //SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));// To avoid glitches//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging

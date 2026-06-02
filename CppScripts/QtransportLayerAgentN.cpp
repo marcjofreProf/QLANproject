@@ -331,6 +331,7 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     // AF_INET: (domain) communicating between processes on different hosts connected by IPV4
     // type: SOCK_STREAM: TCP(reliable, connection oriented) // ( SOCK_STREAM for TCP / SOCK_DGRAM for UDP ) 
     // Protocol value for Internet Protocol(IP), which is 0 
+    if (socket_fd >= 0) { close(socket_fd);}
 	if (string(SOCKtype)=="SOCK_DGRAM"){socket_fd = socket(AF_INET, SOCK_DGRAM, 0);}
 	else {socket_fd = socket(AF_INET, SOCK_STREAM, 0);}
 	if (socket_fd < 0) {
@@ -366,7 +367,7 @@ int QTLAN::ICPmanagementOpenClient(int& socket_fd,char* IPaddressesSockets,char*
     else{address.sin_addr.s_addr = inet_addr(IPaddressesSocketsLocal);address.sin_port = htons(PORT);}// Since we have the info, it is better to specify, instead of INADDR_ANY;
     
     // Forcefully attaching socket to the port
-    if (bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
+    if (string(SOCKtype)=="SOCK_DGRAM" && bind(socket_fd, (struct sockaddr*)&address,sizeof(address))< 0) {
     	close(socket_fd);
     	socket_fd = -1;
     	cout << "Client socket bind failed" << endl;
