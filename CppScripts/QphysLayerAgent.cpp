@@ -1552,7 +1552,12 @@ if (SimulateNumStoredQubitsNodeAux>1){
           }
       }
   }
-  TimeTaggsDetAnalytics[4]=TimeTaggsDetAnalytics[4]/CoincidenceCountAux; // Normalization to the coincidences
+  if (CoincidenceCountAux>0.0){
+  	TimeTaggsDetAnalytics[4]=TimeTaggsDetAnalytics[4]/CoincidenceCountAux; // Normalization to the coincidences
+  }
+  else{
+  	TimeTaggsDetAnalytics[4]=0.0;
+  }
 
   // Individual quad channels analysis
 	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
