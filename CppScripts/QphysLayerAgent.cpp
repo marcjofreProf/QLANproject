@@ -1262,9 +1262,11 @@ int QPLA::SmallDriftContinuousCorrection(char* CurrentEmitReceiveHostIPaux){// E
 						}
 					  SmallOffsetDriftAux=LLIMeanFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
 					  // For each independent channel
+					  cout << "QPLA::SmallOffsetDriftAux" << SmallOffsetDriftAux << endl; // To be commented out
 					  for (unsigned int i=0;i<4;i++){
 					  	if (CheckChOffsetCorrectionIter[i]>0){					  		
 					  		IndependentSmallOffsetDriftAux[i]=LLIMeanFilterSubArray(CheckChOffsetCorrectionArray[i],static_cast<int>(CheckChOffsetCorrectionIter[i]));
+					  		cout << "QPLA::IndependentSmallOffsetDriftAux[i]" << IndependentSmallOffsetDriftAux[i] << endl; // To be commented out
 					  	}
 					  }
 					  //SmallOffsetDriftAux=LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter]));// To avoid glitches//LLIMedianFilterSubArray(SmallOffsetDriftArrayAux,static_cast<int>(RawTotalCurrentNumRecordsQuadCh[iQuadChIter])); // Median averaging
@@ -1534,17 +1536,22 @@ if (SimulateNumStoredQubitsNodeAux>1){
 	CoincidenceWindowPRU=static_cast<long long int>(0.5*HistPeriodicityAux);
 	// Full coincidence in time (currently deactivated in channel)
 	// since synchronizaton with periodic pattern can turn into one channel adjusting to the lower side and the other to the higher side (in terms of time). Hence, watch out!
+	double CoincidenceCountAux=0.0;
 	for (int i = 0; i < (QuadNumChGroups-1); i++) {
       for (int j = i+1; j < (QuadNumChGroups); j++) {
           for (unsigned int k = 0; k < RawTotalCurrentNumRecordsQuadCh[i]; k++){
             	for (unsigned int l = 0; l < RawTotalCurrentNumRecordsQuadCh[j]; l++){
 	                if (abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l]))<CoincidenceWindowPRU and TimeTaggs[i][k]!=0 and TimeTaggs[j][l]!=0){// and ((BitPositionChannelTags(ChannelTags[i][k]))==(BitPositionChannelTags(ChannelTags[j][l])))){
+	                	if ((BitPositionChannelTags(ChannelTags[i][k]))==(BitPositionChannelTags(ChannelTags[j][l]))){
 	                    TimeTaggsDetAnalytics[4]+=1.0;; // Repetition found
+	                	}
+	                	CoincidenceCountAux++;
 	                }
               }
           }
       }
   }
+  TimeTaggsDetAnalytics[4]=TimeTaggsDetAnalytics[4]/CoincidenceCountAux; // Normalization to the coincidences
 
   // Individual quad channels analysis
 	for(int iQuadChIter=0;iQuadChIter<QuadNumChGroups;iQuadChIter++){
