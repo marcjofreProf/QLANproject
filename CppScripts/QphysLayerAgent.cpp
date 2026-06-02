@@ -1534,7 +1534,7 @@ if (SimulateNumStoredQubitsNodeAux>1){
 	//	}
 	//}
 	// Update value ofCoincidenceWindowPRU
-	CoincidenceWindowPRU=static_cast<long long int>(0.5*HistPeriodicityAux);
+	CoincidenceWindowPRU=static_cast<long long int>(0.25*HistPeriodicityAux);
 	// Full coincidence in time (currently deactivated in channel)
 	// since synchronizaton with periodic pattern can turn into one channel adjusting to the lower side and the other to the higher side (in terms of time). Hence, watch out!
 	double CoincidenceCountAux=0.0;
@@ -1544,9 +1544,9 @@ if (SimulateNumStoredQubitsNodeAux>1){
             	for (unsigned int l = 0; l < RawTotalCurrentNumRecordsQuadCh[j]; l++){
 	                if (abs(static_cast<long long int>(TimeTaggs[i][k]) - static_cast<long long int>(TimeTaggs[j][l]))<CoincidenceWindowPRU and TimeTaggs[i][k]!=0 and TimeTaggs[j][l]!=0){// and ((BitPositionChannelTags(ChannelTags[i][k]))==(BitPositionChannelTags(ChannelTags[j][l])))){
 	                	if ((BitPositionChannelTags(ChannelTags[i][k]))==(BitPositionChannelTags(ChannelTags[j][l]))){
-	                    TimeTaggsDetAnalytics[4]+=1.0;; // Repetition found
+	                    TimeTaggsDetAnalytics[4]+=1.0; // Channel coincidence found
 	                	}
-	                	CoincidenceCountAux++;
+	                	CoincidenceCountAux++; // Overall coincidences
 	                }
               }
           }

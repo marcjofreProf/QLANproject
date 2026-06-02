@@ -117,7 +117,7 @@ INITIATIONS:// This is only run once
 	MOV		r4, RECORDS // This will be the loop counter to read the entire set of data
 	// Initializations for faster execution
 	LDI		r7, 0 // Register for clearing other registers
-	MOV		r11, 0xC000C0FF // detection mask. Bits might be moved out of position
+	MOV		r11, 0xC000C0FF // 0xC000C0FF // detection mask. Bits might be moved out of position
 	LDI		r17, 0
 	LDI		r18, 0
 	LDI		r19, 0
@@ -244,8 +244,8 @@ WAIT_FOR_EVENT: // At least dark counts will be detected so detections will happ
 PRECOINCWIN:
 	MOV		r0, r21 // Load again the value of the window length
 	// Then measure wha should be 1 (for edge detection)
-	MOV		r6.w2, r30.w0 // Consecutive red for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. TAkes a lot of time and so it is skew with respect the bits from r31
-	MOV		r6.w0, r31.w0 // Consecutive red for edge detection (bits 15, 14 and 7 to 0)
+	MOV		r6.w2, r30.w0 // Consecutive read for edge detection to read the isolated ones in the other (bits 15 and 14) - also the time to read might be larger since using PRU1 pinouts. TAkes a lot of time and so it is skew with respect the bits from r31
+	MOV		r6.w0, r31.w0 // Consecutive read for edge detection (bits 15, 14 and 7 to 0)
 	QBEQ	ENDCOINCWIN, r0, 1 // Coincides with a 1 // Jump coincidence window
 	// Implement a coincidence window, effectively increasing the window length but introduces jitter
 COINCWINLOOP:
