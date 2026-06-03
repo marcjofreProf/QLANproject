@@ -47,8 +47,10 @@ this->valueSemaphore=0; // Make sure it stays at 0
 		//ProtectionSemaphoreTrap++;
 		//if (ProtectionSemaphoreTrap>UnTrapSemaphoreValueMaxCounter){this->release();cout << "QLLA::Releasing semaphore!!!" << endl;}// Avoid trapping situations
 		if (this->valueSemaphore.compare_exchange_strong(valueSemaphoreExpected,false,std::memory_order_acquire)){	
-		break;
+			break;
 		}
+		// Yield execution to allow Python/Jupyter threads to run
+    std::this_thread::yield();
 	}
 }
  

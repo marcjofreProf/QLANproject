@@ -64,6 +64,8 @@ this->valueSemaphore=0; // Make sure it stays at 0
 		if (this->valueSemaphore.compare_exchange_strong(valueSemaphoreExpected,false,std::memory_order_acquire)){	
 			break;
 		}
+		// Yield execution to allow Python/Jupyter threads to run
+    	std::this_thread::yield();
 	}
 }
 
