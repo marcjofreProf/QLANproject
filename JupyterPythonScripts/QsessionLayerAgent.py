@@ -58,11 +58,13 @@ class QSLA:
             self.QTLAagent.WaitUntilActiveActionFreePreLock(ParamsCharArrayArg,nChararray)
         except TimeoutError as ex:
             print('QSLA::Execution time out. Restarting/Reconnecting QtransportLayerAgent agent.')
+            sys.stdout.flush() # Force Jupyter to display the print statement immediately            
             del self.QTLAagent # destruct QtransportLayerAgent agent          
+            self.QTLAagent = None # Clear the variable safely            
             # Restart/Reconnect QtransportLayerAgent agent
             self.InitAgentBelow()
             self.InitAgentProcess()
-            self.QTLAagent.WaitUntilActiveActionFreePreLock(ParamsCharArrayArg,nChararray)
+            raise ex # Raising the error here stops the cell cleanly instead of killing the kernel.
         finally:
             signal.alarm(0)  # Disable the alarm
 
