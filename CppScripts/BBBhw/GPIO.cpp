@@ -1642,7 +1642,8 @@ return 0; // All ok
 unsigned short GPIO::packBits(unsigned short value) {
     // Rearrange the lower two bytes so that they are correctly splitted for each quad group channel. For each group of 4 bits the order does not follow an arranged order for channel detectors
     // There is something weird still with this quadChannel bit decoding
-    unsigned short byte0aux = ((value & 0x0080) >> 7) | ((value & 0x0008) >> 3) | ((value & 0x0010) >> 4) | ((value & 0x0040) >> 5) | ((value & 0x0002) << 1) | ((value & 0x0020) >> 2) ; // quadChannel 0 // Are the bits 0x0072, moved to 0x000F
+    //unsigned short byte0aux = ((value & 0x0080) >> 7) | ((value & 0x0008) >> 3) | ((value & 0x0010) >> 4) | ((value & 0x0040) >> 5) | ((value & 0x0002) << 1) | ((value & 0x0020) >> 2) ; // quadChannel 0 // Are the bits 0x0072, moved to 0x000F
+    unsigned short byte0aux = ((value & 0x0080) >> 7) | ((value & 0x0008) >> 3) | ((value & 0x0040) >> 5) | ((value & 0x0002) << 1) | ((value & 0x0020) >> 2) ; // quadChannel 0 // Are the bits 0x0072, moved to 0x000F
     //unsigned short byte0aux = ((value & 0x0080) >> 7) | ((value & 0x0040) >> 5) | ((value & 0x0002) << 1) | ((value & 0x0020) >> 2) ; // quadChannel 0 // Are the bits 0x00E2, moved to 0x000F
     unsigned short byte1aux = ((value & 0x8000) >> 11) | ((value & 0x0001) << 5) | ((value & 0x4000) >> 8) | ((value & 0x0004) << 5); // quadChannel 1 // Are the bits 0x0C05, moved to 0x00F0
         
