@@ -64,7 +64,8 @@ class QSLA:
             # Restart/Reconnect QtransportLayerAgent agent
             self.InitAgentBelow()
             self.InitAgentProcess()
-            raise ex # Raising the error here stops the cell cleanly instead of killing the kernel.
+            #raise ex # Raising the error here stops the cell cleanly instead of killing the kernel.
+            self.QTLAagent.WaitUntilActiveActionFreePreLock(ParamsCharArrayArg,nChararray) # Try again
         finally:
             signal.alarm(0)  # Disable the alarm
 
