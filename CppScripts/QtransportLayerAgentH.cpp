@@ -1427,7 +1427,7 @@ while(this->SimulateRetrieveNumStoredQubitsNodeFlag==true){//Wait, only one aski
 }
 
 this->SimulateRetrieveNumStoredQubitsNodeFlag=true;
-int isValidWhileLoopCount = 10; // Number of tries If it needs more than one trial is because the sockets are not working correctly. It is best to check for open sockets and kill the processes taking hold of them
+int isValidWhileLoopCount = 50; // Number of tries If it needs more than one trial is because the sockets are not working correctly. It is best to check for open sockets and kill the processes taking hold of them
 this->InfoSimulateNumStoredQubitsNodeFlag=false; // Reset the flag
 while(isValidWhileLoopCount>0){
 	if (isValidWhileLoopCount % 10==0){// Only try to resend the message once every 10 times
